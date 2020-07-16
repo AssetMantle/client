@@ -26,11 +26,12 @@ object setACLPrivileges {
   val releaseAsset = true
 }
 
-object setACLControllerTest {
+object SetACLControllerTest {
 
   val addTraderRequest = scenario("AddTraderRequest")
     .exec(http("Add_Trader_Form_GET")
       .get(routes.SetACLController.addTraderForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Register Trader)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -41,6 +42,7 @@ object setACLControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
       ))
+      .check(status.is(200))
       .check(substring("Details submitted for organization approval").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -48,6 +50,7 @@ object setACLControllerTest {
   val organizationVerifyTrader = scenario("organizationVerifyTrader")
     .exec(http("Organization_Verify_Trader_GET")
       .get(session => routes.SetACLController.organizationVerifyTraderForm(session(Test.TEST_TRADER_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Set Trader Controls)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -75,6 +78,7 @@ object setACLControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         Test.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD)
       ))
+      .check(status.is(200))
       .check(substring("Trader Controls set successfully").exists)
     )
     .pause(Test.REQUEST_DELAY)

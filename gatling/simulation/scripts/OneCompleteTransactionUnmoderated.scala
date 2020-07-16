@@ -39,9 +39,9 @@ object IssueAssetUnmoderated {
     .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(accountControllerTest.loginScenario)
-    .exec(assetControllerTest.unmoderatedIssueAssetRequestScenario)
-    .exec(accountControllerTest.logoutScenario)
+    .exec(AccountControllerTest.loginScenario)
+    .exec(AssetControllerTest.unmoderatedIssueAssetRequestScenario)
+    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
     .exec { session => session.set(Test.TEST_ASSET_ID, getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String])) }
 }
@@ -57,10 +57,10 @@ object UnmoderatedBuyerExecuteOrder {
        }
      }*/
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(accountControllerTest.loginScenario)
-    .exec(orderControllerTest.unmoderatedBuyerExecuteOrderScenario)
+    .exec(AccountControllerTest.loginScenario)
+    .exec(OrderControllerTest.unmoderatedBuyerExecuteOrderScenario)
     .pause(10)
-    .exec(accountControllerTest.logoutScenario)
+    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
 
@@ -75,9 +75,9 @@ object UnmoderatedSellerExecuteOrder {
        }
      }*/
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(accountControllerTest.loginScenario)
-    .exec(orderControllerTest.unmoderatedSellerExecuteOrderScenario)
-    .exec(accountControllerTest.logoutScenario)
+    .exec(AccountControllerTest.loginScenario)
+    .exec(OrderControllerTest.unmoderatedSellerExecuteOrderScenario)
+    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
 

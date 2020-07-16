@@ -6,7 +6,9 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
-object SendFiatControllerTest {
+object NegativeTest {
+
+  val buyerConfirmBeforeTradeDocumentsUpload
 
   val sendFiatScenario: ScenarioBuilder = scenario("SendFiat")
     .exec(http("Send_Fiat_Form_GET")

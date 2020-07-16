@@ -11,12 +11,13 @@ import io.gatling.jdbc.Predef.jdbcFeeder
 
 import scala.util.Random
 
-object addZoneControllerTest {
+object AddZoneControllerTest {
 
   val inviteZoneScenario: ScenarioBuilder = scenario("InviteZone")
     .feed(EmailAddressFeeder.emailAddressFeed)
     .exec(http("InviteZoneForm_GET")
       .get(routes.AddZoneController.inviteZoneForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Invite Zone)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -27,6 +28,7 @@ object addZoneControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.EMAIL_ADDRESS.name -> "${%s}".format(Test.TEST_EMAIL_ADDRESS)
       ))
+      .check(status.is(200))
       .check(substring("Zone Invitation Sent").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -34,12 +36,14 @@ object addZoneControllerTest {
   val acceptZoneInviteScenario: ScenarioBuilder = scenario("AcceptZoneInvite")
     .exec { session => session.set(Test.TEST_ZONE_INVITATION_ID, getZoneInvitationToken(session(Test.TEST_EMAIL_ADDRESS).as[String])) }
     .exec(http("AcceptZoneInvite")
-      .get(session=>routes.AddZoneController.acceptInvitation(session(Test.TEST_ZONE_INVITATION_ID).as[String]).url)
+      .get(session => routes.AddZoneController.acceptInvitation(session(Test.TEST_ZONE_INVITATION_ID).as[String]).url)
+      .check(status.is(200))
     )
 
   val addZoneRequestScenario: ScenarioBuilder = scenario("AddZoneRequest")
     .exec(http("Add_Zone_Form_GET")
       .get(routes.AddZoneController.addZoneForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(%s)".format("Add Zone Details")).exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -60,6 +64,7 @@ object addZoneControllerTest {
         Form.ADDRESS_ZIP_CODE -> "${%s}".format(Test.TEST_ZIP_CODE),
         Form.ADDRESS_PHONE -> "${%s}".format(Test.TEST_PHONE)
       ))
+      .check(status.is(206))
       .check(substring("Zone KYC").exists)
       .check(css("button:contains(Upload Identification)").exists)
       .check(css("button:contains(Upload Bank Account Detail)").exists)
@@ -69,6 +74,7 @@ object addZoneControllerTest {
       feed(ImageFeeder.imageFeed)
         .exec(http("ZoneKYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_Form_GET")
           .get(session => routes.AddZoneController.userUploadZoneKYCForm(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+          .check(status.is(200))
           .check(css("button:contains(Browse)").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
@@ -83,10 +89,13 @@ object addZoneControllerTest {
             Form.RESUMABLE_IDENTIFIER -> "document",
             Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
           .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
-            .transferEncoding("binary")).asMultipartForm)
+            .transferEncoding("binary")).asMultipartForm
+          .check(status.is(200))
+        )
         .exec(
           http("Store_ZoneKYC_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
             .get(session => routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+            .check(status.is(206))
             .check(substring("Zone KYC").exists)
         )
         .pause(Test.REQUEST_DELAY)
@@ -94,6 +103,7 @@ object addZoneControllerTest {
     .pause(Test.REQUEST_DELAY)
     .exec(http("User_Review_Add_Zone_Request_Form")
       .get(routes.AddZoneController.userReviewAddZoneRequestForm().url)
+      .check(status.is(200))
       .check(css("legend:contains(Review and Submit Zone details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -104,14 +114,16 @@ object addZoneControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD)
       ))
+      .check(status.is(200))
       .check(substring("Zone details submitted for review").exists)
     )
     .pause(Test.REQUEST_DELAY)
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
-      exec(http("ZoneKYCUpdate"+"${%s}".format(Test.TEST_DOCUMENT_TYPE)+"StatusForm_GET")
-        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String],session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+      exec(http("ZoneKYCUpdate" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "StatusForm_GET")
+        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+        .check(status.is(200))
         .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
         .check(css("button:contains(Approve)").exists)
         .check(css("button:contains(Reject)").exists)
@@ -125,6 +137,7 @@ object addZoneControllerTest {
             constants.FormField.DOCUMENT_TYPE.name -> "${%s}".format(Test.TEST_DOCUMENT_TYPE),
             constants.FormField.STATUS.name -> true
           ))
+          .check(status.is(206))
           .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
           .check(css("button:contains(Reject)").exists)
         )
@@ -132,13 +145,10 @@ object addZoneControllerTest {
     }
     .exec(http("Verify_Zone_GET")
       .get(session => routes.AddZoneController.verifyZoneForm(session(Test.TEST_ZONE_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Verify Zone)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec{session=> println(session)
-      session
-
-    }
     .feed(GasFeeder.gasFeed)
     .exec(http("Verify_Zone_POST")
       .post(routes.AddZoneController.verifyZone().url)
@@ -147,7 +157,8 @@ object addZoneControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      //.check(substring("Zone approved successfully").exists)
+      .check(status.is(200))
+      .check(substring("Zone approved successfully").exists)
     )
     .pause(Test.REQUEST_DELAY)
 
@@ -155,6 +166,7 @@ object addZoneControllerTest {
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
     .exec(http("RejectVerifyZone_GET")
       .get(session => routes.AddZoneController.rejectVerifyZoneRequestForm(session(Test.TEST_ZONE_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Reject Zone Request)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
@@ -163,6 +175,7 @@ object addZoneControllerTest {
       .formParamMap(Map(
         constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Verify Zone Rejected").exists)
     )
     .pause(Test.REQUEST_DELAY)

@@ -8,12 +8,15 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import feeders.JDBCFeeder._
 
-object issueFiatControllerTest {
+object WesternUnionControllerTest {
+
+  val wurtcbSecretKey="D3M0r1c8KeyCoMd3X"
 
   val issueFiatRequestScenario: ScenarioBuilder = scenario("IssueFiatRequest")
     .feed(TransactionAmountFeeder.transactionAmountFeed)
     .exec(http("Issue_Fiat_Request_Form_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
+      .check(status.is(200))
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
     .exec(http("westernUnionPortalRedirect_POST")
@@ -28,9 +31,9 @@ object issueFiatControllerTest {
 
   val westernUnionRTCB: ScenarioBuilder = scenario("westernUnionRTCB")
     .feed(wurtcbFeeder.wurtcbFeed)
-    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiatRequest(session(Test.TEST_TRADER_ID).as[String],(session(Test.TEST_TRANSACTION_AMOUNT).as[String]+"000000"))) }
+    .exec { session => session.set(Test.TEST_EXTERNAL_REFRENCE, getRequestIDForIssueFiatRequest(session(Test.TEST_TRADER_ID).as[String],session(Test.TEST_TRANSACTION_AMOUNT).as[String].replace(".","")+"0000")) }
     .exec(session=>
-    session.set(Test.TEST_REQUEST_SIGNATURE,utilities.String.sha256Sum("D3M0r1c8KeyCoMd3X"+session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+session(Test.TEST_WU_INVOICE_NUMBER).as[String]+session(Test.TEST_BUYER_BUSINESS_ID).as[String]+session(Test.TEST_BUYER_FIRST_NAME).as[String]+session(Test.TEST_BUYER_LAST_NAME).as[String]+session(Test.TEST_CREATED_DATE).as[String]+session(Test.TEST_LAST_UPDATED_DATE).as[String]+session(Test.TEST_WU_STATUS).as[String]+session(Test.TEST_DEAL_TYPE).as[String]+session(Test.TEST_PAYMENT_TYPE_ID).as[String]+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
+    session.set(Test.TEST_REQUEST_SIGNATURE,utilities.String.sha256Sum( wurtcbSecretKey +session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+session(Test.TEST_WU_INVOICE_NUMBER).as[String]+session(Test.TEST_BUYER_BUSINESS_ID).as[String]+session(Test.TEST_BUYER_FIRST_NAME).as[String]+session(Test.TEST_BUYER_LAST_NAME).as[String]+session(Test.TEST_CREATED_DATE).as[String]+session(Test.TEST_LAST_UPDATED_DATE).as[String]+session(Test.TEST_WU_STATUS).as[String]+session(Test.TEST_DEAL_TYPE).as[String]+session(Test.TEST_PAYMENT_TYPE_ID).as[String]+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )
     .exec(http("westernUnionRTCB")
       .post(routes.WesternUnionController.westernUnionRTCB().url)
@@ -65,6 +68,8 @@ object issueFiatControllerTest {
                          |<requestSignature>"""+session(Test.TEST_REQUEST_SIGNATURE).as[String]+"""</requestSignature>
                          |
                          |</request>""")).asXml
+      .check(status.is(200))
+      .check(substring("Transaction update successful").exists)
     )
 
 

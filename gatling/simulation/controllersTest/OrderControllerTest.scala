@@ -8,11 +8,12 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef.jdbcFeeder
 
-object orderControllerTest {
+object OrderControllerTest {
 
   val moderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedBuyerExecuteOrder")
     .exec(http("ModeratedBuyerExecuteOrderForm_GET")
       .get(session => routes.OrderController.moderatedBuyerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Moderated Buyer Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -24,6 +25,7 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Buyer Order Executed").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -31,6 +33,7 @@ object orderControllerTest {
   val moderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("ModeratedSellerExecuteOrder")
     .exec(http("ModeratedSellerExecuteOrderForm_GET")
       .get(session => routes.OrderController.moderatedSellerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Moderated Seller Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -42,6 +45,7 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Seller Order Executed").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -50,6 +54,7 @@ object orderControllerTest {
     .feed(FiatProofHashFeeder.fiatProofHashFeed)
     .exec(http("UnmoderatedBuyerExecuteOrderForm_GET")
       .get(session => routes.OrderController.buyerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -62,6 +67,7 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Buyer Order Executed").exists)
     )
     .pause(Test.REQUEST_DELAY)
@@ -69,6 +75,7 @@ object orderControllerTest {
   val unmoderatedSellerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedSellerExecuteOrder")
     .exec(http("UnmoderatedSellerExecuteOrderForm_GET")
       .get(session => routes.OrderController.sellerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+      .check(status.is(200))
       .check(css("legend:contains(Execute Order)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
@@ -80,6 +87,7 @@ object orderControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
+      .check(status.is(200))
       .check(substring("Seller Order Executed").exists)
     )
     .pause(Test.REQUEST_DELAY)

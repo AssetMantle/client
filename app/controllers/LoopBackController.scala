@@ -41,6 +41,8 @@ class LoopBackController @Inject()(
                                     transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder,
                                     transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
                                     transactionsRedeemAsset: transactions.RedeemAsset,
+                                    transactionsChangePassword: transactions.ChangePassword,
+                                    transactionsForgotPassword: transactions.ForgotPassword,
                                     transactionsSendCoin: transactions.SendCoin,
                                     blockchainAccounts: blockchain.Accounts,
                                     blockchainACLAccounts: blockchain.ACLAccounts,
@@ -78,8 +80,6 @@ class LoopBackController @Inject()(
   private var fiatList = Seq[Fiat]()
   private var negotiationList = Seq[Negotiation]()
   private var orderList = Seq[Order]()
-  val x = util.hashing.MurmurHash3.stringHash("999999")
-  println(x)
 
   def transactionModeBasedResponse = transactionMode match {
     case constants.Transactions.BLOCK_MODE => Ok(Json.toJson(BlockResponse(height = Random.nextInt(99999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString, gas_wanted = "999999", gas_used = "888888", code = None)))
@@ -475,6 +475,18 @@ class LoopBackController @Inject()(
 
   def getTraderReputation(address: String): Action[AnyContent] = Action {
     Ok(Json.toJson(queries.responses.TraderReputationResponse.Response(queries.responses.TraderReputationResponse.Value(address, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), None))))
+  }
+
+  def updatePassword(username: String): Action[AnyContent] = Action {
+    implicit val responseWrites = transactionsChangePassword.responseWrites
+
+    Ok(Json.toJson(transactionsChangePassword.Response(false, constants.Response.PASSWORD_UPDATED.message)))
+  }
+
+  def forgotPassword(username: String): Action[AnyContent] = Action {
+    implicit val responseWrites = transactionsForgotPassword.responseWrites
+
+    Ok(Json.toJson(transactionsForgotPassword.Response(false, constants.Response.PASSWORD_UPDATED.message)))
   }
 
 }
