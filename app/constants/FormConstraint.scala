@@ -1,7 +1,7 @@
 package constants
 
 import play.api.data.validation._
-import views.companion.master.{IssueAsset, SignUp, PaymentTerms, ChangePassword, DocumentList}
+import views.companion.master.{IssueAsset, SignUp, PaymentTerms, ChangePassword, DocumentList, ForgotPassword}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -27,6 +27,14 @@ object FormConstraint {
     val errors = {
       if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
       else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val forgotPasswordConstraint: Constraint[ForgotPassword.Data] = Constraint("constraints.forgotPassword")({ forgotPasswordData: ForgotPassword.Data =>
+    val errors = {
+      if (forgotPasswordData.newPassword != forgotPasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
