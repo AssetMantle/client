@@ -45,7 +45,9 @@ object FormConstraint {
 
   val documentListConstraint: Constraint[DocumentList.Data] = Constraint("constraints.documentList")({ documentListData: DocumentList.Data =>
     val errors = {
-      if (documentListData.documentListCompleted && documentListData.physicalDocumentsHandledVia.isEmpty) Seq(ValidationError(constants.Response.PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED.message))
+      if (!documentListData.documentList.contains(Some(constants.File.Asset.BILL_OF_LADING))) Seq(ValidationError(constants.Response.BILL_OF_LADING_REQUIRED.message))
+      else if (!documentListData.documentList.contains(Some(constants.File.Negotiation.INVOICE))) Seq(ValidationError(constants.Response.INVOICE_REQUIRED.message))
+      else if (documentListData.documentListCompleted && documentListData.physicalDocumentsHandledVia.isEmpty) Seq(ValidationError(constants.Response.PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
