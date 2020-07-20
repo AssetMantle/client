@@ -216,6 +216,9 @@ object Response {
   val KEY_STORE_ERROR = new Failure("KEY_STORE_ERROR")
   val PRECISION_MORE_THAN_REQUIRED = new Failure("PRECISION_MORE_THAN_REQUIRED")
   val CONTENT_CONVERSION_ERROR = new Failure("CONTENT_CONVERSION_ERROR")
+  val BILL_OF_LADING_REQUIRED = new Failure("BILL_OF_LADING_REQUIRED")
+  val INVOICE_REQUIRED = new Failure("INVOICE_REQUIRED")
+
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
