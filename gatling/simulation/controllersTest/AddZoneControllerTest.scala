@@ -15,14 +15,14 @@ object AddZoneControllerTest {
 
   val inviteZoneScenario: ScenarioBuilder = scenario("InviteZone")
     .feed(EmailAddressFeeder.emailAddressFeed)
-    .exec(http("InviteZoneForm_GET")
+    .exec(http("Invite_Zone_Form_GET")
       .get(routes.AddZoneController.inviteZoneForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Invite Zone)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("InviteZone_POST")
+    .exec(http("Invite_Zone_POST")
       .post(routes.AddZoneController.inviteZone().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
@@ -35,7 +35,7 @@ object AddZoneControllerTest {
 
   val acceptZoneInviteScenario: ScenarioBuilder = scenario("AcceptZoneInvite")
     .exec { session => session.set(Test.TEST_ZONE_INVITATION_ID, getZoneInvitationToken(session(Test.TEST_EMAIL_ADDRESS).as[String])) }
-    .exec(http("AcceptZoneInvite")
+    .exec(http("Accept_Zone_Invite")
       .get(session => routes.AddZoneController.acceptInvitation(session(Test.TEST_ZONE_INVITATION_ID).as[String]).url)
       .check(status.is(200))
     )
@@ -72,14 +72,14 @@ object AddZoneControllerTest {
     .pause(Test.REQUEST_DELAY)
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
       feed(ImageFeeder.imageFeed)
-        .exec(http("ZoneKYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_Form_GET")
+        .exec(http("Zone_KYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_Form_GET")
           .get(session => routes.AddZoneController.userUploadZoneKYCForm(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
           .check(status.is(200))
           .check(css("button:contains(Browse)").exists)
           .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
         )
         .pause(Test.REQUEST_DELAY)
-        .exec(http("ZoneKYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+        .exec(http("Zone_KYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
           .post(session => routes.AddZoneController.userUploadZoneKYC(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
           .formParamMap(Map(
             Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
@@ -93,7 +93,7 @@ object AddZoneControllerTest {
           .check(status.is(200))
         )
         .exec(
-          http("Store_ZoneKYC_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+          http("Store_Zone_KYC_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
             .get(session => routes.AddZoneController.userStoreZoneKYC(session(Test.TEST_FILE_NAME).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
             .check(status.is(206))
             .check(substring("Zone KYC").exists)
@@ -121,7 +121,7 @@ object AddZoneControllerTest {
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
     .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
-      exec(http("ZoneKYCUpdate" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "StatusForm_GET")
+      exec(http("Zone_KYC_Update" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "StatusForm_GET")
         .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
         .check(status.is(200))
         .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
@@ -143,7 +143,7 @@ object AddZoneControllerTest {
         )
         .pause(Test.REQUEST_DELAY)
     }
-    .exec(http("Verify_Zone_GET")
+    .exec(http("Verify_Zone_Form_GET")
       .get(session => routes.AddZoneController.verifyZoneForm(session(Test.TEST_ZONE_ID).as[String]).url)
       .check(status.is(200))
       .check(css("legend:contains(Verify Zone)").exists)
@@ -164,13 +164,37 @@ object AddZoneControllerTest {
 
 
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
-    .exec(http("RejectVerifyZone_GET")
+    .foreach(constants.File.ZONE_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
+      exec(http("Zone_KYC_Update" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "StatusForm_GET")
+        .get(session => routes.AddZoneController.updateZoneKYCDocumentStatusForm(session(Test.TEST_ZONE_ID).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+        .check(status.is(200))
+        .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
+        .check(css("button:contains(Approve)").exists)
+        .check(css("button:contains(Reject)").exists)
+        .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
+        .pause(Test.REQUEST_DELAY)
+        .exec(http("Zone_KYC_update_Status_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+          .post(routes.AddZoneController.updateZoneKYCDocumentStatus().url)
+          .formParamMap(Map(
+            Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+            constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),
+            constants.FormField.DOCUMENT_TYPE.name -> "${%s}".format(Test.TEST_DOCUMENT_TYPE),
+            constants.FormField.STATUS.name -> false
+          ))
+          .check(status.is(206))
+          .check(css("[id=%s]".format(constants.FormField.ZONE_ID.name), "value").is("${%s}".format(Test.TEST_ZONE_ID)))
+          .check(css("button:contains(Approve)").exists)
+          .check(css("button:contains(Reject)").notExists)
+        )
+        .pause(Test.REQUEST_DELAY)
+    }
+    .exec(http("Reject_Verify_Zone_Form_GET")
       .get(session => routes.AddZoneController.rejectVerifyZoneRequestForm(session(Test.TEST_ZONE_ID).as[String]).url)
       .check(status.is(200))
       .check(css("legend:contains(Reject Zone Request)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("RejectVerifyZone_POST")
+    .exec(http("Reject_VerifyZ_one_POST")
       .post(routes.AddZoneController.rejectVerifyZoneRequest().url)
       .formParamMap(Map(
         constants.FormField.ZONE_ID.name -> "${%s}".format(Test.TEST_ZONE_ID),

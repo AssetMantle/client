@@ -29,6 +29,6 @@ class RejectZone extends Simulation {
     .exec(AddZoneControllerTest.rejectVerifyZoneScenario)
 
   setUp(
-    forgotPasswordScenario.inject(atOnceUsers(1))
+    forgotPasswordScenario.inject(rampUsers(10) during 10)
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

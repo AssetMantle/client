@@ -655,5 +655,6 @@ POST        /loopback/sendFiat                                                  
 POST        /loopback/buyerExecuteOrder                                                           controllers.LoopBackController.buyerExecuteOrder
 POST        /loopback/sellerExecuteOrder                                                          controllers.LoopBackController.sellerExecuteOrder
 POST        /loopback/redeemAsset                                                                 controllers.LoopBackController.redeemAsset
+POST        /loopback/redeemFiat                                                                  controllers.LoopBackController.redeemFiat
 POST        /loopback/updatePassword/:username                                                    controllers.LoopBackController.updatePassword(username: String)
 POST        /loopback/forgotPassword/:username                                                    controllers.LoopBackController.forgotPassword(username: String)

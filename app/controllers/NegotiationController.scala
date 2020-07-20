@@ -82,7 +82,6 @@ class NegotiationController @Inject()(
     implicit request =>
       views.companion.master.NegotiationRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          println(formWithErrors.data)
           val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
@@ -105,7 +104,6 @@ class NegotiationController @Inject()(
           }
         },
         requestData => {
-          println(requestData)
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val asset: Future[Asset] = masterAssets.Service.tryGet(id = requestData.assetID)
 

@@ -124,11 +124,9 @@ class AssetController @Inject()(
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          println("issueassetformWithErrorsData--"+formWithErrors.data)
           Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
         },
         issueAssetData => {
-          println("issueAssetData--"+issueAssetData)
           (loginState.acl match {
             case Some(acl) => {
               if (acl.issueAsset) {

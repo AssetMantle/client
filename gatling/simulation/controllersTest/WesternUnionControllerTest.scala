@@ -19,7 +19,7 @@ object WesternUnionControllerTest {
       .check(status.is(200))
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("westernUnionPortalRedirect_POST")
+    .exec(http("western_Union_Portal_Redirect_POST")
       .post(routes.WesternUnionController.westernUnionPortalRedirect().url)
       .formParamMap(Map(
         constants.FormField.TRANSACTION_AMOUNT.name -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
@@ -35,7 +35,7 @@ object WesternUnionControllerTest {
     .exec(session=>
     session.set(Test.TEST_REQUEST_SIGNATURE,utilities.String.sha256Sum( wurtcbSecretKey +session(Test.TEST_ID).as[String]+session(Test.TEST_REFRENCE).as[String]+session(Test.TEST_EXTERNAL_REFRENCE).as[String]+session(Test.TEST_WU_INVOICE_NUMBER).as[String]+session(Test.TEST_BUYER_BUSINESS_ID).as[String]+session(Test.TEST_BUYER_FIRST_NAME).as[String]+session(Test.TEST_BUYER_LAST_NAME).as[String]+session(Test.TEST_CREATED_DATE).as[String]+session(Test.TEST_LAST_UPDATED_DATE).as[String]+session(Test.TEST_WU_STATUS).as[String]+session(Test.TEST_DEAL_TYPE).as[String]+session(Test.TEST_PAYMENT_TYPE_ID).as[String]+session(Test.TEST_TRANSACTION_AMOUNT).as[String]))
     )
-    .exec(http("westernUnionRTCB")
+    .exec(http("western_Union_RTCB")
       .post(routes.WesternUnionController.westernUnionRTCB().url)
       .body(StringBody(session=>s"""<request>
                          |

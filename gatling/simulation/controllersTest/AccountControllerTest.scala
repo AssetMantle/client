@@ -11,14 +11,14 @@ import io.gatling.jdbc.Predef.jdbcFeeder
 object AccountControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
-    .exec(http("SignUp_GET")
+    .exec(http("Sign_Up_GET")
       .get(routes.AccountController.signUpForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Register)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("SignUp_POST")
+    .exec(http("Sign_Up_POST")
       .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
         constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
@@ -30,7 +30,7 @@ object AccountControllerTest {
       .check(css("legend:contains(Blockchain Passphrase)").exists)
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("CreateWallet_GET")
+    .exec(http("Create_Wallet_Form_GET")
       .get(session => routes.AccountController.createWalletForm(session(Test.TEST_USERNAME).as[String]).url)
       .check(css("legend:contains(Blockchain Passphrase)").exists)
       .check(status.is(200))
@@ -38,7 +38,7 @@ object AccountControllerTest {
       .check(css("[name=%s]".format(Test.MNEMONICS), "value").saveAs(Test.MNEMONICS))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("CreateWallet_POST")
+    .exec(http("Create_Wallet_POST")
       .post(routes.AccountController.createWallet().url)
       .formParamMap(Map(
         constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
@@ -51,7 +51,7 @@ object AccountControllerTest {
     .pause(Test.REQUEST_DELAY)
 
   val loginScenario: ScenarioBuilder = scenario("Login")
-    .exec(http("LoginForm_GET")
+    .exec(http("Login_Form_GET")
       .get(routes.AccountController.loginForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Login)").exists)
@@ -76,7 +76,7 @@ object AccountControllerTest {
 
   val loginMain: ScenarioBuilder = scenario("LoginMain")
     .feed(GenesisFeeder.genesisFeed)
-    .exec(http("LoginForm_GET")
+    .exec(http("Login_Form_GET")
       .get(routes.AccountController.loginForm().url)
       .check(status.is(200))
       .check(css("legend:contains(%s)".format("Login")).exists)
@@ -95,6 +95,7 @@ object AccountControllerTest {
       .check(substring("Trades").exists)
       .check(substring("Transactions").exists)
       .check(substring("Account").exists)
+
     )
     .pause(Test.REQUEST_DELAY)
 
@@ -127,7 +128,7 @@ object AccountControllerTest {
     .feed(AddressDataFeeder.addressDataFeed)
     .feed(DateFeeder.dateFeed)
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddIdentification_Post")
+    .exec(http("Add_Identification_Post")
       .post(routes.AccountController.addIdentification().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
@@ -149,7 +150,7 @@ object AccountControllerTest {
       .check(css("button:contains(Upload Identification)").exists)
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("UploadIdentificationForm")
+    .exec(http("Upload_Identification_Form")
       .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
       .check(status.is(200))
       .check(css("button:contains(Browse)").exists)
@@ -157,7 +158,7 @@ object AccountControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
     .feed(ImageFeeder.imageFeed)
-    .exec(http("IdentificationUpload")
+    .exec(http("Identification_Upload")
       .post(routes.FileController.uploadAccountKYC("IDENTIFICATION").url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
@@ -178,14 +179,14 @@ object AccountControllerTest {
         .check(css("button:contains(Update Identification)").exists)
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("ReviewIdentificationForm_GET")
+    .exec(http("Review_Identification_Form_GET")
       .get(routes.AccountController.userReviewIdentificationForm().url)
       .check(status.is(200))
       .check(css("legend:contains(User Review Identification)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("ReviewIdentification_POST")
+    .exec(http("Review_Identification_POST")
       .post(routes.AccountController.userReviewIdentification().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),

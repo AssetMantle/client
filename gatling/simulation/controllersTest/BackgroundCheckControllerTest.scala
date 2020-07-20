@@ -76,7 +76,7 @@ object BackgroundCheckControllerTest {
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddAssetMemberCheck_POST")
+    .exec(http("Add_Asset_Member_Check_POST")
       .post(routes.BackgroundCheckController.addAssetMemberCheck().url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),

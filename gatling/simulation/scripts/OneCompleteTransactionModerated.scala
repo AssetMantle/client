@@ -10,7 +10,7 @@ import io.gatling.http.Predef._
 class OneCompleteTransactionModerated extends Simulation {
 
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
-   .exec(CreateZone.createZone)
+    .exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
@@ -29,11 +29,11 @@ class OneCompleteTransactionModerated extends Simulation {
     .exec(SendAsset.sendAsset)
     .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
     .exec(RedeemAsset.redeemAsset)
-      .exec(RedeemFiat.redeemFiat)
+    .exec(RedeemFiat.redeemFiat)
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+    oneCompleteModeratedScenario.inject(atOnceUsers(10))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -209,12 +209,13 @@ object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
     /* .exec(session => session.set(Test.TEST_ZONE_USERNAME, "ZONE10qr6Ecmuq").set(Test.TEST_ZONE_PASSWORD,"123123123"))
-    */ /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10cEUVnPV9").set(Test.TEST_SELLER_PASSWORD,"SELL10cEUVnPV9"))
-     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY123TFjb7iV").set(Test.TEST_BUYER_PASSWORD, "BUY123TFjb7iV"))
-     .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
+    */
+    /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10cEUVnPV9").set(Test.TEST_SELLER_PASSWORD,"SELL10cEUVnPV9"))
+        .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY123TFjb7iV").set(Test.TEST_BUYER_PASSWORD, "BUY123TFjb7iV"))
+        .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
+        .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
+    /* .feed(BuyerFeeder.buyerFeed)
      .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
-   /* .feed(BuyerFeeder.buyerFeed)
-    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec { session => session.set(Test.TEST_TRADER_ID, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
@@ -228,7 +229,7 @@ object IssueFiat {
 object IssueAssetModerated {
 
   val issueAssetModerated = scenario("IssueAssetModerated")
-   //prasasffds .feed(GasFeeder.gasFeed)
+    //prasasffds .feed(GasFeeder.gasFeed)
     /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10DIkHxyDY").set(Test.TEST_SELLER_PASSWORD,"SELL10DIkHxyDY"))
     .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10U2EUMEJN").set(Test.TEST_BUYER_PASSWORD, "BUY10U2EUMEJN"))
     .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
@@ -290,7 +291,7 @@ object AcceptBillOfLading {
   val acceptBillOfLading = scenario("AcceptBillOfLading")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
-    .exec(AssetControllerTest.acceptBillOfLading)
+    .exec(AssetControllerTest.updateBillOfLadingStatus(true))
     .exec(AccountControllerTest.logoutScenario)
 }
 
@@ -299,7 +300,7 @@ object BuyerConfirmNegotiation {
   val buyerConfirmNegotiation = scenario("BuyerConfirmNegotiation")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
-    .exec(NegotiationControllerTest.buyerConfirmNegotiation)
+    .exec(NegotiationControllerTest.buyerConfirmNegotiation(constants.Test.PRECONDITIONS_SATISFIED))
     .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
@@ -347,7 +348,7 @@ object SendAsset {
   val sendAsset = scenario("SendAsset")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
-    .exec(AssetControllerTest.sendAsset)
+    .exec(AssetControllerTest.sendAsset(constants.Test.PRECONDITIONS_SATISFIED))
     .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }

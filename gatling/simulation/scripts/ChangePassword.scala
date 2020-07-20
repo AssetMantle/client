@@ -10,7 +10,7 @@ import io.gatling.http.Predef._
 class ChangePassword extends Simulation {
 
   setUp(
-    changePassword.changePasswordScenario.inject(atOnceUsers(1))
+    changePassword.changePasswordScenario.inject(atOnceUsers(10))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 

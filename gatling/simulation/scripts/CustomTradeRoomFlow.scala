@@ -24,14 +24,22 @@ class CustomTradeRoomFlow extends Simulation {
     .exec(AcceptSalesQuote.acceptSalesQuote)
     .exec(UpdateTradeTerms.updateTradeTermsScenario)
     .exec(AcceptAllTerms.acceptAllTradeTerms)
-      .exec(UploadTradeDocuments.uploadTradeDocuments)
-      .exec(RejectBillOfLading.rejectBillOfLading)
-      .exec(UpdateTradeDocuments.updateTradeDocuments)
-      .exec(AcceptBillOfLading.acceptBillOfLading)
+    .exec(UploadTradeDocuments.uploadTradeDocuments)
+    .exec(RejectBillOfLading.rejectBillOfLading)
+    .exec(UpdateTradeDocuments.updateTradeDocuments)
+    .exec(AcceptBillOfLading.acceptBillOfLading)
+    .exec(BuyerConfirmNegotiation.buyerConfirmNegotiation)
+    .exec(SellerConfirmNegotiation.sellerConfirmNegotiation)
+    .exec(VesselCheckAndReleaseAsset.vesselCheckAndReleaseAsset)
+    .exec(SendFiat.sendFiat)
+    .exec(SendAsset.sendAsset)
+    .exec(ModeratedBuyerAndSellerExecuteOrder.moderatedBuyerAndSellerExecuteOrder)
+    .exec(RedeemAsset.redeemAsset)
+    .exec(RedeemFiat.redeemFiat)
 
 
   setUp(
-    passwordMismatch.mismatchPasswordScenario.inject(atOnceUsers(1))
+    customFlow.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -106,9 +114,9 @@ object AcceptAllTerms {
     .exec(AccountControllerTest.logoutScenario)
 }
 
-object UploadTradeDocuments{
+object UploadTradeDocuments {
 
-  val uploadTradeDocuments=scenario("UploadTradeDocuments")
+  val uploadTradeDocuments = scenario("UploadTradeDocuments")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(NegotiationControllerTest.uploadContract)
@@ -124,18 +132,18 @@ object UploadTradeDocuments{
 
 }
 
-object RejectBillOfLading{
+object RejectBillOfLading {
 
-  val rejectBillOfLading=scenario("RejectBillOfLading")
+  val rejectBillOfLading = scenario("RejectBillOfLading")
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
-    .exec(AssetControllerTest.rejectBillOfLading)
+    .exec(AssetControllerTest.updateBillOfLadingStatus(false))
     .exec(AccountControllerTest.logoutScenario)
 }
 
-object UpdateTradeDocuments{
+object UpdateTradeDocuments {
 
-  val updateTradeDocuments=scenario("updateTradeDocuments")
+  val updateTradeDocuments = scenario("updateTradeDocuments")
     .exec(AssetControllerTest.updateAssetDocuments)
     .exec(AssetControllerTest.addBillOfLading)
     .exec(NegotiationControllerTest.updateNegotiationDocuments)
@@ -143,6 +151,8 @@ object UpdateTradeDocuments{
     .exec(AccountControllerTest.logoutScenario)
 
 }
+
+
 
 
 

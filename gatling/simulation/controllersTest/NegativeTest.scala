@@ -8,7 +8,14 @@ import io.gatling.http.Predef._
 
 object NegativeTest {
 
-  val buyerConfirmBeforeTradeDocumentsUpload
+  /*object buyerConfirmBeforeTradeDocumentsUpload{
+
+    val
+
+}
+
+  val buyerConfirmBeforeTradeDocumentsUpload: ScenarioBuilder = scenario("SendFiat")
+    .*/
 
   val sendFiatScenario: ScenarioBuilder = scenario("SendFiat")
     .exec(http("Send_Fiat_Form_GET")

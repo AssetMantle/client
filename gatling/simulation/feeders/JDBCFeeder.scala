@@ -20,7 +20,7 @@ object JDBCFeeder {
 
   def getUBOID(organizationID: String, firstName: String, lastName: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://" + Test.TEST_IP + ":5432/commit", "commit", "commit",
-      s"""SELECT COALESCE((SELECT "id" FROM master."OrganizationUBO" WHERE "organizationID" = '$organizationID' AND "firstName" = '$firstName' AND "lastName" = '$lastName'),'0') AS "id";""")
+      s"""SELECT COALESCE((SELECT "id" FROM master."OrganizationUBO" WHERE "organizationID" = '$organizationID' AND "firstName" = '$firstName' AND "lastName" = '$lastName' FETCH FIRST ROW ONLY),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 

@@ -9,7 +9,7 @@ import io.gatling.http.Predef._
 
 class RejectOrganization extends Simulation {
 
-  val zoneUsername = ""
+  val zoneUsername = "ZONE10U3ZpnZBo"
   val zonePassword = "123123123"
 
   val rejectOrganizationScenario = scenario("RejectOrganization")
@@ -30,9 +30,8 @@ class RejectOrganization extends Simulation {
     .exec { session => session.set(Test.TEST_SELL_ORGANIZATION_ID, getOrganizationID(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, session(Test.TEST_SELL_ORGANIZATION_ID).as[String]) }
     .exec(AddOrganizationControllerTest.rejectOrganizationRequestScenario)
-    .exec(AccountControllerTest.logoutScenario)
 
   setUp(
-    rejectOrganizationScenario.inject(atOnceUsers(1))
+    rejectOrganizationScenario.inject(atOnceUsers(10))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

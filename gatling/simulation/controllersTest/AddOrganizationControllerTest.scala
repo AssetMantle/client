@@ -124,6 +124,7 @@ object AddOrganizationControllerTest {
           .check(status.is(206))
           .check(css("[id=%s]".format(constants.FormField.ORGANIZATION_ID.name), "value").is("${%s}".format(Test.TEST_ORGANIZATION_ID)))
           .check(css("button:contains(Reject)").exists)
+          .check(css("button:contains(Approve)").notExists)
         )
         .pause(Test.REQUEST_DELAY)
     }
@@ -139,7 +140,7 @@ object AddOrganizationControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
-        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
+        constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
       ))
       .check(status.is(200))
       .check(substring("Organization Approved").exists)
@@ -147,13 +148,38 @@ object AddOrganizationControllerTest {
     .pause(Test.REQUEST_DELAY)
 
   val rejectOrganizationRequestScenario: ScenarioBuilder = scenario("RejectOrganizationRequest")
-    .exec(http("RejectOrganizationRequest_GET")
+    .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
+      exec(http("Organization_KYC_Update_Status" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_Form")
+        .get(session => routes.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(session(Test.TEST_ORGANIZATION_ID).as[String], session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
+        .check(status.is(200))
+        .check(css("[id=%s]".format(constants.FormField.ORGANIZATION_ID.name), "value").is("${%s}".format(Test.TEST_ORGANIZATION_ID)))
+        .check(css("button:contains(Approve)").exists)
+        .check(css("button:contains(Reject)").exists)
+        .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+      )
+        .pause(Test.REQUEST_DELAY)
+        .exec(http("Organization_KYC_Update_Status" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+          .post(routes.AddOrganizationController.updateOrganizationKYCDocumentStatus().url)
+          .formParamMap(Map(
+            Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+            constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+            constants.FormField.DOCUMENT_TYPE.name -> "${%s}".format(Test.TEST_DOCUMENT_TYPE),
+            constants.FormField.STATUS.name -> false
+          ))
+          .check(status.is(206))
+          .check(css("[id=%s]".format(constants.FormField.ORGANIZATION_ID.name), "value").is("${%s}".format(Test.TEST_ORGANIZATION_ID)))
+          .check(css("button:contains(Approve)").exists)
+          .check(css("button:contains(Reject)").notExists)
+        )
+        .pause(Test.REQUEST_DELAY)
+    }
+    .exec(http("Reject_Organization_Request_Form_GET")
       .get(session=>routes.AddOrganizationController.rejectRequestForm(session(Test.TEST_ORGANIZATION_ID).as[String]).url)
       .check(status.is(200))
-      .check(css("legend:contains(Reject Request)").exists)
+      .check(css("legend:contains(Reject Organization)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("RejectOrganizationRequest_POST")
+    .exec(http("Reject_Organization_Request_POST")
       .post(routes.AddOrganizationController.rejectRequest().url)
       .formParamMap(Map(
         constants.FormField.ORGANIZATION_ID.name -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
@@ -165,13 +191,13 @@ object AddOrganizationControllerTest {
 
   val addOrUpdateOrganizationBankAccount: ScenarioBuilder = scenario("AddOrUpdateOrganizationBankAccount")
     .feed(BankAccountDetailFeeder.bankAccountDetailFeeder)
-    .exec(http("AddOrUpdateOrganizationBankAccountForm_GET")
+    .exec(http("Add_Or_Update_Organization_Bank_Account_Form_GET")
       .get(routes.AddOrganizationController.addOrUpdateOrganizationBankAccountForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Add/Update Bank Account Details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddOrUpdateOrganizationBankAccount_POST")
+    .exec(http("Add_Or_Update_Organization_Bank_Account_POST")
       .post(routes.AddOrganizationController.addOrUpdateOrganizationBankAccount().url)
       .formParamMap(Map(
         constants.FormField.ACCOUNT_HOLDER_NAME.name ->  "${%s}".format(Test.TEST_ACCOUNT_HOLDER_NAME),
@@ -189,20 +215,20 @@ object AddOrganizationControllerTest {
 
   val userAddUBO: ScenarioBuilder = scenario("UserAddUBO")
     .feed(UBOFeeder.uboFeed)
-    .exec(http("UserAddUBO_Form_GET")
+    .exec(http("User_Add_UBO_Form_GET")
       .get(routes.AddOrganizationController.userAddUBOForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Add UBO Details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("UserAddUBO_POST")
+    .exec(http("User_Add_UBO_POST")
       .post(routes.AddOrganizationController.userAddUBO().url)
       .formParamMap(Map(
-        constants.FormField.PERSON_FIRST_NAME.name -> constants.FormField.PERSON_FIRST_NAME.field,
-        constants.FormField.PERSON_LAST_NAME.name -> constants.FormField.PERSON_LAST_NAME.field,
-        constants.FormField.SHARE_PERCENTAGE.name -> constants.FormField.SHARE_PERCENTAGE.field,
-        constants.FormField.RELATIONSHIP.name -> constants.FormField.RELATIONSHIP.field,
-        constants.FormField.TITLE.name -> constants.FormField.TITLE.field,
+        constants.FormField.PERSON_FIRST_NAME.name -> "${%s}".format(Test.TEST_PERSON_FIRST_NAME),
+        constants.FormField.PERSON_LAST_NAME.name -> "${%s}".format(Test.TEST_PERSON_LAST_NAME),
+        constants.FormField.SHARE_PERCENTAGE.name -> "${%s}".format(Test.TEST_SHARE_PERCENTAGE),
+        constants.FormField.RELATIONSHIP.name -> "${%s}".format(Test.TEST_RELATIONSHIP),
+        constants.FormField.TITLE.name -> "${%s}".format(Test.TEST_TITLE),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(status.is(200))
       .check(substring("UBO Details added successfully").exists)
@@ -210,13 +236,13 @@ object AddOrganizationControllerTest {
 
   val userDeleteUBO: ScenarioBuilder = scenario("UserDeleteUBO")
     .exec { session => session.set(Test.TEST_UBO_ID, getUBOID(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_PERSON_FIRST_NAME).as[String],session(Test.TEST_PERSON_LAST_NAME).as[String])) }
-    .exec(http("UserDeleteUBO_Form_GET")
+    .exec(http("User_Delete_UBO_Form_GET")
       .get(session=>routes.AddOrganizationController.userDeleteUBOForm(session(Test.TEST_UBO_ID).as[String]).url)
       .check(status.is(200))
       .check(css("legend:contains(Delete UBO)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("UserDeleteUBO_POST")
+    .exec(http("User_Delete_UBO_POST")
       .post(routes.AddOrganizationController.userDeleteUBO().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_UBO_ID),
@@ -227,20 +253,20 @@ object AddOrganizationControllerTest {
 
   val addUBO: ScenarioBuilder = scenario("AddUBO")
     .feed(UBOFeeder.uboFeed)
-    .exec(http("AddUBO_Form_GET")
+    .exec(http("Add_UBO_Form_GET")
       .get(routes.AddOrganizationController.addUBOForm().url)
       .check(status.is(200))
       .check(css("legend:contains(Add UBO Details)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("AddUBO_POST")
+    .exec(http("Add_UBO_POST")
       .post(routes.AddOrganizationController.addUBO().url)
       .formParamMap(Map(
-        constants.FormField.PERSON_FIRST_NAME.name -> constants.FormField.PERSON_FIRST_NAME.field,
-        constants.FormField.PERSON_LAST_NAME.name -> constants.FormField.PERSON_LAST_NAME.field,
-        constants.FormField.SHARE_PERCENTAGE.name -> constants.FormField.SHARE_PERCENTAGE.field,
-        constants.FormField.RELATIONSHIP.name -> constants.FormField.RELATIONSHIP.field,
-        constants.FormField.TITLE.name -> constants.FormField.TITLE.field,
+        constants.FormField.PERSON_FIRST_NAME.name -> "${%s}".format(Test.TEST_PERSON_FIRST_NAME),
+        constants.FormField.PERSON_LAST_NAME.name -> "${%s}".format(Test.TEST_PERSON_LAST_NAME),
+        constants.FormField.SHARE_PERCENTAGE.name -> "${%s}".format(Test.TEST_SHARE_PERCENTAGE),
+        constants.FormField.RELATIONSHIP.name -> "${%s}".format(Test.TEST_RELATIONSHIP),
+        constants.FormField.TITLE.name -> "${%s}".format(Test.TEST_TITLE),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(status.is(200))
       .check(substring("UBO Details added successfully").exists)
@@ -248,14 +274,18 @@ object AddOrganizationControllerTest {
 
   val deleteUBO: ScenarioBuilder = scenario("deleteUBO")
     .exec { session => session.set(Test.TEST_UBO_ID, getUBOID(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_PERSON_FIRST_NAME).as[String],session(Test.TEST_PERSON_LAST_NAME).as[String])) }
-    .exec(http("DeleteUBO_Form_GET")
+    .exec{session=>
+      println("UBO_ID----------"+session(Test.TEST_UBO_ID).as[String])
+      session
+    }
+    .exec(http("Delete_UBO_Form_GET")
       .get(session=>routes.AddOrganizationController.deleteUBOForm(session(Test.TEST_UBO_ID).as[String]).url)
       .check(status.is(200))
       .check(css("legend:contains(Delete UBO)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)
-    .exec(http("UserDeleteUBO_POST")
-      .post(routes.AddOrganizationController.userDeleteUBO().url)
+    .exec(http("Delete_UBO_POST")
+      .post(routes.AddOrganizationController.deleteUBO().url)
       .formParamMap(Map(
         constants.FormField.ID.name -> "${%s}".format(Test.TEST_UBO_ID),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))

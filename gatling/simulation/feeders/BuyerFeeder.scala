@@ -6,7 +6,7 @@ import scala.util.Random
 
 object BuyerFeeder {
 
-  val buyerFeed: Array[Map[String, String]] = arrayConstructor(5)
+  val buyerFeed: Array[Map[String, String]] = arrayConstructor(Test.NUMBER_OF_USERS)
 
   def arrayConstructor(users: Int): Array[Map[String, String]] = {
     val feed = new Array[Map[String, String]](users)

@@ -329,12 +329,9 @@ class AddZoneController @Inject()(
     implicit request =>
       views.companion.master.VerifyZone.form.bindFromRequest().fold(
         formWithErrors => {
-          println("Form error")
-          println(formWithErrors.data)
           Future(BadRequest(views.html.component.master.verifyZone(formWithErrors, zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name))))
         },
         verifyZoneData => {
-          println(verifyZoneData)
           val allKYCFilesVerified = masterZoneKYCs.Service.checkAllKYCFilesVerified(verifyZoneData.zoneID)
 
           def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {

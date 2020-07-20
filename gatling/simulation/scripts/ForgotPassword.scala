@@ -22,6 +22,6 @@ class ForgotPassword extends Simulation {
     .exec(AccountControllerTest.loginScenario)
 
   setUp(
-    forgotPasswordScenario.inject(atOnceUsers(1))
+    forgotPasswordScenario.inject(atOnceUsers(10))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

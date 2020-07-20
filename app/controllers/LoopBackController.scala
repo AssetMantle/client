@@ -41,6 +41,7 @@ class LoopBackController @Inject()(
                                     transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder,
                                     transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
                                     transactionsRedeemAsset: transactions.RedeemAsset,
+                                    transactionsRedeemFiat: transactions.RedeemFiat,
                                     transactionsChangePassword: transactions.ChangePassword,
                                     transactionsForgotPassword: transactions.ForgotPassword,
                                     transactionsSendCoin: transactions.SendCoin,
@@ -70,7 +71,7 @@ class LoopBackController @Inject()(
 
   case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroNumber, assetPrice: MicroNumber, quantityUnit: String, var ownerAddress: String, var locked: Boolean, moderated: Boolean, takerAddress: Option[String])
 
-  case class Fiat(pegHash: String, var ownerAddress: String, transactionID: String, var transactionAmount: MicroNumber, redeemedAmount: MicroNumber)
+  case class Fiat(pegHash: String, var ownerAddress: String, transactionID: String, var transactionAmount: MicroNumber,var redeemedAmount: MicroNumber)
 
   case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, var bid: MicroNumber, time: String, var buyerSignature: Option[String] = None, var sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, var buyerContractHash: Option[String] = None, var sellerContractHash: Option[String] = None)
 
@@ -353,7 +354,7 @@ class LoopBackController @Inject()(
 
     fiatList.find(fiat => fiat.ownerAddress == sendFiatRequest.base_req.from).map { fiat =>
       fiat.transactionAmount = (fiat.transactionAmount.toInt - sendFiatRequest.amount.toInt).toString
-      fiatList = fiatList :+ Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, negotiation.id, "", sendFiatRequest.amount, new MicroNumber(0))
+      fiatList = fiatList :+ Fiat(fiat.pegHash, negotiation.id, Random.alphanumeric.take(10).mkString, sendFiatRequest.amount, new MicroNumber(0))
     }.getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
 
     if (!orderList.exists(_.id == negotiation.id)) orderList = orderList :+ Order(negotiation.id, None, None)
@@ -423,7 +424,25 @@ class LoopBackController @Inject()(
 
     val redeemAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    assetList.filter(_.pegHash == redeemAssetRequest.pegHash)
+    assetList= assetList.filterNot(_.pegHash == redeemAssetRequest.pegHash)
+
+    if (kafkaEnabled) {
+      Ok(Json.toJson(KafkaResponse(ticketID = "RDAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
+    } else {
+      transactionModeBasedResponse
+    }
+  }
+
+  def redeemFiat: Action[AnyContent] = Action { implicit request =>
+
+    implicit val requestReads = transactionsRedeemFiat.requestReads
+
+    val redeemFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+
+    fiatList.find(fiat => fiat.ownerAddress == redeemFiatRequest.base_req.from).map { fiat =>
+      fiat.transactionAmount = fiat.transactionAmount - redeemFiatRequest.redeemAmount
+      fiat.redeemedAmount =redeemFiatRequest.redeemAmount
+    }.getOrElse(throw new BaseException(constants.Response.FIAT_PEG_NOT_FOUND))
 
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "RDAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
@@ -487,6 +506,10 @@ class LoopBackController @Inject()(
     implicit val responseWrites = transactionsForgotPassword.responseWrites
 
     Ok(Json.toJson(transactionsForgotPassword.Response(false, constants.Response.PASSWORD_UPDATED.message)))
+  }
+
+  def pushNotification: Action[AnyContent] = Action { implicit request =>
+    Ok
   }
 
 }
