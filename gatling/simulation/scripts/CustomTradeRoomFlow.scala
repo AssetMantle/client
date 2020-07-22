@@ -6,19 +6,18 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import controllersTest._
-import feeders.JDBCFeeder.getAssetID
-import feeders.{PasswordFeeder, UsernameFeeder}
+import feeders.JDBCFeeder._
 
 class CustomTradeRoomFlow extends Simulation {
 
   val customFlow = scenario("sfsdfs")
-    .exec(CreateZone.createZone)
+    /*.exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
     .exec(AddCounterParty.addCounterParty)
-    .exec(IssueFiat.issueFiat)
+    .exec(IssueFiat.issueFiat)*/
     .exec(IssueAssetWithConstraintCheck.issueAssetWithConstraintCheck)
     .exec(CreateSalesQuoteWithConstraintCheck.createSalesQuoteWithConstraintCheck)
     .exec(AcceptSalesQuote.acceptSalesQuote)
@@ -46,6 +45,11 @@ class CustomTradeRoomFlow extends Simulation {
 object IssueAssetWithConstraintCheck {
 
   val issueAssetWithConstraintCheck = scenario("SignUp")
+    .exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10Ri6CUYBE").set(Test.TEST_SELLER_PASSWORD,"SELL10Ri6CUYBE"))
+    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10ATk6b5t7").set(Test.TEST_BUYER_PASSWORD, "BUY10ATk6b5t7"))
+    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
+    .exec { session => session.set(Test.TEST_COUNTER_PARTY, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(ConstraintTest.IssueAsset.gasMissing)
@@ -144,6 +148,8 @@ object RejectBillOfLading {
 object UpdateTradeDocuments {
 
   val updateTradeDocuments = scenario("updateTradeDocuments")
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
+    .exec(AccountControllerTest.loginScenario)
     .exec(AssetControllerTest.updateAssetDocuments)
     .exec(AssetControllerTest.addBillOfLading)
     .exec(NegotiationControllerTest.updateNegotiationDocuments)

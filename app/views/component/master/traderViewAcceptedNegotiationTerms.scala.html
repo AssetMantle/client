@@ -20,7 +20,7 @@
                 case negotiation.buyerTraderID => {
                     @negotiation.status match {
                         case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING => {
-                            @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                            @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'id -> constants.Form.BUYER_CONFIRM_NEGOTIATION.button.replaceAll("""\.""","_"), 'parameters -> s"'${negotiation.id}'")
                         }
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
                             @order match {
@@ -55,7 +55,7 @@
                 case negotiation.sellerTraderID => {
                     @negotiation.status match {
                         case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING => {
-                            @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
+                            @commonFormButton(constants.Form.SELLER_CONFIRM_NEGOTIATION,'id -> constants.Form.SELLER_CONFIRM_NEGOTIATION.button.replaceAll("""\.""","_"), 'parameters -> s"'${negotiation.id}'")
                         }
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
                             @order match {
@@ -81,6 +81,9 @@
                     }
                 }
             }
+                <div id="blockchainSpinner" class="zxcqweasdasda">
+                </div>
+                @commonSpinner("newSpinner123123",spinnerClass ="zxcqweasdasda")
             </div>
         </div>
 

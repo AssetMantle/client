@@ -33,7 +33,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(10))
+    oneCompleteModeratedScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -44,7 +44,9 @@ object CreateZone {
     .exec(AddZoneControllerTest.inviteZoneScenario)
     .feed(ZoneLoginFeeder.zoneLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -72,7 +74,9 @@ object CreateSellerOrganization {
   val createSellerOrganization = scenario("CREATE SELLER ORGANIZATION")
     .feed(SellOrganizationLoginFeeder.sellOrganizationLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELL_ORGANIZATION_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -103,7 +107,9 @@ object CreateSeller {
   val createSeller = scenario("CreateSeller")
     .feed(SellerFeeder.sellerFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -134,7 +140,9 @@ object CreateBuyerOrganization {
   val createBuyerOrganization = scenario("CREATE BUYER ORGANIZATION")
     .feed(BuyOrganizationLoginFeeder.buyOrganizationLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUY_ORGANIZATION_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -166,7 +174,9 @@ object CreateBuyer {
   val createBuyer = scenario("CreateBuyer")
     .feed(BuyerFeeder.buyerFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)

@@ -31,7 +31,7 @@ object ConstraintTest {
           constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD) + "XYZ"),
           Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         .check(status.is(400))
-        .check(css("legend:contains(Passwords Do Not Match)").exists)
+        .check(substring("Passwords Do Not Match").exists)
       )
       .pause(Test.REQUEST_DELAY)
 
@@ -47,12 +47,12 @@ object ConstraintTest {
         .post(routes.AccountController.signUp().url)
         .formParamMap(Map(
           constants.FormField.USERNAME.name -> "${%s}".format(Test.TEST_USERNAME),
-          constants.FormField.USERNAME_AVAILABLE.name -> true,
+          constants.FormField.USERNAME_AVAILABLE.name -> false,
           constants.FormField.SIGNUP_PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
-          constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD) + "XYZ"),
+          constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> ("${%s}".format(Test.TEST_PASSWORD)),
           Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         .check(status.is(400))
-        .check(css("legend:contains(UserName UnAvailable)").exists)
+        .check(substring("UserName UnAvailable").exists)
       )
       .pause(Test.REQUEST_DELAY)
   }
@@ -235,8 +235,7 @@ object ConstraintTest {
           constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
           Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         .check(status.is(400))
-        .check(substring("Bank Account Details Updated Successfully").exists)
-        .check(css("legend:contains(Review Sales Quote)").exists)
+        .check(css("legend:contains(Sales Quote Documents List)").exists)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )
       .pause(Test.REQUEST_DELAY)

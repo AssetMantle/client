@@ -205,7 +205,7 @@ object FormField {
   val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
-  val GAS = new MicroNumberFormField("GAS", new MicroNumber(0.01), new MicroNumber(100000000000000.0), RegularExpression.GAS)
+  val GAS = new MicroNumberFormField("GAS", new MicroNumber(0.01), new MicroNumber(1000000.0), RegularExpression.GAS)
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
 
   //TODO: Error Response through Messages

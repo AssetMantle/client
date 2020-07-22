@@ -25,10 +25,14 @@ class CometActor() extends Actor with ActorLogging {
     case cometMessage: CometMessage =>
       usernameActorPathMap.get(cometMessage.username) match {
         case Some(value) => logger.info(constants.Actor.USER_COMET_ACTOR + ": " + cometMessage.username + "-" + cometMessage.message)
-          value ! cometMessage.message
+              value ! cometMessage.message
+
+       //   value ! cometMessage.message
         case None => logger.info(cometMessage.username + ": " + constants.Actor.ACTOR_NOT_FOUND)
       }
 
+    case delayMessage: DelayMessage=>Thread.sleep(delayMessage.delay)
+      self ! delayMessage.cometMessage
     case updateUsernameActorRef: UpdateUsernameActorRef =>
       usernameActorPathMap += (updateUsernameActorRef.username -> updateUsernameActorRef.actorRef)
       logger.info(updateUsernameActorRef.username + ": " + constants.Actor.USER_COMET_ACTOR_ADDED_TO_MAP)

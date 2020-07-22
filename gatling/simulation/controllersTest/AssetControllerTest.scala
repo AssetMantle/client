@@ -12,6 +12,9 @@ import scala.util.Random
 
 object AssetControllerTest {
 
+  val imageFeed=scenario("imageFeed")
+    .feed(ImageFeeder.imageFeed)
+
   val moderatedIssueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
     .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
@@ -75,7 +78,7 @@ object AssetControllerTest {
 
   val uploadAssetDocuments: ScenarioBuilder = scenario("uploadAssetDocuments")
     .foreach(constants.File.ASSET_DOCUMENTS, Test.TEST_DOCUMENT_TYPE) {
-      feed(ImageFeeder.imageFeed)
+      exec(imageFeed)
         .exec(http("Asset_Document_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.FileController.uploadAssetForm(session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_ASSET_ID).as[String]).url)
           .check(css("button:contains(Browse)").exists)
@@ -102,7 +105,7 @@ object AssetControllerTest {
 
   val updateAssetDocuments: ScenarioBuilder = scenario("updateAssetDocuments")
     .foreach(constants.File.ASSET_DOCUMENTS, Test.TEST_DOCUMENT_TYPE) {
-      feed(ImageFeeder.imageFeed)
+      exec(imageFeed)
         .exec(http("Asset_Document_Update_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.FileController.updateAssetForm(session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_ASSET_ID).as[String]).url)
           .check(css("button:contains(Browse)").exists)
@@ -182,8 +185,8 @@ object AssetControllerTest {
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(status.is(206))
       .check(if (documentStatus) css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("true") else css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("false"))
-      .check(if (documentStatus) css("button:contains(Reject)").exists else css("button:contains(Accept)").exists)
-      .check(if (documentStatus) css("button:contains(Accept)").notExists else css("button:contains(Reject)").notExists)
+      .check(if (documentStatus) css("button:contains(Reject)").exists else css("button:contains(Reject)").notExists)
+      .check(if (documentStatus) css("button:contains(Accept)").notExists else css("button:contains(Accept)").exists)
     )
     .pause(Test.REQUEST_DELAY)
 

@@ -11,9 +11,11 @@ object Message {
 
   case class CometMessage(username: String, message: JsValue)
 
-  def makeCometMessage[T](username: String, messageType: String, messageContent: T)(implicit writes: OWrites[T]): CometMessage = {
+  def makeCometMessage[T](username: String, messageType: String, messageContent: T, processDelay: Option[Long] = None)(implicit writes: OWrites[T]): CometMessage = {
     CometMessage(username, Json.toJson(message(messageType, Json.toJson(messageContent))))
   }
+
+  case class DelayMessage(cometMessage: CometMessage,delay: Long)
 
   case class Account(ping: String = constants.Comet.PING)
 
@@ -34,6 +36,10 @@ object Message {
   case class Negotiation(id: String)
 
   implicit val negotiationWrites: OWrites[Negotiation] = Json.writes[Negotiation]
+
+  case class BlockchainTransaction(id: String, transactionType: String)
+
+  implicit val blockchainTransactionWrites: OWrites[BlockchainTransaction] = Json.writes[BlockchainTransaction]
 
   //For CHAT/ MESSAGE -> Takes message directly from masterTransaction.Message.scala
 

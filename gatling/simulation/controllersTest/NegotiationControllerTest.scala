@@ -2,6 +2,7 @@ package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
+import controllersTest.AssetControllerTest.imageFeed
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
@@ -258,7 +259,7 @@ object NegotiationControllerTest {
 
 
   val uploadContract: ScenarioBuilder = scenario("UploadContract")
-    .feed(ImageFeeder.imageFeed)
+    .exec(imageFeed)
     .exec(http("Upload_Contract_Form" + "_GET")
       .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Negotiation.CONTRACT).url)
       .check(status.is(200))
@@ -288,7 +289,7 @@ object NegotiationControllerTest {
     .pause(Test.REQUEST_DELAY)
 
   val updateContract: ScenarioBuilder = scenario("UpdateContract")
-    .feed(ImageFeeder.imageFeed)
+    .exec(imageFeed)
     .exec(http("Update_Contract_Form" + "_GET")
       .get(session => routes.FileController.updateNegotiationForm(session(Test.TEST_NEGOTIATION_ID).as[String], constants.File.Negotiation.CONTRACT).url)
       .check(status.is(200))
@@ -318,6 +319,7 @@ object NegotiationControllerTest {
     .pause(Test.REQUEST_DELAY)
 
   val addContract: ScenarioBuilder = scenario("AddContract")
+    .feed(ContractDetails.contractDetailsFeed)
     .exec(http("Add_Contract_Form_GET")
       .get(session => routes.NegotiationController.addContractForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(css("legend:contains(Add Contract Details)").exists)
@@ -328,10 +330,10 @@ object NegotiationControllerTest {
       .post(routes.NegotiationController.addContract().url)
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.CONTRACT_NUMBER.name -> constants.FormField.CONTRACT_NUMBER.field,
+        constants.FormField.CONTRACT_NUMBER.name -> "${%s}".format(Test.TEST_CONTRACT_NUMBER),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(substring("Commodity Documents").exists)
-      .check(substring("Trade Documents").exists)
+      .check(substring("Upload Documents").exists)
+      .check(substring("Update Contract").exists)
     )
     .pause(Test.REQUEST_DELAY)
 
@@ -347,9 +349,9 @@ object NegotiationControllerTest {
       .post(routes.NegotiationController.addInvoice().url)
       .formParamMap(Map(
         constants.FormField.NEGOTIATION_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.INVOICE_NUMBER.name -> constants.FormField.INVOICE_NUMBER.field,
-        constants.FormField.INVOICE_AMOUNT.name -> constants.FormField.INVOICE_AMOUNT.field,
-        constants.FormField.INVOICE_DATE.name -> constants.FormField.INVOICE_DATE.field,
+        constants.FormField.INVOICE_NUMBER.name -> "${%s}".format(Test.TEST_INVOICE_NUMBER),
+        constants.FormField.INVOICE_AMOUNT.name -> "${%s}".format(Test.TEST_INVOICE_AMOUNT),
+        constants.FormField.INVOICE_DATE.name -> "${%s}".format(Test.TEST_INVOICE_DATE),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(substring("Commodity Documents").exists)
       .check(substring("Trade Documents").exists)
@@ -375,7 +377,7 @@ object NegotiationControllerTest {
 
   val uploadNegotiationDocuments: ScenarioBuilder = scenario("UploadNegotiationDocuments")
     .foreach(constants.File.NEGOTIATION_DOCUMENTS.filterNot(_ == constants.File.Negotiation.CONTRACT), Test.TEST_DOCUMENT_TYPE) {
-      feed(ImageFeeder2.imageFeed2)
+      exec(imageFeed)
         .exec(http("Negotiation_Document_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.FileController.uploadNegotiationForm(session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
           .check(status.is(200))
@@ -406,7 +408,7 @@ object NegotiationControllerTest {
 
   val updateNegotiationDocuments: ScenarioBuilder = scenario("UpdateNegotiationDocuments")
     .foreach(constants.File.NEGOTIATION_DOCUMENTS.filterNot(_ == constants.File.Negotiation.CONTRACT), Test.TEST_DOCUMENT_TYPE) {
-      feed(ImageFeeder2.imageFeed2)
+      exec(imageFeed)
         .exec(http("Negotiation_Document_Update_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.FileController.updateNegotiationForm(session(Test.TEST_DOCUMENT_TYPE).as[String], session(Test.TEST_NEGOTIATION_ID).as[String]).url)
           .check(status.is(200))

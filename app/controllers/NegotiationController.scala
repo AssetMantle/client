@@ -1107,9 +1107,13 @@ class NegotiationController @Inject()(
                   contract <- contract
                   pegHash <- getPegHash(negotiation.assetID)
                   sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
+                  buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
                   sellerAddress <- getAddress(sellerAccountID)
                   result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAccountID = sellerAccountID, buyerTraderID = buyerTraderID, sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
-                } yield result
+                } yield {
+                  actors.Service.cometActor ! actors.Message.DelayMessage(actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.TRANSACTION_SENT_ENABLE_SPINNER, messageContent = actors.Message.BlockchainTransaction(negotiation.id,constants.Form.BUYER_CONFIRM_NEGOTIATION.button.replaceAll("""\.""","_"))),2000.toLong)
+                  result
+                }
               } else {
                 throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
               }
@@ -1214,7 +1218,10 @@ class NegotiationController @Inject()(
                   buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
                   buyerAddress <- getAddress(buyerAccountID)
                   result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerTraderID = sellerTraderID, buyerAddress = buyerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
-                } yield result
+                } yield {
+                  actors.Service.cometActor ! actors.Message.DelayMessage(actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.TRANSACTION_SENT_ENABLE_SPINNER, messageContent = actors.Message.BlockchainTransaction(negotiation.id,constants.Form.SELLER_CONFIRM_NEGOTIATION.button.replaceAll("""\.""","_"))),2000.toLong)
+                  result
+                }
               } else {
                 throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
               }

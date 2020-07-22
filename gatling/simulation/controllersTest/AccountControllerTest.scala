@@ -2,6 +2,7 @@ package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
+import controllersTest.AssetControllerTest.imageFeed
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
@@ -157,7 +158,7 @@ object AccountControllerTest {
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-    .feed(ImageFeeder.imageFeed)
+  .exec(imageFeed)
     .exec(http("Identification_Upload")
       .post(routes.FileController.uploadAccountKYC("IDENTIFICATION").url)
       .formParamMap(Map(
