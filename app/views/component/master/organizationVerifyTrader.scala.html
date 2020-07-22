@@ -23,5 +23,5 @@
     @commonCheckbox(verifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
     @commonInputMicroNumber(verifyTraderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(verifyTraderForm, constants.FormField.PASSWORD)
-    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'parameters -> s"'${trader.id}'")
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewPendingTraderRequest, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"'${trader.id}'")
 }

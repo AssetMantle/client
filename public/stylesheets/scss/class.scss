@@ -252,7 +252,7 @@ html, body{
   border-radius: $buttonBorderRadius;
   background-color: #ddd;
   height: 13px;
-  margin: 10px 0;
+  margin: 17px 0;
 }
 .progressBar {
   width: 0;
@@ -695,6 +695,11 @@ html, body{
       font-weight: bold;
     }
   }
+  .listItemCenterButton{
+    .cmuk-button{
+      padding: 0 15px;
+    }
+  }
 }
 
 .formNote{
@@ -852,11 +857,13 @@ html, body{
     .modalBody {
       text-align:center;
       .infoRowLabel{
+        width: 300px;
         text-align: left;
         font-weight: bold;
       }
       .infoRowValue{
-        text-align: right;
+        text-align: left;
+        word-break: break-word;
       }
       .title{
         margin: 10px 0 3px 0;
@@ -959,13 +966,11 @@ form{
     .forgotPassword {
       position: absolute;
       right: 0;
-      top: 12px;
+      top: 10px;
     }
 
     .buttonPrimary {
       width: 100%;
-      margin-top: 20px;
-      padding: 5px 0;
     }
   }
 }
@@ -974,8 +979,6 @@ form{
   form .formBody {
     .buttonPrimary {
       width: 100%;
-      margin-top: 20px;
-      padding: 5px 0;
     }
   }
   .usernameAvailability {
@@ -1035,7 +1038,7 @@ form{
 .logoutContainer {
   form {
     .formBody {
-      padding: 25px 60px 60px 60px;
+      padding: 25px 60px 50px 60px;
       p{
         margin-bottom: 30px;
         font-size: $headingFontSizeSmall;
@@ -1061,7 +1064,6 @@ form{
       .buttonPrimary{
         width: 250px;
         margin-top: 20px;
-        padding: 5px 0;
       }
     }
   }
@@ -1078,8 +1080,6 @@ form{
       }
       .buttonPrimary{
         width: 450px;
-        margin-top: 20px;
-        padding: 5px 0;
       }
     }
   }
@@ -2011,6 +2011,7 @@ form{
   .orderInfoCard{
     button{
       margin: 5px;
+      display: block;
     }
   }
 }
@@ -2417,7 +2418,7 @@ header:before,
   flex-wrap: wrap;
   .listItemChild{
     margin: 0;
-    padding: 20px 0;
+    padding: 20px 5px;
     font-size: $paragraphFontSizeSmall;
     font-weight: bold;
     &:last-child .listItemChildValue{
@@ -2547,10 +2548,26 @@ header:before,
   }
 }
 
-.profileDetails{
+.textOverflowCopy{
+  display: flex;
+  justify-content: flex-end;
+  .cmuk-icon-button{
+    width:30px;
+    height: 30px;
+    svg{
+      width: 16px;
+    }
+  }
+  p{
+    margin: 0;
+  }
+}
+
+.comdex .profileDetails{
   .cmuk-button-link{
     @extend %cmuk-button-link;
     margin-bottom: 5px;
+    padding: 0;
   }
   .cmuk-badge{
     @extend  %verifiedLabel;
@@ -2633,18 +2650,17 @@ header:before,
   position: relative;
   display: inline-block;
   .toolTipText {
+    font-size: 12px;
     visibility: hidden;
-    width: 140px;
+    width: 55px;
     background-color: $colorPrimary;
     color: #fff;
     text-align: center;
     border-radius: $buttonBorderRadius;
-    padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -75px;
+    bottom: 120%;
+    left: -52%;
     opacity: 0;
     transition: opacity 0.3s;
     &:after {
@@ -2934,7 +2950,7 @@ figure.zoom {
         color: #848A91;
         font-weight: bold;
         font-size:$paragraphFontSizeSmall;
-        word-break: break-all;
+        word-break:break-word;
       }
       .arrowIcon{
         width:30px;

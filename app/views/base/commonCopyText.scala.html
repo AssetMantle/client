@@ -1,0 +1,6 @@
+@(id: String, value: String)(implicit messagesProvider: MessagesProvider)
+<a class="toolTip" onclick="copyToClipboard('@Messages(value)', '@id')">
+    <span class="toolTipText" id="@id">@Messages(constants.View.COPY)</span>
+    <span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy('@id')"></span>
+</a>
+<script src="@routes.Assets.versioned("javascripts/style/copyToClipboard.js")" type="text/javascript"></script>

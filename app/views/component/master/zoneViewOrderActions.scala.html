@@ -14,6 +14,7 @@
             case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED  => {
                 @order match {
                     case Some(order)=> {
+                        <div class="cmuk-position-center">
                         @order.status match {
                         case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=> {@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
                         case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING=>{
@@ -24,11 +25,12 @@
                         case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING=> {@commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")}
                         case _=>{}
                         }
+                        </div>
                     }
-                    case None=>{@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
+                    case None=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")</div>}
                 }
             }
-            case _=>{@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
+            case _=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")</div>}
         }
     }
 

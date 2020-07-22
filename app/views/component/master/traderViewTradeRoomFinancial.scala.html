@@ -3,7 +3,8 @@
 @import utilities.MicroNumber
 
 @(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<ul class="">
+<div class="financialCard cardPaddingRemove">
+    <ul class="">
     <li class="cmuk-flex">
         <div class="cmuk-flex wallet">
             <span class="walletIcon">@commonIcon("wallet")</span>
@@ -12,7 +13,7 @@
                 <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @walletBalance.toRoundedOffString()</p>
             </div>
         </div>
-        <div>
+        <div class="walletButtons">
             @commonFormButton(constants.Form.ISSUE_FIAT_REQUEST, 'class -> "addBalanceButton")
             @commonFormButton(constants.Form.REDEEM_FIAT, 'class -> "addBalanceButton")
         </div>
@@ -44,3 +45,4 @@
         </div>
     </li>
 </ul>
+</div>

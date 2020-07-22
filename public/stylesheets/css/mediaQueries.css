@@ -149,18 +149,16 @@
     .modal .modalContent .modalBody dl {
       margin-bottom: 10px; }
     .modal .modalContent .modalBody .signUpForm form .formBody, .modal .modalContent .modalBody .mnemonicQuiz form .formBody {
-      padding: 10px 60px 40px 60px; }
+      padding: 20px 50px 50px 50px; }
 
-  .leftContainer .financial {
+  .comdex .leftContainer .financial {
     margin-bottom: 15px; }
-    .leftContainer .financial .cmuk-card {
+    .comdex .leftContainer .financial .cmuk-card {
       height: 265px; }
-      .leftContainer .financial .cmuk-card .cmuk-switcher {
+      .comdex .leftContainer .financial .cmuk-card .cmuk-switcher {
         height: 210px;
         overflow: auto; }
-  .leftContainer .financial .cmuk-switcher ul li {
-    padding: 10px 0; }
-  .leftContainer .addBalanceButton {
+  .comdex .leftContainer .addBalanceButton {
     text-transform: capitalize;
     font-family: Rubik;
     padding: 8px 8px;
@@ -169,17 +167,17 @@
     border-radius: 103px;
     color: #0862BE;
     border: 0; }
-  .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
+  .comdex .leftContainer .documentView .cmuk-card-body, .comdex .leftContainer .documentView .documentList {
     padding: 0px; }
-  .leftContainer .documentView .documentList {
+  .comdex .leftContainer .documentView .documentList {
     height: 150px; }
-  .leftContainer .documentView .cmuk-card {
+  .comdex .leftContainer .documentView .cmuk-card {
     height: 265px; }
-    .leftContainer .documentView .cmuk-card .cmuk-card-body {
+    .comdex .leftContainer .documentView .cmuk-card .cmuk-card-body {
       height: 265px; }
-  .leftContainer .zoneTradeFinancial .cmuk-card-body {
+  .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
-    .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
+    .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
       height: 210px; }
 
   .rightContainer .recentActivityContainer {
@@ -230,6 +228,17 @@
 
   .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
     height: 40px; }
+  .comdex .cmuk-button {
+    padding: .7rem 1.5rem;
+    line-height: 1.5;
+    word-break: break-word; }
+  .comdex .cmuk-button-small {
+    padding: 0 15px;
+    line-height: 28px;
+    font-size: .875rem; }
+
+  form .formBody {
+    padding: 20px 50px 50px 50px; }
 
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .usernameAvailability .failureIcon,
@@ -274,14 +283,39 @@
     height: 530px; }
 
   .leftContainer .financial .financialCard.cardPaddingRemove ul li {
-    padding: 15px 0px; }
+    padding: 5px 0; }
     .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-      padding-top: 10px; }
+      padding-top: 5px; }
+  .leftContainer .financial .cmuk-switcher ul li,
+  .leftContainer .financial .financialCard ul li {
+    padding: 10px 0; }
+    .leftContainer .financial .cmuk-switcher ul li:first-child,
+    .leftContainer .financial .financialCard ul li:first-child {
+      padding-top: 15px; }
 
-  .walletButtons {
-    display: flex;
-    flex-direction: column;
-    align-items: center; } }
+  .profilePictureContainer .profilePicture {
+    height: 70px;
+    width: 70px; }
+
+  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
+    width: 25px; }
+
+  .documentView .documentList .table-scroll tbody tr td:first-child {
+    padding-left: 10px; }
+
+  .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton {
+    top: 10px; }
+
+  .loginForm .formBody .forgotPassword {
+    top: 2px; }
+
+  .signUpForm .usernameAvailability .result {
+    top: 80px; }
+
+  .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
+    line-height: 10px; }
+  .contactDetails .contactInfoItem .cmuk-card .cmuk-button-link {
+    padding: 10px 0; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }
@@ -293,12 +327,21 @@
   .showPassword, .checkIcon {
     top: 37px; }
 
-  .modal .modalContent .modalBody .modalInfoBlock .infoRowLabel, .modal .modalContent .modalBody form .formBody .infoRowLabel {
-    width: 300px; }
-  .modal .modalContent .modalBody .modalInfoBlock .infoRowValue, .modal .modalContent .modalBody form .formBody .infoRowValue {
-    text-align: left; }
   .modal .modalContent .modalBody .modalInfoBlock .documentItem .infoRowLabel, .modal .modalContent .modalBody form .formBody .documentItem .infoRowLabel {
-    width: auto; } }
+    width: auto; }
+
+  .mobileNumberUpdate .countryCode {
+    width: 118px; } }
+@media (min-width: 1600px) and (max-width: 1820px) {
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li {
+    padding: 15px 0; }
+    .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
+      padding-top: 15px; } }
+@media (max-width: 1845px) {
+  .walletButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

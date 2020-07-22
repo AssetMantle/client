@@ -24,8 +24,8 @@
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
-@commonModalButton(constants.View.BACK, constants.Form.ADD_ORGANIZATION.get)
+@commonModalButton(constants.View.BACK, constants.Form.ADD_ORGANIZATION.get, 'class -> "cmuk-margin-top buttonPrimary")
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
-    @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST,'id -> "getOrganizationKYCReviewForm")
+    @commonFormButton(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST,'id -> "getOrganizationKYCReviewForm", 'class -> "cmuk-margin-top buttonPrimary")
 }
 </div>
