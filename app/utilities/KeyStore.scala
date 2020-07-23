@@ -2,7 +2,7 @@ package utilities
 
 import java.io.{FileInputStream, FileOutputStream}
 import java.security.KeyStore
-
+import scala.concurrent.blocking
 import exceptions.BaseException
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
@@ -38,7 +38,7 @@ class KeyStore @Inject()(configuration: Configuration) {
       throw new BaseException(constants.Response.KEY_STORE_ERROR)
   }
 
-  def setPassphrase(alias: String, aliasValue: String): Unit = this.synchronized(
+  def setPassphrase(alias: String, aliasValue: String): Unit = blocking(this.synchronized(
     try {
       val generatedSecret = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).generateSecret(new PBEKeySpec(aliasValue.toCharArray))
       val ks = KeyStore.getInstance(keyStoreType)
@@ -51,7 +51,7 @@ class KeyStore @Inject()(configuration: Configuration) {
       case exception: Exception => logger.error(exception.getMessage)
         throw new BaseException(constants.Response.KEY_STORE_ERROR)
     }
-  )
+  ))
 
   //https://stackoverflow.com/questions/6243446/how-to-store-a-simple-key-string-inside-java-keystore
 }
