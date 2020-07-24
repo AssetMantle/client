@@ -33,7 +33,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+    oneCompleteModeratedScenario.inject(atOnceUsers(50))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -44,16 +44,14 @@ object CreateZone {
     .exec(AddZoneControllerTest.inviteZoneScenario)
     .feed(ZoneLoginFeeder.zoneLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
-    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
-    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
+    .exec(AddZoneControllerTest.acceptZoneInviteScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
     .exec(ContactControllerTest.addOrUpdateEmailAddressScenario)
     .exec(ContactControllerTest.verifyEmailAddressScenario)
     .exec(AccountControllerTest.addIdentification)
-    .exec(AddZoneControllerTest.acceptZoneInviteScenario)
     .exec(AddZoneControllerTest.addZoneRequestScenario)
     .exec(AccountControllerTest.logoutScenario)
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
@@ -74,9 +72,7 @@ object CreateSellerOrganization {
   val createSellerOrganization = scenario("CREATE SELLER ORGANIZATION")
     .feed(SellOrganizationLoginFeeder.sellOrganizationLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELL_ORGANIZATION_PASSWORD).as[String]))
-    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
-    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -91,7 +87,6 @@ object CreateSellerOrganization {
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, session(Test.TEST_SELL_ORGANIZATION_ID).as[String]) }
     .exec(BackgroundCheckControllerTest.corporateScan)
     .exec(AddOrganizationControllerTest.verifyOrganizationScenario)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
   /* .exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String])) }
    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
@@ -107,9 +102,7 @@ object CreateSeller {
   val createSeller = scenario("CreateSeller")
     .feed(SellerFeeder.sellerFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
-    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
-    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -123,7 +116,6 @@ object CreateSeller {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELL_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELL_ORGANIZATION_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(SetACLControllerTest.organizationVerifyTrader)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
   /* .exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_SELLER_USERNAME).as[String])) }
    .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
@@ -140,9 +132,7 @@ object CreateBuyerOrganization {
   val createBuyerOrganization = scenario("CREATE BUYER ORGANIZATION")
     .feed(BuyOrganizationLoginFeeder.buyOrganizationLoginFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUY_ORGANIZATION_PASSWORD).as[String]))
-    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
-    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -157,7 +147,6 @@ object CreateBuyerOrganization {
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, session(Test.TEST_BUY_ORGANIZATION_ID).as[String]) }
     .exec(BackgroundCheckControllerTest.corporateScan)
     .exec(AddOrganizationControllerTest.verifyOrganizationScenario)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
   /*.exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ORGANIZATION) {
@@ -174,9 +163,7 @@ object CreateBuyer {
   val createBuyer = scenario("CreateBuyer")
     .feed(BuyerFeeder.buyerFeed)
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
-    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
     .exec(AccountControllerTest.signUpScenario)
-    .exec(ConstraintTest.SignUp.usernameUnavailable)
     .exec(AccountControllerTest.loginScenario)
     .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
     .exec(ContactControllerTest.verifyMobileNumberScenario)
@@ -190,7 +177,6 @@ object CreateBuyer {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUY_ORGANIZATION_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(SetACLControllerTest.organizationVerifyTrader)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
   /*.exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
@@ -332,7 +318,6 @@ object VesselCheckAndReleaseAsset {
     .exec(AccountControllerTest.loginScenario)
     .exec(BackgroundCheckControllerTest.vesselScan)
     .exec(AssetControllerTest.releaseAsset)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
 
@@ -378,7 +363,6 @@ object ModeratedBuyerAndSellerExecuteOrder {
     .exec(OrderControllerTest.moderatedBuyerExecuteOrderScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
     .exec(OrderControllerTest.moderatedSellerExecuteOrderScenario)
-    .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 
 }

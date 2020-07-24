@@ -658,5 +658,5 @@ POST        /loopback/redeemAsset                                               
 POST        /loopback/redeemFiat                                                                  controllers.LoopBackController.redeemFiat
 POST        /loopback/updatePassword/:username                                                    controllers.LoopBackController.updatePassword(username: String)
 POST        /loopback/forgotPassword/:username                                                    controllers.LoopBackController.forgotPassword(username: String)
-
++ nocsrf
 POST        /loopback/pushNotification                                                            controllers.LoopBackController.pushNotification

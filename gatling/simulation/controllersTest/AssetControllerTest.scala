@@ -184,9 +184,8 @@ object AssetControllerTest {
         constants.FormField.STATUS.name -> documentStatus,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(status.is(206))
-      .check(if (documentStatus) css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("true") else css("[id=%s]".format(constants.FormField.STATUS.name), "value").is("false"))
       .check(if (documentStatus) css("button:contains(Reject)").exists else css("button:contains(Reject)").notExists)
-      .check(if (documentStatus) css("button:contains(Accept)").notExists else css("button:contains(Accept)").exists)
+      .check(if (documentStatus) css("button:contains(Approve)").notExists else css("button:contains(Approve)").exists)
     )
     .pause(Test.REQUEST_DELAY)
 

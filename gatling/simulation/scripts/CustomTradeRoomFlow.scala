@@ -7,17 +7,18 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import controllersTest._
 import feeders.JDBCFeeder._
+import feeders.ZoneLoginFeeder
 
 class CustomTradeRoomFlow extends Simulation {
 
   val customFlow = scenario("sfsdfs")
-    /*.exec(CreateZone.createZone)
+    .exec(CreateZoneWithConstraintCheck.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
     .exec(CreateBuyer.createBuyer)
     .exec(AddCounterParty.addCounterParty)
-    .exec(IssueFiat.issueFiat)*/
+    .exec(IssueFiat.issueFiat)
     .exec(IssueAssetWithConstraintCheck.issueAssetWithConstraintCheck)
     .exec(CreateSalesQuoteWithConstraintCheck.createSalesQuoteWithConstraintCheck)
     .exec(AcceptSalesQuote.acceptSalesQuote)
@@ -42,14 +43,42 @@ class CustomTradeRoomFlow extends Simulation {
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
+
+object CreateZoneWithConstraintCheck {
+
+  val createZone = scenario("CREATE ZONE")
+    .exec(AccountControllerTest.loginMain)
+    .exec(AddZoneControllerTest.inviteZoneScenario)
+    .feed(ZoneLoginFeeder.zoneLoginFeed)
+    .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))
+    .exec(ConstraintTest.SignUp.mismatchPasswordScenario)
+    .exec(AccountControllerTest.signUpScenario)
+    .exec(ConstraintTest.SignUp.usernameUnavailable)
+    .exec(AccountControllerTest.loginScenario)
+    .exec(ContactControllerTest.addOrUpdateMobileNumberScenario)
+    .exec(ContactControllerTest.verifyMobileNumberScenario)
+    .exec(ContactControllerTest.addOrUpdateEmailAddressScenario)
+    .exec(ContactControllerTest.verifyEmailAddressScenario)
+    .exec(AccountControllerTest.addIdentification)
+    .exec(AddZoneControllerTest.acceptZoneInviteScenario)
+    .exec(AddZoneControllerTest.addZoneRequestScenario)
+    .exec(AccountControllerTest.logoutScenario)
+    .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
+    .exec(AccountControllerTest.loginMain)
+    .exec(AddZoneControllerTest.verifyZoneScenario)
+    .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
+  /*.exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
+  .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE) {
+    asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.ZONE, Duration.create(80, "seconds")) {
+       .pause(Test.LOOP_DELAY)
+        .exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_ZONE_USERNAME).as[String])) }
+    }
+  }*/
+}
+
 object IssueAssetWithConstraintCheck {
 
   val issueAssetWithConstraintCheck = scenario("SignUp")
-    .exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10Ri6CUYBE").set(Test.TEST_SELLER_PASSWORD,"SELL10Ri6CUYBE"))
-    .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY10ATk6b5t7").set(Test.TEST_BUYER_PASSWORD, "BUY10ATk6b5t7"))
-    .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_COUNTER_PARTY, session(Test.TEST_BUYER_TRADER_ID).as[String]) }
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_SELLER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_SELLER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(ConstraintTest.IssueAsset.gasMissing)
