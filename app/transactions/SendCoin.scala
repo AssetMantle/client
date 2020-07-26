@@ -32,9 +32,6 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path1
 
-  //testURL
-  //private val testURL = constants.Test.BASE_URL+"/loopback"+ "/" + "bank/accounts"
-
   private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
 
   case class Amount(denom: String, amount: MicroNumber)
