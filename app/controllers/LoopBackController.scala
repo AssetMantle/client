@@ -83,7 +83,7 @@ class LoopBackController @Inject()(
   }
 
   def memberCheckCorporateScan: Action[AnyContent] = Action {
-    Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(5).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)).toString())
+    Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(8).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)).toString())
   }
 
   def memberCheckCorporateScanInfo(request: String): Action[AnyContent] = Action {
@@ -199,12 +199,16 @@ class LoopBackController @Inject()(
   }
 
   def issueAsset: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsIssueAsset.requestReads
+    try {
+      implicit val requestReads = transactionsIssueAsset.requestReads
 
-    val issueAssetRequest = request.body.asJson.map { requestBody =>
-      convertJsonStringToObject[transactionsIssueAsset.Request](requestBody.toString())
-    }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-    issueAssetUpdateSync(Asset(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.to, if (issueAssetRequest.moderated) true else false, issueAssetRequest.moderated, if (issueAssetRequest.takerAddress == "") None else Some(issueAssetRequest.takerAddress)))
+      val issueAssetRequest = request.body.asJson.map { requestBody =>
+        convertJsonStringToObject[transactionsIssueAsset.Request](requestBody.toString())
+      }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      issueAssetUpdateSync(Asset(Random.alphanumeric.filter(_.isDigit).take(8).mkString, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.to, if (issueAssetRequest.moderated) true else false, issueAssetRequest.moderated, if (issueAssetRequest.takerAddress == "") None else Some(issueAssetRequest.takerAddress)))
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "ISAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -217,14 +221,17 @@ class LoopBackController @Inject()(
   }
 
   def issueFiat: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsIssueFiat.requestReads
+    try {
+      implicit val requestReads = transactionsIssueFiat.requestReads
 
-    val issueFiatRequest = request.body.asJson.map { requestBody =>
-      convertJsonStringToObject[transactionsIssueFiat.Request](requestBody.toString())
-    }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      val issueFiatRequest = request.body.asJson.map { requestBody =>
+        convertJsonStringToObject[transactionsIssueFiat.Request](requestBody.toString())
+      }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    issueFiatUpdateSync(Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, new MicroNumber(0)))
-
+      issueFiatUpdateSync(Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, new MicroNumber(0)))
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "ISFI" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -248,13 +255,17 @@ class LoopBackController @Inject()(
   }
 
   def changeBuyerBid: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsChangeBuyerBid.requestReads
+    try {
+      implicit val requestReads = transactionsChangeBuyerBid.requestReads
 
-    val changeBuyerBidRequest = request.body.asJson.map { requestBody =>
-      convertJsonStringToObject[transactionsChangeBuyerBid.Request](requestBody.toString())
-    }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      val changeBuyerBidRequest = request.body.asJson.map { requestBody =>
+        convertJsonStringToObject[transactionsChangeBuyerBid.Request](requestBody.toString())
+      }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    changeBuyerUpdateSync(changeBuyerBidRequest)
+      changeBuyerUpdateSync(changeBuyerBidRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "CHBB" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -272,14 +283,17 @@ class LoopBackController @Inject()(
   }
 
   def changeSellerBid: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsChangeSellerBid.requestReads
+    try {
+      implicit val requestReads = transactionsChangeSellerBid.requestReads
 
-    val changeSellerBidRequest = request.body.asJson.map { requestBody =>
-      convertJsonStringToObject[transactionsChangeSellerBid.Request](requestBody.toString())
-    }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      val changeSellerBidRequest = request.body.asJson.map { requestBody =>
+        convertJsonStringToObject[transactionsChangeSellerBid.Request](requestBody.toString())
+      }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    changeSellerBidUpdateSync(changeSellerBidRequest)
-
+      changeSellerBidUpdateSync(changeSellerBidRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "CHSB" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -291,16 +305,17 @@ class LoopBackController @Inject()(
     negotiationList.find(negotiation => negotiation.buyerAddress == confirmBuyerBidRequest.base_req.from && negotiation.sellerAddress == confirmBuyerBidRequest.to && negotiation.assetPegHash == confirmBuyerBidRequest.pegHash).map { negotiation =>
       negotiation.bid = confirmBuyerBidRequest.bid
       negotiation.buyerContractHash = Some(confirmBuyerBidRequest.buyerContractHash)
-    }
+    }.getOrElse(throw new BaseException(constants.Response.FAILURE))
   }
 
   def confirmBuyerBid: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsConfirmBuyerBid.requestReads
-
-    val confirmBuyerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmBuyerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    confirmBuyerBidUpdate(confirmBuyerBidRequest)
-
+    try {
+      implicit val requestReads = transactionsConfirmBuyerBid.requestReads
+      val confirmBuyerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmBuyerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      confirmBuyerBidUpdate(confirmBuyerBidRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "COBB" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -316,10 +331,13 @@ class LoopBackController @Inject()(
   }
 
   def confirmSellerBid: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsConfirmSellerBid.requestReads
-    val confirmSellerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmSellerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-    confirmSellerBidUpdateSync(confirmSellerBidRequest)
-
+    try {
+      implicit val requestReads = transactionsConfirmSellerBid.requestReads
+      val confirmSellerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsConfirmSellerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      confirmSellerBidUpdateSync(confirmSellerBidRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "COSB" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -334,10 +352,14 @@ class LoopBackController @Inject()(
   }
 
   def releaseAsset: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsReleaseAsset.requestReads
-    val releaseAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsReleaseAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+    try {
+      implicit val requestReads = transactionsReleaseAsset.requestReads
+      val releaseAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsReleaseAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    releaseAssetUpdateSync(releaseAssetRequest)
+      releaseAssetUpdateSync(releaseAssetRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "RLAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -357,12 +379,13 @@ class LoopBackController @Inject()(
   }
 
   def sendAsset: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsSendAsset.requestReads
-
-    val sendAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    sendAssetUpdateAsync(sendAssetRequest)
-
+    try {
+      implicit val requestReads = transactionsSendAsset.requestReads
+      val sendAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      sendAssetUpdateAsync(sendAssetRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "SEAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -383,12 +406,13 @@ class LoopBackController @Inject()(
 
 
   def sendFiat: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsSendFiat.requestReads
-
-    val sendFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    sendFiatUpdateAsync(sendFiatRequest)
-
+    try {
+      implicit val requestReads = transactionsSendFiat.requestReads
+      val sendFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSendFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      sendFiatUpdateAsync(sendFiatRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "SEFI" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -411,11 +435,13 @@ class LoopBackController @Inject()(
   }
 
   def buyerExecuteOrder: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsBuyerExecuteOrder.requestReads
-    val buyerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsBuyerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    buyerExecuteOrderUpdateSync(buyerExecuteOrderRequest)
-
+    try {
+      implicit val requestReads = transactionsBuyerExecuteOrder.requestReads
+      val buyerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsBuyerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      buyerExecuteOrderUpdateSync(buyerExecuteOrderRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "BUEO" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -429,6 +455,7 @@ class LoopBackController @Inject()(
         case Some(order) => order.awbProofHash = Some(sellerExecuteOrderRequest.awbProofHash)
           if (order.fiatProofHash.isDefined && order.awbProofHash.isDefined) {
             assetList.find(_.pegHash == sellerExecuteOrderRequest.pegHash).map { asset =>
+
               if (asset.moderated) {
                 fiatList.find(_.ownerAddress == order.id).map { fiat =>
                   fiat.ownerAddress = sellerExecuteOrderRequest.sellerAddress
@@ -443,11 +470,13 @@ class LoopBackController @Inject()(
   }
 
   def sellerExecuteOrder: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsSellerExecuteOrder.requestReads
-    val sellerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSellerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    sellerExecuteOrderUpdateSync(sellerExecuteOrderRequest)
-
+    try {
+      implicit val requestReads = transactionsSellerExecuteOrder.requestReads
+      val sellerExecuteOrderRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsSellerExecuteOrder.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      sellerExecuteOrderUpdateSync(sellerExecuteOrderRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "SEEO" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -460,12 +489,13 @@ class LoopBackController @Inject()(
   }
 
   def redeemAsset: Action[AnyContent] = Action { implicit request =>
-    implicit val requestReads = transactionsRedeemAsset.requestReads
-
-    val redeemAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    redeemAssetUpdateAsync(redeemAssetRequest)
-
+    try {
+      implicit val requestReads = transactionsRedeemAsset.requestReads
+      val redeemAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+      redeemAssetUpdateAsync(redeemAssetRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "RDAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {
@@ -481,13 +511,15 @@ class LoopBackController @Inject()(
   }
 
   def redeemFiat: Action[AnyContent] = Action { implicit request =>
+    try {
+      implicit val requestReads = transactionsRedeemFiat.requestReads
 
-    implicit val requestReads = transactionsRedeemFiat.requestReads
+      val redeemFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
-    val redeemFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsRedeemFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-
-    redeemFiatUpdateSync(redeemFiatRequest)
-
+      redeemFiatUpdateSync(redeemFiatRequest)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+    }
     if (kafkaEnabled) {
       Ok(Json.toJson(KafkaResponse(ticketID = "RDAS" + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
     } else {

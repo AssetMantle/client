@@ -262,9 +262,7 @@ class ConfirmBuyerBids @Inject()(
         _ <- markDirty(confirmBuyerBid)
         fromAccountID <- getID(confirmBuyerBid.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BUYER_BID_CONFIRMATION_FAILED, message)
-      } yield {
-        actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.TRANSACTION_FAILED_DISABLE_SPINNER, messageContent = actors.Message.BlockchainTransaction("76757575",constants.Form.BUYER_CONFIRM_NEGOTIATION.button.replaceAll("""\.""","_")))
-      }).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

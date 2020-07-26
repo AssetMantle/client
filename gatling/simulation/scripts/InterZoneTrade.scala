@@ -7,9 +7,9 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-class TwoZoneTrade extends Simulation {
+class InterZoneTrade extends Simulation {
 
-  val twoZoneTradeScenario = scenario("TwoZOne")
+  val twoZoneTradeScenario = scenario("InterZoneTrade")
     .exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(session => session.set(Test.TEST_SELL_ZONE_USERNAME, session(Test.TEST_ZONE_USERNAME).as[String]).set(Test.TEST_SELL_ZONE_PASSWORD, session(Test.TEST_ZONE_PASSWORD).as[String]))

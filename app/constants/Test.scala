@@ -9,10 +9,10 @@ object Test {
 
   val IMAGE_FILE_FEED = "/home/prashant/testImages/"
   val REQUEST_DELAY = 2
-  val BLOCKCHAIN_TRANSACTION_DELAY = 30
+  val BLOCKCHAIN_TRANSACTION_DELAY = 40
   val LOOP_DELAY = 1
   val OTP = "999999"
-  val GAS = "999999"
+  val GAS = "10"
   val NEW_PASSOWRD_SUFFIX = "_NEW"
 
   val TEST_NAME = "TEST_NAME"
