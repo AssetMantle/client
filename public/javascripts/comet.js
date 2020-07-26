@@ -1,6 +1,5 @@
 function cometMessageHandler(message) {
     let parsedMessage = JSON.parse(JSON.stringify(message));
-    console.log("messageType---"+parsedMessage.messageType);
     switch (parsedMessage.messageType) {
         case 'ASSET' :
             break;
@@ -32,21 +31,6 @@ function cometMessageHandler(message) {
                 comet('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(parsedMessage.messageContent.chatID, 0), 'CHAT_LOADING');
             }
             break;
-        case 'TRANSACTION_SENT_ENABLE_SPINNER' :
-            console.log("here1111111--"+parsedMessage.messageContent.transactionType);
-            if($('#'+ parsedMessage.messageContent.transactionType).length){
-                console.log("TRANSACTION_SENT_ENABLE_SPINNER----RECeIVED");
-                console.log(parsedMessage.messageContent.transactionType);
-                xyz(parsedMessage.messageContent.transactionType);
-            }
-            break;
-        case 'TRANSACTION_FAILED_DISABLE_SPINNER' :
-            if($('#'+ parsedMessage.messageContent.transactionType).length){
-                console.log("TRANSACTION_FAILED_DISABLE_SPINNER----RECeIVED");
-                console.log(parsedMessage.messageContent.transactionType);
-                abc(parsedMessage.messageContent.transactionType);
-            }
-            break;
         case 'KEEP_ALIVE' :
             console.log("KeepingAlive")
             break;
@@ -55,16 +39,6 @@ function cometMessageHandler(message) {
             break;
 
     }
-}
-
-function xyz(id) {
-       $('#'+id).prop('disabled',true);
-       $("#newSpinner123123").show();
-}
-
-function abc(id){
-      $('#'+id).prop('disabled',false);
-    $("newSpinner123123").hide();
 }
 
 function comet(source, route, loadingSpinnerID = 'commonSpinner') {

@@ -76,9 +76,7 @@ class WesternUnionController @Inject()(
 
         def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
 
-        def zoneAddress(zoneAccountID: String) ={
-          blockchainAccounts.Service.tryGetAddress(zoneAccountID)
-        }
+        def zoneAddress(zoneAccountID: String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
         def zoneAutomatedIssueFiat(traderAddress: String, zoneID: String, zoneAddress: String) = issueFiat(traderAddress = traderAddress, zoneID = zoneID, zoneWalletAddress = zoneAddress, westernUnionReferenceID = requestBody.reference, transactionAmount = new MicroNumber(requestBody.paidOutAmount))
 

@@ -231,9 +231,7 @@ class ConfirmBuyerBids @Inject()(
         _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
         masterNegotiationID <- masterNegotiationID(negotiationID)
         _ <- masterTransactionTradeActivities.Service.create(masterNegotiationID, constants.TradeActivity.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
-      } yield {
-        /*actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiationID))*/
-      }).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {

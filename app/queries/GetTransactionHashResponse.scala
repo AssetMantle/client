@@ -2,7 +2,6 @@ package queries
 
 import java.net.ConnectException
 
-import controllers.routes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.{WSClient, WSResponse}
