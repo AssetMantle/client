@@ -28,6 +28,7 @@ class CometActor() extends Actor with ActorLogging {
           value ! cometMessage.message
         case None => logger.info(cometMessage.username + ": " + constants.Actor.ACTOR_NOT_FOUND)
       }
+
     case updateUsernameActorRef: UpdateUsernameActorRef =>
       usernameActorPathMap += (updateUsernameActorRef.username -> updateUsernameActorRef.actorRef)
       logger.info(updateUsernameActorRef.username + ": " + constants.Actor.USER_COMET_ACTOR_ADDED_TO_MAP)
