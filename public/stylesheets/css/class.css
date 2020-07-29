@@ -425,14 +425,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100% !important; }
 .comdex .buttonPrimary {
   border-radius: 0.25rem;
-  background: #fff;
-  color: #000;
-  font-size: 0.875rem;
-  transition: 0.2s;
-  border: 1px solid rgba(5, 60, 117, 0.12); }
-.comdex .cmuk-button:hover {
+  background: #0862BE;
   color: #FFFFFF;
-  background: #0862BE; }
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: 1px solid rgba(5, 60, 117, 0.12); }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
   background-color: #053C75; }
 .comdex .cmuk-input {
@@ -512,6 +509,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
+  border: none;
   outline: none;
   cursor: pointer; }
 .comdex .cmuk-button-link {
@@ -591,12 +589,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     top: 13px;
     left: 160px;
     font-weight: bold; }
-.comdex .cmuk-button-success:hover {
-  background-color: #5cb85c;
-  color: #fff; }
-.comdex .cmuk-button-danger:hover {
-  background-color: #ec2147;
-  color: #fff; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -1883,6 +1875,12 @@ header:before,
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
         background: #0862BE; }
+    .commonList .listItemChild .cmuk-button-success:hover {
+      background-color: #5cb85c;
+      color: #fff; }
+    .commonList .listItemChild .cmuk-button-danger:hover {
+      background-color: #ec2147;
+      color: #fff; }
 
 .accountName {
   position: absolute;

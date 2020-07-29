@@ -523,15 +523,11 @@ html, body{
   }
   .buttonPrimary {
     border-radius: 0.25rem;
-    background:#fff;
-    color: #000;
-    font-size: $paragraphFontSizeSmall;
-    transition:0.2s;
-    border: 1px solid rgba(5, 60, 117, 0.12);
-  }
-  .cmuk-button:hover {
+    background:$colorPrimary;
     color: #FFFFFF;
-    background: #0862BE;
+    font-size: $paragraphFontSizeSmall;
+    font-weight: bold;
+    border: 1px solid rgba(5, 60, 117, 0.12);
   }
   .buttonPrimary:active, .buttonPrimary.cmuk-active{
     background-color: $colorSecondary;
@@ -640,6 +636,7 @@ html, body{
   .cmuk-button {
     overflow: hidden;
     position: relative;
+    border: none;
     outline: none;
     cursor: pointer;
   }
@@ -744,18 +741,6 @@ html, body{
       top: 13px;
       left: 160px;
       font-weight: bold;
-    }
-  }
-  .cmuk-button-success{
-    &:hover{
-      background-color: #5cb85c;
-      color: #fff;
-    }
-  }
-  .cmuk-button-danger{
-    &:hover{
-      background-color: #ec2147;
-      color: #fff;
     }
   }
 }
@@ -2530,7 +2515,18 @@ header:before,
         background: $colorPrimary;
       }
     }
-
+    .cmuk-button-success{
+      &:hover{
+        background-color: #5cb85c;
+        color: #fff;
+      }
+    }
+    .cmuk-button-danger{
+      &:hover{
+        background-color: #ec2147;
+        color: #fff;
+      }
+    }
   }
 }
 
