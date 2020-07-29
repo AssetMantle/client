@@ -23,6 +23,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComponentViewController @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                          blockchainFiats: blockchain.Fiats,
+                                         blockchainAccounts: blockchain.Accounts,
+                                         blockchainTransactionConfirmBuyerBids: blockchainTransaction.ConfirmBuyerBids,
+                                         blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
+                                         blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
+                                         blockchainTransactionSendFiats: blockchainTransaction.SendFiats,
+                                         blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders,
+                                         blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
+                                         blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets,
                                          masterAssets: master.Assets,
                                          masterAssetHistories: master.AssetHistories,
                                          masterAccountFiles: master.AccountFiles,
@@ -1242,20 +1250,57 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getResult(traderID: String, negotiation: Negotiation) = {
+      def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
+
+      def getOrder(negotiationID: String): Future[Option[Order]] = masterOrders.Service.get(negotiationID)
+
+      def getCounterPartyTrader(traderID: String, negotiation: Negotiation) = masterTraders.Service.tryGet(if (traderID == negotiation.buyerTraderID) negotiation.sellerTraderID else negotiation.buyerTraderID)
+
+      def getBuyerAddress(traderID: String, negotiation: Negotiation, counterPartyAccountID: String) = if (traderID == negotiation.buyerTraderID) Future(loginState.address) else blockchainAccounts.Service.tryGetAddress(counterPartyAccountID)
+
+      def getSellerAddress(traderID: String, negotiation: Negotiation, counterPartyAccountID: String) = if (traderID == negotiation.sellerTraderID) Future(loginState.address) else blockchainAccounts.Service.tryGetAddress(counterPartyAccountID)
+
+      def getSuccessiveTransactionStatus(traderID: String, negotiation: Negotiation, order: Option[Order], buyerAddress: String, sellerAddress: String, asset: Asset) = {
+        val pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
+
+        if (traderID == negotiation.buyerTraderID) {
+          negotiation.status match {
+            case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING => blockchainTransactionConfirmBuyerBids.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
+            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => order match {
+              case Some(order) => order.status match {
+                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
+                case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionBuyerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
+                case _ => Future(Option(false))
+              }
+              case None => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
+            }
+            case _ => Future(Option(false))
+          }
+        } else if (traderID == negotiation.sellerTraderID) {
+          negotiation.status match {
+            case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING => blockchainTransactionConfirmSellerBids.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
+            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => order match {
+              case Some(order) => order.status match {
+                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
+                case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionSellerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
+                case constants.Status.Order.COMPLETED => Future(Option(false))
+              }
+              case None => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
+            }
+            case _ => Future(Option(false))
+          }
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+
+      }
+
+      def getResult(traderID: String, negotiation: Negotiation, order: Option[Order], asset: Asset, counterPartyTrader: Trader, successiveTransactionStatus: Option[Boolean]) = {
         if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
-          val asset = masterAssets.Service.tryGet(negotiation.assetID)
-          val order = masterOrders.Service.get(negotiationID)
-          val counterPartyTrader = masterTraders.Service.tryGet(if (traderID == negotiation.buyerTraderID) negotiation.sellerTraderID else negotiation.buyerTraderID)
-
-          def getCounterPartyOrganization(organizationID: String) = masterOrganizations.Service.tryGet(organizationID)
-
+          val counterPartyOrganization = masterOrganizations.Service.tryGet(counterPartyTrader.organizationID)
           for {
-            asset <- asset
-            order <- order
-            counterPartyTrader <- counterPartyTrader
-            counterPartyOrganization <- getCounterPartyOrganization(counterPartyTrader.organizationID)
-          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiation = negotiation, order = order, asset = asset))
+            counterPartyOrganization <- counterPartyOrganization
+          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiation = negotiation, order = order, asset = asset, successiveTransactionStatus = successiveTransactionStatus))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1264,7 +1309,13 @@ class ComponentViewController @Inject()(
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(traderID, negotiation)
+        asset <- getAsset(negotiation.assetID)
+        order <- getOrder(negotiation.id)
+        counterPartyTrader <- getCounterPartyTrader(traderID, negotiation)
+        buyerAddress <- getBuyerAddress(traderID, negotiation, counterPartyTrader.accountID)
+        sellerAddress <- getSellerAddress(traderID, negotiation, counterPartyTrader.accountID)
+        successiveTransactionStatus <- getSuccessiveTransactionStatus(traderID, negotiation, order, buyerAddress, sellerAddress, asset)
+        result <- getResult(traderID, negotiation, order, asset, counterPartyTrader, successiveTransactionStatus)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
