@@ -523,10 +523,15 @@ html, body{
   }
   .buttonPrimary {
     border-radius: 0.25rem;
-    background:$colorPrimary;
-    color: #FFFFFF;
+    background:#fff;
+    color: #000;
     font-size: $paragraphFontSizeSmall;
-    font-weight: bold;
+    transition:0.2s;
+    border: 1px solid rgba(5, 60, 117, 0.12);
+  }
+  .cmuk-button:hover {
+    color: #FFFFFF;
+    background: #0862BE;
   }
   .buttonPrimary:active, .buttonPrimary.cmuk-active{
     background-color: $colorSecondary;
@@ -635,7 +640,6 @@ html, body{
   .cmuk-button {
     overflow: hidden;
     position: relative;
-    border: none;
     outline: none;
     cursor: pointer;
   }
@@ -740,6 +744,18 @@ html, body{
       top: 13px;
       left: 160px;
       font-weight: bold;
+    }
+  }
+  .cmuk-button-success{
+    &:hover{
+      background-color: #5cb85c;
+      color: #fff;
+    }
+  }
+  .cmuk-button-danger{
+    &:hover{
+      background-color: #ec2147;
+      color: #fff;
     }
   }
 }
@@ -1790,12 +1806,7 @@ form{
         &:first-child {
           padding-top: 0px;
         }
-        &:nth-child(2) p.cmuk-comment-meta {
-          color: #4CA841;
-        }
-        &:nth-child(3) p.cmuk-comment-meta {
-          color: #F2453C;
-        }
+
       }
     }
     .cmuk-switcher, .financialCard{
@@ -1809,14 +1820,6 @@ form{
         &:last-child {
           border: 0;
         }
-        &:nth-child(2) p.cmuk-comment-meta {
-          color: #4CA841;
-        }
-        &:nth-child(3) p.cmuk-comment-meta {
-          color: #F2453C;
-        }
-
-
         .wallet {
           align-items: center;
           .walletIcon {
@@ -1840,7 +1843,7 @@ form{
 
           .payableIcon {
             @extend %iconBackground;
-            background: #A23BBB;
+            background: #F2453C;
             box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25);
             .icon{
               left:3px;
@@ -2527,18 +2530,7 @@ header:before,
         background: $colorPrimary;
       }
     }
-    .cmuk-button-success{
-      &:hover{
-        background-color: #5cb85c;
-        color: #fff;
-      }
-    }
-    .cmuk-button-danger{
-      &:hover{
-        background-color: #ec2147;
-        color: #fff;
-      }
-    }
+
   }
 }
 

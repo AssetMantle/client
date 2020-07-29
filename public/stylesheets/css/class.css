@@ -425,10 +425,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100% !important; }
 .comdex .buttonPrimary {
   border-radius: 0.25rem;
-  background: #0862BE;
-  color: #FFFFFF;
+  background: #fff;
+  color: #000;
   font-size: 0.875rem;
-  font-weight: bold; }
+  transition: 0.2s;
+  border: 1px solid rgba(5, 60, 117, 0.12); }
+.comdex .cmuk-button:hover {
+  color: #FFFFFF;
+  background: #0862BE; }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
   background-color: #053C75; }
 .comdex .cmuk-input {
@@ -508,7 +512,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
-  border: none;
   outline: none;
   cursor: pointer; }
 .comdex .cmuk-button-link {
@@ -588,6 +591,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     top: 13px;
     left: 160px;
     font-weight: bold; }
+.comdex .cmuk-button-success:hover {
+  background-color: #5cb85c;
+  color: #fff; }
+.comdex .cmuk-button-danger:hover {
+  background-color: #ec2147;
+  color: #fff; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -1355,10 +1364,6 @@ form .formBody {
   margin: 0 20px; }
   .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
     padding-top: 0px; }
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li:nth-child(2) p.cmuk-comment-meta {
-    color: #4CA841; }
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li:nth-child(3) p.cmuk-comment-meta {
-    color: #F2453C; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
   padding: 10px 0;
@@ -1367,10 +1372,6 @@ form .formBody {
     padding-top: 0; }
   .leftContainer .financial .cmuk-switcher ul li:last-child, .leftContainer .financial .financialCard ul li:last-child {
     border: 0; }
-  .leftContainer .financial .cmuk-switcher ul li:nth-child(2) p.cmuk-comment-meta, .leftContainer .financial .financialCard ul li:nth-child(2) p.cmuk-comment-meta {
-    color: #4CA841; }
-  .leftContainer .financial .cmuk-switcher ul li:nth-child(3) p.cmuk-comment-meta, .leftContainer .financial .financialCard ul li:nth-child(3) p.cmuk-comment-meta {
-    color: #F2453C; }
   .leftContainer .financial .cmuk-switcher ul li .wallet, .leftContainer .financial .financialCard ul li .wallet {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .wallet .walletIcon, .leftContainer .financial .financialCard ul li .wallet .walletIcon {
@@ -1383,7 +1384,7 @@ form .formBody {
   .leftContainer .financial .cmuk-switcher ul li .payable, .leftContainer .financial .financialCard ul li .payable {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon {
-      background: #A23BBB;
+      background: #F2453C;
       box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25); }
       .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .icon {
         left: 3px; }
@@ -1882,12 +1883,6 @@ header:before,
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
         background: #0862BE; }
-    .commonList .listItemChild .cmuk-button-success:hover {
-      background-color: #5cb85c;
-      color: #fff; }
-    .commonList .listItemChild .cmuk-button-danger:hover {
-      background-color: #ec2147;
-      color: #fff; }
 
 .accountName {
   position: absolute;
