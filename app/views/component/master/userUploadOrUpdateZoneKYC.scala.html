@@ -24,8 +24,8 @@
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }
-@commonModalButton(constants.View.BACK, constants.Form.ADD_ZONE.get)
+@commonModalButton(constants.View.BACK, constants.Form.ADD_ZONE.get, 'class -> "cmuk-margin-top buttonPrimary")
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
-    @commonFormButton(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION)
+    @commonFormButton(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, 'class -> "cmuk-margin-top buttonPrimary")
 }
 </div>

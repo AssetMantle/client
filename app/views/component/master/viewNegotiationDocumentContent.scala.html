@@ -7,12 +7,16 @@
 @import models.master.Trader
 @import models.master.Organization
 @(documentType:String, documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="modalInfoBlock">
-@documentContent match {
+    @documentContent match {
     case Some(content)=> {
         @documentType match {
             case constants.File.Negotiation.INVOICE => {
-                @Messages(constants.File.Negotiation.INVOICE) :
+                <legend class="cmuk-legend">
+                    @Messages(constants.File.Negotiation.INVOICE)
+                </legend>
+                <hr>
+                <div class="modalInfoBlock">
+
                 @defining(content.asInstanceOf[Serializable.Invoice]){invoiceDetails=>
 
                     @traderList.map{ trader =>
@@ -36,17 +40,24 @@
                     @commonTextInfo(constants.View.INVOICE_NUMBER, invoiceDetails.invoiceNumber)
                     @commonMicroNumberInfo(constants.View.AMOUNT, invoiceDetails.invoiceAmount)
                     @commonDateInfo(constants.View.INVOICE_DATE, invoiceDetails.invoiceDate)
+                    }
+                </div>
                 }
-            }
             case constants.File.Negotiation.CONTRACT =>{
-                @Messages(constants.File.Negotiation.CONTRACT) :
-                @defining(content.asInstanceOf[Serializable.Contract]){contractDetails=>
-                    @commonTextInfo(constants.View.CONTRACT_NUMBER, contractDetails.contractNumber)
-                }
+                    <legend class="cmuk-legend">
+                        @Messages(constants.File.Negotiation.CONTRACT)
+                    </legend>
+                    <hr>
+                    <div class="modalInfoBlock">
+                        @defining(content.asInstanceOf[Serializable.Contract]){contractDetails=>
+                            @commonTextInfo(constants.View.CONTRACT_NUMBER, contractDetails.contractNumber)
+                        }
+                    </div>
             }
             case _ => {}
         }
     }
-    case None=>{@Messages(constants.View.CONTENT_NOT_FOUND)}
+    case None=>{<div class="modalInfoBlock">
+                @Messages(constants.View.CONTENT_NOT_FOUND)
+                </div>}
 }
-</div>
