@@ -217,12 +217,12 @@
       }
       .signUpForm, .mnemonicQuiz{
         form .formBody{
-          padding: 10px 60px 40px 60px;
+          padding: 20px 50px 50px 50px;
         }
       }
     }
   }
-  .leftContainer{
+  .comdex .leftContainer{
     .financial{
       margin-bottom: 15px;
       .cmuk-card{
@@ -233,14 +233,16 @@
         }
       }
     }
-    .financial {
-      .cmuk-switcher{
-        ul li {
-          padding: 10px 0;
-      }
-      }
+    .addBalanceButton{
+      text-transform: capitalize;
+      font-family: $fontFamilyPrimary;
+      padding: 8px 8px;
+      line-height:normal;
+      background: rgba(8, 98, 190, 0.1);
+      border-radius: 103px;
+      color: #0862BE;
+      border: 0;
     }
-
     .documentView{
       .cmuk-card-body, .documentList{
         padding:0px;
@@ -343,6 +345,19 @@
     .cmuk-input, .cmuk-select:not([multiple]):not([size]){
       height: 40px;
     }
+    .cmuk-button{
+      padding: .7rem 1.5rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .cmuk-button-small {
+      padding: 0 15px;
+      line-height: 28px;
+      font-size: .875rem;
+    }
+  }
+  form .formBody {
+    padding: 20px 50px 50px 50px;
   }
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .usernameAvailability .failureIcon,
@@ -404,7 +419,48 @@
   .iframeModal{
     height: 530px;
   }
-
+  .leftContainer .financial {
+    .financialCard.cardPaddingRemove ul li {
+      &:first-child {
+        padding-top: 5px;
+      }
+      padding: 5px 0;
+    }
+    .cmuk-switcher ul li,
+    .financialCard ul li{
+      &:first-child {
+        padding-top: 15px;
+      }
+      padding: 10px 0;
+    }
+  }
+  .profilePictureContainer .profilePicture {
+    height: 70px;
+    width: 70px;
+  }
+  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory{
+    width: 25px;
+  }
+  .documentView .documentList .table-scroll tbody tr td:first-child{
+    padding-left: 10px;
+  }
+  .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton{
+    top:10px;
+  }
+  .loginForm .formBody .forgotPassword{
+    top:2px
+  }
+  .signUpForm .usernameAvailability .result{
+    top:80px;
+  }
+  .contactDetails .contactInfoItem .cmuk-card {
+    .cmuk-button{
+      line-height: 10px;
+    }
+    .cmuk-button-link{
+      padding: 10px 0;
+    }
+  }
 }
 
 @media (min-width: 1600px) {
@@ -422,12 +478,6 @@
   }
   .modal .modalContent .modalBody {
     .modalInfoBlock, form .formBody{
-      .infoRowLabel {
-        width: 300px;
-      }
-      .infoRowValue {
-        text-align: left;
-      }
       .documentItem{
         .infoRowLabel{
           width: auto;
@@ -435,8 +485,25 @@
       }
     }
   }
+  .mobileNumberUpdate .countryCode{
+    width:118px;
+  }
 }
-
+@media (min-width: 1600px) and (max-width: 1820px) {
+  .leftContainer .financial .financialCard.cardPaddingRemove ul li{
+    &:first-child{
+      padding-top: 15px;
+    }
+    padding: 15px 0;
+  }
+}
+@media (max-width:1845px){
+  .walletButtons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
 @media (max-width:1920px){
   .comdex .cmuk-container {
     max-width: 100%;

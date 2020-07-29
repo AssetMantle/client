@@ -60,12 +60,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
 
-.profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
+.comdex .profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
   font-weight: bold;
   font-size: 0.875rem;
   text-decoration: none; }
 
-.comdex .cmuk-badge.verified, .comdex .cmuk-badge.rejected, .comdex .cmuk-badge.pending, .profileDetails .cmuk-badge {
+.comdex .cmuk-badge.verified, .comdex .cmuk-badge.rejected, .comdex .cmuk-badge.pending, .comdex .profileDetails .cmuk-badge {
   font-weight: bold;
   border-radius: 5px;
   font-size: 10px; }
@@ -208,7 +208,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 3px;
   background-color: #ddd;
   height: 13px;
-  margin: 10px 0; }
+  margin: 17px 0; }
 
 .progressBar {
   width: 0;
@@ -421,6 +421,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     word-break: break-word;
     margin-right: 15px; }
 
+.documentButtons .cmuk-button-success {
+  margin-bottom: 5px; }
+
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
 .comdex .buttonPrimary {
@@ -589,6 +592,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     top: 13px;
     left: 160px;
     font-weight: bold; }
+.comdex .listItemCenterButton .cmuk-button {
+  padding: 0 15px; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -716,10 +721,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     .modal .modalContent .modalBody {
       text-align: center; }
       .modal .modalContent .modalBody .infoRowLabel {
+        width: 300px;
         text-align: left;
         font-weight: bold; }
       .modal .modalContent .modalBody .infoRowValue {
-        text-align: right; }
+        text-align: left;
+        word-break: break-word; }
       .modal .modalContent .modalBody .title {
         margin: 10px 0 5px 0; }
       .modal .modalContent .modalBody hr {
@@ -789,16 +796,12 @@ form .formBody {
 .loginForm .formBody .forgotPassword {
   position: absolute;
   right: 0;
-  top: 12px; }
+  top: 10px; }
 .loginForm .formBody .buttonPrimary {
-  width: 100%;
-  margin-top: 20px;
-  padding: 5px 0; }
+  width: 100%; }
 
 .signUpForm form .formBody .buttonPrimary {
-  width: 100%;
-  margin-top: 20px;
-  padding: 5px 0; }
+  width: 100%; }
 .signUpForm .usernameAvailability {
   position: relative; }
   .signUpForm .usernameAvailability .result {
@@ -838,7 +841,7 @@ form .formBody {
     fill: #FE4350; }
 
 .logoutContainer form .formBody {
-  padding: 25px 60px 60px 60px; }
+  padding: 25px 60px 50px 60px; }
   .logoutContainer form .formBody p {
     margin-bottom: 30px;
     font-size: 1.25rem; }
@@ -857,15 +860,12 @@ form .formBody {
         margin-right: 15px; }
   .logoutContainer form .formBody .buttonPrimary {
     width: 250px;
-    margin-top: 20px;
-    padding: 5px 0; }
+    margin-top: 20px; }
 
 .mnemonicQuiz form .formBody .commonInputPassword dd input {
   width: 450px; }
 .mnemonicQuiz form .formBody .buttonPrimary {
-  width: 450px;
-  margin-top: 20px;
-  padding: 5px 0; }
+  width: 450px; }
 .mnemonicQuiz .titleMnemonic {
   font-weight: bold; }
 .mnemonicQuiz .errorMnemonicInput {
@@ -1529,7 +1529,8 @@ form .formBody {
     position: relative;
     bottom: 50px; }
 .rightContainer .orderInfoCard button {
-  margin: 5px; }
+  margin: 5px;
+  display: block; }
 
 .documentItem {
   display: flex;
@@ -1849,7 +1850,7 @@ header:before,
   flex-wrap: wrap; }
   .commonList .listItemChild {
     margin: 0;
-    padding: 20px 0;
+    padding: 20px 5px;
     font-size: 0.875rem;
     font-weight: bold; }
     .commonList .listItemChild:last-child .listItemChildValue {
@@ -1936,10 +1937,22 @@ header:before,
   height: 11px;
   fill: #0862BE; }
 
-.profileDetails .cmuk-button-link {
-  margin-bottom: 5px; }
-.profileDetails .editIcon,
-.profileDetails .editIcon .icon, .profileDetails .icon {
+.textOverflowCopy {
+  display: flex;
+  justify-content: flex-end; }
+  .textOverflowCopy .cmuk-icon-button {
+    width: 30px;
+    height: 30px; }
+    .textOverflowCopy .cmuk-icon-button svg {
+      width: 16px; }
+  .textOverflowCopy p {
+    margin: 0; }
+
+.comdex .profileDetails .cmuk-button-link {
+  margin-bottom: 5px;
+  padding: 0; }
+.comdex .profileDetails .editIcon,
+.comdex .profileDetails .editIcon .icon, .comdex .profileDetails .icon {
   height: 18px;
   width: 18px;
   margin-right: 5px;
@@ -1995,18 +2008,17 @@ header:before,
   position: relative;
   display: inline-block; }
   .toolTip .toolTipText {
+    font-size: 12px;
     visibility: hidden;
-    width: 140px;
+    width: 55px;
     background-color: #0862BE;
     color: #fff;
     text-align: center;
     border-radius: 3px;
-    padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -75px;
+    bottom: 120%;
+    left: -52%;
     opacity: 0;
     transition: opacity 0.3s; }
     .toolTip .toolTipText:after {
@@ -2251,7 +2263,7 @@ figure.zoom {
       color: #848A91;
       font-weight: bold;
       font-size: 0.875rem;
-      word-break: break-all; }
+      word-break: break-word; }
     .salesQuoteCard .salesQuoteCardMiddle p .lines {
       letter-spacing: 1px;
       color: #D0D0D0; }

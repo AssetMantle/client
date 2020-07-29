@@ -110,6 +110,8 @@ class SendAssets @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sendAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
+  private def getTransactionByFromToAddressesAndPegHash(from: String, to: String, pegHash: String)= db.run(sendAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -197,6 +199,7 @@ class SendAssets @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionStatus(from: String, to: String, pegHash: String) = getTransactionByFromToAddressesAndPegHash(from, to, pegHash).map(x => if (x.isDefined) x.get.status else Option(false))
   }
 
   object Utility {

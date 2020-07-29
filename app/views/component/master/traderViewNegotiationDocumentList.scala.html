@@ -53,7 +53,7 @@
     case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING | constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED=> {
         <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
             <tbody>
-                <tr><td colspan="3">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
+                <tr><td colspan="4">@Messages(constants.View.ASSET_DOCUMENTS):</td></tr>
                         @assetFileList.filter(assetFile=> negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
                             <tr>
                                 <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>
@@ -65,7 +65,7 @@
                                             @commonIcon("seen")
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="cmuk-text-center">
                                         @assetFile.status match{
                                             case Some(true)=>{<span class="cmuk-badge verified">@constants.View.APPROVED</span>}
                                             case Some(false)=>{<span class="cmuk-badge rejected">@constants.View.REJECTED</span>}
@@ -94,7 +94,11 @@
                                                 @commonIcon("seen")
                                             </span>
                                         </td>
-                                        @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>}
+                                        @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) {
+                                            <td class="cmuk-text-center"><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>
+                                        }else {
+                                            <td></td>
+                                        }
                                     }
                                     case _=>{<td colspan="3"></td>}
                                 }

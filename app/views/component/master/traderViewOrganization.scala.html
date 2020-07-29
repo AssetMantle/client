@@ -8,7 +8,16 @@
 } {
     @commonTextInfo(constants.View.ORGANIZATION_NAME, traderOrganization.name)
     @commonTextInfo(constants.View.ABBREVIATION, traderOrganization.abbreviation.getOrElse(""))
-    @commonTextInfo(constants.View.ORGANIZATION_ID, traderOrganization.id)
+    <div class="cmuk-flex infoRow">
+        <div class="infoRowLabel">
+        @Messages(constants.View.ORGANIZATION_ID)
+        </div>
+        <div class="infoRowValue textOverflowCopy">
+            <p>@Messages(traderOrganization.id)
+            </p>
+            @commonCopyText("organizationId", traderOrganization.id)
+        </div>
+    </div>
     @commonDateInfo(constants.View.ESTABLISHMENT_DATE, traderOrganization.establishmentDate)
     @commonBooleanInfo(constants.View.VERIFIED_STATUS, traderOrganization.verificationStatus)
 }

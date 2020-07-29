@@ -31,7 +31,7 @@
             }
             @commonVerticalMicroNumberInfo(constants.View.AMOUNT, receiveFiat.amount)
             @commonVerticalTextInfo(constants.View.STATUS, receiveFiat.status)
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            <div class="listItemChild cmuk-flex cmuk-flex-middle listItemCenterButton">
                 @if(history) {
                     @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(receiveFiat.orderID), 'class->"cmuk-button buttonPrimary")
                 } else {
