@@ -240,16 +240,7 @@
       }
       }
     }
-    .addBalanceButton{
-      text-transform: capitalize;
-      font-family: $fontFamilyPrimary;
-      padding: 8px 8px;
-      line-height:normal;
-      background: rgba(8, 98, 190, 0.1);
-      border-radius: 103px;
-      color: #0862BE;
-      border: 0;
-    }
+
     .documentView{
       .cmuk-card-body, .documentList{
         padding:0px;
@@ -327,10 +318,10 @@
   }
   .salesQuoteCard{
     .salesQuoteCardLeft{
-      flex: 32%;
+      flex: 15%;
     }
     .salesQuoteCardMiddle{
-      flex: 41%;
+      flex: 10%;
     }
     .salesQuoteCardRight{
       flex: 27%;
@@ -413,17 +404,7 @@
   .iframeModal{
     height: 530px;
   }
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li{
-    &:first-child{
-      padding-top: 10px;
-    }
-    padding: 15px 0px;
-  }
-  .walletButtons{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+
 }
 
 @media (min-width: 1600px) {

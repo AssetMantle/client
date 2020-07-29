@@ -12,7 +12,6 @@
         @commonVerticalInfoBox(){
             <div class="salesQuoteCardLeft salesChild">
                 <div class="salesQuoteCategory buy">
-                    <span>@Messages(constants.View.BUY)</span>
                 </div>
                 <div class="content">
                 @assetList.find(_.id == receivedNegotiationRequest.assetID) match {
@@ -23,7 +22,6 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(receivedNegotiationRequest.quantity.toRoundedOffString(), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq((receivedNegotiationRequest.price/receivedNegotiationRequest.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}
@@ -31,6 +29,15 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
+                @assetList.find(_.id == receivedNegotiationRequest.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetInitialData">
+                            <p class="assetPrice">@Seq((receivedNegotiationRequest.price/receivedNegotiationRequest.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), receivedNegotiationRequest.quantityUnit).mkString(" ")</p>
+                        </div>
+                    }
+                    case None => {}
+                }
+
                 @counterPartyTraderList.find(_.id == receivedNegotiationRequest.sellerTraderID) match {
                     case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -43,16 +50,22 @@
                     }
                     case None => {}
                 }
-                <p><span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
             <div class="salesQuoteCardRight salesChild">
+                <div class="cmuk-text-center">
+                    <p><span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                    <div class="navigationLocation">
+                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    </div>
+                    <p><span>@receivedNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
+                <div class="cmuk-text-center">
                 @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-                 @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-success")
-                @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-danger")
+                  <div>
+                    @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-success")
+                    @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-danger")
+                  </div>
+                </div>
             </div>
         }
     }

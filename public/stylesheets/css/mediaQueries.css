@@ -160,15 +160,6 @@
         overflow: auto; }
   .leftContainer .financial .cmuk-switcher ul li {
     padding: 10px 0; }
-  .leftContainer .addBalanceButton {
-    text-transform: capitalize;
-    font-family: Rubik;
-    padding: 8px 8px;
-    line-height: normal;
-    background: rgba(8, 98, 190, 0.1);
-    border-radius: 103px;
-    color: #0862BE;
-    border: 0; }
   .leftContainer .documentView .cmuk-card-body, .leftContainer .documentView .documentList {
     padding: 0px; }
   .leftContainer .documentView .documentList {
@@ -215,9 +206,9 @@
     left: 0px; }
 
   .salesQuoteCard .salesQuoteCardLeft {
-    flex: 32%; }
+    flex: 15%; }
   .salesQuoteCard .salesQuoteCardMiddle {
-    flex: 41%; }
+    flex: 10%; }
   .salesQuoteCard .salesQuoteCardRight {
     flex: 27%; } }
 @media (max-width: 1599px) {
@@ -271,17 +262,7 @@
     top: 0; }
 
   .iframeModal {
-    height: 530px; }
-
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li {
-    padding: 15px 0px; }
-    .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-      padding-top: 10px; }
-
-  .walletButtons {
-    display: flex;
-    flex-direction: column;
-    align-items: center; } }
+    height: 530px; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }
