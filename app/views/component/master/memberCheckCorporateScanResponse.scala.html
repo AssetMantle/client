@@ -35,12 +35,12 @@
                 @commonTextInfo(constants.View.PRIMARY_LOCATION, entity.primaryLocation.getOrElse(""))
                 @commonTextInfo(constants.View.MONITORING_STATUS, entity.monitoringStatus.getOrElse(""))
                 @commonJavascriptButton(constants.View.DETAILS, JavaScript(s"componentResource('scanDetailedResult', jsRoutes.controllers.BackgroundCheckController.corporateScanResult(${entity.resultId}))"))
-                @commonFormButton(constants.Form.MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION, 'parameters -> s"${entity.resultId}")
-                @commonFormButton(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, 'parameters -> s" '${organizationID}', ${corporateScanResponse.scanResult.scanId}, ${entity.resultId}")
+                @commonFormButton(constants.Form.MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"${entity.resultId}")
+                @commonFormButton(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s" '${organizationID}', ${corporateScanResponse.scanResult.scanId}, ${entity.resultId}")
             }
         }
         case None => {
-            @commonFormButton(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, 'parameters -> s" '${organizationID}', ${corporateScanResponse.scanResult.scanId}")
+            @commonFormButton(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s" '${organizationID}', ${corporateScanResponse.scanResult.scanId}")
         }
     }
 <div id="scanDetailedResult"></div>

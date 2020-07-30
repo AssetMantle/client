@@ -30,6 +30,6 @@
         @commonJavascriptButton(constants.View.ADD, JavaScript("onDocumentListIncomplete(this)"))
             @commonCheckbox(documentsListForm, constants.FormField.DOCUMENT_LIST_COMPLETED, 'containerDivClass -> "hidden", 'id -> "negotiationDocumentListCompleted")
             @commonSelect(documentsListForm, constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA)
-    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_PAYMENT_TERMS.get, 'parameters -> s"'${id}'")
+            @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_PAYMENT_TERMS.get, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"'${id}'")
 }
 

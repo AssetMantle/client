@@ -23,6 +23,7 @@ object TransactionResponse {
   case class ErrorResponse(error: String) extends BaseResponse
 
   implicit val ErrorResponseReads: Reads[ErrorResponse] = Json.reads[ErrorResponse]
+  implicit val ErrorResponseWrites: OWrites[ErrorResponse] = Json.writes[ErrorResponse]
 
   case class KafkaResponse(ticketID: String) extends BaseResponse
 

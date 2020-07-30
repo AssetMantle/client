@@ -41,5 +41,5 @@
                 <p  class="cmuk-text-left cmuk-margin-remove"><span class="cmuk-text-left">@Messages(negotiationDocument)</span></p>
             }
     @commonInputText(traderReviewNegotiationRequest, constants.FormField.ID, 'value -> negotiation.id, 'containerDivClass -> "hidden", 'readonly -> true)
-    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'parameters -> s"'${negotiation.id}'")
+    @commonModalButton(constants.View.BACK, constants.Form.NEGOTIATION_DOCUMENT_LIST.get, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"'${negotiation.id}'")
 }

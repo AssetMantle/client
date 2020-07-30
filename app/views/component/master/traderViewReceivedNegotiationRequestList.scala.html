@@ -51,8 +51,10 @@
             </div>
             <div class="salesQuoteCardRight salesChild">
                 @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${receivedNegotiationRequest.id}'")
-                 @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-success")
-                @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-danger")
+                 <div>
+                    @commonFormButton(constants.Form.ACCEPT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-success")
+                    @commonFormButton(constants.Form.REJECT_NEGOTIATION_REQUEST, 'parameters -> s"'${receivedNegotiationRequest.id}'", 'class -> "cmuk-button-danger")
+                 </div>
             </div>
         }
     }

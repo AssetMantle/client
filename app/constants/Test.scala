@@ -7,14 +7,16 @@ object Test {
 
   val BASE_URL = "http://" + TEST_IP + ":9000"
 
-  val IMAGE_FILE_FEED = "/home/prashant/testImages/"
+  val TEST_IMAGE_PATH = "/home/prashant/testImages/"
   val REQUEST_DELAY = 2
   val BLOCKCHAIN_TRANSACTION_DELAY = 40
   val LOOP_DELAY = 1
   val OTP = "999999"
   val GAS = "10"
-  val NEW_PASSOWRD_SUFFIX = "_NEW"
 
+  val NEW_PASSOWRD_SUFFIX = "_NEW"
+  val BLOCKCHAIN_ADDRESS_PREFIX = "commit1"
+  val LOOPBACK="LOOPBACK"
   val TEST_NAME = "TEST_NAME"
   val TEST_MNEMONIC = "TEST_MNEMONIC"
 
@@ -269,4 +271,25 @@ object Test {
   val CREDIT_TENTATIVE_DATE = "CREDIT.TENTATIVE_DATE"
   val CREDIT_REFERENCE = "CREDIT.REFERENCE"
 
+  object TEST_TICKET_ID_PREFIX{
+    val SEND_COIN="SECO"
+    val ADD_ZONE="DEZO"
+    val ADD_ORGANIZATION="DEOR"
+    val SET_ACL="DEAC"
+    val ISSUE_ASSET="ISAS"
+    val ISSUE_FIAT="ISFI"
+    val CHANGE_BUYER_BID="CHBB"
+    val CHANGE_SELLER_BID="CHSB"
+    val CONFIRM_BUYER_BID="COBB"
+    val CONFIRM_SELLER_BID="COSB"
+    val RELEASE_ASSET="RLAS"
+    val SEND_ASSET="SEAS"
+    val SEND_FIAT="SEFI"
+    val BUYER_EXECUTE_ORDER="BUEO"
+    val SELLER_EXECUTE_ORDER="SEEO"
+    val REDEEM_ASSET="RDAS"
+    val REDEEM_FIAT="RDFI"
+
+
+  }
 }

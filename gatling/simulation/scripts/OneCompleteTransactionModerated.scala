@@ -33,7 +33,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(50))
+    oneCompleteModeratedScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 

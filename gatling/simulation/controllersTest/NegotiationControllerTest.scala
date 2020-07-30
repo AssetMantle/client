@@ -276,7 +276,7 @@ object NegotiationControllerTest {
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
         Form.RESUMABLE_IDENTIFIER -> "document",
         Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
-      .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+      .bodyPart(RawFileBodyPart("file", Test.TEST_IMAGE_PATH + "${%s}".format(Test.TEST_FILE_NAME))
         .transferEncoding("binary")).asMultipartForm
       .check(status.is(200))
     )
@@ -306,7 +306,7 @@ object NegotiationControllerTest {
         Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
         Form.RESUMABLE_IDENTIFIER -> "document",
         Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
-      .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+      .bodyPart(RawFileBodyPart("file", Test.TEST_IMAGE_PATH + "${%s}".format(Test.TEST_FILE_NAME))
         .transferEncoding("binary")).asMultipartForm
       .check(status.is(200))
     )
@@ -394,7 +394,7 @@ object NegotiationControllerTest {
             Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
             Form.RESUMABLE_IDENTIFIER -> "document",
             Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
-          .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+          .bodyPart(RawFileBodyPart("file", Test.TEST_IMAGE_PATH + "${%s}".format(Test.TEST_FILE_NAME))
             .transferEncoding("binary")).asMultipartForm
           .check(status.is(200))
         )
@@ -425,7 +425,7 @@ object NegotiationControllerTest {
             Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
             Form.RESUMABLE_IDENTIFIER -> "document",
             Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
-          .bodyPart(RawFileBodyPart("file", Test.IMAGE_FILE_FEED + "${%s}".format(Test.TEST_FILE_NAME))
+          .bodyPart(RawFileBodyPart("file", Test.TEST_IMAGE_PATH + "${%s}".format(Test.TEST_FILE_NAME))
             .transferEncoding("binary")).asMultipartForm
           .check(status.is(200))
         )

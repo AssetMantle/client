@@ -35,8 +35,8 @@ object ImageFeeder {
       }}
 
       val fileName="test"+Random.alphanumeric.take(6).mkString+".jpg"
-     ImageIO.write(img, "jpg", new File(Test.IMAGE_FILE_FEED+fileName))
-      val length=(new File(Test.IMAGE_FILE_FEED+fileName).length())
+     ImageIO.write(img, "jpg", new File(Test.TEST_IMAGE_PATH+fileName))
+      val length=(new File(Test.TEST_IMAGE_PATH+fileName).length())
       imageFeed(id) = Map(Test.TEST_FILE_NAME -> fileName, Test.TEST_FILE_SIZE -> length.toString)
     }
       imageFeed

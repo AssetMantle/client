@@ -626,16 +626,16 @@ GET         /loopback/api/v1/corp-scans/single/:request                         
 GET         /loopback/sendEmail/:emailAddress                                                     controllers.LoopBackController.sendEmail(emailAddress: String)
 GET         /loopback/sendSMS/:mobileNumber                                                       controllers.LoopBackController.sendSMS(mobileNumber: String)
 GET         /loopback/keys/mnemonic                                                               controllers.LoopBackController.mnemonic
-GET         /loopback/zone/:zoneID                                                                controllers.LoopBackController.getZone(zoneID:String)
-GET         /loopback/organization/:organizationID                                                controllers.LoopBackController.getOrganization(organizationID :String)
-GET         /loopback/response/:ticketID                                                          controllers.LoopBackController.getResponse(ticketID:String)
-GET         /loopback/txs/:txHash                                                                 controllers.LoopBackController.getTxHashResponse(txHash:String)
-GET         /loopback/auth/accounts/:address                                                      controllers.LoopBackController.getAccount(address:String)
-GET         /loopback/negotiation/:negotiationID                                                  controllers.LoopBackController.getNegotiation(negotiationID: String)
-GET         /loopback/negotiationID/:buyerAddress/:sellerAddress/:pegHash                         controllers.LoopBackController.getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String)
-GET         /loopback/order/:orderID                                                              controllers.LoopBackController.getOrder(orderID: String)
-GET         /loopback/reputation/:address                                                         controllers.LoopBackController.getTraderReputation(address: String)
-GET         /loopback/acl/:address                                                                controllers.LoopBackController.getACL(address: String)
+GET         /loopback/zone/:zoneID                                                                controllers.LoopBackController.zone(zoneID:String)
+GET         /loopback/organization/:organizationID                                                controllers.LoopBackController.organization(organizationID :String)
+GET         /loopback/response/:ticketID                                                          controllers.LoopBackController.response(ticketID:String)
+GET         /loopback/txs/:txHash                                                                 controllers.LoopBackController.txHashResponse(txHash:String)
+GET         /loopback/auth/accounts/:address                                                      controllers.LoopBackController.account(address:String)
+GET         /loopback/negotiation/:negotiationID                                                  controllers.LoopBackController.negotiation(negotiationID: String)
+GET         /loopback/negotiationID/:buyerAddress/:sellerAddress/:pegHash                         controllers.LoopBackController.negotiationID(buyerAddress: String, sellerAddress: String, pegHash: String)
+GET         /loopback/order/:orderID                                                              controllers.LoopBackController.order(orderID: String)
+GET         /loopback/reputation/:address                                                         controllers.LoopBackController.traderReputation(address: String)
+GET         /loopback/acl/:address                                                                controllers.LoopBackController.acl(address: String)
 
 POST        /loopback/api/v1/corp-scans/single                                                    controllers.LoopBackController.memberCheckCorporateScan
 POST        /loopback/keys                                                                        controllers.LoopBackController.addKey

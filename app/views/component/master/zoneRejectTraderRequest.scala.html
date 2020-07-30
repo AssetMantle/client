@@ -6,5 +6,5 @@
 @commonForm(constants.Form.ZONE_REJECT_TRADER_REQUEST, rejectTraderRequestForm) {
     @commonInputText(rejectTraderRequestForm, constants.FormField.TRADER_ID, 'value -> traderID, 'readonly -> true)
     @commonInputText(rejectTraderRequestForm, constants.FormField.COMMENT, 'required -> false)
-    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'parameters -> s"'${traderID}'")
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.zoneViewPendingTraderRequest, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"'${traderID}'")
 }
