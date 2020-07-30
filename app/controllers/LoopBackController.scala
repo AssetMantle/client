@@ -110,7 +110,7 @@ class LoopBackController @Inject()(
   }
 
   def sendSMS(mobileNumber: String): Action[AnyContent] = Action.async {
-    val mobileNumberAccount = masterMobiles.Service.getMobileNumberAccount(mobileNumber)
+    val username = masterMobiles.Service.getUsernameByMobileNumber(mobileNumber)
 
     def updateOTP(accountID: Option[String]): Future[Int] = {
       accountID match {
@@ -120,8 +120,8 @@ class LoopBackController @Inject()(
     }
 
     for {
-      mobileNumberAccount <- mobileNumberAccount
-      _ <- updateOTP(mobileNumberAccount)
+      username <- username
+      _ <- updateOTP(username)
     } yield Ok
   }
 

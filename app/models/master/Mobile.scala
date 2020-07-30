@@ -145,7 +145,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def tryGetUnverifiedMobileNumber(id: String): Future[String] = tryGetMobileNumberByIDAndStatus(id, status = false)
 
-    def getMobileNumberAccount(mobileNumber: String): Future[Option[String]] = getAccountIDByMobileNumber(mobileNumber)
+    def getUsernameByMobileNumber(mobileNumber: String): Future[Option[String]] = getAccountIDByMobileNumber(mobileNumber)
 
     def updateMobileNumber(id: String, mobileNumber: String): Future[Int] = updateMobileNumberAndStatusByID(id = id, mobileNumber = mobileNumber, status = false)
   }
