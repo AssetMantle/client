@@ -261,7 +261,7 @@ class FileController @Inject()(
         negotiation <- negotiation
         _ <- storeFile(negotiation.assetID)
         result <- getResultByDocumentType(negotiation)
-        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_UPLOADED, loginState.username, messagesApi(documentType)(request.messages.lang))
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_UPLOADED, loginState.username, Messages(documentType))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -327,7 +327,7 @@ class FileController @Inject()(
         oldDocument <- oldDocument(negotiation.assetID)
         _ <- updateFile(oldDocument, negotiation.assetID)
         result <- getResultByDocumentType(negotiation)
-        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_UPDATED, loginState.username, messagesApi(documentType)(request.messages.lang))
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_UPDATED, loginState.username, Messages(documentType))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -457,7 +457,7 @@ class FileController @Inject()(
       (for {
         negotiationDocumentList <- negotiationDocumentList
         result <- storeAndGetResult((negotiationDocumentList.negotiationDocuments ++ Seq(constants.File.Negotiation.CONTRACT)).contains(documentType))
-        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.NEGOTIATION_DOCUMENT_UPLOADED, loginState.username, messagesApi(documentType)(request.messages.lang))
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.NEGOTIATION_DOCUMENT_UPLOADED, loginState.username, Messages(documentType))
       } yield {
         result
       }).recover {
@@ -550,7 +550,7 @@ class FileController @Inject()(
         oldDocument <- oldDocument
         _ <- updateFile(oldDocument)
         result <- getResultByDocumentType
-        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.NEGOTIATION_DOCUMENT_UPDATED, loginState.username, messagesApi(documentType)(request.messages.lang))
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.NEGOTIATION_DOCUMENT_UPDATED, loginState.username, Messages(documentType))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
