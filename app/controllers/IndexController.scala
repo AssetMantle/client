@@ -21,22 +21,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      println("index")
-      val traderIDs=Seq("DF9E1B4A3DD38365",
-      "8EB04FBF640E0606",
-        "F3EDF38A45590EA4"
-    )
-
-      def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
-
-      getTraders(traderIDs).map{traders=>
-        traders.map{trader=>
-          println("asdasdadsadasd")
-          println(trader.toString)
-        }
-
-      }
-
       (loginState.userType match {
         case constants.User.USER => withUsernameToken.Ok(views.html.profile())
         case constants.User.WITHOUT_LOGIN =>
