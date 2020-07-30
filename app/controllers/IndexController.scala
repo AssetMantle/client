@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,masterTraders:models.master.Traders, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -20,6 +20,22 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+
+      println("index")
+      val traderIDs=Seq("DF9E1B4A3DD38365",
+      "8EB04FBF640E0606",
+        "F3EDF38A45590EA4"
+    )
+
+      def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+
+      getTraders(traderIDs).map{traders=>
+        traders.map{trader=>
+          println("asdasdadsadasd")
+          println(trader.toString)
+        }
+
+      }
 
       (loginState.userType match {
         case constants.User.USER => withUsernameToken.Ok(views.html.profile())

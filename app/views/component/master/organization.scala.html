@@ -15,7 +15,9 @@
             <div class="title"> <span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
             @commonTextInfo(constants.View.NAME, organization.name)
             @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
-            @commonTextInfo(constants.View.ID, organization.id)
+            <p>@commonTextInfo(constants.View.ID, organization.id, 'id -> "organizationID")
+                <a class="toolTip"  onclick="copyToClipboard('organizationID','toolTipOrganizationID')"><span class="toolTipText" id="toolTipOrganizationID">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy('toolTipOrganizationID')"></span></a>
+            </p>
             @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
             @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
         }

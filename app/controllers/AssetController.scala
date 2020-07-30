@@ -37,6 +37,7 @@ class AssetController @Inject()(
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                  docusignEnvelopes: docusign.Envelopes,
                                  masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                 masterTransactionTradeActivities:masterTransaction.TradeActivities,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
@@ -261,6 +262,7 @@ class AssetController @Inject()(
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.BILL_OF_LADING_CONTENT_ADDED, billOfLadingContentData.negotiationID)
+                _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.BILL_OF_LADING_CONTENT_ADDED, loginState.username)
                 result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
@@ -528,6 +530,7 @@ class AssetController @Inject()(
               _ <- verify
               sellerAccountID <- sellerAccountID
               _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_ACCEPTED,loginState.username, messagesApi(updateAssetDocumentStatusData.documentType)(request.messages.lang))
             } yield {}
           } else {
             val reject = masterTransactionAssetFiles.Service.reject(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
@@ -536,6 +539,7 @@ class AssetController @Inject()(
               _ <- reject
               sellerAccountID <- sellerAccountID
               _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_REJECTED, loginState.username, messagesApi(updateAssetDocumentStatusData.documentType)(request.messages.lang))
             } yield {}
           }
 

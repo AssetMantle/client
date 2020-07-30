@@ -22,6 +22,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    masterTraders: master.Traders,
                                    masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
+                                   masterTransactionTradeActivities:masterTransaction.TradeActivities,
                                    docusignEnvelopes: docusign.Envelopes,
                                    withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -81,9 +82,13 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
     def getTraders(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
-    def updateStatus(docusignEnvelope: docusign.Envelope, traderAccountIDs: Seq[String]) = event match {
+    def updateStatus(docusignEnvelope: docusign.Envelope, traders: Seq[Trader], negotiation: Negotiation) = event match {
       case constants.External.Docusign.SEND => {
-        docusignEnvelopes.Service.markSent(envelopeId)
+        val markSent=docusignEnvelopes.Service.markSent(envelopeId)
+        for{
+          _<-markSent
+          _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.CONTRACT_SENT_FOR_SIGNATURE, traders.find(_.id== negotiation.sellerTraderID).map(_.accountID).getOrElse(""))
+        }yield ()
       }
       case constants.External.Docusign.SIGNING_COMPLETE => {
         val oldFile = masterTransactionNegotiationFiles.Service.tryGet(docusignEnvelope.id, docusignEnvelope.documentType)
@@ -104,8 +109,9 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
           _ <- markSigningComplete
           _ <- markContractSigned(docusignEnvelope.id)
           _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
-          _ <- utilitiesNotification.send(traderAccountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
-          _ <- utilitiesNotification.send(traderAccountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+          _ <- utilitiesNotification.send(traders(0).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+          _ <- utilitiesNotification.send(traders(1).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+          _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.CONTRACT_SIGNED, traders.find(_.id== negotiation.buyerTraderID).map(_.accountID).getOrElse(""))
         } yield 0
       }
       case _ => throw new BaseException(constants.Response.UNEXPECTED_EVENT)
@@ -115,7 +121,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       envelope <- envelope
       negotiation <- getNegotiation(envelope.id)
       traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
-      _ <- updateStatus(envelope, traders.map(_.accountID))
+      _ <- updateStatus(envelope, traders,negotiation)
     } yield {
       actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
       actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
