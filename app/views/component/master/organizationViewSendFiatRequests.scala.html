@@ -4,11 +4,12 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.SEND_FIAT_REQUESTS) {
+@commonCard(constants.View.SEND_FIAT_REQUESTS, 'cardIconPath -> "images/icons/icons.svg#outBoundTransaction") {
 }{
     @commonHorizontalSwitcher(ListMap(
         constants.View.PENDING_SEND_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewPendingSendFiatRequestList,
         constants.View.COMPLETE_SEND_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewCompleteSendFiatRequestList,
         constants.View.FAILED_SEND_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewFailedSendFiatRequestList,
     ))
+    <button class="viewMore"></button>
 }

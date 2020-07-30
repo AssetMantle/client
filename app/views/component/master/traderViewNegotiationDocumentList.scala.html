@@ -65,7 +65,7 @@
                                             @commonIcon("seen")
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="cmuk-text-center">
                                         @assetFile.status match{
                                             case Some(true)=>{<span class="cmuk-badge verified">@constants.View.APPROVED</span>}
                                             case Some(false)=>{<span class="cmuk-badge rejected">@constants.View.REJECTED</span>}
@@ -95,7 +95,7 @@
                                             </span>
                                         </td>
                                         @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) {
-                                            <td><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>
+                                            <td class="cmuk-text-center"><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>
                                         }else {
                                             <td></td>
                                         }

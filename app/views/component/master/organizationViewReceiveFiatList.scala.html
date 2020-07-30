@@ -6,7 +6,7 @@
 
 @(receiveFiats: Seq[ReceiveFiat], receiveFiatHistories: Seq[ReceiveFiat], traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.RECEIVED_FIAT) {
+@commonCard(constants.View.RECEIVED_FIAT, 'cardIconPath -> "images/icons/icons.svg#fundReceived") {
 } {
    @receiveFiatData(receiveFiats, false)
    @receiveFiatData(receiveFiatHistories, true)
@@ -33,4 +33,5 @@
             </div>
         }
     }
+    <button class="viewMore"></button>
 }
