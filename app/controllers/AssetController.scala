@@ -530,7 +530,7 @@ class AssetController @Inject()(
               _ <- verify
               sellerAccountID <- sellerAccountID
               _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_ACCEPTED,loginState.username, messagesApi(updateAssetDocumentStatusData.documentType)(request.messages.lang))
+              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_ACCEPTED,loginState.username, Messages(updateAssetDocumentStatusData.documentType))
             } yield {}
           } else {
             val reject = masterTransactionAssetFiles.Service.reject(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
@@ -539,7 +539,7 @@ class AssetController @Inject()(
               _ <- reject
               sellerAccountID <- sellerAccountID
               _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_REJECTED, loginState.username, messagesApi(updateAssetDocumentStatusData.documentType)(request.messages.lang))
+              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_REJECTED, loginState.username, Messages(updateAssetDocumentStatusData.documentType))
             } yield {}
           }
 
