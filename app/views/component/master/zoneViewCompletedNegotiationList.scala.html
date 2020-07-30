@@ -19,7 +19,6 @@
                         <div class="assetInitialData">
                             <p class="assetTitle">@Messages(asset.assetType)</p>
                             <p class="assetQuantity">@Seq(negotiation.quantity.toString, negotiation.quantityUnit).mkString(" ")</p>
-                            <p class="assetPrice">@Seq((negotiation.price/negotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
                     case None => {}
@@ -27,6 +26,14 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
+                @assetList.find(_.id == negotiation.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetInitialData">
+                            <p class="assetPrice">@Seq((negotiation.price/negotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" ")</p>
+                        </div>
+                    }
+                    case None => {}
+                }
                 <p><span cmuk-tooltip="@Messages(constants.View.BUYER_TRADER_ID)">@negotiation.buyerTraderID</span>
                     <span class="lines">---</span>
                     <span cmuk-tooltip="@Messages(constants.View.SELLER_TRADER_ID)">@negotiation.sellerTraderID</span>
@@ -45,15 +52,15 @@
                     }
                     case None => {}
                 }
-
-                <p><span>@negotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@negotiation.assetOtherDetails.shippingDetails.portOfDischarge</span>
-                </p>
             </div>
             <div class="salesQuoteCardRight salesChild">
+                <div class="cmuk-text-center">
+                    <p><span>@negotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                    <div class="navigationLocation">
+                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    </div>
+                    <p><span>@negotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
             @commonLink(constants.View.GO_TO_TRADE_ROOM, routes.ViewController.tradeRoomCompleted(negotiation.id), 'class->"cmuk-button buttonPrimary")
             </div>
 

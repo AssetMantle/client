@@ -13,7 +13,7 @@
                 @commonVerticalInfoBox() {
                     <div class="salesQuoteCardLeft salesChild">
                         <div class="salesQuoteCategory buy">
-                            <span>@Messages(constants.View.BUY)</span>
+
                         </div>
                         <div class="content">
                         @assetList.find(_.id == completedNegotiation.assetID) match {
@@ -24,7 +24,6 @@
                                 <div class="assetInitialData">
                                     <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(completedNegotiation.quantity.toString, completedNegotiation.quantityUnit).mkString(" ")</p>
-                                    <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
                             case None => {}
@@ -32,6 +31,14 @@
                         </div>
                     </div>
                     <div class="salesQuoteCardMiddle salesChild">
+                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                        case Some(asset) => {
+                        <div class="assetInitialData">
+                            <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
+                        </div>
+                    }
+                        case None => {}
+                    }
                         @counterPartyTraderList.find(_.id == completedNegotiation.sellerTraderID) match {
                         case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -44,13 +51,15 @@
                     }
                         case None => {}
                     }
-                <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
                 <div class="salesQuoteCardRight salesChild">
+                    <div class="cmuk-text-center">
+                        <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                        <div class="navigationLocation">
+                            <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                        </div>
+                        <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                    </div>
                 @commonLink(constants.View.GO_TO_TRADE_ROOM, routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class -> "cmuk-button buttonPrimary")
                 </div>
                 }
@@ -70,7 +79,6 @@
                                 <div class="assetInitialData">
                                     <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(completedNegotiation.quantity.toString, completedNegotiation.quantityUnit).mkString(" ")</p>
-                                    <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
                             case None => {}
@@ -78,6 +86,14 @@
                         </div>
                     </div>
                     <div class="salesQuoteCardMiddle salesChild">
+                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                            case Some(asset) => {
+                                <div class="assetInitialData">
+                                    <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
+                                </div>
+                            }
+                            case None => {}
+                        }
                         @counterPartyTraderList.find(_.id == completedNegotiation.buyerTraderID) match {
                             case Some(trader) => {
                                 @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -90,13 +106,16 @@
                             }
                             case None => {}
                         }
-                        <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span>
-                            <span class="lines">---</span>
-                            <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                            <span class="lines">---</span>
-                            <span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+
                     </div>
                     <div class="salesQuoteCardRight salesChild">
+                        <div class="cmuk-text-center">
+                            <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                            <div class="navigationLocation">
+                                <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                            </div>
+                            <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                        </div>
                     @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class->"cmuk-button buttonPrimary")
                     </div>
                 }
