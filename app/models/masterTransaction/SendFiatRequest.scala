@@ -51,7 +51,7 @@ class SendFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequestSerialized]] = db.run(sendFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequestSerialized]] = db.run(sendFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequestSerialized]] = db.run(sendFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).result)
 

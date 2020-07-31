@@ -51,9 +51,9 @@ class RedeemFiatRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[RedeemFiatRequestSerialized]] = db.run(redeemFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[RedeemFiatRequestSerialized]] = db.run(redeemFiatRequestTable.filter(_.traderID inSet traderIDs).filter(_.status === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequestSerialized]] = db.run(redeemFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[RedeemFiatRequestSerialized]] = db.run(redeemFiatRequestTable.filter(_.traderID === traderID).filter(_.status === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def update(redeemFiatRequestSerialized: RedeemFiatRequestSerialized): Future[Int] = db.run(redeemFiatRequestTable.update(redeemFiatRequestSerialized).asTry).map {
     case Success(result) => result

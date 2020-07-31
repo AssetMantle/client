@@ -129,9 +129,9 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  private def findAllNegotiationsByTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID === traderID) union negotiationHistoryTable.filter(_.sellerTraderID === traderID)).filter(_.status.inSet(statuses)).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def findAllNegotiationsByTraderIDAndStatuses(traderID: String, statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID === traderID) union negotiationHistoryTable.filter(_.sellerTraderID === traderID)).filter(_.status.inSet(statuses)).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def findAllNegotiationsByTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID inSet traderIDs) union negotiationHistoryTable.filter(_.sellerTraderID inSet traderIDs)).filter(_.status.inSet(statuses)).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def findAllNegotiationsByTraderIDsAndStatuses(traderIDs: Seq[String], statuses: String*): Future[Seq[NegotiationHistorySerializable]] = db.run((negotiationHistoryTable.filter(_.buyerTraderID inSet traderIDs) union negotiationHistoryTable.filter(_.sellerTraderID inSet traderIDs)).filter(_.status.inSet(statuses)).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def tryGetBuyerTraderIDByID(id: String): Future[String] = db.run(negotiationHistoryTable.filter(_.id === id).map(_.buyerTraderID).result.head.asTry).map {
     case Success(result) => result
