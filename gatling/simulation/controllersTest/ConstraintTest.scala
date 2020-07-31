@@ -235,6 +235,7 @@ object ConstraintTest {
           constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
           Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
         .check(status.is(400))
+        .check(substring("PHYSICAL_DOCUMENTS_HANDLED_VIA_REQUIRED").exists)
         .check(css("legend:contains(Sales Quote Documents List)").exists)
         .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
       )

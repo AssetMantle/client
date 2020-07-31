@@ -8,10 +8,12 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
+import scala.util.Random
+
 
 object NegotiationControllerTest {
 
-  val negotiationTermList = Seq("ASSET_DESCRIPTION", "PRICE", "QUANTITY", "ASSET_OTHER_DETAILS", "PAYMENT_TERMS", "DOCUMENT_LIST")
+  val negotiationTermList = Seq(constants.View.ASSET_DESCRIPTION, constants.View.PRICE, constants.View.QUANTITY, constants.View.ASSET_OTHER_DETAILS, constants.View.PAYMENT_TERMS, constants.View.DOCUMENT_LIST)
 
   val negotiationRequestScenario: ScenarioBuilder = scenario("NegotiationRequest")
     .exec(http("Negotiation_Request_Form_GET")
@@ -72,7 +74,7 @@ object NegotiationControllerTest {
         "DOCUMENT_LIST[2]" -> constants.File.Asset.COA,
         "DOCUMENT_LIST[3]" -> constants.File.Negotiation.BILL_OF_EXCHANGE,
         "DOCUMENT_LIST[4]" -> constants.File.Negotiation.INVOICE,
-        constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> "BANK",
+        constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> Random.shuffle(constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA).head,
         constants.FormField.DOCUMENT_LIST_COMPLETED.name -> true,
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
       .check(status.is(206))
@@ -461,15 +463,15 @@ object NegotiationControllerTest {
         }
       .check{
         state match{
-          case constants.Test.TRADE_DOCUMENTS_NOT_UPLOADED=> substring("Trade Documents Confirmed").exists
-          case constants.Test.BILL_OF_LADING_NOT_ACCEPTED=>  substring("Trade Documents Confirmed").exists
+          case constants.Test.TRADE_DOCUMENTS_NOT_UPLOADED=> substring("RESPONSE.FAILURE.ALL_TRADE_DOCUMENTS_NOT_UPLOADED").exists
+          case constants.Test.BILL_OF_LADING_NOT_ACCEPTED=>  substring("Bill Of Lading Verification Status Pending").exists
           case constants.Test.PRECONDITIONS_SATISFIED=> substring("Trade Documents Confirmed").exists
         }
       }
     )
     .pause(Test.REQUEST_DELAY)
 
-  val sellerConfirmNegotiation: ScenarioBuilder = scenario("SellerConfirmNegotiation")
+  def sellerConfirmNegotiation(state:String): ScenarioBuilder = scenario("SellerConfirmNegotiation")
     .exec(http("Seller_ConfirmForm_GET")
       .get(session => routes.NegotiationController.sellerConfirmForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(status.is(200))
@@ -484,8 +486,20 @@ object NegotiationControllerTest {
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))
-      .check(status.is(200))
-      .check(substring("Trade Documents Confirmed").exists)
+      .check{
+        state match{
+          case constants.Test.TRADE_DOCUMENTS_NOT_UPLOADED=> status.is(500)
+          case constants.Test.BILL_OF_LADING_NOT_ACCEPTED=>  status.is(500)
+          case constants.Test.PRECONDITIONS_SATISFIED=> status.is(200)
+        }
+      }
+      .check{
+        state match{
+          case constants.Test.TRADE_DOCUMENTS_NOT_UPLOADED=> substring("RESPONSE.FAILURE.ALL_TRADE_DOCUMENTS_NOT_UPLOADED").exists
+          case constants.Test.BILL_OF_LADING_NOT_ACCEPTED=>  substring("Bill Of Lading Verification Status Pending").exists
+          case constants.Test.PRECONDITIONS_SATISFIED=> substring("Trade Documents Confirmed").exists
+        }
+      }
     )
     .pause(Test.REQUEST_DELAY)
 

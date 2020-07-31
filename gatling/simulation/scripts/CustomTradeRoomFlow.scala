@@ -83,7 +83,7 @@ object IssueAssetWithConstraintCheck {
     .exec(AccountControllerTest.loginScenario)
     .exec(ConstraintTest.IssueAsset.gasMissing)
     .exec(ConstraintTest.IssueAsset.passwordMissing)
-    .exec(AssetControllerTest.moderatedIssueAssetRequestScenario)
+    .exec(AssetControllerTest.moderatedIssueAssetRequest)
     .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
     .exec { session => session.set(Test.TEST_ASSET_ID, getAssetID(session(Test.TEST_SELLER_TRADER_ID).as[String], session(Test.TEST_ASSET_TYPE).as[String], session(Test.TEST_ASSET_DESCRIPTION).as[String])) }

@@ -152,15 +152,15 @@ object AccountControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
     .exec(http("Upload_Identification_Form")
-      .get(routes.FileController.uploadAccountKYCForm("IDENTIFICATION").url)
+      .get(routes.FileController.uploadAccountKYCForm(constants.File.AccountKYC.IDENTIFICATION).url)
       .check(status.is(200))
       .check(css("button:contains(Browse)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
     )
     .pause(Test.REQUEST_DELAY)
-  .exec(imageFeed)
+    .exec(imageFeed)
     .exec(http("Identification_Upload")
-      .post(routes.FileController.uploadAccountKYC("IDENTIFICATION").url)
+      .post(routes.FileController.uploadAccountKYC(constants.File.AccountKYC.IDENTIFICATION).url)
       .formParamMap(Map(
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
         Form.RESUMABLE_CHUNK_NUMBER -> "1",
@@ -174,7 +174,7 @@ object AccountControllerTest {
     )
     .exec(
       http("Store_Identification")
-        .get(session => routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String], "IDENTIFICATION").url)
+        .get(session => routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String], constants.File.AccountKYC.IDENTIFICATION).url)
         .check(status.is(206))
         .check(substring("Provide proof of identity").exists)
         .check(css("button:contains(Update Identification)").exists)
@@ -220,7 +220,7 @@ object AccountControllerTest {
   val forgotPassword: ScenarioBuilder = scenario("Forgot Passowrd")
     .exec(http("Email_OTP_Forgot_Password_Form_GET")
       .get(routes.AccountController.emailOTPForgotPasswordForm().url)
-        .check(status.is(200))
+      .check(status.is(200))
       .check(css("legend:contains(Forgot Password)").exists)
       .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN)))
     .pause(Test.REQUEST_DELAY)

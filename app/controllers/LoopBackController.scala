@@ -43,10 +43,6 @@ class LoopBackController @Inject()(
                                     blockchainAccounts: blockchain.Accounts,
                                     blockchainACLAccounts: blockchain.ACLAccounts,
                                     blockchainACLHashes: blockchain.ACLHashes,
-                                    blockchainAssets: blockchain.Assets,
-                                    blockchainFiats: blockchain.Fiats,
-                                    blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-                                    blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                     masterOrganizations: master.Organizations,
                                     masterTraders: master.Traders,
                                     masterEmails: master.Emails,
@@ -130,7 +126,6 @@ class LoopBackController @Inject()(
   }
 
   def addKey: Action[AnyContent] = Action { implicit request =>
-
     implicit val requestReads = transactionsAddKey.requestReads
     implicit val responseWrites = transactionsAddKey.responseWrites
 
@@ -202,7 +197,6 @@ class LoopBackController @Inject()(
   def issueAsset: Action[AnyContent] = Action { implicit request =>
     try {
       implicit val requestReads = transactionsIssueAsset.requestReads
-
       val issueAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsIssueAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
       issueAssetUpdate(Asset(Random.alphanumeric.filter(_.isDigit).take(8).mkString, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.to, if (issueAssetRequest.moderated) true else false, issueAssetRequest.moderated, if (issueAssetRequest.takerAddress == "") None else Some(issueAssetRequest.takerAddress)))
 
@@ -242,7 +236,7 @@ class LoopBackController @Inject()(
     Ok(Json.toJson(queries.responses.AccountResponse.Response(value = Value(address = address, coins = Some(Seq(queries.responses.AccountResponse.Coin(denom, "2000"))), asset_peg_wallet = Some(assetPegWallet), fiat_peg_wallet = Some(fiatPegWallet), account_number = Random.alphanumeric.filter(_.isDigit).take(3).mkString, sequence = Random.alphanumeric.filter(_.isDigit).take(3).mkString))))
   }
 
-  def changeBuyerUpdate(changeBuyerBidRequest: transactionsChangeBuyerBid.Request) = synchronized {
+  def changeBuyerBidUpdate(changeBuyerBidRequest: transactionsChangeBuyerBid.Request) = synchronized {
     negotiationList.find(negotiation => negotiation.buyerAddress == changeBuyerBidRequest.base_req.from && negotiation.sellerAddress == changeBuyerBidRequest.to && negotiation.assetPegHash == changeBuyerBidRequest.pegHash) match {
       case Some(negotiation) => negotiationList.find(negotiation => negotiation.buyerAddress == changeBuyerBidRequest.base_req.from && negotiation.sellerAddress == changeBuyerBidRequest.to && negotiation.assetPegHash == changeBuyerBidRequest.pegHash).map { negotiation =>
         negotiation.bid = changeBuyerBidRequest.bid
@@ -255,7 +249,7 @@ class LoopBackController @Inject()(
     try {
       implicit val requestReads = transactionsChangeBuyerBid.requestReads
       val changeBuyerBidRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsChangeBuyerBid.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-      changeBuyerUpdate(changeBuyerBidRequest)
+      changeBuyerBidUpdate(changeBuyerBidRequest)
       if (kafkaEnabled) {
         Ok(Json.toJson(KafkaResponse(ticketID = constants.Test.TEST_TICKET_ID_PREFIX.CHANGE_BUYER_BID + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
       } else {
@@ -358,10 +352,7 @@ class LoopBackController @Inject()(
   def sendAssetUpdate(sendAssetRequest: transactionsSendAsset.Request) = synchronized {
     val negotiation = negotiationList.find(negotiation => negotiation.buyerAddress == sendAssetRequest.to && negotiation.sellerAddress == sendAssetRequest.base_req.from && negotiation.assetPegHash == sendAssetRequest.pegHash).getOrElse(throw new BaseException(constants.Response.NEGOTIATION_NOT_FOUND))
     if (!orderList.exists(_.id == negotiation.id)) orderList = orderList :+ Order(negotiation.id, None, None)
-    assetList.find(_.pegHash == negotiation.assetPegHash).map { asset =>
-      asset.ownerAddress = negotiation.id
-    }.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
-
+    assetList.find(_.pegHash == negotiation.assetPegHash).map { asset =>asset.ownerAddress = negotiation.id}.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
   }
 
   def sendAsset: Action[AnyContent] = Action { implicit request =>
@@ -412,7 +403,7 @@ class LoopBackController @Inject()(
       orderList.find(_.id == negotiation.id) match {
         case Some(order) => order.fiatProofHash = Some(buyerExecuteOrderRequest.fiatProofHash)
           if (order.fiatProofHash.isDefined && order.awbProofHash.isDefined) {
-            assetList.find(_.pegHash == buyerExecuteOrderRequest.pegHash).map { asset =>asset.ownerAddress == buyerExecuteOrderRequest.buyerAddress}.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
+            assetList.find(_.pegHash == buyerExecuteOrderRequest.pegHash).map { asset => asset.ownerAddress == buyerExecuteOrderRequest.buyerAddress }.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))
           }
         case None => throw new BaseException(constants.Response.FAILURE)
       }
@@ -442,9 +433,7 @@ class LoopBackController @Inject()(
           if (order.fiatProofHash.isDefined && order.awbProofHash.isDefined) {
             assetList.find(_.pegHash == sellerExecuteOrderRequest.pegHash).map { asset =>
               if (asset.moderated) {
-                fiatList.find(_.ownerAddress == order.id).map { fiat =>
-                  fiat.ownerAddress = sellerExecuteOrderRequest.sellerAddress
-                }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+                fiatList.find(_.ownerAddress == order.id).map { fiat =>fiat.ownerAddress = sellerExecuteOrderRequest.sellerAddress}.getOrElse(throw new BaseException(constants.Response.FAILURE))
               }
               asset.ownerAddress == sellerExecuteOrderRequest.buyerAddress
             }.getOrElse(throw new BaseException(constants.Response.ASSET_NOT_FOUND))

@@ -55,7 +55,7 @@ object AddOrganizationControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
     .foreach(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES, Test.TEST_DOCUMENT_TYPE) {
-      feed(ImageFeeder.imageFeed)
+        exec(AssetControllerTest.imageFeed)
         .exec(http("Organization_KYC_Upload_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE) + "_FORM")
           .get(session => routes.AddOrganizationController.userUploadOrganizationKYCForm(session(Test.TEST_DOCUMENT_TYPE).as[String]).url)
           .check(status.is(200))
@@ -274,10 +274,6 @@ object AddOrganizationControllerTest {
 
   val deleteUBO: ScenarioBuilder = scenario("deleteUBO")
     .exec { session => session.set(Test.TEST_UBO_ID, getUBOID(session(Test.TEST_ORGANIZATION_ID).as[String],session(Test.TEST_PERSON_FIRST_NAME).as[String],session(Test.TEST_PERSON_LAST_NAME).as[String])) }
-    .exec{session=>
-      println("UBO_ID----------"+session(Test.TEST_UBO_ID).as[String])
-      session
-    }
     .exec(http("Delete_UBO_Form_GET")
       .get(session=>routes.AddOrganizationController.deleteUBOForm(session(Test.TEST_UBO_ID).as[String]).url)
       .check(status.is(200))

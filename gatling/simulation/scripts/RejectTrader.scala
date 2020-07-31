@@ -9,8 +9,8 @@ import io.gatling.http.Predef._
 
 class RejectTrader extends Simulation {
 
-  val organizationUsername="SELLORG6Sk3Hxp5c"
-  val organizationPassword="SELLORG6Sk3Hxp5c"
+  val organizationUsername=""
+  val organizationPassword=""
 
   val rejectTraderScenario = scenario("RejectTrader")
     .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(organizationUsername)) }

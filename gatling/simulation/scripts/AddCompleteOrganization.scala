@@ -9,7 +9,7 @@ import io.gatling.http.Predef._
 
 class AddCompleteOrganization extends Simulation {
 
-  val zoneUsername="ZONE10U3ZpnZBo"
+  val zoneUsername=""
   val zonePassword="123123123"
 
   val addCompleteOrganizationScenario = scenario("AddCompleteOrganization")

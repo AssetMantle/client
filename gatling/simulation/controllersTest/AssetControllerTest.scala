@@ -15,7 +15,7 @@ object AssetControllerTest {
   val imageFeed=scenario("imageFeed")
     .feed(ImageFeeder.imageFeed)
 
-  val moderatedIssueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
+  val moderatedIssueAssetRequest: ScenarioBuilder = scenario("IssueAssetRequest")
     .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
     .exec(http("Moderated_Issue_Asset_Request_Form_GET")
@@ -45,7 +45,7 @@ object AssetControllerTest {
     )
     .pause(Test.REQUEST_DELAY)
 
-  val unmoderatedIssueAssetRequestScenario: ScenarioBuilder = scenario("IssueAssetRequest")
+  val unmoderatedIssueAssetRequest: ScenarioBuilder = scenario("IssueAssetRequest")
     .feed(AssetDetailFeeder.assetDetailFeed)
     .feed(GasFeeder.gasFeed)
     .feed(ShippingDetailsFeeder.shippingDetailsFeeder)
