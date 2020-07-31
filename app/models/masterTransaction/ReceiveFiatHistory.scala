@@ -37,9 +37,9 @@ class ReceiveFiatHistories @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] val receiveFiatHistoryTable = TableQuery[ReceiveFiatHistoryTable]
 
-  private def getByTraderIDsAndStatuses(traderIDs: Seq[String], status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status inSet status).result)
+  private def getByTraderIDsAndStatuses(traderIDs: Seq[String], status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status inSet status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def getByTraderIDAndStatuses(traderID: String, status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID === traderID).filter(_.status inSet status).result)
+  private def getByTraderIDAndStatuses(traderID: String, status: Seq[String]): Future[Seq[ReceiveFiatHistorySerialized]] = db.run(receiveFiatHistoryTable.filter(_.traderID === traderID).filter(_.status inSet status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private[models] class ReceiveFiatHistoryTable(tag: Tag) extends Table[ReceiveFiatHistorySerialized](tag, "ReceiveFiat_History") {
 

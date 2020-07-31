@@ -37,9 +37,9 @@ class SendFiatRequestHistories @Inject()(protected val databaseConfigProvider: D
 
   private[models] val sendFiatRequestHistoryTable = TableQuery[SendFiatRequestHistoryTable]
 
-  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequestHistorySerialized]] = db.run(sendFiatRequestHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status === status).result)
+  private def getByTraderIDsAndStatus(traderIDs: Seq[String], status: String): Future[Seq[SendFiatRequestHistorySerialized]] = db.run(sendFiatRequestHistoryTable.filter(_.traderID inSet traderIDs).filter(_.status === status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequestHistorySerialized]] = db.run(sendFiatRequestHistoryTable.filter(_.traderID === traderID).filter(_.status === status).result)
+  private def getByTraderIDAndStatus(traderID: String, status: String): Future[Seq[SendFiatRequestHistorySerialized]] = db.run(sendFiatRequestHistoryTable.filter(_.traderID === traderID).filter(_.status === status).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getAmountsByNegotiationIDAndStatuses(negotiationID: String, statuses: Seq[String]): Future[Seq[String]] = db.run(sendFiatRequestHistoryTable.filter(_.negotiationID === negotiationID).filter(_.status inSet statuses).map(_.amount).result)
 

@@ -307,7 +307,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private def findAllByAssetID(assetID: String): Future[Seq[NegotiationSerializable]] = db.run(negotiationTable.filter(_.assetID === assetID).result)
 
-
   private def updateBuyerAcceptedAssetDescriptionByID(id: String, buyerAcceptedAssetDescription: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.buyerAcceptedAssetDescription).update(buyerAcceptedAssetDescription).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
