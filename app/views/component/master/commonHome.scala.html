@@ -11,9 +11,16 @@
         <div>
             @commonTextInfo(constants.User.USER_NAME, loginState.username)
             @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
-            <p>@commonTextInfo(constants.View.BLOCKCHAIN_ADDRESS, loginState.address, 'id -> "blockchainAddress")
-                <a class="toolTip"  onclick="copyToClipboard('blockchainAddress','toolTipBlockchainAddress')"><span class="toolTipText" id="toolTipBlockchainAddress">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy('toolTipBlockchainAddress')"></span></a>
-            </p>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel">
+                @Messages(constants.View.BLOCKCHAIN_ADDRESS)
+                </div>
+                <div class="infoRowValue textOverflowCopy">
+                <p class="hashCode">@Messages(loginState.address)
+                </p>
+                    @commonCopyText("blockchainAddress", loginState.address)
+                </div>
+            </div>
         </div>
         <div class="cmuk-text-center">
         @commonFormButton(constants.Form.CHANGE_PASSWORD,'class -> "cmuk-button buttonPrimary")

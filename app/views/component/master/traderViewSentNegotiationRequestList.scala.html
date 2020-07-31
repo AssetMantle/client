@@ -11,7 +11,6 @@
     @commonVerticalInfoBox(){
         <div class="salesQuoteCardLeft salesChild">
                 <div class="salesQuoteCategory sell">
-                    <span>@Messages(constants.View.SELL)</span>
                 </div>
                 <div class="content">
                 @assetList.find(_.id == sentNegotiationRequest.assetID) match {
@@ -22,7 +21,6 @@
                     <div class="assetInitialData">
                         <p class="assetTitle">@Messages(asset.assetType)</p>
                         <p class="assetQuantity">@Seq(sentNegotiationRequest.quantity.toRoundedOffString(), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
-                        <p class="assetPrice">@Seq((sentNegotiationRequest.price/sentNegotiationRequest.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
                     </div>
                     }
                     case None => {}
@@ -30,6 +28,14 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
+                @assetList.find(_.id == sentNegotiationRequest.assetID) match {
+                    case Some(asset) => {
+                        <div class="assetInitialData">
+                            <p class="assetPrice">@Seq((sentNegotiationRequest.price/sentNegotiationRequest.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), sentNegotiationRequest.quantityUnit).mkString(" ")</p>
+                        </div>
+                    }
+                    case None => {}
+                }
                 @counterPartyTraderList.find(_.id == sentNegotiationRequest.buyerTraderID) match {
                     case Some(trader) => {
                         @counterPartyOrganizationList.find(_.id == trader.organizationID) match {
@@ -42,15 +48,19 @@
                     }
                     case None => {}
                 }
-                <p><span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span>
-                    <span class="lines">---</span>
-                    <span class="arrowIcon">@commonIcon("roundedRightArrow")</span>
-                    <span class="lines">---</span>
-                    <span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
             </div>
             <div class="salesQuoteCardRight salesChild">
-                @Messages(sentNegotiationRequest.status)
+                <div class="cmuk-text-center">
+                    <p><span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                    <div class="navigationLocation">
+                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    </div>
+                    <p><span>@sentNegotiationRequest.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
+                <div class="cmuk-text-center">
+                <p>@Messages(sentNegotiationRequest.status)</p>
                 @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${sentNegotiationRequest.id}'")
+            </div>
             </div>
     }
 }

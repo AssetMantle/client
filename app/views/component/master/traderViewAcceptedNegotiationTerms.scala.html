@@ -6,7 +6,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], asset: Asset, successiveTransactionStatus:Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
@@ -15,7 +15,7 @@
                 <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
                 <span class="tradeName">@Messages(asset.assetType) &nbsp;</span>
             </div>
-            <div>
+            <div id='@Seq(negotiation.id, "SuccessiveTransaction").mkString("")'>
             @traderID match {
                 case negotiation.buyerTraderID => {
                     @negotiation.status match {
@@ -82,6 +82,14 @@
                 }
             }
             </div>
+            <div class="transactionPending">
+                </div>
+            @commonSpinner("transactionPendingSpinner",spinnerClass ="transactionPending")
+            <script>
+                @if(successiveTransactionStatus.isEmpty || successiveTransactionStatus == Some(true)){
+                    transactionPending('@Seq(negotiation.id, "SuccessiveTransaction").mkString("")',"transactionPendingSpinner")
+                }
+            </script>
         </div>
 
         <div class="terms">
@@ -188,9 +196,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedAssetDescription) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>
@@ -206,9 +214,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedPrice) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>
@@ -219,9 +227,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedQuantity) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>
@@ -246,9 +254,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedAssetOtherDetails) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>
@@ -284,9 +292,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedPaymentTerms) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>
@@ -301,7 +309,7 @@
                     <div>
                         <div class="cmuk-flex">
                         <span class="termIcon">@commonIcon("document")</span>
-                        <p class="documentTermName"><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
+                        <p class="documentTermName cmuk-margin-remove"><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
                     </div>
                         @negotiation.documentList.assetDocuments.map { assetDocument =>
                             <p class="termIdent">
@@ -317,9 +325,9 @@
                     </div>
                     <div>
                     @if(negotiation.buyerAcceptedDocumentList) {
-                        @Messages(constants.View.ACCEPTED)
+                        <span class="cmuk-badge verified">@constants.View.ACCEPTED</span>
                     } else {
-                        @Messages(constants.View.PENDING)
+                        <span class="cmuk-badge pending">@constants.View.PENDING</span>
                     }
                     </div>
                 </div>

@@ -5,7 +5,7 @@
 
 @(acceptOrRejectAssetDocumentForm: Form[AcceptOrRejectAssetDocument.Data] =AcceptOrRejectAssetDocument.form,negotiationID: String, assetFile: AssetFile)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<div id="@Seq(negotiationID, assetFile.documentType).mkString("")">
+<div id="@Seq(negotiationID, assetFile.documentType).mkString("")" class="documentButtons">
 @commonAcceptOrRejectForm(constants.Form.ACCEPT_OR_REJECT_ASSET_DOCUMENT, acceptOrRejectAssetDocumentForm, Seq(negotiationID, assetFile.documentType).mkString(""), assetFile.status) {
     @commonInputText(acceptOrRejectAssetDocumentForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonInputText(acceptOrRejectAssetDocumentForm, constants.FormField.DOCUMENT_TYPE, 'value -> assetFile.documentType, 'containerDivClass -> "hidden", 'readonly -> true)

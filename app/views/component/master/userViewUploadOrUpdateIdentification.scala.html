@@ -20,8 +20,8 @@
                 @commonModalButton(Seq(Messages(constants.View.UPDATE), Messages( file.documentType)).mkString(" "),routes.javascript.FileController.updateAccountKYCForm,'parameters -> s"'${file.documentType}'")
                 <script>hideElement('@Seq(constants.View.UPLOAD, file.documentType).mkString("_")')</script>
             }
-            @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get)
-            @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION)
+            @commonModalButton(constants.View.BACK, constants.Form. ADD_IDENTIFICATION.get, 'class -> "cmuk-margin-top buttonPrimary")
+            @commonFormButton(constants.Form.USER_REVIEW_IDENTIFICATION, 'class -> "cmuk-margin-top buttonPrimary")
         }
         case None => {}
     }

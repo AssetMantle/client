@@ -109,6 +109,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(buyerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
+  private def getTransactionByBuyerSellerAddressesAndPegHash(buyerAddress: String, sellerAddress: String, pegHash: String) = db.run(buyerExecuteOrderTable.filter(x => x.buyerAddress === buyerAddress && x.sellerAddress === sellerAddress && x.pegHash === pegHash).result.headOption)
+
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -184,6 +186,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionStatus(buyerAddress: String, sellerAddress: String, pegHash: String) = getTransactionByBuyerSellerAddressesAndPegHash(buyerAddress, sellerAddress, pegHash).map(x => if (x.isDefined) x.get.status else Option(false))
   }
 
   object Utility {

@@ -29,6 +29,6 @@
     @commonInputText(addInvoiceForm, constants.FormField.INVOICE_NUMBER)
     @commonInputMicroNumber(addInvoiceForm, constants.FormField.INVOICE_AMOUNT)
     @commonInputDate(addInvoiceForm, constants.FormField.INVOICE_DATE)
-    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'parameters -> s"'${negotiationID}'")
+    @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.tradeDocuments, 'class -> "cmuk-margin-top buttonPrimary", 'parameters -> s"'${negotiationID}'")
 }
 

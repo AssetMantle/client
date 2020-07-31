@@ -1,8 +1,8 @@
-function copyToClipboard(elementId, toolTipID) {
+function copyToClipboard(elementId, id) {
     // Create an auxiliary hidden input
     let aux = document.createElement("input");
     // Get the text from the element passed into the input
-    aux.setAttribute("value", $('#' + elementId).html());
+    aux.setAttribute("value",  elementId);
     // Append the aux input to the body
     document.body.appendChild(aux);
     // Highlight the content
@@ -12,13 +12,11 @@ function copyToClipboard(elementId, toolTipID) {
     // Remove the input from the body
     document.body.removeChild(aux);
 
-    var tooltip = document.getElementById(toolTipID);
+    var tooltip = document.getElementById(id);
     tooltip.innerHTML = "Copied";
-    console.log("CopytoClipboard")
 
 }
-function afterCopy(toolTipID) {
-    console.log("AfterCopy")
-    var tooltip = document.getElementById(toolTipID);
-    tooltip.innerHTML = "Copy to clipboard";
+function afterCopy(id) {
+    var tooltip = document.getElementById(id);
+    tooltip.innerHTML = "Copy";
 }

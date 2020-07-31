@@ -4,11 +4,12 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.REDEEM_FIAT_REQUESTS) {
+@commonCard(constants.View.REDEEM_FIAT_REQUESTS, 'cardIconPath -> "images/icons/icons.svg#fundWithdral") {
 }{
     @commonHorizontalSwitcher(ListMap(
         constants.View.PENDING_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.zoneViewPendingRedeemFiatRequestList,
         constants.View.COMPLETE_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.zoneViewCompleteRedeemFiatRequestList,
         constants.View.FAILED_REDEEM_FIAT_REQUEST_LIST -> routes.javascript.ComponentViewController.zoneViewFailedRedeemFiatRequestList,
     ))
+    <button class="viewMore"></button>
 }
