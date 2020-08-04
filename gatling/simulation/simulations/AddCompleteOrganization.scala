@@ -1,16 +1,18 @@
-package scripts
+package simulations
 
 import constants.Test
-import controllersTest._
+import scenarios._
 import feeders.JDBCFeeder._
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
+import javax.inject.{Inject, Singleton}
+import play.api.libs.ws.WSClient
 
 class AddCompleteOrganization extends Simulation {
 
-  val zoneUsername=""
-  val zonePassword="123123123"
+  val zoneUsername = ""
+  val zonePassword = "123123123"
 
   val addCompleteOrganizationScenario = scenario("AddCompleteOrganization")
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(zoneUsername)) }
@@ -30,7 +32,7 @@ class AddCompleteOrganization extends Simulation {
     .exec(AddOrganizationControllerTest.userAddUBO)
     .exec(AddOrganizationControllerTest.userDeleteUBO)
     .exec(AccountControllerTest.logoutScenario)
-    .exec(session => session.set(Test.TEST_USERNAME, zoneUsername).set(Test.TEST_PASSWORD,zonePassword))
+    .exec(session => session.set(Test.TEST_USERNAME, zoneUsername).set(Test.TEST_PASSWORD, zonePassword))
     .exec(AccountControllerTest.loginScenario)
     .exec(BackgroundCheckControllerTest.corporateScan)
     .exec(AddOrganizationControllerTest.verifyOrganizationScenario)
@@ -43,6 +45,6 @@ class AddCompleteOrganization extends Simulation {
     .exec(AccountControllerTest.logoutScenario)
 
   setUp(
-    addCompleteOrganizationScenario.inject(atOnceUsers(10))
+    addCompleteOrganizationScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

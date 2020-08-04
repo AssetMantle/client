@@ -1,7 +1,7 @@
-package scripts
+package simulations
 
 import constants.Test
-import controllersTest._
+import scenarios._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import feeders.JDBCFeeder._

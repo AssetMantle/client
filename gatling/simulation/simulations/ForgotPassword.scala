@@ -1,7 +1,7 @@
-package scripts
+package simulations
 
 import constants.Test
-import controllersTest._
+import scenarios._
 import feeders.JDBCFeeder._
 import feeders._
 import io.gatling.core.Predef._
@@ -22,6 +22,6 @@ class ForgotPassword extends Simulation {
     .exec(AccountControllerTest.loginScenario)
 
   setUp(
-    forgotPasswordScenario.inject(atOnceUsers(10))
+    forgotPasswordScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

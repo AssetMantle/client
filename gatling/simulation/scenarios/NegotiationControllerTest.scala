@@ -1,8 +1,8 @@
-package controllersTest
+package scenarios
 
 import constants.{Form, Test}
 import controllers.routes
-import controllersTest.AssetControllerTest.imageFeed
+import scenarios.AssetControllerTest.imageFeed
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder

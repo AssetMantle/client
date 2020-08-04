@@ -1,4 +1,4 @@
-package controllersTest
+package scenarios
 
 import constants.{Form, Test}
 import controllers.routes

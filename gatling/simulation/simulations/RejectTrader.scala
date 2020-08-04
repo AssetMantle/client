@@ -1,7 +1,7 @@
-package scripts
+package simulations
 
 import constants.Test
-import controllersTest._
+import scenarios._
 import feeders.JDBCFeeder._
 import feeders._
 import io.gatling.core.Predef._
@@ -32,6 +32,6 @@ class RejectTrader extends Simulation {
     .exec(TraderControllerTest.organizationRejectTrader)
 
   setUp(
-    rejectTraderScenario.inject(atOnceUsers(10))
+    rejectTraderScenario.inject(atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }

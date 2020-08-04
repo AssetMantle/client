@@ -1,11 +1,11 @@
-package scripts
+package simulations
 
 import constants.Test
 import controllers.routes
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import controllersTest._
+import scenarios._
 import feeders.JDBCFeeder._
 import feeders.ZoneLoginFeeder
 
