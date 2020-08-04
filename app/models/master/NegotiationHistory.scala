@@ -284,9 +284,9 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
 
     def getAllByAssetID(assetID: String): Future[Seq[NegotiationHistory]] = findAllByAssetID(assetID).map(_.map(_.deserialize))
 
-    def getAllCompletedNegotiationListByTraderID(traderID: String): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
+    def getAllCompletedNegotiationListByTraderID(traderID: String): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDAndStatuses(traderID = traderID, constants.Status.Negotiation.COMPLETED, constants.Status.Negotiation.ASSET_ALREADY_TRADED).map(_.map(_.deserialize))
 
-    def getAllCompletedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED).map(_.map(_.deserialize))
+    def getAllCompletedNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[NegotiationHistory]] = findAllNegotiationsByTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.COMPLETED, constants.Status.Negotiation.ASSET_ALREADY_TRADED).map(_.map(_.deserialize))
 
     def tryGetBuyerTraderID(id: String): Future[String] = tryGetBuyerTraderIDByID(id)
 

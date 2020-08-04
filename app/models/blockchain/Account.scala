@@ -13,7 +13,7 @@ import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
-import slick.lifted.OptionMapper2._
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

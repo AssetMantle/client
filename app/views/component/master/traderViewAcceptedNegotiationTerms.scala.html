@@ -22,7 +22,7 @@
                         case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING => {
                             @commonFormButton(constants.Form.BUYER_CONFIRM_NEGOTIATION, 'parameters -> s"'${negotiation.id}'")
                         }
-                        case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
+                        case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED | constants.Status.Negotiation.COMPLETED => {
                             @order match {
                                 case Some(order) => {
                                     @order.status match {

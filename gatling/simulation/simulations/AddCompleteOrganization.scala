@@ -6,8 +6,6 @@ import feeders.JDBCFeeder._
 import feeders._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
 
 class AddCompleteOrganization extends Simulation {
 

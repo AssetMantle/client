@@ -8,7 +8,7 @@ import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import scala.util.Random
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

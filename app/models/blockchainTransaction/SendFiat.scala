@@ -307,7 +307,9 @@ class SendFiats @Inject()(
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- masterTransactionTradeActivities.Service.create(negotiationID = masterNegotiation.id, tradeActivity = constants.TradeActivity.SEND_FIAT_TO_ORDER_SUCCESSFUL)
-      } yield ()).recover {
+      } yield {
+        actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
