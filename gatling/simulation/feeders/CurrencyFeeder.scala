@@ -10,7 +10,7 @@ object CurrencyFeeder {
 
   def arrayConstructor(users: Int): Array[Map[String, String]] = {
     val feed = new Array[Map[String, String]](users)
-    for (id <- 0 until users) feed(id) = Map(Test.TEST_CURRENCY -> "USD")
+    for (id <- 0 until users) feed(id) = Map(Test.TEST_CURRENCY -> Random.shuffle(constants.SelectFieldOptions.CURRENCIES).head)
     feed
   }
 }

@@ -90,6 +90,8 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       } yield otp
     }
 
+    def insertOrUpdate(emailOTP: EmailOTP): Future[Int] = upsert(emailOTP)
+
     def verifyOTP(id: String, otp: String): Future[Boolean] = {
       val emailOTP = findById(id)
       for {

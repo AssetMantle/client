@@ -32,11 +32,11 @@ function cometMessageHandler(message) {
             }
             break;
         case 'KEEP_ALIVE' :
+            console.log("KeepingAlive")
             break;
         default :
             console.log("Unhandled Comet message");
             break;
-
 
     }
 }

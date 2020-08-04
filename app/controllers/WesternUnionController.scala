@@ -136,7 +136,6 @@ class WesternUnionController @Inject()(
   }
 
   private def issueFiat(traderAddress: String, zoneID: String, zoneWalletAddress: String, westernUnionReferenceID: String, transactionAmount: MicroNumber): Future[String] = {
-
     val zonePassword = Future(keyStore.getPassphrase(zoneID))
 
     def sendTransaction(zonePassword: String) = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
@@ -158,5 +157,6 @@ class WesternUnionController @Inject()(
     }
 
   }
+
 
 }

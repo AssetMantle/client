@@ -62,18 +62,14 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-
     val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
-
     (for {
       _ <- send
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
-      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
-        throw new BaseException(constants.Response.SMS_SEND_FAILED)
-      case apiConnectionException: ApiConnectionException => logger.error(apiConnectionException.getMessage, apiConnectionException)
-        throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE)
+      case apiException: ApiException => throw new BaseException(constants.Response.SMS_SEND_FAILED, apiException)
+      case apiConnectionException: ApiConnectionException => throw new BaseException(constants.Response.SMS_SERVICE_CONNECTION_FAILURE, apiConnectionException)
     }
   }
 
@@ -118,7 +114,6 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
-
   }
 
   private def sendEmailByAccountID(accountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang): Future[String] = {
