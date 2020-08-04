@@ -51,9 +51,9 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def findAllByID(traderID: String): Future[Seq[FiatRequestSerialized]] = db.run(fiatRequestTable.filter(_.traderID === traderID).result)
+  private def findAllByID(traderID: String): Future[Seq[FiatRequestSerialized]] = db.run(fiatRequestTable.filter(_.traderID === traderID).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def findAllByTraderIDs(traderIDs: Seq[String]): Future[Seq[FiatRequestSerialized]] = db.run(fiatRequestTable.filter(_.traderID inSet traderIDs).result)
+  private def findAllByTraderIDs(traderIDs: Seq[String]): Future[Seq[FiatRequestSerialized]] = db.run(fiatRequestTable.filter(_.traderID inSet traderIDs).sortBy(x=>x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => if (result > 0) {
