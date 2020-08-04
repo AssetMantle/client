@@ -84,7 +84,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private def findAllByTraderID(ownerID: String): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID === ownerID).result)
 
-  private def findAllByTraderIDAndStatuses(ownerID: String, statuses: String*): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID === ownerID).filter(_.status.inSet(statuses)).result)
+  private def findAllByTraderIDAndStatuses(ownerID: String, statuses: String*): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.ownerID === ownerID).filter(_.status.inSet(statuses)).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def findAllByIDs(ids: Seq[String]): Future[Seq[AssetSerializable]] = db.run(assetTable.filter(_.id.inSet(ids)).result)
 

@@ -91,6 +91,8 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     }
 
+    def insertOrUpdate(smsOTP: SMSOTP): Future[Int] = upsert(smsOTP)
+
     def verifyOTP(id: String, otp: String): Future[Boolean] = {
       val smsOTP = findById(id)
       for {

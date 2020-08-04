@@ -33,6 +33,7 @@ class ChangePassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
   case class Request(oldPassword: String, newPassword: String, confirmNewPassword: String) extends BaseRequest
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
+  implicit val responseWrites: OWrites[Response] = Json.writes[Response]
 
   case class Response(error: Boolean, message: String) extends BaseResponse
 

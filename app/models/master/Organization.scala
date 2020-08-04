@@ -130,7 +130,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
+  private def getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getOrganizationsByIDs(organizationIDs: Seq[String]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.id inSet (organizationIDs)).result)
 
@@ -267,7 +267,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def markOrganizationFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]]= getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
+    def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]] = getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
   }
 
 }

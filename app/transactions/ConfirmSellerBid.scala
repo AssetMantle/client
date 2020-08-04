@@ -4,7 +4,7 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OWrites, Reads}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
@@ -40,6 +40,7 @@ class ConfirmSellerBid @Inject()(wsClient: WSClient)(implicit configuration: Con
   }
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
+  implicit val baseRequestReads: Reads[BaseReq] = Json.reads[BaseReq]
 
   case class Request(base_req: BaseReq, to: String, bid: MicroNumber, time: String, pegHash: String, sellerContractHash: String, mode: String, password: String) extends BaseRequest
 
@@ -52,6 +53,7 @@ class ConfirmSellerBid @Inject()(wsClient: WSClient)(implicit configuration: Con
   }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+  implicit val requestReads: Reads[Request] = Json.reads[Request]
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 

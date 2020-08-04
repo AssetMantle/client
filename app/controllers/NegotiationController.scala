@@ -601,7 +601,7 @@ class NegotiationController @Inject()(
                   _ <- updateQuantity
                   _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)
-                  _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, negotiation.sellerTraderID)
+                  _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, loginState.username)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateAssetTermsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
                 } yield result
               } else Future(BadRequest(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = (negotiation.price / negotiation.quantity).roundedOff(), quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = "")).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
@@ -668,6 +668,7 @@ class NegotiationController @Inject()(
             _ <- updateAssetOtherDetails(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_OTHER_DETAILS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_OTHER_DETAILS_UPDATED, negotiation.id)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_OTHER_DETAILS_UPDATED, loginState.username)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateAssetOtherDetailsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield {
             actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
@@ -726,7 +727,7 @@ class NegotiationController @Inject()(
             _ <- updatePaymentTerms(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_PAYMENT_TERMS_UPDATED, negotiation.id)
-            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, negotiation.sellerTraderID)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, loginState.username)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield {
             actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
@@ -789,7 +790,7 @@ class NegotiationController @Inject()(
             _ <- updateDocumentList(traderID = traderID, negotiation = negotiation)
             _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED, negotiation.id)
-            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, negotiation.sellerTraderID)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, loginState.username)
             result <- getResult(negotiation)
           } yield {
             actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
@@ -807,7 +808,7 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
+      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.buyerTraderID) {
         withUsernameToken.Ok(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = termType, status = false))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -936,6 +937,7 @@ class NegotiationController @Inject()(
                 buyerAccountID <- buyerAccountID
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.INVOICE_CONTENT_ADDED, updateInvoiceContentData.negotiationID)
+                _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.INVOICE_CONTENT_ADDED, loginState.username)
                 result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
               } yield result
             } else {
@@ -1007,6 +1009,7 @@ class NegotiationController @Inject()(
                 _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.CONTRACT_CONTENT_ADDED, updateContractContentData.negotiationID)
                 result <- withUsernameToken.PartialContent(views.html.component.master.tradeDocuments(negotiation, assetFileList, negotiationFileList, negotiationEnvelopeList))
+                _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.CONTRACT_CONTENT_ADDED, loginState.username)
               } yield result
             } else {
               Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
@@ -1107,6 +1110,7 @@ class NegotiationController @Inject()(
                   contract <- contract
                   pegHash <- getPegHash(negotiation.assetID)
                   sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
+                  buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
                   sellerAddress <- getAddress(sellerAccountID)
                   result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAccountID = sellerAccountID, buyerTraderID = buyerTraderID, sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
                 } yield result
@@ -1344,6 +1348,7 @@ class NegotiationController @Inject()(
                   sellerAccountID <- sellerAccountID
                   _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, confirmAllNegotiationTermsData.negotiationID)
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, confirmAllNegotiationTermsData.negotiationID)
+                  _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, loginState.username)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(confirmAllNegotiationTermsData.negotiationID))
                 } yield {
                   actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
@@ -1411,6 +1416,7 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             _ <- markContractSignedAndAccepted(traderID, negotiation)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID))
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.CONTRACT_MARKED_AS_SIGNED, loginState.username)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = updateContractSignedData.negotiationID, failures = Seq(baseException.failure)))

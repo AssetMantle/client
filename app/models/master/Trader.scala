@@ -116,9 +116,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getTradersByStatusAndZoneID(zoneID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.status.? === status).result)
+  private def getTradersByStatusAndZoneID(zoneID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def getTradersByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).result)
+  private def getTradersByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getTraderIDsByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[String]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).map(_.id).result)
 

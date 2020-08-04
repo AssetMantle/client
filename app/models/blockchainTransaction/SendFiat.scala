@@ -45,6 +45,7 @@ class SendFiats @Inject()(
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
                            masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
+                           masterTransactionTradeActivities:masterTransaction.TradeActivities,
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
 
@@ -305,6 +306,7 @@ class SendFiats @Inject()(
         toAccountID <- getAccountID(sendFiat.to)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = masterNegotiation.id, tradeActivity = constants.TradeActivity.SEND_FIAT_TO_ORDER_SUCCESSFUL)
       } yield {
         actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
       }).recover {

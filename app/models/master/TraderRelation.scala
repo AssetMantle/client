@@ -72,11 +72,11 @@ class TraderRelations @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private def checkByFromIDToIDAndStatus(id: String, status: Option[Boolean]): Future[Boolean] = db.run(traderRelationTable.filter(_.id === id).filter(_.status.? === status).exists.result)
 
-  private def findAllByFromIDOrToIDAndStatus(id: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(relation => relation.fromID === id || relation.toID === id).filter(_.status.? === status).result)
+  private def findAllByFromIDOrToIDAndStatus(id: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(relation => relation.fromID === id || relation.toID === id).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def findAllByFromIDAndStatus(fromID: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(_.fromID === fromID).filter(_.status.? === status).result)
+  private def findAllByFromIDAndStatus(fromID: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(_.fromID === fromID).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
-  private def findAllByToIDAndStatus(toID: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(_.toID === toID).filter(_.status.? === status).result)
+  private def findAllByToIDAndStatus(toID: String, status: Option[Boolean]): Future[Seq[TraderRelation]] = db.run(traderRelationTable.filter(_.toID === toID).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getTraderRelationIDByFromIDAndToID(fromID: String, toID: String): String = Seq(fromID, toID).sorted.mkString("")
 
