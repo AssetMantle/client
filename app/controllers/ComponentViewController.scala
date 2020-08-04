@@ -49,7 +49,6 @@ class ComponentViewController @Inject()(
                                          masterZones: master.Zones,
                                          masterFiats: master.Fiats,
                                          masterOrders: master.Orders,
-                                         masterOrderHistories: master.OrderHistories,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionAssetFileHistories: masterTransaction.AssetFileHistories,
                                          docusignEnvelopes: docusign.Envelopes,
@@ -1283,7 +1282,7 @@ class ComponentViewController @Inject()(
               case Some(order) => order.status match {
                 case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
                 case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionSellerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
-                case constants.Status.Order.COMPLETED => Future(Option(false))
+                case _ => Future(Option(false))
               }
               case None => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
             }
@@ -1346,17 +1345,15 @@ class ComponentViewController @Inject()(
       def getResult(traderID: String, negotiationHistory: NegotiationHistory) = {
         if (traderID == negotiationHistory.buyerTraderID || traderID == negotiationHistory.sellerTraderID) {
           val assetHistory = masterAssetHistories.Service.tryGet(negotiationHistory.assetID)
-          val orderHistory = masterOrderHistories.Service.tryGet(negotiationID)
           val counterPartyTrader = masterTraders.Service.tryGet(if (traderID == negotiationHistory.buyerTraderID) negotiationHistory.sellerTraderID else negotiationHistory.buyerTraderID)
 
           def getCounterPartyOrganization(organizationID: String) = masterOrganizations.Service.tryGet(organizationID)
 
           for {
             assetHistory <- assetHistory
-            orderHistory <- orderHistory
             counterPartyTrader <- counterPartyTrader
             counterPartyOrganization <- getCounterPartyOrganization(counterPartyTrader.organizationID)
-          } yield Ok(views.html.component.master.traderViewCompletedNegotiationTerms(counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiationHistory = negotiationHistory, orderHistory = orderHistory, assetHistory = assetHistory))
+          } yield Ok(views.html.component.master.traderViewCompletedNegotiationTerms(counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiationHistory = negotiationHistory, assetHistory = assetHistory))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }

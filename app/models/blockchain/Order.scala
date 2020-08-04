@@ -180,6 +180,15 @@ class Orders @Inject()(actorSystem: ActorSystem,
                   val updateMasterAssetStatus = masterAssets.Service.markTradeCompletedByPegHash(assetPegWallet.head.pegHash, masterNegotiation.buyerTraderID)
                   val markMasterOrderStatusCompleted = masterOrders.Service.markStatusCompletedByBCOrderID(dirtyOrder.id)
                   val createReceiveFiat = masterTransactionReceiveFiats.Service.create(masterNegotiation.sellerTraderID, masterOrder.id, new MicroNumber(fiatsInOrder), constants.Status.ReceiveFiat.ORDER_COMPLETION_FIAT)
+                  val markMasterNegotiationStatusCompleted = masterNegotiations.Service.markCompleted(masterNegotiation.id)
+                  val sameAssetNegotiationList = masterNegotiations.Service.getAllByAssetID(masterNegotiation.assetID)
+
+                  def markOtherNegotiationsAssetAlreadyTraded(negotiationList: Seq[masterNegotiation]) = Future.sequence {
+                    negotiationList.map { negotiation =>
+                      masterNegotiations.Service.markAssetAlreadyTraded(negotiation.id)
+                    }
+                  }
+
                   for {
                     _ <- updateAsset
                     _ <- sellerMarkDirty
@@ -187,6 +196,9 @@ class Orders @Inject()(actorSystem: ActorSystem,
                     _ <- deleteOrderFiats
                     _ <- updateMasterAssetStatus
                     _ <- markMasterOrderStatusCompleted
+                    _ <- markMasterNegotiationStatusCompleted
+                    sameAssetNegotiationList <- sameAssetNegotiationList
+                    _ <- markOtherNegotiationsAssetAlreadyTraded(sameAssetNegotiationList.filterNot(_.id == masterNegotiation.id))
                     _ <- createReceiveFiat
                   } yield ()
                 } else Future(Unit)
