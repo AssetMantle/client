@@ -39,6 +39,7 @@ class SendAssets @Inject()(
                             masterNegotiations: master.Negotiations,
                             masterOrders: master.Orders,
                             masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
+                            masterTransactionTradeActivities:masterTransaction.TradeActivities,
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             transaction: utilities.Transaction,
                             utilitiesNotification: utilities.Notification,
@@ -271,6 +272,7 @@ class SendAssets @Inject()(
         toAccountID <- getAccountID(sendAsset.to)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, blockResponse.txhash)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, blockResponse.txhash)
+        _ <- masterTransactionTradeActivities.Service.create(negotiationID = masterNegotiation.id, tradeActivity = constants.TradeActivity.SEND_ASSET_TO_ORDER_SUCCESSFUL)
       } yield ()
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

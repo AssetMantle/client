@@ -7,7 +7,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.{blockchain, master}
+import models.master.Negotiation
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -25,7 +26,7 @@ case class ReleaseAsset(from: String, to: String, pegHash: String, gas: MicroNum
 }
 
 @Singleton
-class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets, masterNegotiations: master.Negotiations, masterTransactionTradeActivities: masterTransaction.TradeActivities)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_RELEASE_ASSET
 
@@ -196,16 +197,29 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         } yield {}
       }
 
+      def getAssetID(pegHash: String): Future[String] = masterAssets.Service.tryGetIDByPegHash(pegHash)
+
+      def getNegotiationListByAssetID(assetID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
+
       def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
+
+      def createTradeActivity(negotiationList: Seq[Negotiation]): Future[Seq[String]] = Future.sequence {
+        negotiationList.map { negotiation =>
+          masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ZONE_RELEASED_ASSET)
+        }
+      }
 
       (for {
         _ <- markTransactionSuccessful
         releaseAsset <- releaseAsset
         _ <- markDirty(releaseAsset)
+        assetID <- getAssetID(releaseAsset.pegHash)
+        negotiationList <- getNegotiationListByAssetID(assetID)
         fromAccountID <- getAccountID(releaseAsset.from)
         toAccountID <- getAccountID(releaseAsset.to)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ZONE_RELEASED_ASSET, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_RELEASED_ASSET, blockResponse.txhash)
+        _ <- createTradeActivity(negotiationList)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

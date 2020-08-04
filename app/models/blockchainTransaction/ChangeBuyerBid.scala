@@ -266,12 +266,12 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
             sellerOrganization <- getOrganization(seller.organizationID)
             _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, sellerOrganization.name)
             _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, buyerOrganization.name)
+            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_STARTED, negotiation.assetDescription)
           } yield ()
         } else {
           for {
             _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
             _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
-            _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_STARTED, negotiation.buyerTraderID, negotiation.sellerTraderID, negotiation.assetDescription)
           } yield ()
         }
       }
