@@ -210,7 +210,7 @@ class ComponentViewController @Inject()(
 
   def traderViewAcceptedBuyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username + "kjh")
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
 
       def getBuyNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllAcceptedBuyNegotiationListByTraderID(traderID)
 
