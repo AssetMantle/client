@@ -14,6 +14,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = withoutLoginAction { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
+        routes.javascript.Assets.versioned,
+
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.loginForm,
         routes.javascript.AccountController.logoutForm,
