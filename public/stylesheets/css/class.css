@@ -2235,9 +2235,9 @@ figure.zoom {
       font-weight: bold;
       font-size: 0.875rem; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory.buy {
-    background: #F2453C; }
-  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory.sell {
     background: #4CA841; }
+  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory.sell {
+    background: #F2453C; }
 .salesQuoteCard .salesQuoteCardMiddle {
   position: relative;
   border-radius: 2px;
