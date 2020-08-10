@@ -1,0 +1,21 @@
+@import models.common.Serializable.Coin
+@import utilities.MicroNumber
+@import views.html.base._
+@import views.html.component.blockchain.{accountWalletAllTokens, accountWalletStakingToken}
+@import scala.collection.immutable.ListMap
+
+@(address: String, accountBalances: Seq[Coin], delegatedAmount: MicroNumber, undelegatingAmount: MicroNumber, delegationRewards: MicroNumber, isValidator: Boolean, commissionRewards: MicroNumber, stakingTokenSymbol: String, totalTokens: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.ACCOUNT_WALLET) {
+    @address
+} {
+    @if(totalTokens > 1) {
+        @commonHorizontalSwitcher(ListMap(
+            constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances),
+            constants.View.STAKING_TOKEN -> accountWalletStakingToken(availableAmount = accountBalances.find(_.denom == stakingTokenSymbol).fold(MicroNumber.zero)(_.amount), delegatedAmount = delegatedAmount, undelegatingAmount = undelegatingAmount, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingTokenSymbol = stakingTokenSymbol))
+        )
+    } else {
+        @accountWalletStakingToken(availableAmount = accountBalances.find(_.denom == stakingTokenSymbol).fold(MicroNumber.zero)(_.amount), delegatedAmount = delegatedAmount, undelegatingAmount = undelegatingAmount, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingTokenSymbol = stakingTokenSymbol)
+    }
+
+}

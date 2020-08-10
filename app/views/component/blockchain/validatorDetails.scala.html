@@ -1,0 +1,47 @@
+@import views.html.base._
+@import models.blockchain.Validator
+
+@(validator: Validator, selfDelegationAddress: String, votingPower: String, bondedStatus: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(validator.description.moniker.getOrElse(constants.View.MONIKER_NOT_FOUND)) {
+    <div>
+    @if(validator.status == bondedStatus) {
+        <span class="cmuk-badge verified">@Messages(constants.View.ACTIVE)</span>
+
+    } else {
+        <span class="cmuk-badge pending">@Messages(constants.View.INACTIVE)</span>
+    }
+    @if(validator.jailed) {
+        <span class="cmuk-badge rejected">@Messages(constants.View.JAILED)</span>
+    }
+    </div>
+} {
+    @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
+    @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.account(selfDelegationAddress)))
+    @commonTextInfo(constants.View.COMMISSION_RATE, validator.commission.commissionRates.rate.toString + "%")
+    @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
+    @validator.description.identity match {
+        case Some(identity) => {
+            @commonTextInfo(constants.View.VALIDATOR_IDENTITY, identity)
+        }
+        case None => {}
+    }
+    @validator.description.website match {
+        case Some(website) => {
+            @commonTextInfo(constants.View.VALIDATOR_WEBSITE, website)
+        }
+        case None => {}
+    }
+    @validator.description.securityContact match {
+        case Some(securityContact) => {
+            @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, securityContact)
+        }
+        case None => {}
+    }
+    @validator.description.details match {
+        case Some(details) => {
+            @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, details)
+        }
+        case None => {}
+    }
+}

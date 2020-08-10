@@ -4,6 +4,7 @@ import controllers.actions.{WithLoginAction, WithUnknownLoginAction, WithUserLog
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable.Coin
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -45,7 +46,7 @@ class SendCoinController @Inject()(
         },
         sendCoinData => {
           val transactionProcess = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = Seq(Coin("stake", sendCoinData.amount)), gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
             request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = transactionMode),
             action = transactionsSendCoin.Service.post,
@@ -58,7 +59,7 @@ class SendCoinController @Inject()(
             result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(loginState.address, failures = Seq(baseException.failure)))
           }
         }
       )

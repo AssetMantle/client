@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -46,8 +46,6 @@ class Accounts @Inject()(
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-
-  private val denom = configuration.get[String]("blockchain.denom")
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
     case Success(result) => result
@@ -82,7 +80,7 @@ class Accounts @Inject()(
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
-  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, coins: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.coins, x.dirtyBit)).update((accountNumber, sequence, coins, dirtyBit)).asTry).map {
+  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.dirtyBit)).update((accountNumber, sequence, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -91,13 +89,6 @@ class Accounts @Inject()(
   }
 
   private def findByAddress(address: String): Future[Account] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
-
-  private def getCoinsByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -116,13 +107,11 @@ class Accounts @Inject()(
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
 
-    def * = (address, username, coins, publicKey, accountNumber, sequence, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Account.tupled, Account.unapply)
+    def * = (address, username, publicKey, accountNumber, sequence, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Account.tupled, Account.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
     def username = column[String]("username")
-
-    def coins = column[String]("coins")
 
     def publicKey = column[String]("publicKey")
 
@@ -149,11 +138,9 @@ class Accounts @Inject()(
 
     def create(address: String, username: String, pubkey: String): Future[String] = add(Account(address = address, username = username, publicKey = pubkey, dirtyBit = false))
 
-    def refreshDirty(address: String, accountNumber: String, sequence: String, coins: String): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, coins, dirtyBit = false)
+    def refreshDirty(address: String, accountNumber: String, sequence: String): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, dirtyBit = false)
 
     def get(address: String): Future[Account] = findByAddress(address)
-
-    def getCoins(address: String): Future[String] = getCoinsByAddress(address)
 
     def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 
@@ -168,38 +155,4 @@ class Accounts @Inject()(
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
   }
 
-  object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = {
-      val dirtyAddresses = Service.getDirtyAddresses
-      Thread.sleep(sleepTime)
-
-      def refreshDirtyAndSendCometMessage(dirtyAddresses: Seq[String]) = {
-        Future.sequence {
-          dirtyAddresses.map { dirtyAddress =>
-            val responseAccount = getAccount.Service.get(dirtyAddress)
-            val accountID = Service.tryGetUsername(dirtyAddress)
-
-            def refreshDirty(responseAccount: Response): Future[Int] = Service.refreshDirty(responseAccount.value.address, responseAccount.value.account_number, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denom).map(_.amount).headOption.getOrElse(""))
-
-            for {
-              responseAccount <- responseAccount
-              _ <- refreshDirty(responseAccount)
-              accountID <- accountID
-            } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ACCOUNT, messageContent = actors.Message.Account())
-          }
-        }
-      }
-
-      (for {
-        dirtyAddresses <- dirtyAddresses
-        _ <- refreshDirtyAndSendCometMessage(dirtyAddresses)
-      } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
-    }
-  }
-
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    Utility.dirtyEntityUpdater()
-  }(schedulerExecutionContext)
 }

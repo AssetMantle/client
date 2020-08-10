@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{ActorPath, ActorRef}
+import models.common.Serializable.Fee
 import play.api.libs.json.{JsValue, Json, OWrites, Writes}
 
 object Message {
@@ -50,5 +51,28 @@ object Message {
   case class SMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: Seq[String])
 
   case class PushNotification(token: String, pushNotification: constants.Notification.PushNotification, messageParameters: Seq[String])
+
+  object WebSocket {
+
+    case class AddActor(actorRef: ActorRef)
+
+    case class RemoveActor(actorRef: ActorRef)
+
+    case class Block(height: Int, time: String, proposer: String)
+
+    implicit val blockWrites: OWrites[Block] = Json.writes[Block]
+
+    case class Tx(hash: String, status: Boolean, numMsgs: Int, fees: Fee)
+
+    implicit val txWrites: OWrites[Tx] = Json.writes[Tx]
+
+    case class NewBlock(block: Block, txs: Seq[Tx], averageBlockTime: Double, validators: Seq[String])
+
+    implicit val newBlockWrites: OWrites[NewBlock] = Json.writes[NewBlock]
+
+    case class BlockchainConnectionLost(blockchainConnectionLost: Boolean)
+
+    implicit val blockchainConnectionLostWrites: OWrites[BlockchainConnectionLost] = Json.writes[BlockchainConnectionLost]
+  }
 
 }

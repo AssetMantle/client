@@ -96,8 +96,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
           _ <- updateFile(oldFile, signedFileNameList)
           _ <- markSigningComplete
           _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
-          _ <- utilitiesNotification.send(accountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
-          _ <- utilitiesNotification.send(accountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+          _ <- utilitiesNotification.send(accountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
+          _ <- utilitiesNotification.send(accountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
         } yield 0
       }
       case _ => throw new BaseException(constants.Response.UNEXPECTED_EVENT)
@@ -141,7 +141,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def authorization: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
-        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(address = loginState.address, failures = Seq(baseException.failure)))
       }
   }
 
@@ -150,7 +150,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {
         _ <- updateAccessToken
-      } yield Ok(views.html.account(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
+      } yield Ok(views.html.account(address = loginState.address, successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

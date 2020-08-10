@@ -6,6 +6,8 @@ import play.api.data.Forms.{boolean, date, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
+import utilities.MicroNumber
+import utilities.NumericOperation.checkPrecision
 
 import scala.util.matching.Regex
 
@@ -52,6 +54,7 @@ object FormField {
   val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
+  val SEARCH = new StringFormField("SEARCH_TX_HASH_HEIGHT_BLOCK_HEIGHT_ADDRESS", 1, 1000)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
@@ -62,13 +65,12 @@ object FormField {
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
+  val TOKEN_SYMBOL = new SelectFormField("TOKEN_SYMBOL", Seq.empty)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, Int.MaxValue)
   val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
   val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
-  val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
 
   //DateFormField
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
@@ -83,6 +85,10 @@ object FormField {
 
   //NestedFormField
   val ADDRESS = new NestedFormField("ADDRESS")
+
+  //MicroNumberFormField
+  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -117,6 +123,11 @@ object FormField {
 
   class NestedFormField(fieldName: String) {
     val name: String = fieldName
+  }
+
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
+    val name: String = fieldName
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }

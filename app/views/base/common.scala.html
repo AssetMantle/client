@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-
+@import views.html.component.blockchain._
 @(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
@@ -15,12 +15,14 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/mediaQueries.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/dataTables.min.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
-        <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/webSocket.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/comet.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/activitiesBox.js")" type="text/javascript"></script>
@@ -33,6 +35,7 @@
         <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/dataTables/dataTables.min.js")" type="text/javascript"></script>
     </head>
     <body class="comdex">
         <div class="bodyContainer">
@@ -61,7 +64,7 @@
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
+                                <li><a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect"><span class="accountIcon">
                                 @commonIcon("account")
                                 </span>
                                     @Messages(constants.View.ACCOUNT)
@@ -72,42 +75,71 @@
                         </ul>
                     </div>
                     <div class="cmuk-navbar-right">
+                        <div class="searchContainer hidden">
+                        @searchField()
+                        </div>
                         <ul class="cmuk-navbar-nav">
-                        @loginState match {
-                            case null => {
-                                <li>
-                                    <a>
-                                    @commonModalButton(constants.View.SIGN_UP, routes.javascript.AccountController.signUpForm, 'class -> "buttonRegister")
-                                    </a>
-                                </li>
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
-                                    @Messages(constants.Form.LOGIN.legend)
-                                    </a>
-                                </li>
-                            }
-                            case default => {
-                                <script type="text/javascript">
+                            <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                            @commonIcon("dashBoard")
+                            </span>
+                                @Messages(constants.View.DASHBOARD)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
+                            @commonIcon("blocks")
+                            </span>
+                                @Messages(constants.View.BLOCKS)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
+                            @commonIcon("transactions")
+                            </span>
+                                @Messages(constants.View.TRANSACTIONS)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
+                            @commonIcon("validators")
+                            </span>
+                                @Messages(constants.View.VALIDATORS)
+                            </a>
+                            </li>
+                            @loginState match {
+                                case null => {
+                                    <li>
+                                        <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
+                                            <span class="singUpIcon">@commonIcon("signUp")</span> @Messages(constants.Form.SIGN_UP.legend)
+                                        </a>
+
+                                    </li>
+                                    <li>
+                                        <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
+                                            <span class="loginIcon">@commonIcon("login")</span>
+                                            @Messages(constants.Form.LOGIN.legend)
+                                        </a>
+                                    </li>
+                                }
+                                case default => {
+                                    <script type="text/javascript">
                                         var cometMessage = function (message) {
                                             cometMessageHandler(message);
                                         }
                                     </script>
-                                <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
+                                    <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
-                                <li class="login-nav-item">
-                                    <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
-                                        @loginState.username
-                                    <span cmuk-icon="user" class="loginIcon"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
-                                        <span class="logoutIcon">@commonIcon("logout")</span>
-                                    </a>
-                                </li>
+                                    <li class="login-nav-item">
+                                        <a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect">
+                                            @loginState.username
+                                        <span cmuk-icon="user" class="loginIcon"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
+                                            <span class="logoutIcon">@commonIcon("logout")</span>
+                                        </a>
+                                    </li>
 
+                                }
                             }
-                        }
                         </ul>
                     </div>
                 </div>
@@ -159,9 +191,13 @@
                 case null => {
                     <div class="pageContent cmuk-container">
                         <div class="leftSide sticky">
-                        @left
+                            <div class="mobileSearch">
+                            @searchField()
+                            </div>
+                            @left
                         </div>
                         <div class="middle" id="centerContent">
+
                         @center
                         </div>
                         <div class="rightSide sticky">
@@ -172,7 +208,10 @@
                 case default => {
                     <div class="pageContent cmuk-container">
                         <div class="leftSide sticky">
-                        @left
+                            <div class="mobileSearch">
+                            @searchField()
+                            </div>
+                            @left
                         </div>
                         <div class="middle" id="centerContent">
                         @center
@@ -204,13 +243,19 @@
                 <div>@Messages(constants.View.CONNECTION_ERROR)</div>
             </div>
         </div>
+        <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
+            <div class="connectionError">
+                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
+                <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
+            </div>
+        </div>
         </div>
             @* Footer *@
         <div class="footer">
             <div class="cmuk-container">
                 <div>
                     <div class="footerLogo">
-                        <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
+                        <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
                     </div>
                 </div>
                 <div class="copyRight">

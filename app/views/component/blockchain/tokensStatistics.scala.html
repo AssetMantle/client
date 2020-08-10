@@ -1,0 +1,32 @@
+@import models.blockchain.Token
+@import play.api.data.Field
+@import views.html.base._
+@import views.html.helper.select
+@import scala.collection.immutable.ListMap
+
+@(tokens: Seq[Token], stakingTokenSymbol: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.TOKENS_STATISTICS) {
+    @if(tokens.nonEmpty) {
+        <div class="cardHeaderSelect">
+        @select(Field(form = views.companion.blockchain.TokenSymbol.form, name = constants.FormField.TOKEN_SYMBOL.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(tokens.head.symbol)), for(symbol <- tokens.map(_.symbol)) yield (symbol, symbol), 'id -> "tokensStatisticsSymbolSelect", 'value -> s"'${tokens.head.symbol}'", 'onClick -> s"showStatistics('${tokens.map(_.symbol)}')", 'class -> "cmuk-select", 'label -> "")
+        </div>
+    }
+} {
+    @if(tokens.nonEmpty) {
+        @tokens.map { token =>
+            <div id="@Seq("tokenStatistics", token.symbol).mkString("_")" class="hidden">
+                @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
+                @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
+                @if(token.symbol == stakingTokenSymbol) {
+                    @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
+                    @commonPieChart("bondingTokenStatisticsChart", ListMap(
+                        constants.View.BONDED_AMOUNT -> token.bondedAmount.toDouble,
+                        constants.View.NOT_BONDED_AMOUNT -> token.notBondedAmount.toDouble,
+                    ), showLegend = true)
+                }
+            </div>
+        }
+    }
+    <script src="@routes.Assets.versioned("javascripts/tokensStatistics.js")" type="text/javascript"></script>
+}

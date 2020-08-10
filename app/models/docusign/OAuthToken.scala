@@ -137,7 +137,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           baseException.failure match {
-            case constants.Response.NO_SUCH_ELEMENT_EXCEPTION => utilitiesNotification.send(constants.User.MAIN_ACCOUNT, constants.Notification.DOCUSIGN_AUTHORIZATION_PENDING)
+            case constants.Response.NO_SUCH_ELEMENT_EXCEPTION => utilitiesNotification.send(constants.User.MAIN_ACCOUNT, constants.Notification.DOCUSIGN_AUTHORIZATION_PENDING)()
             case _ => throw baseException
           }
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)

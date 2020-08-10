@@ -1,0 +1,29 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.CreateValidator
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[CreateValidator]) { createValidator =>
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(createValidator.delegatorAddress, routes.ViewController.account(createValidator.delegatorAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(createValidator.validatorAddress, routes.ViewController.validator(createValidator.validatorAddress)))
+    @commonTextInfo(constants.View.PUBLIC_KEY, createValidator.publicKey)
+    @commonTextInfo(constants.View.AMOUNT_DELEGATED, s"${createValidator.value.amount} ${createValidator.value.denom}")
+    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(createValidator.minSelfDelegation))
+    @commonTextInfo(constants.View.VALIDATOR_MONIKER, createValidator.description.moniker.getOrElse(""))
+    @if(createValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_IDENTITY, createValidator.description.identity.getOrElse(""))
+    }
+    @if(createValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_WEBSITE, createValidator.description.website.getOrElse(""))
+    }
+    @if(createValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, createValidator.description.securityContact.getOrElse(""))
+    }
+    @if(createValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, createValidator.description.details.getOrElse(""))
+    }
+    @commonTextInfo(constants.View.COMMISSION_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.rate) * 100).toDouble)} %")
+    @commonTextInfo(constants.View.MAXIMUM_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.maxRate) * 100).toDouble)} %")
+    @commonTextInfo(constants.View.MAXIMUM_CHANGE_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.maxChangeRate) * 100).toDouble)} %")
+}

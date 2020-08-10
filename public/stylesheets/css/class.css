@@ -157,11 +157,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .toggleElement {
   text-align: center;
-  background-color: #0862BE;
+  background-color: #000;
   color: #FFFFFF; }
 
 .showToggleElement {
-  background-color: #0862BE;
+  background-color: #000;
   cursor: pointer;
   color: #10292e; }
 
@@ -249,14 +249,16 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100%;
   padding: 30px 0;
   font-size: 0.875rem;
-  background: #031221; }
+  background: #000; }
   .footer .copyRight {
     margin: 10px 0;
     font-weight: bold;
-    color: #053C75; }
+    color: #ffffff; }
     .footer .copyRight a {
       text-decoration: none;
-      color: #053C75; }
+      color: #ffffff; }
+  .footer img {
+    width: 120px; }
 
 .iframeModal {
   height: 700px;
@@ -315,7 +317,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .fileName {
   font-size: 0.875rem;
-  color: #0862BE;
+  color: #000;
   margin-bottom: 5px; }
 
 .checkboxSection {
@@ -373,16 +375,88 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .forgotPasswordNote {
   font-size: 1.25rem; }
 
+.blockHeightItem .listItemChild .listItemChildTitle {
+  display: none; }
+.blockHeightItem .listItemChild p {
+  margin: 0; }
+.blockHeightItem .cmuk-link {
+  width: 120px;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; }
+
+.chartContainer {
+  height: 260px; }
+
+.cardSelectHeader dl {
+  margin: 0; }
+  .cardSelectHeader dl label {
+    display: none; }
+
+.tableViewCard .infoRow {
+  display: table-row; }
+  .tableViewCard .infoRow .infoRowLabel {
+    text-align: left;
+    vertical-align: bottom;
+    font-size: .875rem;
+    font-weight: 400;
+    color: #999;
+    width: auto; }
+  .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue {
+    padding: 3px 12px;
+    display: table-cell; }
+
+.textOverflowCopy {
+  display: flex; }
+  .textOverflowCopy .cmuk-icon-button {
+    width: 30px;
+    height: 30px; }
+    .textOverflowCopy .cmuk-icon-button svg {
+      width: 16px; }
+  .textOverflowCopy p {
+    margin: 0; }
+
+.transactionListCard .commonList .listItemChild .listItemChildTitle {
+  display: none;
+  margin: 0; }
+.transactionListCard .listItemChildValue {
+  margin: 0; }
+
+.block {
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+  margin-right: .2em;
+  border: 0.1em solid #000;
+  -webkit-box-shadow: 1px 1px 3px 0 #000;
+  -moz-box-shadow: 1px 1px 3px 0 #000;
+  box-shadow: 1px 1px 3px 0 #000;
+  border-radius: 3px; }
+  .block .full {
+    background-color: #000;
+    height: 100%;
+    width: 100%; }
+
+.cardHeaderSelect {
+  position: absolute;
+  right: 10px; }
+
+.pieChartContainer {
+  display: flex; }
+  .pieChartContainer div {
+    flex: 50%; }
+
 .comdex .cmuk-sticky-fixed {
   width: 100% !important; }
 .comdex .buttonPrimary {
   border-radius: 0.25rem;
-  background: #0862BE;
+  background: #000;
   color: #FFFFFF;
   font-size: 0.875rem;
   font-weight: bold; }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
-  background-color: #053C75; }
+  background-color: #000; }
 .comdex .cmuk-input {
   background: #FFFFFF;
   cursor: auto;
@@ -397,7 +471,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     letter-spacing: 0.01em; }
   .comdex .cmuk-input:focus {
     color: #272829;
-    border: 1px solid #0862BE; }
+    border: 1px solid #000; }
 .comdex input[type=date] {
   padding: 12px 15px; }
 .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
@@ -457,6 +531,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     margin-left: 15px;
     position: absolute;
     right: 20px; }
+.comdex .cmuk-card-body .cmuk-card-body {
+  padding: 10px; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -464,11 +540,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   outline: none;
   cursor: pointer; }
 .comdex .cmuk-button-link {
-  color: #0862BE; }
+  color: #000; }
   .comdex .cmuk-button-link:hover, .comdex .cmuk-button-link:focus {
     text-decoration: none; }
 .comdex .cmuk-button-primary {
-  background-color: #0862BE; }
+  background-color: #000; }
 .comdex .cmuk-legend {
   font-weight: bold;
   text-align: center;
@@ -477,7 +553,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1.125rem; }
 .comdex .cmuk-spinner > * > * {
   stroke-width: 2 !important;
-  stroke: #0862BE !important; }
+  stroke: #000 !important; }
+.comdex .cmuk-search-icon > * > * {
+  stroke-width: 2 !important; }
 .comdex .cmuk-accordion-title::before {
   background-image: url("../../images/chevron-up.svg"); }
 .comdex .cmuk-open > .cmuk-accordion-title::before {
@@ -537,6 +615,72 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     top: 13px;
     left: 160px;
     font-weight: bold; }
+.comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]) {
+  height: 35px;
+  width: 150px; }
+.comdex .tableCard .cmuk-card-body {
+  padding: 10px; }
+  .comdex .tableCard .cmuk-card-body .cmuk-card-header {
+    display: none; }
+.comdex .cmuk-subnav-pill > .cmuk-active > a {
+  background-color: #222; }
+.comdex .searchForm {
+  width: auto;
+  margin-right: 15px; }
+  .comdex .searchForm dl {
+    margin: 0; }
+    .comdex .searchForm dl label {
+      display: none; }
+    .comdex .searchForm dl .cmuk-search-input {
+      border-radius: 5px;
+      padding-right: 40px;
+      background: #fff;
+      width: 450px;
+      font-size: 1rem !important; }
+.comdex .dataTables_wrapper .dataTables_filter {
+  width: auto;
+  margin-bottom: 15px; }
+  .comdex .dataTables_wrapper .dataTables_filter label {
+    display: flex;
+    align-items: center; }
+.comdex .dataTables_wrapper select, .comdex .dataTables_wrapper input {
+  width: 250px;
+  background: #fff;
+  height: 30px;
+  color: #666;
+  border: 1px solid #e5e5e5;
+  transition: .2s ease-in-out;
+  transition-property: color, background-color, border; }
+.comdex table.dataTable tbody th, .comdex table.dataTable tbody td {
+  padding: 16px 12px; }
+.comdex table.dataTable {
+  border-collapse: collapse; }
+.comdex table.dataTable.no-footer {
+  border-bottom: 1px solid #e5e5e5; }
+.comdex table.dataTable thead th {
+  border-bottom: 0; }
+.comdex table.dataTable tfoot th {
+  border-top: 0; }
+.comdex .dataTables_wrapper .dataTables_paginate .paginate_button.current, .comdex .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  padding: 0 10px; }
+.comdex .dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0; }
+.comdex table.dataTable thead .sorting,
+.comdex table.dataTable thead .sorting_asc,
+.comdex table.dataTable thead .sorting_desc,
+.comdex table.dataTable thead .sorting_asc_disabled,
+.comdex table.dataTable thead .sorting_desc_disabled {
+  background-position: center left; }
+.comdex .cmuk-drop {
+  width: 400px; }
+.comdex .mobileSearch {
+  margin-bottom: 10px;
+  display: none; }
+  .comdex .mobileSearch .searchForm dl input {
+    background: #e5e5e5;
+    padding: 0 10px;
+    border-radius: 5px;
+    color: #000; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -558,9 +702,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     height: 20px; }
 
 .header {
-  background: #053C75; }
+  background: #000; }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-    background: #053C75;
+    background: #000;
     padding: 0 0 0 35px; }
   .header .navItemRippleEffect {
     position: relative;
@@ -572,12 +716,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     text-transform: none; }
   .header .cmuk-logo {
     padding: 0 40px 0 0;
-    border-right: 1px solid #1C5998; }
+    border-right: 1px solid #ffffff; }
     .header .cmuk-logo img {
       width: 120px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
-    padding: 0 25px;
-    border-left: 1px solid #1C5998; }
+    padding: 0 25px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 0.875rem;
@@ -590,27 +733,29 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding: 3px 40px 0 40px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav li .loginLink {
     padding: 0 45px 0 45px; }
-  .header .cmuk-navbar-right .loginIcon {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    margin: 0 10px 0;
-    padding: 3px;
-    border: 2px solid #1e60a5; }
   .header .cmuk-navbar-nav > li > a {
     padding: 0 25px;
     font-weight: bold;
-    color: #FFFFFF;
+    color: rgba(255, 255, 255, 0.75);
     font-size: 0.875rem;
     letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
     width: 20px;
-    height: 16px;
-    margin-bottom: 3px; }
-  .header .dashboardIcon, .header .traderIcon, .header .accountIcon, .header .transactionIcon {
-    margin-right: 8px;
+    height: 20px;
+    margin-bottom: -2px; }
+  .header .dashboardIcon, .header .blocksIcon, .header .traderIcon, .header .accountIcon, .header .transactionsIcon, .header .validatorsIcon, .header .singUpIcon, .header .loginIcon {
+    margin-right: 5px;
     width: 20px;
     height: 20px; }
+  .header .loginIcon .icon {
+    margin-bottom: -5px; }
+  .header .blocksIcon .icon {
+    width: 20px;
+    height: 25px; }
+  .header .transactionsIcon .icon {
+    width: 16px;
+    margin-bottom: -3px;
+    height: 16px; }
   .header .icon {
     width: 20px;
     height: 20px;
@@ -622,7 +767,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     border-bottom: 3px solid #FFFFFF;
     padding-top: 3px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
-      fill: #FE4350; }
+      fill: #e50913; }
   .header .logoutIcon .icon {
     width: 20px;
     height: 20px; }
@@ -929,7 +1074,7 @@ form .formBody {
     padding: 15px 20px;
     font-size: 1.125rem;
     text-transform: capitalize;
-    color: #0862BE;
+    color: #000;
     font-weight: bold; }
     .tabSection .cmuk-subnav-pill li a:before {
       content: "";
@@ -941,7 +1086,7 @@ form .formBody {
       background: url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
       padding-left: 25px; }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #053C75;
+  background: #000;
   color: #FFFFFF; }
   .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
@@ -966,7 +1111,7 @@ form .formBody {
     display: flex;
     justify-content: center;
     border-radius: 50%;
-    color: #053C75;
+    color: #000;
     font-weight: bold; }
   .left .quoteIdTitle {
     color: #6C7883;
@@ -1097,7 +1242,7 @@ form .formBody {
         height: 16px;
         margin-bottom: 3px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-      color: #0862BE;
+      color: #000;
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
@@ -1180,7 +1325,7 @@ form .formBody {
     align-items: center; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
       width: 250px;
-      color: #0862BE;
+      color: #000;
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
@@ -1258,7 +1403,6 @@ form .formBody {
     width: 18px;
     height: 18px; }
 .leftContainer .cmuk-card-body {
-  padding: 0;
   overflow-y: auto; }
   .leftContainer .cmuk-card-body ul {
     padding: 0;
@@ -1328,13 +1472,13 @@ form .formBody {
   line-height: normal;
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
-  color: #0862BE;
+  color: #000;
   margin: 5px;
   border: 0; }
   .leftContainer .addBalanceButton .plusIcon .icon {
     width: 10px;
     height: 10px;
-    fill: #0862BE; }
+    fill: #000; }
 .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon {
   bottom: 2px; }
 .leftContainer .icon {
@@ -1359,7 +1503,7 @@ form .formBody {
     color: #061728;
     background: none;
     font-weight: bold;
-    border-bottom: 2px solid #0862BE; }
+    border-bottom: 2px solid #000; }
   .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
     height: 300px;
     overflow: auto; }
@@ -1393,8 +1537,6 @@ form .formBody {
   border-radius: 3px; }
 .rightContainer .cmuk-card-header {
   font-size: 1rem; }
-.rightContainer .cmuk-card-body {
-  padding: 0 13px; }
 .rightContainer .chatRoom .cmuk-card-header .icon {
   width: 18px;
   height: 18px; }
@@ -1470,7 +1612,7 @@ form .formBody {
     font-size: 1rem;
     margin: 10px; }
     .documentItem .documentContentTop a {
-      color: #053C75;
+      color: #000;
       text-decoration: none; }
   .documentItem .documentThumbnail {
     margin: 10px; }
@@ -1513,7 +1655,7 @@ header:before,
     height: 100%;
     border-right: 2px dashed #CECECE;
     left: 29px;
-    top: 0;
+    top: 5px;
     position: absolute; }
   .timeline .timeline-item {
     margin-bottom: 20px;
@@ -1524,18 +1666,19 @@ header:before,
       width: 40px;
       height: 40px;
       position: relative;
-      top: 0;
+      top: 5;
       display: inline-block;
       left: 10px;
       overflow: hidden;
       border-radius: 50%; }
     .timeline .timeline-item .timeline-icon .icon {
-      fill: #0862BE;
+      fill: #000;
       width: 15px;
       height: 15px; }
     .timeline .timeline-item .timeline-content {
+      cursor: pointer;
       width: 80%;
-      padding: 0;
+      padding: 5px 10px;
       position: relative;
       -webkit-transition: all 0.3s ease;
       -moz-transition: all 0.3s ease;
@@ -1543,6 +1686,8 @@ header:before,
       .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
         font-size: 0.875rem; }
+    .timeline .timeline-item .timeline-content:hover {
+      background: #e7eaf3; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
     .timeline .timeline-item .timeline-content.right:before {
@@ -1711,14 +1856,14 @@ header:before,
       color: #848A91;
       font-size: 0.875rem; }
     .chat .partner .replytoMessage p {
-      border-left: 2px solid #0862BE;
+      border-left: 2px solid #000;
       padding: 0 10px; }
     .chat .partner .messageContent {
       color: #061728;
       font-size: 0.875rem; }
       .chat .partner .messageContent p {
         margin: 0;
-        color: #0862BE;
+        color: #000;
         text-align: left; }
     .chat .partner p {
       word-break: break-word;
@@ -1728,7 +1873,7 @@ header:before,
     padding: 10px;
     border-radius: 10px 10px 0 10px;
     margin: 10px;
-    background: #0862BE;
+    background: #000;
     color: #fff;
     position: relative; }
     .chat .you::after {
@@ -1737,8 +1882,8 @@ header:before,
       bottom: 0;
       content: "";
       border-top: .5rem solid transparent;
-      border-bottom: 0.5rem solid #0862BE;
-      border-left: 0.5rem solid #0862BE;
+      border-bottom: 0.5rem solid #000;
+      border-left: 0.5rem solid #000;
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
@@ -1800,7 +1945,7 @@ header:before,
       line-height: 28px; }
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
-        background: #0862BE; }
+        background: #000; }
 
 .accountName {
   position: absolute;
@@ -1822,10 +1967,10 @@ header:before,
     display: block; }
 
 .accountName.buy {
-  background: linear-gradient(180deg, #0862BE 0%, #05488C 100%); }
+  background: linear-gradient(180deg, #000 0%, #05488C 100%); }
 
 .accountName.sell {
-  background: linear-gradient(180deg, #0862BE 0%, #520E63 100%); }
+  background: linear-gradient(180deg, #000 0%, #520E63 100%); }
 
 .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
   margin-bottom: 5px; }
@@ -1854,7 +1999,7 @@ header:before,
 .profileContainer .plusIcon .icon {
   width: 11px;
   height: 11px;
-  fill: #0862BE; }
+  fill: #000; }
 
 .profileDetails .cmuk-button-link {
   margin-bottom: 5px; }
@@ -1913,18 +2058,17 @@ header:before,
   position: relative;
   display: inline-block; }
   .toolTip .toolTipText {
+    font-size: 12px;
     visibility: hidden;
-    width: 140px;
-    background-color: #0862BE;
+    width: 55px;
+    background-color: #000;
     color: #fff;
     text-align: center;
     border-radius: 3px;
-    padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -75px;
+    bottom: 120%;
+    left: -52%;
     opacity: 0;
     transition: opacity 0.3s; }
     .toolTip .toolTipText:after {
@@ -1935,7 +2079,7 @@ header:before,
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
-      border-color: #0862BE transparent transparent transparent; }
+      border-color: #000 transparent transparent transparent; }
 
 .toolTip:hover .toolTipText {
   visibility: visible;
@@ -2016,7 +2160,7 @@ dl .info {
     background: none;
     color: #061728;
     font-weight: bold;
-    border-bottom: 2px solid #0862BE; }
+    border-bottom: 2px solid #000; }
   .switcherCard .cmuk-subnav-pill li:not(:last-child) {
     border-right: 1px solid #e7eaf3; }
   .switcherCard .cmuk-subnav-pill > * > :first-child {
@@ -2044,7 +2188,7 @@ dl .info {
   color: #636363;
   font-weight: bold;
   font-size: 0.875rem;
-  border-bottom: 2px solid #0862BE;
+  border-bottom: 2px solid #000;
   background: none; }
 
 .traderRelationList .cmuk-card-header {
@@ -2169,7 +2313,7 @@ figure.zoom {
     line-height: 38px; }
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
-      background: #0862BE; }
+      background: #000; }
 
 .rippleEffect {
   position: absolute;

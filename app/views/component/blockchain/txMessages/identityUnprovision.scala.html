@@ -1,0 +1,11 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.IdentityUnprovision
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[IdentityUnprovision]) { identityUnprovision =>
+    @commonTextInfo(constants.View.FROM, identityUnprovision.from)
+    @commonTextInfo(constants.View.TO, identityUnprovision.to)
+    @commonHtmlInfo(constants.View.IDENTITY_ID, commonLink(identityUnprovision.identityID, routes.ViewController.identity(identityUnprovision.identityID)))
+}

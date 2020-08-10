@@ -1,0 +1,12 @@
+@import models.blockchain.Split
+@import views.html.base._
+
+@(splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@splits.map { split =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.OWNER_ID, split.ownerID)
+        @commonTextInfo(constants.View.OWNABLE_ID, split.ownableID)
+        @commonTextInfo(constants.View.SPLIT, split.split.toString)
+    }
+}

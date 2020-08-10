@@ -72,7 +72,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             emailAddress <- emailAddress
             _ <- addOrUpdateEmailAddress(emailAddress)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_ADDRESS_UPDATED, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_ADDRESS_UPDATED, loginState.username)()
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
           } yield result
             ).recover {
@@ -123,7 +123,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             mobileNumber <- mobileNumber
             _ <- addOrUpdateMobileNumber(mobileNumber)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)()
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
           } yield result
             ).recover {
@@ -181,7 +181,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             otpVerified <- verifyOTP
             _ <- verifyEmailAddress(otpVerified)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)()
           } yield {
             result
           }
@@ -223,7 +223,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             otpVerified <- verifyOTP
             _ <- verifyMobileNumber(otpVerified)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.SUCCESS)))
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)()
           } yield {
             result
           }).recover {

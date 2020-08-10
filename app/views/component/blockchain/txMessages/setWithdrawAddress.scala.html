@@ -1,0 +1,10 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.SetWithdrawAddress
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SetWithdrawAddress]) { setWithdrawAddress =>
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(setWithdrawAddress.delegatorAddress, routes.ViewController.account(setWithdrawAddress.delegatorAddress)))
+    @commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonLink(setWithdrawAddress.withdrawAddress, routes.ViewController.account(setWithdrawAddress.withdrawAddress)))
+}

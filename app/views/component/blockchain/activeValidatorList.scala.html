@@ -1,0 +1,26 @@
+@import views.html.base._
+@import models.blockchain.Validator
+@import utilities.MicroNumber
+
+@(validators: Seq[Validator], totalBondedAmount: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<table class="cmuk-table cmuk-table-striped tableSort">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.VALIDATOR)</th>
+            <th>@Messages(constants.View.VOTING_POWER)</th>
+            <th>@Messages(constants.View.COMMISSION_RATE)</th>
+        </tr>
+    </thead>
+        <tbody>
+            @validators.map { validator =>
+                <tr>
+                    <td class="blockHeightItem">
+                        @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker.getOrElse(validator.operatorAddress), routes.ViewController.validator(validator.operatorAddress)))
+                    </td>
+                    <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
+                    <td>@validator.commission.commissionRates.rate.toString %</td>
+                </tr>
+            }
+        </tbody>
+</table>
+<script src="@routes.Assets.versioned("javascripts/dataTables/dataTable.js")" type="text/javascript"></script>

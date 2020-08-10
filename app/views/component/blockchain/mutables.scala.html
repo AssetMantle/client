@@ -1,0 +1,10 @@
+@import models.common.Serializable.Mutables
+@import views.html.base._
+@import views.html.component.blockchain.properties
+
+@(mutables: Mutables)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(constants.View.MUTABLE_PROPERTIES):
+@commonInfoBox() {
+    @properties(mutables.properties.propertyList)
+}

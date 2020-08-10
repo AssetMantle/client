@@ -1,0 +1,13 @@
+@import models.common.Serializable.Property
+@import views.html.base._
+
+@(properties: Seq[Property])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@properties.map { property =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.PROPERTY_ID, property.id)
+        @Messages(constants.View.FACT):
+        @commonTextInfo(constants.View.FACT_HASH, property.fact.hash)
+        @commonBooleanInfo(constants.View.META, Option(property.fact.meta))
+    }
+}

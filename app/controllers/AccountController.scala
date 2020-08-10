@@ -157,7 +157,7 @@ class AccountController @Inject()(
           val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = username, token = loginData.pushNotificationToken)
           for {
             _ <- pushNotificationTokenUpdate
-            _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+            _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)()
           } yield Unit
         }
 
@@ -238,7 +238,7 @@ class AccountController @Inject()(
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
           } yield {
             shutdownActorsAndGetResult
           }).recover {
@@ -298,7 +298,7 @@ class AccountController @Inject()(
         val otp = masterTransactionEmailOTP.Service.get(emailOTPForgotPasswordData.username)
         (for {
           otp <- otp
-          _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
+          _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)()
         } yield {
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }).recover {
@@ -447,7 +447,7 @@ class AccountController @Inject()(
                 _ <- updateCompletionStatus
                 //TODO: Remove this when Trulioo is integrated
                 _ <- masterIdentifications.Service.markVerified(loginState.username)
-                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)
+                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)()
                 result <- getResult
               } yield result
             } else {
