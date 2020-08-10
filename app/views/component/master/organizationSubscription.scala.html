@@ -3,7 +3,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.ORGANIZATION_SUBSCRIPTION_DETAILS){
+@commonCard(constants.View.ORGANIZATION_SUBSCRIPTION_DETAILS,  'cardIconPath -> "images/icons/icons.svg#subscriptionDetails"){
 }{
     <button class="viewMore"></button>
 }

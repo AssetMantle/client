@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.TRADE_ROOMS) {
+@commonCard(constants.View.TRADE_ROOMS, 'cardIconPath -> "images/icons/icons.svg#tradeRoom") {
 } {
     @commonHorizontalSwitcher(ListMap(
         constants.View.ACTIVE_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.zoneViewActiveNegotiationList,

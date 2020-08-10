@@ -5,7 +5,7 @@
 @import models.master.OrganizationUBO
 @(ubos: Seq[OrganizationUBO])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.UBOS) {
+@commonCard(constants.View.UBOS, 'cardIconPath -> "images/icons/icons.svg#ubos") {
     @if(ubos.nonEmpty) {
         @commonFormButton(constants.Form.ADD_UBO    )
     }

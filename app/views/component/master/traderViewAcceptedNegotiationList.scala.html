@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="traderTradeRooms">
-@commonCard(constants.View.TRADE_ROOMS) {
+@commonCard(constants.View.TRADE_ROOMS, 'cardIconPath -> "images/icons/icons.svg#tradeRoom") {
 } {
     @commonHorizontalSwitcher(ListMap(
         constants.View.BUY_NEGOTIATION_LIST -> routes.javascript.ComponentViewController.traderViewAcceptedBuyNegotiationList,

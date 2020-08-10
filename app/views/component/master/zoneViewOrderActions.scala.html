@@ -7,7 +7,7 @@
 @import models.master.Order
 @(negotiation: Negotiation, asset: Asset, order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.ORDER_ACTIONS){
+@commonCard(constants.View.ORDER_ACTIONS,  'cardIconPath -> "images/icons/icons.svg#orderActions"){
 }{
     @if(asset.moderated){
         @negotiation.status match {
