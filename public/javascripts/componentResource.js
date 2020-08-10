@@ -20,7 +20,11 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
                 replaceDocument(data.responseText);
             },
             500: function (data) {
-                replaceDocument(data.responseText);
+                let imageElement= document.createElement('img');
+                const imageRoute =jsRoutes.controllers.Assets.versioned("images/exclamation.png");
+                imageElement.src= imageRoute.url;
+                div.html(imageElement);
+                div.append("<br>"+"<p>"+data.responseText+"</p>")
             }
         }
     });
