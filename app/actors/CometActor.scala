@@ -7,7 +7,7 @@ import akka.dispatch.PriorityGenerator
 import akka.dispatch.UnboundedStablePriorityMailbox
 import com.typesafe.config.Config
 import javax.inject.Singleton
-
+import akka.stream.alpakka
 import scala.concurrent.ExecutionContext
 
 @Singleton

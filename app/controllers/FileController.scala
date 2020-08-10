@@ -2,6 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
+import akka.util.ByteString
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -12,6 +13,7 @@ import models.common.Serializable._
 import models.docusign
 import models.masterTransaction.{AssetFile, NegotiationFile}
 import models.{blockchain, master, masterTransaction}
+import play.api.http.HttpEntity
 import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -47,11 +49,13 @@ class FileController @Inject()(
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
+                                utilitiesFileStore: utilities.FileStore
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
+  private val useS3BucketForStorage = configuration.get[Boolean]("s3.fileStorage")
 
   def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
@@ -112,7 +116,7 @@ class FileController @Inject()(
     implicit request =>
       val oldDocument = masterAccountKYCs.Service.tryGet(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocument: AccountKYC): Future[Boolean] = fileResourceManager.updateFile[AccountKYC](
+      def updateFile(oldDocument: AccountKYC): Future[Unit] = fileResourceManager.updateFile[AccountKYC](
         name = name,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
         oldDocument = oldDocument,
@@ -141,9 +145,26 @@ class FileController @Inject()(
     implicit request =>
       val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
 
+      def fetchFile(checkFileNameExists: Boolean) = {
+        if (checkFileNameExists) {
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield {
+              println("got  FIle")
+              Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+            }
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)))
+          }
+        }
+        else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+      }
+
       (for {
         checkFileNameExists <- checkFileNameExists
-      } yield if (checkFileNameExists) Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        result <- fetchFile(checkFileNameExists)
+      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
@@ -152,9 +173,13 @@ class FileController @Inject()(
   //TODO Shall we verify for genesis
   def genesisAccessedFile(fileName: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName))
-      }.recover {
+      (if (useS3BucketForStorage) {
+        for {
+          bucketFile <- fileResourceManager.getFile(fileName)
+        } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+      } else {
+        Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName)))
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -163,16 +188,25 @@ class FileController @Inject()(
     implicit request =>
       val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def fetchFile(userZoneID: String, organizationZoneID: String) = {
+        if (userZoneID == organizationZoneID) {
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName)))
+          }
+        }
+        else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+      }
+
       (for {
         organizationZoneID <- organizationZoneID
         userZoneID <- userZoneID
-      } yield {
-        if (organizationZoneID == userZoneID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }).recover {
+        result <- fetchFile(userZoneID, organizationZoneID)
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -274,7 +308,7 @@ class FileController @Inject()(
 
       def oldDocument(assetID: String) = masterTransactionAssetFiles.Service.tryGet(id = assetID, documentType = documentType)
 
-      def updateFile(oldDocument: AssetFile, assetID: String): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.AssetFile](
+      def updateFile(oldDocument: AssetFile, assetID: String): Future[Unit] = fileResourceManager.updateFile[masterTransaction.AssetFile](
         name = name,
         path = fileResourceManager.getAssetFilePath(documentType),
         oldDocument = oldDocument,
@@ -351,7 +385,8 @@ class FileController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getNegotiationFilePath(documentType))
+            case Some(file) =>
+              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getNegotiationFilePath(documentType))
               Ok
           }
         }
@@ -469,7 +504,7 @@ class FileController @Inject()(
     implicit request =>
       val oldDocument = masterTransactionNegotiationFiles.Service.tryGet(id = negotiationID, documentType = documentType)
 
-      def updateFile(oldDocument: NegotiationFile): Future[Boolean] = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
+      def updateFile(oldDocument: NegotiationFile): Future[Unit] = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
         name = name,
         path = fileResourceManager.getNegotiationFilePath(documentType),
         oldDocument = oldDocument,
@@ -564,10 +599,21 @@ class FileController @Inject()(
 
       def fileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
+      def fetchFile(fileName: String) = {
+        if (useS3BucketForStorage) {
+          for {
+            bucketFile <- fileResourceManager.getFile(fileName)
+          } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+        } else {
+          Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName)))
+        }
+      }
+
       (for {
         id <- id
         fileName <- fileName(id)
-      } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName))
+        result <- fetchFile(fileName)
+      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -580,10 +626,21 @@ class FileController @Inject()(
 
       def fileName(id: String): Future[String] = masterOrganizationKYCs.Service.tryGetFileName(id = id, documentType = documentType)
 
+      def fetchFile(fileName: String) = {
+        if (useS3BucketForStorage) {
+          for {
+            bucketFile <- fileResourceManager.getFile(fileName)
+          } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+        } else {
+          Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName)))
+        }
+      }
+
       (for {
         id <- id
         fileName <- fileName(id)
-      } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName))
+        result <- fetchFile(fileName)
+      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -597,19 +654,28 @@ class FileController @Inject()(
 
       def fileName: Future[String] = masterTransactionNegotiationFiles.Service.tryGetFileName(id = id, documentType = documentType)
 
-      def getTraderZOneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
+      def getTraderZoneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
+
+      def fetchFile(fileName: String, sellerTraderZoneID: String, buyerTraderZoneID: String, zoneID: String) = {
+        if (sellerTraderZoneID == zoneID || buyerTraderZoneID == zoneID) {
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getNegotiationFilePath(documentType), fileName = fileName)))
+          }
+        } else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
+      }
 
       (for {
         zoneID <- zoneID
         negotiation <- negotiation
         fileName <- fileName
-        sellerTraderZoneID <- getTraderZOneID(negotiation.sellerTraderID)
-        buyerTraderZoneID <- getTraderZOneID(negotiation.buyerTraderID)
-      } yield {
-        if (sellerTraderZoneID == zoneID || buyerTraderZoneID == zoneID) {
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getNegotiationFilePath(documentType), fileName = fileName))
-        } else Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-      }).recover {
+        sellerTraderZoneID <- getTraderZoneID(negotiation.sellerTraderID)
+        buyerTraderZoneID <- getTraderZoneID(negotiation.buyerTraderID)
+        result <- fetchFile(fileName, sellerTraderZoneID, buyerTraderZoneID, zoneID)
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -663,7 +729,7 @@ class FileController @Inject()(
     implicit request =>
       val oldDocument = masterAccountFiles.Service.tryGet(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocument: AccountFile): Future[Boolean] = fileResourceManager.updateFile[AccountFile](
+      def updateFile(oldDocument: AccountFile): Future[Unit] = fileResourceManager.updateFile[AccountFile](
         name = name,
         path = fileResourceManager.getAccountFilePath(documentType),
         oldDocument = oldDocument,
@@ -712,9 +778,21 @@ class FileController @Inject()(
             checkFileNameExistsAccountFiles <- checkFileNameExistsAccountFiles
           } yield if (checkFileNameExistsAccountFiles) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
       }
+
+      def fetchFile(path: String) = {
+        if (useS3BucketForStorage) {
+          for {
+            bucketFile <- fileResourceManager.getFile(fileName)
+          } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+        } else {
+          Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
+        }
+      }
+
       (for {
         path <- path
-      } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+        result <- fetchFile(path)
+      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -744,20 +822,33 @@ class FileController @Inject()(
         } yield traderPartOfNegotiation
       }
 
-      (for {
-        traderID <- traderID
-        traderNegotiationExists <- checkTraderNegotiationExists(traderID)
-      } yield {
+      def fetchFile(traderNegotiationExists: Boolean) = {
         if (traderNegotiationExists) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
             case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield {
+              println("got  FIle")
+              Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+            }
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-      }).recover {
+      }
+
+      (for {
+        traderID <- traderID
+        traderNegotiationExists <- checkTraderNegotiationExists(traderID)
+        result <- fetchFile(traderNegotiationExists)
+      } yield result
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -793,20 +884,30 @@ class FileController @Inject()(
         } yield traderOrganizationIDs
       }
 
-      (for {
-        organizationID <- organizationID
-        traderOrganizationIDs <- traderOrganizationIDs
-      } yield {
+      def fetchFile(organizationID: String, traderOrganizationIDs: Seq[String]) = {
         if (traderOrganizationIDs contains organizationID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
             case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-      }).recover {
+      }
+
+      (for {
+        organizationID <- organizationID
+        traderOrganizationIDs <- traderOrganizationIDs
+        result <- fetchFile(organizationID, traderOrganizationIDs)
+      } yield result
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -842,21 +943,30 @@ class FileController @Inject()(
         } yield traderZoneIDs
       }
 
-
-      (for {
-        zoneID <- zoneID
-        traderZoneIDs <- traderZoneIDs
-      } yield {
+      def fetchFile(zoneID: String, traderZoneIDs: Seq[String]) = {
         if (traderZoneIDs contains zoneID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
             case _ => fileResourceManager.getNegotiationFilePath(documentType)
           }
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+          if (useS3BucketForStorage) {
+            for {
+              bucketFile <- fileResourceManager.getFile(fileName)
+            } yield Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
+          } else {
+            Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
+          }
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
-      }).recover {
+      }
+
+      (for {
+        zoneID <- zoneID
+        traderZoneIDs <- traderZoneIDs
+        result <- fetchFile(zoneID, traderZoneIDs)
+      } yield result
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

@@ -45,6 +45,7 @@ class AddOrganizationController @Inject()(
                                            withUsernameToken: WithUsernameToken,
                                            withoutLoginAction: WithoutLoginAction,
                                            withoutLoginActionAsync: WithoutLoginActionAsync,
+                                           utilitiesFileStore:utilities.FileStore
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -308,7 +309,7 @@ class AddOrganizationController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
+            case Some(file) => utilitiesFileStore.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -353,7 +354,7 @@ class AddOrganizationController @Inject()(
 
       def getOldDocument(organizationID: String): Future[OrganizationKYC] = masterOrganizationKYCs.Service.tryGet(id = organizationID, documentType = documentType)
 
-      def updateFile(oldDocument: OrganizationKYC): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
+      def updateFile(oldDocument: OrganizationKYC): Future[Unit] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocument = oldDocument,
@@ -693,7 +694,7 @@ class AddOrganizationController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
+            case Some(file) => utilitiesFileStore.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -731,7 +732,7 @@ class AddOrganizationController @Inject()(
 
       def getOldDocument(organizationID: String): Future[OrganizationKYC] = masterOrganizationKYCs.Service.tryGet(id = organizationID, documentType = documentType)
 
-      def updateFile(oldDocument: OrganizationKYC): Future[Boolean] = fileResourceManager.updateFile[OrganizationKYC](
+      def updateFile(oldDocument: OrganizationKYC): Future[Unit] = fileResourceManager.updateFile[OrganizationKYC](
         name = name,
         path = fileResourceManager.getOrganizationKYCFilePath(documentType),
         oldDocument = oldDocument,

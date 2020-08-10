@@ -1535,6 +1535,7 @@ class ComponentViewController @Inject()(
 
   def traderViewNegotiationDocument(negotiationID: String, documentType: Option[String] = None): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      println(negotiationID,documentType)
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -1559,7 +1560,11 @@ class ComponentViewController @Inject()(
             for {
               assetFileList <- assetFileList
               negotiationFileList <- negotiationFileList
-            } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, (assetFileList ++ negotiationFileList).headOption))
+            } yield {
+              println(assetFileList.toString())
+              println(negotiationFileList.toString())
+              Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, (assetFileList ++ negotiationFileList).headOption))
+            }
         }
       }
       else {

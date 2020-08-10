@@ -225,7 +225,7 @@ class AddZoneController @Inject()(
 
       def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Unit] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocument = oldDocument,
@@ -545,7 +545,7 @@ class AddZoneController @Inject()(
 
       def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Unit] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocument = oldDocument,

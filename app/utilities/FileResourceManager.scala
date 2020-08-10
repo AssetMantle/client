@@ -1,15 +1,18 @@
 package utilities
 
 import exceptions.BaseException
+import fly.play.s3.{BucketFile, S3}
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
+import play.api.http.DefaultFileMimeTypes
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSClient, defaultFileMimeTypes: DefaultFileMimeTypes)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
@@ -45,54 +48,85 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
   private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
 
+  private val s3BucketName = configuration.get[String]("s3.bucketName")
+  val s3 = S3.fromConfiguration(wsClient, configuration)
+  val bucket = s3.getBucket(s3BucketName)
+
+  private val useS3BucketForStorage = configuration.get[Boolean]("s3.fileStorage")
+
+  private val tempFilePath: String = rootFilePath + configuration.get[String]("upload.temp")
 
   def getAccountKYCFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.AccountKYC.IDENTIFICATION => uploadAccountKYCIdentificationPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.AccountKYC.IDENTIFICATION => uploadAccountKYCIdentificationPath
+        case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      }
+    } else {
+      tempFilePath
     }
   }
 
   def getZoneKYCFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.ZoneKYC.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
-      case constants.File.ZoneKYC.IDENTIFICATION => uploadZoneKYCIdentificationPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.ZoneKYC.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
+        case constants.File.ZoneKYC.IDENTIFICATION => uploadZoneKYCIdentificationPath
+        case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      }
+    } else {
+      tempFilePath
     }
   }
 
   def getOrganizationKYCFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.OrganizationKYC.ACRA => uploadOrganizationKYCACRAPath
-      case constants.File.OrganizationKYC.BOARD_RESOLUTION => uploadOrganizationKYCBoardResolutionPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.OrganizationKYC.ACRA => uploadOrganizationKYCACRAPath
+        case constants.File.OrganizationKYC.BOARD_RESOLUTION => uploadOrganizationKYCBoardResolutionPath
+        case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      }
+    } else {
+      tempFilePath
     }
   }
 
   def getAssetFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.Asset.BILL_OF_LADING => uploadAssetBillOfLadingPath
-      case constants.File.Asset.COO => uploadAssetCOOPath
-      case constants.File.Asset.COA => uploadAssetCOAPath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.Asset.BILL_OF_LADING => uploadAssetBillOfLadingPath
+        case constants.File.Asset.COO => uploadAssetCOOPath
+        case constants.File.Asset.COA => uploadAssetCOAPath
+        case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      }
+    } else {
+      tempFilePath
     }
   }
 
   def getNegotiationFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.Negotiation.INVOICE => uploadNegotiationInvoicePath
-      case constants.File.Negotiation.BILL_OF_EXCHANGE => uploadNegotiationBillOfExchangePath
-      case constants.File.Negotiation.CONTRACT => uploadNegotiationContractPath
-      case constants.File.Negotiation.INSURANCE => uploadNegotiationInsurancePath
-      case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
-      case _ => uploadNegotiationOthersPath
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.Negotiation.INVOICE => uploadNegotiationInvoicePath
+        case constants.File.Negotiation.BILL_OF_EXCHANGE => uploadNegotiationBillOfExchangePath
+        case constants.File.Negotiation.CONTRACT => uploadNegotiationContractPath
+        case constants.File.Negotiation.INSURANCE => uploadNegotiationInsurancePath
+        case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
+        case _ => uploadNegotiationOthersPath
+      }
+    } else {
+      tempFilePath
     }
   }
 
   def getAccountFilePath(documentType: String): String = {
-    documentType match {
-      case constants.File.Account.PROFILE_PICTURE => uploadAccountProfilePicturePath
-      case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+    if (!useS3BucketForStorage) {
+      documentType match {
+        case constants.File.Account.PROFILE_PICTURE => uploadAccountProfilePicturePath
+        case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
+      }
+    } else {
+      tempFilePath
     }
   }
 
@@ -109,24 +143,36 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
     def updateAndCreateFile(fileName: String, encodedBase64: Option[Array[Byte]]): Future[String] = masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
 
+    def storeFileInS3BucketAndDelete(fileName: String) = {
+      if (useS3BucketForStorage) {
+        val add = bucket.add(BucketFile(fileName, defaultFileMimeTypes.forFileName(fileName).getOrElse(""), utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(getNegotiationFilePath(document.documentType), fileName))))
+        for {
+          _ <- add
+        } yield utilities.FileOperations.deleteFile(path, fileName)
+      } else {
+        Future(true)
+      }
+    }
+
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
       _ <- updateAndCreateFile(fileName, encodedBase64)
+      _ <- Future(utilities.FileOperations.renameFile(path, name, fileName))
+      _ <- storeFileInS3BucketAndDelete(fileName)
     } yield {
-      utilities.FileOperations.renameFile(path, name, fileName)
       utilitiesLog.infoLog(constants.Log.Info.STORE_FILE_EXIT, name, document.documentType, path)
     }
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
-      case e: Exception => logger.error(e.getMessage)
+      case e: Exception => logger.error(e.getMessage, e)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, path: String, oldDocument: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+  def updateFile[T <: Document[T]](name: String, path: String, oldDocument: T, updateOldDocument: T => Future[Int]): Future[Unit] = {
     val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
       utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
@@ -138,13 +184,23 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
     def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64).updateStatus(None))
 
+    def storeFileInS3BucketAndDelete(fileName: String) = {
+      if (useS3BucketForStorage) {
+        val add = bucket.add(BucketFile(fileName, defaultFileMimeTypes.forFileName(fileName).getOrElse(""), utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(getNegotiationFilePath(oldDocument.documentType), fileName))))
+        for {
+          _ <- add
+        } yield utilities.FileOperations.deleteFile(path, fileName)
+      } else {
+        Future(true)
+      }
+    }
+
     (for {
       (fileName, encodedBase64) <- getFileNameAndEncodedBase64
       _ <- update(fileName, encodedBase64)
-    } yield {
-      utilities.FileOperations.deleteFile(path, oldDocument.fileName)
-      utilities.FileOperations.renameFile(path, name, fileName)
-    }).recover {
+      _ <- Future(utilities.FileOperations.renameFile(path, name, fileName))
+      _ <- storeFileInS3BucketAndDelete(fileName)
+    } yield ()).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
@@ -152,5 +208,17 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
+  }
+
+  def getFile(fileName: String) = {
+    println("getting FIle")
+    bucket.get(fileName).map{x=>
+      println("got it yayayaay")
+      x
+    }
+      .recover {
+        case e: Exception => logger.error(e.getMessage)
+          throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+      }
   }
 }
