@@ -969,18 +969,18 @@ html, body{
 
 form{
   .formBody{
-    padding: 20px 60px 60px 60px;
+    padding: 30px 60px 60px 60px;
   }
 }
 
 .termAccept{
-  margin: 0px 0px 30px 30px;
+  margin: 0 0 30px 30px;
 }
 .modalInfoBlock{
   width: 620px;
   max-height: 600px;
   overflow: auto;
-  padding: 20px 60px 60px 60px;
+  padding: 30px 60px 60px 60px;
   @extend %scroller;
   .traderCommodity{
     margin:10px 0;
@@ -1729,6 +1729,7 @@ form{
     .cmuk-card-header .icon {
       width: 18px;
       height: 18px;
+      margin-bottom: 3px;
     }
   }
 }
@@ -2282,6 +2283,7 @@ header:before,
     .cmuk-button{
       line-height: 28px;
       padding: 0 12px;
+      margin: 0;
     }
   }
   .cmuk-card{
