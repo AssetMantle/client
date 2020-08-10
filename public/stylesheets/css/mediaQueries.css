@@ -17,7 +17,7 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #0862BE; }
+    background-color: #000; }
 
   .switcherCard .cmuk-subnav {
     flex-wrap: nowrap;
@@ -95,6 +95,9 @@
   .comdex .mobileNavigation {
     display: flex;
     flex: auto; } }
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .comdex .searchForm dl .cmuk-search-input {
+    width: 200px; } }
 @media (min-width: 1200px) {
   .pageContainer .leftSide {
     height: 100%;
@@ -113,10 +116,20 @@
     float: left;
     margin-left: 0.5%;
     right: 0;
-    margin-bottom: 5px; } }
-@media (max-width: 1200px) {
+    margin-bottom: 5px; }
+
+  .searchContainer {
+    display: block; } }
+@media (max-width: 1199px) {
   .pageContainer .middle {
-    margin-bottom: 20px; } }
+    margin-bottom: 20px; }
+
+  .leftSide, .rightSide {
+    position: relative !important;
+    top: 0 !important; }
+
+  .comdex .mobileSearch {
+    display: block; } }
 @media (max-width: 992px) {
   .MnemonicQuiz .mnemonicNote {
     background-image: none; }
@@ -131,7 +144,11 @@
       flex: none; }
       .modal .modalContent .modalBody .infoBlock .infoBlockItem .infoBlockItemRight {
         padding: 0;
-        border: none; } }
+        border: none; }
+
+  .tableViewCard .infoRow .infoRowLabel {
+    width: 125px;
+    vertical-align: inherit; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
     top: 10%;

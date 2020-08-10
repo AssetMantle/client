@@ -1,0 +1,17 @@
+@import models.`abstract`.TransactionMessage
+@import views.html.base._
+@import views.html.component.blockchain.properties
+@import models.common.TransactionMessages.AssetMint
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[AssetMint]) { assetMint =>
+    @commonTextInfo(constants.View.FROM, assetMint.from)
+    @commonTextInfo(constants.View.FROM_ID, assetMint.fromID)
+    @commonTextInfo(constants.View.TO_ID, assetMint.toID)
+    @commonTextInfo(constants.View.MAINTAINERS_ID, assetMint.maintainersID)
+    @commonTextInfo(constants.View.CLASSIFICATION_ID, assetMint.classificationID)
+    @commonIntInfo(constants.View.LOCK, assetMint.lock)
+    @commonIntInfo(constants.View.BURN, assetMint.burn)
+    @properties(assetMint.properties.propertyList)
+}

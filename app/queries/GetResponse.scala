@@ -29,8 +29,7 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
   object Service {
 
     def get(ticketID: String): Future[WSResponse] = action(ticketID).recover {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
 
   }

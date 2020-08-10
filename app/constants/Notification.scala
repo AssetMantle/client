@@ -1,8 +1,10 @@
 package constants
 
 import constants.Notification.{Email, PushNotification, SMS}
+import controllers.routes
+import play.api.routing.JavaScriptReverseRoute
 
-class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
+class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, val route: Option[JavaScriptReverseRoute] = None) {
 
   val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
 
@@ -51,9 +53,15 @@ object Notification {
   val EMAIL_ADDRESS_UPDATED = new Notification(notificationType = "EMAIL_ADDRESS_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
   val MOBILE_NUMBER_UPDATED = new Notification(notificationType = "MOBILE_NUMBER_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
 
+
+  val VALIDATOR_CREATED = new Notification(notificationType = "VALIDATOR_CREATED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val VALIDATOR_EDITED = new Notification(notificationType = "VALIDATOR_EDITED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val VALIDATOR_UNJAILED = new Notification(notificationType = "VALIDATOR_UNJAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val VALIDATOR_SLASHED = new Notification(notificationType = "VALIDATOR_SLASHED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_MISSED_BLOCKS = new Notification(notificationType = "VALIDATOR_MISSED_BLOCKS", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+
   //userReviewIdentification
   val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = false, sendPushNotification = true, sendSMS = false)
-
   val IDENTIFICATION_UPDATE = new Notification(notificationType = "IDENTIFICATION_UPDATE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   val CONTRACT_SIGNED = new Notification(notificationType = "CONTRACT_SIGNED", sendEmail = false, sendPushNotification = true, sendSMS = false)

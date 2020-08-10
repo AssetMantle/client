@@ -1,0 +1,16 @@
+@import views.html.base._
+@import models.blockchain.Transaction
+
+@(address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.VALIDATOR_TRANSACTIONS) {
+} {
+    <div id="validatorTxs"></div>
+    @commonSpinner("validatorTransactionsPageChangeSpinner")
+    @commonJavascriptButton(constants.View.BACK, JavaScript(s"getValidatorTxs('${address}', -1)"), 'id -> "validatorTransactions_BACK")
+    @commonJavascriptButton(constants.View.NEXT, JavaScript(s"getValidatorTxs('${address}', 1)"), 'id -> "validatorTransactions_NEXT")
+    <script>
+            componentResource('validatorTxs', jsRoutes.controllers.ComponentViewController.validatorTransactionsPerPage('@address', 1), 'validatorTransactionsPageChangeSpinner', 'pageChange');
+    </script>
+    <script src="@routes.Assets.versioned("javascripts/validatorTransactions.js")" type="text/javascript"></script>
+}

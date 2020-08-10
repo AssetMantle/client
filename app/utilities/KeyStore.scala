@@ -2,7 +2,7 @@ package utilities
 
 import java.io.{FileInputStream, FileOutputStream}
 import java.security.KeyStore
-
+import scala.concurrent.blocking
 import exceptions.BaseException
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
@@ -20,9 +20,9 @@ class KeyStore @Inject()(configuration: Configuration) {
 
   private val keyStorePassword = configuration.get[String]("keyStore.password")
 
-  private val keyStoreType = "PKCS12"
+  private val keyStoreType = "JCEKS"
 
-  private val secretKeyFactoryAlgorithm = "PBE"
+  private val secretKeyFactoryAlgorithm = "PBEWithHmacSHA512AndAES_256"
 
   def getPassphrase(alias: String): String = try {
     val ks = KeyStore.getInstance(keyStoreType)
@@ -38,18 +38,20 @@ class KeyStore @Inject()(configuration: Configuration) {
       throw new BaseException(constants.Response.KEY_STORE_ERROR)
   }
 
-  def setPassphrase(alias: String, aliasValue: String): Unit = try {
-    val generatedSecret = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).generateSecret(new PBEKeySpec(aliasValue.toCharArray))
-    val ks = KeyStore.getInstance(keyStoreType)
-    ks.load(new FileInputStream(keyStoreLocation), keyStorePassword.toCharArray)
-    val keyStorePasswordProtection = new KeyStore.PasswordProtection(keyStorePassword.toCharArray)
-    try ks.setEntry(alias, new KeyStore.SecretKeyEntry(generatedSecret), keyStorePasswordProtection)
-    finally keyStorePasswordProtection.destroy()
-    ks.store(new FileOutputStream(keyStoreLocation), keyStorePassword.toCharArray)
-  } catch {
-    case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.KEY_STORE_ERROR)
-  }
+  def setPassphrase(alias: String, aliasValue: String): Unit = blocking(this.synchronized(
+    try {
+      val generatedSecret = SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).generateSecret(new PBEKeySpec(aliasValue.toCharArray))
+      val ks = KeyStore.getInstance(keyStoreType)
+      ks.load(new FileInputStream(keyStoreLocation), keyStorePassword.toCharArray)
+      val keyStorePasswordProtection = new KeyStore.PasswordProtection(keyStorePassword.toCharArray)
+      try ks.setEntry(alias, new KeyStore.SecretKeyEntry(generatedSecret), keyStorePasswordProtection)
+      finally keyStorePasswordProtection.destroy()
+      ks.store(new FileOutputStream(keyStoreLocation), keyStorePassword.toCharArray)
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.KEY_STORE_ERROR)
+    }
+  ))
 
   //https://stackoverflow.com/questions/6243446/how-to-store-a-simple-key-string-inside-java-keystore
 }

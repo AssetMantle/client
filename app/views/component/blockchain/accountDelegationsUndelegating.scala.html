@@ -1,0 +1,13 @@
+@import views.html.base._
+@import models.common.Serializable.UndelegationEntry
+@import scala.collection.immutable.ListMap
+
+@(undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@undelegations.map { case (validatorAddress, undelegationEntries) =>
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), routes.ViewController.validator(validatorAddress)))
+    @undelegationEntries.map { undelegationEntry =>
+        @commonTextInfo(constants.View.AMOUNT_UNDELEGATING, utilities.NumericOperation.formatNumber(undelegationEntry.balance.toMicroDouble))
+        @commonTextInfo(constants.View.COMPLETION_TIME, undelegationEntry.completionTime)
+    }
+}

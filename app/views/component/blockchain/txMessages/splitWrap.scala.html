@@ -1,0 +1,14 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.SplitWrap
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SplitWrap]) { splitWrap =>
+    @commonTextInfo(constants.View.FROM, splitWrap.from)
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(splitWrap.fromID, routes.ViewController.identity(splitWrap.fromID)))
+    @Messages(constants.View.COINS):
+    @splitWrap.coins.map { coin =>
+        @coin.amount @coin.denom
+    }
+}

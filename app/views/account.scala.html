@@ -1,44 +1,55 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(address: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 
-@left={
+@left = {
     <div class="leftContainer">
-        <div id="financials" class="financial"></div>
+        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
     </div>
     <script>
+            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
+            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
     </script>
 }
 
-@center ={
+@center = {
     <div class="cmuk-container cmuk-margin-bottom">
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
+        <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                </div>
-
+                <div id="accountWallet" class="switcherCard tableViewCard"></div>
+            </div>
         </div>
-        <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-
+        <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                </div>
-
+                <div id="accountDelegations" class="switcherCard tableViewCard"></div>
+            </div>
         </div>
-        <script>
-            </script>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="accountTransactions"></div>
+            </div>
+        </div>
     </div>
+    <script>
+            componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
+            componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
+            componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
+    </script>
 }
 
 @right = {
     <div class="rightContainer">
-    <div class="recentActivityContainer">
-        <div id="recentActivities"></div>
-    </div>
+        <div class="recentActivityContainer">
+            <div id="publicRecentActivities"></div>
+        </div>
+        <div id="votingPowers" class="cmuk-margin-bottom"></div>
     </div>
     <script>
-        componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+            componentResource('publicRecentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
+            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
     </script>
 }

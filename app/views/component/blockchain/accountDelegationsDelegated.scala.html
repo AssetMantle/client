@@ -1,0 +1,14 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+@import utilities.MicroNumber
+
+@(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonPieChart("accountDelegationsDelagatedChart", ListMap(delegations.mapValues(_.toDouble).toList: _*), showLegend = false)
+@delegations.map { case (validatorAddress, amount) =>
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), routes.ViewController.validator(validatorAddress)))
+    @commonTextInfo(constants.View.AMOUNT_DELEGATED, utilities.NumericOperation.formatNumber(amount))
+}
+
+
+
+

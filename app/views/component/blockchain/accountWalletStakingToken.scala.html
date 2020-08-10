@@ -1,0 +1,35 @@
+@import utilities.MicroNumber
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(availableAmount: MicroNumber, delegatedAmount: MicroNumber, undelegatingAmount: MicroNumber, delegationRewards: MicroNumber, isValidator: Boolean, commissionRewards: MicroNumber, stakingTokenSymbol: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="pieChartContainer">
+  <div>
+    @commonTextInfo(constants.View.AVAILABLE, s"${utilities.NumericOperation.formatNumber(availableAmount.toMicroDouble)} ${stakingTokenSymbol}")
+    @commonTextInfo(constants.View.DELEGATED, s"${utilities.NumericOperation.formatNumber(delegatedAmount.toMicroDouble)} ${stakingTokenSymbol}")
+    @commonTextInfo(constants.View.UNDELEGATING, Seq(undelegatingAmount.toString, stakingTokenSymbol).mkString(" "))
+    @commonTextInfo(constants.View.DELEGATOR_REWARDS, Seq(delegationRewards.toString, stakingTokenSymbol).mkString(" "))
+    @if(isValidator) {
+        @commonTextInfo(constants.View.COMMISSION_REWARDS, Seq(commissionRewards.toString, stakingTokenSymbol).mkString(" "))
+    }
+  </div>
+    @if(availableAmount != MicroNumber.zero || delegatedAmount != MicroNumber.zero || undelegatingAmount != MicroNumber.zero) {
+        @defining(if(isValidator)
+            ListMap(
+                constants.View.AVAILABLE -> availableAmount.toDouble,
+                constants.View.DELEGATED -> delegatedAmount.toDouble,
+                constants.View.UNDELEGATING -> undelegatingAmount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationRewards.toDouble,
+                constants.View.COMMISSION_REWARDS -> delegationRewards.toDouble,
+            ) else ListMap(
+                constants.View.AVAILABLE -> availableAmount.toDouble,
+                constants.View.DELEGATED -> delegatedAmount.toDouble,
+                constants.View.UNDELEGATING -> undelegatingAmount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationRewards.toDouble,
+            )
+        ) { dataMap =>
+            @commonPieChart("accountWalletStakingTokenChart", dataMap, showLegend = true)
+        }
+    }
+</div>
+

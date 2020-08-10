@@ -1,0 +1,14 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.IdentityIssue
+@import views.html.base._
+@import views.html.component.blockchain.properties
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[IdentityIssue]) { identityIssue =>
+    @commonTextInfo(constants.View.FROM, identityIssue.from)
+    @commonTextInfo(constants.View.TO, identityIssue.to)
+    @commonTextInfo(constants.View.MAINTAINERS_ID, identityIssue.maintainersID)
+    @commonTextInfo(constants.View.CLASSIFICATION_ID, identityIssue.classificationID)
+    @properties(identityIssue.properties.propertyList)
+}

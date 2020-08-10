@@ -18,13 +18,14 @@ object JSON {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case _: JsError =>
+        case mainError: JsError => logger.error(mainError.toString)
           val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](response.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
-            case error: JsError => logger.info(response.body)
-              throw new BaseException(new Failure(error.toString, null))
+            case error: JsError => logger.error(error.toString)
+              logger.error(response.body)
+              throw new BaseException(constants.Response.JSON_UNMARSHALLING_ERROR)
           }
-          logger.info(errorResponse.error)
+          logger.error(errorResponse.error)
           throw new BaseException(new Failure(errorResponse.error, null))
       }
     }.recover {
@@ -40,6 +41,7 @@ object JSON {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.error(errors.toString)
+          logger.error(jsonString)
           throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       }
     }

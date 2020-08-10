@@ -1,0 +1,9 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.WithdrawValidatorCommission
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[WithdrawValidatorCommission]) { withdrawValidatorCommission =>
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(withdrawValidatorCommission.validatorAddress, routes.ViewController.validator(withdrawValidatorCommission.validatorAddress)))
+}

@@ -1,0 +1,27 @@
+@import views.html.base._
+@import models.blockchain.Transaction
+
+@(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <th>@Messages(constants.View.TRANSACTION_HASH)</th>
+    <th>@Messages(constants.View.HEIGHT)</th>
+    <th>@Messages(constants.View.STATUS)</th>
+    <th>@Messages(constants.View.TIME)</th>
+</tr>
+@transactions.zipWithIndex.map { case (tx, index) =>
+<tr>
+    <td class="blockHeightItem">
+        <div class="listItemChild">
+            <div class="textOverflowCopy">
+                <p class="cmuk-link hashCode" id = "transactionListPageItemTxHash_@index" title="@tx.hash" onclick="getPage(jsRoutes.controllers.ViewController.transaction, ('transactionListPageItemTxHash_' + @index))">
+                @tx.hash
+                </p>
+            </div>
+        </div>
+    </td>
+    <td id="transactionListPageItemTxHeight_@index">@tx.height</td>
+    <td id="transactionListPageItemTxStatus_@index">@Option(tx.status)</td>
+    <td id="transactionListPageItemTxFees_@index">@utilities.Date.bcTimestampToString(tx.timestamp)</td>
+</tr>
+}

@@ -1,0 +1,42 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@views.html.base.common(Messages(constants.View.BLOCKS), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+    <div class="leftContainer">
+        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+    </div>
+    <script>
+            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
+            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+    </script>
+}
+
+@center = {
+    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+        <div class="cmuk-card-body">
+            <div id="blockList"></div>
+        </div>
+    </div>
+
+    <script>
+            componentResource('blockList', jsRoutes.controllers.ComponentViewController.blockList());
+    </script>
+}
+
+@right = {
+    <div class="rightContainer">
+        <div class="recentActivityContainer">
+            <div id="publicRecentActivities"></div>
+        </div>
+        <div id="votingPowers" class="cmuk-margin-bottom"></div>
+    </div>
+    <script>
+            componentResource('publicRecentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
+            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
+    </script>
+}

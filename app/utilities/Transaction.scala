@@ -2,7 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Abstract.BaseTransaction
+import models.`abstract`.BaseTransaction
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import queries.{GetResponse, GetTransactionHashResponse}

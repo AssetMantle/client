@@ -1,8 +1,7 @@
-@import controllers.actions.LoginState
 @import models.masterTransaction.Notification
 @import views.html.base._
 
-@(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="timeline recentActivityBox" cmuk-scrollspy="target: > div; cls: cmuk-animation-fade; delay: 100; repeat: true">
     @if(notifications.nonEmpty) {

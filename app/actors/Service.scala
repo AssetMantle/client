@@ -7,6 +7,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.{CompletionStrategy, Materializer, OverflowStrategy}
 import com.typesafe.config.ConfigFactory
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import play.api.libs.json.{JsValue, Json}
 
@@ -14,21 +15,23 @@ import scala.concurrent.duration._
 
 object Service {
 
-  private val actorSystem = ActorSystem(constants.Module.ACTOR_SERVICE, ConfigFactory.load)
+  implicit val actorSystem: ActorSystem = ActorSystem(constants.Module.ACTOR_SERVICE, ConfigFactory.load)
 
-  private implicit val logger: Logger = Logger(constants.Module.ACTOR_SERVICE)
+  private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ACTOR_SERVICE
+  implicit val module: String = constants.Module.ACTOR_SERVICE
 
-  private implicit val materializer: Materializer = Materializer(actorSystem)
+  implicit val materializer: Materializer = Materializer(actorSystem)
 
-  val cometActor: ActorRef = actorSystem.actorOf(props = Props[CometActor].withDispatcher("akka.actor.cometMailBox"), name = constants.Module.ACTOR_COMET)
+  val cometActor: ActorRef = actorSystem.actorOf(props = Props[CometActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_COMET)
 
-  val emailActor: ActorRef = actorSystem.actorOf(props = Props[EmailActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Module.ACTOR_EMAIL)
+  val emailActor: ActorRef = actorSystem.actorOf(props = Props[EmailActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_EMAIL)
 
-  val smsActor: ActorRef = actorSystem.actorOf(props = Props[SMSActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Module.ACTOR_SMS)
+  val smsActor: ActorRef = actorSystem.actorOf(props = Props[SMSActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_SMS)
 
-  val pushNotificationActor: ActorRef = actorSystem.actorOf(props = Props[PushNotificationActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Module.ACTOR_PUSH_NOTIFICATION)
+  val pushNotificationActor: ActorRef = actorSystem.actorOf(props = Props[PushNotificationActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_PUSH_NOTIFICATION)
+
+  val appWebSocketActor: ActorRef = actorSystem.actorOf(props = Props[AppWebSocketActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_APP_WEB_SOCKET)
 
   object Comet {
     private def cometCompletionMatcher: PartialFunction[Any, CompletionStrategy] = {

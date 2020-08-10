@@ -1,0 +1,21 @@
+@import views.html.base._
+@import models.blockchain.Block
+
+@(blocks: Seq[Block], numberOfTxs: Map[Int, Int], proposersList: Map[Int, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <th>@Messages(constants.View.HEIGHT)</th>
+    <th>@Messages(constants.View.PROPOSER)</th>
+    <th>@Messages(constants.View.NUMBER_OF_TRANSACTIONS)</th>
+    <th>@Messages(constants.View.TIME)</th>
+</tr>
+@blocks.zipWithIndex.map { case (block, index) =>
+<tr>
+    <td class="blockHeightItem">
+        @commonVerticalIntInfo(constants.View.HEIGHT, block.height, 'id -> ("blockListPageItemHeight_" + index), 'class -> "cmuk-link", 'onclick -> s"getPage(${utilities.String.getJsRouteFunction(routes.javascript.ViewController.block)}, '${"blockListPageItemHeight_" + index}')")
+    </td>
+    <td id="blockListPageItemProposer_@index">@proposersList.getOrElse(block.height, "")</td>
+    <td id="blockListPageItemNumTxs_@index">@numberOfTxs.getOrElse(block.height, 0)</td>
+    <td id="blockListPageItemTime_@index">@utilities.Date.bcTimestampToString(block.time)</td>
+</tr>
+}

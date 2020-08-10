@@ -1,0 +1,11 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.Undelegate
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Undelegate]) { undelegate =>
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(undelegate.delegatorAddress, routes.ViewController.account(undelegate.delegatorAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(undelegate.validatorAddress, routes.ViewController.validator(undelegate.validatorAddress)))
+    @commonTextInfo(constants.View.AMOUNTS, s"${undelegate.amount.amount} ${undelegate.amount.denom}")
+}

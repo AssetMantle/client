@@ -1,0 +1,17 @@
+@import models.`abstract`.TransactionMessage
+@import views.html.base._
+@import views.html.component.blockchain.properties
+@import models.common.TransactionMessages.OrderMake
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[OrderMake]) { orderMake =>
+    @commonTextInfo(constants.View.FROM, orderMake.from)
+    @commonTextInfo(constants.View.MAINTAINERS_ID, orderMake.maintainersID)
+    @commonTextInfo(constants.View.MAKER_ID, orderMake.makerID)
+    @commonTextInfo(constants.View.TAKER_ID, orderMake.takerID)
+    @commonTextInfo(constants.View.MAKER_SPLIT, orderMake.makerSplit.toString)
+    @commonTextInfo(constants.View.MAKER_SPLIT_ID, orderMake.makerSplitID)
+    @commonTextInfo(constants.View.EXCHANGE_RATE, orderMake.exchangeRate.toString)
+    @commonTextInfo(constants.View.TAKER_SPLIT_ID, orderMake.takerSplitID)
+}

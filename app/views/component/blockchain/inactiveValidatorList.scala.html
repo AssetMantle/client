@@ -1,0 +1,29 @@
+@import views.html.base._
+@import models.blockchain.Validator
+
+@(validators: Seq[Validator])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<table class="cmuk-table cmuk-table-striped tableSort">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.VALIDATOR)</th>
+            <th>@Messages(constants.View.VOTING_POWER)</th>
+            <th>@Messages(constants.View.COMMISSION_RATE)</th>
+            <th>@Messages(constants.View.VALIDATOR_BONDING_STATUS)</th>
+            <th>@Messages(constants.View.JAILED)</th>
+        </tr>
+<tbody>
+    @validators.map { validator =>
+        <tr>
+            <td class="blockHeightItem">
+                @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker.getOrElse(validator.operatorAddress), routes.ViewController.validator(validator.operatorAddress)))
+            </td>
+            <td>@validator.tokens</td>
+            <td>@validator.commission.commissionRates.rate%</td>
+            <td>@validator.status.toString</td>
+            <td>@validator.jailed.toString</td>
+        </tr>
+    }
+</tbody>
+</table>
+<script src="@routes.Assets.versioned("javascripts/dataTables/dataTable.js")" type="text/javascript"></script>

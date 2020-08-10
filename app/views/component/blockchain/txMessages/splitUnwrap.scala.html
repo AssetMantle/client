@@ -1,0 +1,12 @@
+@import models.`abstract`.TransactionMessage
+@import models.common.TransactionMessages.SplitUnwrap
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SplitUnwrap]) { splitUnwrap =>
+    @commonTextInfo(constants.View.FROM, splitUnwrap.from)
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(splitUnwrap.fromID, routes.ViewController.identity(splitUnwrap.fromID)))
+    @commonTextInfo(constants.View.OWNABLE_ID, splitUnwrap.ownableID)
+    @commonTextInfo(constants.View.SPLIT, splitUnwrap.split.toString)
+}

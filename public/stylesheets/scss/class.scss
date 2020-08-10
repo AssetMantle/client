@@ -311,15 +311,18 @@ html, body{
   width: 100%;
   padding: 30px 0;
   font-size: $paragraphFontSizeSmall;
-  background: #031221;
+  background: $colorSecondary;
   .copyRight{
     margin: 10px 0;
     font-weight: bold;
-    color:$colorSecondary;
+    color:#ffffff;
     a{
       text-decoration: none;
-      color:$colorSecondary;
+      color:#ffffff;
     }
+  }
+  img{
+    width: 120px;
   }
 }
 
@@ -467,6 +470,108 @@ html, body{
   font-size: $headingFontSizeSmall;
 }
 
+.blockHeightItem{
+.listItemChild{
+  .listItemChildTitle{
+    display: none;
+  }
+  p{
+    margin:0;
+  }
+}
+  .cmuk-link{
+    width:120px;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+.chartContainer{
+  height: 260px;
+}
+.cardSelectHeader{
+  dl {
+    margin: 0;
+    label {
+      display: none;
+    }
+  }
+}
+.tableViewCard{
+  .infoRow {
+    display: table-row;
+
+    .infoRowLabel {
+      text-align: left;
+      vertical-align: bottom;
+      font-size: .875rem;
+      font-weight: 400;
+      color: #999;
+      width: auto;
+    }
+
+    .infoRowLabel, .infoRowValue {
+      padding: 3px 12px;
+      display: table-cell;
+    }
+  }
+}
+
+.textOverflowCopy{
+  display: flex;
+  .cmuk-icon-button{
+    width:30px;
+    height: 30px;
+    svg{
+      width: 16px;
+    }
+  }
+  p{
+    margin: 0;
+  }
+}
+
+.transactionListCard{
+  .commonList .listItemChild {
+    .listItemChildTitle {
+      display: none;
+      margin: 0;
+    }
+  }
+  .listItemChildValue{
+    margin: 0;
+  }
+}
+
+.block{
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+  margin-right: .2em;
+  border: .1em solid $colorSecondary;
+  -webkit-box-shadow: 1px 1px 3px 0 $colorSecondary;
+  -moz-box-shadow: 1px 1px 3px 0 $colorSecondary;
+  box-shadow: 1px 1px 3px 0 $colorSecondary;
+  border-radius: 3px;
+  .full{
+    background-color: $colorSecondary;
+    height: 100%;
+    width: 100%;
+  }
+}
+.cardHeaderSelect{
+  position: absolute;
+  right: 10px;
+}
+
+.pieChartContainer{
+  display: flex;
+  div{
+    flex:50%;
+  }
+}
+
 .comdex {
   .cmuk-overflow-auto{
     @extend %scroller;
@@ -585,6 +690,11 @@ html, body{
 
     }
   }
+  .cmuk-card-body{
+    .cmuk-card-body{
+      padding: 10px;
+    }
+  }
   .cmuk-button {
     overflow: hidden;
     position: relative;
@@ -611,6 +721,9 @@ html, body{
   .cmuk-spinner>*>*{
     stroke-width:2 !important;
     stroke:$colorPrimary !important;
+  }
+  .cmuk-search-icon>*>*{
+    stroke-width:2 !important;
   }
   .cmuk-accordion-title::before{
     background-image:url('../../images/chevron-up.svg');
@@ -692,6 +805,103 @@ html, body{
       font-weight: bold;
     }
   }
+  .cardSelectHeader {
+    .cmuk-select:not([multiple]):not([size]) {
+      height: 35px;
+      width: 150px;
+    }
+  }
+  .tableCard{
+    .cmuk-card-body{
+      .cmuk-card-header{
+        display: none;
+      }
+      padding: 10px;
+    }
+  }
+  .cmuk-subnav-pill>.cmuk-active>a{
+    background-color: #222;
+  }
+  .searchForm{
+    width: auto;
+    margin-right: 15px;
+    dl {
+      margin: 0;
+      label {
+        display: none;
+      }
+      .cmuk-search-input {
+        border-radius: 5px;
+        padding-right: 40px;
+        background: #fff;
+          width: 450px;
+          font-size: $paragraphFontSizeMedium !important;
+        }
+    }
+
+  }
+  .dataTables_wrapper{
+    .dataTables_filter{
+      width: auto;
+      margin-bottom: 15px;
+      label{
+        display: flex;
+        align-items: center;
+      }
+    }
+   select, input {
+     width: 250px;
+      background: #fff;
+      height: 30px;
+      color: #666;
+      border: 1px solid #e5e5e5;
+      transition: .2s ease-in-out;
+      transition-property: color, background-color, border;
+    }
+  }
+  table.dataTable tbody th, table.dataTable tbody td{
+    padding: 16px 12px;
+  }
+  table.dataTable{
+    border-collapse: collapse;
+  }
+  table.dataTable.no-footer{
+    border-bottom:1px solid #e5e5e5;
+  }
+  table.dataTable thead th {
+    border-bottom: 0;
+  }
+  table.dataTable tfoot th {
+    border-top: 0;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+  padding: 0 10px;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button{
+    padding: 0;
+  }
+  table.dataTable thead .sorting,
+  table.dataTable thead .sorting_asc,
+  table.dataTable thead .sorting_desc,
+  table.dataTable thead .sorting_asc_disabled,
+  table.dataTable thead .sorting_desc_disabled{
+    background-position:center left;
+  }
+  .cmuk-drop{
+    width: 400px;
+  }
+  .mobileSearch{
+    margin-bottom: 10px;
+    display: none;
+    .searchForm dl {
+      input {
+        background: #e5e5e5;
+        padding: 0 10px;
+        border-radius: 5px;
+        color: #000;
+      }
+    }
+  }
 }
 
 .formNote{
@@ -735,7 +945,7 @@ html, body{
   }
   .cmuk-logo{
     padding: 0 40px 0 0;
-    border-right: 1px solid #1C5998;
+    border-right: 1px solid #ffffff;
     img{
       width: 120px;
     }
@@ -743,7 +953,7 @@ html, body{
   .cmuk-navbar-right{
     .cmuk-navbar-nav>li>a{
       padding:0 25px;
-      border-left: 1px solid #1C5998;
+      //border-left: 1px solid #ffffff;
     }
     .cmuk-navbar-nav {
       .buttonRegister{
@@ -762,31 +972,39 @@ html, body{
         padding: 0 45px 0 45px;
       }
     }
-    .loginIcon{
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      margin: 0 10px 0;
-      padding: 3px;
-      border: 2px solid #1e60a5;
-    }
   }
   .cmuk-navbar-nav>li>a{
     padding:0 25px;
     font-weight: bold;
-    color: #FFFFFF;
+    color: hsla(0,0%,100%,.75);
     font-size:$paragraphFontSizeSmall;
     letter-spacing: 0.4px;
   }
   .dashboardIcon .icon{
     width: 20px;
-    height: 16px;
-    margin-bottom: 3px;
+    height: 20px;
+    margin-bottom: -2px;
   }
-  .dashboardIcon, .traderIcon, .accountIcon, .transactionIcon{
-    margin-right: 8px;
+  .dashboardIcon, .blocksIcon, .traderIcon, .accountIcon, .transactionsIcon, .validatorsIcon, .singUpIcon, .loginIcon{
+    margin-right: 5px;
     width: 20px;
     height: 20px;
+  }
+  .loginIcon .icon{
+    margin-bottom: -5px;
+  }
+  .blocksIcon {
+    .icon {
+      width: 20px;
+      height: 25px;
+    }
+  }
+  .transactionsIcon{
+    .icon{
+      width: 16px;
+      margin-bottom: -3px;
+      height: 16px;
+    }
   }
   .icon {
     width: 20px;
@@ -801,7 +1019,7 @@ html, body{
     border-bottom: 3px solid #FFFFFF;
     padding-top: 3px;
     .icon {
-      fill: #FE4350;
+      fill: #e50913;
     }
   }
   .logoutIcon{
@@ -1675,7 +1893,6 @@ form{
     }
   }
   .cmuk-card-body{
-    padding:0;
     overflow-y: auto;
     @extend %scroller;
     ul{
@@ -1896,9 +2113,6 @@ form{
   .cmuk-card-header{
     font-size: $paragraphFontSizeMedium;
   }
-  .cmuk-card-body{
-    padding: 0 13px;
-  }
   .chatRoom {
     .cmuk-card-header{
       .icon{
@@ -2066,7 +2280,7 @@ header:before,
     height: 100%;
     border-right:2px dashed #CECECE;
     left: 29px;
-    top: 0;
+    top: 5px;
     position: absolute; }
   .timeline-item {
     margin-bottom: 20px;
@@ -2077,7 +2291,7 @@ header:before,
       width: 40px;
       height: 40px;
       position: relative;
-      top: 0;
+      top: 5;
       display: inline-block;
       left: 10px;
       overflow: hidden;
@@ -2088,8 +2302,9 @@ header:before,
       width: 15px;
       height: 15px;}
     .timeline-content {
+      cursor: pointer;
       width: 80%;
-      padding: 0;
+      padding: 5px 10px;
       position: relative;
       -webkit-transition: all 0.3s ease;
       -moz-transition: all 0.3s ease;
@@ -2098,6 +2313,9 @@ header:before,
         color: #000000;
         font-size: $paragraphFontSizeSmall;
       }
+    }
+    .timeline-content:hover{
+      background: #e7eaf3;
     }
     .timeline-content.right {
       float: right; }
@@ -2601,18 +2819,17 @@ header:before,
   position: relative;
   display: inline-block;
   .toolTipText {
+    font-size: 12px;
     visibility: hidden;
-    width: 140px;
+    width: 55px;
     background-color: $colorPrimary;
     color: #fff;
     text-align: center;
     border-radius: $buttonBorderRadius;
-    padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -75px;
+    bottom: 120%;
+    left: -52%;
     opacity: 0;
     transition: opacity 0.3s;
     &:after {

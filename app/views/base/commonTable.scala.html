@@ -1,10 +1,10 @@
-@()(title: Html = Html(""))(content: Html = Html(""))
+@(id : String, tableType : String)(title: Html = Html(""))(content: Html = Html(""))
 <div class="cmuk-overflow-auto">
     <div class="cmuk-card-header">
-        <h2 class="cmuk-card-title leftText headerFontSize cmuk-text-bold">@title</h2>
+        <p class="leftText">@title</p>
     </div>
     <div class="productTable">
-        <table class="cmuk-table cmuk-table-divider">
+        <table class="cmuk-table @tableType" id="@id">
             <tbody>
                 @content
             </tbody>

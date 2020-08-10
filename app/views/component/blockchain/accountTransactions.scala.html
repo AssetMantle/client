@@ -1,0 +1,16 @@
+@import views.html.base._
+@import models.blockchain.Transaction
+
+@(address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.ACCOUNT_TRANSACTIONS) {
+} {
+    <div id="accountTxs"></div>
+    @commonSpinner("accountTransactionsPageChangeSpinner")
+    @commonJavascriptButton(constants.View.BACK, JavaScript(s"getAccountTxs('${address}', -1)"), 'id -> "accountTransactions_BACK")
+    @commonJavascriptButton(constants.View.NEXT, JavaScript(s"getAccountTxs('${address}', 1)"), 'id -> "accountTransactions_NEXT")
+    <script>
+            componentResource('accountTxs', jsRoutes.controllers.ComponentViewController.accountTransactionsPerPage('@address', 1), 'accountTransactionsPageChangeSpinner', 'pageChange');
+    </script>
+    <script src="@routes.Assets.versioned("javascripts/accountTransactions.js")" type="text/javascript"></script>
+}

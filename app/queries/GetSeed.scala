@@ -34,7 +34,7 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
     def get(): Future[Response] = action().recover {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
   }
 
