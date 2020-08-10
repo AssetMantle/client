@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetUnbondedValidators @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ABCI_INFO
+  private implicit val module: String = constants.Module.QUERIES_GET_UNBONDED_VALIDATORS
 
   private implicit val logger: Logger = Logger(this.getClass)
 

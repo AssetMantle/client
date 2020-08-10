@@ -23,7 +23,7 @@ object Service {
 
   implicit val materializer: Materializer = Materializer(actorSystem)
 
-  val cometActor: ActorRef = actorSystem.actorOf(props = Props[CometActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_COMET)
+  val cometActor: ActorRef = actorSystem.actorOf(props = Props[CometActor].withDispatcher("akka.actor.cometMailBox"), name = constants.Actor.ACTOR_COMET)
 
   val emailActor: ActorRef = actorSystem.actorOf(props = Props[EmailActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_EMAIL)
 

@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetSplit @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ACCOUNT
+  private implicit val module: String = constants.Module.QUERIES_GET_SPLIT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

@@ -6,6 +6,8 @@
 @properties.map { property =>
     @commonInfoBox() {
         @commonTextInfo(constants.View.PROPERTY_ID, property.id)
-        @commonTextInfo(constants.View.FACT, property.fact.hash)
+        @Messages(constants.View.FACT):
+        @commonTextInfo(constants.View.FACT_HASH, property.fact.hash)
+        @commonBooleanInfo(constants.View.META, Option(property.fact.meta))
     }
 }

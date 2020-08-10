@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_TRANSACTION_HASH_RESPONSE
+  private implicit val module: String = constants.Module.QUERIES_GET_TRANSACTION
 
   private implicit val logger: Logger = Logger(this.getClass)
 

@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetAllSigningInfos @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ABCI_INFO
+  private implicit val module: String = constants.Module.QUERIES_GET_ALL_SIGNING_INFOS
 
   private implicit val logger: Logger = Logger(this.getClass)
 

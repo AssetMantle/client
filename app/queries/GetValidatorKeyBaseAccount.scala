@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetValidatorKeyBaseAccount @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_TRANSACTION_HASH_RESPONSE
+  private implicit val module: String = constants.Module.QUERIES_GET_VALIDATOR_KEY_BASE_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetBlockCommit @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_BLOCK_DETAILS
+  private implicit val module: String = constants.Module.QUERIES_GET_BLOCK_COMMIT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

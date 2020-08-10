@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetValidatorDistributionRewards @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ABCI_INFO
+  private implicit val module: String = constants.Module.QUERIES_GET_DISTRIBUTION_REWARDS
 
   private implicit val logger: Logger = Logger(this.getClass)
 
