@@ -52,6 +52,8 @@ libraryDependencies += "commons-codec" % "commons-codec" % "1.14"
 
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
 
+libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "2.0.1"
+
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.65"
 
 libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar"))

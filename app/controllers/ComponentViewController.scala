@@ -1561,8 +1561,6 @@ class ComponentViewController @Inject()(
               assetFileList <- assetFileList
               negotiationFileList <- negotiationFileList
             } yield {
-              println(assetFileList.toString())
-              println(negotiationFileList.toString())
               Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, (assetFileList ++ negotiationFileList).headOption))
             }
         }

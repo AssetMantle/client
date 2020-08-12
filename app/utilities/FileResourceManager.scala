@@ -1,22 +1,46 @@
 package utilities
 
+import java.io.File
+
+import akka.NotUsed
+import akka.actor.ActorSystem
+import play.api.http.DefaultFileMimeTypes
 import exceptions.BaseException
-import fly.play.s3.{BucketFile, S3}
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
-import play.api.http.DefaultFileMimeTypes
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import akka.http.scaladsl.model
+import akka.http.scaladsl.model.{ContentType, ContentTypes, HttpCharset, HttpCharsets, MediaTypes}
+import akka.http.scaladsl.model.MediaType
+import akka.http.scaladsl.model.MediaType.{Compressible, NotCompressible}
 
 import scala.concurrent.{ExecutionContext, Future}
+import akka.stream.alpakka.s3
+import akka.stream.alpakka.s3.{MemoryBufferType, MultipartUploadSettings, ObjectMetadata, RetrySettings, S3Attributes, S3Exception, S3Ext, S3Settings}
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import akka.stream.alpakka.s3.scaladsl.S3
+import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.FileIO
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import akka.stream.Materializer
+import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
+import akka.util.ByteString
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.regions.providers.{AwsRegionProvider, AwsRegionProviderChain}
+
+import scala.concurrent.duration.FiniteDuration
 
 @Singleton
-class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSClient, defaultFileMimeTypes: DefaultFileMimeTypes)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: utilities.Log, wsClient: WSClient, keyStore: KeyStore, defaultFileMimeTypes: DefaultFileMimeTypes)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val system: ActorSystem = ActorSystem()
+  implicit val materializer: Materializer = Materializer(system)
 
   private val rootFilePath = configuration.get[String]("upload.rootFilePath")
 
@@ -48,64 +72,77 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
 
   private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
 
-  private val s3BucketName = configuration.get[String]("s3.bucketName")
-  val s3 = S3.fromConfiguration(wsClient, configuration)
-  val bucket = s3.getBucket(s3BucketName)
-
-  private val useS3BucketForStorage = configuration.get[Boolean]("s3.fileStorage")
+  private val s3BucketInUse = configuration.get[Boolean]("s3.useBucket")
 
   private val tempFilePath: String = rootFilePath + configuration.get[String]("upload.temp")
 
+  private val s3region: String = configuration.get[String]("s3.region")
+
+  private val s3Bucket: String = configuration.get[String]("s3.bucket")
+
+  private val awsCredentialsProvider = StaticCredentialsProvider.create(AwsBasicCredentials.create(keyStore.getPassphrase(constants.KeyStore.AWS_ACCESS_KEY_ID), keyStore.getPassphrase(constants.KeyStore.AWS_SECRET_ACCESS_KEY)))
+
+  private val s3RegionProvider = new AwsRegionProvider {override def getRegion: Region = Region.of(s3region)}
+
+  private val s3Settings = S3Ext(actorSystem).settings
+    .withCredentialsProvider(awsCredentialsProvider)
+    .withListBucketApiVersion(ListBucketVersion2)
+    .withS3RegionProvider(s3RegionProvider)
+
+  private val s3Attributes = S3Attributes.settings(s3Settings)
+
   def getAccountKYCFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.AccountKYC.IDENTIFICATION => uploadAccountKYCIdentificationPath
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
-    } else {
-      tempFilePath
     }
   }
 
   def getZoneKYCFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.ZoneKYC.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
         case constants.File.ZoneKYC.IDENTIFICATION => uploadZoneKYCIdentificationPath
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
-    } else {
-      tempFilePath
     }
   }
 
   def getOrganizationKYCFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.OrganizationKYC.ACRA => uploadOrganizationKYCACRAPath
         case constants.File.OrganizationKYC.BOARD_RESOLUTION => uploadOrganizationKYCBoardResolutionPath
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
-    } else {
-      tempFilePath
     }
   }
 
   def getAssetFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.Asset.BILL_OF_LADING => uploadAssetBillOfLadingPath
         case constants.File.Asset.COO => uploadAssetCOOPath
         case constants.File.Asset.COA => uploadAssetCOAPath
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
-    } else {
-      tempFilePath
     }
   }
 
   def getNegotiationFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.Negotiation.INVOICE => uploadNegotiationInvoicePath
         case constants.File.Negotiation.BILL_OF_EXCHANGE => uploadNegotiationBillOfExchangePath
@@ -114,19 +151,17 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
         case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
         case _ => uploadNegotiationOthersPath
       }
-    } else {
-      tempFilePath
     }
   }
 
   def getAccountFilePath(documentType: String): String = {
-    if (!useS3BucketForStorage) {
+    if (s3BucketInUse) {
+      tempFilePath
+    } else {
       documentType match {
         case constants.File.Account.PROFILE_PICTURE => uploadAccountProfilePicturePath
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
-    } else {
-      tempFilePath
     }
   }
 
@@ -144,8 +179,12 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
     def updateAndCreateFile(fileName: String, encodedBase64: Option[Array[Byte]]): Future[String] = masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
 
     def storeFileInS3BucketAndDelete(fileName: String) = {
-      if (useS3BucketForStorage) {
-        val add = bucket.add(BucketFile(fileName, defaultFileMimeTypes.forFileName(fileName).getOrElse(""), utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(getNegotiationFilePath(document.documentType), fileName))))
+      if (s3BucketInUse) {
+        def charset(): HttpCharset = HttpCharsets.`US-ASCII`
+
+        def getContentType(getCharset: () => HttpCharset) = ContentType(MediaTypes.forExtension(utilities.FileOperations.fileExtensionFromName(fileName)), getCharset)
+
+        val add = FileIO.fromPath(new File(getNegotiationFilePath(document.documentType) + fileName).toPath).runWith(S3.multipartUpload(s3Bucket, fileName, getContentType(charset)).withAttributes(s3Attributes))
         for {
           _ <- add
         } yield utilities.FileOperations.deleteFile(path, fileName)
@@ -163,12 +202,15 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
       utilitiesLog.infoLog(constants.Log.Info.STORE_FILE_EXIT, name, document.documentType, path)
     }
       ).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message)
-        utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
-      case e: Exception => logger.error(e.getMessage, e)
-        utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+      case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, baseException)
+      case s3Exception: S3Exception => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, s3Exception)
+      case e: Exception => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
     }
   }
 
@@ -185,11 +227,18 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
     def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64).updateStatus(None))
 
     def storeFileInS3BucketAndDelete(fileName: String) = {
-      if (useS3BucketForStorage) {
-        val add = bucket.add(BucketFile(fileName, defaultFileMimeTypes.forFileName(fileName).getOrElse(""), utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(getNegotiationFilePath(oldDocument.documentType), fileName))))
+      if (s3BucketInUse) {
+        def charset(): HttpCharset = HttpCharsets.`US-ASCII`
+
+        def getContentType(getCharset: () => HttpCharset) = ContentType(MediaTypes.forExtension(utilities.FileOperations.fileExtensionFromName(fileName)), getCharset)
+
+        val add = FileIO.fromPath(new File(getNegotiationFilePath(oldDocument.documentType) + fileName).toPath).runWith(S3.multipartUpload(s3Bucket, fileName, getContentType(charset)).withAttributes(s3Attributes))
         for {
           _ <- add
-        } yield utilities.FileOperations.deleteFile(path, fileName)
+        } yield {
+          S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+          utilities.FileOperations.deleteFile(path, fileName)
+        }
       } else {
         Future(true)
       }
@@ -201,24 +250,21 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log, wsClient: WSCli
       _ <- Future(utilities.FileOperations.renameFile(path, name, fileName))
       _ <- storeFileInS3BucketAndDelete(fileName)
     } yield ()).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message)
-        utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
-      case e: Exception => logger.error(e.getMessage)
-        utilities.FileOperations.deleteFile(path, name)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+      case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, baseException)
+      case s3Exception: S3Exception => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, s3Exception)
+      case e: Exception => utilities.FileOperations.deleteFile(path, name)
+        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
     }
   }
 
-  def getFile(fileName: String) = {
-    println("getting FIle")
-    bucket.get(fileName).map{x=>
-      println("got it yayayaay")
-      x
-    }
-      .recover {
-        case e: Exception => logger.error(e.getMessage)
-          throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-      }
+  def getFile(fileName: String): Future[(Source[ByteString, NotUsed], ObjectMetadata)] = {
+    println(fileName)
+    S3.download(s3Bucket, fileName).withAttributes(s3Attributes).runWith(Sink.head).map(_.getOrElse(throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)))
   }
+
 }

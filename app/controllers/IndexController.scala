@@ -25,22 +25,6 @@ class IndexController @Inject()(fileResourceManager: utilities.FileResourceManag
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
-  def index2 = Action.async {
-    val s3 = S3.fromConfiguration(wsClient, configuration)
-    val bucket = s3.getBucket("testing-pers")
-    bucket.list.map { list =>
-      println(list.toString)
-      Ok(list.toString)
-    }
-    // bucket.get()
-    bucket.get("ou46zzl19u451.jpg").map { bucketFile =>
-      bucketFile.content
-      // val inputFile=new BufferedInputStream(bucketFile.content)
-      // Ok.sendFile(utilities.FileOperations.newFile(fileResourceManager.getNegotiationFilePath(constants.File.Negotiation.INVOICE), bucketFile.name))
-      Ok.sendEntity(HttpEntity.Strict(ByteString(bucketFile.content), Some(bucketFile.contentType)))
-    }
-  }
-
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
