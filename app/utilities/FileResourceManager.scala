@@ -196,13 +196,10 @@ class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: util
     }
       ).recover {
       case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
         throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, baseException)
       case s3Exception: S3Exception => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
-        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, s3Exception)
+        throw new BaseException(constants.Response.S3_EXCEPTION, s3Exception)
       case e: Exception => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, document.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
     }
   }
@@ -244,17 +241,17 @@ class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: util
       _ <- storeFileInS3BucketAndDelete(fileName)
     } yield ()).recover {
       case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
         throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, baseException)
       case s3Exception: S3Exception => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
-        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR, s3Exception)
+        throw new BaseException(constants.Response.S3_EXCEPTION, s3Exception)
       case e: Exception => utilities.FileOperations.deleteFile(path, name)
-        S3.deleteObject(s3Bucket, oldDocument.fileName).withAttributes(s3Attributes).runForeach(x => Unit)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
     }
   }
 
   def getFile(fileName: String): Future[(Source[ByteString, NotUsed], ObjectMetadata)] = S3.download(s3Bucket, fileName).withAttributes(s3Attributes).runWith(Sink.head).map(_.getOrElse(throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)))
-
+    .recover {
+      case s3Exception: S3Exception => throw new BaseException(constants.Response.S3_EXCEPTION, s3Exception)
+      case e: Exception => throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
+    }
 }
