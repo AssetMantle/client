@@ -96,7 +96,7 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- fiatPegWallet
       } yield Ok(views.html.component.master.fiatList(fiatPegWallet))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -128,7 +128,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderID, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderID)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -164,7 +164,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.organizationFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -200,7 +200,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.zoneFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -228,7 +228,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(buyNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewAcceptedBuyNegotiationList(buyNegotiationList = buyNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -252,7 +252,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(sellNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewAcceptedSellNegotiationList(sellNegotiationList = sellNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -276,7 +276,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(completedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewCompletedNegotiationList(traderID = traderID, completedNegotiationList = completedNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -304,7 +304,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(sentNegotiationRequestList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewSentNegotiationRequestList(sentNegotiationRequestList = sentNegotiationRequestList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -328,7 +328,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(receivedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewReceivedNegotiationRequestList(receivedNegotiationRequestList = receivedNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -352,7 +352,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(incompleteNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.traderViewIncompleteNegotiationList(incompleteNegotiationList = incompleteNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -382,7 +382,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList((rejectedReceivedNegotiationList ++ rejectedSentNegotiationList ++ failedNegotiationList).map(_.assetID))
       } yield Ok(views.html.component.master.traderViewRejectedAndFailedNegotiationList(rejectedReceivedNegotiationList = rejectedReceivedNegotiationList, rejectedSentNegotiationList = rejectedSentNegotiationList, failedNegotiationList = failedNegotiationList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -416,7 +416,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(buyNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewAcceptedBuyNegotiationList(buyNegotiationList = buyNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -446,7 +446,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(sellNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewAcceptedSellNegotiationList(sellNegotiationList = sellNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -476,7 +476,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(completedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewCompletedNegotiationList(completedNegotiationList = completedNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -511,7 +511,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(sentNegotiationRequestList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewSentNegotiationRequestList(sentNegotiationRequestList = sentNegotiationRequestList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -541,7 +541,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(receivedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewReceivedNegotiationList(receivedNegotiationList = receivedNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -571,7 +571,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList(incompleteNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewIncompleteNegotiationList(incompleteNegotiationList = incompleteNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -607,7 +607,7 @@ class ComponentViewController @Inject()(
         assetList <- getAssetList((rejectedReceivedNegotiationList ++ rejectedSentNegotiationList ++ failedNegotiationList).map(_.assetID))
       } yield Ok(views.html.component.master.organizationViewRejectedAndFailedNegotiationList(rejectedReceivedNegotiationList = rejectedReceivedNegotiationList, rejectedSentNegotiationList = rejectedSentNegotiationList, failedNegotiationList = failedNegotiationList, traderList = traderList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList, assetList = assetList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -653,7 +653,7 @@ class ComponentViewController @Inject()(
         acceptedTraders <- acceptedTraders(organizationID)
       } yield Ok(views.html.component.master.organizationViewAcceptedTraderAccountList(acceptedTraders))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -667,7 +667,7 @@ class ComponentViewController @Inject()(
         trader <- trader
       } yield Ok(views.html.component.master.organizationViewAcceptedTraderAccount(trader = trader))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -682,7 +682,7 @@ class ComponentViewController @Inject()(
         pendingTraderRequests <- pendingTraderRequests(organizationID)
       } yield Ok(views.html.component.master.organizationViewPendingTraderRequestList(pendingTraderRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -696,7 +696,7 @@ class ComponentViewController @Inject()(
         trader <- trader
       } yield Ok(views.html.component.master.organizationViewPendingTraderRequest(trader = trader))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -711,7 +711,7 @@ class ComponentViewController @Inject()(
         rejectedTraderRequests <- rejectedTraderRequests(organizationID)
       } yield Ok(views.html.component.master.organizationViewRejectedTraderRequestList(rejectedTraderRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -725,7 +725,7 @@ class ComponentViewController @Inject()(
         trader <- trader
       } yield Ok(views.html.component.master.organizationViewRejectedTraderRequest(trader = trader))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -745,7 +745,7 @@ class ComponentViewController @Inject()(
         acceptedTraders <- acceptedTraders(zoneID)
       } yield Ok(views.html.component.master.zoneViewAcceptedTraderAccountList(acceptedTraders))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -762,7 +762,7 @@ class ComponentViewController @Inject()(
         organization <- organization(trader.organizationID)
       } yield Ok(views.html.component.master.zoneViewAcceptedTraderAccount(trader = trader, organization = organization))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -777,7 +777,7 @@ class ComponentViewController @Inject()(
         pendingTraderRequests <- pendingTraderRequests(zoneID)
       } yield Ok(views.html.component.master.zoneViewPendingTraderRequestList(pendingTraderRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -794,7 +794,7 @@ class ComponentViewController @Inject()(
         organization <- organization(trader.organizationID)
       } yield Ok(views.html.component.master.zoneViewPendingTraderRequest(trader = trader, organization = organization))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -809,7 +809,7 @@ class ComponentViewController @Inject()(
         rejectedTraderRequests <- rejectedTraderRequests(zoneID)
       } yield Ok(views.html.component.master.zoneViewRejectedTraderRequestList(rejectedTraderRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -826,7 +826,7 @@ class ComponentViewController @Inject()(
         organization <- organization(trader.organizationID)
       } yield Ok(views.html.component.master.zoneViewRejectedTraderRequest(trader = trader, organization = organization))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -846,7 +846,7 @@ class ComponentViewController @Inject()(
         acceptedOrganizations <- acceptedOrganizations(zoneID)
       } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccountList(acceptedOrganizations))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -869,7 +869,7 @@ class ComponentViewController @Inject()(
         organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
       } yield Ok(views.html.component.master.zoneViewAcceptedOrganizationAccount(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -884,7 +884,7 @@ class ComponentViewController @Inject()(
         pendingOrganizationRequests <- pendingOrganizationRequests(zoneID)
       } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequestList(pendingOrganizationRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -907,7 +907,7 @@ class ComponentViewController @Inject()(
         organizationKYCs <- getOrganizationKYCs(zoneID = zoneID, organization = organization)
       } yield Ok(views.html.component.master.zoneViewPendingOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -922,7 +922,7 @@ class ComponentViewController @Inject()(
         rejectedOrganizationRequests <- rejectedOrganizationRequests(zoneID)
       } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequestList(rejectedOrganizationRequests))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -946,7 +946,7 @@ class ComponentViewController @Inject()(
         ubos <- ubos(organization.id)
       } yield Ok(views.html.component.master.zoneViewRejectedOrganizationRequest(organization = organization, organizationKYCs = organizationKYCs, ubos = ubos))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.account())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1004,7 +1004,7 @@ class ComponentViewController @Inject()(
         result <- getUserResult(identification, utilities.Contact.getStatus(mobile, email))
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1019,7 +1019,7 @@ class ComponentViewController @Inject()(
         traderOrganization <- getOrganizationByID(trader.organizationID)
       } yield Ok(views.html.component.master.traderViewOrganization(traderOrganization))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1037,7 +1037,7 @@ class ComponentViewController @Inject()(
         organizationKYCs <- getOrganizationKYCs(organization.id)
       } yield Ok(views.html.component.master.organization(organizationZone = organizationZone, organization = organization, organizationKYCs = organizationKYCs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1055,7 +1055,7 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         acceptedTraderRelations <- acceptedTraderRelations(traderID)
       } yield Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1072,7 +1072,7 @@ class ComponentViewController @Inject()(
         receivedPendingTraderRelations <- receivedPendingTraderRelations(traderID)
         sentPendingTraderRelations <- sentPendingTraderRelations(traderID)
       } yield Ok(views.html.component.master.pendingTraderRelationList(sentPendingTraderRelations = sentPendingTraderRelations, receivedPendingTraderRelations = receivedPendingTraderRelations))).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1105,7 +1105,7 @@ class ComponentViewController @Inject()(
           toTrader <- toTrader
           result <- getResult(fromTrader = fromTrader, toTrader = toTrader)
         } yield result).recover {
-          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
   }
 
@@ -1120,7 +1120,7 @@ class ComponentViewController @Inject()(
           trader <- trader
           organizationName <- getOrganizationName(trader.organizationID)
         } yield Ok(views.html.component.master.pendingSentTraderRelation(accountID = trader.accountID, organizationName = organizationName))).recover {
-          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
   }
 
@@ -1161,7 +1161,7 @@ class ComponentViewController @Inject()(
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationZoneID = organizationZoneID, zoneID = zoneID)
       } yield Ok(views.html.component.master.zoneViewOrganizationBankAccount(organizationID, organizationBankAccountDetail))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1176,7 +1176,7 @@ class ComponentViewController @Inject()(
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationID)
       } yield Ok(views.html.component.master.organizationBankAccount(organizationBankAccountDetail))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1191,7 +1191,7 @@ class ComponentViewController @Inject()(
         organizationBankAccountDetail <- organizationBankAccountDetail(organizationID)
       } yield Ok(views.html.component.master.traderViewOrganizationBankAccount(organizationBankAccountDetail))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1209,7 +1209,7 @@ class ComponentViewController @Inject()(
         ubos <- ubos(organization)
       } yield Ok(views.html.component.master.userViewOrganizationUBOs(organization, ubos))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1224,7 +1224,7 @@ class ComponentViewController @Inject()(
         ubos <- ubos(organizationID)
       } yield Ok(views.html.component.master.viewOrganizationUBOs(ubos))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1317,7 +1317,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderID, negotiation, order, asset, counterPartyTrader, successiveTransactionStatus)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1365,7 +1365,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderID, negotiationHistory)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1400,7 +1400,7 @@ class ComponentViewController @Inject()(
         traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
         result <- getResult(traderList, negotiation, organizationID)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1435,7 +1435,7 @@ class ComponentViewController @Inject()(
         traderList <- getTraderList(Seq(negotiationHistory.sellerTraderID, negotiationHistory.buyerTraderID))
         result <- getResult(traderList, negotiationHistory, organizationID)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1467,7 +1467,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderID, negotiation)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1498,7 +1498,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderOrganizationIDs, negotiation, organizationID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1529,7 +1529,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderZoneIDs, negotiation, zoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1574,7 +1574,7 @@ class ComponentViewController @Inject()(
         result <- getResult(negotiation, traderID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1621,7 +1621,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderOrganizationIDs, negotiation, organizationID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1668,7 +1668,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderZoneIDs, negotiation, zoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1711,7 +1711,7 @@ class ComponentViewController @Inject()(
         result <- getResult(negotiationHistory, traderID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1758,7 +1758,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderOrganizationIDs, negotiationHistory, organizationID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1805,7 +1805,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderZoneIDs, negotiationHistory, zoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1835,7 +1835,7 @@ class ComponentViewController @Inject()(
         result <- getResult(negotiation, traderID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1875,7 +1875,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderID, negotiationHistory)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1906,7 +1906,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderOrganizationIDs, negotiationHistory, organizationID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1937,7 +1937,7 @@ class ComponentViewController @Inject()(
         result <- getResult(traderZoneIDs, negotiationHistory, zoneID)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1974,7 +1974,7 @@ class ComponentViewController @Inject()(
         traderList = traderList,
       ))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -1996,7 +1996,7 @@ class ComponentViewController @Inject()(
         tradeCompletedSellNegotiationList = tradeCompletedSellNegotiationList.sortBy(_.time).reverse
       ))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2021,7 +2021,7 @@ class ComponentViewController @Inject()(
         traderList = traderList,
       ))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2051,7 +2051,7 @@ class ComponentViewController @Inject()(
         counterPartyTraderList <- getCounterPartyTraderList(traderList.map(_.id))
         assetList <- getAssetListList(acceptedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.zoneViewActiveNegotiationList(acceptedNegotiationList, counterPartyTraderList, assetList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2078,7 +2078,7 @@ class ComponentViewController @Inject()(
         counterPartyTraderList <- getCounterPartyTraderList(completedNegotiationList.map(negotiation => if (traderList.map(_.id) contains negotiation.sellerTraderID) negotiation.buyerTraderID else negotiation.sellerTraderID))
         assetList <- getAssetList(completedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.zoneViewCompletedNegotiationList(completedNegotiationList, counterPartyTraderList, assetList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2112,7 +2112,7 @@ class ComponentViewController @Inject()(
         result <- getResult(zoneID = zoneID, traderList = traderList, negotiation = negotiation)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2146,7 +2146,7 @@ class ComponentViewController @Inject()(
         result <- getResult(zoneID = zoneID, traderList = traderList, negotiationHistory = negotiationHistory)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2166,7 +2166,7 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
       } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatsInOrder, 0, negotiation.price - fiatsInOrder))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2193,7 +2193,7 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- getFiatPegWallet(traderIDList)
       } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2208,7 +2208,7 @@ class ComponentViewController @Inject()(
         negotiation <- negotiation
         billOfLading <- getBillOfLading(negotiation.assetID)
       } yield Ok(views.html.component.master.zoneViewTradeRoomChecks(negotiation.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[BillOfLading].vesselName))))).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2222,7 +2222,7 @@ class ComponentViewController @Inject()(
         negotiationHistory <- negotiationHistory
         billOfLading <- billOfLading(negotiationHistory.assetID)
       } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomChecks(negotiationHistory.assetID, billOfLading.map(document => document.documentContent.map(_.asInstanceOf[BillOfLading].vesselName))))).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2255,7 +2255,7 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- getFiatPegWallet(traderIDList)
       } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2277,7 +2277,7 @@ class ComponentViewController @Inject()(
         fiatPegWallet <- getFiatPegWallet(traderIDList)
       } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2317,7 +2317,7 @@ class ComponentViewController @Inject()(
         asset <- getAsset(negotiation.assetID)
       } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = asset.moderated))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2344,7 +2344,7 @@ class ComponentViewController @Inject()(
         asset <- getAsset(negotiation.assetID)
       } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.moderated))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2385,7 +2385,7 @@ class ComponentViewController @Inject()(
         traderList <- getTraderList(Seq(negotiation.buyerTraderID, negotiation.sellerTraderID))
         result <- getResult(zoneID, traderList, negotiation)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2414,7 +2414,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewNegotiationDocumentContent(documentType, documentContent, negotiation, traderList, organizationList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2435,7 +2435,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewAssetDocumentContent(documentType, documentContent))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2464,7 +2464,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewNegotiationDocumentContent(documentType, documentContent, negotiation, traderList, organizationList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2485,7 +2485,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewAssetDocumentContent(documentType, documentContent))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2514,7 +2514,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewNegotiationDocumentContent(documentType, documentContent, negotiation, traderList, organizationList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2535,7 +2535,7 @@ class ComponentViewController @Inject()(
         documentContent <- getDocumentContent(document)
       } yield Ok(views.html.component.master.viewAssetDocumentContent(documentType, documentContent))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2553,7 +2553,7 @@ class ComponentViewController @Inject()(
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2574,7 +2574,7 @@ class ComponentViewController @Inject()(
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2599,7 +2599,7 @@ class ComponentViewController @Inject()(
         rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
       } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2628,7 +2628,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewPendingSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2651,7 +2651,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2674,7 +2674,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2699,7 +2699,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewPendingRedeemFiatRequestList(redeemFiatRequestList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2720,7 +2720,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewRedeemFiatRequestList(redeemFiatRequestList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2741,7 +2741,7 @@ class ComponentViewController @Inject()(
         traders <- traders(zoneID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewRedeemFiatRequestList(redeemFiatRequestList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2764,7 +2764,7 @@ class ComponentViewController @Inject()(
         receiveFiatList <- receiveFiatList(traders.map(_.id))
         receiveFiatHistoryList <- receiveFiatHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.zoneViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList, organizations, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2790,7 +2790,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2810,7 +2810,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2830,7 +2830,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(traders.map(_.id))
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2852,7 +2852,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewRedeemFiatRequestList(redeemFiatRequestList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2869,7 +2869,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewRedeemFiatRequestList(redeemFiatRequestList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2886,7 +2886,7 @@ class ComponentViewController @Inject()(
         traders <- traders(organizationID)
         redeemFiatRequestList <- redeemFiatRequestList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewRedeemFiatRequestList(redeemFiatRequestList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2906,7 +2906,7 @@ class ComponentViewController @Inject()(
         receiveFiatList <- receiveFiatList(traders.map(_.id))
         receiveFiatHistoryList <- receiveFiatHistoryList(traders.map(_.id))
       } yield Ok(views.html.component.master.organizationViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList, traders))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2929,7 +2929,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
       } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2946,7 +2946,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
       } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2963,7 +2963,7 @@ class ComponentViewController @Inject()(
         sendFiatRequestList <- sendFiatRequestList(trader.id)
         sendFiatRequestHistoryList <- sendFiatRequestHistoryList(trader.id)
       } yield Ok(views.html.component.master.traderViewSendFiatRequestList(sendFiatRequestList, sendFiatRequestHistoryList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2982,7 +2982,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         redeemFiatRequestList <- redeemFiatRequestList(trader.id)
       } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -2996,7 +2996,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         redeemFiatRequestList <- redeemFiatRequestList(trader.id)
       } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -3010,7 +3010,7 @@ class ComponentViewController @Inject()(
         trader <- trader
         redeemFiatRequestList <- redeemFiatRequestList(trader.id)
       } yield Ok(views.html.component.master.traderViewRedeemFiatRequestList(redeemFiatRequestList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -3027,7 +3027,7 @@ class ComponentViewController @Inject()(
         receiveFiatList <- receiveFiatList(trader.id)
         receiveFiatHistoryList <- receiveFiatHistoryList(trader.id)
       } yield Ok(views.html.component.master.traderViewReceiveFiatList(receiveFiatList, receiveFiatHistoryList))).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -3059,7 +3059,7 @@ class ComponentViewController @Inject()(
         result <- getResult(trader, negotiation)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -3091,7 +3091,7 @@ class ComponentViewController @Inject()(
         result <- getResult(organizationID, negotiationTraders, negotiation)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
