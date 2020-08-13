@@ -3,20 +3,13 @@ package controllers
 import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import fly.play.s3.S3
 import javax.inject.{Inject, Singleton}
 import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import java.io.BufferedInputStream
-import fly.play.s3.BucketFile
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.ws.WSClient
-import java.io.{ByteArrayInputStream, File, FileInputStream, FileNotFoundException, IOException, RandomAccessFile}
+import scala.concurrent.ExecutionContext
 
-import akka.util.ByteString
-import play.api.http.HttpEntity
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
