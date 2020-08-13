@@ -262,9 +262,6 @@ class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: util
     }
   }
 
-  def getFile(fileName: String): Future[(Source[ByteString, NotUsed], ObjectMetadata)] = {
-    println(fileName)
-    S3.download(s3Bucket, fileName).withAttributes(s3Attributes).runWith(Sink.head).map(_.getOrElse(throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)))
-  }
+  def getFile(fileName: String): Future[(Source[ByteString, NotUsed], ObjectMetadata)] = S3.download(s3Bucket, fileName).withAttributes(s3Attributes).runWith(Sink.head).map(_.getOrElse(throw new BaseException(constants.Response.FILE_NOT_FOUND_EXCEPTION)))
 
 }

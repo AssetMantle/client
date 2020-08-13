@@ -44,8 +44,7 @@ class AddOrganizationController @Inject()(
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
                                            withoutLoginAction: WithoutLoginAction,
-                                           withoutLoginActionAsync: WithoutLoginActionAsync,
-                                           utilitiesFileStore:utilities.FileStore
+                                           withoutLoginActionAsync: WithoutLoginActionAsync
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -309,7 +308,7 @@ class AddOrganizationController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilitiesFileStore.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
