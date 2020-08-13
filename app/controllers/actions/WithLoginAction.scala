@@ -59,11 +59,7 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
       } yield {
         result
       }).recover {
-        case baseException: BaseException =>
-          if (baseException.failure.message == constants.Response.USERNAME_NOT_FOUND.message) logger.info(baseException.failure.message)
-          else logger.info(baseException.failure.message, baseException)
-
-          Results.Unauthorized(views.html.index()).withNewSession
+        case baseException: BaseException => Results.Unauthorized(views.html.index()).withNewSession
       }
     }
   }
