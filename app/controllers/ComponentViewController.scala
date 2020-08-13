@@ -1559,9 +1559,7 @@ class ComponentViewController @Inject()(
             for {
               assetFileList <- assetFileList
               negotiationFileList <- negotiationFileList
-            } yield {
-              Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, (assetFileList ++ negotiationFileList).headOption))
-            }
+            } yield Ok(views.html.component.master.traderViewNegotiationDocument(negotiationID, (assetFileList ++ negotiationFileList).headOption))
         }
       }
       else {

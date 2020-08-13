@@ -47,9 +47,7 @@ class FileController @Inject()(
                                withGenesisLoginAction: WithGenesisLoginAction,
                                withUsernameToken: WithUsernameToken,
                                withoutLoginAction: WithoutLoginAction,
-                               withoutLoginActionAsync: WithoutLoginActionAsync,
-                               utilitiesFileStore: utilities.FileStore,
-                               defaultFileMimeTypes:DefaultFileMimeTypes
+                               withoutLoginActionAsync: WithoutLoginActionAsync
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -146,7 +144,7 @@ class FileController @Inject()(
     implicit request =>
       val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
 
-      def fetchFile(checkFileNameExists: Boolean) = {
+      def getFile(checkFileNameExists: Boolean) = {
         if (checkFileNameExists) {
           if (s3BucketInUse) {
             for {
@@ -161,7 +159,7 @@ class FileController @Inject()(
 
       (for {
         checkFileNameExists <- checkFileNameExists
-        result <- fetchFile(checkFileNameExists)
+        result <- getFile(checkFileNameExists)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -187,7 +185,7 @@ class FileController @Inject()(
       val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def fetchFile(userZoneID: String, organizationZoneID: String) = {
+      def getFile(userZoneID: String, organizationZoneID: String) = {
         if (userZoneID == organizationZoneID) {
           if (s3BucketInUse) {
             for {
@@ -203,7 +201,7 @@ class FileController @Inject()(
       (for {
         organizationZoneID <- organizationZoneID
         userZoneID <- userZoneID
-        result <- fetchFile(userZoneID, organizationZoneID)
+        result <- getFile(userZoneID, organizationZoneID)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -597,7 +595,7 @@ class FileController @Inject()(
 
       def fileName(id: String): Future[String] = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
 
-      def fetchFile(fileName: String) = {
+      def getFile(fileName: String) = {
         if (s3BucketInUse) {
           for {
             s3File <- fileResourceManager.getFile(fileName)
@@ -610,7 +608,7 @@ class FileController @Inject()(
       (for {
         id <- id
         fileName <- fileName(id)
-        result <- fetchFile(fileName)
+        result <- getFile(fileName)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -624,7 +622,7 @@ class FileController @Inject()(
 
       def fileName(id: String): Future[String] = masterOrganizationKYCs.Service.tryGetFileName(id = id, documentType = documentType)
 
-      def fetchFile(fileName: String) = {
+      def getFile(fileName: String) = {
         if (s3BucketInUse) {
           for {
             s3File <- fileResourceManager.getFile(fileName)
@@ -637,7 +635,7 @@ class FileController @Inject()(
       (for {
         id <- id
         fileName <- fileName(id)
-        result <- fetchFile(fileName)
+        result <- getFile(fileName)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -654,7 +652,7 @@ class FileController @Inject()(
 
       def getTraderZoneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
 
-      def fetchFile(fileName: String, sellerTraderZoneID: String, buyerTraderZoneID: String, zoneID: String) = {
+      def getFile(fileName: String, sellerTraderZoneID: String, buyerTraderZoneID: String, zoneID: String) = {
         if (sellerTraderZoneID == zoneID || buyerTraderZoneID == zoneID) {
           if (s3BucketInUse) {
             for {
@@ -672,7 +670,7 @@ class FileController @Inject()(
         fileName <- fileName
         sellerTraderZoneID <- getTraderZoneID(negotiation.sellerTraderID)
         buyerTraderZoneID <- getTraderZoneID(negotiation.buyerTraderID)
-        result <- fetchFile(fileName, sellerTraderZoneID, buyerTraderZoneID, zoneID)
+        result <- getFile(fileName, sellerTraderZoneID, buyerTraderZoneID, zoneID)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -777,7 +775,7 @@ class FileController @Inject()(
           } yield if (checkFileNameExistsAccountFiles) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
       }
 
-      def fetchFile(path: String) = {
+      def getFile(path: String) = {
         if (s3BucketInUse) {
           for {
             s3File <- fileResourceManager.getFile(fileName)
@@ -789,7 +787,7 @@ class FileController @Inject()(
 
       (for {
         path <- path
-        result <- fetchFile(path)
+        result <- getFile(path)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -820,7 +818,7 @@ class FileController @Inject()(
         } yield traderPartOfNegotiation
       }
 
-      def fetchFile(traderNegotiationExists: Boolean) = {
+      def getFile(traderNegotiationExists: Boolean) = {
         if (traderNegotiationExists) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
@@ -841,7 +839,7 @@ class FileController @Inject()(
       (for {
         traderID <- traderID
         traderNegotiationExists <- checkTraderNegotiationExists(traderID)
-        result <- fetchFile(traderNegotiationExists)
+        result <- getFile(traderNegotiationExists)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -879,7 +877,7 @@ class FileController @Inject()(
         } yield traderOrganizationIDs
       }
 
-      def fetchFile(organizationID: String, traderOrganizationIDs: Seq[String]) = {
+      def getFile(organizationID: String, traderOrganizationIDs: Seq[String]) = {
         if (traderOrganizationIDs contains organizationID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
@@ -900,7 +898,7 @@ class FileController @Inject()(
       (for {
         organizationID <- organizationID
         traderOrganizationIDs <- traderOrganizationIDs
-        result <- fetchFile(organizationID, traderOrganizationIDs)
+        result <- getFile(organizationID, traderOrganizationIDs)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -938,7 +936,7 @@ class FileController @Inject()(
         } yield traderZoneIDs
       }
 
-      def fetchFile(zoneID: String, traderZoneIDs: Seq[String]) = {
+      def getFile(zoneID: String, traderZoneIDs: Seq[String]) = {
         if (traderZoneIDs contains zoneID) {
           val path = documentType match {
             case constants.File.Asset.BILL_OF_LADING | constants.File.Asset.COO | constants.File.Asset.COA => fileResourceManager.getAssetFilePath(documentType)
@@ -959,7 +957,7 @@ class FileController @Inject()(
       (for {
         zoneID <- zoneID
         traderZoneIDs <- traderZoneIDs
-        result <- fetchFile(zoneID, traderZoneIDs)
+        result <- getFile(zoneID, traderZoneIDs)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
