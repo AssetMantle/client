@@ -4,12 +4,10 @@ import java.io.File
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import play.api.http.DefaultFileMimeTypes
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import akka.http.scaladsl.model.{ContentType, HttpCharset, HttpCharsets, MediaTypes}
 
