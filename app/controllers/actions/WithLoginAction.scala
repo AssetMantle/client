@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents,withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter, blockchainAccounts: blockchain.Accounts, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter, blockchainAccounts: blockchain.Accounts, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
@@ -60,7 +60,9 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         result
       }).recover {
         case baseException: BaseException =>
-          logger.info(baseException.failure.message, baseException)
+          if (baseException.failure.message == constants.Response.USERNAME_NOT_FOUND.message) logger.info(baseException.failure.message)
+          else logger.info(baseException.failure.message, baseException)
+
           Results.Unauthorized(views.html.index()).withNewSession
       }
     }
