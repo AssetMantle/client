@@ -11,14 +11,10 @@ import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import akka.http.scaladsl.model
-import akka.http.scaladsl.model.{ContentType, ContentTypes, HttpCharset, HttpCharsets, MediaTypes}
-import akka.http.scaladsl.model.MediaType
-import akka.http.scaladsl.model.MediaType.{Compressible, NotCompressible}
+import akka.http.scaladsl.model.{ContentType, HttpCharset, HttpCharsets, MediaTypes}
 
 import scala.concurrent.{ExecutionContext, Future}
-import akka.stream.alpakka.s3
-import akka.stream.alpakka.s3.{MemoryBufferType, MultipartUploadSettings, ObjectMetadata, RetrySettings, S3Attributes, S3Exception, S3Ext, S3Settings}
+import akka.stream.alpakka.s3.{ObjectMetadata, S3Attributes, S3Exception, S3Ext}
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import akka.stream.alpakka.s3.scaladsl.S3
 import akka.stream.scaladsl.{Sink, Source}
@@ -28,19 +24,16 @@ import akka.stream.Materializer
 import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
 import akka.util.ByteString
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.regions.providers.{AwsRegionProvider, AwsRegionProviderChain}
-
-import scala.concurrent.duration.FiniteDuration
+import software.amazon.awssdk.regions.providers.AwsRegionProvider
 
 @Singleton
-class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: utilities.Log, wsClient: WSClient, keyStore: KeyStore, defaultFileMimeTypes: DefaultFileMimeTypes)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: utilities.Log, keyStore: KeyStore)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val system: ActorSystem = ActorSystem()
-  implicit val materializer: Materializer = Materializer(system)
+  implicit val materializer: Materializer = Materializer(actorSystem)
 
   private val rootFilePath = configuration.get[String]("upload.rootFilePath")
 
@@ -82,7 +75,9 @@ class FileResourceManager @Inject()(actorSystem: ActorSystem, utilitiesLog: util
 
   private val awsCredentialsProvider = StaticCredentialsProvider.create(AwsBasicCredentials.create(keyStore.getPassphrase(constants.KeyStore.AWS_ACCESS_KEY_ID), keyStore.getPassphrase(constants.KeyStore.AWS_SECRET_ACCESS_KEY)))
 
-  private val s3RegionProvider = new AwsRegionProvider {override def getRegion: Region = Region.of(s3region)}
+  private val s3RegionProvider = new AwsRegionProvider {
+    override def getRegion: Region = Region.of(s3region)
+  }
 
   private val s3Settings = S3Ext(actorSystem).settings
     .withCredentialsProvider(awsCredentialsProvider)

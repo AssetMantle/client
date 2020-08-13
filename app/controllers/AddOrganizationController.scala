@@ -526,7 +526,7 @@ class AddOrganizationController @Inject()(
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,
                   updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
                 )
-                
+
                 def sendAddOrganizationTransaction(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                   entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,

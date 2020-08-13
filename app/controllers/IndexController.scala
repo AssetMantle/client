@@ -19,7 +19,7 @@ import akka.util.ByteString
 import play.api.http.HttpEntity
 
 @Singleton
-class IndexController @Inject()(fileResourceManager: utilities.FileResourceManager, wsClient: WSClient, messagesControllerComponents: MessagesControllerComponents, masterTraders: models.master.Traders, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
