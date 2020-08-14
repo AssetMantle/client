@@ -55,30 +55,6 @@
                             <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                         </a>
                         <ul class="cmuk-navbar-nav">
-                        @loginState match {
-                            case null => {}
-                            case default => {
-                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
-                                @commonIcon("dashboard")
-                                </span>
-                                    @Messages(constants.View.DASHBOARD)
-                                </a>
-                                </li>
-                                <li><a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect"><span class="accountIcon">
-                                @commonIcon("account")
-                                </span>
-                                    @Messages(constants.View.ACCOUNT)
-                                </a>
-                                </li>
-                            }
-                        }
-                        </ul>
-                    </div>
-                    <div class="cmuk-navbar-right">
-                        <div class="searchContainer hidden">
-                        @searchField()
-                        </div>
-                        <ul class="cmuk-navbar-nav">
                             <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
                             @commonIcon("dashBoard")
                             </span>
@@ -103,6 +79,31 @@
                                 @Messages(constants.View.VALIDATORS)
                             </a>
                             </li>
+                        @loginState match {
+                            case null => {}
+                            case default => {
+                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                @commonIcon("dashboard")
+                                </span>
+                                    @Messages(constants.View.DASHBOARD)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect"><span class="accountIcon">
+                                @commonIcon("account")
+                                </span>
+                                    @Messages(constants.View.ACCOUNT)
+                                </a>
+                                </li>
+                            }
+                        }
+                        </ul>
+                    </div>
+                    <div class="cmuk-navbar-right">
+                        <div class="searchContainer hidden">
+                        @searchField()
+                        </div>
+                        <ul class="cmuk-navbar-nav">
+
                             @loginState match {
                                 case null => {
                                     <li>

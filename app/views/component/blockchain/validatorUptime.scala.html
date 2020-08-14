@@ -5,23 +5,25 @@
 
 @commonCard(constants.View.UPTIME) {
 } {
-    <div id="missingBlocksCounter" style="display: flex;  flex-wrap: wrap">
-    @defining(uptimeMap.keySet.last) { lastHeight =>
-        @uptimeMap.map { case (height, present) =>
-            @defining(height - lastHeight) { index =>
-                <div id="@Seq("missingBlocksCounter", 99 - index).mkString("_")">
-                @if(present) {
-                    <div class="block" cmuk-tooltip="@height">
-                        <div class="full"></div>
-                    </div>
-                } else {
-                    <div class="block" cmuk-tooltip="@height">
-                        <div class="empty"></div>
+    @uptime %
+    <div id="@hexAddress">
+        <div id="missingBlocksCounter" style="display: flex; flex-wrap: wrap">
+        @defining(uptimeMap.keySet.last) { lastHeight =>
+            @uptimeMap.map { case (height, present) =>
+                @defining(height - lastHeight) { index =>
+                    <div id="@Seq("missingBlocksCounter", 99 - index).mkString("_")">
+                        <div class="block" cmuk-tooltip="@height" id="@height">
+                        @if(present) {
+                            <div class="full"></div>
+                        } else {
+                            <div class="empty"></div>
+                        }
+                        </div>
                     </div>
                 }
-                </div>
             }
         }
-    }
+        </div>
     </div>
 }
+

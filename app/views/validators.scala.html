@@ -22,7 +22,7 @@
             <div class="cmuk-card-header">
             @Messages(constants.View.VALIDATORS)
             </div>
-            <div class="cmuk-card-body">
+            <div class="cmuk-card-body validatorList">
                 <div id="validatorList"></div>
             </div>
         </div>
@@ -37,7 +37,7 @@
         <div class="recentActivityContainer">
             <div id="publicRecentActivities"></div>
         </div>
-        <div id="votingPowers" class="cmuk-margin-bottom"></div>
+        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
     </div>
     <script>
             componentResource('publicRecentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
