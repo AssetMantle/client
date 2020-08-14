@@ -17,7 +17,7 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #000; }
+    background-color: #191616; }
 
   .switcherCard .cmuk-subnav {
     flex-wrap: nowrap;
@@ -64,7 +64,10 @@
       width: 95px; }
 
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
-    flex-wrap: wrap; } }
+    flex-wrap: wrap; }
+
+  .comdex .searchForm dl .cmuk-search-input {
+    width: 280px; } }
 @media (min-width: 640px) {
   .modalBody form {
     width: 620px;
