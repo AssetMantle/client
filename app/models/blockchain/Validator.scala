@@ -31,6 +31,7 @@ class Validators @Inject()(
                             blockchainDelegations: Delegations,
                             blockchainAccountBalances: AccountBalances,
                             keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
+                            blockchainWithdrawAddresses: WithdrawAddresses,
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -281,11 +282,13 @@ class Validators @Inject()(
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
       val accountBalance = blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
+      val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 
       (for {
         _ <- updateValidator
         _ <- accountBalance
         _ <- insertDelegation
+        _ <- withdrawAddressBalanceUpdate
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

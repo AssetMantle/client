@@ -12,7 +12,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetClassification
-import queries.responses.ClassificationResponse.{Response => ClassificationResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -128,10 +127,22 @@ class Classifications @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onDefine(classificationDefine: ClassificationDefine): Future[Unit] = {
-      val hashID = Immutables(Properties(classificationDefine.traits.map(_.property))).getHashID
-      Future()
+      val upsert = Service.insertOrUpdate(Classification(id = getID(chainID = chainID, maintainersID = classificationDefine.maintainersID, hashID = Immutables(Properties(classificationDefine.traits.map(_.property))).getHashID), traits = classificationDefine.traits))
+
+      (for {
+        _ <- upsert
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
 
+    private def getID(chainID: String, maintainersID: String, hashID: String) = Seq(chainID, maintainersID, hashID).mkString(constants.Blockchain.IDSeparator)
+
+    private def getFeatures(id: String): (String, String, String) = {
+      val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
+      if (idList.length == 3) (idList(0), idList(1), idList(2)) else ("", "", "")
+    }
   }
 
 }

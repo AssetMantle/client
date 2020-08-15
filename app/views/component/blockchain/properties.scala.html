@@ -7,7 +7,7 @@
     @commonInfoBox() {
         @commonTextInfo(constants.View.PROPERTY_ID, property.id)
         @Messages(constants.View.FACT):
-        @commonTextInfo(constants.View.FACT_HASH, property.fact.hash)
-        @commonBooleanInfo(constants.View.META, Option(property.fact.meta))
+        @commonTextInfo(constants.View.FACT_HASH, property.fact.value.getHash)
+        @commonBooleanInfo(constants.View.META, Option(property.fact.value.isMeta))
     }
 }

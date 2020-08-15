@@ -114,10 +114,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.block,
         routes.javascript.ViewController.transaction,
         routes.javascript.ViewController.validator,
-        routes.javascript.ViewController.asset,
-        routes.javascript.ViewController.identity,
-        routes.javascript.ViewController.split,
-        routes.javascript.ViewController.order,
 
         routes.javascript.BackgroundCheckController.memberScanForm,
         routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,

@@ -82,25 +82,4 @@ class ViewController @Inject()(
       Ok(views.html.dashboard())
   }
 
-  def asset(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.asset(id))
-  }
-
-  def identity(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.identity(id))
-  }
-
-  def split(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.split(id))
-  }
-
-  def order(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.order(id))
-  }
-
-
 }

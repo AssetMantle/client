@@ -137,7 +137,7 @@ class Identities @Inject()(
       val hashID = Immutables(identityIssue.properties).getHashID
       val identityResponse = getIdentity.Service.get(getID(chainID = chainID, maintainersID = identityIssue.maintainersID, classificationID = identityIssue.classificationID, hashID = hashID))
 
-      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == identityIssue.maintainersID && x.value.id.value.classificationID.value.idString == identityIssue.maintainersID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
+      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == identityIssue.maintainersID && x.value.id.value.classificationID.value.idString == identityIssue.classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
         val identityID = getID(chainID = identity.value.id.value.chainID.value.idString, maintainersID = identity.value.id.value.maintainersID.value.idString, classificationID = identity.value.id.value.classificationID.value.idString, hashID = identity.value.id.value.hashID.value.idString)
         Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
       }
@@ -153,15 +153,15 @@ class Identities @Inject()(
 
     def onProvision(identityProvision: IdentityProvision): Future[Unit] = {
       val identityResponse = getIdentity.Service.get(identityProvision.identityID)
+      val (chainID, maintainersID, classificationID, hashID) = getFeatures(identityProvision.identityID)
 
-      def insertOrUpdateAll(identityResponse: IdentityResponse) = Future.traverse(identityResponse.result.value.identities.value.list) { identity =>
-        val identityID = getID(chainID = identity.value.id.value.chainID.value.idString, maintainersID = identity.value.id.value.maintainersID.value.idString, classificationID = identity.value.id.value.classificationID.value.idString, hashID = identity.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = identity.value.provisionedAddressList.fold[Seq[String]](Seq.empty)(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold[Seq[String]](Seq.empty)(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
+      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
+        Service.insertOrUpdate(Identity(id = identityProvision.identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
       }
 
       (for {
         identityResponse <- identityResponse
-        _ <- insertOrUpdateAll(identityResponse)
+        _ <- insertOrUpdate(identityResponse)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -170,15 +170,15 @@ class Identities @Inject()(
 
     def onUnprovision(identityUnprovision: IdentityUnprovision): Future[Unit] = {
       val identityResponse = getIdentity.Service.get(identityUnprovision.identityID)
+      val (chainID, maintainersID, classificationID, hashID) = getFeatures(identityUnprovision.identityID)
 
-      def insertOrUpdateAll(identityResponse: IdentityResponse) = Future.traverse(identityResponse.result.value.identities.value.list) { identity =>
-        val identityID = getID(chainID = identity.value.id.value.chainID.value.idString, maintainersID = identity.value.id.value.maintainersID.value.idString, classificationID = identity.value.id.value.classificationID.value.idString, hashID = identity.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = identity.value.provisionedAddressList.fold[Seq[String]](Seq.empty)(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold[Seq[String]](Seq.empty)(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
+      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
+        Service.insertOrUpdate(Identity(id = identityUnprovision.identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
       }
 
       (for {
         identityResponse <- identityResponse
-        _ <- insertOrUpdateAll(identityResponse)
+        _ <- insertOrUpdate(identityResponse)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -188,7 +188,7 @@ class Identities @Inject()(
     private def getID(chainID: String, maintainersID: String, classificationID: String, hashID: String) = Seq(chainID, maintainersID, classificationID, hashID).mkString(constants.Blockchain.IDSeparator)
 
     private def getFeatures(id: String): (String, String, String, String) = {
-      val idList = id.split(constants.Blockchain.IDSeparator)
+      val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
       if (idList.length == 4) (idList(0), idList(1), idList(2), idList(3)) else ("", "", "", "")
     }
   }

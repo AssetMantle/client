@@ -202,15 +202,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def markDirty(sendCoin: SendCoin): Future[Unit] = {
-        val markDirtyTo = blockchainAccounts.Service.markDirty(sendCoin.to)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(sendCoin.from)
-        for {
-          _ <- markDirtyTo
-          _ <- markDirtyFrom
-        } yield {}
-      }
-
       def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
 
       def toAccount(accountID: String): Future[Account] = masterAccounts.Service.tryGet(accountID)
@@ -224,7 +215,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       (for {
         _ <- markTransactionSuccessful
         sendCoin <- sendCoin
-        _ <- markDirty(sendCoin)
         accountID <- getAccountID(sendCoin.to)
         toAccount <- toAccount(accountID)
         _ <- unknownUserTypeUpdate(toAccount)

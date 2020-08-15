@@ -26,6 +26,7 @@ class Block @Inject()(
                        blockchainClassifications: blockchain.Classifications,
                        blockchainDelegations: blockchain.Delegations,
                        blockchainIdentities: blockchain.Identities,
+                       blockchainMetas: blockchain.Metas,
                        blockchainOrders: blockchain.Orders,
                        blockchainRedelegations: blockchain.Redelegations,
                        blockchainSigningInfos: blockchain.SigningInfos,
@@ -136,34 +137,36 @@ class Block @Inject()(
           try {
             stdMsg.messageType match {
               //bank
-              case constants.TransactionMessage.SEND_COIN => blockchainAccountBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
+              case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainAccountBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
               //slashing
-              case constants.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(transaction.hash, stdMsg.message.asInstanceOf[Unjail])
+              case constants.Blockchain.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(transaction.hash, stdMsg.message.asInstanceOf[Unjail])
               //staking
-              case constants.TransactionMessage.CREATE_VALIDATOR => blockchainValidators.Utility.onCreateValidator(transaction.hash, stdMsg.message.asInstanceOf[CreateValidator])
-              case constants.TransactionMessage.EDIT_VALIDATOR => blockchainValidators.Utility.onEditValidator(transaction.hash, stdMsg.message.asInstanceOf[EditValidator])
-              case constants.TransactionMessage.DELEGATE => blockchainValidators.Utility.onDelegation(stdMsg.message.asInstanceOf[Delegate])
-              case constants.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stdMsg.message.asInstanceOf[Redelegate])
-              case constants.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stdMsg.message.asInstanceOf[Undelegate])
-              case constants.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
+              case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => blockchainValidators.Utility.onCreateValidator(transaction.hash, stdMsg.message.asInstanceOf[CreateValidator])
+              case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => blockchainValidators.Utility.onEditValidator(transaction.hash, stdMsg.message.asInstanceOf[EditValidator])
+              case constants.Blockchain.TransactionMessage.DELEGATE => blockchainValidators.Utility.onDelegation(stdMsg.message.asInstanceOf[Delegate])
+              case constants.Blockchain.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stdMsg.message.asInstanceOf[Redelegate])
+              case constants.Blockchain.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stdMsg.message.asInstanceOf[Undelegate])
+              case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
               //Asset
-              case constants.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(stdMsg.message.asInstanceOf[AssetMint])
-              case constants.TransactionMessage.ASSET_MUTATE => blockchainAssets.Utility.onMutate(stdMsg.message.asInstanceOf[AssetMutate])
-              case constants.TransactionMessage.ASSET_BURN => blockchainAssets.Utility.onBurn(stdMsg.message.asInstanceOf[AssetBurn])
+              case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(stdMsg.message.asInstanceOf[AssetMint])
+              case constants.Blockchain.TransactionMessage.ASSET_MUTATE => blockchainAssets.Utility.onMutate(stdMsg.message.asInstanceOf[AssetMutate])
+              case constants.Blockchain.TransactionMessage.ASSET_BURN => blockchainAssets.Utility.onBurn(stdMsg.message.asInstanceOf[AssetBurn])
               //Identity
-              case constants.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(stdMsg.message.asInstanceOf[IdentityIssue])
-              case constants.TransactionMessage.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(stdMsg.message.asInstanceOf[IdentityProvision])
-              case constants.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(stdMsg.message.asInstanceOf[IdentityUnprovision])
+              case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(stdMsg.message.asInstanceOf[IdentityIssue])
+              case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(stdMsg.message.asInstanceOf[IdentityProvision])
+              case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(stdMsg.message.asInstanceOf[IdentityUnprovision])
               //Split
-              case constants.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(stdMsg.message.asInstanceOf[SplitSend])
-              case constants.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(stdMsg.message.asInstanceOf[SplitWrap])
-              case constants.TransactionMessage.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(stdMsg.message.asInstanceOf[SplitUnwrap])
+              case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(stdMsg.message.asInstanceOf[SplitSend])
+              case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(stdMsg.message.asInstanceOf[SplitWrap])
+              case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(stdMsg.message.asInstanceOf[SplitUnwrap])
               //Order
-              case constants.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(stdMsg.message.asInstanceOf[OrderMake], height)
-              case constants.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(stdMsg.message.asInstanceOf[OrderTake])
-              case constants.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
+              case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(stdMsg.message.asInstanceOf[OrderMake], height)
+              case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(stdMsg.message.asInstanceOf[OrderTake])
+              case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
               //classification
-              case constants.TransactionMessage.CLASSIFICATION_DEFINE => blockchainClassifications.Utility.onDefine(stdMsg.message.asInstanceOf[ClassificationDefine])
+              case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => blockchainClassifications.Utility.onDefine(stdMsg.message.asInstanceOf[ClassificationDefine])
+                //meta
+              case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
               case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType)
             }
           } catch {
@@ -181,8 +184,8 @@ class Block @Inject()(
 
     def updateValidatorAndDelegations(validators: Seq[Validator]) = Future.traverse(validators) { validator =>
       val updatedValidator = blockchainValidators.Utility.insertOrUpdateValidator(validator.operatorAddress)
-      val updateDelegation = blockchainRedelegations.Utility.onSlashing(validator.operatorAddress)
-      val updateUnbonding = blockchainUndelegations.Utility.onSlashing(validator.operatorAddress)
+      val updateDelegation = blockchainRedelegations.Utility.onSlashingEvent(validator.operatorAddress)
+      val updateUnbonding = blockchainUndelegations.Utility.onSlashingEvent(validator.operatorAddress)
       val updateSigningInfo = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
 
       for {

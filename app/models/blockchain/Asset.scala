@@ -24,7 +24,9 @@ case class Asset(id: String, burn: Int, lock: Int, immutables: Immutables, mutab
 class Assets @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
-                        getAsset: GetAsset
+                        getAsset: GetAsset,
+                        blockchainSplits: Splits,
+                        blockchainMetas: Metas,
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -135,11 +137,32 @@ class Assets @Inject()(
 
     def onMint(assetMint: AssetMint): Future[Unit] = {
       val hashID = Immutables(assetMint.properties).getHashID
-      val assetResponse = getAsset.Service.get(getID(chainID = chainID, maintainersID = assetMint.maintainersID, classificationID = assetMint.classificationID, hashID = hashID))
+      val assetID = getID(chainID = chainID, maintainersID = assetMint.maintainersID, classificationID = assetMint.classificationID, hashID = hashID)
+      val assetResponse = getAsset.Service.get(assetID)
+      val insertOrUpdateSplits = blockchainSplits.Utility.splitsMint(ownerID = assetMint.toID, ownableID = assetID)
+      val upsertMetas = blockchainMetas.Utility.checkAndUpsertMetas(assetMint.properties.propertyList.map(_.fact))
 
       def insertOrUpdate(assetResponse: AssetResponse) = assetResponse.result.value.assets.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == assetMint.maintainersID && x.value.id.value.classificationID.value.idString == assetMint.maintainersID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ASSET_NOT_FOUND)) { asset =>
-        val assetID = getID(chainID = asset.value.id.value.chainID.value.idString, maintainersID = asset.value.id.value.maintainersID.value.idString, classificationID = asset.value.id.value.classificationID.value.idString, hashID = asset.value.id.value.hashID.value.idString)
         Service.insertOrUpdate(Asset(id = assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
+      }
+
+      (for {
+        assetResponse <- assetResponse
+        _ <- insertOrUpdate(assetResponse)
+        _ <- insertOrUpdateSplits
+        _ <- upsertMetas
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def onMutate(assetMutate: AssetMutate): Future[Unit] = {
+      val assetResponse = getAsset.Service.get(assetMutate.assetID)
+      val (chainID, maintainersID, classificationID, hashID) = getFeatures(assetMutate.assetID)
+
+      def insertOrUpdate(assetResponse: AssetResponse) = assetResponse.result.value.assets.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ASSET_NOT_FOUND)) { asset =>
+        Service.insertOrUpdate(Asset(id = assetMutate.assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
       }
 
       (for {
@@ -151,31 +174,16 @@ class Assets @Inject()(
       }
     }
 
-    def onMutate(assetMutate: AssetMutate): Future[Unit] = {
-      val assetResponse = getAsset.Service.get(assetMutate.assetID)
-
-      def insertOrUpdateAll(assetResponse: AssetResponse) = Future.traverse(assetResponse.result.value.assets.value.list) { asset =>
-        val assetID = getID(chainID = asset.value.id.value.chainID.value.idString, maintainersID = asset.value.id.value.maintainersID.value.idString, classificationID = asset.value.id.value.classificationID.value.idString, hashID = asset.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Asset(id = assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
-      }
-
-      (for {
-        assetResponse <- assetResponse
-        _ <- insertOrUpdateAll(assetResponse)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
     def onBurn(assetBurn: AssetBurn): Future[Unit] = {
       val assetResponse = getAsset.Service.get(assetBurn.assetID)
       val (chainID, maintainersID, classificationID, hashID) = getFeatures(assetBurn.assetID)
+      val updateOrDeleteSplits = blockchainSplits.Utility.splitsBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID)
 
       def delete(assetResponse: AssetResponse) = if (assetResponse.result.value.assets.value.list.exists(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID)) Service.delete(assetBurn.assetID) else Future(0)
 
       (for {
         assetResponse <- assetResponse
+        _ <- updateOrDeleteSplits
         _ <- delete(assetResponse)
       } yield ()
         ).recover {
@@ -186,7 +194,7 @@ class Assets @Inject()(
     private def getID(chainID: String, maintainersID: String, classificationID: String, hashID: String) = Seq(chainID, maintainersID, classificationID, hashID).mkString(constants.Blockchain.IDSeparator)
 
     private def getFeatures(id: String): (String, String, String, String) = {
-      val idList = id.split(constants.Blockchain.IDSeparator)
+      val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
       if (idList.length == 4) (idList(0), idList(1), idList(2), idList(3)) else ("", "", "", "")
     }
 

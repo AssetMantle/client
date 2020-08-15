@@ -31,6 +31,7 @@ class Undelegations @Inject()(
                                getAllValidatorUndelegations: GetAllValidatorUndelegations,
                                blockchainValidators: Validators,
                                blockchainDelegations: Delegations,
+                               blockchainWithdrawAddresses: WithdrawAddresses,
                                getValidator: GetValidator,
                              )(implicit executionContext: ExecutionContext) {
 
@@ -134,20 +135,21 @@ class Undelegations @Inject()(
       val undelegationsResponse = getValidatorDelegatorUndelegations.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.validatorAddress)
-
+      val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(undelegate.delegatorAddress)
       def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationsResponse) = Service.insertOrUpdate(undelegationsResponse.result.toUndelegation)
 
       (for {
         undelegationsResponse <- undelegationsResponse
         _ <- updateValidator
         _ <- upsertUndelegation(undelegationsResponse)
+        _ <- withdrawAddressBalanceUpdate
         _ <- updateOrDeleteDelegation
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    def onSlashing(validatorAddress: String): Future[Unit] = {
+    def onSlashingEvent(validatorAddress: String): Future[Unit] = {
       val undelegations = Service.getAllByValidator(validatorAddress)
 
       def updateUndelegations(undelegations: Seq[Undelegation]) = if (undelegations.nonEmpty) {

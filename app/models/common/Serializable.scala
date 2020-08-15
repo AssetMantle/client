@@ -73,11 +73,48 @@ object Serializable {
 
   implicit val idWrites: OWrites[ID] = Json.writes[ID]
 
-  case class Fact(hash: String, meta: Boolean)
+  case class NonMetaFactValue(hash: String, meta: Boolean) extends models.`abstract`.FactValue {
+    def get: String = ""
 
-  def newFact(fact: String): Fact = Fact(hash = utilities.Hash.getHash(fact), meta = false)
+    def getHash: String = hash
 
-  implicit val factReads: Reads[Fact] = Json.reads[Fact]
+    def isMeta: Boolean = meta
+  }
+
+  def newNonMetaFactValue(fact: String): NonMetaFactValue = NonMetaFactValue(hash = utilities.Hash.getHash(fact), false)
+
+  implicit val nonMetaFactReads: Reads[NonMetaFactValue] = Json.reads[NonMetaFactValue]
+
+  implicit val nonMetaFactWrites: OWrites[NonMetaFactValue] = Json.writes[NonMetaFactValue]
+
+  case class MetaFactValue(fact: String, hash: String) extends models.`abstract`.FactValue {
+    def get: String = fact
+
+    def getHash: String = hash
+
+    def isMeta: Boolean = true
+  }
+
+  implicit val metaFactReads: Reads[MetaFactValue] = Json.reads[MetaFactValue]
+
+  implicit val metaFactWrites: OWrites[MetaFactValue] = Json.writes[MetaFactValue]
+
+  implicit val factValueWrites: Writes[models.`abstract`.FactValue] = {
+    case metaFactValue: MetaFactValue => Json.toJson(metaFactValue)(Json.writes[MetaFactValue])
+    case nonMetaFactValue: NonMetaFactValue => Json.toJson(nonMetaFactValue)(Json.writes[NonMetaFactValue])
+  }
+
+  case class Fact(factType: String, value: models.`abstract`.FactValue)
+
+  def factApply(factType: String, value: JsObject): Fact = factType match {
+    case constants.Blockchain.Fact.META_FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[MetaFactValue](value.toString))
+    case constants.Blockchain.Fact.FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[NonMetaFactValue](value.toString))
+  }
+
+  implicit val factReads: Reads[Fact] = (
+    (JsPath \ "factType").read[String] and
+      (JsPath \ "value").read[JsObject]
+    ) (factApply _)
 
   implicit val factWrites: OWrites[Fact] = Json.writes[Fact]
 
@@ -100,8 +137,7 @@ object Serializable {
   implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
 
   case class Immutables(properties: Properties) {
-    //apache-codec Base64 encoder gives Sw4O7BtF/0y7TclwCDzQArfGe7I= instead of Sw4O7BtF_0y7TclwCDzQArfGe7I= So use java.util.Base64
-    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.hash): _*)
+    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.value.getHash): _*)
   }
 
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]

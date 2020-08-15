@@ -26,10 +26,6 @@ GET         /validators                                          controllers.Vie
 GET         /block                                               controllers.ViewController.block(height: Int)
 GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
 GET         /validator                                           controllers.ViewController.validator(address: String)
-GET         /asset                                               controllers.ViewController.asset(id: String)
-GET         /identity                                            controllers.ViewController.identity(id: String)
-GET         /split                                               controllers.ViewController.split(id: String)
-GET         /order                                               controllers.ViewController.order(id: String)
 
 GET         /profilePicture                                      controllers.ComponentViewController.profilePicture
 

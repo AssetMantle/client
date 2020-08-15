@@ -10,6 +10,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetSplit
+import queries.responses.SplitResponse.{Response => SplitResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,6 +22,7 @@ case class Split(ownerID: String, ownableID: String, split: BigDecimal, createdB
 class Splits @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
+                        blockchainAccountBalances: AccountBalances,
                         getSplit: GetSplit,
                       )(implicit executionContext: ExecutionContext) {
 
@@ -39,21 +41,21 @@ class Splits @Inject()(
   private def add(split: Split): Future[String] = db.run((splitTable returning splitTable.map(_.ownerID) += split).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.SPLIT_INSERT_FAILED, psqlException)
     }
   }
 
   private def addMultiple(splits: Seq[Split]): Future[Seq[String]] = db.run((splitTable returning splitTable.map(_.ownerID) ++= splits).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.SPLIT_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(split: Split): Future[Int] = db.run(splitTable.insertOrUpdate(split).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.SPLIT_UPSERT_FAILED, psqlException)
     }
   }
 
@@ -66,11 +68,19 @@ class Splits @Inject()(
   private def getByOwnerAndOwnable(ownerID: String, ownableID: String) = db.run(splitTable.filter(_.ownableID === ownableID).filter(_.ownerID === ownerID).result.headOption.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ASSET_NOT_FOUND, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SPLIT_NOT_FOUND, noSuchElementException)
     }
   }
 
   private def getAllSplits = db.run(splitTable.result)
+
+  private def deleteByIDs(ownerID: String, ownableID: String): Future[Int] = db.run(splitTable.filter(_.ownerID === ownerID).filter(_.ownableID === ownableID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.SPLIT_UPSERT_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SPLIT_NOT_FOUND, noSuchElementException)
+    }
+  }
 
   private[models] class SplitTable(tag: Tag) extends Table[Split](tag, "Split_BC") {
 
@@ -113,30 +123,107 @@ class Splits @Inject()(
 
     def insertOrUpdate(split: Split): Future[Int] = upsert(split)
 
+    def delete(ownerID: String, ownableID: String): Future[Int] = deleteByIDs(ownerID = ownerID, ownableID = ownableID)
+
   }
 
   object Utility {
-    def onSend(splitSend: SplitSend): Future[Unit] = {
-      val split = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
 
-      def insert(split: Option[Split]) = split.fold(Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitSend.split)))(oldSplit => Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = (oldSplit.split + splitSend.split))))
+    def onSend(splitSend: SplitSend): Future[Unit] = {
+      val allSplitsResponse = getSplit.Service.get(ownerID = "-", ownableID = "-")
+
+      def updateSplits(allSplitsResponse: SplitResponse) = {
+        val updateFromSplit = allSplitsResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == splitSend.fromID && x.value.id.value.ownableID.value.idString == splitSend.ownableID).fold(
+          Service.delete(ownerID = splitSend.fromID, ownableID = splitSend.ownableID)
+        )(splitResponse => Service.insertOrUpdate(Split(ownerID = splitSend.fromID, ownableID = splitSend.ownableID, split = splitResponse.value.split)))
+
+        val updateToSplit = allSplitsResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == splitSend.toID && x.value.id.value.ownableID.value.idString == splitSend.ownableID).fold(
+          throw new BaseException(constants.Response.SPLIT_NOT_FOUND)
+        )(splitResponse => Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitResponse.value.split)))
+
+        for {
+          _ <- updateFromSplit
+          _ <- updateToSplit
+        } yield ()
+      }
 
       (for {
-        split <- split
-        _ <- insert(split)
+        allSplitsResponse <- allSplitsResponse
+        _ <- updateSplits(allSplitsResponse)
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def onWrap(splitWrap: SplitWrap): Future[Unit] = {
+      val allSplitsResponse = getSplit.Service.get(ownerID = "-", ownableID = "-")
+      val updateAccountBalance = blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(splitWrap.from)
+
+      def updateSplits(allSplitsResponse: SplitResponse) = Future.traverse(splitWrap.coins) { coin =>
+        allSplitsResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == splitWrap.fromID && x.value.id.value.ownableID.value.idString == coin.denom).fold(
+          throw new BaseException(constants.Response.SPLIT_NOT_FOUND)
+        )(splitResponse => Service.insertOrUpdate(Split(ownerID = splitWrap.fromID, ownableID = coin.denom, split = splitResponse.value.split)))
+      }
+
+      (for {
+        allSplitsResponse <- allSplitsResponse
+        _ <- updateSplits(allSplitsResponse)
+        _ <- updateAccountBalance
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def onUnwrap(splitUnwrap: SplitUnwrap): Future[Unit] = {
+      val allSplitsResponse = getSplit.Service.get(ownerID = "-", ownableID = "-")
+      val updateAccountBalance = blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(splitUnwrap.from)
+
+      def updateSplits(allSplitsResponse: SplitResponse) = allSplitsResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == splitUnwrap.fromID && x.value.id.value.ownableID.value.idString == splitUnwrap.ownableID).fold(
+        Service.delete(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID)
+      )(splitResponse => Service.insertOrUpdate(Split(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID, split = splitResponse.value.split)))
+
+      (for {
+        allSplitsResponse <- allSplitsResponse
+        _ <- updateSplits(allSplitsResponse)
+        _ <- updateAccountBalance
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def splitsMint(ownerID: String, ownableID: String): Future[Unit] = {
+      val splitResponse = getSplit.Service.get(ownerID = ownerID, ownableID = ownableID)
+
+      def insertOrUpdate(splitResponse: SplitResponse) = splitResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == ownerID && x.value.id.value.ownableID.value.idString == ownableID).fold(
+        throw new BaseException(constants.Response.SPLIT_NOT_FOUND)
+      )(split =>
+        Service.insertOrUpdate(Split(ownerID = split.value.id.value.ownerID.value.idString, ownableID = split.value.id.value.ownableID.value.idString, split = split.value.split)))
+
+      (for {
+        splitResponse <- splitResponse
+        _ <- insertOrUpdate(splitResponse)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    def onWrap(splitWrap: SplitWrap): Future[Unit] = {
-      Future()
+    def splitsBurn(ownerID: String, ownableID: String): Future[Unit] = {
+      val splitResponse = getSplit.Service.get(ownerID = ownerID, ownableID = ownableID)
+
+      def updateOrDelete(splitResponse: SplitResponse) = splitResponse.result.value.splits.value.list.find(x => x.value.id.value.ownerID.value.idString == ownerID && x.value.id.value.ownableID.value.idString == ownableID).fold(
+        Service.delete(ownerID = ownerID, ownableID = ownableID)
+      )(split => Service.insertOrUpdate(Split(ownerID = split.value.id.value.ownerID.value.idString, ownableID = split.value.id.value.ownableID.value.idString, split = split.value.split)))
+
+      (for {
+        splitResponse <- splitResponse
+        _ <- updateOrDelete(splitResponse)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
 
-    def onUnwrap(splitUnwrap: SplitUnwrap): Future[Unit] = {
-      Future()
-    }
   }
 
 }

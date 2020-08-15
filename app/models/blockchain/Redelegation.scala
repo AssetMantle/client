@@ -29,7 +29,8 @@ class Redelegations @Inject()(
                                getValidatorDelegatorRedelegations: GetValidatorDelegatorRedelegations,
                                getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
                                getValidator: GetValidator,
-                               blockchainValidators: Validators
+                               blockchainValidators: Validators,
+                               blockchainWithdrawAddresses: WithdrawAddresses,
                              )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -120,6 +121,7 @@ class Redelegations @Inject()(
       val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorSrcAddress)
       val updateDstValidatorDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorDstAddress)
+      val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(redelegate.delegatorAddress)
       val updateValidators = {
         val updateSrcValidatorResponse = blockchainValidators.Utility.insertOrUpdateValidator(redelegate.validatorSrcAddress)
         val updateDstValidatorResponse = blockchainValidators.Utility.insertOrUpdateValidator(redelegate.validatorDstAddress)
@@ -136,13 +138,14 @@ class Redelegations @Inject()(
         _ <- upsertRedelegation(redelegationsResponse)
         _ <- updateSrcValidatorDelegation
         _ <- updateDstValidatorDelegation
+        _ <- withdrawAddressBalanceUpdate
         _ <- updateValidators
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    def onSlashing(validatorAddress: String): Future[Unit] = {
+    def onSlashingEvent(validatorAddress: String): Future[Unit] = {
       val redelegations = Service.getAllBySourceValidator(validatorAddress)
 
       def updateDelegations(redelegations: Seq[Redelegation]) = if (redelegations.nonEmpty) {

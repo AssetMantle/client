@@ -1,6 +1,5 @@
 package models.common
 
-import exceptions.BaseException
 import models.`abstract`.TransactionMessage
 import models.common.Serializable.{Coin, Properties, StdMsg, ValidatorDescription, CommissionRates => SerializableCommissionRates}
 import play.api.Logger
@@ -162,9 +161,20 @@ object TransactionMessages {
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
+  //classification
   case class ClassificationDefine(from: String, fromID: String, maintainersID: String, traits: Seq[Serializable.Trait]) extends TransactionMessage
 
   implicit val classificationDefineReads: Reads[ClassificationDefine] = Json.reads[ClassificationDefine]
+
+  //meta
+  case class MetaReveal(from: String, fromID: String, data: String) extends TransactionMessage
+
+  implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
+
+  //unknown
+  case class Unknown(value: String) extends TransactionMessage
+
+  implicit val unknownReads: Reads[Unknown] = Json.reads[Unknown]
 
   implicit val transactionMessageWrites: Writes[TransactionMessage] = {
     //bank
@@ -206,53 +216,57 @@ object TransactionMessages {
     case orderCancel: OrderCancel => Json.toJson(orderCancel)(Json.writes[OrderCancel])
     //Classification
     case classificationDefine: ClassificationDefine => Json.toJson(classificationDefine)(Json.writes[ClassificationDefine])
-    case _ => throw new BaseException(constants.Response.TRANSACTION_TYPE_NOT_FOUND)
+    //meta
+    case metaReveal: MetaReveal => Json.toJson(metaReveal)(Json.writes[MetaReveal])
+    case x: Any => Json.toJson(x.toString)
   }
 
   def stdMsgApply(msgType: String, value: JsObject): StdMsg = {
     msgType match {
       //bank
-      case constants.TransactionMessage.SEND_COIN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
+      case constants.Blockchain.TransactionMessage.SEND_COIN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
       //crisis
-      case constants.TransactionMessage.VERIFY_INVARIANT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[VerifyInvariant](value.toString))
+      case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[VerifyInvariant](value.toString))
       //distribution
-      case constants.TransactionMessage.SET_WITHDRAW_ADDRESS => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SetWithdrawAddress](value.toString))
-      case constants.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawDelegatorReward](value.toString))
-      case constants.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawValidatorCommission](value.toString))
-      case constants.TransactionMessage.FUND_COMMUNITY_POOL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[FundCommunityPool](value.toString))
+      case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SetWithdrawAddress](value.toString))
+      case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawDelegatorReward](value.toString))
+      case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawValidatorCommission](value.toString))
+      case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[FundCommunityPool](value.toString))
       //TODO evidence Pending in cosmos-sdk
-      //case constants.TransactionMessage.SUBMIT_EVIDENCE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitEvidence](value.toString))
+      //case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitEvidence](value.toString))
       //gov
-      case constants.TransactionMessage.DEPOSIT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Deposit](value.toString))
-      case constants.TransactionMessage.SUBMIT_PROPOSAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitProposal](value.toString))
-      case constants.TransactionMessage.VOTE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Vote](value.toString))
+      case constants.Blockchain.TransactionMessage.DEPOSIT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Deposit](value.toString))
+      case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitProposal](value.toString))
+      case constants.Blockchain.TransactionMessage.VOTE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Vote](value.toString))
       //slashing
-      case constants.TransactionMessage.UNJAIL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Unjail](value.toString))
+      case constants.Blockchain.TransactionMessage.UNJAIL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Unjail](value.toString))
       //staking
-      case constants.TransactionMessage.CREATE_VALIDATOR => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[CreateValidator](value.toString))
-      case constants.TransactionMessage.EDIT_VALIDATOR => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[EditValidator](value.toString))
-      case constants.TransactionMessage.DELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Delegate](value.toString))
-      case constants.TransactionMessage.REDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
-      case constants.TransactionMessage.UNDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
+      case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[CreateValidator](value.toString))
+      case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[EditValidator](value.toString))
+      case constants.Blockchain.TransactionMessage.DELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Delegate](value.toString))
+      case constants.Blockchain.TransactionMessage.REDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
+      case constants.Blockchain.TransactionMessage.UNDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
       //asset
-      case constants.TransactionMessage.ASSET_MINT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))
-      case constants.TransactionMessage.ASSET_MUTATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMutate](value.toString))
-      case constants.TransactionMessage.ASSET_BURN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetBurn](value.toString))
+      case constants.Blockchain.TransactionMessage.ASSET_MINT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))
+      case constants.Blockchain.TransactionMessage.ASSET_MUTATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMutate](value.toString))
+      case constants.Blockchain.TransactionMessage.ASSET_BURN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetBurn](value.toString))
       //identity
-      case constants.TransactionMessage.IDENTITY_ISSUE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
-      case constants.TransactionMessage.IDENTITY_PROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
-      case constants.TransactionMessage.IDENTITY_UNPROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
+      case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
+      case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
+      case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
       //split
-      case constants.TransactionMessage.SPLIT_SEND => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitSend](value.toString))
-      case constants.TransactionMessage.SPLIT_WRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))
-      case constants.TransactionMessage.SPLIT_UNWRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitUnwrap](value.toString))
+      case constants.Blockchain.TransactionMessage.SPLIT_SEND => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitSend](value.toString))
+      case constants.Blockchain.TransactionMessage.SPLIT_WRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))
+      case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitUnwrap](value.toString))
       //order
-      case constants.TransactionMessage.ORDER_MAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
-      case constants.TransactionMessage.ORDER_TAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
-      case constants.TransactionMessage.ORDER_CANCEL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
+      case constants.Blockchain.TransactionMessage.ORDER_MAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
+      case constants.Blockchain.TransactionMessage.ORDER_TAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
+      case constants.Blockchain.TransactionMessage.ORDER_CANCEL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
       //classification
-      case constants.TransactionMessage.CLASSIFICATION_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
-      case _ => throw new BaseException(constants.Response.TRANSACTION_TYPE_NOT_FOUND)
+      case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
+      //meta
+      case constants.Blockchain.TransactionMessage.META_REVEAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
+      case _ => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Unknown](value.toString))
     }
   }
 
