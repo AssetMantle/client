@@ -14,13 +14,60 @@
 *:focus {
   outline: none!important;
 }
+$dark-color: #132a47;
+$light-color: red;
 html, body{
   height: 100%;
   position: relative;
-  background: #F0F0F0;
   @extend %scroller;
 }
 
+body.dark-mode {
+  ::-webkit-scrollbar-thumb {
+    background: rgba(119,131,143,.5);
+    border: none;
+  }
+  .cmuk-navbar-container:not(.cmuk-navbar-transparent){
+    background: #112641;
+  }
+  .cmuk-card-default,
+  .cmuk-card-body,
+  .cmuk-card-header,
+  .financialCardSection,
+  .commonList,
+  .documentItem,
+  .cmuk-input{
+    background: $dark-color !important;
+    border-color: #18365b!important;
+  }
+  button{
+    background:rgba(52,152,219,.1) !important;
+    color: #e5ecf3;
+  }
+  h1, h2, h3, h4, h5, h6, .cmuk-switcher li, p,
+  .cmuk-legend, label,
+  .cmuk-card-header,
+  .timeline-item .timeline-content .activityContent,
+  .infoRowLabel,
+  .financial .financialCard ul li .ctitle,
+  .cmuk-input,
+  .cmuk-input:focus,
+  .listItemChild .listItemChildTitle,
+  .listItemChild .listItemChildValue
+  {
+    color: #e5ecf3;
+  }
+  .modalContent{
+    background: $dark-color !important;
+  }
+*{
+  border-color: #18365b!important;
+}
+}
+
+body.dark-mode p {
+  color: #c0d3df;
+}
 %scroller{
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin;
@@ -117,7 +164,6 @@ html, body{
   min-height: 100vh;
   display: block;
   position: relative;
-  background: #F0F0F0;
   padding-bottom: 115px;
 }
 
@@ -970,6 +1016,11 @@ html, body{
 form{
   .formBody{
     padding: 30px 60px 60px 60px;
+    //&:after{
+    //  display: block;
+    //  content: '';
+    //  padding-bottom:30px;
+    //}
   }
 }
 

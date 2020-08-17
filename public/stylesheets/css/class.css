@@ -12,8 +12,43 @@
 
 html, body {
   height: 100%;
-  position: relative;
-  background: #F0F0F0; }
+  position: relative; }
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: rgba(119, 131, 143, 0.5);
+  border: none; }
+body.dark-mode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
+  background: #112641; }
+body.dark-mode .cmuk-card-default,
+body.dark-mode .cmuk-card-body,
+body.dark-mode .cmuk-card-header,
+body.dark-mode .financialCardSection,
+body.dark-mode .commonList,
+body.dark-mode .documentItem,
+body.dark-mode .cmuk-input {
+  background: #132a47 !important;
+  border-color: #18365b !important; }
+body.dark-mode button {
+  background: rgba(52, 152, 219, 0.1) !important;
+  color: #e5ecf3; }
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode .cmuk-switcher li, body.dark-mode p,
+body.dark-mode .cmuk-legend, body.dark-mode label,
+body.dark-mode .cmuk-card-header,
+body.dark-mode .timeline-item .timeline-content .activityContent,
+body.dark-mode .infoRowLabel,
+body.dark-mode .financial .financialCard ul li .ctitle,
+body.dark-mode .cmuk-input,
+body.dark-mode .cmuk-input:focus,
+body.dark-mode .listItemChild .listItemChildTitle,
+body.dark-mode .listItemChild .listItemChildValue {
+  color: #e5ecf3; }
+body.dark-mode .modalContent {
+  background: #132a47 !important; }
+body.dark-mode * {
+  border-color: #18365b !important; }
+
+body.dark-mode p {
+  color: #c0d3df; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -96,7 +131,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   min-height: 100vh;
   display: block;
   position: relative;
-  background: #F0F0F0;
   padding-bottom: 115px; }
 
 .toolTip:hover .toolTipText {
