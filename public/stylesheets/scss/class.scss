@@ -1954,15 +1954,17 @@ form{
 }
 
 .rightContainer{
+  .cmuk-card-header{
+    .icon{
+      width: 18px;
+      height: 18px;
+      margin-bottom: 2px;
+    }
+  }
   .recentActivityContainer{
     margin-bottom: 20px;
     .cmuk-card-header{
       padding:15px 20px;
-      .icon{
-        width: 18px;
-        height: 18px;
-        margin-bottom: 2px;
-      }
     }
     .cmuk-card-body{
       overflow-y: auto;
