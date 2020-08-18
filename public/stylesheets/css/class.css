@@ -1,5 +1,5 @@
 :root {
-  font-family: "Montserrat",sans-serif !important;
+  font-family: 'Montserrat', sans-serif !important;
   box-sizing: border-box; }
 
 *,
@@ -495,9 +495,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button-primary {
   border: none; }
 .comdex .primaryFont {
-  font-family: Rubik; }
+  font-family: "Montserrat", sans-serif; }
 .comdex .secondaryFont {
-  font-family: Oxygen; }
+  font-family: "Montserrat", sans-serif; }
 .comdex .cmuk-alert-warning p {
   text-decoration: underline;
   cursor: pointer; }
@@ -737,7 +737,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 0.875rem;
-    font-family: Rubik;
+    font-family: "Montserrat", sans-serif;
     color: #FFFFFF;
     line-height: inherit;
     padding: 5px 30px;
@@ -777,7 +777,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
+    border-bottom: 3px solid #e50913;
     padding-top: 3px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
       fill: #e50913; }
@@ -1063,7 +1063,7 @@ form .formBody {
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
         color: #FFFFFF;
-        font-family: Rubik; }
+        font-family: "Montserrat", sans-serif; }
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
@@ -1288,7 +1288,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
         width: auto;
@@ -1351,7 +1351,7 @@ form .formBody {
       font-size: 0.875rem;
       margin-left: 20px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
       color: #061728;
@@ -1385,7 +1385,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dt {
         width: auto;
@@ -1479,7 +1479,7 @@ form .formBody {
       background: rgba(94, 181, 92, 0.27); }
 .leftContainer .addBalanceButton {
   text-transform: capitalize;
-  font-family: Rubik;
+  font-family: "Montserrat", sans-serif;
   padding: 8px 8px;
   font-size: 0.875rem;
   line-height: normal;
@@ -1805,7 +1805,7 @@ header:before,
       width: 100%;
       text-transform: capitalize;
       font-size: 0.875rem;
-      font-family: Rubik; }
+      font-family: "Montserrat", sans-serif; }
 
 .infoRow {
   line-height: 1.8;
@@ -2264,9 +2264,9 @@ figure.zoom {
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
       text-transform: uppercase; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-      font-family: Rubik; }
+      font-family: "Montserrat", sans-serif; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetPrice {
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #254364; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
     width: 30px;

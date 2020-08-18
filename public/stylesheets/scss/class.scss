@@ -2,7 +2,7 @@
 @import "variables.scss";
 
 :root{
-  font-family: "Montserrat",sans-serif !important;
+  font-family: 'Montserrat', sans-serif !important;
   box-sizing: border-box;
 }
 
@@ -1033,7 +1033,7 @@ html, body{
   }
   .cmuk-navbar-nav>li>a.active{
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
+    border-bottom: 3px solid #e50913;
     padding-top: 3px;
     .icon {
       fill: #e50913;
