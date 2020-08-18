@@ -33,9 +33,14 @@
                 <div id="matchConfirmPasswordsResult" class="result">
                     <span class="passwordNotMatched error">@Messages(constants.View.REPEAT_PASSWORD_MISMATCH)</span>
                 </div>
-                <div class="showPassword" id="showPassword" onclick="showPassword()"><span class="eyeIcon">
-                    @commonIcon("eye")
-                </span></div>
+                <div class="showPassword" id="showPassword" onclick="showPassword()">
+                    <span class="eyeIcon closeEye">
+                        @commonIcon("eye")
+                    </span>
+                    <span class="eyeIcon openEye hidden">
+                    @commonIcon("openEye")
+                    </span>
+                </div>
             </div>
         </div>
     </div>

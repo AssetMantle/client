@@ -46,7 +46,7 @@ function togglePageContentLightDark() {
 }
 
 function isDarkThemeSelected() {
-    return document.cookie.match(/theme=light/i) != null
+    return document.cookie.match(/theme=dark/i) != null
 }
 
 function setThemeFromCookie() {
@@ -54,7 +54,7 @@ function setThemeFromCookie() {
     const bg =isDarkThemeSelected();
     console.log(bg)
     console.log('Cookies are now: ' + document.cookie)
-    body.className = isDarkThemeSelected() ? 'light-mode' : 'dark-mode'
+    body.className = isDarkThemeSelected() ? 'dark-mode' : 'light-mode'
 }
 
 (function() {

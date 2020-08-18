@@ -217,7 +217,12 @@
       }
       .signUpForm, .mnemonicQuiz{
         form .formBody{
-          padding: 20px 50px 50px 50px;
+          padding: 20px 50px 0 50px;
+          &:after{
+            display: block;
+            content: '';
+            padding-bottom:50px;
+          }
         }
       }
     }
@@ -234,14 +239,7 @@
       }
     }
     .addBalanceButton{
-      text-transform: capitalize;
-      font-family: $fontFamilyPrimary;
       padding: 8px 8px;
-      line-height:normal;
-      background: rgba(8, 98, 190, 0.1);
-      border-radius: 103px;
-      color: #0862BE;
-      border: 0;
     }
     .documentView{
       .cmuk-card-body, .documentList{
@@ -357,7 +355,12 @@
     }
   }
   form .formBody {
-    padding: 20px 50px 50px 50px;
+    padding: 20px 50px 0 50px;
+    &:after{
+      display: block;
+      content: '';
+      padding-bottom:50px;
+    }
   }
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .usernameAvailability .failureIcon,
@@ -495,13 +498,6 @@
       padding-top: 15px;
     }
     padding: 15px 0;
-  }
-}
-@media (max-width:1845px){
-  .walletButtons{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 }
 @media (max-width:1920px){

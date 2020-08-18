@@ -2,7 +2,7 @@
 @import "variables.scss";
 
 :root{
-  font-family: Oxygen, sans-serif !important;
+  font-family: 'Oxygen', sans-serif !important;
   box-sizing: border-box;
 }
 
@@ -16,10 +16,12 @@
 }
 $dark-color: #132a47;
 $light-color: red;
+
 html, body{
   height: 100%;
   position: relative;
   @extend %scroller;
+
 }
 
 body.dark-mode {
@@ -65,6 +67,9 @@ body.dark-mode {
 }
 }
 
+body.light-mode{
+
+}
 body.dark-mode p {
   color: #c0d3df;
 }
@@ -364,10 +369,10 @@ body.dark-mode p {
   .copyRight{
     margin: 10px 0;
     font-weight: bold;
-    color:$colorSecondary;
+    color:$colorPrimary;
     a{
       text-decoration: none;
-      color:$colorSecondary;
+      color:$colorPrimary;
     }
   }
 }
@@ -674,6 +679,7 @@ body.dark-mode p {
     }
   }
   .cmuk-card-header{
+    font-weight: bold;
     color:#061728;
     padding: 15px 20px;
     .cmuk-button{
@@ -873,7 +879,7 @@ body.dark-mode p {
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      margin: 0 10px 0;
+      margin: 0 0 0 10px;
       padding: 3px;
       border: 2px solid #1e60a5;
     }
@@ -905,8 +911,8 @@ body.dark-mode p {
   }
   .cmuk-navbar-nav>li>a.active{
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
-    padding-top: 3px;
+    border-bottom: 4px solid #FE4350;
+    padding-top: 4px;
     .icon {
       fill: #FE4350;
     }
@@ -1015,12 +1021,12 @@ body.dark-mode p {
 
 form{
   .formBody{
-    padding: 30px 60px 60px 60px;
-    //&:after{
-    //  display: block;
-    //  content: '';
-    //  padding-bottom:30px;
-    //}
+    padding: 30px 60px 0 60px;
+    &:after{
+      display: block;
+      content: '';
+      padding-bottom:60px;
+    }
   }
 }
 
@@ -1031,13 +1037,18 @@ form{
   width: 620px;
   max-height: 600px;
   overflow: auto;
-  padding: 30px 60px 60px 60px;
+  padding: 30px 60px 0 60px;
   @extend %scroller;
   .traderCommodity{
     margin:10px 0;
     display: flex;
     align-items: center;
     justify-content: start;
+  }
+  &:after{
+    display: block;
+    content: '';
+    padding-bottom:60px;
   }
 }
 
@@ -1142,7 +1153,12 @@ form{
 .logoutContainer {
   form {
     .formBody {
-      padding: 25px 60px 50px 60px;
+      padding: 25px 60px 0 60px;
+      &:after{
+        display: block;
+        content: '';
+        padding-bottom:50px;
+      }
       p{
         margin-bottom: 30px;
         font-size: $headingFontSizeSmall;
@@ -1793,7 +1809,6 @@ form{
     @extend %cmuk-card-default;
   }
   .cmuk-card-header{
-    color: #061728;
     font-size: $paragraphFontSizeMedium;
     .icon{
       margin-bottom: 2px;
@@ -1838,6 +1853,7 @@ form{
       .cmuk-switcher{
         height: 300px;
         overflow: auto;
+        @extend %scroller;
       }
     }
     .financialCard.cardPaddingRemove {
@@ -1875,7 +1891,7 @@ form{
         }
 
         .ctitle {
-          color: #5C6166;
+          color: #60778F;
           line-height: 2;
           font-size: $paragraphFontSizeSmall;
         }
@@ -2907,7 +2923,8 @@ dl .info {
   }
   .cmuk-subnav-pill>*>:first-child{
     padding: 10px 10px;
-    color:#999;
+    color:#848A91;
+    font-weight: bold;
     text-transform: capitalize;
   }
   .cmuk-switcher{
@@ -2933,6 +2950,8 @@ dl .info {
       }
       a{
         padding: 15px 0;
+        color: #848A91;
+        font-weight: bold;
       }
     }
   }
@@ -2940,7 +2959,7 @@ dl .info {
     flex: 1;
   }
   .cmuk-subnav-pill>.cmuk-active>a{
-    color: #636363;
+    color: #343C44;
     font-weight: bold;
     font-size: $paragraphFontSizeSmall;
     border-bottom: 2px solid $colorPrimary;

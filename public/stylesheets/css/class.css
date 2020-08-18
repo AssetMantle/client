@@ -1,5 +1,5 @@
 :root {
-  font-family: Oxygen, sans-serif !important;
+  font-family: 'Oxygen', sans-serif !important;
   box-sizing: border-box; }
 
 *,
@@ -50,7 +50,7 @@ body.dark-mode * {
 body.dark-mode p {
   color: #c0d3df; }
 
-html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
+html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .leftContainer .financial .cmuk-card .cmuk-switcher, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin; }
 
@@ -291,10 +291,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .footer .copyRight {
     margin: 10px 0;
     font-weight: bold;
-    color: #053C75; }
+    color: #0862BE; }
     .footer .copyRight a {
       text-decoration: none;
-      color: #053C75; }
+      color: #0862BE; }
 
 .iframeModal {
   height: 700px;
@@ -507,9 +507,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button-primary {
   border: none; }
 .comdex .primaryFont {
-  font-family: Rubik; }
+  font-family: "Rubik", sans-serif; }
 .comdex .secondaryFont {
-  font-family: Oxygen; }
+  font-family: "Oxygen", sans-serif; }
 .comdex .cmuk-alert-warning p {
   text-decoration: underline;
   cursor: pointer; }
@@ -537,6 +537,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .comdex .cmuk-alert-success .successIcon .icon {
     fill: #FFFFFF; }
 .comdex .cmuk-card-header {
+  font-weight: bold;
   color: #061728;
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
@@ -672,7 +673,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 0.875rem;
-    font-family: Rubik;
+    font-family: "Rubik", sans-serif;
     color: #FFFFFF;
     line-height: inherit;
     padding: 5px 30px;
@@ -685,7 +686,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    margin: 0 10px 0;
+    margin: 0 0 0 10px;
     padding: 3px;
     border: 2px solid #1e60a5; }
   .header .cmuk-navbar-nav > li > a {
@@ -710,8 +711,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
-    padding-top: 3px; }
+    border-bottom: 4px solid #FE4350;
+    padding-top: 4px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
       fill: #FE4350; }
   .header .logoutIcon .icon {
@@ -793,7 +794,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; }
 
 form .formBody {
-  padding: 30px 60px 60px 60px; }
+  padding: 30px 60px 0 60px; }
+  form .formBody:after {
+    display: block;
+    content: '';
+    padding-bottom: 60px; }
 
 .termAccept {
   margin: 0 0 30px 30px; }
@@ -802,12 +807,16 @@ form .formBody {
   width: 620px;
   max-height: 600px;
   overflow: auto;
-  padding: 30px 60px 60px 60px; }
+  padding: 30px 60px 0 60px; }
   .modalInfoBlock .traderCommodity {
     margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: start; }
+  .modalInfoBlock:after {
+    display: block;
+    content: '';
+    padding-bottom: 60px; }
 
 .loginForm .formBody .inputField {
   position: relative;
@@ -875,7 +884,11 @@ form .formBody {
     fill: #FE4350; }
 
 .logoutContainer form .formBody {
-  padding: 25px 60px 50px 60px; }
+  padding: 25px 60px 0 60px; }
+  .logoutContainer form .formBody:after {
+    display: block;
+    content: '';
+    padding-bottom: 50px; }
   .logoutContainer form .formBody p {
     margin-bottom: 30px;
     font-size: 1.25rem; }
@@ -1000,7 +1013,7 @@ form .formBody {
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
         color: #FFFFFF;
-        font-family: Rubik; }
+        font-family: "Rubik", sans-serif; }
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
@@ -1229,7 +1242,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Rubik", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
         width: auto;
@@ -1292,7 +1305,7 @@ form .formBody {
       font-size: 0.875rem;
       margin-left: 20px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
-      font-family: Rubik;
+      font-family: "Rubik", sans-serif;
       color: #061728; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
       color: #061728;
@@ -1326,7 +1339,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Rubik", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dt {
         width: auto;
@@ -1354,7 +1367,6 @@ form .formBody {
 .leftContainer .financial {
   margin-bottom: 20px; }
 .leftContainer .cmuk-card-header {
-  color: #061728;
   font-size: 1rem; }
   .leftContainer .cmuk-card-header .icon {
     margin-bottom: 2px;
@@ -1405,7 +1417,7 @@ form .formBody {
       background: #053C75;
       box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25); }
   .leftContainer .financial .cmuk-switcher ul li .ctitle, .leftContainer .financial .financialCard ul li .ctitle {
-    color: #5C6166;
+    color: #60778F;
     line-height: 2;
     font-size: 0.875rem; }
   .leftContainer .financial .cmuk-switcher ul li .payable, .leftContainer .financial .financialCard ul li .payable {
@@ -1431,7 +1443,7 @@ form .formBody {
   background: #0862BE; }
 .leftContainer .addBalanceButton {
   text-transform: capitalize;
-  font-family: Rubik;
+  font-family: "Rubik", sans-serif;
   padding: 8px 15px;
   font-size: 0.875rem;
   line-height: normal;
@@ -1759,7 +1771,7 @@ header:before,
       width: 100%;
       text-transform: capitalize;
       font-size: 0.875rem;
-      font-family: Rubik; }
+      font-family: "Rubik", sans-serif; }
 
 .infoRow {
   line-height: 1.8;
@@ -2151,7 +2163,8 @@ dl .info {
     border-right: 1px solid #e7eaf3; }
   .switcherCard .cmuk-subnav-pill > * > :first-child {
     padding: 10px 10px;
-    color: #999;
+    color: #848A91;
+    font-weight: bold;
     text-transform: capitalize; }
   .switcherCard .cmuk-switcher {
     height: 256px;
@@ -2167,11 +2180,13 @@ dl .info {
     .switcherCardSecond .cmuk-subnav li:first-child {
       border-right: 1px solid #cccccc; }
     .switcherCardSecond .cmuk-subnav li a {
-      padding: 15px 0; }
+      padding: 15px 0;
+      color: #848A91;
+      font-weight: bold; }
 .switcherCardSecond .cmuk-subnav > * {
   flex: 1; }
 .switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
-  color: #636363;
+  color: #343C44;
   font-weight: bold;
   font-size: 0.875rem;
   border-bottom: 2px solid #0862BE;
@@ -2248,9 +2263,9 @@ figure.zoom {
       overflow: hidden;
       width: 120px; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-      font-family: Rubik; }
+      font-family: "Rubik", sans-serif; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetPrice {
-      font-family: Rubik;
+      font-family: "Rubik", sans-serif;
       color: #254364; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
     width: 5px;
