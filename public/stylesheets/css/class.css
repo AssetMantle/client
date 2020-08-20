@@ -1406,6 +1406,10 @@ form .formBody {
   .pageContainer .middle .mainTabs .tradeTerms button {
     font-size: 0.875rem; }
 
+.leftContainer .tableCard table td, .leftContainer .comdex .tableCard table tr {
+  padding: 10px;
+  font-size: 0.875rem;
+  vertical-align: middle; }
 .leftContainer .financial {
   margin-bottom: 20px; }
 .leftContainer .cmuk-card-header {
@@ -2350,5 +2354,13 @@ figure.zoom {
     display: none; }
   .identificationCheckbox .commonCheckBox dl dd {
     margin: 0 5px 0 0; }
+
+.transactionMessages .cmuk-card-body .cmuk-card-header {
+  color: #e50913; }
+.transactionMessages .cmuk-card-body .cmuk-card-body {
+  height: auto; }
+  .transactionMessages .cmuk-card-body .cmuk-card-body .cmuk-card-body .title {
+    padding-left: 12px;
+    font-weight: 700; }
 
 /*# sourceMappingURL=class.css.map */

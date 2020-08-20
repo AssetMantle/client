@@ -6,9 +6,9 @@
 @commonCard(constants.View.TRANSACTION_MESSAGES) {
 } {
     @messages.map { msg =>
-        @commonInfoBox() {
+        @commonCard(msg.messageType) {
+        } {
             <div class="tableViewCard">
-            @commonTextInfo(constants.View.TRANSACTION_MESSAGE_TYPE, msg.messageType)
             @msg.messageType match {
                 case constants.TransactionMessage.SEND_COIN => {
                     @views.html.component.blockchain.txMessages.sendCoin(msg.message)

@@ -1894,6 +1894,11 @@ form{
 }
 
 .leftContainer{
+  .tableCard table td, .comdex .tableCard table tr{
+    padding:10px;
+    font-size: $paragraphFontSizeSmall;
+    vertical-align: middle;
+  }
   .financial{
     margin-bottom: 20px;
   }
@@ -3208,6 +3213,22 @@ figure.zoom {
       }
       dd{
         margin: 0 5px 0 0;
+      }
+    }
+  }
+}
+.transactionMessages{
+  .cmuk-card-body {
+    .cmuk-card-header {
+      color: #e50913;
+    }
+    .cmuk-card-body{
+      height: auto;
+      .cmuk-card-body{
+        .title{
+          padding-left: 12px;
+          font-weight: 700;
+        }
       }
     }
   }
