@@ -1,48 +1,24 @@
-// (function ($) {
-//     $('#togglePageContentLightDark').on('click', function () {
-//
-//         $('body').toggleClass('dark-mode');
-//         if ($('body').hasClass('dark-mode')) {
-//             writeCookie("displaymode", "dark");
-//             window.mode = 'dark';
-//             document.cookie = "displaymode = normal ; expires=" + date;
-//
-//         }
-//         else {
-//             let date = new Date(Date.now() + 86400e3);
-//             date = date.toUTCString();
-//             document.cookie = key + "=" + value +  " ; expires=" + date;
-//             document.cookie = "displaymode = normal ; expires=" + date;
-//             writeCookie("displaymode", "normal");
-//             window.mode = 'normal';
-//         }
-//     });
-//     function writeCookie(key, value) {
-//         console.log("raj");
-//         let date = new Date(Date.now() + 86400e3);
-//         date = date.toUTCString();
-//         document.cookie = key + "=" + value +  " ; expires=" + date;
-//         window.document.cookie = key + "=" + value + "; expires=" + date.toGMTString() + "; path=/"; return value;
-//
-//     }
-//
-// })(jQuery);
-
-
 function togglePageContentLightDark() {
+    if($('body').hasClass('lightMode')){
+        $('#toggleLightDark .darkMode').removeClass("hidden");
+        $('#toggleLightDark .dayMode').addClass("hidden");
+    }
+    else {
+        $('#toggleLightDark .dayMode').removeClass("hidden");
+        $('#toggleLightDark .darkMode').addClass("hidden");
+    }
     var body = document.getElementById('body')
     var currentClass = body.className
-    if ($('body').hasClass('dark-mode')) {
-        var newClass ='light-mode';
+    if ($('body').hasClass('darkMode')) {
+        var newClass ='lightMode';
     }
-    else if ($('body').hasClass('light-mode')) {
-        var newClass ='dark-mode';
+    else if ($('body').hasClass('lightMode')) {
+        var newClass ='darkMode';
     }
     body.className = newClass
     let date = new Date(Date.now() + 86400e3);
     date = date.toUTCString();
-    document.cookie = 'theme=' + (newClass == 'dark-mode' ? 'dark' : 'light') + " ; expires=" + date;
-    console.log('Cookies are now: ' + document.cookie)
+    document.cookie = 'theme=' + (newClass == 'darkMode' ? 'dark' : 'light') + " ; expires=" + date;
 }
 
 function isDarkThemeSelected() {
@@ -51,10 +27,7 @@ function isDarkThemeSelected() {
 
 function setThemeFromCookie() {
     var body = document.getElementById('body')
-    const bg =isDarkThemeSelected();
-    console.log(bg)
-    console.log('Cookies are now: ' + document.cookie)
-    body.className = isDarkThemeSelected() ? 'dark-mode' : 'light-mode'
+    body.className = isDarkThemeSelected() ? 'darkMode' : 'lightMode'
 }
 
 (function() {

@@ -553,3 +553,9 @@
     }
   }
 }
+@media (max-width: 1199px) {
+  .leftSide, .rightSide {
+    position: relative !important;
+    top: 0 !important;
+  }
+}

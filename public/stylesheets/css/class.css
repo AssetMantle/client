@@ -10,49 +10,220 @@
 *:focus {
   outline: none !important; }
 
-html, body {
-  height: 100%;
-  position: relative; }
-
-body.dark-mode ::-webkit-scrollbar-thumb {
-  background: rgba(119, 131, 143, 0.5);
-  border: none; }
-body.dark-mode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #112641; }
-body.dark-mode .cmuk-card-default,
-body.dark-mode .cmuk-card-body,
-body.dark-mode .cmuk-card-header,
-body.dark-mode .financialCardSection,
-body.dark-mode .commonList,
-body.dark-mode .documentItem,
-body.dark-mode .cmuk-input {
-  background: #132a47 !important;
-  border-color: #18365b !important; }
-body.dark-mode button {
-  background: rgba(52, 152, 219, 0.1) !important;
-  color: #e5ecf3; }
-body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode .cmuk-switcher li, body.dark-mode p,
-body.dark-mode .cmuk-legend, body.dark-mode label,
-body.dark-mode .cmuk-card-header,
-body.dark-mode .timeline-item .timeline-content .activityContent,
-body.dark-mode .infoRowLabel,
-body.dark-mode .financial .financialCard ul li .ctitle,
-body.dark-mode .cmuk-input,
-body.dark-mode .cmuk-input:focus,
-body.dark-mode .listItemChild .listItemChildTitle,
-body.dark-mode .listItemChild .listItemChildValue {
-  color: #e5ecf3; }
-body.dark-mode .modalContent {
-  background: #132a47 !important; }
-body.dark-mode * {
-  border-color: #18365b !important; }
-
-body.dark-mode p {
-  color: #c0d3df; }
-
-html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .leftContainer .financial .cmuk-card .cmuk-switcher, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
+body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .leftContainer .financial .cmuk-card .cmuk-switcher, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin; }
+
+html, body {
+  height: 100%;
+  position: relative;
+  scrollbar-width: thin; }
+
+body.darkMode .cmuk-card-header, body.darkMode .cmuk-card-body, body.darkMode .cmuk-card-body .uploadDoc, body.darkMode .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body, body.darkMode .cmuk-card-default,
+body.darkMode .financialCardSection,
+body.darkMode .documentItem,
+body.darkMode .cmuk-input,
+body.darkMode .cmuk-panel-scrollable, body.darkMode .switcherCard .cmuk-subnav, body.darkMode .switcherCard .cmuk-subnav-pill li:not(:last-child), body.darkMode .switcherCardSecond .cmuk-subnav, body.darkMode .switcherCardSecond .cmuk-subnav-pill li:not(:last-child) {
+  border-color: #31323A !important; }
+
+body.darkMode, body.darkMode .comdex .cmuk-overflow-auto, body.darkMode .modal
+.modalContent .modalBody form .formBody, body.darkMode .modalInfoBlock,
+body.darkMode .leftContainer .cmuk-card-body, body.darkMode .leftContainer
+.financial .cmuk-card .cmuk-switcher, body.darkMode .rightContainer
+.recentActivityContainer .cmuk-card-body .recentActivityMessages,
+body.darkMode .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer,
+body.darkMode .documentView .documentList, body.darkMode .switcherCard .cmuk-switcher {
+  scrollbar-color: #484951 #20212A;
+  scrollbar-width: thin; }
+body.darkMode .banner {
+  border-bottom: 1px solid #31323A;
+  background-color: #20212A; }
+  body.darkMode .banner .bannerText h3 {
+    color: #D0D0D0; }
+body.darkMode .tabSection .cmuk-subnav-pill li a {
+  background-color: #282934; }
+body.darkMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
+  border-top: 1px solid #31323A;
+  border-bottom: 1px solid #31323A; }
+body.darkMode .middle .mainTabs .tradeTerms .sellerTerm {
+  background: #282934;
+  border: none;
+  filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25)); }
+  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIcon .icon {
+    fill: #848589; }
+  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel {
+    color: #0862BE;
+    font-weight: bold; }
+  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm p {
+    color: #60778F; }
+body.darkMode .infoRowValue {
+  color: #60778F; }
+  body.darkMode .infoRowValue p {
+    color: #60778F; }
+body.darkMode ::-webkit-scrollbar-thumb {
+  background: rgba(119, 131, 143, 0.5);
+  border: none; }
+body.darkMode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
+  background: #20212A;
+  border-bottom: 1px solid #31323A; }
+body.darkMode .footer {
+  background: #20212A;
+  border-top: 1px solid #31323A; }
+body.darkMode .header .cmuk-logo {
+  border-right: 1px solid #31323A; }
+body.darkMode .header .cmuk-navbar-nav > li > a {
+  color: #848589; }
+body.darkMode .header .icon {
+  fill: #848589; }
+body.darkMode .header .cmuk-navbar-nav > li > a.active {
+  color: #FFFFFF; }
+  body.darkMode .header .cmuk-navbar-nav > li > a.active .icon {
+    fill: #FE4350; }
+body.darkMode .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
+  border-left: 1px solid #31323A; }
+body.darkMode .cmuk-card-header .icon {
+  fill: #848589; }
+body.darkMode .financialCard .cmuk-card-header .icon {
+  fill: none;
+  stroke: #848589; }
+body.darkMode .cmuk-card-body .uploadDoc {
+  background: #282934; }
+body.darkMode .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
+  background: #282934; }
+body.darkMode .commonList {
+  background: #282934 !important;
+  border: none;
+  filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25)); }
+body.darkMode .cmuk-card-default {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 3px; }
+body.darkMode .cmuk-card-default,
+body.darkMode .financialCardSection,
+body.darkMode .documentItem,
+body.darkMode .cmuk-input,
+body.darkMode .cmuk-panel-scrollable {
+  background: #282934 !important; }
+body.darkMode .addBalanceButton {
+  border: none !important; }
+body.darkMode button, body.darkMode .buttonPrimary, body.darkMode .addBalanceButton {
+  background: #383941;
+  color: #FFFFFF; }
+body.darkMode h1, body.darkMode h2, body.darkMode h3, body.darkMode h4, body.darkMode h5, body.darkMode h6, body.darkMode .cmuk-switcher li, body.darkMode p,
+body.darkMode .cmuk-legend, body.darkMode label,
+body.darkMode .cmuk-card-header,
+body.darkMode .timeline-item .timeline-content .activityContent,
+body.darkMode .infoRowLabel,
+body.darkMode .cmuk-input,
+body.darkMode .cmuk-input:focus,
+body.darkMode .listItemChild .listItemChildTitle,
+body.darkMode .listItemChild .listItemChildValue {
+  color: #D0D0D0; }
+body.darkMode .financial .cmuk-switcher ul li .ctitle, body.darkMode .financial .financialCard ul li .ctitle, body.darkMode .financial .financial ul li .ctitle {
+  color: #60778F; }
+body.darkMode .financial .cmuk-switcher ul li .wallet .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .receivable .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .payable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .payable .cmuk-comment-meta, body.darkMode .financial .financial ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financial ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financial ul li .payable .cmuk-comment-meta {
+  color: #FAFAFA; }
+body.darkMode .modal
+.modalContent {
+  background: #282934 !important; }
+  body.darkMode .modal
+  .modalContent .closeButton:hover {
+    background: #383941; }
+body.darkMode .switcherCard .cmuk-subnav-pill > .cmuk-active > a, body.darkMode .switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
+  color: #FFFFFF; }
+body.darkMode .switcherCard .cmuk-subnav-pill > * > a:focus, body.darkMode .switcherCard .cmuk-subnav-pill > * > a:hover, body.darkMode .switcherCardSecond .cmuk-subnav-pill > * > a:focus, body.darkMode .switcherCardSecond .cmuk-subnav-pill > * > a:hover {
+  background-color: transparent; }
+body.darkMode .switcherCard .cmuk-switcher li .commonList .buttonPrimary, body.darkMode .switcherCardSecond .cmuk-switcher li .commonList .buttonPrimary {
+  background: transparent;
+  border: 1px solid #0862BE;
+  color: #0862BE; }
+body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
+  color: #D0D0D0; }
+body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
+  color: #60778F; }
+body.darkMode .salesQuoteCard .salesQuoteCardRight p {
+  color: #60778F; }
+body.darkMode .salesQuoteCard .salesQuoteCardMiddle {
+  border-color: #484951; }
+  body.darkMode .salesQuoteCard .salesQuoteCardMiddle p {
+    color: #D0D0D0; }
+    body.darkMode .salesQuoteCard .salesQuoteCardMiddle p span {
+      color: #60778F; }
+body.darkMode .timeline:before {
+  border-color: #4A4B51; }
+body.darkMode .timeline .timeline-item .timeline-icon {
+  background: #383941; }
+body.darkMode hr {
+  border-color: #4A4B51; }
+body.darkMode .comdex input:-webkit-autofill,
+body.darkMode .comdex input:-webkit-autofill:hover,
+body.darkMode .comdex input:-webkit-autofill:focus,
+body.darkMode .comdex input:-webkit-autofill:active {
+  -webkit-text-fill-color: #D0D0D0;
+  -webkit-box-shadow: 0 0 0 30px #282934 inset; }
+body.darkMode .toolTip .toolTipText {
+  background-color: #383941;
+  color: #0862BE; }
+  body.darkMode .toolTip .toolTipText:after {
+    border-color: #383941 transparent transparent transparent; }
+body.darkMode .cmuk-icon-button, body.darkMode .cmuk-icon-button:hover {
+  background: #383941; }
+body.darkMode .chat .partner {
+  background: #383941;
+  color: #0862BE; }
+  body.darkMode .chat .partner:after {
+    border-color: transparent #383941  #383941 transparent; }
+body.darkMode p {
+  color: #D0D0D0; }
+body.darkMode .documentItem .documentContentTop a {
+  color: #0862BE; }
+body.darkMode .documentView .documentList .docIcon {
+  background-color: #383941;
+  border-color: #4A4B51; }
+body.darkMode .documentView .documentList .seenIcon {
+  background-color: #383941; }
+body.darkMode .documentView .documentList .table-scroll tbody > * {
+  border-color: #4A4B51; }
+body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
+  color: #D0D0D0; }
+body.darkMode .cmuk-button-danger:disabled, body.darkMode .cmuk-button-success {
+  background-color: #5cb85c;
+  color: #fff; }
+body.darkMode .cmuk-button-danger {
+  background-color: #f0506e;
+  color: #fff; }
+body.darkMode .logoutContainer form .formBody .commonCheckBox dl {
+  border-color: #4A4B51; }
+body.darkMode .comdex .cmuk-height-medium.extendCard .viewMore {
+  background-image: url(../../images/chevron-up-white.svg); }
+body.darkMode .viewMore {
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(../../images/chevron-down-white.svg); }
+
+body.lightMode .buttonPrimary {
+  background: #0862BE; }
+body.lightMode .cmuk-input {
+  background: #FFFFFF; }
+body.lightMode .header .cmuk-logo {
+  border-right: 1px solid #1C5998; }
+body.lightMode .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
+  background: #053C75; }
+body.lightMode .header .cmuk-navbar-nav > li > a, body.lightMode .header .cmuk-navbar-nav > li > a.active {
+  color: #FFFFFF; }
+body.lightMode .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
+  border-left: 1px solid #1C5998; }
+body.lightMode .cmuk-card-default {
+  background: #FAFAFA;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 3px; }
+body.lightMode .tabSection .cmuk-subnav-pill > .cmuk-active > a {
+  background: #053C75; }
+body.lightMode .tabSection .cmuk-subnav-pill li a {
+  background-color: #FAFBFD; }
+body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
+  border-top: 1px solid #e7eaf3;
+  border-bottom: 1px solid #e7eaf3; }
 
 ::-webkit-scrollbar {
   width: 7px;
@@ -89,11 +260,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .leftContainer .financial .cmuk-switcher ul li .wallet .cmuk-comment-meta, .leftContainer .financial .financialCard ul li .wallet .cmuk-comment-meta, .leftContainer .financial .cmuk-switcher ul li .payable .cmuk-comment-meta, .leftContainer .financial .financialCard ul li .payable .cmuk-comment-meta, .leftContainer .financial .cmuk-switcher ul li .receivable .cmuk-comment-meta, .leftContainer .financial .financialCard ul li .receivable .cmuk-comment-meta, .leftContainer .financial .cmuk-switcher ul li .leftDays .cmuk-comment-meta, .leftContainer .financial .financialCard ul li .leftDays .cmuk-comment-meta {
   color: #061728;
   font-size: 1rem; }
-
-.pageContainer .middle .cmuk-card-default, .leftContainer .cmuk-card-default {
-  background: #FAFAFA;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 3px; }
 
 .comdex .profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
   font-weight: bold;
@@ -254,8 +420,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 70px;
   height: 70px; }
 
-.uploadForm .modalInfoBlock {
-  padding: 50px; }
 .uploadForm .uploadBox .dropBox p {
   font-size: 1rem; }
 .uploadForm .uploadBox p {
@@ -411,18 +575,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .forgotPasswordNote {
   font-size: 1.25rem; }
 
-.switcherCard .cmuk-switcher.extendSwitcher {
-  height: 80vh; }
-
-.comdex .cmuk-height-medium.extendCard {
-  height: 85vh; }
-
-.comdex .cmuk-height-medium.extendCard .viewMore {
-  background-image: url(../../images/chevron-up.svg); }
-
-.comdex .cmuk-height-medium {
-  transition: 0.2s; }
-
 .walletButtons {
   margin: 10px 15px; }
 
@@ -435,15 +587,15 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   opacity: 0;
   left: 0;
   margin: auto;
-  background: #fff;
   color: #fff;
   padding: 5px 0;
-  background-image: url(../../images/chevron-down.svg);
   height: 20px;
-  background-repeat: no-repeat;
-  background-position: center; }
+  background: #fff url(../../images/chevron-down.svg) no-repeat center; }
 
-.tradeList:hover .viewMore, .salesQuoteList:hover .viewMore, .salesQuoteList:hover .viewMore, .commonCard:hover .viewMore {
+.tradeList:hover .viewMore,
+.salesQuoteList:hover .viewMore,
+.salesQuoteList:hover .viewMore,
+.commonCard:hover .viewMore {
   opacity: 1;
   bottom: 0; }
 
@@ -470,7 +622,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
   background-color: #053C75; }
 .comdex .cmuk-input {
-  background: #FFFFFF;
   cursor: auto;
   box-sizing: border-box;
   border-radius: 2px;
@@ -544,6 +695,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     margin-left: 15px;
     position: absolute;
     right: 20px; }
+  .comdex .cmuk-card-header .icon {
+    fill: #053C75; }
 .comdex .cmuk-button {
   overflow: hidden;
   position: relative;
@@ -615,7 +768,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   stroke-width: 2 !important;
   stroke: #ffffff !important; }
 .comdex [class*=cmuk-modal-close-] {
-  top: 20px;
+  top: 15px;
+  background: transparent;
   right: 20px;
   padding: 12px;
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
@@ -629,6 +783,21 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     font-weight: bold; }
 .comdex .listItemCenterButton .cmuk-button {
   padding: 0 15px; }
+.comdex .darkModeButton {
+  padding: 5px 10px;
+  background: #053C75; }
+  .comdex .darkModeButton .dayMode .icon, .comdex .darkModeButton .darkMode .icon {
+    width: 16px;
+    height: 15px; }
+.comdex .financialCard .cmuk-card-header .icon {
+  fill: none;
+  stroke: #053C75; }
+.comdex .cmuk-height-medium.extendCard {
+  height: 85vh; }
+.comdex .cmuk-height-medium.extendCard .viewMore {
+  background-image: url(../../images/chevron-up.svg); }
+.comdex .cmuk-height-medium {
+  transition: 0.2s; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -652,7 +821,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .header {
   background: #053C75; }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-    background: #053C75;
     padding: 0 0 0 35px; }
   .header .navItemRippleEffect {
     position: relative;
@@ -663,13 +831,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     min-height: 60px;
     text-transform: none; }
   .header .cmuk-logo {
-    padding: 0 40px 0 0;
-    border-right: 1px solid #1C5998; }
+    padding: 0 40px 0 0; }
     .header .cmuk-logo img {
       width: 120px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
-    padding: 0 25px;
-    border-left: 1px solid #1C5998; }
+    padding: 0 25px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 0.875rem;
@@ -692,7 +858,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-nav > li > a {
     padding: 0 25px;
     font-weight: bold;
-    color: #FFFFFF;
     font-size: 0.875rem;
     letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
@@ -710,7 +875,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
-    color: #FFFFFF;
     border-bottom: 4px solid #FE4350;
     padding-top: 4px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
@@ -1027,13 +1191,9 @@ form .formBody {
   border-radius: 5px; }
   .tabSection .cmuk-subnav-pill li:first-child a {
     border-radius: 5px 5px 0 0; }
-  .tabSection .cmuk-subnav-pill li:nth-child(2) {
-    border-top: 1px solid #e7eaf3;
-    border-bottom: 1px solid #e7eaf3; }
   .tabSection .cmuk-subnav-pill li:last-child a {
     border-radius: 0 0 5px 5px; }
   .tabSection .cmuk-subnav-pill li a {
-    background-color: #FAFBFD;
     padding: 15px 20px;
     font-size: 1.125rem;
     text-transform: capitalize;
@@ -1049,7 +1209,6 @@ form .formBody {
       background: url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
       padding-left: 25px; }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #053C75;
   color: #FFFFFF; }
   .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
@@ -1157,7 +1316,7 @@ form .formBody {
 .pageContainer .pageContent {
   padding-top: 10px; }
 .pageContainer .middle {
-  margin-bottom: 10px; }
+  margin-bottom: 20px; }
   .pageContainer .middle .mainTabs .cmuk-card-body {
     min-height: 820px;
     padding: 0; }
@@ -1402,7 +1561,7 @@ form .formBody {
   padding: 10px 0;
   margin: 0 20px; }
   .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-    padding-top: 0px; }
+    padding-top: 0; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
   padding: 10px 0;
@@ -1464,44 +1623,15 @@ form .formBody {
   height: 20px; }
 .leftContainer .zoneTradeFinancial .cmuk-card-body {
   padding: 0; }
-  .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav {
-    border-bottom: 1px solid #e5e5e5; }
-    .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav li {
-      padding: 0;
-      flex: 1;
-      text-align: center;
-      margin: 0; }
-      .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav li:first-child {
-        border-right: 1px solid #cccccc; }
-      .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav li a {
-        padding: 15px 0;
-        text-transform: capitalize;
-        font-size: 1rem; }
-  .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav > .cmuk-active > a {
-    color: #061728;
-    background: none;
-    font-weight: bold;
-    border-bottom: 2px solid #0862BE; }
-  .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
-    height: 300px;
-    overflow: auto; }
-    .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher .cmuk-comment-meta {
-      color: #061728;
-      font-size: 1rem; }
-  .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher > li {
-    padding: 0;
-    margin: 0; }
-    .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher > li li {
-      margin: 0 30px; }
 
+.rightContainer .cmuk-card-header .icon {
+  width: 18px;
+  height: 18px;
+  margin-bottom: 2px; }
 .rightContainer .recentActivityContainer {
   margin-bottom: 20px; }
   .rightContainer .recentActivityContainer .cmuk-card-header {
     padding: 15px 20px; }
-    .rightContainer .recentActivityContainer .cmuk-card-header .icon {
-      width: 18px;
-      height: 18px;
-      margin-bottom: 2px; }
   .rightContainer .recentActivityContainer .cmuk-card-body {
     overflow-y: auto;
     padding: 0; }
@@ -1509,10 +1639,6 @@ form .formBody {
       height: 300px;
       padding: 0 15px;
       overflow: auto; }
-.rightContainer .cmuk-card-default {
-  background: #FAFAFA;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 3px; }
 .rightContainer .cmuk-card-header {
   font-size: 1rem; }
 .rightContainer .cmuk-card-body {
@@ -2054,7 +2180,8 @@ header:before,
 
 .toolTip {
   position: relative;
-  display: inline-block; }
+  display: inline-block;
+  margin-left: 3px; }
   .toolTip .toolTipText {
     font-size: 12px;
     visibility: hidden;
@@ -2170,6 +2297,8 @@ dl .info {
     height: 256px;
     overflow: auto;
     padding: 5px 20px; }
+  .switcherCard .cmuk-switcher.extendSwitcher {
+    height: 80vh; }
 
 .switcherCardSecond .cmuk-subnav {
   margin: 0;
@@ -2244,7 +2373,7 @@ figure.zoom {
     height: 80%;
     width: 1px;
     background: #D0D0D0;
-    right: 0px; }
+    right: 0; }
   .salesQuoteCard .salesQuoteCardLeft .assetIcon {
     flex: 20%;
     text-align: center; }
@@ -2303,7 +2432,7 @@ figure.zoom {
     height: 80%;
     width: 1px;
     background: #D0D0D0;
-    right: 0px; }
+    right: 0; }
   .salesQuoteCard .salesQuoteCardMiddle p {
     margin: 0;
     line-height: 1.7;
@@ -2333,7 +2462,8 @@ figure.zoom {
     margin: 0;
     color: #4B4B4B;
     font-weight: bold;
-    font-size: 12px; }
+    font-size: 12px;
+    font-family: "Rubik", sans-serif; }
   .salesQuoteCard .salesQuoteCardRight .arrowIcon {
     width: 30px;
     height: 30px; }

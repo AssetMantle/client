@@ -368,5 +368,9 @@
   .comdex .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
     border: none;
     padding: 0px; } }
+@media (max-width: 1199px) {
+  .leftSide, .rightSide {
+    position: relative !important;
+    top: 0 !important; } }
 
 /*# sourceMappingURL=mediaQueries.css.map */

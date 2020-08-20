@@ -35,11 +35,14 @@
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/viewMore.js")" type="text/javascript"></script>
         <style>
-                body.dark-mode, .dark-mode .bodyContainer {
-                    background-color: #01263f !important;
+                html{
+                    background: #20212A !important;
+                }
+                body.darkMode, .darkMode .bodyContainer {
+                    background-color: #20212A !important;
                 }
 
-                body.light-mode, .light-mode .bodyContainer{
+                body.lightMode, .lightMode .bodyContainer{
                     background-color: #F0F0F0 !important;
                 }
         </style>
@@ -249,7 +252,14 @@
                 <div>
                     <div class="footerLogo">
                         <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
-                        <button type="button" name="dark_light" onclick="togglePageContentLightDark()" title="Toggle dark/light mode">🌛</button>
+                        <button type="button" name="dark_light"  class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
+                            <span class="dayMode">
+                            @commonIcon("dayMode")
+                            </span>
+                            <span class="darkMode hidden">
+                            @commonIcon("darkMode")
+                            </span>
+                        </button>
                     </div>
                 </div>
                 <div class="copyRight">
