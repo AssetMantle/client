@@ -26,6 +26,8 @@ body.darkMode .cmuk-input,
 body.darkMode .cmuk-panel-scrollable, body.darkMode .switcherCard .cmuk-subnav, body.darkMode .switcherCard .cmuk-subnav-pill li:not(:last-child), body.darkMode .switcherCardSecond .cmuk-subnav, body.darkMode .switcherCardSecond .cmuk-subnav-pill li:not(:last-child) {
   border-color: #31323A !important; }
 
+body.darkMode ::-webkit-scrollbar-track {
+  background-color: transparent; }
 body.darkMode, body.darkMode .comdex .cmuk-overflow-auto, body.darkMode .modal
 .modalContent .modalBody form .formBody, body.darkMode .modalInfoBlock,
 body.darkMode .leftContainer .cmuk-card-body, body.darkMode .leftContainer
@@ -45,14 +47,18 @@ body.darkMode .tabSection .cmuk-subnav-pill li a {
 body.darkMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
   border-top: 1px solid #31323A;
   border-bottom: 1px solid #31323A; }
+body.darkMode .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
+  color: #ffffff; }
 body.darkMode .middle .mainTabs .tradeTerms .sellerTerm {
   background: #282934;
   border: none;
   filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25)); }
+  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .documentTermName, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIdent {
+    color: #D0D0D0; }
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIcon .icon {
     fill: #848589; }
-  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel {
-    color: #0862BE;
+  body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
+    color: #D0D0D0;
     font-weight: bold; }
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm p {
     color: #60778F; }
@@ -135,7 +141,8 @@ body.darkMode .switcherCard .cmuk-subnav-pill > * > a:focus, body.darkMode .swit
 body.darkMode .switcherCard .cmuk-switcher li .commonList .buttonPrimary, body.darkMode .switcherCardSecond .cmuk-switcher li .commonList .buttonPrimary {
   background: transparent;
   border: 1px solid #0862BE;
-  color: #0862BE; }
+  color: #0862BE;
+  border-radius: 5px; }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
   color: #D0D0D0; }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
@@ -182,9 +189,10 @@ body.darkMode .documentView .documentList .docIcon {
 body.darkMode .documentView .documentList .seenIcon {
   background-color: #383941; }
 body.darkMode .documentView .documentList .table-scroll tbody > * {
-  border-color: #4A4B51; }
+  border-color: #31323A; }
 body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
-  color: #D0D0D0; }
+  color: #D0D0D0;
+  font-weight: 600; }
 body.darkMode .cmuk-button-danger:disabled, body.darkMode .cmuk-button-success {
   background-color: #5cb85c;
   color: #fff; }
@@ -200,6 +208,9 @@ body.darkMode .viewMore {
   background-repeat: no-repeat;
   background-position: center;
   background-image: url(../../images/chevron-down-white.svg); }
+body.darkMode .commodityImage {
+  background: #838388;
+  border: 1.51312px solid #838388; }
 
 body.lightMode .buttonPrimary {
   background: #0862BE; }
@@ -224,6 +235,9 @@ body.lightMode .tabSection .cmuk-subnav-pill li a {
 body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
   border-top: 1px solid #e7eaf3;
   border-bottom: 1px solid #e7eaf3; }
+body.lightMode .commodityImage {
+  background: #F2F2F2;
+  border: 1.51312px solid #E3E3E3; }
 
 ::-webkit-scrollbar {
   width: 7px;
@@ -233,6 +247,9 @@ body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
 ::-webkit-scrollbar-thumb {
   overflow: visible;
   border-radius: 4px; }
+
+::-webkit-scrollbar-track {
+  background-color: #fff; }
 
 ::-webkit-scrollbar-thumb {
   background: #E2E4E6;
@@ -784,7 +801,7 @@ body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
 .comdex .listItemCenterButton .cmuk-button {
   padding: 0 15px; }
 .comdex .darkModeButton {
-  padding: 5px 10px;
+  padding: 3px 7px 6px 10px;
   background: #053C75; }
   .comdex .darkModeButton .dayMode .icon, .comdex .darkModeButton .darkMode .icon {
     width: 16px;
@@ -828,7 +845,7 @@ body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
   .header .cmuk-navbar-item,
   .header .cmuk-navbar-nav > li > a,
   .header .cmuk-navbar-toggle {
-    min-height: 60px;
+    min-height: 61px;
     text-transform: none; }
   .header .cmuk-logo {
     padding: 0 40px 0 0; }
@@ -1002,6 +1019,7 @@ form .formBody {
   text-decoration: none; }
 .loginForm .formBody .forgotPassword {
   position: absolute;
+  background: transparent;
   right: 0;
   top: 10px; }
 .loginForm .formBody .buttonPrimary {
@@ -1181,6 +1199,8 @@ form .formBody {
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
+.tabSection .cmuk-padding-large {
+  padding: 65px; }
 .tabSection p {
   font-size: 1.625rem;
   letter-spacing: 0.01em;
@@ -1304,8 +1324,6 @@ form .formBody {
   width: 44px;
   height: 44px;
   display: inline-flex;
-  background: #F2F2F2;
-  border: 1.51312px solid #E3E3E3;
   position: relative;
   text-align: center;
   border-radius: 50%;
@@ -1557,11 +1575,6 @@ form .formBody {
   .leftContainer .financial .cmuk-card .cmuk-switcher {
     height: 300px;
     overflow: auto; }
-.leftContainer .financial .financialCard.cardPaddingRemove ul li {
-  padding: 10px 0;
-  margin: 0 20px; }
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-    padding-top: 0; }
 .leftContainer .financial .cmuk-switcher ul li, .leftContainer .financial .financialCard ul li {
   justify-content: space-between;
   padding: 10px 0;
@@ -1573,8 +1586,7 @@ form .formBody {
   .leftContainer .financial .cmuk-switcher ul li .wallet, .leftContainer .financial .financialCard ul li .wallet {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .wallet .walletIcon, .leftContainer .financial .financialCard ul li .wallet .walletIcon {
-      background: #053C75;
-      box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25); }
+      background: #053C75; }
   .leftContainer .financial .cmuk-switcher ul li .ctitle, .leftContainer .financial .financialCard ul li .ctitle {
     color: #60778F;
     line-height: 2;
@@ -1582,25 +1594,29 @@ form .formBody {
   .leftContainer .financial .cmuk-switcher ul li .payable, .leftContainer .financial .financialCard ul li .payable {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon {
-      background: #F2453C;
-      box-shadow: 0 0 0 3px rgba(106, 103, 226, 0.25); }
+      background: #F2453C; }
       .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .icon {
         left: 3px; }
   .leftContainer .financial .cmuk-switcher ul li .receivable, .leftContainer .financial .financialCard ul li .receivable {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .receivable .receivableIcon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon {
-      background: #49A948;
-      box-shadow: 0 0 0 3px rgba(83, 217, 81, 0.25); }
+      background: #49A948; }
       .leftContainer .financial .cmuk-switcher ul li .receivable .receivableIcon .icon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon .icon {
         left: 3px; }
   .leftContainer .financial .cmuk-switcher ul li .leftDays, .leftContainer .financial .financialCard ul li .leftDays {
     align-items: center; }
     .leftContainer .financial .cmuk-switcher ul li .leftDays .leftDaysIcon, .leftContainer .financial .financialCard ul li .leftDays .leftDaysIcon {
       background: rgba(94, 181, 92, 0.27); }
-.leftContainer .addBalanceButton:hover {
+.leftContainer .walletButtons button:first-child {
   color: #fff;
   background: #0862BE; }
-.leftContainer .addBalanceButton {
+  .leftContainer .walletButtons button:first-child:hover {
+    background: #fff;
+    color: #000; }
+.leftContainer .walletButtons .addBalanceButton:hover {
+  color: #fff;
+  background: #0862BE; }
+.leftContainer .walletButtons .addBalanceButton {
   text-transform: capitalize;
   font-family: "Rubik", sans-serif;
   padding: 8px 15px;
@@ -1612,7 +1628,7 @@ form .formBody {
   color: #000;
   margin: 5px;
   border: 1px solid rgba(5, 60, 117, 0.12); }
-  .leftContainer .addBalanceButton .plusIcon .icon {
+  .leftContainer .walletButtons .addBalanceButton .plusIcon .icon {
     width: 10px;
     height: 10px;
     fill: #0862BE; }
@@ -1823,15 +1839,16 @@ header:before,
   background: #FFFFFF;
   border: 0.411524px solid #EAEAEA;
   box-sizing: border-box;
-  padding: 5px;
+  padding: 2px 0 5px 5px;
   border-radius: 1.6461px;
-  margin-right: 5px; }
+  margin-right: 8px; }
   .documentView .documentList .docIcon .icon {
     width: 12px;
     height: 15px; }
 .documentView .documentList .moreIcon span {
   width: 15px; }
 .documentView .documentList .seenIcon {
+  cursor: pointer;
   padding: 5px;
   background: #DDE8F3;
   border-radius: 2px; }
@@ -2296,7 +2313,7 @@ dl .info {
   .switcherCard .cmuk-switcher {
     height: 256px;
     overflow: auto;
-    padding: 5px 20px; }
+    padding: 15px 20px; }
   .switcherCard .cmuk-switcher.extendSwitcher {
     height: 80vh; }
 
@@ -2386,18 +2403,14 @@ figure.zoom {
       line-height: 2; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
       text-transform: capitalize;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: bold;
-      overflow: hidden;
-      width: 120px; }
+      font-weight: bold; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
       font-family: "Rubik", sans-serif; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetPrice {
       font-family: "Rubik", sans-serif;
       color: #254364; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
-    width: 5px;
+    width: 6px;
     text-transform: uppercase;
     position: absolute;
     display: flex;
@@ -2465,13 +2478,12 @@ figure.zoom {
     font-size: 12px;
     font-family: "Rubik", sans-serif; }
   .salesQuoteCard .salesQuoteCardRight .arrowIcon {
-    width: 30px;
-    height: 30px; }
+    width: 25px; }
     .salesQuoteCard .salesQuoteCardRight .arrowIcon .icon {
       width: 25px;
       height: 25px; }
   .salesQuoteCard .salesQuoteCardRight .cmuk-button {
-    line-height: 38px; }
+    line-height: 36px; }
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
       background: #0862BE; }

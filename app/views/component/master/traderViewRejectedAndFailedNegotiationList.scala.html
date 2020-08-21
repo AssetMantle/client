@@ -55,12 +55,12 @@
 
             </div>
             <div class="salesQuoteCardRight salesChild">
-                <div class="cmuk-text-center">
+                <div class="cmuk-flex">
+                    <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    <div class="cmuk-text-left">
                     <p><span>@rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <div class="navigationLocation">
-                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
-                    </div>
                     <p><span>@rejectedReceivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
                 </div>
                 <div class="cmuk-text-center">
                <p>@rejectedReceivedNegotiation.status</p>
@@ -88,7 +88,6 @@
                                 <div class="assetInitialData">
                                     <p class="assetTitle">@Messages(asset.assetType)</p>
                                     <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
-                                    <p class="assetPrice">@Seq((rejectedSentNegotiation.price/rejectedSentNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
                             case None => {}
@@ -118,12 +117,12 @@
                         }
                     </div>
                     <div class="salesQuoteCardRight salesChild">
-                        <div class="cmuk-text-center">
+                        <div class="cmuk-flex">
+                            <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                            <div class="cmuk-text-left">
                             <p><span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                            <div class="navigationLocation">
-                                <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
-                            </div>
                             <p><span>@rejectedSentNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                        </div>
                         </div>
                         <div class="cmuk-text-center">
                         <p>@rejectedSentNegotiation.status</p>
@@ -180,12 +179,12 @@
                 }
             </div>
             <div class="salesQuoteCardRight salesChild">
-                <div class="cmuk-text-center">
+                <div class="cmuk-flex">
+                    <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    <div class="cmuk-text-left">
                     <p><span>@failedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <div class="navigationLocation">
-                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
-                    </div>
                     <p><span>@failedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
                 </div>
                 <div class="cmuk-text-center">
                 <p>@failedNegotiation.status</p>

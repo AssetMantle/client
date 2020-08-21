@@ -158,20 +158,24 @@
   .comdex .leftContainer .financial {
     margin-bottom: 15px; }
     .comdex .leftContainer .financial .cmuk-card {
-      height: 265px; }
+      height: 302px; }
       .comdex .leftContainer .financial .cmuk-card .cmuk-switcher {
-        height: 210px;
+        height: 250px;
         overflow: auto; }
+      .comdex .leftContainer .financial .cmuk-card .financialCard .financialCardSection {
+        padding: 15px 0; }
+    .comdex .leftContainer .financial .financialCard .cmuk-card .financialCardSection {
+      padding: 15px 0; }
   .comdex .leftContainer .addBalanceButton {
     padding: 8px 8px; }
   .comdex .leftContainer .documentView .cmuk-card-body, .comdex .leftContainer .documentView .documentList {
     padding: 0px; }
   .comdex .leftContainer .documentView .documentList {
-    height: 150px; }
+    height: 190px; }
   .comdex .leftContainer .documentView .cmuk-card {
-    height: 265px; }
+    height: 305px; }
     .comdex .leftContainer .documentView .cmuk-card .cmuk-card-body {
-      height: 265px; }
+      height: 305px; }
   .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body {
     height: auto; }
     .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
@@ -180,19 +184,19 @@
   .rightContainer .recentActivityContainer {
     margin-bottom: 15px; }
     .rightContainer .recentActivityContainer .cmuk-card-body {
-      height: 210px; }
+      height: 250px; }
       .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
-        height: 210px; }
+        height: 250px; }
   .rightContainer .chatRoom .cmuk-card-body {
-    height: 215px; }
+    height: 255px; }
     .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 140px; }
+      height: 170px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
 
   .comdex .cmuk-height-medium {
-    height: 210px; }
+    height: 250px; }
   .comdex .cmuk-card-header .cmuk-button {
     line-height: 26px; }
   .comdex .updateDocumentField button {
@@ -202,19 +206,21 @@
     font-weight: bold; }
 
   .switcherCard .cmuk-switcher {
-    height: 170px; }
+    height: 190px; }
 
   .timeline:before {
     left: 19px; }
   .timeline .timeline-item .timeline-icon {
-    left: 0px; }
+    left: 0; }
 
   .salesQuoteCard .salesQuoteCardLeft {
-    flex: 15%; }
+    flex: 12%; }
   .salesQuoteCard .salesQuoteCardMiddle {
-    flex: 10%; }
+    flex: 13%; }
   .salesQuoteCard .salesQuoteCardRight {
-    flex: 27%; } }
+    flex: 30%; }
+    .salesQuoteCard .salesQuoteCardRight .cmuk-button {
+      line-height: 28px; } }
 @media (max-width: 1599px) {
   :root {
     font-size: 13px; }
@@ -283,23 +289,27 @@
   .iframeModal {
     height: 530px; }
 
+  .leftContainer .financial .financialCard ul li .wallet .walletIcon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon {
+    width: 36px;
+    height: 36px; }
+    .leftContainer .financial .financialCard ul li .wallet .walletIcon .leftContainer .icon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon .leftContainer .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .leftContainer .icon {
+      width: 18px;
+      height: 18px; }
   .leftContainer .financial .financialCard.cardPaddingRemove ul li {
-    padding: 5px 0; }
+    padding: 5px 0;
+    margin: 0 20px; }
     .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-      padding-top: 5px; }
+      padding-top: 0; }
   .leftContainer .financial .cmuk-switcher ul li,
   .leftContainer .financial .financialCard ul li {
     padding: 10px 0; }
     .leftContainer .financial .cmuk-switcher ul li:first-child,
     .leftContainer .financial .financialCard ul li:first-child {
-      padding-top: 15px; }
+      padding-top: 0; }
 
   .profilePictureContainer .profilePicture {
     height: 70px;
     width: 70px; }
-
-  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
-    width: 25px; }
 
   .documentView .documentList .table-scroll tbody tr td:first-child {
     padding-left: 10px; }
@@ -333,11 +343,6 @@
 
   .mobileNumberUpdate .countryCode {
     width: 118px; } }
-@media (min-width: 1600px) and (max-width: 1820px) {
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li {
-    padding: 15px 0; }
-    .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
-      padding-top: 15px; } }
 @media (max-width: 1920px) {
   .comdex .cmuk-container {
     max-width: 100%; } }

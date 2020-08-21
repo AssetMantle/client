@@ -62,12 +62,12 @@
                 }
             </div>
             <div class="salesQuoteCardRight salesChild">
-                <div class="cmuk-text-center">
+                <div class="cmuk-flex">
+                    <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    <div class="cmuk-text-left">
                     <p><span>@buyNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <div class="navigationLocation">
-                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
-                    </div>
                     <p><span>@buyNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                </div>
                 </div>
             @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(buyNegotiation.id), 'class -> "cmuk-button buttonPrimary")
             </div>
