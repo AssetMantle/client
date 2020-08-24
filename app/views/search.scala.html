@@ -2,7 +2,7 @@
 @import views.html.base._
 @import models.blockchain._
 
-@(query: String, asset: Option[Asset], identity: Option[Identity], splits: Seq[Split], order: Option[Order], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(query: String, asset: Option[Asset], identity: Option[Identity], splits: Seq[Split], order: Option[Order], meta: Option[Meta], classification: Option[Classification], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -23,7 +23,7 @@
             <div class="cmuk-grid-match" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                     <div class="switcherCard tableViewCard">
-                        @views.html.component.blockchain.assetDetails(asset.get)
+                        @views.html.component.blockchain.asset(asset.get)
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="cmuk-grid-match" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                     <div class="switcherCard tableViewCard">
-                    @views.html.component.blockchain.identityDetails(identity.get)
+                    @views.html.component.blockchain.identity(identity.get)
                     </div>
                 </div>
             </div>
@@ -41,7 +41,7 @@
             <div class="cmuk-grid-match" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                     <div class="switcherCard tableViewCard">
-                    @views.html.component.blockchain.allSplits(ownerSplits = splits.filter(_.ownerID == query), ownableSplits = splits.filter(_.ownableID == query))
+                    @views.html.component.blockchain.split(ownerSplits = splits.filter(_.ownerID == query), ownableSplits = splits.filter(_.ownableID == query))
                     </div>
                 </div>
             </div>
@@ -50,7 +50,25 @@
             <div class="cmuk-grid-match" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                     <div class="switcherCard tableViewCard">
-                    @views.html.component.blockchain.orderDetails(order.get)
+                    @views.html.component.blockchain.order(order.get)
+                    </div>
+                </div>
+            </div>
+        }
+        @if(meta.nonEmpty) {
+            <div class="cmuk-grid-match" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div class="switcherCard tableViewCard">
+                    @views.html.component.blockchain.meta(meta.get)
+                    </div>
+                </div>
+            </div>
+        }
+        @if(classification.nonEmpty) {
+            <div class="cmuk-grid-match" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div class="switcherCard tableViewCard">
+                    @views.html.component.blockchain.classification(classification.get)
                     </div>
                 </div>
             </div>

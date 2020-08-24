@@ -29,7 +29,7 @@ class Validators @Inject()(
                             blockchainSigningInfos: SigningInfos,
                             masterTransactionNotifications: masterTransaction.Notifications,
                             blockchainDelegations: Delegations,
-                            blockchainAccountBalances: AccountBalances,
+                            blockchainAccounts: Accounts,
                             keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                             blockchainWithdrawAddresses: WithdrawAddresses,
                           )(implicit executionContext: ExecutionContext) {
@@ -280,7 +280,7 @@ class Validators @Inject()(
 
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
-      val accountBalance = blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
+      val accountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 

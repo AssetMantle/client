@@ -1,4 +1,4 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import views.html.base._
 @import views.html.component.blockchain.properties
 @import models.common.TransactionMessages.AssetMutate
@@ -6,7 +6,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[AssetMutate]) { assetMutate =>
-    @commonTextInfo(constants.View.FROM, assetMutate.from)
-    @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetMutate.assetID, routes.ViewController.asset(assetMutate.assetID)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(assetMutate.from, routes.ViewController.account(assetMutate.from)))
+    @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetMutate.assetID, routes.IndexController.search(assetMutate.assetID)))
     @properties(assetMutate.properties.propertyList)
 }

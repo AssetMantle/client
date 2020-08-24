@@ -1,12 +1,12 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import views.html.base._
 @import models.common.TransactionMessages.OrderTake
 
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[OrderTake]) { orderTake =>
-    @commonTextInfo(constants.View.FROM, orderTake.from)
-    @commonHtmlInfo(constants.View.ORDER_ID, commonLink(orderTake.orderID, routes.ViewController.order(orderTake.orderID)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(orderTake.from, routes.ViewController.account(orderTake.from)))
+    @commonHtmlInfo(constants.View.ORDER_ID, commonLink(orderTake.orderID, routes.IndexController.search(orderTake.orderID)))
     @commonTextInfo(constants.View.TAKER_SPLIT, orderTake.takerSplit.toString)
-    @commonTextInfo(constants.View.FROM_ID, orderTake.fromID)
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderTake.fromID, routes.IndexController.search(orderTake.fromID)))
 }

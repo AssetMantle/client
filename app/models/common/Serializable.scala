@@ -1,7 +1,8 @@
 package models.common
 
-import models.`abstract`.TransactionMessage
 import models.common.TransactionMessages._
+import models.common.DataValue._
+import models.Abstract.{DataValue, TransactionMessage}
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -73,48 +74,40 @@ object Serializable {
 
   implicit val idWrites: OWrites[ID] = Json.writes[ID]
 
-  case class NonMetaFactValue(hash: String, meta: Boolean) extends models.`abstract`.FactValue {
-    def get: String = ""
+  case class Data(dataType: String, value: DataValue)
 
-    def getHash: String = hash
-
-    def isMeta: Boolean = meta
-  }
-
-  def newNonMetaFactValue(fact: String): NonMetaFactValue = NonMetaFactValue(hash = utilities.Hash.getHash(fact), false)
-
-  implicit val nonMetaFactReads: Reads[NonMetaFactValue] = Json.reads[NonMetaFactValue]
-
-  implicit val nonMetaFactWrites: OWrites[NonMetaFactValue] = Json.writes[NonMetaFactValue]
-
-  case class MetaFactValue(fact: String, hash: String) extends models.`abstract`.FactValue {
-    def get: String = fact
-
-    def getHash: String = hash
-
-    def isMeta: Boolean = true
-  }
-
-  implicit val metaFactReads: Reads[MetaFactValue] = Json.reads[MetaFactValue]
-
-  implicit val metaFactWrites: OWrites[MetaFactValue] = Json.writes[MetaFactValue]
-
-  implicit val factValueWrites: Writes[models.`abstract`.FactValue] = {
-    case metaFactValue: MetaFactValue => Json.toJson(metaFactValue)(Json.writes[MetaFactValue])
-    case nonMetaFactValue: NonMetaFactValue => Json.toJson(nonMetaFactValue)(Json.writes[NonMetaFactValue])
-  }
-
-  case class Fact(factType: String, value: models.`abstract`.FactValue)
-
-  def factApply(factType: String, value: JsObject): Fact = factType match {
-    case constants.Blockchain.Fact.META_FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[MetaFactValue](value.toString))
-    case constants.Blockchain.Fact.FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[NonMetaFactValue](value.toString))
-  }
-
-  implicit val factReads: Reads[Fact] = (
-    (JsPath \ "factType").read[String] and
+  implicit val dataReads: Reads[Data] = (
+    (JsPath \ "dataType").read[String] and
       (JsPath \ "value").read[JsObject]
-    ) (factApply _)
+    ) (dataValueApply _)
+
+  implicit val dataWrites: OWrites[Data] = Json.writes[Data]
+
+  case class MetaFact(data: Data) {
+    def getHash: String = data.value.GenerateHash
+  }
+
+  implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]
+
+  implicit val metaFactWrites: OWrites[MetaFact] = Json.writes[MetaFact]
+
+  case class MetaProperty(id: String, metaFact: MetaFact)
+
+  implicit val metaPropertyReads: Reads[MetaProperty] = Json.reads[MetaProperty]
+
+  implicit val metaPropertyWrites: OWrites[MetaProperty] = Json.writes[MetaProperty]
+
+  case class MetaProperties(metaPropertyList: Seq[MetaProperty])
+
+  implicit val metaPropertiesReads: Reads[MetaProperties] = Json.reads[MetaProperties]
+
+  implicit val metaPropertiesWrites: OWrites[MetaProperties] = Json.writes[MetaProperties]
+
+  case class Fact(hash: String)
+
+  def NewFact(data: String): Fact = Fact(utilities.Hash.getHash(data))
+
+  implicit val factReads: Reads[Fact] = Json.reads[Fact]
 
   implicit val factWrites: OWrites[Fact] = Json.writes[Fact]
 
@@ -137,18 +130,12 @@ object Serializable {
   implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
 
   case class Immutables(properties: Properties) {
-    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.value.getHash): _*)
+    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.hash): _*)
   }
 
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]
 
   implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
-
-  case class Trait(id: String, property: Property, mutable: Boolean)
-
-  implicit val traitReads: Reads[Trait] = Json.reads[Trait]
-
-  implicit val traitWrites: OWrites[Trait] = Json.writes[Trait]
 
   case class StdMsg(messageType: String, message: TransactionMessage)
 

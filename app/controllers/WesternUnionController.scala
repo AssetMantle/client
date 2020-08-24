@@ -5,12 +5,11 @@ import constants.Form
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.Account
-import models.{blockchain, blockchainTransaction, master, westernUnion}
+import models.master.Account
+import models.{blockchain, master, westernUnion}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import services.SFTPScheduler
 import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,7 +17,7 @@ import scala.xml.NodeSeq
 
 @Singleton
 class WesternUnionController @Inject()(
-                                        blockchainAccounts: blockchain.Accounts,
+                                        masterAccounts: master.Accounts,
                                         messagesControllerComponents: MessagesControllerComponents,
                                         masterEmails: master.Emails,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
@@ -84,9 +83,9 @@ class WesternUnionController @Inject()(
         },
         issueFiatRequestData => {
           val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
-          val account = blockchainAccounts.Service.get(loginState.address)
+          val account = masterAccounts.Service.tryGetByAddress(loginState.address)
 
-          def create(account: Account): Future[String] = westernUnionFiatRequests.Service.create(traderID = account.username, transactionAmount = issueFiatRequestData.transactionAmount)
+          def create(account: Account): Future[String] = westernUnionFiatRequests.Service.create(traderID = account.id, transactionAmount = issueFiatRequestData.transactionAmount)
 
           (for {
             emailAddress <- emailAddress
@@ -94,7 +93,7 @@ class WesternUnionController @Inject()(
             transactionID <- create(account)
           } yield {
             val queryString = Map(Form.CLIENT_ID -> Seq(wuClientID), Form.CLIENT_REFERENCE -> Seq(transactionID),
-              Form.WU_SFTP_BUYER_ID -> Seq(account.username), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(account.username), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(account.username),
+              Form.WU_SFTP_BUYER_ID -> Seq(account.id), Form.WU_SFTP_BUYER_FIRST_NAME -> Seq(account.id), Form.WU_SFTP_BUYER_LAST_NAME -> Seq(account.id),
               Form.WU_SFTP_BUYER_ADDRESS -> Seq(account.address),
               Form.BUYER_CITY -> Seq(account.address), Form.BUYER_ZIP -> Seq(account.address),
               Form.BUYER_EMAIL -> Seq(emailAddress), Form.SERVICE_ID -> Seq(wuServiceID),

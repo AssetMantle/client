@@ -68,13 +68,27 @@ function updateTransactionList(receivedData) {
                 if (numTxs >= transactionListPage.children().length) {
                     $('#transactionListPageItemTxHash_' + i).text(receivedData.txs[numTxs - i].hash);
                     $('#transactionListPageItemTxHeight_' + i).text(receivedData.block.height);
-                    $('#transactionListPageItemTxStatus_' + i).text(receivedData.txs[numTxs - i].status);
+                    $('#transactionListPageItemTxStatusStatic_' + i).hide();
+                    if (receivedData.txs[numTxs - i].status) {
+                        $('#transactionListPageItemTxStatusTrue_' + i).show();
+                        $('#transactionListPageItemTxStatusFalse_' + i).hide();
+                    } else {
+                        $('#transactionListPageItemTxStatusTrue_' + i).hide();
+                        $('#transactionListPageItemTxStatusFalse_' + i).show();
+                    }
                     $('#transactionListPageItemTxFees_' + i).text(receivedData.txs[numTxs - i].proposer);
                 } else {
                     if (i <= (numTxs - 1)) {
                         $('#transactionListPageItemTxHash_' + i).text(receivedData.txs[i].hash);
                         $('#transactionListPageItemTxHeight_' + i).text(receivedData.block.height);
-                        $('#transactionListPageItemTxStatus_' + i).text(receivedData.txs[i].status);
+                        $('#transactionListPageItemTxStatusStatic_' + i).hide();
+                        if (receivedData.txs[i].status) {
+                            $('#transactionListPageItemTxStatusTrue_' + i).show();
+                            $('#transactionListPageItemTxStatusFalse_' + i).hide();
+                        } else {
+                            $('#transactionListPageItemTxStatusTrue_' + i).hide();
+                            $('#transactionListPageItemTxStatusFalse_' + i).show();
+                        }
                         $('#transactionListPageItemTxFees_' + i).text(receivedData.txs[i].proposer);
                     } else {
                         $('#transactionListPageItemTxHash_' + i).text($('#transactionListPageItemTxHash_' + (i - 1)).text());

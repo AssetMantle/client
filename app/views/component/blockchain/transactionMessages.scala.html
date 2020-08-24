@@ -79,6 +79,9 @@
                 case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => {
                     @views.html.component.blockchain.txMessages.classificationDefine(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => {
+                    @views.html.component.blockchain.txMessages.maintainerDeputize(msg.message)
+                }
                 case _ => {
                     @views.html.component.blockchain.txMessages.classificationDefine(msg.message)
                 }

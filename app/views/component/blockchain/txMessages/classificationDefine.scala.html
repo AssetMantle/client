@@ -1,4 +1,4 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import models.common.TransactionMessages.ClassificationDefine
 @import views.html.base._
 @import views.html.component.blockchain.properties
@@ -6,8 +6,13 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[ClassificationDefine]) { classificationDefine =>
-    @commonTextInfo(constants.View.FROM, classificationDefine.from)
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(classificationDefine.fromID, routes.ViewController.identity(classificationDefine.fromID)))
-    @commonHtmlInfo(constants.View.MAINTAINERS_ID, commonLink(classificationDefine.maintainersID, routes.ViewController.identity(classificationDefine.maintainersID)))
-    @properties(classificationDefine.traits.map(_.property))
+    @commonHtmlInfo(constants.View.FROM, commonLink(classificationDefine.from, routes.ViewController.account(classificationDefine.from)))
+    @Messages(constants.View.IMMUTABLE_META_TRAITS):
+    @views.html.component.blockchain.metaProperties(classificationDefine.immutableMetaTraits.metaPropertyList)
+    @Messages(constants.View.IMMUTABLE_TRAITS):
+    @views.html.component.blockchain.properties(classificationDefine.immutableTraits.propertyList)
+    @Messages(constants.View.MUTABLE_META_TRAITS):
+    @views.html.component.blockchain.metaProperties(classificationDefine.mutableMetaTraits.metaPropertyList)
+    @Messages(constants.View.MUTABLE_TRAITS):
+    @views.html.component.blockchain.properties(classificationDefine.mutableTraits.propertyList)
 }

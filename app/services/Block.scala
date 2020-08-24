@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class Block @Inject()(
                        blockchainBlocks: blockchain.Blocks,
-                       blockchainAccountBalances: blockchain.AccountBalances,
+                       blockchainAccounts: blockchain.Accounts,
                        blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                        blockchainAssets: blockchain.Assets,
                        blockchainClassifications: blockchain.Classifications,
@@ -62,6 +62,7 @@ class Block @Inject()(
   }
 
   def insertTransactionsOnBlock(height: Int): Future[Seq[blockchainTransaction]] = {
+    println(height)
     val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height)
 
     def getTransactionsHash(transactionsByHeightResponse: TransactionByHeightResponse) = transactionsByHeightResponse.result.txs.map(_.hash)
@@ -137,7 +138,7 @@ class Block @Inject()(
           try {
             stdMsg.messageType match {
               //bank
-              case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainAccountBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
+              case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainAccounts.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
               //slashing
               case constants.Blockchain.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(transaction.hash, stdMsg.message.asInstanceOf[Unjail])
               //staking

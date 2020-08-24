@@ -1,0 +1,12 @@
+@import models.common.Serializable.MetaProperty
+@import views.html.base._
+
+@(metaProperties: Seq[MetaProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@metaProperties.map { metaProperty =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.META_PROPERTY_ID, metaProperty.id)
+        @Messages(constants.View.META_FACT):
+        @views.html.component.blockchain.data(metaProperty.metaFact.data)
+    }
+}

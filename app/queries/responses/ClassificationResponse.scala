@@ -1,7 +1,7 @@
 package queries.responses
 
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.{ID, Trait}
+import queries.responses.common.ID
 import transactions.Abstract.BaseResponse
 
 object ClassificationResponse {
@@ -14,7 +14,7 @@ object ClassificationResponse {
 
   implicit val classificationIDReads: Reads[ClassificationID] = Json.reads[ClassificationID]
 
-  case class Classification(id: ClassificationID, traits: Seq[Trait])
+  case class Classification(id: ClassificationID)
 
   implicit val classificationReads: Reads[Classification] = Json.reads[Classification]
 

@@ -11,7 +11,12 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents,withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter , blockchainAccounts: blockchain.Accounts, masterAccounts: master.Accounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithUnknownLoginAction @Inject()(
+                                        messagesControllerComponents: MessagesControllerComponents,
+                                        withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
+                                        masterAccounts: master.Accounts,
+                                        masterTransactionSessionTokens: masterTransaction.SessionTokens
+                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_UNKNOWN_LOGIN_ACTION
 
@@ -24,7 +29,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
         val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.UNKNOWN)
-        val address = blockchainAccounts.Service.tryGetAddress(username)
+        val address = masterAccounts.Service.tryGetAddress(username)
         for {
           _ <- sessionTokenVerify
           _ <- tokenTimeVerify

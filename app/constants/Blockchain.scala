@@ -5,6 +5,7 @@ object Blockchain {
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
+  val OneDec = BigDecimal("1.000000000000000000")
 
   object Order {
     val MakerIDProperty = "MakerID"
@@ -17,9 +18,14 @@ object Blockchain {
     val Exchanges = "exchanges"
   }
 
-  object Fact {
-    val META_FACT = "xprt/metaFact"
-    val FACT = "xprt/fact"
+  val META_FACT = "xprt/metaFact"
+  val NON_META_FACT = "xprt/fact"
+
+  object Data {
+    val STRING_DATA = "xprt/stringData"
+    val HEIGHT_DATA = "xprt/heightData"
+    val ID_DATA = "xprt/idData"
+    val DEC_DATA = "xprt/decData"
   }
 
   object Events {
@@ -82,6 +88,8 @@ object Blockchain {
     val META_REVEAL = "/xprt/metas/reveal/message"
     //classification
     val CLASSIFICATION_DEFINE = "/xprt/classifications/define/message"
+    //maintainer
+    val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
   }
 
 

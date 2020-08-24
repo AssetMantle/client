@@ -1,0 +1,23 @@
+@import models.common.Serializable.Data
+@import views.html.base._
+
+@(data: Data)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.DATA_TYPE, data.dataType)
+@data.dataType match {
+    case constants.Blockchain.Data.STRING_DATA => {
+        @commonTextInfo(constants.View.DATA, data.value.AsString)
+    }
+    case constants.Blockchain.Data.ID_DATA => {
+        @commonTextInfo(constants.View.DATA, data.value.AsID)
+    }
+    case constants.Blockchain.Data.HEIGHT_DATA => {
+        @commonIntInfo(constants.View.DATA, data.value.AsHeight)
+    }
+    case constants.Blockchain.Data.DEC_DATA => {
+        @commonTextInfo(constants.View.DATA, data.value.AsDec.toString)
+    }
+    case _ => {
+        @commonTextInfo(constants.View.DATA, data.toString)
+    }
+}

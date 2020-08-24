@@ -12,7 +12,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetIdentity
-import queries.responses.IdentityResponse.{Response => IdentityResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -134,17 +133,11 @@ class Identities @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onIssue(identityIssue: IdentityIssue): Future[Unit] = {
-      val hashID = Immutables(identityIssue.properties).getHashID
-      val identityResponse = getIdentity.Service.get(getID(chainID = chainID, maintainersID = identityIssue.maintainersID, classificationID = identityIssue.classificationID, hashID = hashID))
-
-      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == identityIssue.maintainersID && x.value.id.value.classificationID.value.idString == identityIssue.classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
-        val identityID = getID(chainID = identity.value.id.value.chainID.value.idString, maintainersID = identity.value.id.value.maintainersID.value.idString, classificationID = identity.value.id.value.classificationID.value.idString, hashID = identity.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
-      }
+      val immutables = Immutables(identityIssue.properties)
+      val insertOrUpdate = Service.insertOrUpdate(Identity(id = getID(chainID = chainID, maintainersID = identityIssue.maintainersID, classificationID = identityIssue.classificationID, hashID = immutables.getHashID), provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(properties = identityIssue.properties, maintainersID = identityIssue.maintainersID), immutables = immutables))
 
       (for {
-        identityResponse <- identityResponse
-        _ <- insertOrUpdate(identityResponse)
+        _ <- insertOrUpdate
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -152,16 +145,13 @@ class Identities @Inject()(
     }
 
     def onProvision(identityProvision: IdentityProvision): Future[Unit] = {
-      val identityResponse = getIdentity.Service.get(identityProvision.identityID)
-      val (chainID, maintainersID, classificationID, hashID) = getFeatures(identityProvision.identityID)
+      val oldIdentity = Service.tryGet(identityProvision.identityID)
 
-      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
-        Service.insertOrUpdate(Identity(id = identityProvision.identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
-      }
+      def update(oldIdentity: Identity) = Service.insertOrUpdate(oldIdentity.copy(provisionedAddressList = oldIdentity.provisionedAddressList :+ identityProvision.to))
 
       (for {
-        identityResponse <- identityResponse
-        _ <- insertOrUpdate(identityResponse)
+        oldIdentity <- oldIdentity
+        _ <- update(oldIdentity)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -169,16 +159,13 @@ class Identities @Inject()(
     }
 
     def onUnprovision(identityUnprovision: IdentityUnprovision): Future[Unit] = {
-      val identityResponse = getIdentity.Service.get(identityUnprovision.identityID)
-      val (chainID, maintainersID, classificationID, hashID) = getFeatures(identityUnprovision.identityID)
+      val oldIdentity = Service.tryGet(identityUnprovision.identityID)
 
-      def insertOrUpdate(identityResponse: IdentityResponse) = identityResponse.result.value.identities.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)) { identity =>
-        Service.insertOrUpdate(Identity(id = identityUnprovision.identityID, provisionedAddressList = identity.value.provisionedAddressList.fold(Seq.empty[String])(x => x), unprovisionedAddressList = identity.value.unprovisionedAddressList.fold(Seq.empty[String])(x => x), mutables = identity.value.mutables.toMutables, immutables = identity.value.immutables.toImmutables))
-      }
+      def update(oldIdentity: Identity) = Service.insertOrUpdate(oldIdentity.copy(provisionedAddressList = oldIdentity.provisionedAddressList.filterNot(_ == identityUnprovision.to), unprovisionedAddressList = oldIdentity.unprovisionedAddressList :+ identityUnprovision.to))
 
       (for {
-        identityResponse <- identityResponse
-        _ <- insertOrUpdate(identityResponse)
+        oldIdentity <- oldIdentity
+        _ <- update(oldIdentity)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException

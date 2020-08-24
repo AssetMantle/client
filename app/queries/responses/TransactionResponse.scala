@@ -5,7 +5,7 @@ import models.common.Serializable
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
-import queries.`abstract`.TransactionMessageResponse
+import queries.Abstract.TransactionMessageResponse
 import queries.responses.common.TransactionMessageResponses._
 import queries.responses.common.{Coin, Event}
 import transactions.Abstract.BaseResponse

@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.`abstract`.BaseTransaction
+import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.master.Account
@@ -202,7 +202,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
+      def getAccountID(address: String) = masterAccounts.Service.tryGetUsername(address)
 
       def toAccount(accountID: String): Future[Account] = masterAccounts.Service.tryGet(accountID)
 
@@ -240,7 +240,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
+      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

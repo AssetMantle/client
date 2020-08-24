@@ -1,4 +1,4 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import models.common.TransactionMessages.IdentityIssue
 @import views.html.base._
 @import views.html.component.blockchain.properties
@@ -6,9 +6,9 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[IdentityIssue]) { identityIssue =>
-    @commonTextInfo(constants.View.FROM, identityIssue.from)
-    @commonTextInfo(constants.View.TO, identityIssue.to)
-    @commonTextInfo(constants.View.MAINTAINERS_ID, identityIssue.maintainersID)
-    @commonTextInfo(constants.View.CLASSIFICATION_ID, identityIssue.classificationID)
+    @commonHtmlInfo(constants.View.FROM, commonLink(identityIssue.from, routes.ViewController.account(identityIssue.from)))
+    @commonHtmlInfo(constants.View.TO, commonLink(identityIssue.to, routes.ViewController.account(identityIssue.to)))
+    @commonHtmlInfo(constants.View.MAINTAINERS_ID, commonLink(identityIssue.maintainersID, routes.IndexController.search(identityIssue.maintainersID)))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(identityIssue.classificationID, routes.IndexController.search(identityIssue.classificationID)))
     @properties(identityIssue.properties.propertyList)
 }

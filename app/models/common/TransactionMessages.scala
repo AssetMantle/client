@@ -1,7 +1,7 @@
 package models.common
 
-import models.`abstract`.TransactionMessage
-import models.common.Serializable.{Coin, Properties, StdMsg, ValidatorDescription, CommissionRates => SerializableCommissionRates}
+import models.Abstract.TransactionMessage
+import models.common.Serializable._
 import play.api.Logger
 import play.api.libs.json._
 import utilities.MicroNumber
@@ -82,7 +82,7 @@ object TransactionMessages {
   implicit val descriptionWrites: OWrites[Description] = Json.writes[Description]
 
   case class Commission(rate: String, maxRate: String, maxChangeRate: String) {
-    def toSerializableCommissionRates: SerializableCommissionRates = SerializableCommissionRates(rate = BigDecimal(rate) * 100, maxRate = BigDecimal(maxRate) * 100, maxChangeRate = BigDecimal(maxChangeRate) * 100)
+    def toSerializableCommissionRates: CommissionRates = CommissionRates(rate = BigDecimal(rate) * 100, maxRate = BigDecimal(maxRate) * 100, maxChangeRate = BigDecimal(maxChangeRate) * 100)
   }
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
@@ -149,7 +149,7 @@ object TransactionMessages {
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
   //Order
-  case class OrderMake(from: String, maintainersID: String, makerID: String, takerID: String, makerSplit: BigDecimal, makerSplitID: String, exchangeRate: BigDecimal, takerSplitID: String) extends TransactionMessage
+  case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
 
@@ -162,14 +162,19 @@ object TransactionMessages {
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
   //classification
-  case class ClassificationDefine(from: String, fromID: String, maintainersID: String, traits: Seq[Serializable.Trait]) extends TransactionMessage
+  case class ClassificationDefine(from: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
 
   implicit val classificationDefineReads: Reads[ClassificationDefine] = Json.reads[ClassificationDefine]
 
   //meta
-  case class MetaReveal(from: String, fromID: String, data: String) extends TransactionMessage
+  case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage
 
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
+
+  //maintainer
+  case class MaintainerDeputize(id: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessage
+
+  implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]
 
   //unknown
   case class Unknown(value: String) extends TransactionMessage
@@ -218,6 +223,8 @@ object TransactionMessages {
     case classificationDefine: ClassificationDefine => Json.toJson(classificationDefine)(Json.writes[ClassificationDefine])
     //meta
     case metaReveal: MetaReveal => Json.toJson(metaReveal)(Json.writes[MetaReveal])
+    //maintainer
+    case deputize: MaintainerDeputize => Json.toJson(deputize)(Json.writes[MaintainerDeputize])
     case x: Any => Json.toJson(x.toString)
   }
 
@@ -266,6 +273,8 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
       //meta
       case constants.Blockchain.TransactionMessage.META_REVEAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
+      //maintainer
+      case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MaintainerDeputize](value.toString))
       case _ => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Unknown](value.toString))
     }
   }

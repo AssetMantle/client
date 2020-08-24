@@ -1,4 +1,3 @@
-@import views.html.base._
 @import models.blockchain.Transaction
 
 @(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -21,7 +20,21 @@
         </div>
     </td>
     <td id="transactionListPageItemTxHeight_@index">@tx.height</td>
-    <td id="transactionListPageItemTxStatus_@index">@Option(tx.status)</td>
+    <td id="transactionListPageItemTxStatus_@index">
+        <div id="transactionListPageItemTxStatusStatic_@index">
+        @if(tx.status) {
+            <span cmuk-icon="check" class="check hidden"></span>
+        } else {
+            <span cmuk-icon="close" class="close hidden"></span>
+        }
+        </div>
+        <div class="hidden" id="transactionListPageItemTxStatusTrue_@index">
+            <span cmuk-icon="check" class="check"></span>
+        </div>
+        <div id="transactionListPageItemTxStatusFalse_@index" class="hidden">
+            <span cmuk-icon="close" class="close"></span>
+        </div>
+    </td>
     <td id="transactionListPageItemTxFees_@index">@utilities.Date.bcTimestampToString(tx.timestamp)</td>
 </tr>
 }

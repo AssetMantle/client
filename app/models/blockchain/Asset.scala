@@ -12,7 +12,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetAsset
-import queries.responses.AssetResponse.{Response => AssetResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -136,21 +135,16 @@ class Assets @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onMint(assetMint: AssetMint): Future[Unit] = {
-      val hashID = Immutables(assetMint.properties).getHashID
-      val assetID = getID(chainID = chainID, maintainersID = assetMint.maintainersID, classificationID = assetMint.classificationID, hashID = hashID)
-      val assetResponse = getAsset.Service.get(assetID)
-      val insertOrUpdateSplits = blockchainSplits.Utility.splitsMint(ownerID = assetMint.toID, ownableID = assetID)
-      val upsertMetas = blockchainMetas.Utility.checkAndUpsertMetas(assetMint.properties.propertyList.map(_.fact))
-
-      def insertOrUpdate(assetResponse: AssetResponse) = assetResponse.result.value.assets.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == assetMint.maintainersID && x.value.id.value.classificationID.value.idString == assetMint.maintainersID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ASSET_NOT_FOUND)) { asset =>
-        Service.insertOrUpdate(Asset(id = assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
-      }
+      val immutables = Immutables(assetMint.properties)
+      val assetID = getID(chainID = chainID, maintainersID = assetMint.maintainersID, classificationID = assetMint.classificationID, hashID = immutables.getHashID)
+      val insertOrUpdateSplits = blockchainSplits.Utility.auxiliaryMint(ownerID = assetMint.toID, ownableID = assetID, splitValue = constants.Blockchain.OneDec)
+//      val upsertMetas = blockchainMetas.Utility.checkAndUpsertMetas(assetMint.properties.propertyList.map(_.fact))
+      val upsertAsset = Service.insertOrUpdate(Asset(id = assetID, burn = assetMint.burn, lock = assetMint.lock, immutables = immutables, mutables = Mutables(assetMint.properties, assetMint.maintainersID)))
 
       (for {
-        assetResponse <- assetResponse
-        _ <- insertOrUpdate(assetResponse)
+        _ <- upsertAsset
         _ <- insertOrUpdateSplits
-        _ <- upsertMetas
+//        _ <- upsertMetas
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -158,16 +152,17 @@ class Assets @Inject()(
     }
 
     def onMutate(assetMutate: AssetMutate): Future[Unit] = {
-      val assetResponse = getAsset.Service.get(assetMutate.assetID)
-      val (chainID, maintainersID, classificationID, hashID) = getFeatures(assetMutate.assetID)
+      val oldAsset = Service.tryGet(assetMutate.assetID)
 
-      def insertOrUpdate(assetResponse: AssetResponse) = assetResponse.result.value.assets.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ASSET_NOT_FOUND)) { asset =>
-        Service.insertOrUpdate(Asset(id = assetMutate.assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
+      def upsertAsset(oldAsset: Asset) = {
+        val unchangedIDList = oldAsset.mutables.properties.propertyList.map(_.id).diff(assetMutate.properties.propertyList.map(_.id))
+
+//        Service.insertOrUpdate(oldAsset.copy(mutables = oldAsset.mutables.properties.propertyList.filter(x => unchangedIDList.contains(x.id)) ++ assetMutate.properties.propertyList))
       }
 
       (for {
-        assetResponse <- assetResponse
-        _ <- insertOrUpdate(assetResponse)
+        oldAsset <- oldAsset
+//        _ <- upsertAsset(oldAsset)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -175,16 +170,12 @@ class Assets @Inject()(
     }
 
     def onBurn(assetBurn: AssetBurn): Future[Unit] = {
-      val assetResponse = getAsset.Service.get(assetBurn.assetID)
-      val (chainID, maintainersID, classificationID, hashID) = getFeatures(assetBurn.assetID)
-      val updateOrDeleteSplits = blockchainSplits.Utility.splitsBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID)
-
-      def delete(assetResponse: AssetResponse) = if (assetResponse.result.value.assets.value.list.exists(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID)) Service.delete(assetBurn.assetID) else Future(0)
+      val updateOrDeleteSplits = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.OneDec)
+      val deleteAsset = Service.delete(assetBurn.assetID)
 
       (for {
-        assetResponse <- assetResponse
         _ <- updateOrDeleteSplits
-        _ <- delete(assetResponse)
+        _ <- deleteAsset
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException

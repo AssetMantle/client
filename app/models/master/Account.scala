@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, language: Lang, userType: String, partialMnemonic: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(id: String, address: String, secretHash: String, language: Lang, userType: String, partialMnemonic: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration, utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext) {
@@ -32,11 +32,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(id: String, secretHash: String, language: String, userType: String, partialMnemonic: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(id = id, secretHash = secretHash, language = Lang(language), userType = userType, partialMnemonic = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonic), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(id: String, address: String, secretHash: String, language: String, userType: String, partialMnemonic: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(id = id, address = address, secretHash = secretHash, language = Lang(language), userType = userType, partialMnemonic = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonic), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(id = account.id, secretHash = account.secretHash, language = account.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0), userType = account.userType, partialMnemonic = Json.toJson(account.partialMnemonic).toString, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(id = account.id, address = account.address, secretHash = account.secretHash, language = account.language.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0), userType = account.userType, partialMnemonic = Json.toJson(account.partialMnemonic).toString, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.id) += serialize(account)).asTry).map {
     case Success(result) => result
@@ -46,6 +46,27 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def findById(id: String): Future[AccountSerialized] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def findByAddress(address: String): Future[AccountSerialized] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def findIDByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def findAddressByID(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -117,9 +138,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") {
 
-    def * = (id, secretHash, language, userType, partialMnemonic, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (id, address, secretHash, language, userType, partialMnemonic, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def address = column[String]("address")
 
     def secretHash = column[String]("secretHash")
 
@@ -151,9 +174,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map(!_)
 
-    def addLogin(username: String, password: String, language: Lang, mnemonics: Seq[String]): Future[String] = add(Account(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString, partialMnemonic = mnemonics, language = language, userType = constants.User.WITHOUT_LOGIN))
+    def addLogin(username: String, password: String, address: String, language: Lang, mnemonics: Seq[String]): Future[String] = add(Account(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString, address = address, partialMnemonic = mnemonics, language = language, userType = constants.User.WITHOUT_LOGIN))
 
     def tryGet(username: String): Future[Account] = findById(username).map(_.deserialize)
+
+    def tryGetByAddress(address: String): Future[Account] = findByAddress(address).map(_.deserialize)
+
+    def tryGetUsername(address: String): Future[String] = findIDByAddress(address)
+
+    def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
     def tryGetLanguage(id: String): Future[String] = tryGetLanguageById(id)
 
@@ -170,6 +199,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         if (userTypeResult == userType) true else throw new BaseException(constants.Response.UNAUTHORIZED)
       }
     }
+
+    def checkAccountExists(username: String): Future[Boolean] = checkById(username)
 
   }
 

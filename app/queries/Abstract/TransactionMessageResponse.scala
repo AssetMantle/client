@@ -1,6 +1,6 @@
-package queries.`abstract`
+package queries.Abstract
 
-import models.`abstract`.TransactionMessage
+import models.Abstract.TransactionMessage
 
 abstract class TransactionMessageResponse {
   def toTxMsg: TransactionMessage

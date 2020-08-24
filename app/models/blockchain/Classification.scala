@@ -17,13 +17,14 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Classification(id: String, traits: Seq[Trait], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Classification(id: String, immutableTraits: Immutables, mutableTraits: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Classifications @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  configuration: Configuration,
-                                 getClassification: GetClassification
+                                 getClassification: GetClassification,
+                                 blockchainMetas: Metas
                                )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -36,11 +37,11 @@ class Classifications @Inject()(
 
   import databaseConfig.profile.api._
 
-  case class ClassificationSerialized(id: String, traits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Classification = Classification(id = id, traits = utilities.JSON.convertJsonStringToObject[Seq[Trait]](traits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ClassificationSerialized(id: String, immutableTraits: String, mutableTraits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Classification = Classification(id = id, immutableTraits = utilities.JSON.convertJsonStringToObject[Immutables](immutableTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Mutables](mutableTraits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(classification: Classification): ClassificationSerialized = ClassificationSerialized(id = classification.id, traits = Json.toJson(classification.traits).toString, createdBy = classification.createdBy, createdOn = classification.createdOn, createdOnTimeZone = classification.createdOnTimeZone, updatedBy = classification.updatedBy, updatedOn = classification.updatedOn, updatedOnTimeZone = classification.updatedOnTimeZone)
+  def serialize(classification: Classification): ClassificationSerialized = ClassificationSerialized(id = classification.id, immutableTraits = Json.toJson(classification.immutableTraits).toString, mutableTraits = Json.toJson(classification.mutableTraits).toString, createdBy = classification.createdBy, createdOn = classification.createdOn, createdOnTimeZone = classification.createdOnTimeZone, updatedBy = classification.updatedBy, updatedOn = classification.updatedOn, updatedOnTimeZone = classification.updatedOnTimeZone)
 
   private[models] val classificationTable = TableQuery[ClassificationTable]
 
@@ -86,11 +87,13 @@ class Classifications @Inject()(
 
   private[models] class ClassificationTable(tag: Tag) extends Table[ClassificationSerialized](tag, "Classification_BC") {
 
-    def * = (id, traits, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ClassificationSerialized.tupled, ClassificationSerialized.unapply)
+    def * = (id, immutableTraits, mutableTraits, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ClassificationSerialized.tupled, ClassificationSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def traits = column[String]("traits")
+    def immutableTraits = column[String]("immutableTraits")
+
+    def mutableTraits = column[String]("mutableTraits")
 
     def createdBy = column[String]("createdBy")
 
@@ -127,10 +130,14 @@ class Classifications @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onDefine(classificationDefine: ClassificationDefine): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(Classification(id = getID(chainID = chainID, maintainersID = classificationDefine.maintainersID, hashID = Immutables(Properties(classificationDefine.traits.map(_.property))).getHashID), traits = classificationDefine.traits))
+      val immutablesMetaTraitsScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(classificationDefine.immutableMetaTraits.metaPropertyList)
+      val mutablesMetaTraitsScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(classificationDefine.mutableMetaTraits.metaPropertyList)
+//      val upsert = Service.insertOrUpdate(Classification(id = classificationDefine.id, traits = classificationDefine.traits))
 
       (for {
-        _ <- upsert
+        _ <- immutablesMetaTraitsScrubAuxiliary
+        _ <- mutablesMetaTraitsScrubAuxiliary
+//        _ <- upsert
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException

@@ -1,0 +1,13 @@
+@import views.html.base._
+@import models.blockchain.Classification
+
+@(classification: Classification)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.CLASSIFICATION) {
+} {
+    @commonTextInfo(constants.View.CLASSIFICATION_ID, classification.id)
+    @Messages(constants.View.MUTABLE_TRAITS):
+    @views.html.component.blockchain.mutables(classification.mutableTraits)
+    @Messages(constants.View.IMMUTABLE_TRAITS):
+    @views.html.component.blockchain.immutables(classification.immutableTraits)
+}

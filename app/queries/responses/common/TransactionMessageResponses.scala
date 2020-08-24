@@ -1,11 +1,11 @@
 package queries.responses.common
 
 import exceptions.BaseException
-import models.`abstract`.TransactionMessage
+import models.Abstract.TransactionMessage
 import models.common.{Serializable, TransactionMessages}
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
-import queries.`abstract`.TransactionMessageResponse
+import queries.Abstract.TransactionMessageResponse
 import queries.responses.TransactionResponse.Msg
 import utilities.MicroNumber
 
@@ -193,8 +193,8 @@ object TransactionMessageResponses {
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
   //Order
-  case class OrderMake(from: String, maintainersID: ID, makerID: ID, takerID: ID, makerSplit: BigDecimal, makerSplitID: ID, exchangeRate: BigDecimal, takerSplitID: ID) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, maintainersID = maintainersID.value.idString, makerID = makerID.value.idString, takerID = takerID.value.idString, makerSplit = makerSplit, makerSplitID = makerSplitID.value.idString, exchangeRate = exchangeRate, takerSplitID = takerSplitID.value.idString)
+  case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, fromID = fromID.value.idString, classificationID = classificationID.value.idString, makerOwnableID = makerOwnableID.value.idString, takerOwnableID = takerOwnableID.value.idString, expiresIn = expiresIn.toInt, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties.toMetaProperties, immutableProperties = immutableProperties.toProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
@@ -212,18 +212,25 @@ object TransactionMessageResponses {
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
   //Classification
-  case class ClassificationDefine(from: String, fromID: ID, maintainersID: ID, traits: Traits) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.ClassificationDefine(from = from, fromID = fromID.value.idString, maintainersID = maintainersID.value.idString, traits = traits.traitList.map(_.toTrait))
+  case class ClassificationDefine(from: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ClassificationDefine(from = from, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
   }
 
   implicit val classificationDefineReads: Reads[ClassificationDefine] = Json.reads[ClassificationDefine]
 
   //meta
-  case class MetaReveal(from: String, fromID: ID, data: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.MetaReveal(from = from, fromID = fromID.value.idString, data = data)
+  case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.MetaReveal(from = from, metaFact = metaFact.toMetaFact)
   }
 
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
+
+  //maintainer
+  case class MaintainerDeputize(id: ID, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.MaintainerDeputize(id = id.value.idString, maintainedTraits = maintainedTraits.toProperties, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer)
+  }
+
+  implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]
 
   //unknown
   case class Unknown(value: String) extends TransactionMessageResponse {
@@ -277,6 +284,8 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
       //meta
       case constants.Blockchain.TransactionMessage.META_REVEAL => Msg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
+      //maintainer
+      case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => Msg(msgType, utilities.JSON.convertJsonStringToObject[MaintainerDeputize](value.toString))
       //unknown
       case _ => Msg(msgType, utilities.JSON.convertJsonStringToObject[Unknown](value.toString))
     }

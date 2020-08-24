@@ -1,30 +1,18 @@
 package queries.responses.common
 
 import models.common.Serializable
-import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Reads}
+import play.api.libs.json.{Json, Reads}
 
-case class Fact(factType: String, value: queries.`abstract`.FactValue) {
-  def toFact: Serializable.Fact = Serializable.Fact(factType, value.toFactValue)
+case class Fact(value: Fact.Value) {
+  def toFact: Serializable.Fact = Serializable.Fact(value.hash)
 }
 
 object Fact {
 
-  implicit val module: String = constants.Module.FACT_RESPONSES
+  case class Value(hash: String)
 
-  implicit val logger: Logger = Logger(this.getClass)
+  implicit val valueReads: Reads[Value] = Json.reads[Value]
 
-  def factApply(factType: String, value: JsObject): Fact = try {
-    factType match {
-      case constants.Blockchain.Fact.META_FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[MetaFactValue](value.toString))
-      case constants.Blockchain.Fact.FACT => Fact(factType, utilities.JSON.convertJsonStringToObject[NonMetaFactValue](value.toString))
-    }
-  }
-
-  implicit val factReads: Reads[Fact] = (
-    (JsPath \ "type").read[String] and
-      (JsPath \ "value").read[JsObject]
-    ) (factApply _)
+  implicit val factReads: Reads[Fact] = Json.reads[Fact]
 
 }

@@ -113,11 +113,6 @@ GET         /component/validatorDelegations                      controllers.Com
 GET         /component/validatorTransactions                     controllers.ComponentViewController.validatorTransactions(address: String)
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
-GET         /component/assetDetails                              controllers.ComponentViewController.assetDetails(id: String)
-GET         /component/identityDetails                           controllers.ComponentViewController.identityDetails(id: String)
-GET         /component/allSplits                                 controllers.ComponentViewController.allSplits(id: String)
-GET         /component/orderDetails                              controllers.ComponentViewController.orderDetails(id: String)
-
 GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
 GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)
