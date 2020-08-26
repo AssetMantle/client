@@ -165,7 +165,7 @@ class Orders @Inject()(
         _ <- upsert(immutableProperties = immutableProperties, mutableProperties = mutableProperties)
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -208,7 +208,7 @@ class Orders @Inject()(
         mutableScrubs <- mutableScrubs(mutableMetaProperties)
         _ <- upsertOrder(oldOrder, mutableScrubs, orderID, immutables)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -243,7 +243,7 @@ class Orders @Inject()(
         _ <- takerTransferSplits(oldOrder)
         _ <- updateOrRemoveOrder(oldOrder = oldOrder, makerOwnableSplit = makerOwnableSplit.data.value.AsDec, exchangeRate = exchangeRate.data.value.AsDec)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -260,7 +260,7 @@ class Orders @Inject()(
         _ <- transferSplits(oldOrder, makerOwnableSplit.data.value.AsDec)
         _ <- removeOrder(orderCancel.orderID)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

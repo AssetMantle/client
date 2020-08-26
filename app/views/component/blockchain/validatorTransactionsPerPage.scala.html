@@ -22,7 +22,13 @@
                 <td class="blockHeightItem">
                     @commonLink(tx.height.toString, routes.ViewController.block(tx.height))
                 </td>
-                <td>@Option(tx.status)</td>
+                <td>
+                @if(tx.status) {
+                    <span cmuk-icon="check" class="check hidden"></span>
+                } else {
+                    <span cmuk-icon="close" class="close hidden"></span>
+                }
+                </td>
                 <td>@utilities.Date.bcTimestampToString(tx.timestamp)</td>
             </tr>
         }

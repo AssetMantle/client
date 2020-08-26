@@ -230,7 +230,7 @@ class Validators @Inject()(
         _ <- insertValidator(validatorResponse.result.toValidator)
         _ <- updateOtherDetails()
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -252,7 +252,7 @@ class Validators @Inject()(
         validatorResponse <- validatorResponse
         _ <- insertValidator(validatorResponse.result.toValidator)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -274,7 +274,7 @@ class Validators @Inject()(
         validatorResponse <- validatorResponse
         _ <- updateAndAddEvent(validatorResponse.result.toValidator)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -290,7 +290,7 @@ class Validators @Inject()(
         _ <- insertDelegation
         _ <- withdrawAddressBalanceUpdate
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

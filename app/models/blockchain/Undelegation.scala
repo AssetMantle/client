@@ -145,7 +145,7 @@ class Undelegations @Inject()(
         _ <- withdrawAddressBalanceUpdate
         _ <- updateOrDeleteDelegation
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

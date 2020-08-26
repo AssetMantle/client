@@ -127,7 +127,7 @@ class Metas @Inject()(
         _ <- upsertMeta
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

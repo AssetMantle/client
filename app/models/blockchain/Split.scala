@@ -150,7 +150,7 @@ class Splits @Inject()(
         oldToSplit <- oldToSplit
         _ <- updateSplits(oldFromSplit, oldToSplit)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -171,7 +171,7 @@ class Splits @Inject()(
         _ <- updateAccountBalance
         _ <- updateSplits
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -186,7 +186,7 @@ class Splits @Inject()(
         _ <- updateSplits(oldFromSplit)
         _ <- updateAccountBalance
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

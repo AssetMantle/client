@@ -23,7 +23,13 @@
                     <td class="blockHeightItem">
                         @commonLink(tx.hash, routes.ViewController.transaction(tx.hash))
                     </td>
-                    <td>@Option(tx.status)</td>
+                    <td>
+                    @if(tx.status) {
+                        <span cmuk-icon="check" class="check hidden"></span>
+                    } else {
+                        <span cmuk-icon="close" class="close hidden"></span>
+                    }
+                    </td>
                     <td>@tx.messages.length</td>
                     <td>@if(tx.fee.amount.nonEmpty) {
                         @tx.fee.amount.map(amt => s"${amt.amount} ${amt.denom}").mkString(", ")
