@@ -84,10 +84,10 @@ object DataValue {
   implicit val idDataWrites: OWrites[IDDataValue] = Json.writes[IDDataValue]
 
   implicit val dataValueWrites: Writes[DataValue] = {
-    case stringData: StringDataValue => Json.toJson(stringData)(Json.writes[StringDataValue])
-    case decData: DecDataValue => Json.toJson(decData)(Json.writes[DecDataValue])
-    case idData: IDDataValue => Json.toJson(idData)(Json.writes[IDDataValue])
-    case heightData: HeightDataValue => Json.toJson(heightData)(Json.writes[HeightDataValue])
+    case stringData: StringDataValue => Json.toJson(stringData)
+    case decData: DecDataValue => Json.toJson(decData)
+    case idData: IDDataValue => Json.toJson(idData)
+    case heightData: HeightDataValue => Json.toJson(heightData)
     case _ => throw new BaseException(constants.Response.DATA_TYPE_NOT_FOUND)
   }
 
