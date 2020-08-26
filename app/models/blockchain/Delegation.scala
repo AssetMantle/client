@@ -113,7 +113,7 @@ class Delegations @Inject()(
 
   object Utility {
 
-    //onDelegation moved blockchain/Validators due to import cycle issues
+    //onDelegation moved to blockchain/Validators due to import cycle issues
 
     def insertOrUpdate(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
       val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
