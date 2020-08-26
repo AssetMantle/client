@@ -4,12 +4,12 @@ import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 
 case class Mutables(value: Mutables.Value) {
-  def toMutables: Serializable.Mutables = Serializable.Mutables(properties = value.properties.toProperties, maintainersID = value.maintainersID.value.idString)
+  def toMutables: Serializable.Mutables = Serializable.Mutables(properties = value.properties.toProperties)
 }
 
 object Mutables {
 
-  case class Value(properties: Properties, maintainersID: ID)
+  case class Value(properties: Properties)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

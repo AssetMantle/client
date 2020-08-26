@@ -24,6 +24,7 @@ class Identities @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             configuration: Configuration,
                             getIdentity: GetIdentity,
+                            blockchainMetas: Metas
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -133,11 +134,19 @@ class Identities @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onIssue(identityIssue: IdentityIssue): Future[Unit] = {
-      val immutables = Immutables(identityIssue.properties)
-      val insertOrUpdate = Service.insertOrUpdate(Identity(id = getID(chainID = chainID, maintainersID = identityIssue.maintainersID, classificationID = identityIssue.classificationID, hashID = immutables.getHashID), provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(properties = identityIssue.properties, maintainersID = identityIssue.maintainersID), immutables = immutables))
+      val immutableScrubs = blockchainMetas.Utility.auxiliaryScrub(identityIssue.immutableMetaProperties.metaPropertyList)
+      val mutableScrubs = blockchainMetas.Utility.auxiliaryScrub(identityIssue.mutableMetaProperties.metaPropertyList)
+
+      def insertOrUpdate(immutableScrubs: Seq[Property], mutableScrubs: Seq[Property]) = {
+        val immutables = Immutables(Properties(immutableScrubs ++ identityIssue.immutableProperties.propertyList))
+        Service.insertOrUpdate(Identity(id = getID(classificationID = identityIssue.classificationID, hashID = immutables.getHashID), provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(Properties(mutableScrubs ++ identityIssue.mutableProperties.propertyList)), immutables = immutables)
+        )
+      }
 
       (for {
-        _ <- insertOrUpdate
+        immutableScrubs <- immutableScrubs
+        mutableScrubs <- mutableScrubs
+        _ <- insertOrUpdate(immutableScrubs = immutableScrubs, mutableScrubs = mutableScrubs)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -172,11 +181,11 @@ class Identities @Inject()(
       }
     }
 
-    private def getID(chainID: String, maintainersID: String, classificationID: String, hashID: String) = Seq(chainID, maintainersID, classificationID, hashID).mkString(constants.Blockchain.IDSeparator)
+    private def getID(classificationID: String, hashID: String) = Seq(classificationID, hashID).mkString(constants.Blockchain.IDSeparator)
 
-    private def getFeatures(id: String): (String, String, String, String) = {
+    private def getFeatures(id: String): (String, String) = {
       val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
-      if (idList.length == 4) (idList(0), idList(1), idList(2), idList(3)) else ("", "", "", "")
+      if (idList.length == 2) (idList(0), idList(1)) else ("", "")
     }
   }
 

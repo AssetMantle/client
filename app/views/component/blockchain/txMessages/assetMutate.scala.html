@@ -8,5 +8,4 @@
 @defining(msg.asInstanceOf[AssetMutate]) { assetMutate =>
     @commonHtmlInfo(constants.View.FROM, commonLink(assetMutate.from, routes.ViewController.account(assetMutate.from)))
     @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetMutate.assetID, routes.IndexController.search(assetMutate.assetID)))
-    @properties(assetMutate.properties.propertyList)
 }

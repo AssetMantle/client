@@ -15,7 +15,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
@@ -202,7 +201,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String) = masterAccounts.Service.tryGetUsername(address)
+      def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
 
       def toAccount(accountID: String): Future[Account] = masterAccounts.Service.tryGet(accountID)
 
@@ -240,7 +239,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getAccountID(address: String): Future[String] = masterAccounts.Service.tryGetUsername(address)
+      def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
       (for {
         _ <- markTransactionFailed

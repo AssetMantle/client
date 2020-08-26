@@ -20,6 +20,7 @@ CREATE SCHEMA IF NOT EXISTS MEMBER_CHECK
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
     "address"           VARCHAR NOT NULL,
+    "username"          VARCHAR NOT NULL UNIQUE,
     "coins"             VARCHAR NOT NULL,
     "publicKey"         VARCHAR NOT NULL,
     "accountNumber"     VARCHAR NOT NULL,
@@ -36,8 +37,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 (
     "id"                VARCHAR NOT NULL,
-    "burn"              INTEGER NOT NULL,
-    "lock"              INTEGER NOT NULL,
     "immutables"        VARCHAR NOT NULL,
     "mutables"          VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
@@ -386,7 +385,6 @@ CREATE TABLE IF NOT EXISTS KEY_BASE."ValidatorAccount"
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
     "id"                VARCHAR NOT NULL,
-    "address"           VARCHAR NOT NULL UNIQUE,
     "secretHash"        VARCHAR NOT NULL,
     "language"          VARCHAR NOT NULL,
     "userType"          VARCHAR NOT NULL,
@@ -807,8 +805,6 @@ ALTER TABLE BLOCKCHAIN."Undelegation"
 ALTER TABLE KEY_BASE."ValidatorAccount"
     ADD CONSTRAINT ValidatorAccount_Validator FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Validator" ("operatorAddress");
 
-ALTER TABLE MASTER."Account"
-    ADD CONSTRAINT Account_Account_BC_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER."AccountFile"
     ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."AccountKYC"

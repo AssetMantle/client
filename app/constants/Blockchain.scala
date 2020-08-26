@@ -7,6 +7,17 @@ object Blockchain {
   val IDSeparator = "."
   val OneDec = BigDecimal("1.000000000000000000")
 
+  object Properties {
+    val Burn = "burn"
+    val Creation = "creation"
+    val Expiry = "expiry"
+    val Lock = "lock"
+    val MakerSplit = "makerSplit"
+    val MakerOwnableSplit = "makerOwnableSplit"
+    val TakerID = "takerID"
+    val ExchangeRate = "exchangeRate"
+  }
+
   object Order {
     val MakerIDProperty = "MakerID"
     val TakerIDProperty = "TakerID"
@@ -15,7 +26,7 @@ object Blockchain {
     val ExchangeRateProperty = "ExchangeRate"
     val TakerSplitIDProperty = "TakerSplitID"
     val HeightProperty = "Height"
-    val Exchanges = "exchanges"
+    val Orders = "orders"
   }
 
   val META_FACT = "xprt/metaFact"

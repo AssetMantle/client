@@ -1,24 +1,26 @@
 package utilities
 
-import java.io.{BufferedOutputStream, FileOutputStream}
 import java.util.Arrays
-
 import com.docusign.esign.api.EnvelopesApi
-import com.docusign.esign.client.{ApiClient, ApiException}
-import com.docusign.esign.client.auth.OAuth.OAuthToken
+import com.docusign.esign.client.ApiClient
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, Signer, Document => DocusignDocument, ReturnUrlRequest => CallBackURLRequest}
-import com.sun.jersey.api.client.ClientHandlerException
 import com.sun.jersey.core.util.{Base64 => Base64Docusign}
-import controllers.routes
+import com.docusign.esign.client.ApiException
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Document
-import models.docusign
-import models.docusign.{OAuthToken => DocusignOAuthToken}
-import models.master.{Email, Account}
-import org.apache.commons.codec.binary.Base64
+import models.master.Email
+import models.master
+import models.blockchain.Account
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
-
+import java.io.{BufferedOutputStream, FileOutputStream}
+import models.docusign.{OAuthToken => DocusignOAuthToken}
+import com.docusign.esign.client.auth.OAuth.OAuthToken
+import com.sun.jersey.api.client.ClientHandlerException
+import controllers.routes
+import models.Trait.Document
+import org.apache.commons.codec.binary.Base64
+import models.docusign
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,8 +65,8 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
       val signerList = accountList.zipWithIndex.map { case (account, index) =>
         val signer = new Signer()
-        signer.setEmail(emailList.find(_.id == account.id).map(_.emailAddress).getOrElse(""))
-        signer.setName(account.id)
+        signer.setEmail(emailList.find(_.id == account.username).map(_.emailAddress).getOrElse(""))
+        signer.setName(account.username)
         signer.clientUserId(account.address)
         signer.recipientId((index + 1).toString)
         signer
@@ -125,7 +127,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       viewRequest.setReturnUrl(webAppURL + routes.DocusignController.callBack(envelopeID, "").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
-      viewRequest.setUserName(account.id)
+      viewRequest.setUserName(account.username)
       viewRequest.setClientUserId(account.address)
 
       envelopesApi.createRecipientView(accountID, envelopeID, viewRequest).getUrl

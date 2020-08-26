@@ -113,11 +113,13 @@ class Startup @Inject()(
         val insertValidator = blockchainValidators.Service.insertMultiple(validatorResults.map(_.toValidator))
         val insertDelegations = Future.traverse(validatorResults)(validatorResult => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorResult.operator_address), validatorAddress = validatorResult.operator_address))
 //        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
-        for {
+        (for {
           _ <- insertValidator
           _ <- insertDelegations
 //          _ <- insertKeyBaseAccount
-        } yield ()
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.getLocalizedMessage)
+        }
       }
 
       (for {

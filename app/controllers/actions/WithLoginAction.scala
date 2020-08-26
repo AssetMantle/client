@@ -30,12 +30,14 @@ class WithLoginAction @Inject()(
       def verifySessionTokenAndUserType(username: String, sessionToken: String) = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
-        val account = masterAccounts.Service.tryGet(username)
+        val userType = masterAccounts.Service.getUserType(username)
+        val address = blockchainAccounts.Service.tryGetAddress(username)
         for {
           _ <- sessionTokenVerify
           _ <- tokenTimeVerify
-          account <- account
-        } yield (account.userType, account.address)
+          userType <- userType
+          address <- address
+        } yield (userType, address)
       }
 
       def result(loginState: LoginState): Future[Result] = f(loginState)(request)

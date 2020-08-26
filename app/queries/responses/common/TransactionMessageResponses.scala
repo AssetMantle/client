@@ -136,14 +136,14 @@ object TransactionMessageResponses {
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
   //Asset
-  case class AssetMint(from: String, fromID: ID, toID: ID, maintainersID: ID, classificationID: ID, properties: Properties, lock: Height, burn: Height) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.AssetMint(from = from, fromID = fromID.value.idString, toID = toID.value.idString, maintainersID = maintainersID.value.idString, classificationID = classificationID.value.idString, properties = properties.toProperties, lock = lock.toInt, burn = burn.toInt)
+  case class AssetMint(from: String, fromID: ID, toID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.AssetMint(from = from, fromID = fromID.value.idString, toID = toID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
 
   implicit val assetMintReads: Reads[AssetMint] = Json.reads[AssetMint]
 
-  case class AssetMutate(from: String, assetID: ID, properties: Properties, lock: Height, burn: Height) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.AssetMutate(from = from, assetID = assetID.value.idString, properties = properties.toProperties, lock = lock.toInt, burn = burn.toInt)
+  case class AssetMutate(from: String, fromID: ID, assetID: ID, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.AssetMutate(from = from, fromID = fromID.value.idString, assetID = assetID.value.idString, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
 
   implicit val assetMutateReads: Reads[AssetMutate] = Json.reads[AssetMutate]
@@ -155,8 +155,8 @@ object TransactionMessageResponses {
   implicit val assetBurnReads: Reads[AssetBurn] = Json.reads[AssetBurn]
 
   //Identity
-  case class IdentityIssue(from: String, to: String, fromID: ID, maintainersID: ID, classificationID: ID, properties: Properties) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.IdentityIssue(from = from, to = to, fromID = fromID.value.idString, maintainersID = maintainersID.value.idString, classificationID = classificationID.value.idString, properties = properties.toProperties)
+  case class IdentityIssue(from: String, to: String, fromID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.IdentityIssue(from = from, to = to, fromID = fromID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
 
   implicit val identityIssueReads: Reads[IdentityIssue] = Json.reads[IdentityIssue]
@@ -199,14 +199,14 @@ object TransactionMessageResponses {
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
 
-  case class OrderTake(from: String, fromID: ID, takerSplit: BigDecimal, orderID: ID) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.OrderTake(from = from, fromID = fromID.value.idString, takerSplit = takerSplit, orderID = orderID.value.idString)
+  case class OrderTake(from: String, fromID: ID, takerOwnableSplit: BigDecimal, orderID: ID) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.OrderTake(from = from, fromID = fromID.value.idString, takerOwnableSplit = takerOwnableSplit, orderID = orderID.value.idString)
   }
 
   implicit val orderTakeReads: Reads[OrderTake] = Json.reads[OrderTake]
 
-  case class OrderCancel(from: String, orderID: ID) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.OrderCancel(from = from, orderID = orderID.value.idString)
+  case class OrderCancel(from: String, fromID: ID, orderID: ID) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.OrderCancel(from = from, fromID = fromID.value.idString, orderID = orderID.value.idString)
   }
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
@@ -226,8 +226,8 @@ object TransactionMessageResponses {
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
 
   //maintainer
-  case class MaintainerDeputize(id: ID, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.MaintainerDeputize(id = id.value.idString, maintainedTraits = maintainedTraits.toProperties, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer)
+  case class MaintainerDeputize(from: String, fromID: ID, toID: ID, classificationID: ID, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.MaintainerDeputize(from = from, fromID = fromID.value.idString, toID = toID.value.idString, classificationID = classificationID.value.idString, maintainedTraits = maintainedTraits.toProperties, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer)
   }
 
   implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]

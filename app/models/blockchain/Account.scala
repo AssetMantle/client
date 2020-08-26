@@ -19,7 +19,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: Seq[Coin], publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, coins: Seq[Coin], publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -41,11 +41,11 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(address: String, coins: String, publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(address: String, username: String, coins: String, publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(address = address, username = username, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, coins = Json.toJson(account.coins).toString, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, coins = Json.toJson(account.coins).toString, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
     case Success(result) => result
@@ -70,6 +70,27 @@ class Accounts @Inject()(
 
   private def getByAddress(address: String): Future[Option[AccountSerialized]] = db.run(accountTable.filter(_.address === address).result.headOption)
 
+  private def findByUsername(username: String): Future[AccountSerialized] = db.run(accountTable.filter(_.username === username).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def findUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def findAddressByID(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def deleteByAddress(address: String): Future[Int] = db.run(accountTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -78,11 +99,15 @@ class Accounts @Inject()(
     }
   }
 
+  private def checkAccountExistsByUsername(username: String): Future[Boolean] = db.run(accountTable.filter(_.username === username).exists.result)
+
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account_BC") {
 
-    def * = (address, coins, publicKey, accountNumber, sequence, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (address, username, coins, publicKey, accountNumber, sequence, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
+
+    def username = column[String]("username")
 
     def coins = column[String]("coins")
 
@@ -107,13 +132,22 @@ class Accounts @Inject()(
 
   object Service {
 
-    def create(account: Account): Future[String] = add(account)
+    def create(address: String, username: String, publicKey: String): Future[String] = add(Account(address = address, username = username, coins = Seq(), publicKey = publicKey, accountNumber = "", sequence = ""))
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
     def insertOrUpdate(account: Account): Future[Int] = upsert(account)
 
     def get(address: String): Future[Option[Account]] = getByAddress(address).map(_.map(_.deserialize))
+
+    def tryGetByUsername(username: String): Future[Account] = findByUsername(username).map(_.deserialize)
+
+    def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
+
+    def tryGetAddress(username: String): Future[String] = findAddressByID(username)
+
+    def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
+
   }
 
   object Utility {
@@ -131,12 +165,14 @@ class Accounts @Inject()(
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
+      val oldAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))
+      def upsert(accountResponse: AccountResponse, oldAccount: Option[Account]) = Service.insertOrUpdate(oldAccount.fold(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))(x => x.copy(coins = accountResponse.result.value.coins.map(_.toCoin))))
 
       (for {
         accountResponse <- accountResponse
-        _ <- upsert(accountResponse)
+        oldAccount <- oldAccount
+        _ <- upsert(accountResponse, oldAccount)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message)
           throw baseException

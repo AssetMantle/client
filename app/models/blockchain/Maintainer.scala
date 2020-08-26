@@ -6,6 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
+import models.common.TransactionMessages.MaintainerDeputize
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -129,13 +130,21 @@ class Maintainers @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-    def onDeputize() = Future()
+    def onDeputize(maintainerDeputize: MaintainerDeputize): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(Maintainer(id = getID(classificationID = maintainerDeputize.classificationID, fromID = maintainerDeputize.fromID), maintainedTraits = maintainerDeputize.maintainedTraits, addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
-    private def getID(chainID: String, maintainersID: String, hashID: String) = Seq(chainID, maintainersID, hashID).mkString(constants.Blockchain.IDSeparator)
+      (for {
+        _ <- upsert
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
-    private def getFeatures(id: String): (String, String, String) = {
+    private def getID(classificationID: String, fromID: String) = Seq(classificationID, fromID).mkString(constants.Blockchain.IDSeparator)
+
+    private def getFeatures(id: String): (String, String) = {
       val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
-      if (idList.length == 3) (idList(0), idList(1), idList(2)) else ("", "", "")
+      if (idList.length == 2) (idList(0), idList(1)) else ("", "")
     }
   }
 

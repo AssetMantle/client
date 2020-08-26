@@ -20,7 +20,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
                                    withLoginAction: WithLoginAction,
                                    masterAccountKYCs: master.AccountKYCs,
                                    docusignEnvelopes: docusign.Envelopes,
-                                   masterAccounts: master.Accounts,
+                                   blockchainAccounts: blockchain.Accounts,
                                    withoutLoginActionAsync: WithoutLoginActionAsync)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -39,7 +39,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
             case None => {
               val file = masterAccountKYCs.Service.tryGet(id, documentType)
               val counterPartyAddress = "counterPartyAddress"
-              val counterParty = masterAccounts.Service.tryGetByAddress(counterPartyAddress)
+              val counterParty = blockchainAccounts.Service.tryGet(counterPartyAddress)
 
               def getBuyerEmail(accountID: String): Future[Email] = masterEmails.Service.tryGet(accountID)
 
@@ -48,7 +48,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
               for {
                 file <- file
                 counterParty <- counterParty
-                counterPartyEmail <- getBuyerEmail(counterParty.id)
+                counterPartyEmail <- getBuyerEmail(counterParty.username)
                 envelopeID <- utilitiesDocusign.createEnvelope(Seq(counterPartyEmail), Seq(file), Seq(counterParty))
                 _ <- create(id, envelopeID)
                 senderViewURL <- utilitiesDocusign.createSenderViewURL(envelopeID)
@@ -73,8 +73,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
 
-    val account = masterAccounts.Service.tryGetByAddress("accountAddress")
-    val counterPartyAccount = masterAccounts.Service.tryGetByAddress("counterPartyAccountAddress")
+    val account = blockchainAccounts.Service.tryGet("accountAddress")
+    val counterPartyAccount = blockchainAccounts.Service.tryGet("counterPartyAccountAddress")
 
     def updateStatus(docusignEnvelope: docusign.Envelope, accountIDs: Seq[String]) = event match {
       case constants.External.Docusign.SEND => {
@@ -107,10 +107,10 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       envelope <- envelope
       account <- account
       counterPartyAccount <- counterPartyAccount
-      _ <- updateStatus(envelope, Seq(account.id, counterPartyAccount.id))
+      _ <- updateStatus(envelope, Seq(account.username, counterPartyAccount.username))
     } yield {
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = account.id, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = counterPartyAccount.id, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
+      actors.Service.cometActor ! actors.Message.makeCometMessage(username = account.username, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
+      actors.Service.cometActor ! actors.Message.makeCometMessage(username = counterPartyAccount.username, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
       Ok(views.html.component.master.docusignCallBackView(event))
     }).recover {
       case baseException: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
@@ -121,7 +121,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val envelope = docusignEnvelopes.Service.tryGet(id, documentType)
-      val account = masterAccounts.Service.tryGetByAddress(loginState.address)
+      val account = blockchainAccounts.Service.tryGet(loginState.address)
       (for {
         emailAddress <- emailAddress
         envelope <- envelope

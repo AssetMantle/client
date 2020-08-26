@@ -77,6 +77,8 @@ class Metas @Inject()(
 
   private def getAllMetas = db.run(metaTable.result)
 
+  private def checkIfExistsByID(id: String) = db.run(metaTable.filter(_.id === id).exists.result)
+
   private[models] class MetaTable(tag: Tag) extends Table[MetaSerialized](tag, "Meta_BC") {
 
     def * = (id, data, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MetaSerialized.tupled, MetaSerialized.unapply)
@@ -112,6 +114,8 @@ class Metas @Inject()(
 
     def insertOrUpdate(meta: Meta): Future[Int] = upsert(meta)
 
+    def checkIfExists(id: String): Future[Boolean] = checkIfExistsByID(id)
+
   }
 
   object Utility {
@@ -127,18 +131,17 @@ class Metas @Inject()(
       }
     }
 
-    def auxiliaryScrub(metaPropertyList: Seq[MetaProperty]): Future[Unit] = {
+    def auxiliaryScrub(metaPropertyList: Seq[MetaProperty]): Future[Seq[Property]] = {
       val upsertMetas = Future.traverse(metaPropertyList)(metaProperty => Service.insertOrUpdate(Meta(id = metaProperty.metaFact.getHash, data = metaProperty.metaFact.data)))
 
       (for {
         _ <- upsertMetas
-      } yield ()
+      } yield metaPropertyList.map(_.removeData())
         ).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-//    def checkAndUpsertMetas(facts: Seq[Fact]): Future[Seq[Int]] = Future.traverse(facts)(fact => if (fact.value.isMeta) Service.insertOrUpdate(Meta(id = fact.value.getHash, data = fact.value.get)) else Future(0))
   }
 
 }

@@ -9,9 +9,5 @@
     @commonHtmlInfo(constants.View.FROM, commonLink(assetMint.from, routes.ViewController.account(assetMint.from)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(assetMint.fromID, routes.IndexController.search(assetMint.fromID)))
     @commonHtmlInfo(constants.View.TO_ID, commonLink(assetMint.toID, routes.IndexController.search(assetMint.toID)))
-    @commonHtmlInfo(constants.View.MAINTAINERS_ID, commonLink(assetMint.maintainersID, routes.IndexController.search(assetMint.maintainersID)))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(assetMint.classificationID, routes.IndexController.search(assetMint.classificationID)))
-    @commonIntInfo(constants.View.LOCK, assetMint.lock)
-    @commonIntInfo(constants.View.BURN, assetMint.burn)
-    @properties(assetMint.properties.propertyList)
 }

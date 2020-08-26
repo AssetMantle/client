@@ -27,6 +27,7 @@ class Block @Inject()(
                        blockchainDelegations: blockchain.Delegations,
                        blockchainIdentities: blockchain.Identities,
                        blockchainMetas: blockchain.Metas,
+                       blockchainMaintainers: blockchain.Maintainers,
                        blockchainOrders: blockchain.Orders,
                        blockchainRedelegations: blockchain.Redelegations,
                        blockchainSigningInfos: blockchain.SigningInfos,
@@ -166,8 +167,10 @@ class Block @Inject()(
               case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
               //classification
               case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => blockchainClassifications.Utility.onDefine(stdMsg.message.asInstanceOf[ClassificationDefine])
-                //meta
+              //meta
               case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
+              //maintainer
+              case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => blockchainMaintainers.Utility.onDeputize(stdMsg.message.asInstanceOf[MaintainerDeputize])
               case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType)
             }
           } catch {
