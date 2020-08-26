@@ -40,6 +40,9 @@
                 case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => {
                     @views.html.component.blockchain.txMessages.withdrawValidatorCommission(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.ASSET_DEFINE => {
+                    @views.html.component.blockchain.txMessages.assetDefine(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.ASSET_MINT => {
                     @views.html.component.blockchain.txMessages.assetMint(msg.message)
                 }
@@ -48,6 +51,9 @@
                 }
                 case constants.Blockchain.TransactionMessage.ASSET_BURN => {
                     @views.html.component.blockchain.txMessages.assetBurn(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => {
+                    @views.html.component.blockchain.txMessages.identityDefine(msg.message)
                 }
                 case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => {
                     @views.html.component.blockchain.txMessages.identityIssue(msg.message)
@@ -67,6 +73,9 @@
                 case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => {
                     @views.html.component.blockchain.txMessages.splitUnwrap(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.ORDER_DEFINE => {
+                    @views.html.component.blockchain.txMessages.orderDefine(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.ORDER_MAKE => {
                     @views.html.component.blockchain.txMessages.orderMake(msg.message)
                 }
@@ -76,16 +85,15 @@
                 case constants.Blockchain.TransactionMessage.ORDER_CANCEL => {
                     @views.html.component.blockchain.txMessages.orderCancel(msg.message)
                 }
-                case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => {
-                    @views.html.component.blockchain.txMessages.classificationDefine(msg.message)
-                }
                 case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => {
                     @views.html.component.blockchain.txMessages.maintainerDeputize(msg.message)
                 }
-                case _ => {
-                    @views.html.component.blockchain.txMessages.classificationDefine(msg.message)
+                case constants.Blockchain.TransactionMessage.META_REVEAL => {
+                    @views.html.component.blockchain.txMessages.metaReveal(msg.message)
                 }
-                case _ => {}
+                case _ => {
+                    @views.html.component.blockchain.txMessages.unknown(msg.message)
+                }
             }
             </div>
         }

@@ -18,6 +18,10 @@ object Blockchain {
     val ExchangeRate = "exchangeRate"
   }
 
+  object Exchange {
+    val Exchanges = "Exchanges"
+  }
+
   object Order {
     val MakerIDProperty = "MakerID"
     val TakerIDProperty = "TakerID"
@@ -29,10 +33,7 @@ object Blockchain {
     val Orders = "orders"
   }
 
-  val META_FACT = "xprt/metaFact"
-  val NON_META_FACT = "xprt/fact"
-
-  object Data {
+  object DataType {
     val STRING_DATA = "xprt/stringData"
     val HEIGHT_DATA = "xprt/heightData"
     val ID_DATA = "xprt/idData"
@@ -80,10 +81,12 @@ object Blockchain {
     val REDELEGATE = "cosmos-sdk/MsgBeginRedelegate"
     val UNDELEGATE = "cosmos-sdk/MsgUndelegate"
     //asset
+    val ASSET_DEFINE = "/xprt/assets/define/message"
     val ASSET_MINT = "/xprt/assets/mint/message"
     val ASSET_MUTATE = "/xprt/assets/mutate/message"
     val ASSET_BURN = "/xprt/assets/burn/message"
     //identity
+    val IDENTITY_DEFINE = "/xprt/identities/define/message"
     val IDENTITY_ISSUE = "/xprt/identities/issue/message"
     val IDENTITY_PROVISION = "/xprt/identities/provision/message"
     val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/message"
@@ -92,13 +95,12 @@ object Blockchain {
     val SPLIT_WRAP = "/xprt/splits/wrap/message"
     val SPLIT_UNWRAP = "/xprt/splits/unwrap/message"
     //order
+    val ORDER_DEFINE = "/xprt/orders/define/message"
     val ORDER_MAKE = "/xprt/orders/make/message"
     val ORDER_TAKE = "/xprt/orders/take/message"
     val ORDER_CANCEL = "/xprt/orders/cancel/message"
     //meta
     val META_REVEAL = "/xprt/metas/reveal/message"
-    //classification
-    val CLASSIFICATION_DEFINE = "/xprt/classifications/define/message"
     //maintainer
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
   }

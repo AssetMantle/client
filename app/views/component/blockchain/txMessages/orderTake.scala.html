@@ -6,7 +6,7 @@
 
 @defining(msg.asInstanceOf[OrderTake]) { orderTake =>
     @commonHtmlInfo(constants.View.FROM, commonLink(orderTake.from, routes.ViewController.account(orderTake.from)))
-    @commonHtmlInfo(constants.View.ORDER_ID, commonLink(orderTake.orderID, routes.IndexController.search(orderTake.orderID)))
-    @commonTextInfo(constants.View.TAKER_SPLIT, orderTake.takerSplit.toString)
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderTake.fromID, routes.IndexController.search(orderTake.fromID)))
+    @commonHtmlInfo(constants.View.ORDER_ID, commonLink(orderTake.orderID, routes.IndexController.search(orderTake.orderID)))
+    @commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, orderTake.takerOwnableSplit.toString)
 }

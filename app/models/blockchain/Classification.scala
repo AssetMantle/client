@@ -6,7 +6,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
-import models.common.TransactionMessages.ClassificationDefine
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -129,26 +128,21 @@ class Classifications @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-    def onDefine(classificationDefine: ClassificationDefine): Future[Unit] = {
-      val immutablesMetaTraitsScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(classificationDefine.immutableMetaTraits.metaPropertyList)
-      val mutablesMetaTraitsScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(classificationDefine.mutableMetaTraits.metaPropertyList)
-//      val upsert = Service.insertOrUpdate(Classification(id = classificationDefine.id, traits = classificationDefine.traits))
+    def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(Classification(id = getID(chainID = chainID, immutables = immutables, mutables = mutables), immutableTraits = immutables, mutableTraits = mutables))
 
       (for {
-        _ <- immutablesMetaTraitsScrubAuxiliary
-        _ <- mutablesMetaTraitsScrubAuxiliary
-//        _ <- upsert
-      } yield ()
-        ).recover {
+        _ <- upsert
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    private def getID(chainID: String, maintainersID: String, hashID: String) = Seq(chainID, maintainersID, hashID).mkString(constants.Blockchain.IDSeparator)
+    private def getID(chainID: String, immutables: Immutables, mutables: Mutables) = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
-    private def getFeatures(id: String): (String, String, String) = {
+    private def getFeatures(id: String): (String, String) = {
       val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
-      if (idList.length == 3) (idList(0), idList(1), idList(2)) else ("", "", "")
+      if (idList.length == 3) (idList(0), idList(1)) else ("", "")
     }
   }
 

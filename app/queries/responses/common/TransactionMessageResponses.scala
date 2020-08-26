@@ -136,6 +136,12 @@ object TransactionMessageResponses {
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
   //Asset
+  case class AssetDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.AssetDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
+  }
+
+  implicit val assetDefineReads: Reads[AssetDefine] = Json.reads[AssetDefine]
+
   case class AssetMint(from: String, fromID: ID, toID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.AssetMint(from = from, fromID = fromID.value.idString, toID = toID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
@@ -155,6 +161,12 @@ object TransactionMessageResponses {
   implicit val assetBurnReads: Reads[AssetBurn] = Json.reads[AssetBurn]
 
   //Identity
+  case class IdentityDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.IdentityDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
+  }
+
+  implicit val identityDefineReads: Reads[IdentityDefine] = Json.reads[IdentityDefine]
+
   case class IdentityIssue(from: String, to: String, fromID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityIssue(from = from, to = to, fromID = fromID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
@@ -193,6 +205,12 @@ object TransactionMessageResponses {
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
   //Order
+  case class OrderDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.OrderDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
+  }
+
+  implicit val orderDefineReads: Reads[OrderDefine] = Json.reads[OrderDefine]
+
   case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, fromID = fromID.value.idString, classificationID = classificationID.value.idString, makerOwnableID = makerOwnableID.value.idString, takerOwnableID = takerOwnableID.value.idString, expiresIn = expiresIn.toInt, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties.toMetaProperties, immutableProperties = immutableProperties.toProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
@@ -210,13 +228,6 @@ object TransactionMessageResponses {
   }
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
-
-  //Classification
-  case class ClassificationDefine(from: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.ClassificationDefine(from = from, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
-  }
-
-  implicit val classificationDefineReads: Reads[ClassificationDefine] = Json.reads[ClassificationDefine]
 
   //meta
   case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessageResponse {
@@ -265,10 +276,12 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.REDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
       case constants.Blockchain.TransactionMessage.UNDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
       //asset
+      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MINT => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MUTATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetMutate](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_BURN => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetBurn](value.toString))
       //identity
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityDefine](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
@@ -277,11 +290,10 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => Msg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))
       case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => Msg(msgType, utilities.JSON.convertJsonStringToObject[SplitUnwrap](value.toString))
       //order
+      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
-      //classification
-      case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
       //meta
       case constants.Blockchain.TransactionMessage.META_REVEAL => Msg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
       //maintainer

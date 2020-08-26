@@ -8,10 +8,10 @@ import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 
 case class Data(dataType: String, value: Data.Value) {
   def toData: Serializable.Data = dataType match {
-    case constants.Blockchain.Data.STRING_DATA => Serializable.Data(constants.Blockchain.Data.STRING_DATA, StringDataValue(value.value))
-    case constants.Blockchain.Data.ID_DATA => Serializable.Data(constants.Blockchain.Data.ID_DATA, IDDataValue(value.value))
-    case constants.Blockchain.Data.HEIGHT_DATA => Serializable.Data(constants.Blockchain.Data.HEIGHT_DATA, HeightDataValue(value.value.toInt))
-    case constants.Blockchain.Data.DEC_DATA => Serializable.Data(constants.Blockchain.Data.DEC_DATA, DecDataValue(BigDecimal(value.value)))
+    case constants.Blockchain.DataType.STRING_DATA => Serializable.Data(constants.Blockchain.DataType.STRING_DATA, StringDataValue(value.value))
+    case constants.Blockchain.DataType.ID_DATA => Serializable.Data(constants.Blockchain.DataType.ID_DATA, IDDataValue(value.value))
+    case constants.Blockchain.DataType.HEIGHT_DATA => Serializable.Data(constants.Blockchain.DataType.HEIGHT_DATA, HeightDataValue(value.value.toInt))
+    case constants.Blockchain.DataType.DEC_DATA => Serializable.Data(constants.Blockchain.DataType.DEC_DATA, DecDataValue(BigDecimal(value.value)))
   }
 }
 
@@ -38,10 +38,10 @@ object Data {
   implicit val decValueReads: Reads[DecValue] = Json.reads[DecValue]
 
   def dataApply(dataType: String, value: JsObject): Data = dataType match {
-    case constants.Blockchain.Data.STRING_DATA => Data(constants.Blockchain.Data.STRING_DATA, Value(value.toString))
-    case constants.Blockchain.Data.ID_DATA => Data(constants.Blockchain.Data.ID_DATA, Value(utilities.JSON.convertJsonStringToObject[IDValue](value.toString).value.value.idString))
-    case constants.Blockchain.Data.HEIGHT_DATA => Data(constants.Blockchain.Data.HEIGHT_DATA, Value(utilities.JSON.convertJsonStringToObject[HeightValue](value.toString).value.value.height))
-    case constants.Blockchain.Data.DEC_DATA => Data(constants.Blockchain.Data.DEC_DATA, Value(utilities.JSON.convertJsonStringToObject[DecValue](value.toString).value.toString))
+    case constants.Blockchain.DataType.STRING_DATA => Data(constants.Blockchain.DataType.STRING_DATA, Value(value.toString))
+    case constants.Blockchain.DataType.ID_DATA => Data(constants.Blockchain.DataType.ID_DATA, Value(utilities.JSON.convertJsonStringToObject[IDValue](value.toString).value.value.idString))
+    case constants.Blockchain.DataType.HEIGHT_DATA => Data(constants.Blockchain.DataType.HEIGHT_DATA, Value(utilities.JSON.convertJsonStringToObject[HeightValue](value.toString).value.value.height))
+    case constants.Blockchain.DataType.DEC_DATA => Data(constants.Blockchain.DataType.DEC_DATA, Value(utilities.JSON.convertJsonStringToObject[DecValue](value.toString).value.toString))
   }
 
   implicit val dataReads: Reads[Data] = (

@@ -12,7 +12,7 @@ object DataValue {
   private implicit val logger: Logger = Logger(this.getClass)
 
   case class StringDataValue(value: String) extends DataValue {
-    val dataType: String = constants.Blockchain.Data.STRING_DATA
+    val dataType: String = constants.Blockchain.DataType.STRING_DATA
 
     def GenerateHash: String = utilities.Hash.getHash(value)
 
@@ -30,7 +30,7 @@ object DataValue {
   implicit val stringDataWrites: OWrites[StringDataValue] = Json.writes[StringDataValue]
 
   case class DecDataValue(value: BigDecimal) extends DataValue {
-    val dataType: String = constants.Blockchain.Data.DEC_DATA
+    val dataType: String = constants.Blockchain.DataType.DEC_DATA
 
     def GenerateHash: String = utilities.Hash.getHash(value.toString)
 
@@ -48,7 +48,7 @@ object DataValue {
   implicit val decDataWrites: OWrites[DecDataValue] = Json.writes[DecDataValue]
 
   case class HeightDataValue(value: Int) extends DataValue {
-    val dataType: String = constants.Blockchain.Data.HEIGHT_DATA
+    val dataType: String = constants.Blockchain.DataType.HEIGHT_DATA
 
     def GenerateHash: String = utilities.Hash.getHash(value.toString)
 
@@ -66,7 +66,7 @@ object DataValue {
   implicit val heightDataWrites: OWrites[HeightDataValue] = Json.writes[HeightDataValue]
 
   case class IDDataValue(value: String) extends DataValue {
-    val dataType: String = constants.Blockchain.Data.ID_DATA
+    val dataType: String = constants.Blockchain.DataType.ID_DATA
 
     def GenerateHash: String = utilities.Hash.getHash(value)
 
@@ -92,10 +92,10 @@ object DataValue {
   }
 
   def dataValueApply(dataType: String, value: JsObject): Serializable.Data =  dataType match {
-    case constants.Blockchain.Data.STRING_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[StringDataValue](value.toString))
-    case constants.Blockchain.Data.ID_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[IDDataValue](value.toString))
-    case constants.Blockchain.Data.HEIGHT_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[HeightDataValue](value.toString))
-    case constants.Blockchain.Data.DEC_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[DecDataValue](value.toString))
+    case constants.Blockchain.DataType.STRING_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[StringDataValue](value.toString))
+    case constants.Blockchain.DataType.ID_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[IDDataValue](value.toString))
+    case constants.Blockchain.DataType.HEIGHT_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[HeightDataValue](value.toString))
+    case constants.Blockchain.DataType.DEC_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[DecDataValue](value.toString))
   }
 
 }

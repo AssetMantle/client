@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
-import models.common.TransactionMessages.{IdentityIssue, IdentityProvision, IdentityUnprovision}
+import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityProvision, IdentityUnprovision}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -24,7 +24,8 @@ class Identities @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             configuration: Configuration,
                             getIdentity: GetIdentity,
-                            blockchainMetas: Metas
+                            blockchainMetas: Metas,
+                            blockchainClassifications: Classifications
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -132,6 +133,22 @@ class Identities @Inject()(
   object Utility {
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
+
+    def onDefine(identityDefine: IdentityDefine): Future[Unit] = {
+      val immutablesMetaScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(identityDefine.immutableMetaTraits.metaPropertyList)
+      val mutablesMetaScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(identityDefine.mutableMetaTraits.metaPropertyList)
+
+      def upsert(immutableProperties: Seq[Property], mutableProperties: Seq[Property]) = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(immutableProperties)), mutables = Mutables(Properties(mutableProperties)))
+
+      (for {
+        immutableProperties <- immutablesMetaScrubAuxiliary
+        mutableProperties <- mutablesMetaScrubAuxiliary
+        _ <- upsert(immutableProperties = immutableProperties, mutableProperties = mutableProperties)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
     def onIssue(identityIssue: IdentityIssue): Future[Unit] = {
       val immutableScrubs = blockchainMetas.Utility.auxiliaryScrub(identityIssue.immutableMetaProperties.metaPropertyList)

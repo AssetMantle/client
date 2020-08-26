@@ -242,7 +242,7 @@ class Splits @Inject()(
 
     def exchangeAuxiliaryCustody(makerID: String, makerSplitID: String, makerSplit: BigDecimal): Future[Unit] = {
       val splitBurn = auxiliaryBurn(ownerID = makerID, ownableID = makerSplitID, splitValue = makerSplit)
-      val splitMint = auxiliaryMint(ownerID = constants.Blockchain.Properties.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
+      val splitMint = auxiliaryMint(ownerID = constants.Blockchain.Exchange.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
 
       (for {
         _ <- splitBurn
@@ -253,7 +253,7 @@ class Splits @Inject()(
     }
 
     def exchangeAuxiliaryReverse(makerID: String, makerSplitID: String, makerSplit: BigDecimal): Future[Unit] = {
-      val splitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Properties.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
+      val splitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Exchange.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
       val splitMint = auxiliaryMint(ownerID = makerID, ownableID = makerSplitID, splitValue = makerSplit)
 
       (for {
@@ -265,7 +265,7 @@ class Splits @Inject()(
     }
 
     def exchangeAuxiliarySwap(makerID: String, makerSplitID: String, makerSplit: BigDecimal, takerID: String, takerSplitID: String, takerSplit: BigDecimal): Future[Unit] = {
-      val makerSplitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Properties.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
+      val makerSplitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Exchange.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
       val takerSplitBurn = auxiliaryBurn(ownerID = takerID, ownableID = takerSplitID, splitValue = takerSplit)
       val makerSplitMint = auxiliaryMint(ownerID = makerID, ownableID = takerSplitID, splitValue = takerSplit)
       val takerSplitMint = auxiliaryMint(ownerID = takerID, ownableID = makerSplitID, splitValue = makerSplit)

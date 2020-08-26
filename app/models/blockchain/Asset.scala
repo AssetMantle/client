@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
-import models.common.TransactionMessages.{AssetBurn, AssetMint, AssetMutate}
+import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -24,6 +24,7 @@ class Assets @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
                         getAsset: GetAsset,
+                        blockchainClassifications: Classifications,
                         blockchainSplits: Splits,
                         blockchainMetas: Metas,
                       )(implicit executionContext: ExecutionContext) {
@@ -127,6 +128,22 @@ class Assets @Inject()(
   }
 
   object Utility {
+
+    def onDefine(assetDefine: AssetDefine): Future[Unit] = {
+      val immutablesMetaScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(assetDefine.immutableMetaTraits.metaPropertyList)
+      val mutablesMetaScrubAuxiliary = blockchainMetas.Utility.auxiliaryScrub(assetDefine.mutableMetaTraits.metaPropertyList)
+
+      def upsert(immutableProperties: Seq[Property], mutableProperties: Seq[Property]) = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(immutableProperties)), mutables = Mutables(Properties(mutableProperties)))
+
+      (for {
+        immutableProperties <- immutablesMetaScrubAuxiliary
+        mutableProperties <- mutablesMetaScrubAuxiliary
+        _ <- upsert(immutableProperties = immutableProperties, mutableProperties = mutableProperties)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
     def onMint(assetMint: AssetMint): Future[Unit] = {
       val immutableScrubs = blockchainMetas.Utility.auxiliaryScrub(assetMint.immutableMetaProperties.metaPropertyList)

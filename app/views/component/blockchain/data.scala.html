@@ -5,16 +5,16 @@
 
 @commonTextInfo(constants.View.DATA_TYPE, data.dataType)
 @data.dataType match {
-    case constants.Blockchain.Data.STRING_DATA => {
+    case constants.Blockchain.DataType.STRING_DATA => {
         @commonTextInfo(constants.View.DATA, data.value.AsString)
     }
-    case constants.Blockchain.Data.ID_DATA => {
+    case constants.Blockchain.DataType.ID_DATA => {
         @commonTextInfo(constants.View.DATA, data.value.AsID)
     }
-    case constants.Blockchain.Data.HEIGHT_DATA => {
+    case constants.Blockchain.DataType.HEIGHT_DATA => {
         @commonIntInfo(constants.View.DATA, data.value.AsHeight)
     }
-    case constants.Blockchain.Data.DEC_DATA => {
+    case constants.Blockchain.DataType.DEC_DATA => {
         @commonTextInfo(constants.View.DATA, data.value.AsDec.toString)
     }
     case _ => {

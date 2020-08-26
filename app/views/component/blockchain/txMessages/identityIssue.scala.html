@@ -8,5 +8,14 @@
 @defining(msg.asInstanceOf[IdentityIssue]) { identityIssue =>
     @commonHtmlInfo(constants.View.FROM, commonLink(identityIssue.from, routes.ViewController.account(identityIssue.from)))
     @commonHtmlInfo(constants.View.TO, commonLink(identityIssue.to, routes.ViewController.account(identityIssue.to)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(identityIssue.fromID, routes.IndexController.search(identityIssue.fromID)))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(identityIssue.classificationID, routes.IndexController.search(identityIssue.classificationID)))
+    @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+    @views.html.component.blockchain.metaProperties(identityIssue.immutableMetaProperties.metaPropertyList)
+    @Messages(constants.View.MUTABLE_META_PROPERTIES):
+    @views.html.component.blockchain.metaProperties(identityIssue.mutableMetaProperties.metaPropertyList)
+    @Messages(constants.View.IMMUTABLE_PROPERTIES):
+    @views.html.component.blockchain.properties(identityIssue.immutableProperties.propertyList)
+    @Messages(constants.View.MUTABLE_PROPERTIES):
+    @views.html.component.blockchain.properties(identityIssue.mutableProperties.propertyList)
 }

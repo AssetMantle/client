@@ -17,27 +17,39 @@ object TransactionMessages {
 
   implicit val sendCoinReads: Reads[SendCoin] = Json.reads[SendCoin]
 
+  implicit val sendCoinWrites: OWrites[SendCoin] = Json.writes[SendCoin]
+
   //crisis
   case class VerifyInvariant(sender: String, invariantModuleName: String, invariantRoute: String) extends TransactionMessage
 
   implicit val verifyInvariantReads: Reads[VerifyInvariant] = Json.reads[VerifyInvariant]
+
+  implicit val verifyInvariantWrites: OWrites[VerifyInvariant] = Json.writes[VerifyInvariant]
 
   //distribution
   case class SetWithdrawAddress(delegatorAddress: String, withdrawAddress: String) extends TransactionMessage
 
   implicit val setWithdrawAddressReads: Reads[SetWithdrawAddress] = Json.reads[SetWithdrawAddress]
 
+  implicit val setWithdrawAddressWrites: OWrites[SetWithdrawAddress] = Json.writes[SetWithdrawAddress]
+
   case class WithdrawDelegatorReward(delegatorAddress: String, validatorAddress: String) extends TransactionMessage
 
   implicit val withdrawDelegatorRewardReads: Reads[WithdrawDelegatorReward] = Json.reads[WithdrawDelegatorReward]
+
+  implicit val withdrawDelegatorRewardWrites: OWrites[WithdrawDelegatorReward] = Json.writes[WithdrawDelegatorReward]
 
   case class WithdrawValidatorCommission(validatorAddress: String) extends TransactionMessage
 
   implicit val withdrawValidatorCommissionReads: Reads[WithdrawValidatorCommission] = Json.reads[WithdrawValidatorCommission]
 
+  implicit val withdrawValidatorCommissionWrites: OWrites[WithdrawValidatorCommission] = Json.writes[WithdrawValidatorCommission]
+
   case class FundCommunityPool(amount: Seq[Coin], depositor: String) extends TransactionMessage
 
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
+
+  implicit val fundCommunityPoolWrites: OWrites[FundCommunityPool] = Json.writes[FundCommunityPool]
 
   //evidence
   //TODO Pending in cosmos-sdk
@@ -46,6 +58,8 @@ object TransactionMessages {
   case class Deposit(proposalID: Long, depositor: String, amount: Seq[Coin]) extends TransactionMessage
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
+
+  implicit val depositWrites: OWrites[Deposit] = Json.writes[Deposit]
 
   case class ContentValue(title: String, description: String, recipient: String, amount: Seq[Coin])
 
@@ -63,14 +77,20 @@ object TransactionMessages {
 
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
+  implicit val submitProposalWrites: OWrites[SubmitProposal] = Json.writes[SubmitProposal]
+
   case class Vote(proposalID: Long, voter: String, option: Int) extends TransactionMessage
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
+
+  implicit val voteWrites: OWrites[Vote] = Json.writes[Vote]
 
   //slashing
   case class Unjail(address: String) extends TransactionMessage
 
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
+
+  implicit val unjailWrites: OWrites[Unjail] = Json.writes[Unjail]
 
   //staking
   case class Description(moniker: Option[String], identity: Option[String], website: Option[String], securityContact: Option[String], details: Option[String]) {
@@ -93,138 +113,192 @@ object TransactionMessages {
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
+  implicit val createValidatorWrites: OWrites[CreateValidator] = Json.writes[CreateValidator]
+
   case class EditValidator(validatorAddress: String, commissionRate: Option[String], description: Description, minSelfDelegation: Option[MicroNumber]) extends TransactionMessage
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]
+
+  implicit val editValidatorWrites: OWrites[EditValidator] = Json.writes[EditValidator]
 
   case class Delegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage
 
   implicit val delegateReads: Reads[Delegate] = Json.reads[Delegate]
 
+  implicit val delegateWrites: OWrites[Delegate] = Json.writes[Delegate]
+
   case class Redelegate(delegatorAddress: String, validatorSrcAddress: String, validatorDstAddress: String, amount: Coin) extends TransactionMessage
 
   implicit val redelegateReads: Reads[Redelegate] = Json.reads[Redelegate]
+
+  implicit val redelegateWrites: OWrites[Redelegate] = Json.writes[Redelegate]
 
   case class Undelegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage
 
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
+  implicit val undelegateWrites: OWrites[Undelegate] = Json.writes[Undelegate]
+
   //Asset
+  case class AssetDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+
+  implicit val assetDefineReads: Reads[AssetDefine] = Json.reads[AssetDefine]
+
+  implicit val assetDefineWrites: OWrites[AssetDefine] = Json.writes[AssetDefine]
+
   case class AssetMint(from: String, fromID: String, toID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
 
   implicit val assetMintReads: Reads[AssetMint] = Json.reads[AssetMint]
+
+  implicit val assetMintWrites: OWrites[AssetMint] = Json.writes[AssetMint]
 
   case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
 
   implicit val assetMutateReads: Reads[AssetMutate] = Json.reads[AssetMutate]
 
+  implicit val assetMutateWrites: OWrites[AssetMutate] = Json.writes[AssetMutate]
+
   case class AssetBurn(from: String, fromID: String, assetID: String) extends TransactionMessage
 
   implicit val assetBurnReads: Reads[AssetBurn] = Json.reads[AssetBurn]
 
+  implicit val assetBurnWrites: OWrites[AssetBurn] = Json.writes[AssetBurn]
+
   //Identity
+  case class IdentityDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+
+  implicit val identityDefineReads: Reads[IdentityDefine] = Json.reads[IdentityDefine]
+
+  implicit val identityDefineWrites: OWrites[IdentityDefine] = Json.writes[IdentityDefine]
+
   case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
 
   implicit val identityIssueReads: Reads[IdentityIssue] = Json.reads[IdentityIssue]
+
+  implicit val identityIssueWrites: OWrites[IdentityIssue] = Json.writes[IdentityIssue]
 
   case class IdentityProvision(from: String, to: String, identityID: String) extends TransactionMessage
 
   implicit val identityProvisionReads: Reads[IdentityProvision] = Json.reads[IdentityProvision]
 
+  implicit val identityProvisionWrites: OWrites[IdentityProvision] = Json.writes[IdentityProvision]
+
   case class IdentityUnprovision(from: String, to: String, identityID: String) extends TransactionMessage
 
   implicit val identityUnprovisionReads: Reads[IdentityUnprovision] = Json.reads[IdentityUnprovision]
+
+  implicit val identityUnprovisionWrites: OWrites[IdentityUnprovision] = Json.writes[IdentityUnprovision]
 
   //Split
   case class SplitSend(from: String, fromID: String, toID: String, ownableID: String, split: BigDecimal) extends TransactionMessage
 
   implicit val splitSendReads: Reads[SplitSend] = Json.reads[SplitSend]
 
+  implicit val splitSendWrites: OWrites[SplitSend] = Json.writes[SplitSend]
+
   case class SplitWrap(from: String, fromID: String, coins: Seq[Coin]) extends TransactionMessage
 
   implicit val splitWrapReads: Reads[SplitWrap] = Json.reads[SplitWrap]
+
+  implicit val splitWrapWrites: OWrites[SplitWrap] = Json.writes[SplitWrap]
 
   case class SplitUnwrap(from: String, fromID: String, ownableID: String, split: BigDecimal) extends TransactionMessage
 
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
+  implicit val splitUnwrapWrites: OWrites[SplitUnwrap] = Json.writes[SplitUnwrap]
+
   //Order
+  case class OrderDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+
+  implicit val orderDefineReads: Reads[OrderDefine] = Json.reads[OrderDefine]
+
+  implicit val orderDefineWrites: OWrites[OrderDefine] = Json.writes[OrderDefine]
+
   case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
+
+  implicit val orderMakeWrites: OWrites[OrderMake] = Json.writes[OrderMake]
 
   case class OrderTake(from: String, fromID: String, takerOwnableSplit: BigDecimal, orderID: String) extends TransactionMessage
 
   implicit val orderTakeReads: Reads[OrderTake] = Json.reads[OrderTake]
 
+  implicit val orderTakeWrites: OWrites[OrderTake] = Json.writes[OrderTake]
+
   case class OrderCancel(from: String, fromID: String, orderID: String) extends TransactionMessage
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
-  //classification
-  case class ClassificationDefine(from: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
-
-  implicit val classificationDefineReads: Reads[ClassificationDefine] = Json.reads[ClassificationDefine]
+  implicit val orderCancelWrites: OWrites[OrderCancel] = Json.writes[OrderCancel]
 
   //meta
   case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage
 
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
 
+  implicit val metaRevealWrites: OWrites[MetaReveal] = Json.writes[MetaReveal]
+
   //maintainer
   case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessage
 
   implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]
+
+  implicit val maintainerDeputizeWrites: OWrites[MaintainerDeputize] = Json.writes[MaintainerDeputize]
 
   //unknown
   case class Unknown(value: String) extends TransactionMessage
 
   implicit val unknownReads: Reads[Unknown] = Json.reads[Unknown]
 
+  implicit val unknownWrites: OWrites[Unknown] = Json.writes[Unknown]
+
   implicit val transactionMessageWrites: Writes[TransactionMessage] = {
     //bank
-    case sendCoin: SendCoin => Json.toJson(sendCoin)(Json.writes[SendCoin])
+    case sendCoin: SendCoin => Json.toJson(sendCoin)
     //staking
-    case createValidator: CreateValidator => Json.toJson(createValidator)(Json.writes[CreateValidator])
-    case editValidator: EditValidator => Json.toJson(editValidator)(Json.writes[EditValidator])
-    case delegate: Delegate => Json.toJson(delegate)(Json.writes[Delegate])
-    case redelegate: Redelegate => Json.toJson(redelegate)(Json.writes[Redelegate])
-    case undelegate: Undelegate => Json.toJson(undelegate)(Json.writes[Undelegate])
+    case createValidator: CreateValidator => Json.toJson(createValidator)
+    case editValidator: EditValidator => Json.toJson(editValidator)
+    case delegate: Delegate => Json.toJson(delegate)
+    case redelegate: Redelegate => Json.toJson(redelegate)
+    case undelegate: Undelegate => Json.toJson(undelegate)
     //crisis
-    case verifyInvariant: VerifyInvariant => Json.toJson(verifyInvariant)(Json.writes[VerifyInvariant])
+    case verifyInvariant: VerifyInvariant => Json.toJson(verifyInvariant)
     //distribution
-    case setWithdrawAddress: SetWithdrawAddress => Json.toJson(setWithdrawAddress)(Json.writes[SetWithdrawAddress])
-    case withdrawDelegatorReward: WithdrawDelegatorReward => Json.toJson(withdrawDelegatorReward)(Json.writes[WithdrawDelegatorReward])
-    case withdrawValidatorCommission: WithdrawValidatorCommission => Json.toJson(withdrawValidatorCommission)(Json.writes[WithdrawValidatorCommission])
-    case fundCommunityPool: FundCommunityPool => Json.toJson(fundCommunityPool)(Json.writes[FundCommunityPool])
+    case setWithdrawAddress: SetWithdrawAddress => Json.toJson(setWithdrawAddress)
+    case withdrawDelegatorReward: WithdrawDelegatorReward => Json.toJson(withdrawDelegatorReward)
+    case withdrawValidatorCommission: WithdrawValidatorCommission => Json.toJson(withdrawValidatorCommission)
+    case fundCommunityPool: FundCommunityPool => Json.toJson(fundCommunityPool)
     //gov
-    case deposit: Deposit => Json.toJson(deposit)(Json.writes[Deposit])
-    case submitProposal: SubmitProposal => Json.toJson(submitProposal)(Json.writes[SubmitProposal])
-    case vote: Vote => Json.toJson(vote)(Json.writes[Vote])
+    case deposit: Deposit => Json.toJson(deposit)
+    case submitProposal: SubmitProposal => Json.toJson(submitProposal)
+    case vote: Vote => Json.toJson(vote)
     //slashing
-    case unjail: Unjail => Json.toJson(unjail)(Json.writes[Unjail])
+    case unjail: Unjail => Json.toJson(unjail)
     //asset
-    case assetMint: AssetMint => Json.toJson(assetMint)(Json.writes[AssetMint])
-    case assetMutate: AssetMutate => Json.toJson(assetMutate)(Json.writes[AssetMutate])
-    case assetBurn: AssetBurn => Json.toJson(assetBurn)(Json.writes[AssetBurn])
+    case assetDefine: AssetDefine => Json.toJson(assetDefine)
+    case assetMint: AssetMint => Json.toJson(assetMint)
+    case assetMutate: AssetMutate => Json.toJson(assetMutate)
+    case assetBurn: AssetBurn => Json.toJson(assetBurn)
     //Identity
-    case identityIssue: IdentityIssue => Json.toJson(identityIssue)(Json.writes[IdentityIssue])
-    case identityProvision: IdentityProvision => Json.toJson(identityProvision)(Json.writes[IdentityProvision])
-    case identityUnprovision: IdentityUnprovision => Json.toJson(identityUnprovision)(Json.writes[IdentityUnprovision])
+    case identityDefine: IdentityDefine => Json.toJson(identityDefine)
+    case identityIssue: IdentityIssue => Json.toJson(identityIssue)
+    case identityProvision: IdentityProvision => Json.toJson(identityProvision)
+    case identityUnprovision: IdentityUnprovision => Json.toJson(identityUnprovision)
     //Split
-    case splitSend: SplitSend => Json.toJson(splitSend)(Json.writes[SplitSend])
-    case splitWrap: SplitWrap => Json.toJson(splitWrap)(Json.writes[SplitWrap])
-    case splitUnwrap: SplitUnwrap => Json.toJson(splitUnwrap)(Json.writes[SplitUnwrap])
+    case splitSend: SplitSend => Json.toJson(splitSend)
+    case splitWrap: SplitWrap => Json.toJson(splitWrap)
+    case splitUnwrap: SplitUnwrap => Json.toJson(splitUnwrap)
     //Order
-    case orderMake: OrderMake => Json.toJson(orderMake)(Json.writes[OrderMake])
-    case orderTake: OrderTake => Json.toJson(orderTake)(Json.writes[OrderTake])
-    case orderCancel: OrderCancel => Json.toJson(orderCancel)(Json.writes[OrderCancel])
-    //Classification
-    case classificationDefine: ClassificationDefine => Json.toJson(classificationDefine)(Json.writes[ClassificationDefine])
+    case orderDefine: OrderDefine => Json.toJson(orderDefine)
+    case orderMake: OrderMake => Json.toJson(orderMake)
+    case orderTake: OrderTake => Json.toJson(orderTake)
+    case orderCancel: OrderCancel => Json.toJson(orderCancel)
     //meta
-    case metaReveal: MetaReveal => Json.toJson(metaReveal)(Json.writes[MetaReveal])
+    case metaReveal: MetaReveal => Json.toJson(metaReveal)
     //maintainer
-    case deputize: MaintainerDeputize => Json.toJson(deputize)(Json.writes[MaintainerDeputize])
+    case deputize: MaintainerDeputize => Json.toJson(deputize)
     case x: Any => Json.toJson(x.toString)
   }
 
@@ -254,10 +328,12 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.REDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
       case constants.Blockchain.TransactionMessage.UNDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
       //asset
+      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MINT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MUTATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMutate](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_BURN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetBurn](value.toString))
       //identity
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityDefine](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
@@ -266,11 +342,10 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))
       case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitUnwrap](value.toString))
       //order
+      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
-      //classification
-      case constants.Blockchain.TransactionMessage.CLASSIFICATION_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[ClassificationDefine](value.toString))
       //meta
       case constants.Blockchain.TransactionMessage.META_REVEAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
       //maintainer
