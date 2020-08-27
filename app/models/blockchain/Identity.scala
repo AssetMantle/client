@@ -220,7 +220,7 @@ class Identities @Inject()(
       def defineAndUpsert(nubProperty: Property) = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
         val mutables = Mutables(Properties(Seq()))
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(immutables, mutables)
+        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(""))))), mutables)
 
         def upsert(classificationID: String) = Service.insertOrUpdate(Identity(id = getID(classificationID = classificationID, immutables = immutables), provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
 
