@@ -16,20 +16,11 @@ object Blockchain {
     val MakerOwnableSplit = "makerOwnableSplit"
     val TakerID = "takerID"
     val ExchangeRate = "exchangeRate"
+    val NubID = "nubID"
   }
 
-  object Exchange {
-    val Exchanges = "Exchanges"
-  }
-
-  object Order {
-    val MakerIDProperty = "MakerID"
-    val TakerIDProperty = "TakerID"
-    val MakerSplitProperty = "MakerSplit"
-    val MakerSplitIDProperty = "MakerSplitID"
-    val ExchangeRateProperty = "ExchangeRate"
-    val TakerSplitIDProperty = "TakerSplitID"
-    val HeightProperty = "Height"
+  object Modules {
+    val Exchanges = "exchanges"
     val Orders = "orders"
   }
 
@@ -90,6 +81,7 @@ object Blockchain {
     val IDENTITY_ISSUE = "/xprt/identities/issue/message"
     val IDENTITY_PROVISION = "/xprt/identities/provision/message"
     val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/message"
+    val IDENTITY_NUB = "/xprt/identities/nub/message"
     //split
     val SPLIT_SEND = "/xprt/splits/send/message"
     val SPLIT_WRAP = "/xprt/splits/wrap/message"

@@ -64,6 +64,9 @@
                 case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => {
                     @views.html.component.blockchain.txMessages.identityUnprovision(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.IDENTITY_NUB => {
+                    @views.html.component.blockchain.txMessages.identityNub(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.SPLIT_SEND => {
                     @views.html.component.blockchain.txMessages.splitSend(msg.message)
                 }

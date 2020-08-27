@@ -25,6 +25,10 @@ object Data {
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 
+  case class StringValue(value: String)
+
+  implicit val stringValueReads: Reads[StringValue] = Json.reads[StringValue]
+
   case class HeightValue(value: Height)
 
   implicit val heightValueReads: Reads[HeightValue] = Json.reads[HeightValue]
@@ -38,7 +42,7 @@ object Data {
   implicit val decValueReads: Reads[DecValue] = Json.reads[DecValue]
 
   def dataApply(dataType: String, value: JsObject): Data = dataType match {
-    case constants.Blockchain.DataType.STRING_DATA => Data(constants.Blockchain.DataType.STRING_DATA, Value(value.toString))
+    case constants.Blockchain.DataType.STRING_DATA => Data(constants.Blockchain.DataType.STRING_DATA, Value(utilities.JSON.convertJsonStringToObject[StringValue](value.toString).value))
     case constants.Blockchain.DataType.ID_DATA => Data(constants.Blockchain.DataType.ID_DATA, Value(utilities.JSON.convertJsonStringToObject[IDValue](value.toString).value.value.idString))
     case constants.Blockchain.DataType.HEIGHT_DATA => Data(constants.Blockchain.DataType.HEIGHT_DATA, Value(utilities.JSON.convertJsonStringToObject[HeightValue](value.toString).value.value.height))
     case constants.Blockchain.DataType.DEC_DATA => Data(constants.Blockchain.DataType.DEC_DATA, Value(utilities.JSON.convertJsonStringToObject[DecValue](value.toString).value.toString))

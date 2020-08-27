@@ -185,6 +185,12 @@ object TransactionMessageResponses {
 
   implicit val identityUnprovisionReads: Reads[IdentityUnprovision] = Json.reads[IdentityUnprovision]
 
+  case class IdentityNub(from: String, nubID: ID) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.IdentityNub(from = from, nubID = nubID.value.idString)
+  }
+
+  implicit val identityNubReads: Reads[IdentityNub] = Json.reads[IdentityNub]
+
   //Split
   case class SplitSend(from: String, fromID: ID, toID: ID, ownableID: ID, split: BigDecimal) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.SplitSend(from = from, fromID = fromID.value.idString, toID = toID.value.idString, ownableID = ownableID.value.idString, split = split)
@@ -285,6 +291,7 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
+      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => Msg(msgType, utilities.JSON.convertJsonStringToObject[IdentityNub](value.toString))
       //split
       case constants.Blockchain.TransactionMessage.SPLIT_SEND => Msg(msgType, utilities.JSON.convertJsonStringToObject[SplitSend](value.toString))
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => Msg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))

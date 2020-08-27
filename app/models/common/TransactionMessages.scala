@@ -189,6 +189,12 @@ object TransactionMessages {
 
   implicit val identityUnprovisionWrites: OWrites[IdentityUnprovision] = Json.writes[IdentityUnprovision]
 
+  case class IdentityNub(from: String, nubID: String) extends TransactionMessage
+
+  implicit val identityNubReads: Reads[IdentityNub] = Json.reads[IdentityNub]
+
+  implicit val identityNubWrites: OWrites[IdentityNub] = Json.writes[IdentityNub]
+
   //Split
   case class SplitSend(from: String, fromID: String, toID: String, ownableID: String, split: BigDecimal) extends TransactionMessage
 
@@ -286,6 +292,7 @@ object TransactionMessages {
     case identityIssue: IdentityIssue => Json.toJson(identityIssue)
     case identityProvision: IdentityProvision => Json.toJson(identityProvision)
     case identityUnprovision: IdentityUnprovision => Json.toJson(identityUnprovision)
+    case identityNub: IdentityNub => Json.toJson(identityNub)
     //Split
     case splitSend: SplitSend => Json.toJson(splitSend)
     case splitWrap: SplitWrap => Json.toJson(splitWrap)
@@ -337,6 +344,7 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityIssue](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityProvision](value.toString))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityUnprovision](value.toString))
+      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[IdentityNub](value.toString))
       //split
       case constants.Blockchain.TransactionMessage.SPLIT_SEND => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitSend](value.toString))
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SplitWrap](value.toString))

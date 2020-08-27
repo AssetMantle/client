@@ -16,7 +16,11 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Classification(id: String, immutableTraits: Immutables, mutableTraits: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Classification(id: String, immutableTraits: Immutables, mutableTraits: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def getChainID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(0)
+
+  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(1)
+}
 
 @Singleton
 class Classifications @Inject()(
@@ -128,22 +132,20 @@ class Classifications @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-    def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(Classification(id = getID(chainID = chainID, immutables = immutables, mutables = mutables), immutableTraits = immutables, mutableTraits = mutables))
+    def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[String] = {
+      val classificationID = getID(chainID = chainID, immutables = immutables, mutables = mutables)
+      val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
 
       (for {
         _ <- upsert
-      } yield ()).recover {
+      } yield classificationID
+        ).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
     private def getID(chainID: String, immutables: Immutables, mutables: Mutables) = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
-    private def getFeatures(id: String): (String, String) = {
-      val idList = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
-      if (idList.length == 3) (idList(0), idList(1)) else ("", "")
-    }
   }
 
 }

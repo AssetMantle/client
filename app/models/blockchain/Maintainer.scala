@@ -16,7 +16,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Maintainer(id: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Maintainer(id: String, maintainedTraits: Mutables, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(0)
 
   def getFromID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(1)
@@ -39,7 +39,7 @@ class Maintainers @Inject()(
   import databaseConfig.profile.api._
 
   case class MaintainerSerialized(id: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Maintainer = Maintainer(id = id, maintainedTraits = utilities.JSON.convertJsonStringToObject[Properties](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Maintainer = Maintainer(id = id, maintainedTraits = utilities.JSON.convertJsonStringToObject[Mutables](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(maintainer: Maintainer): MaintainerSerialized = MaintainerSerialized(id = maintainer.id, maintainedTraits = Json.toJson(maintainer.maintainedTraits).toString, addMaintainer = maintainer.addMaintainer, removeMaintainer = maintainer.removeMaintainer, mutateMaintainer = maintainer.mutateMaintainer, createdBy = maintainer.createdBy, createdOn = maintainer.createdOn, createdOnTimeZone = maintainer.createdOnTimeZone, updatedBy = maintainer.updatedBy, updatedOn = maintainer.updatedOn, updatedOnTimeZone = maintainer.updatedOnTimeZone)
@@ -135,7 +135,7 @@ class Maintainers @Inject()(
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
     def onDeputize(maintainerDeputize: MaintainerDeputize): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(Maintainer(id = getID(classificationID = maintainerDeputize.classificationID, fromID = maintainerDeputize.fromID), maintainedTraits = maintainerDeputize.maintainedTraits, addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
+      val upsert = Service.insertOrUpdate(Maintainer(id = getID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.fromID), maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
       (for {
         _ <- upsert
@@ -144,7 +144,17 @@ class Maintainers @Inject()(
       }
     }
 
-    private def getID(classificationID: String, fromID: String) = Seq(classificationID, fromID).mkString(constants.Blockchain.IDSeparator)
+    def auxiliarySuper(classificationID: String, identityID: String, mutableTraits: Mutables): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(Maintainer(id = getID(classificationID = classificationID, identityID = identityID), maintainedTraits = mutableTraits, addMaintainer = true, removeMaintainer = true, mutateMaintainer = true))
+
+      (for {
+        _ <- upsert
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    private def getID(classificationID: String, identityID: String) = Seq(classificationID, identityID).mkString(constants.Blockchain.IDSeparator)
 
   }
 
