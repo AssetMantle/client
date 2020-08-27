@@ -5,7 +5,10 @@ object Blockchain {
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
+  val FirstOrderCompositeIDSeparator = "|"
+  val SecondOrderCompositeIDSeparator = "*"
   val OneDec = BigDecimal("1.000000000000000000")
+  val ToHashSeparator = "_"
 
   object Properties {
     val Burn = "burn"

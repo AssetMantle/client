@@ -154,7 +154,7 @@ class Maintainers @Inject()(
       }
     }
 
-    private def getID(classificationID: String, identityID: String) = Seq(classificationID, identityID).mkString(constants.Blockchain.IDSeparator)
+    private def getID(classificationID: String, identityID: String) = Seq(classificationID, identityID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
   }
 

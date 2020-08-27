@@ -239,47 +239,5 @@ class Splits @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-
-    def exchangeAuxiliaryCustody(makerID: String, makerSplitID: String, makerSplit: BigDecimal): Future[Unit] = {
-      val splitBurn = auxiliaryBurn(ownerID = makerID, ownableID = makerSplitID, splitValue = makerSplit)
-      val splitMint = auxiliaryMint(ownerID = constants.Blockchain.Modules.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
-
-      (for {
-        _ <- splitBurn
-        _ <- splitMint
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
-    def exchangeAuxiliaryReverse(makerID: String, makerSplitID: String, makerSplit: BigDecimal): Future[Unit] = {
-      val splitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Modules.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
-      val splitMint = auxiliaryMint(ownerID = makerID, ownableID = makerSplitID, splitValue = makerSplit)
-
-      (for {
-        _ <- splitBurn
-        _ <- splitMint
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
-    def exchangeAuxiliarySwap(makerID: String, makerSplitID: String, makerSplit: BigDecimal, takerID: String, takerSplitID: String, takerSplit: BigDecimal): Future[Unit] = {
-      val makerSplitBurn = auxiliaryBurn(ownerID = constants.Blockchain.Modules.Exchanges, ownableID = makerSplitID, splitValue = makerSplit)
-      val takerSplitBurn = auxiliaryBurn(ownerID = takerID, ownableID = takerSplitID, splitValue = takerSplit)
-      val makerSplitMint = auxiliaryMint(ownerID = makerID, ownableID = takerSplitID, splitValue = takerSplit)
-      val takerSplitMint = auxiliaryMint(ownerID = takerID, ownableID = makerSplitID, splitValue = makerSplit)
-
-      (for {
-        _ <- makerSplitBurn
-        _ <- takerSplitBurn
-        _ <- makerSplitMint
-        _ <- takerSplitMint
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
   }
-
 }

@@ -220,7 +220,8 @@ class Identities @Inject()(
       def defineAndUpsert(nubProperty: Property) = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
         val mutables = Mutables(Properties(Seq()))
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(""))))), mutables)
+        //While giving Immutables to auxiliaryDefine, do not use NewFact(""), instead directly use Fact(""). This is because, in BC, NewMetaFact is used in Property NubID with "". So when hash is evaluated in auxiliaryDefine in BC, hash of "" is evaluated. Using NewFact will lead to computing hash of "" one more time compared to BC.
+        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, Fact(""))))), mutables)
 
         def upsert(classificationID: String) = Service.insertOrUpdate(Identity(id = getID(classificationID = classificationID, immutables = immutables), provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
 
@@ -239,7 +240,7 @@ class Identities @Inject()(
       }
     }
 
-    private def getID(classificationID: String, immutables: Immutables) = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.IDSeparator)
+    private def getID(classificationID: String, immutables: Immutables) = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
   }
 

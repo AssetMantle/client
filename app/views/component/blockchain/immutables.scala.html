@@ -4,7 +4,11 @@
 
 @(immutables: Immutables)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(constants.View.IMMUTABLE_PROPERTIES):
 @commonInfoBox() {
-    @properties(immutables.properties.propertyList)
+    @Messages(constants.View.IMMUTABLE_PROPERTIES):
+    @if(immutables.properties.propertyList.isEmpty) {
+        @Messages(constants.View.IMMUTABLES_NOT_FOUND)
+    } else {
+        @properties(immutables.properties.propertyList)
+    }
 }

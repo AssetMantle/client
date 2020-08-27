@@ -277,7 +277,7 @@ class Orders @Inject()(
       }
     }
 
-    private def getID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, hashID: String) = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, hashID).mkString(constants.Blockchain.IDSeparator)
+    private def getID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, hashID: String) = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, hashID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 
   }
 
