@@ -68,7 +68,7 @@
                             <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                         </a>
                         <ul class="cmuk-navbar-nav">
-                            <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                            <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
                             @commonIcon("dashBoard")
                             </span>
                                 @Messages(constants.View.DASHBOARD)
@@ -257,11 +257,8 @@
                 <div>@Messages(constants.View.CONNECTION_ERROR)</div>
             </div>
         </div>
-            <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
-                <div class="connectionError">
-                    <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
-                    <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
-                </div>
+            <div class = "centerScreen hidden" id="blockchainConnectionLost">
+
             </div>
         </div>
             @* Footer *@

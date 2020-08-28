@@ -106,6 +106,7 @@ body.darkMode .addBalanceButton {
 body.darkMode button, body.darkMode .buttonPrimary, body.darkMode .addBalanceButton {
   background: #383941;
   color: #FFFFFF; }
+body.darkMode table tr td:not(:first-child),
 body.darkMode h1, body.darkMode h2, body.darkMode h3, body.darkMode h4, body.darkMode h5, body.darkMode h6, body.darkMode .cmuk-switcher li, body.darkMode p,
 body.darkMode .cmuk-legend, body.darkMode label,
 body.darkMode .cmuk-card-header,
@@ -200,7 +201,7 @@ body.darkMode .commodityImage {
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
   background: #2f2d38;
   border-color: #31323A; }
-body.darkMode .blockHeightItem .listItemChild p {
+body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
   color: #e50913; }
 body.darkMode .tableCard table tr {
   border-bottom: 1px solid #31323A; }
@@ -208,6 +209,14 @@ body.darkMode .tableCard table tr {
     color: #D0D0D0; }
   body.darkMode .tableCard table tr td {
     color: #60778F; }
+body.darkMode .cmuk-alert-danger {
+  background: #7b4852; }
+body.darkMode .block {
+  border-color: #e5e5e5; }
+  body.darkMode .block .full {
+    background-color: #e5e5e5; }
+body.darkMode .searchForm dl .cmuk-search-input {
+  border: none; }
 
 body.lightMode .buttonPrimary {
   background: #191616; }

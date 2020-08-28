@@ -170,6 +170,7 @@ body.darkMode {
     background:#383941;
     color: #FFFFFF ;
   }
+   table tr td:not(:first-child),
   h1, h2, h3, h4, h5, h6, .cmuk-switcher li, p,
   .cmuk-legend, label,
   .cmuk-card-header,
@@ -326,8 +327,10 @@ body.darkMode {
     background: #2f2d38;
     border-color:$darkModeBorderColor;
   }
-  .blockHeightItem .listItemChild p{
-    color: #e50913
+  .blockHeightItem {
+    .listItemChild p, a {
+      color: #e50913
+    }
   }
   .tableCard{
     table{
@@ -341,6 +344,18 @@ body.darkMode {
         }
       }
     }
+  }
+  .cmuk-alert-danger {
+    background: #7b4852;
+  }
+  .block {
+    border-color: #e5e5e5;
+    .full {
+      background-color: #e5e5e5;
+    }
+  }
+  .searchForm dl .cmuk-search-input{
+    border: none;
   }
 }
 
