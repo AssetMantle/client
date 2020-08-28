@@ -305,7 +305,7 @@ body.darkMode {
       border-color: #4A4B51;
     }
     .seenIcon{
-      background-color: #383941;
+      background-color: #DDE8F3;
     }
     .table-scroll {
       tbody {
@@ -345,6 +345,25 @@ body.darkMode {
     background: #838388;
     border: 1.51312px solid #838388;
   }
+  .contactDetails .contactInfoItem .cmuk-card .cmuk-button{
+    background: none;
+  }
+  .comdex {
+    .cmuk-alert-success{
+      background-color: #32d296;
+      p{
+        color: #fff;
+      }
+    }
+    .cmuk-alert-warning {
+      background: #faa05a80;
+      color: #fff;
+    }
+    .cmuk-alert-danger{
+      background: #f0506e69;
+    }
+  }
+
 }
 
 // End Of Dark Mode Styles

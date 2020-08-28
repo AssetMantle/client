@@ -68,7 +68,7 @@
                         @loginState match {
                             case null => {}
                             case default => {
-                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
                                     @commonIcon("dashboard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)

@@ -187,7 +187,7 @@ body.darkMode .documentView .documentList .docIcon {
   background-color: #383941;
   border-color: #4A4B51; }
 body.darkMode .documentView .documentList .seenIcon {
-  background-color: #383941; }
+  background-color: #DDE8F3; }
 body.darkMode .documentView .documentList .table-scroll tbody > * {
   border-color: #31323A; }
 body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
@@ -211,6 +211,17 @@ body.darkMode .viewMore {
 body.darkMode .commodityImage {
   background: #838388;
   border: 1.51312px solid #838388; }
+body.darkMode .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
+  background: none; }
+body.darkMode .comdex .cmuk-alert-success {
+  background-color: #32d296; }
+  body.darkMode .comdex .cmuk-alert-success p {
+    color: #fff; }
+body.darkMode .comdex .cmuk-alert-warning {
+  background: #faa05a80;
+  color: #fff; }
+body.darkMode .comdex .cmuk-alert-danger {
+  background: #f0506e69; }
 
 body.lightMode .buttonPrimary {
   background: #0862BE; }
