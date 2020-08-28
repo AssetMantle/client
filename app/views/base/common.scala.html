@@ -257,8 +257,11 @@
                 <div>@Messages(constants.View.CONNECTION_ERROR)</div>
             </div>
         </div>
-            <div class = "centerScreen hidden" id="blockchainConnectionLost">
-
+            <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
+                <div class="connectionError">
+                    <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
+                    <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
+                </div>
             </div>
         </div>
             @* Footer *@
