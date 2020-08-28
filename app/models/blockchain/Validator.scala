@@ -206,7 +206,7 @@ class Validators @Inject()(
 
   object Utility {
 
-    def onCreateValidator(txHash: String, createValidator: CreateValidator): Future[Unit] = {
+    def onCreateValidator(createValidator: CreateValidator): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(createValidator.validatorAddress)
 
       def insertValidator(validator: Validator) = Service.insertOrUpdate(validator)
@@ -214,7 +214,7 @@ class Validators @Inject()(
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(Delegate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.validatorAddress), validatorAddress = createValidator.validatorAddress, amount = createValidator.value))
         val insertSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(createValidator.publicKey)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${createValidator.validatorAddress}'")
         val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
 
         for {
@@ -234,13 +234,13 @@ class Validators @Inject()(
       }
     }
 
-    def onEditValidator(txHash: String, editValidator: EditValidator): Future[Unit] = {
+    def onEditValidator(editValidator: EditValidator): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(editValidator.validatorAddress)
 
       def insertValidator(validator: Validator) = {
         val update = Service.insertOrUpdate(validator)
         val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
         for {
           _ <- update
           _ <- insertKeyBaseAccount
@@ -256,13 +256,13 @@ class Validators @Inject()(
       }
     }
 
-    def onUnjail(txHash: String, unjail: Unjail): Future[Unit] = {
+    def onUnjail(unjail: Unjail): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(unjail.address)
 
       def updateAndAddEvent(validator: Validator) = {
         val upsert = Service.insertOrUpdate(validator)
         val updateSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
         for {
           _ <- upsert
           _ <- updateSigningInfos

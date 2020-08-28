@@ -41,7 +41,7 @@
             <div class="cmuk-grid-match" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
                     <div class="switcherCard tableViewCard">
-                    @views.html.component.blockchain.split(ownerSplits = splits.filter(_.ownerID == query), ownableSplits = splits.filter(_.ownableID == query))
+                    @views.html.component.blockchain.splits(splits)
                     </div>
                 </div>
             </div>
