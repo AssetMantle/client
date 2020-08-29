@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.SALES_QUOTE_LIST) {
+@commonCard(constants.View.SALES_QUOTE_LIST, 'cardIconPath -> "images/icons/icons.svg#salesQuoteList") {
 } {
     @commonHorizontalSwitcher(ListMap(
         constants.View.SENT_NEGOTIATION_REQUEST_LIST -> routes.javascript.ComponentViewController.organizationViewSentNegotiationRequestList,

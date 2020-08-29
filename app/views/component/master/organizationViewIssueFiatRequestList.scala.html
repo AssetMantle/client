@@ -4,7 +4,7 @@
 @import views.html.base._
 @(traderList: Seq[Trader], fiatRequestList: Seq[FiatRequest], rtcbList: Seq[RTCB])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.FIAT_TRANSACTIONS) {
+@commonCard(constants.View.FIAT_TRANSACTIONS,  'cardIconPath -> "images/icons/icons.svg#fundDeposits") {
 } {
     @fiatRequestList.map { fiatRequest =>
         @commonVerticalInfoBox() {

@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.TRADERS) {
+@commonCard(constants.View.TRADERS, 'cardIconPath -> "images/icons/icons.svg#traders") {
     @commonFormButton(constants.Form.INVITE_TRADER)
 }{
     @commonHorizontalSwitcher(ListMap(

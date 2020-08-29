@@ -15,9 +15,16 @@
             <div class="title"> <span>@Messages(constants.View.ORGANIZATION_DETAILS)</span></div>
             @commonTextInfo(constants.View.NAME, organization.name)
             @commonTextInfo(constants.View.ABBREVIATION, organization.abbreviation.getOrElse(""))
-            <p>@commonTextInfo(constants.View.ID, organization.id, 'id -> "organizationID")
-                <a class="toolTip"  onclick="copyToClipboard('organizationID','toolTipOrganizationID')"><span class="toolTipText" id="toolTipOrganizationID">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy('toolTipOrganizationID')"></span></a>
-            </p>
+            <div class="cmuk-flex infoRow">
+                <div class="infoRowLabel">
+                @Messages(constants.View.ORGANIZATION_ID)
+                </div>
+                <div class="infoRowValue textOverflowCopy">
+                    <p>@Messages(organization.id)
+                    </p>
+                    @commonCopyText("traderViewOrganizationId", organization.id)
+                </div>
+            </div>
             @commonDateInfo(constants.View.ESTABLISHMENT_DATE, organization.establishmentDate)
             @commonBooleanInfo(constants.View.VERIFIED_STATUS, organization.verificationStatus)
         }

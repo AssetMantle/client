@@ -969,18 +969,18 @@ html, body{
 
 form{
   .formBody{
-    padding: 20px 60px 60px 60px;
+    padding: 30px 60px 60px 60px;
   }
 }
 
 .termAccept{
-  margin: 0px 0px 30px 30px;
+  margin: 0 0 30px 30px;
 }
 .modalInfoBlock{
   width: 620px;
   max-height: 600px;
   overflow: auto;
-  padding: 20px 60px 60px 60px;
+  padding: 30px 60px 60px 60px;
   @extend %scroller;
   .traderCommodity{
     margin:10px 0;
@@ -1729,6 +1729,7 @@ form{
     .cmuk-card-header .icon {
       width: 18px;
       height: 18px;
+      margin-bottom: 3px;
     }
   }
 }
@@ -1953,15 +1954,17 @@ form{
 }
 
 .rightContainer{
+  .cmuk-card-header{
+    .icon{
+      width: 18px;
+      height: 18px;
+      margin-bottom: 2px;
+    }
+  }
   .recentActivityContainer{
     margin-bottom: 20px;
     .cmuk-card-header{
       padding:15px 20px;
-      .icon{
-        width: 18px;
-        height: 18px;
-        margin-bottom: 2px;
-      }
     }
     .cmuk-card-body{
       overflow-y: auto;
@@ -2282,6 +2285,7 @@ header:before,
     .cmuk-button{
       line-height: 28px;
       padding: 0 12px;
+      margin: 0;
     }
   }
   .cmuk-card{
@@ -3012,10 +3016,10 @@ figure.zoom {
       }
     }
     .salesQuoteCategory.buy{
-      background: #F2453C;
+      background: #4CA841;
     }
     .salesQuoteCategory.sell{
-      background: #4CA841;
+      background: #F2453C;
     }
   }
   .salesQuoteCardMiddle{

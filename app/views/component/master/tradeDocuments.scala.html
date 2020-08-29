@@ -16,7 +16,7 @@
         <div class="modalInfoBlock">
         <div id='@Seq("UPLOAD", "NEGOTIATION", constants.File.Negotiation.CONTRACT).mkString("_")'>
             <p>@Messages(constants.View.UPLOAD_CONTRACT_NOTE)</p>
-        @commonModalButton(Seq("UPLOAD", constants.File.Negotiation.CONTRACT).mkString("_"), routes.javascript.FileController.uploadNegotiationForm,  'parameters -> s"'${constants.File.Negotiation.CONTRACT}','${negotiation.id}'")
+        @commonModalButton(Messages(constants.View.UPLOAD), routes.javascript.FileController.uploadNegotiationForm,  'parameters -> s"'${constants.File.Negotiation.CONTRACT}','${negotiation.id}'")
         </div>
         @negotiationFiles.find(_.documentType== constants.File.Negotiation.CONTRACT) match {
             case Some(document) => {
@@ -30,7 +30,7 @@
                             <span>@constants.View.CONTRACT_SIGNATURE_PENDING</span>
                         }
                         case None=> {
-                            @commonModalButton(Seq("UPDATE", document.documentType).mkString("_"), routes.javascript.FileController.updateNegotiationForm,  'parameters -> s"'${document.documentType}','${negotiation.id}'")
+                            @commonModalButton(Messages(constants.View.UPDATE), routes.javascript.FileController.updateNegotiationForm,  'parameters -> s"'${document.documentType}','${negotiation.id}'")
                              @commonFormButton(constants.Form.ADD_CONTRACT, 'parameters -> s"'${negotiation.id}'")
                             }
                         }
@@ -61,7 +61,7 @@
                 } {
                     <a href="@routes.FileController.tradingFile(assetFile.id, assetFile.fileName, assetFile.documentType)" target="_blank">@Messages(assetFile.documentType)</a>
                 } {
-                    @commonModalButton(Seq("UPDATE", assetFile.documentType).mkString("_"), routes.javascript.FileController.updateAssetForm, 'parameters -> s"'${assetFile.documentType}','${negotiation.id}'")
+                    @commonModalButton(Messages(constants.View.UPDATE), routes.javascript.FileController.updateAssetForm, 'parameters -> s"'${assetFile.documentType}','${negotiation.id}'")
                     @assetFile.documentType match {
                         case constants.File.Asset.BILL_OF_LADING => {
                             @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiation.id}'")
@@ -84,7 +84,7 @@
                 } {
                     <a class="hashCode" title="@Messages(negotiationFile.documentType)" href="@routes.FileController.tradingFile(negotiation.id, negotiationFile.fileName, negotiationFile.documentType)" target="_blank">@Messages(negotiationFile.documentType)</a>
                 } {
-                    @commonModalButton(Seq("UPDATE", negotiationFile.documentType).mkString("_"), routes.javascript.FileController.updateNegotiationForm, 'parameters -> s"'${negotiationFile.documentType}','${negotiation.id}'")
+                    @commonModalButton(Messages(constants.View.UPDATE), routes.javascript.FileController.updateNegotiationForm, 'parameters -> s"'${negotiationFile.documentType}','${negotiation.id}'")
                     @negotiationFile.documentType match {
                         case constants.File.Negotiation.INVOICE => {
                             @commonFormButton(constants.Form.ADD_INVOICE, 'parameters -> s"'${negotiation.id}'")

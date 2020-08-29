@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="traderSalesQuotes">
-@commonCard(constants.View.SALES_QUOTE_LIST) {
+@commonCard(constants.View.SALES_QUOTE_LIST, 'cardIconPath -> "images/icons/icons.svg#salesQuoteList") {
   @commonFormButton(constants.Form.NEGOTIATION_REQUEST)
 } {
   @commonHorizontalSwitcher(ListMap(
