@@ -2,7 +2,7 @@
 @import "variables.scss";
 
 :root{
-  font-family: Oxygen, sans-serif !important;
+  font-family: 'Montserrat', sans-serif !important;
   box-sizing: border-box;
 }
 
@@ -818,25 +818,41 @@ html, body{
       }
       padding: 10px;
     }
+    table{
+      margin: 0;
+      td , tr{
+        padding: 12px 12px;
+      }
+    }
   }
   .cmuk-subnav-pill>.cmuk-active>a{
-    background-color: #222;
+    background-color: #e50913;
+  }
+  .validatorList .cmuk-subnav li a{
+    padding: 5px 20px;
+    font-size: $paragraphFontSizeMedium;
+    border-radius: 5px;
   }
   .searchForm{
     width: auto;
-    margin-right: 15px;
+    margin-right: 20px;
     dl {
       margin: 0;
       label {
         display: none;
       }
       .cmuk-search-input {
-        border-radius: 5px;
-        padding-right: 40px;
+        border-radius: 3px;
+        padding:0 40px 0 10px;
         background: #fff;
+        height: 35px;
           width: 450px;
-          font-size: $paragraphFontSizeMedium !important;
+          font-size: $paragraphFontSizeSmall !important;
         }
+    }
+    .cmuk-search-icon{
+      background: #585858;
+      color: #ffffff;
     }
 
   }
@@ -902,6 +918,9 @@ html, body{
       }
     }
   }
+  .cmuk-input:focus, .cmuk-select:focus, .cmuk-textarea:focus{
+    border-color: $colorSecondary;
+  }
 }
 
 .formNote{
@@ -945,7 +964,6 @@ html, body{
   }
   .cmuk-logo{
     padding: 0 40px 0 0;
-    border-right: 1px solid #ffffff;
     img{
       width: 120px;
     }
@@ -953,7 +971,6 @@ html, body{
   .cmuk-navbar-right{
     .cmuk-navbar-nav>li>a{
       padding:0 25px;
-      //border-left: 1px solid #ffffff;
     }
     .cmuk-navbar-nav {
       .buttonRegister{
@@ -969,7 +986,7 @@ html, body{
         padding: 3px 40px 0 40px;
       }
       li .loginLink{
-        padding: 0 45px 0 45px;
+        padding: 0 40px 0 15px;
       }
     }
   }
@@ -1016,7 +1033,7 @@ html, body{
   }
   .cmuk-navbar-nav>li>a.active{
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
+    border-bottom: 3px solid #e50913;
     padding-top: 3px;
     .icon {
       fill: #e50913;
@@ -1877,6 +1894,11 @@ form{
 }
 
 .leftContainer{
+  .tableCard table td, .comdex .tableCard table tr{
+    padding:10px;
+    font-size: $paragraphFontSizeSmall;
+    vertical-align: middle;
+  }
   .financial{
     margin-bottom: 20px;
   }
@@ -3191,6 +3213,22 @@ figure.zoom {
       }
       dd{
         margin: 0 5px 0 0;
+      }
+    }
+  }
+}
+.transactionMessages{
+  .cmuk-card-body {
+    .cmuk-card-header {
+      color: #e50913;
+    }
+    .cmuk-card-body{
+      height: auto;
+      .cmuk-card-body{
+        .title{
+          padding-left: 12px;
+          font-weight: 700;
+        }
       }
     }
   }

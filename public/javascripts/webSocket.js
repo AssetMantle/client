@@ -103,12 +103,42 @@ function updateTransactionList(receivedData) {
 }
 
 function updateMissedBlocksCounter(receivedData) {
-    let missingBlocksCounter = $('#missingBlocksCounter');
-    for (let i = missingBlocksCounter.children().length - 1; i >= 0; i--) {
-        if (i === 0) {
-            $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", receivedData.block.height);
-        } else {
-            $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", $('#missingBlocksCounter_' + (i - 1)).children('.block').children('div').text());
+    let blockId = $("#missingBlocksCounter").parent().attr("id");
+    let missingBlocksBox = $('#missingBlocksCounter');
+    let count = 0;
+    for (let i = 0; i < receivedData.validators.length; i++) {
+        let missingBlocksCounter = receivedData.validators[i];
+        if (blockId === missingBlocksCounter) {
+            count ++;
+        }
+    }
+
+    if(count === 0){
+        for (let i = missingBlocksBox.children().length - 1; i >= 0; i--) {
+            let previousBlockHeight = $('#missingBlocksCounter_' + (i - 1)).children('.block').attr("id");
+            if (i === 0) {
+                $('#missingBlocksCounter_' + i).children('.block').html("<div class=\"empty\"></div>");
+                $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", receivedData.block.height);
+                $('#missingBlocksCounter_' + i).children('.block').attr("id", receivedData.block.height);
+            } else {
+                $('#missingBlocksCounter_' + i).children('.block').html($('#missingBlocksCounter_' + (i - 1)).children('.block').children('div'));
+                $('#missingBlocksCounter_' + i).children('.block').attr("id", previousBlockHeight);
+                $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", previousBlockHeight);
+            }
+        }
+    }else
+    {
+        for (let i = missingBlocksBox.children().length - 1; i >= 0; i--) {
+            let previousBlockHeight = $('#missingBlocksCounter_' + (i - 1)).children('.block').attr("id");
+            if (i === 0) {
+                $('#missingBlocksCounter_' + i).children('.block').html("<div class=\"full\"></div>");
+                $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", receivedData.block.height);
+                $('#missingBlocksCounter_' + i).children('.block').attr("id", receivedData.block.height);
+            } else {
+                $('#missingBlocksCounter_' + i).children('.block').html($('#missingBlocksCounter_' + (i - 1)).children('.block').children('div'));
+                $('#missingBlocksCounter_' + i).children('.block').attr("id", previousBlockHeight);
+                $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", previousBlockHeight);
+            }
         }
     }
 }

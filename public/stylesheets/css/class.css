@@ -1,5 +1,5 @@
 :root {
-  font-family: Oxygen, sans-serif !important;
+  font-family: 'Montserrat', sans-serif !important;
   box-sizing: border-box; }
 
 *,
@@ -157,11 +157,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .toggleElement {
   text-align: center;
-  background-color: #000;
+  background-color: #191616;
   color: #FFFFFF; }
 
 .showToggleElement {
-  background-color: #000;
+  background-color: #191616;
   cursor: pointer;
   color: #10292e; }
 
@@ -249,7 +249,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100%;
   padding: 30px 0;
   font-size: 0.875rem;
-  background: #000; }
+  background: #191616; }
   .footer .copyRight {
     margin: 10px 0;
     font-weight: bold;
@@ -317,7 +317,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .fileName {
   font-size: 0.875rem;
-  color: #000;
+  color: #191616;
   margin-bottom: 5px; }
 
 .checkboxSection {
@@ -428,13 +428,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   height: 1.5em;
   display: inline-block;
   margin-right: .2em;
-  border: 0.1em solid #000;
-  -webkit-box-shadow: 1px 1px 3px 0 #000;
-  -moz-box-shadow: 1px 1px 3px 0 #000;
-  box-shadow: 1px 1px 3px 0 #000;
+  border: 0.1em solid #191616;
+  -webkit-box-shadow: 1px 1px 3px 0 #191616;
+  -moz-box-shadow: 1px 1px 3px 0 #191616;
+  box-shadow: 1px 1px 3px 0 #191616;
   border-radius: 3px; }
   .block .full {
-    background-color: #000;
+    background-color: #191616;
     height: 100%;
     width: 100%; }
 
@@ -451,12 +451,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100% !important; }
 .comdex .buttonPrimary {
   border-radius: 0.25rem;
-  background: #000;
+  background: #191616;
   color: #FFFFFF;
   font-size: 0.875rem;
   font-weight: bold; }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
-  background-color: #000; }
+  background-color: #191616; }
 .comdex .cmuk-input {
   background: #FFFFFF;
   cursor: auto;
@@ -471,7 +471,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     letter-spacing: 0.01em; }
   .comdex .cmuk-input:focus {
     color: #272829;
-    border: 1px solid #000; }
+    border: 1px solid #191616; }
 .comdex input[type=date] {
   padding: 12px 15px; }
 .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
@@ -495,9 +495,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button-primary {
   border: none; }
 .comdex .primaryFont {
-  font-family: Rubik; }
+  font-family: "Montserrat", sans-serif; }
 .comdex .secondaryFont {
-  font-family: Oxygen; }
+  font-family: "Montserrat", sans-serif; }
 .comdex .cmuk-alert-warning p {
   text-decoration: underline;
   cursor: pointer; }
@@ -540,11 +540,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   outline: none;
   cursor: pointer; }
 .comdex .cmuk-button-link {
-  color: #000; }
+  color: #191616; }
   .comdex .cmuk-button-link:hover, .comdex .cmuk-button-link:focus {
     text-decoration: none; }
 .comdex .cmuk-button-primary {
-  background-color: #000; }
+  background-color: #191616; }
 .comdex .cmuk-legend {
   font-weight: bold;
   text-align: center;
@@ -553,7 +553,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1.125rem; }
 .comdex .cmuk-spinner > * > * {
   stroke-width: 2 !important;
-  stroke: #000 !important; }
+  stroke: #191616 !important; }
 .comdex .cmuk-search-icon > * > * {
   stroke-width: 2 !important; }
 .comdex .cmuk-accordion-title::before {
@@ -622,21 +622,33 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   padding: 10px; }
   .comdex .tableCard .cmuk-card-body .cmuk-card-header {
     display: none; }
+.comdex .tableCard table {
+  margin: 0; }
+  .comdex .tableCard table td, .comdex .tableCard table tr {
+    padding: 12px 12px; }
 .comdex .cmuk-subnav-pill > .cmuk-active > a {
-  background-color: #222; }
+  background-color: #e50913; }
+.comdex .validatorList .cmuk-subnav li a {
+  padding: 5px 20px;
+  font-size: 1rem;
+  border-radius: 5px; }
 .comdex .searchForm {
   width: auto;
-  margin-right: 15px; }
+  margin-right: 20px; }
   .comdex .searchForm dl {
     margin: 0; }
     .comdex .searchForm dl label {
       display: none; }
     .comdex .searchForm dl .cmuk-search-input {
-      border-radius: 5px;
-      padding-right: 40px;
+      border-radius: 3px;
+      padding: 0 40px 0 10px;
       background: #fff;
+      height: 35px;
       width: 450px;
-      font-size: 1rem !important; }
+      font-size: 0.875rem !important; }
+  .comdex .searchForm .cmuk-search-icon {
+    background: #585858;
+    color: #ffffff; }
 .comdex .dataTables_wrapper .dataTables_filter {
   width: auto;
   margin-bottom: 15px; }
@@ -681,6 +693,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding: 0 10px;
     border-radius: 5px;
     color: #000; }
+.comdex .cmuk-input:focus, .comdex .cmuk-select:focus, .comdex .cmuk-textarea:focus {
+  border-color: #191616; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -702,9 +716,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     height: 20px; }
 
 .header {
-  background: #000; }
+  background: #191616; }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-    background: #000;
+    background: #191616;
     padding: 0 0 0 35px; }
   .header .navItemRippleEffect {
     position: relative;
@@ -715,8 +729,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     min-height: 60px;
     text-transform: none; }
   .header .cmuk-logo {
-    padding: 0 40px 0 0;
-    border-right: 1px solid #ffffff; }
+    padding: 0 40px 0 0; }
     .header .cmuk-logo img {
       width: 120px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
@@ -724,7 +737,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
     background-color: #FE4350;
     font-size: 0.875rem;
-    font-family: Rubik;
+    font-family: "Montserrat", sans-serif;
     color: #FFFFFF;
     line-height: inherit;
     padding: 5px 30px;
@@ -732,7 +745,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-right .cmuk-navbar-nav .login-nav-item a {
     padding: 3px 40px 0 40px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav li .loginLink {
-    padding: 0 45px 0 45px; }
+    padding: 0 40px 0 15px; }
   .header .cmuk-navbar-nav > li > a {
     padding: 0 25px;
     font-weight: bold;
@@ -764,7 +777,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     color: #FFFFFF; }
   .header .cmuk-navbar-nav > li > a.active {
     color: #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
+    border-bottom: 3px solid #e50913;
     padding-top: 3px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
       fill: #e50913; }
@@ -1050,7 +1063,7 @@ form .formBody {
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
         color: #FFFFFF;
-        font-family: Rubik; }
+        font-family: "Montserrat", sans-serif; }
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
@@ -1074,7 +1087,7 @@ form .formBody {
     padding: 15px 20px;
     font-size: 1.125rem;
     text-transform: capitalize;
-    color: #000;
+    color: #191616;
     font-weight: bold; }
     .tabSection .cmuk-subnav-pill li a:before {
       content: "";
@@ -1086,7 +1099,7 @@ form .formBody {
       background: url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
       padding-left: 25px; }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #000;
+  background: #191616;
   color: #FFFFFF; }
   .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
@@ -1111,7 +1124,7 @@ form .formBody {
     display: flex;
     justify-content: center;
     border-radius: 50%;
-    color: #000;
+    color: #191616;
     font-weight: bold; }
   .left .quoteIdTitle {
     color: #6C7883;
@@ -1242,7 +1255,7 @@ form .formBody {
         height: 16px;
         margin-bottom: 3px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-      color: #000;
+      color: #191616;
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
@@ -1275,7 +1288,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
         width: auto;
@@ -1325,7 +1338,7 @@ form .formBody {
     align-items: center; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
       width: 250px;
-      color: #000;
+      color: #191616;
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
@@ -1338,7 +1351,7 @@ form .formBody {
       font-size: 0.875rem;
       margin-left: 20px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
       color: #061728;
@@ -1372,7 +1385,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus {
       display: flex;
       align-items: center;
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dt {
         width: auto;
@@ -1393,6 +1406,10 @@ form .formBody {
   .pageContainer .middle .mainTabs .tradeTerms button {
     font-size: 0.875rem; }
 
+.leftContainer .tableCard table td, .leftContainer .comdex .tableCard table tr {
+  padding: 10px;
+  font-size: 0.875rem;
+  vertical-align: middle; }
 .leftContainer .financial {
   margin-bottom: 20px; }
 .leftContainer .cmuk-card-header {
@@ -1466,19 +1483,19 @@ form .formBody {
       background: rgba(94, 181, 92, 0.27); }
 .leftContainer .addBalanceButton {
   text-transform: capitalize;
-  font-family: Rubik;
+  font-family: "Montserrat", sans-serif;
   padding: 8px 8px;
   font-size: 0.875rem;
   line-height: normal;
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
-  color: #000;
+  color: #191616;
   margin: 5px;
   border: 0; }
   .leftContainer .addBalanceButton .plusIcon .icon {
     width: 10px;
     height: 10px;
-    fill: #000; }
+    fill: #191616; }
 .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon {
   bottom: 2px; }
 .leftContainer .icon {
@@ -1503,7 +1520,7 @@ form .formBody {
     color: #061728;
     background: none;
     font-weight: bold;
-    border-bottom: 2px solid #000; }
+    border-bottom: 2px solid #191616; }
   .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
     height: 300px;
     overflow: auto; }
@@ -1612,7 +1629,7 @@ form .formBody {
     font-size: 1rem;
     margin: 10px; }
     .documentItem .documentContentTop a {
-      color: #000;
+      color: #191616;
       text-decoration: none; }
   .documentItem .documentThumbnail {
     margin: 10px; }
@@ -1672,7 +1689,7 @@ header:before,
       overflow: hidden;
       border-radius: 50%; }
     .timeline .timeline-item .timeline-icon .icon {
-      fill: #000;
+      fill: #191616;
       width: 15px;
       height: 15px; }
     .timeline .timeline-item .timeline-content {
@@ -1792,7 +1809,7 @@ header:before,
       width: 100%;
       text-transform: capitalize;
       font-size: 0.875rem;
-      font-family: Rubik; }
+      font-family: "Montserrat", sans-serif; }
 
 .infoRow {
   line-height: 1.8;
@@ -1856,14 +1873,14 @@ header:before,
       color: #848A91;
       font-size: 0.875rem; }
     .chat .partner .replytoMessage p {
-      border-left: 2px solid #000;
+      border-left: 2px solid #191616;
       padding: 0 10px; }
     .chat .partner .messageContent {
       color: #061728;
       font-size: 0.875rem; }
       .chat .partner .messageContent p {
         margin: 0;
-        color: #000;
+        color: #191616;
         text-align: left; }
     .chat .partner p {
       word-break: break-word;
@@ -1873,7 +1890,7 @@ header:before,
     padding: 10px;
     border-radius: 10px 10px 0 10px;
     margin: 10px;
-    background: #000;
+    background: #191616;
     color: #fff;
     position: relative; }
     .chat .you::after {
@@ -1882,8 +1899,8 @@ header:before,
       bottom: 0;
       content: "";
       border-top: .5rem solid transparent;
-      border-bottom: 0.5rem solid #000;
-      border-left: 0.5rem solid #000;
+      border-bottom: 0.5rem solid #191616;
+      border-left: 0.5rem solid #191616;
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
@@ -1945,7 +1962,7 @@ header:before,
       line-height: 28px; }
       .commonList .listItemChild .cmuk-button:hover {
         color: #FFFFFF;
-        background: #000; }
+        background: #191616; }
 
 .accountName {
   position: absolute;
@@ -1967,10 +1984,10 @@ header:before,
     display: block; }
 
 .accountName.buy {
-  background: linear-gradient(180deg, #000 0%, #05488C 100%); }
+  background: linear-gradient(180deg, #191616 0%, #05488C 100%); }
 
 .accountName.sell {
-  background: linear-gradient(180deg, #000 0%, #520E63 100%); }
+  background: linear-gradient(180deg, #191616 0%, #520E63 100%); }
 
 .salesQuoteList .cmuk-card-body .commonList .cmuk-button {
   margin-bottom: 5px; }
@@ -1999,7 +2016,7 @@ header:before,
 .profileContainer .plusIcon .icon {
   width: 11px;
   height: 11px;
-  fill: #000; }
+  fill: #191616; }
 
 .profileDetails .cmuk-button-link {
   margin-bottom: 5px; }
@@ -2061,7 +2078,7 @@ header:before,
     font-size: 12px;
     visibility: hidden;
     width: 55px;
-    background-color: #000;
+    background-color: #191616;
     color: #fff;
     text-align: center;
     border-radius: 3px;
@@ -2079,7 +2096,7 @@ header:before,
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
-      border-color: #000 transparent transparent transparent; }
+      border-color: #191616 transparent transparent transparent; }
 
 .toolTip:hover .toolTipText {
   visibility: visible;
@@ -2160,7 +2177,7 @@ dl .info {
     background: none;
     color: #061728;
     font-weight: bold;
-    border-bottom: 2px solid #000; }
+    border-bottom: 2px solid #191616; }
   .switcherCard .cmuk-subnav-pill li:not(:last-child) {
     border-right: 1px solid #e7eaf3; }
   .switcherCard .cmuk-subnav-pill > * > :first-child {
@@ -2188,7 +2205,7 @@ dl .info {
   color: #636363;
   font-weight: bold;
   font-size: 0.875rem;
-  border-bottom: 2px solid #000;
+  border-bottom: 2px solid #191616;
   background: none; }
 
 .traderRelationList .cmuk-card-header {
@@ -2251,9 +2268,9 @@ figure.zoom {
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
       text-transform: uppercase; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-      font-family: Rubik; }
+      font-family: "Montserrat", sans-serif; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetPrice {
-      font-family: Rubik;
+      font-family: "Montserrat", sans-serif;
       color: #254364; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
     width: 30px;
@@ -2313,7 +2330,7 @@ figure.zoom {
     line-height: 38px; }
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
       color: #FFFFFF;
-      background: #000; }
+      background: #191616; }
 
 .rippleEffect {
   position: absolute;
@@ -2337,5 +2354,13 @@ figure.zoom {
     display: none; }
   .identificationCheckbox .commonCheckBox dl dd {
     margin: 0 5px 0 0; }
+
+.transactionMessages .cmuk-card-body .cmuk-card-header {
+  color: #e50913; }
+.transactionMessages .cmuk-card-body .cmuk-card-body {
+  height: auto; }
+  .transactionMessages .cmuk-card-body .cmuk-card-body .cmuk-card-body .title {
+    padding-left: 12px;
+    font-weight: 700; }
 
 /*# sourceMappingURL=class.css.map */

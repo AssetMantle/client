@@ -17,7 +17,7 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #000; }
+    background-color: #191616; }
 
   .switcherCard .cmuk-subnav {
     flex-wrap: nowrap;
@@ -64,7 +64,10 @@
       width: 95px; }
 
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
-    flex-wrap: wrap; } }
+    flex-wrap: wrap; }
+
+  .comdex .searchForm dl .cmuk-search-input {
+    width: 280px; } }
 @media (min-width: 640px) {
   .modalBody form {
     width: 620px;
@@ -173,7 +176,7 @@
     padding: 10px 0; }
   .leftContainer .addBalanceButton {
     text-transform: capitalize;
-    font-family: Rubik;
+    font-family: "Montserrat", sans-serif;
     padding: 8px 8px;
     line-height: normal;
     background: rgba(8, 98, 190, 0.1);
@@ -328,7 +331,7 @@
     border: none; }
   .comdex .header .buttonRegister {
     background-color: #FE4350;
-    font-family: Rubik;
+    font-family: "Montserrat", sans-serif;
     color: #FFFFFF;
     line-height: inherit;
     padding: 5px 30px;
