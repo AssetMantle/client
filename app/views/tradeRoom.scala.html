@@ -10,21 +10,21 @@
         <div id="financial" class="financial"></div>
         @loginState.userType match {
             case constants.User.TRADER => {
-                <div id="traderViewAcceptedNegotiationDocumentList"></div>
+                <div id="traderViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
                 <script type="text/javascript">
                     componentResource('financial', jsRoutes.controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks('@negotiationID'));
                     componentResource('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
             }
             case constants.User.ORGANIZATION => {
-                <div id="organizationViewAcceptedNegotiationDocumentList"></div>
+                <div id="organizationViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
                 <script type="text/javascript">
                     componentResource('financial', jsRoutes.controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks('@negotiationID'));
                     componentResource('organizationViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiationDocumentList('@negotiationID'));
                 </script>
             }
             case constants.User.ZONE => {
-                <div id="zoneViewAcceptedNegotiationDocumentList"></div>
+                <div id="zoneViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
                 <script type="text/javascript">
                     componentResource('financial', jsRoutes.controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks('@negotiationID'));
                     componentResource('zoneViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationDocumentList('@negotiationID'));
@@ -78,7 +78,7 @@
                 <div id="tradeActivities"></div>
             </div>
             <div id="chatRoom" class="chatRoom"></div>
-            <div id="orderActions" class="orderInfoCard"></div>
+            <div id="orderActions" class="orderInfoCard cmuk-margin-bottom"></div>
         </div>
     </div>
     <script>

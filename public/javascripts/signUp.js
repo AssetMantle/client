@@ -56,6 +56,14 @@ function checkPasswords() {
 
 function showPassword() {
     $('#showPassword span').toggleClass('active');
+    if($('#showPassword span').hasClass('active')){
+        $('#showPassword .openEye').removeClass("hidden");
+        $('#showPassword .closeEye').addClass("hidden");
+    }
+    else {
+        $('#showPassword .closeEye').removeClass("hidden");
+        $('#showPassword .openEye').addClass("hidden");
+    }
     let password = $('#signUpPassword')[0];
     let matchPassword = $('#signUpConfirmPassword')[0];
     if (password.type && matchPassword.type === "password") {

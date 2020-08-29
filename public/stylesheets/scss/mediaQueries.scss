@@ -217,7 +217,12 @@
       }
       .signUpForm, .mnemonicQuiz{
         form .formBody{
-          padding: 20px 50px 50px 50px;
+          padding: 20px 50px 0 50px;
+          &:after{
+            display: block;
+            content: '';
+            padding-bottom:50px;
+          }
         }
       }
     }
@@ -226,34 +231,34 @@
     .financial{
       margin-bottom: 15px;
       .cmuk-card{
-        height: 265px;
+        height: 302px;
         .cmuk-switcher{
-          height: 210px;
+          height: 250px;
           overflow: auto;
         }
+        .financialCard .financialCardSection{
+          padding: 15px 0;
+        }
       }
+      .financialCard .cmuk-card .financialCardSection{
+        padding: 15px 0;
+      }
+
     }
     .addBalanceButton{
-      text-transform: capitalize;
-      font-family: $fontFamilyPrimary;
       padding: 8px 8px;
-      line-height:normal;
-      background: rgba(8, 98, 190, 0.1);
-      border-radius: 103px;
-      color: #0862BE;
-      border: 0;
     }
     .documentView{
       .cmuk-card-body, .documentList{
         padding:0px;
       }
       .documentList{
-        height: 150px;
+        height: 190px;
       }
       .cmuk-card{
-        height: 265px;
+        height: 305px;
         .cmuk-card-body{
-          height: 265px;
+          height: 305px;
         }
       }
     }
@@ -270,17 +275,17 @@
     .recentActivityContainer{
       margin-bottom: 15px;
       .cmuk-card-body{
-        height: 210px;
+        height: 250px;
         .recentActivityMessages{
-          height: 210px;
+          height: 250px;
         }
       }
     }
     .chatRoom{
       .cmuk-card-body{
-        height: 215px;
+        height: 255px;
         .chatMessagesContainer {
-          height: 140px;
+          height: 170px;
         }
       }
     }
@@ -292,7 +297,7 @@
   }
   .comdex {
     .cmuk-height-medium{
-      height: 210px;
+      height: 250px;
     }
     .cmuk-card-header .cmuk-button
     {
@@ -307,7 +312,7 @@
   }
   .switcherCard{
     .cmuk-switcher{
-      height: 170px;
+      height: 190px;
     }
   }
   .timeline {
@@ -315,18 +320,21 @@
       left: 19px;
     }
     .timeline-item .timeline-icon {
-      left: 0px;
+      left: 0;
     }
   }
   .salesQuoteCard{
     .salesQuoteCardLeft{
-      flex: 15%;
+      flex: 12%;
     }
     .salesQuoteCardMiddle{
-      flex: 10%;
+      flex: 13%;
     }
     .salesQuoteCardRight{
-      flex: 27%;
+      flex: 30%;
+      .cmuk-button{
+        line-height: 28px;
+      }
     }
   }
 }
@@ -357,7 +365,12 @@
     }
   }
   form .formBody {
-    padding: 20px 50px 50px 50px;
+    padding: 20px 50px 0 50px;
+    &:after{
+      display: block;
+      content: '';
+      padding-bottom:50px;
+    }
   }
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .usernameAvailability .failureIcon,
@@ -420,16 +433,30 @@
     height: 530px;
   }
   .leftContainer .financial {
-    .financialCard.cardPaddingRemove ul li {
-      &:first-child {
-        padding-top: 5px;
+    .financialCard ul li{
+    .wallet .walletIcon, .receivable .receivableIcon, .payable .payableIcon{
+      width: 36px;
+      height: 36px;
+      .leftContainer .icon {
+        width: 18px;
+        height: 18px;
       }
-      padding: 5px 0;
+    }
+    }
+    .financialCard.cardPaddingRemove {
+      ul li {
+        padding: 5px 0;
+        margin: 0 20px;
+        &:first-child {
+          padding-top: 0;
+        }
+
+      }
     }
     .cmuk-switcher ul li,
     .financialCard ul li{
       &:first-child {
-        padding-top: 15px;
+        padding-top: 0;
       }
       padding: 10px 0;
     }
@@ -437,9 +464,6 @@
   .profilePictureContainer .profilePicture {
     height: 70px;
     width: 70px;
-  }
-  .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory{
-    width: 25px;
   }
   .documentView .documentList .table-scroll tbody tr td:first-child{
     padding-left: 10px;
@@ -489,21 +513,7 @@
     width:118px;
   }
 }
-@media (min-width: 1600px) and (max-width: 1820px) {
-  .leftContainer .financial .financialCard.cardPaddingRemove ul li{
-    &:first-child{
-      padding-top: 15px;
-    }
-    padding: 15px 0;
-  }
-}
-@media (max-width:1845px){
-  .walletButtons{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-}
+
 @media (max-width:1920px){
   .comdex .cmuk-container {
     max-width: 100%;
@@ -555,5 +565,11 @@
         }
       }
     }
+  }
+}
+@media (max-width: 1199px) {
+  .leftSide, .rightSide {
+    position: relative !important;
+    top: 0 !important;
   }
 }

@@ -51,12 +51,12 @@
                 }
             </div>
             <div class="salesQuoteCardRight salesChild">
-                <div class="cmuk-text-center">
+                <div class="cmuk-flex">
+                    <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
+                    <div class="cmuk-text-left">
                     <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <div class="navigationLocation">
-                        <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
-                    </div>
                     <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                    </div>
                 </div>
                 <div class="viewQuotePayment">@commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
 
