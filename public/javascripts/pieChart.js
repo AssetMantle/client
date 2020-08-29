@@ -37,8 +37,8 @@ function pieChart(chartID, keys, values, showLegend) {
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-                position: "right",
-                align: "middle",
+                position: 'right',
+                align: 'center',
                 labels: {
                     boxWidth: 10,
                     boxHeight: 2
