@@ -6,25 +6,28 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
-import models.common.TransactionMessages.ClassificationDefine
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetClassification
-import queries.responses.ClassificationResponse.{Response => ClassificationResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Classification(id: String, traits: Seq[Trait], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Classification(id: String, immutableTraits: Immutables, mutableTraits: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def getChainID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(0)
+
+  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(1)
+}
 
 @Singleton
 class Classifications @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  configuration: Configuration,
-                                 getClassification: GetClassification
+                                 getClassification: GetClassification,
+                                 blockchainMetas: Metas
                                )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -37,11 +40,11 @@ class Classifications @Inject()(
 
   import databaseConfig.profile.api._
 
-  case class ClassificationSerialized(id: String, traits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Classification = Classification(id = id, traits = utilities.JSON.convertJsonStringToObject[Seq[Trait]](traits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ClassificationSerialized(id: String, immutableTraits: String, mutableTraits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Classification = Classification(id = id, immutableTraits = utilities.JSON.convertJsonStringToObject[Immutables](immutableTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Mutables](mutableTraits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(classification: Classification): ClassificationSerialized = ClassificationSerialized(id = classification.id, traits = Json.toJson(classification.traits).toString, createdBy = classification.createdBy, createdOn = classification.createdOn, createdOnTimeZone = classification.createdOnTimeZone, updatedBy = classification.updatedBy, updatedOn = classification.updatedOn, updatedOnTimeZone = classification.updatedOnTimeZone)
+  def serialize(classification: Classification): ClassificationSerialized = ClassificationSerialized(id = classification.id, immutableTraits = Json.toJson(classification.immutableTraits).toString, mutableTraits = Json.toJson(classification.mutableTraits).toString, createdBy = classification.createdBy, createdOn = classification.createdOn, createdOnTimeZone = classification.createdOnTimeZone, updatedBy = classification.updatedBy, updatedOn = classification.updatedOn, updatedOnTimeZone = classification.updatedOnTimeZone)
 
   private[models] val classificationTable = TableQuery[ClassificationTable]
 
@@ -87,11 +90,13 @@ class Classifications @Inject()(
 
   private[models] class ClassificationTable(tag: Tag) extends Table[ClassificationSerialized](tag, "Classification_BC") {
 
-    def * = (id, traits, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ClassificationSerialized.tupled, ClassificationSerialized.unapply)
+    def * = (id, immutableTraits, mutableTraits, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ClassificationSerialized.tupled, ClassificationSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def traits = column[String]("traits")
+    def immutableTraits = column[String]("immutableTraits")
+
+    def mutableTraits = column[String]("mutableTraits")
 
     def createdBy = column[String]("createdBy")
 
@@ -127,10 +132,19 @@ class Classifications @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-    def onDefine(classificationDefine: ClassificationDefine): Future[Unit] = {
-      val hashID = Immutables(Properties(classificationDefine.traits.map(_.property))).getHashID
-      Future()
+    def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[String] = {
+      val classificationID = getID(chainID = chainID, immutables = immutables, mutables = mutables)
+      val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
+
+      (for {
+        _ <- upsert
+      } yield classificationID
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
+
+    private def getID(chainID: String, immutables: Immutables, mutables: Mutables) = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
   }
 

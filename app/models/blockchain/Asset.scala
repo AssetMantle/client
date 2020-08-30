@@ -6,25 +6,32 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
-import models.common.TransactionMessages.{AssetBurn, AssetMint, AssetMutate}
+import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetAsset
-import queries.responses.AssetResponse.{Response => AssetResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: String, burn: Int, lock: Int, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(id: String, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(0)
+
+  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(1)
+}
 
 @Singleton
 class Assets @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
-                        getAsset: GetAsset
+                        getAsset: GetAsset,
+                        blockchainClassifications: Classifications,
+                        blockchainSplits: Splits,
+                        blockchainMetas: Metas,
+                        blockchainMaintainers: Maintainers
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -37,11 +44,11 @@ class Assets @Inject()(
 
   import databaseConfig.profile.api._
 
-  case class AssetSerialized(id: String, burn: Int, lock: Int, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Asset = Asset(id = id, burn = burn, lock = lock, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AssetSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Asset = Asset(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(asset: Asset): AssetSerialized = AssetSerialized(id = asset.id, burn = asset.burn, lock = asset.lock, immutables = Json.toJson(asset.immutables).toString, mutables = Json.toJson(asset.mutables).toString, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
+  def serialize(asset: Asset): AssetSerialized = AssetSerialized(id = asset.id, immutables = Json.toJson(asset.immutables).toString, mutables = Json.toJson(asset.mutables).toString, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
 
   private[models] val assetTable = TableQuery[AssetTable]
 
@@ -87,13 +94,9 @@ class Assets @Inject()(
 
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerialized](tag, "Asset_BC") {
 
-    def * = (id, burn, lock, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
+    def * = (id, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
-
-    def burn = column[Int]("burn")
-
-    def lock = column[Int]("lock")
 
     def immutables = column[String]("immutables")
 
@@ -131,64 +134,88 @@ class Assets @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.main.chainID")
+    def onDefine(assetDefine: AssetDefine): Future[Unit] = {
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.immutableMetaTraits.metaPropertyList)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.mutableMetaTraits.metaPropertyList)
 
-    def onMint(assetMint: AssetMint): Future[Unit] = {
-      val hashID = Immutables(assetMint.properties).getHashID
-      val assetResponse = getAsset.Service.get(getID(chainID = chainID, maintainersID = assetMint.maintainersID, classificationID = assetMint.classificationID, hashID = hashID))
+      def defineAndSuperAuxiliary(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
+        val mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ assetDefine.mutableTraits.propertyList))
+        val defineAuxiliary = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ assetDefine.immutableTraits.propertyList)), mutables = mutables)
 
-      def insertOrUpdate(assetResponse: AssetResponse) = assetResponse.result.value.assets.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == assetMint.maintainersID && x.value.id.value.classificationID.value.idString == assetMint.maintainersID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ASSET_NOT_FOUND)) { asset =>
-        val assetID = getID(chainID = asset.value.id.value.chainID.value.idString, maintainersID = asset.value.id.value.maintainersID.value.idString, classificationID = asset.value.id.value.classificationID.value.idString, hashID = asset.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Asset(id = assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
+        def superAuxiliary(classificationID: String) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = assetDefine.fromID, mutableTraits = mutables)
+
+        for {
+          classificationID <- defineAuxiliary
+          _ <- superAuxiliary(classificationID = classificationID)
+        } yield classificationID
       }
 
       (for {
-        assetResponse <- assetResponse
-        _ <- insertOrUpdate(assetResponse)
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        _ <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onMint(assetMint: AssetMint): Future[Unit] = {
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.immutableMetaProperties.metaPropertyList)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.mutableMetaProperties.metaPropertyList)
+
+      def upsert(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
+        val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ assetMint.immutableProperties.propertyList))
+        val assetID = getID(classificationID = assetMint.classificationID, immutables = immutables)
+        val mintAuxiliary = blockchainSplits.Utility.auxiliaryMint(ownerID = assetMint.toID, ownableID = assetID, splitValue = constants.Blockchain.OneDec)
+        val upsertAsset = Service.insertOrUpdate(Asset(id = assetID, immutables = immutables, mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ assetMint.mutableProperties.propertyList))))
+
+        for {
+          _ <- mintAuxiliary
+          _ <- upsertAsset
+        } yield ()
+      }
+
+      (for {
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        _ <- upsert(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+      } yield ()
+        ).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onMutate(assetMutate: AssetMutate): Future[Unit] = {
-      val assetResponse = getAsset.Service.get(assetMutate.assetID)
+      val oldAsset = Service.tryGet(assetMutate.assetID)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMutate.mutableMetaProperties.metaPropertyList)
 
-      def insertOrUpdateAll(assetResponse: AssetResponse) = Future.traverse(assetResponse.result.value.assets.value.list) { asset =>
-        val assetID = getID(chainID = asset.value.id.value.chainID.value.idString, maintainersID = asset.value.id.value.maintainersID.value.idString, classificationID = asset.value.id.value.classificationID.value.idString, hashID = asset.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Asset(id = assetID, lock = asset.value.lock.toInt, burn = asset.value.burn.toInt, mutables = asset.value.mutables.toMutables, immutables = asset.value.immutables.toImmutables))
-      }
+      def upsertAsset(oldAsset: Asset, scrubbedMutableMetaProperties: Seq[Property]) = Service.insertOrUpdate(oldAsset.copy(mutables = oldAsset.mutables.mutate(scrubbedMutableMetaProperties ++ assetMutate.mutableProperties.propertyList)))
 
       (for {
-        assetResponse <- assetResponse
-        _ <- insertOrUpdateAll(assetResponse)
+        oldAsset <- oldAsset
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        _ <- upsertAsset(oldAsset, scrubbedMutableMetaProperties)
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onBurn(assetBurn: AssetBurn): Future[Unit] = {
-      val assetResponse = getAsset.Service.get(assetBurn.assetID)
-      val (chainID, maintainersID, classificationID, hashID) = getFeatures(assetBurn.assetID)
-
-      def delete(assetResponse: AssetResponse) = if (assetResponse.result.value.assets.value.list.exists(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.classificationID.value.idString == classificationID && x.value.id.value.hashID.value.idString == hashID)) Service.delete(assetBurn.assetID) else Future(0)
+      val burnAuxiliary = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.OneDec)
+      val deleteAsset = Service.delete(assetBurn.assetID)
 
       (for {
-        assetResponse <- assetResponse
-        _ <- delete(assetResponse)
+        _ <- burnAuxiliary
+        _ <- deleteAsset
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    private def getID(chainID: String, maintainersID: String, classificationID: String, hashID: String) = Seq(chainID, maintainersID, classificationID, hashID).mkString(constants.Blockchain.IDSeparator)
-
-    private def getFeatures(id: String): (String, String, String, String) = {
-      val idList = id.split(constants.Blockchain.IDSeparator)
-      if (idList.length == 4) (idList(0), idList(1), idList(2), idList(3)) else ("", "", "", "")
-    }
+    private def getID(classificationID: String, immutables: Immutables) = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
   }
 

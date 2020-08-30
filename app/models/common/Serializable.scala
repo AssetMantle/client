@@ -1,6 +1,7 @@
 package models.common
 
-import models.`abstract`.TransactionMessage
+import models.Abstract.{DataValue, TransactionMessage}
+import models.common.DataValue._
 import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.functional.syntax._
@@ -73,9 +74,18 @@ object Serializable {
 
   implicit val idWrites: OWrites[ID] = Json.writes[ID]
 
-  case class Fact(hash: String, meta: Boolean)
+  case class Data(dataType: String, value: DataValue)
 
-  def newFact(fact: String): Fact = Fact(hash = utilities.Hash.getHash(fact), meta = false)
+  implicit val dataReads: Reads[Data] = (
+    (JsPath \ "dataType").read[String] and
+      (JsPath \ "value").read[JsObject]
+    ) (dataValueApply _)
+
+  implicit val dataWrites: OWrites[Data] = Json.writes[Data]
+
+  case class Fact(hash: String)
+
+  def NewFact(data: String): Fact = Fact(utilities.Hash.getHash(data))
 
   implicit val factReads: Reads[Fact] = Json.reads[Fact]
 
@@ -87,32 +97,60 @@ object Serializable {
 
   implicit val propertyWrites: OWrites[Property] = Json.writes[Property]
 
-  case class Properties(propertyList: Seq[Property])
+  case class Properties(propertyList: Seq[Property]) {
+    def mutate(property: Property): Properties = Properties(propertyList.filterNot(_.id == property.id) :+ property)
+  }
 
   implicit val propertiesReads: Reads[Properties] = Json.reads[Properties]
 
   implicit val propertiesWrites: OWrites[Properties] = Json.writes[Properties]
 
-  case class Mutables(properties: Properties, maintainersID: String)
+  case class MetaFact(data: Data) {
+    def getHash: String = data.value.GenerateHash
+
+    def removeData(): Fact = NewFact(data.value.AsString)
+  }
+
+  implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]
+
+  implicit val metaFactWrites: OWrites[MetaFact] = Json.writes[MetaFact]
+
+  case class MetaProperty(id: String, metaFact: MetaFact) {
+    def removeData(): Property = Property(id = id, fact = metaFact.removeData())
+  }
+
+  implicit val metaPropertyReads: Reads[MetaProperty] = Json.reads[MetaProperty]
+
+  implicit val metaPropertyWrites: OWrites[MetaProperty] = Json.writes[MetaProperty]
+
+  case class MetaProperties(metaPropertyList: Seq[MetaProperty]) {
+    def removeData(): Properties = Properties(metaPropertyList.map(_.removeData()))
+
+    def mutate(metaProperty: MetaProperty): MetaProperties = MetaProperties((metaPropertyList.filterNot(_.id == metaProperty.id) :+ metaProperty))
+  }
+
+  implicit val metaPropertiesReads: Reads[MetaProperties] = Json.reads[MetaProperties]
+
+  implicit val metaPropertiesWrites: OWrites[MetaProperties] = Json.writes[MetaProperties]
+
+  case class Mutables(properties: Properties) {
+    def mutate(mutatingProperties: Seq[Property]): Mutables = {
+      val mutatingPropertiesID = mutatingProperties.map(_.id)
+      Mutables(Properties(properties.propertyList.filterNot(x => mutatingPropertiesID.contains(x.id)) ++ mutatingProperties))
+    }
+  }
 
   implicit val mutablesReads: Reads[Mutables] = Json.reads[Mutables]
 
   implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
 
   case class Immutables(properties: Properties) {
-    //apache-codec Base64 encoder gives Sw4O7BtF/0y7TclwCDzQArfGe7I= instead of Sw4O7BtF_0y7TclwCDzQArfGe7I= So use java.util.Base64
     def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.hash): _*)
   }
 
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]
 
   implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
-
-  case class Trait(id: String, property: Property, mutable: Boolean)
-
-  implicit val traitReads: Reads[Trait] = Json.reads[Trait]
-
-  implicit val traitWrites: OWrites[Trait] = Json.writes[Trait]
 
   case class StdMsg(messageType: String, message: TransactionMessage)
 

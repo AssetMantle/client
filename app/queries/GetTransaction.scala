@@ -27,7 +27,7 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private def action(txHash: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + txHash).get)
 
-  private def actionWithWSResponse(txHash: String): Future[WSResponse] = wsClient.url(url + txHash).get
+  private def actionResponseAsWSResponse(txHash: String): Future[WSResponse] = wsClient.url(url + txHash).get
 
   object Service {
 
@@ -35,7 +35,7 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
 
-    def getAsWSResponse(txHash: String): Future[WSResponse] = actionWithWSResponse(txHash).recover {
+    def getAsWSResponse(txHash: String): Future[WSResponse] = actionResponseAsWSResponse(txHash).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
   }

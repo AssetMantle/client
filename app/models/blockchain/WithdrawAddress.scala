@@ -20,6 +20,7 @@ case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String, cr
 class WithdrawAddresses @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    configuration: Configuration,
+                                   blockchainAccounts: Accounts
                                  )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -57,12 +58,14 @@ class WithdrawAddresses @Inject()(
 
   private def findAll: Future[Seq[WithdrawAddress]] = db.run(withdrawAddressTable.result)
 
-  private def findByDelegatorAddress(delegatorAddress: String): Future[WithdrawAddress] = db.run(withdrawAddressTable.filter(_.delegatorAddress === delegatorAddress).result.head.asTry).map {
+  private def tryGetByDelegatorAddress(delegatorAddress: String): Future[WithdrawAddress] = db.run(withdrawAddressTable.filter(_.delegatorAddress === delegatorAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SIGNING_INFO_NOT_FOUND, noSuchElementException)
     }
   }
+
+  private def getByDelegatorAddress(delegatorAddress: String): Future[Option[String]] = db.run(withdrawAddressTable.filter(_.delegatorAddress === delegatorAddress).map(_.withdrawAddress).result.headOption)
 
   private[models] class WithdrawAddressTable(tag: Tag) extends Table[WithdrawAddress](tag, "WithdrawAddress") {
 
@@ -95,7 +98,7 @@ class WithdrawAddresses @Inject()(
 
     def getAll: Future[Seq[WithdrawAddress]] = findAll
 
-    def get(delegatorAddress: String): Future[WithdrawAddress] = findByDelegatorAddress(delegatorAddress)
+    def get(delegatorAddress: String): Future[String] = getByDelegatorAddress(delegatorAddress).map(_.getOrElse(delegatorAddress))
 
   }
 
@@ -105,6 +108,19 @@ class WithdrawAddresses @Inject()(
 
       (for {
         _ <- insert
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def withdrawRewards(address: String): Future[Unit] = {
+      val withdrawAddress = Service.get(address)
+
+      def updateBalance(withdrawAddress: String) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(withdrawAddress)
+
+      (for {
+        withdrawAddress <- withdrawAddress
+        _ <- updateBalance(withdrawAddress)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

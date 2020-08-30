@@ -25,11 +25,11 @@ class GetSplit @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(assetID: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + assetID).get)
+  private def action(ownerID: String, ownableID: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + ownerID + "|" + ownableID).get)
 
   object Service {
 
-    def get(assetID: String): Future[Response] = action(assetID).recover {
+    def get(ownerID: String, ownableID: String): Future[Response] = action(ownerID = ownerID, ownableID = ownableID).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
   }

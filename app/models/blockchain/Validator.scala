@@ -29,8 +29,9 @@ class Validators @Inject()(
                             blockchainSigningInfos: SigningInfos,
                             masterTransactionNotifications: masterTransaction.Notifications,
                             blockchainDelegations: Delegations,
-                            blockchainAccountBalances: AccountBalances,
+                            blockchainAccounts: Accounts,
                             keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
+                            blockchainWithdrawAddresses: WithdrawAddresses,
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -205,7 +206,7 @@ class Validators @Inject()(
 
   object Utility {
 
-    def onCreateValidator(txHash: String, createValidator: CreateValidator): Future[Unit] = {
+    def onCreateValidator(createValidator: CreateValidator): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(createValidator.validatorAddress)
 
       def insertValidator(validator: Validator) = Service.insertOrUpdate(validator)
@@ -213,7 +214,7 @@ class Validators @Inject()(
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(Delegate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.validatorAddress), validatorAddress = createValidator.validatorAddress, amount = createValidator.value))
         val insertSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(createValidator.publicKey)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${createValidator.validatorAddress}'")
         val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
 
         for {
@@ -229,17 +230,17 @@ class Validators @Inject()(
         _ <- insertValidator(validatorResponse.result.toValidator)
         _ <- updateOtherDetails()
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    def onEditValidator(txHash: String, editValidator: EditValidator): Future[Unit] = {
+    def onEditValidator(editValidator: EditValidator): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(editValidator.validatorAddress)
 
       def insertValidator(validator: Validator) = {
         val update = Service.insertOrUpdate(validator)
         val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
         for {
           _ <- update
           _ <- insertKeyBaseAccount
@@ -251,17 +252,17 @@ class Validators @Inject()(
         validatorResponse <- validatorResponse
         _ <- insertValidator(validatorResponse.result.toValidator)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    def onUnjail(txHash: String, unjail: Unjail): Future[Unit] = {
+    def onUnjail(unjail: Unjail): Future[Unit] = {
       val validatorResponse = getValidator.Service.get(unjail.address)
 
       def updateAndAddEvent(validator: Validator) = {
         val upsert = Service.insertOrUpdate(validator)
         val updateSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${txHash}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
         for {
           _ <- upsert
           _ <- updateSigningInfos
@@ -273,21 +274,23 @@ class Validators @Inject()(
         validatorResponse <- validatorResponse
         _ <- updateAndAddEvent(validatorResponse.result.toValidator)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
-      val accountBalance = blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
+      val accountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
+      val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 
       (for {
         _ <- updateValidator
         _ <- accountBalance
         _ <- insertDelegation
+        _ <- withdrawAddressBalanceUpdate
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

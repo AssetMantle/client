@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.`abstract`.BaseTransaction
+import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.master.Account
@@ -15,7 +15,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
@@ -202,15 +201,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def markDirty(sendCoin: SendCoin): Future[Unit] = {
-        val markDirtyTo = blockchainAccounts.Service.markDirty(sendCoin.to)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(sendCoin.from)
-        for {
-          _ <- markDirtyTo
-          _ <- markDirtyFrom
-        } yield {}
-      }
-
       def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
 
       def toAccount(accountID: String): Future[Account] = masterAccounts.Service.tryGet(accountID)
@@ -224,7 +214,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
       (for {
         _ <- markTransactionSuccessful
         sendCoin <- sendCoin
-        _ <- markDirty(sendCoin)
         accountID <- getAccountID(sendCoin.to)
         toAccount <- toAccount(accountID)
         _ <- unknownUserTypeUpdate(toAccount)

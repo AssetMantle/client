@@ -1,0 +1,10 @@
+@import views.html.base._
+@import models.blockchain.Meta
+
+@(meta: Meta)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.META) {
+} {
+    @commonTextInfo(constants.View.META_ID, meta.id)
+    @commonHtmlInfo(constants.View.META_DATA, views.html.component.blockchain.data(meta.data))
+}

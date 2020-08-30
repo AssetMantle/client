@@ -1,0 +1,9 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Unknown
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Unknown]) { unknown =>
+    @commonTextInfo(constants.View.MESSAGE, unknown.value)
+}

@@ -5,26 +5,51 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.common.DataValue.{DecDataValue, HeightDataValue}
 import models.common.Serializable._
-import models.common.TransactionMessages.{OrderCancel, OrderMake, OrderTake}
+import models.common.TransactionMessages.{OrderCancel, OrderDefine, OrderMake, OrderTake}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetOrder
-import queries.responses.OrderResponse.{Response => OrderResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Order(id: String, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def getTakerID: Property = immutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.TakerID).getOrElse(mutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.TakerID).getOrElse(Property(id = constants.Blockchain.Properties.TakerID, fact = NewFact(""))))
+
+  def getExchangeRate: Property = immutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.ExchangeRate).getOrElse(mutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.TakerID).getOrElse(Property(id = constants.Blockchain.Properties.TakerID, fact = NewFact(""))))
+
+  def getCreation: Property = immutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.Creation).getOrElse(mutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.Creation).getOrElse(Property(id = constants.Blockchain.Properties.Creation, fact = NewFact("-1"))))
+
+  def getExpiry: Property = immutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.Expiry).getOrElse(mutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.Expiry).getOrElse(Property(id = constants.Blockchain.Properties.Expiry, fact = NewFact("-1"))))
+
+  def getMakerOwnableSplit: Property = immutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.MakerOwnableSplit).getOrElse(mutables.properties.propertyList.find(_.id == constants.Blockchain.Properties.MakerOwnableSplit).getOrElse(Property(id = constants.Blockchain.Properties.MakerOwnableSplit, fact = NewFact(constants.Blockchain.OneDec.toString))))
+
+  def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(0)
+
+  def getMakerOwnableID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(1)
+
+  def getTakerOwnableID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(2)
+
+  def getMakerID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(3)
+
+  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)(4)
+
+}
 
 @Singleton
 class Orders @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
-                        getOrder: GetOrder
+                        getOrder: GetOrder,
+                        blockchainSplits: Splits,
+                        blockchainMetas: Metas,
+                        blockchainClassifications: Classifications,
+                        blockchainMaintainers: Maintainers
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -129,69 +154,131 @@ class Orders @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-    def onMake(orderMake: OrderMake, makeHeight: Int): Future[Unit] = {
-      val hashID = Immutables(Properties(propertyList = Seq(
-        Property(constants.Blockchain.Order.MakerIDProperty, newFact(orderMake.makerID)),
-        Property(constants.Blockchain.Order.TakerIDProperty, newFact(orderMake.takerID)),
-        Property(constants.Blockchain.Order.MakerSplitIDProperty, newFact(orderMake.makerSplitID)),
-        Property(constants.Blockchain.Order.ExchangeRateProperty, newFact(orderMake.exchangeRate.toString)),
-        Property(constants.Blockchain.Order.TakerSplitIDProperty, newFact(orderMake.takerSplitID)),
-        Property(constants.Blockchain.Order.HeightProperty, newFact(makeHeight.toString)),
-      ))).getHashID
-      val orderResponse = getOrder.Service.get(getID(chainID = chainID, maintainersID = orderMake.maintainersID, hashID = hashID))
+    def onDefine(orderDefine: OrderDefine): Future[Unit] = {
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.immutableMetaTraits.metaPropertyList)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.mutableMetaTraits.metaPropertyList)
 
-      def insertOrUpdate(orderResponse: OrderResponse) = orderResponse.result.value.Orders.value.list.find(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == orderMake.maintainersID && x.value.id.value.hashID.value.idString == hashID).fold(throw new BaseException(constants.Response.ORDER_NOT_FOUND)) { order =>
-        val orderID = getID(chainID = order.value.id.value.chainID.value.idString, maintainersID = order.value.id.value.maintainersID.value.idString, hashID = order.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Order(id = orderID, mutables = order.value.mutables.toMutables, immutables = order.value.immutables.toImmutables))
+      def defineAndSuperAuxiliary(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
+        val mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ orderDefine.mutableTraits.propertyList))
+        val defineAuxiliary = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ orderDefine.immutableTraits.propertyList)), mutables = mutables)
+
+        def superAuxiliary(classificationID: String) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = orderDefine.fromID, mutableTraits = mutables)
+
+        for {
+          classificationID <- defineAuxiliary
+          _ <- superAuxiliary(classificationID = classificationID)
+        } yield classificationID
       }
 
       (for {
-        orderResponse <- orderResponse
-        _ <- insertOrUpdate(orderResponse)
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        _ <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
       } yield ()
         ).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onMake(orderMake: OrderMake, blockHeight: Int): Future[Unit] = {
+      val transferAuxiliary = blockchainSplits.Utility.auxiliaryTransfer(fromID = orderMake.fromID, toID = constants.Blockchain.Modules.Orders, ownableID = orderMake.makerOwnableID, splitValue = orderMake.makerOwnableSplit)
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderMake.immutableMetaProperties.metaPropertyList)
+
+      def getImmutables(scrubbedImmutableMetaProperties: Seq[Property]) = Future(Immutables(Properties(scrubbedImmutableMetaProperties ++ orderMake.immutableProperties.propertyList)))
+
+      def getOrderID(immutables: Immutables) = Future(getID(classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, hashID = immutables.getHashID))
+
+      def getOldOrder(orderID: String) = Service.get(orderID)
+
+      def getNewMakerOwnableSplit(oldOrder: Option[Order]): Future[BigDecimal] = if (oldOrder.isDefined) {
+        val oldMakerOwnableSplitMeta = blockchainMetas.Service.tryGet(oldOrder.get.getMakerOwnableSplit.fact.hash)
+
+        for {
+          oldMakerOwnableSplitMeta <- oldMakerOwnableSplitMeta
+        } yield orderMake.makerOwnableSplit + oldMakerOwnableSplitMeta.data.value.AsDec
+      } else {
+        Future(orderMake.makerOwnableSplit)
+      }
+
+      def scrubMutableMetaProperties(makerOwnableSplit: BigDecimal) = blockchainMetas.Utility.auxiliaryScrub(orderMake.mutableMetaProperties.metaPropertyList ++ Seq(
+          MetaProperty(constants.Blockchain.Properties.Expiry, MetaFact(Data(constants.Blockchain.DataType.HEIGHT_DATA, HeightDataValue(orderMake.expiresIn + blockHeight)))),
+          MetaProperty(constants.Blockchain.Properties.MakerOwnableSplit, MetaFact(Data(constants.Blockchain.DataType.DEC_DATA, DecDataValue(makerOwnableSplit))))))
+
+      def upsertOrder(oldOrder: Option[Order], mutableScrubs: Seq[Property], orderID: String, immutables: Immutables) = {
+        val mutables = Mutables(Properties(mutableScrubs ++ orderMake.mutableProperties.propertyList))
+        oldOrder.fold(Service.insertOrUpdate(Order(id = orderID, mutables = mutables, immutables = immutables)))(x => Service.insertOrUpdate(x.copy(mutables = x.mutables.mutate(mutables.properties.propertyList))))
+      }
+
+      (for {
+        _ <- transferAuxiliary
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        immutables <- getImmutables(scrubbedImmutableMetaProperties)
+        orderID <- getOrderID(immutables)
+        oldOrder <- getOldOrder(orderID)
+        makerOwnableSplit <- getNewMakerOwnableSplit(oldOrder)
+        scrubbedMutableMetaProperties <- scrubMutableMetaProperties(makerOwnableSplit)
+        _ <- upsertOrder(oldOrder, scrubbedMutableMetaProperties, orderID, immutables)
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onTake(orderTake: OrderTake): Future[Unit] = {
-      val orderResponse = getOrder.Service.get(orderTake.orderID)
+      def getMakerOwnableSplitMeta(oldOrder: Order) = blockchainMetas.Service.tryGet(oldOrder.getMakerOwnableSplit.fact.hash)
 
-      def insertOrUpdateAll(orderResponse: OrderResponse) = Future.traverse(orderResponse.result.value.Orders.value.list) { order =>
-        val orderID = getID(chainID = order.value.id.value.chainID.value.idString, maintainersID = order.value.id.value.maintainersID.value.idString, hashID = order.value.id.value.hashID.value.idString)
-        Service.insertOrUpdate(Order(id = orderID, mutables = order.value.mutables.toMutables, immutables = order.value.immutables.toImmutables))
+      def getExchangeRateMeta(oldOrder: Order) = blockchainMetas.Service.tryGet(oldOrder.getExchangeRate.fact.hash)
+
+      def transferAuxiliary(oldOrder: Order) = blockchainSplits.Utility.auxiliaryTransfer(fromID = orderTake.fromID, toID = oldOrder.getMakerID, ownableID = oldOrder.getTakerOwnableID, splitValue = orderTake.takerOwnableSplit)
+
+      def updateOrRemoveOrder(oldOrder: Order, makerOwnableSplit: BigDecimal, exchangeRate: BigDecimal) = {
+        val sendMakerOwnableSplit = orderTake.takerOwnableSplit * exchangeRate
+        val updatedMakerOwnableSplit = makerOwnableSplit - sendMakerOwnableSplit
+        if (updatedMakerOwnableSplit == 0) Service.delete(orderTake.orderID) else {
+          val makerTransferSplits = blockchainSplits.Utility.auxiliaryTransfer(fromID = constants.Blockchain.Modules.Orders, toID = orderTake.fromID, ownableID = oldOrder.getMakerOwnableID, splitValue = sendMakerOwnableSplit)
+          val scrubMetaMutables = blockchainMetas.Utility.auxiliaryScrub(Seq(MetaProperty(constants.Blockchain.Properties.MakerSplit, MetaFact(Data(constants.Blockchain.DataType.DEC_DATA, DecDataValue(updatedMakerOwnableSplit))))))
+
+          def update(mutated: Seq[Property]) = Service.insertOrUpdate(oldOrder.copy(mutables = oldOrder.mutables.mutate(mutated)))
+
+          for {
+            _ <- makerTransferSplits
+            mutated <- scrubMetaMutables
+            _ <- update(mutated)
+          } yield ()
+        }
       }
 
       (for {
-        orderResponse <- orderResponse
-        _ <- insertOrUpdateAll(orderResponse)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
+        oldOrder <- Service.tryGet(orderTake.orderID)
+        makerOwnableSplitMeta <- getMakerOwnableSplitMeta(oldOrder)
+        exchangeRateMeta <- getExchangeRateMeta(oldOrder)
+        _ <- transferAuxiliary(oldOrder)
+        _ <- updateOrRemoveOrder(oldOrder = oldOrder, makerOwnableSplit = makerOwnableSplitMeta.data.value.AsDec, exchangeRate = exchangeRateMeta.data.value.AsDec)
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onCancel(orderCancel: OrderCancel): Future[Unit] = {
-      val orderResponse = getOrder.Service.get(orderCancel.orderID)
-      val (chainID, maintainersID, hashID) = getFeatures(orderCancel.orderID)
+      val oldOrder = Service.tryGet(orderCancel.orderID)
 
-      def delete(orderResponse: OrderResponse) = if (!orderResponse.result.value.Orders.value.list.exists(x => x.value.id.value.chainID.value.idString == chainID && x.value.id.value.maintainersID.value.idString == maintainersID && x.value.id.value.hashID.value.idString == hashID)) Service.delete(orderCancel.orderID) else Future(0)
+      def getMakerOwnableSplitMeta(oldOrder: Order) = blockchainMetas.Service.tryGet(oldOrder.getMakerOwnableSplit.fact.hash)
+
+      def auxiliaryTransfer(oldOrder: Order, makerOwnableSplit: BigDecimal) = blockchainSplits.Utility.auxiliaryTransfer(fromID = constants.Blockchain.Modules.Orders, toID = orderCancel.fromID, ownableID = oldOrder.getMakerOwnableID, splitValue = makerOwnableSplit)
+
+      def removeOrder(orderID: String) = Service.delete(orderID)
 
       (for {
-        orderResponse <- orderResponse
-        _ <- delete(orderResponse)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
+        oldOrder <- oldOrder
+        makerOwnableSplitMeta <- getMakerOwnableSplitMeta(oldOrder)
+        _ <- auxiliaryTransfer(oldOrder, makerOwnableSplitMeta.data.value.AsDec)
+        _ <- removeOrder(orderCancel.orderID)
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
-  }
 
-  private def getID(chainID: String, maintainersID: String, hashID: String) = s"${chainID}.${maintainersID}.${hashID}"
+    private def getID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, hashID: String) = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, hashID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 
-  private def getFeatures(id: String): (String, String, String) = {
-    val idList = id.split(".")
-    if (idList.length == 3) (idList(0), idList(1), idList(2)) else ("", "", "")
   }
 
 }

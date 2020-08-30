@@ -8,8 +8,6 @@
 @commonCard(constants.View.ASSET) {
 } {
     @commonTextInfo(constants.View.ASSET_ID, asset.id)
-    @commonIntInfo(constants.View.LOCK, asset.lock)
-    @commonIntInfo(constants.View.BURN, asset.burn)
     @immutables(asset.immutables)
     @mutables(asset.mutables)
 }

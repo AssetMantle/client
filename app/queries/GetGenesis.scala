@@ -25,7 +25,7 @@ class GetGenesis @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
+  private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withMethod("GET").stream())
 
   object Service {
     def get: Future[Response] = action.recover {

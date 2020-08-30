@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ViewController @Inject()(
-                                blockchainAccountBalances: blockchain.AccountBalances,
+                                blockchainAccounts: blockchain.Accounts,
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginAction: WithLoginAction,
                                 withUsernameToken: WithUsernameToken,
@@ -35,16 +35,9 @@ class ViewController @Inject()(
         }
   }
 
-  def account(address: String): Action[AnyContent] = withoutLoginActionAsync {
+  def account(address: String): Action[AnyContent] = withoutLoginAction {
     implicit request =>
-      val exists = blockchainAccountBalances.Service.checkExists(address)
-      (for {
-        exists <- exists
-      } yield if (exists) Ok(views.html.account(address)) else throw new BaseException(constants.Response.WALLET_NOT_FOUND)
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
-      }
-
+      Ok(views.html.account(address))
   }
 
   def blocks(): Action[AnyContent] = withoutLoginAction {
@@ -81,26 +74,5 @@ class ViewController @Inject()(
     implicit request =>
       Ok(views.html.dashboard())
   }
-
-  def asset(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.asset(id))
-  }
-
-  def identity(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.identity(id))
-  }
-
-  def split(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.split(id))
-  }
-
-  def order(id: String): Action[AnyContent] = withoutLoginAction {
-    implicit request =>
-      Ok(views.html.order(id))
-  }
-
 
 }

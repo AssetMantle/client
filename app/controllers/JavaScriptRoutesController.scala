@@ -69,11 +69,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.validatorTransactions,
         routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
-        routes.javascript.ComponentViewController.assetDetails,
-        routes.javascript.ComponentViewController.identityDetails,
-        routes.javascript.ComponentViewController.allSplits,
-        routes.javascript.ComponentViewController.orderDetails,
-
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
@@ -114,10 +109,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.block,
         routes.javascript.ViewController.transaction,
         routes.javascript.ViewController.validator,
-        routes.javascript.ViewController.asset,
-        routes.javascript.ViewController.identity,
-        routes.javascript.ViewController.split,
-        routes.javascript.ViewController.order,
 
         routes.javascript.BackgroundCheckController.memberScanForm,
         routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,

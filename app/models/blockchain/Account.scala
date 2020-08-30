@@ -6,18 +6,20 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.common.Serializable.Coin
+import models.common.TransactionMessages.SendCoin
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse.Response
+import queries.responses.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, coins: Seq[Coin], publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -37,58 +39,52 @@ class Accounts @Inject()(
 
   import databaseConfig.profile.api._
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   private[models] val accountTable = TableQuery[AccountTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  case class AccountSerialized(address: String, username: String, coins: String, publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(address = address, username = username, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
 
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, coins = Json.toJson(account.coins).toString, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-
-  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
+  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
     }
   }
 
-  private def tryGetAddressByUsername(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
+  private def upsert(account: Account): Future[Int] = db.run(accountTable.insertOrUpdate(serialize(account)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+    }
+  }
+
+  private def tryGetByAddress(address: String): Future[AccountSerialized] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.WALLET_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def getByAddress(address: String): Future[Option[AccountSerialized]] = db.run(accountTable.filter(_.address === address).result.headOption)
+
+  private def findByUsername(username: String): Future[AccountSerialized] = db.run(accountTable.filter(_.username === username).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def tryGetUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
+  private def findUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def getUsernameByAddress(address: String): Future[Option[String]] = db.run(accountTable.filter(_.address === address).map(_.username).result.headOption)
-
-  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
-
-  private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
-
-  private def updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address: String, accountNumber: String, sequence: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.accountNumber, x.sequence, x.dirtyBit)).update((accountNumber, sequence, dirtyBit)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
-
-  private def findByAddress(address: String): Future[Account] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
+  private def findAddressByID(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -99,27 +95,27 @@ class Accounts @Inject()(
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.WALLET_NOT_FOUND, noSuchElementException)
     }
   }
 
   private def checkAccountExistsByUsername(username: String): Future[Boolean] = db.run(accountTable.filter(_.username === username).exists.result)
 
-  private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
+  private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account_BC") {
 
-    def * = (address, username, publicKey, accountNumber, sequence, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Account.tupled, Account.unapply)
+    def * = (address, username, coins, publicKey, accountNumber, sequence, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
     def username = column[String]("username")
+
+    def coins = column[String]("coins")
 
     def publicKey = column[String]("publicKey")
 
     def accountNumber = column[String]("accountNumber")
 
     def sequence = column[String]("sequence")
-
-    def dirtyBit = column[Boolean]("dirtyBit")
 
     def createdBy = column[String]("createdBy")
 
@@ -136,23 +132,52 @@ class Accounts @Inject()(
 
   object Service {
 
-    def create(address: String, username: String, pubkey: String): Future[String] = add(Account(address = address, username = username, publicKey = pubkey, dirtyBit = false))
+    def create(address: String, username: String, publicKey: String): Future[String] = add(Account(address = address, username = username, coins = Seq(), publicKey = publicKey, accountNumber = "", sequence = ""))
 
-    def refreshDirty(address: String, accountNumber: String, sequence: String): Future[Int] = updateAccountNumberSequenceCoinsAndDirtyBitByAddress(address, accountNumber, sequence, dirtyBit = false)
+    def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
-    def get(address: String): Future[Account] = findByAddress(address)
+    def insertOrUpdate(account: Account): Future[Int] = upsert(account)
 
-    def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
+    def get(address: String): Future[Option[Account]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
+    def tryGetByUsername(username: String): Future[Account] = findByUsername(username).map(_.deserialize)
 
-    def tryGetAddress(username: String): Future[String] = tryGetAddressByUsername(username)
+    def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
 
-    def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
-
-    def tryGetUsername(address: String): Future[String] = tryGetUsernameByAddress(address)
+    def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
+
+  }
+
+  object Utility {
+
+    def onSendCoin(sendCoin: SendCoin): Future[Unit] = {
+      val updateFromAccount = insertOrUpdateAccountBalance(sendCoin.fromAddress)
+      val updateToAccount = insertOrUpdateAccountBalance(sendCoin.toAddress)
+      (for {
+        _ <- updateFromAccount
+        _ <- updateToAccount
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
+      val accountResponse = getAccount.Service.get(address)
+      val oldAccount = Service.get(address)
+
+      def upsert(accountResponse: AccountResponse, oldAccount: Option[Account]) = Service.insertOrUpdate(oldAccount.fold(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))(x => x.copy(coins = accountResponse.result.value.coins.map(_.toCoin))))
+
+      (for {
+        accountResponse <- accountResponse
+        oldAccount <- oldAccount
+        _ <- upsert(accountResponse, oldAccount)
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message)
+          throw baseException
+      }
+    }
   }
 
 }

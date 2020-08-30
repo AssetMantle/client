@@ -2,10 +2,10 @@ package utilities
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.`abstract`.BaseTransaction
+import models.Abstract.BaseTransaction
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import queries.{GetResponse, GetTransactionHashResponse}
+import queries.{GetResponse, GetTransaction}
 import transactions.Abstract.BaseRequest
 import transactions.responses.TransactionResponse
 import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
@@ -14,7 +14,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
+class Transaction @Inject()(getTransaction: GetTransaction, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -82,7 +82,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJson[BlockResponse](getResponse.Service.get(ticketID))
         case constants.Transactions.ASYNC_MODE => val transactionResponse = utilities.JSON.getResponseFromJson[AsyncResponse](getResponse.Service.get(ticketID))
 
-          def getBlockResponse(transactionResponse: TransactionResponse.AsyncResponse): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionResponse.txhash))
+          def getBlockResponse(transactionResponse: TransactionResponse.AsyncResponse): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTransaction.Service.getAsWSResponse(transactionResponse.txhash))
 
           for {
             transactionResponse <- transactionResponse
@@ -90,7 +90,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
           } yield response
         case constants.Transactions.SYNC_MODE => val transactionResponse = utilities.JSON.getResponseFromJson[SyncResponse](getResponse.Service.get(ticketID))
 
-          def getBlockResponse(transactionResponse: TransactionResponse.SyncResponse): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionResponse.txhash))
+          def getBlockResponse(transactionResponse: TransactionResponse.SyncResponse): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTransaction.Service.getAsWSResponse(transactionResponse.txhash))
 
           for {
             transactionResponse <- transactionResponse
@@ -112,7 +112,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         } else {
           val transactionHash = getTransactionHash(ticketID)
 
-          def getBlockResponse(transactionHash: Option[String]): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionHash.getOrElse(throw new BaseException(constants.Response.TRANSACTION_HASH_NOT_FOUND))))
+          def getBlockResponse(transactionHash: Option[String]): Future[BlockResponse] = utilities.JSON.getResponseFromJson[BlockResponse](getTransaction.Service.getAsWSResponse(transactionHash.getOrElse(throw new BaseException(constants.Response.TRANSACTION_HASH_NOT_FOUND))))
 
           for {
             transactionHash <- transactionHash

@@ -84,7 +84,7 @@ class WesternUnionController @Inject()(
         },
         issueFiatRequestData => {
           val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
-          val account = blockchainAccounts.Service.get(loginState.address)
+          val account = blockchainAccounts.Service.tryGet(loginState.address)
 
           def create(account: Account): Future[String] = westernUnionFiatRequests.Service.create(traderID = account.username, transactionAmount = issueFiatRequestData.transactionAmount)
 

@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain
+import models.blockchain.Asset
 import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -19,8 +20,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 masterAccounts: Accounts,
                                 blockchainAssets: blockchain.Assets,
                                 blockchainSplits: blockchain.Splits,
+                                blockchainMetas: blockchain.Metas,
                                 blockchainIdentities: blockchain.Identities,
+                                blockchainMaintainers: blockchain.Maintainers,
                                 blockchainOrders: blockchain.Orders,
+                                blockchainClassifications: blockchain.Classifications,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
@@ -66,15 +70,21 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
       val identity = blockchainIdentities.Service.get(query)
       val order = blockchainOrders.Service.get(query)
+      val meta = blockchainMetas.Service.get(query)
+      val classification = blockchainClassifications.Service.get(query)
+      val maintainer = blockchainMaintainers.Service.get(query)
 
       (for {
         asset <- asset
         splits <- splits
         identity <- identity
         order <- order
+        meta <- meta
+        classification <- classification
+        maintainer <- maintainer
       } yield {
-        if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty) InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-        else Ok(views.html.search(query, asset, identity, splits, order))
+        if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && meta.isEmpty && classification.isEmpty && maintainer.isEmpty) InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+        else Ok(views.html.search(query, asset, identity, splits, order, meta, classification, maintainer))
       }).recover {
         case _: BaseException => InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
       }

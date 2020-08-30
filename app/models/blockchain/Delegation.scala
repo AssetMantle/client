@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.TransactionMessages.Delegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -113,6 +112,8 @@ class Delegations @Inject()(
   }
 
   object Utility {
+
+    //onDelegation moved to blockchain/Validators due to import cycle issues
 
     def insertOrUpdate(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
       val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
