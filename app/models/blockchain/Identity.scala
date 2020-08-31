@@ -221,7 +221,7 @@ class Identities @Inject()(
         val immutables = Immutables(Properties(Seq(nubProperty)))
         val mutables = Mutables(Properties(Seq()))
         //While giving Immutables to auxiliaryDefine, do not use NewFact(""), instead directly use Fact(""). This is because, in BC, NewMetaFact is used in Property NubID with "". So when hash is evaluated in auxiliaryDefine in BC, hash of "" is evaluated. Using NewFact will lead to computing hash of "" one more time compared to BC.
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, Fact(""))))), mutables)
+        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, Fact(constants.Blockchain.FactType.ID, ""))))), mutables)
 
         def upsert(classificationID: String) = Service.insertOrUpdate(Identity(id = getID(classificationID = classificationID, immutables = immutables), provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
 

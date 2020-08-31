@@ -324,6 +324,7 @@ object View {
   val PROPERTY_ID = "PROPERTY_ID"
   val FACT = "FACT"
   val FACT_HASH = "FACT_HASH"
+  val FACT_TYPE = "FACT_TYPE"
   val META_FACT_HASH = "META_FACT_HASH"
   val META = "META"
   val META_FACT = "META_FACT"
