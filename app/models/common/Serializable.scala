@@ -83,9 +83,9 @@ object Serializable {
 
   implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
-  case class Fact(hash: String)
+  case class Fact(factType: String, hash: String)
 
-  def NewFact(data: String): Fact = Fact(utilities.Hash.getHash(data))
+  def NewFact(factType: String, data: String): Fact = Fact(factType = factType, hash = utilities.Hash.getHash(data))
 
   implicit val factReads: Reads[Fact] = Json.reads[Fact]
 
@@ -108,7 +108,7 @@ object Serializable {
   case class MetaFact(data: Data) {
     def getHash: String = data.value.GenerateHash
 
-    def removeData(): Fact = NewFact(data.value.AsString)
+    def removeData(): Fact = NewFact(constants.Blockchain.FactType.getFactTypeFromDataType(data.dataType), data.value.AsString)
   }
 
   implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]

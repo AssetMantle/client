@@ -34,6 +34,20 @@ object Blockchain {
     val DEC_DATA = "xprt/decData"
   }
 
+  object FactType {
+    val STRING = "S"
+    val HEIGHT = "H"
+    val ID = "I"
+    val DEC = "D"
+
+    def getFactTypeFromDataType(dataType: String): String = dataType match {
+      case DataType.STRING_DATA => STRING
+      case DataType.HEIGHT_DATA => HEIGHT
+      case DataType.ID_DATA => ID
+      case DataType.DEC_DATA => DEC
+    }
+  }
+
   object Events {
 
     object Slashing {
