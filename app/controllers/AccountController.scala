@@ -109,7 +109,7 @@ class AccountController @Inject()(
         def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, password = createWalletData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createWalletData.mnemonics).mkString(" ")))
 
-          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createWalletData.username, pubkey = addKeyResponse.pubkey)
+          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createWalletData.username, publicKey = addKeyResponse.pubkey)
 
           for {
             addKeyResponse <- addKeyResponse

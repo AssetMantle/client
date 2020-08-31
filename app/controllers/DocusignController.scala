@@ -39,7 +39,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
             case None => {
               val file = masterAccountKYCs.Service.tryGet(id, documentType)
               val counterPartyAddress = "counterPartyAddress"
-              val counterParty = blockchainAccounts.Service.get(counterPartyAddress)
+              val counterParty = blockchainAccounts.Service.tryGet(counterPartyAddress)
 
               def getBuyerEmail(accountID: String): Future[Email] = masterEmails.Service.tryGet(accountID)
 
@@ -73,8 +73,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
 
-    val account = blockchainAccounts.Service.get("accountAddress")
-    val counterPartyAccount = blockchainAccounts.Service.get("counterPartyAccountAddress")
+    val account = blockchainAccounts.Service.tryGet("accountAddress")
+    val counterPartyAccount = blockchainAccounts.Service.tryGet("counterPartyAccountAddress")
 
     def updateStatus(docusignEnvelope: docusign.Envelope, accountIDs: Seq[String]) = event match {
       case constants.External.Docusign.SEND => {
@@ -121,7 +121,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val envelope = docusignEnvelopes.Service.tryGet(id, documentType)
-      val account = blockchainAccounts.Service.get(loginState.address)
+      val account = blockchainAccounts.Service.tryGet(loginState.address)
       (for {
         emailAddress <- emailAddress
         envelope <- envelope

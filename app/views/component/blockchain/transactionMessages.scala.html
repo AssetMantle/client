@@ -10,76 +10,93 @@
         } {
             <div class="tableViewCard">
             @msg.messageType match {
-                case constants.TransactionMessage.SEND_COIN => {
+                case constants.Blockchain.TransactionMessage.SEND_COIN => {
                     @views.html.component.blockchain.txMessages.sendCoin(msg.message)
                 }
-                case constants.TransactionMessage.CREATE_VALIDATOR => {
+                case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => {
                     @views.html.component.blockchain.txMessages.createValidator(msg.message)
                 }
-                case constants.TransactionMessage.EDIT_VALIDATOR => {
+                case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => {
                     @views.html.component.blockchain.txMessages.editValidator(msg.message)
                 }
-                case constants.TransactionMessage.DELEGATE => {
+                case constants.Blockchain.TransactionMessage.DELEGATE => {
                     @views.html.component.blockchain.txMessages.delegate(msg.message)
                 }
-                case constants.TransactionMessage.REDELEGATE => {
+                case constants.Blockchain.TransactionMessage.REDELEGATE => {
                     @views.html.component.blockchain.txMessages.redelegate(msg.message)
                 }
-                case constants.TransactionMessage.UNDELEGATE => {
+                case constants.Blockchain.TransactionMessage.UNDELEGATE => {
                     @views.html.component.blockchain.txMessages.undelegate(msg.message)
                 }
-                case constants.TransactionMessage.UNJAIL => {
+                case constants.Blockchain.TransactionMessage.UNJAIL => {
                     @views.html.component.blockchain.txMessages.unjail(msg.message)
                 }
-                case constants.TransactionMessage.SET_WITHDRAW_ADDRESS => {
+                case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => {
                     @views.html.component.blockchain.txMessages.setWithdrawAddress(msg.message)
                 }
-                case constants.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => {
+                case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => {
                     @views.html.component.blockchain.txMessages.withdrawDelegationReward(msg.message)
                 }
-                case constants.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => {
+                case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => {
                     @views.html.component.blockchain.txMessages.withdrawValidatorCommission(msg.message)
                 }
-                case constants.TransactionMessage.ASSET_MINT => {
+                case constants.Blockchain.TransactionMessage.ASSET_DEFINE => {
+                    @views.html.component.blockchain.txMessages.assetDefine(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.ASSET_MINT => {
                     @views.html.component.blockchain.txMessages.assetMint(msg.message)
                 }
-                case constants.TransactionMessage.ASSET_MUTATE => {
+                case constants.Blockchain.TransactionMessage.ASSET_MUTATE => {
                     @views.html.component.blockchain.txMessages.assetMutate(msg.message)
                 }
-                case constants.TransactionMessage.ASSET_BURN => {
+                case constants.Blockchain.TransactionMessage.ASSET_BURN => {
                     @views.html.component.blockchain.txMessages.assetBurn(msg.message)
                 }
-                case constants.TransactionMessage.IDENTITY_ISSUE => {
+                case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => {
+                    @views.html.component.blockchain.txMessages.identityDefine(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => {
                     @views.html.component.blockchain.txMessages.identityIssue(msg.message)
                 }
-                case constants.TransactionMessage.IDENTITY_PROVISION => {
+                case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => {
                     @views.html.component.blockchain.txMessages.identityProvision(msg.message)
                 }
-                case constants.TransactionMessage.IDENTITY_UNPROVISION => {
+                case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => {
                     @views.html.component.blockchain.txMessages.identityUnprovision(msg.message)
                 }
-                case constants.TransactionMessage.SPLIT_SEND => {
+                case constants.Blockchain.TransactionMessage.IDENTITY_NUB => {
+                    @views.html.component.blockchain.txMessages.identityNub(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.SPLIT_SEND => {
                     @views.html.component.blockchain.txMessages.splitSend(msg.message)
                 }
-                case constants.TransactionMessage.SPLIT_WRAP => {
+                case constants.Blockchain.TransactionMessage.SPLIT_WRAP => {
                     @views.html.component.blockchain.txMessages.splitWrap(msg.message)
                 }
-                case constants.TransactionMessage.SPLIT_UNWRAP => {
+                case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => {
                     @views.html.component.blockchain.txMessages.splitUnwrap(msg.message)
                 }
-                case constants.TransactionMessage.ORDER_MAKE => {
+                case constants.Blockchain.TransactionMessage.ORDER_DEFINE => {
+                    @views.html.component.blockchain.txMessages.orderDefine(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.ORDER_MAKE => {
                     @views.html.component.blockchain.txMessages.orderMake(msg.message)
                 }
-                case constants.TransactionMessage.ORDER_TAKE => {
+                case constants.Blockchain.TransactionMessage.ORDER_TAKE => {
                     @views.html.component.blockchain.txMessages.orderTake(msg.message)
                 }
-                case constants.TransactionMessage.ORDER_CANCEL => {
+                case constants.Blockchain.TransactionMessage.ORDER_CANCEL => {
                     @views.html.component.blockchain.txMessages.orderCancel(msg.message)
                 }
-                case constants.TransactionMessage.CLASSIFICATION_DEFINE => {
-                    @views.html.component.blockchain.txMessages.classificationDefine(msg.message)
+                case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => {
+                    @views.html.component.blockchain.txMessages.maintainerDeputize(msg.message)
                 }
-                case _ => {}
+                case constants.Blockchain.TransactionMessage.META_REVEAL => {
+                    @views.html.component.blockchain.txMessages.metaReveal(msg.message)
+                }
+                case _ => {
+                    @views.html.component.blockchain.txMessages.unknown(msg.message)
+                }
             }
             </div>
         }

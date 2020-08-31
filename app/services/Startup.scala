@@ -13,21 +13,23 @@ import play.api.{Configuration, Logger}
 import play.libs.Json
 import queries._
 import queries.responses.CommunityPoolResponse.{Response => CommunityPoolResponse}
-import queries.responses.GenesisResponse.Balance
+import queries.responses.GenesisResponse.{AccountValue, Genesis}
 import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
+import queries.responses.TransactionResponse.Msg
 import queries.responses.ValidatorResponse.{Result => ValidatorResult}
 import queries.responses.WSClientBlockResponse.{NewBlockEvents, Response => WSClientBlockResponse}
 import utilities.MicroNumber
 
 import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.io.{Source => ScalaSource}
 import scala.util.{Failure, Success}
 
 @Singleton
 class Startup @Inject()(
-                         blockchainAccountBalances: blockchain.AccountBalances,
+                         blockchainAccounts: blockchain.Accounts,
                          blockchainBlocks: blockchain.Blocks,
                          blockchainDelegations: blockchain.Delegations,
                          blockchainSigningInfos: blockchain.SigningInfos,
@@ -53,10 +55,14 @@ class Startup @Inject()(
 
   private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
+  private val genesisFilePath = configuration.get[String]("blockchain.genesisFilePath")
+
   private def initialize(): Unit = {
     try {
-      val genesisResponse = Await.result(getGenesis.Service.get, Duration.Inf)
-      Await.result(insertOrUpdateAccountBalances(genesisResponse.result.genesis.app_state.bank.balances), Duration.Inf)
+      val genesisSource = ScalaSource.fromFile(genesisFilePath)
+      val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
+      genesisSource.close()
+      Await.result(insertOrUpdateAccountBalances(genesis.app_state.auth.accounts.map(_.value)), Duration.Inf)
       val latestBlockHeight = Await.result(blockchainBlocks.Service.getLatestBlockHeight, Duration.Inf)
       val missingBlockHeights = Await.result(blockchainBlocks.Service.getMissingBlocks(1, latestBlockHeight), Duration.Inf)
       Await.result(insertOrUpdateAllValidators(latestBlockHeight), Duration.Inf)
@@ -92,8 +98,8 @@ class Startup @Inject()(
     }
   }
 
-  private def insertOrUpdateAccountBalances(balances: Seq[Balance]) = {
-    val upsert = Future.traverse(balances)(balance => blockchainAccountBalances.Utility.insertOrUpdateAccountBalance(address = balance.address))
+  private def insertOrUpdateAccountBalances(accounts: Seq[AccountValue]) = {
+    val upsert = Future.traverse(accounts)(account => blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.address))
     (for {
       _ <- upsert
     } yield ()
@@ -101,6 +107,8 @@ class Startup @Inject()(
       case baseException: BaseException => throw baseException
     }
   }
+
+  private def insertGenesisTransactions(msgs: Seq[Msg]) = Future.traverse(msgs)(msg => blocksServices.actionOnTxMessages(msg.toStdMsg, 0))
 
   private def insertOrUpdateAllValidators(latestBlockHeight: Int): Future[Unit] = {
     if (latestBlockHeight == 0) {
@@ -112,12 +120,14 @@ class Startup @Inject()(
       def insert(validatorResults: Seq[ValidatorResult]) = {
         val insertValidator = blockchainValidators.Service.insertMultiple(validatorResults.map(_.toValidator))
         val insertDelegations = Future.traverse(validatorResults)(validatorResult => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorResult.operator_address), validatorAddress = validatorResult.operator_address))
-        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
-        for {
+//        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
+        (for {
           _ <- insertValidator
           _ <- insertDelegations
-          _ <- insertKeyBaseAccount
-        } yield ()
+//          _ <- insertKeyBaseAccount
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.getLocalizedMessage)
+        }
       }
 
       (for {
@@ -283,6 +293,6 @@ class Startup @Inject()(
     def run(): Unit = runOnStartup()
   }
 
-  actors.Service.actorSystem.scheduler.scheduleOnce(200.millisecond, initializeRunnable)(schedulerExecutionContext)
+  actors.Service.actorSystem.scheduler.scheduleOnce(500.millisecond, initializeRunnable)(schedulerExecutionContext)
 
 }

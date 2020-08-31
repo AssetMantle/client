@@ -19,15 +19,23 @@ object GenesisResponse {
 
   implicit val genUtilReads: Reads[Genutil] = Json.reads[Genutil]
 
-  case class Balance(address: String, coins: Seq[Coin])
-
-  implicit val balanceReads: Reads[Balance] = Json.reads[Balance]
-
-  case class Bank(balances: Seq[Balance])
+  case class Bank(send_enabled: Boolean)
 
   implicit val bankReads: Reads[Bank] = Json.reads[Bank]
 
-  case class AppState(bank: Bank, genutil: Genutil)
+  case class AccountValue(address: String, coins: Seq[Coin])
+
+  implicit val accountValueReads: Reads[AccountValue] = Json.reads[AccountValue]
+
+  case class Account(value: AccountValue)
+
+  implicit val accountReads: Reads[Account] = Json.reads[Account]
+
+  case class  Auth(accounts: Seq[Account])
+
+  implicit val authReads: Reads[Auth] = Json.reads[Auth]
+
+  case class AppState(bank: Bank, genutil: Genutil, auth: Auth)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 

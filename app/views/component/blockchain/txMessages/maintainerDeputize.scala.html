@@ -1,0 +1,17 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.MaintainerDeputize
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[MaintainerDeputize]) { maintainerDeputize =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(maintainerDeputize.from, routes.ViewController.account(maintainerDeputize.from)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(maintainerDeputize.fromID, routes.IndexController.search(maintainerDeputize.fromID)))
+    @commonHtmlInfo(constants.View.TO_ID, commonLink(maintainerDeputize.toID, routes.IndexController.search(maintainerDeputize.toID)))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(maintainerDeputize.classificationID, routes.IndexController.search(maintainerDeputize.classificationID)))
+    @Messages(constants.View.MAINTAINED_TRAITS):
+    @views.html.component.blockchain.properties(maintainerDeputize.maintainedTraits.propertyList)
+    @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(maintainerDeputize.addMaintainer))
+    @commonBooleanInfo(constants.View.REMOVE_MAINTAINER, Option(maintainerDeputize.removeMaintainer))
+    @commonBooleanInfo(constants.View.MUTATE_MAINTAINER, Option(maintainerDeputize.mutateMaintainer))
+}

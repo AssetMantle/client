@@ -16,9 +16,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SigningInfo(consensusAddress: String, startHeight: Int, indexOffset: Int, jailedUntil: String, tombstoned: Boolean = false, missedBlocksCounter: Int = 0, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-  val hexAddress: String = utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress)
-}
+case class SigningInfo(consensusAddress: String, startHeight: Int, indexOffset: Int, jailedUntil: String, tombstoned: Boolean = false, missedBlocksCounter: Int = 0, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SigningInfos @Inject()(
@@ -112,7 +110,7 @@ class SigningInfos @Inject()(
     def get(consensusAddress: String): Future[SigningInfo] = findByConsensusAddress(consensusAddress)
 
     //TODO Optimize using Bech32
-    def getByHexAddress(hexAddress: String): Future[SigningInfo] = getAll.map(_.find(_.hexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.SIGNING_INFO_NOT_FOUND)))
+    def getByHexAddress(hexAddress: String): Future[SigningInfo] = getAll.map(_.find(x => utilities.Bech32.convertConsensusAddressToHexAddress(x.consensusAddress) == hexAddress).getOrElse(throw new BaseException(constants.Response.SIGNING_INFO_NOT_FOUND)))
 
   }
 
@@ -134,7 +132,7 @@ class SigningInfos @Inject()(
     def insertAll(): Future[Unit] = {
       val allSigningInfosResponse = getAllSigningInfos.Service.get
 
-      def update(signingInfosResponse: AllSigningInfosResponse) = Service.insertMultiple(signingInfosResponse.result.map(_.toSigningInfo))
+      def update(signingInfosResponse: AllSigningInfosResponse) = Service.insertMultiple(signingInfosResponse.result.filter(_.address != "").map(_.toSigningInfo))
 
       (for {
         allSigningInfosResponse <- allSigningInfosResponse

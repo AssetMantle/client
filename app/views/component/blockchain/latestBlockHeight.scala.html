@@ -1,6 +1,6 @@
 @import views.html.base._
 
-@(blockHeight: Int, proposer: String, time: String, averageBlockTime: String, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockHeight: Int, proposer: String, time: String, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
 } {

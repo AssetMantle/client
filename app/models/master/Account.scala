@@ -171,6 +171,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       }
     }
 
+    def checkAccountExists(username: String): Future[Boolean] = checkById(username)
+
   }
 
 }

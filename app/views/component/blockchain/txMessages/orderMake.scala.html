@@ -1,4 +1,4 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import views.html.base._
 @import views.html.component.blockchain.properties
 @import models.common.TransactionMessages.OrderMake
@@ -6,12 +6,19 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[OrderMake]) { orderMake =>
-    @commonTextInfo(constants.View.FROM, orderMake.from)
-    @commonTextInfo(constants.View.MAINTAINERS_ID, orderMake.maintainersID)
-    @commonTextInfo(constants.View.MAKER_ID, orderMake.makerID)
-    @commonTextInfo(constants.View.TAKER_ID, orderMake.takerID)
-    @commonTextInfo(constants.View.MAKER_SPLIT, orderMake.makerSplit.toString)
-    @commonTextInfo(constants.View.MAKER_SPLIT_ID, orderMake.makerSplitID)
-    @commonTextInfo(constants.View.EXCHANGE_RATE, orderMake.exchangeRate.toString)
-    @commonTextInfo(constants.View.TAKER_SPLIT_ID, orderMake.takerSplitID)
+    @commonHtmlInfo(constants.View.FROM, commonLink(orderMake.from, routes.ViewController.account(orderMake.from)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderMake.fromID, routes.IndexController.search(orderMake.fromID)))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(orderMake.classificationID, routes.IndexController.search(orderMake.classificationID)))
+    @commonHtmlInfo(constants.View.MAKER_OWNABLE_ID, commonLink(orderMake.makerOwnableID, routes.IndexController.search(orderMake.makerOwnableID)))
+    @commonHtmlInfo(constants.View.TAKER_OWNABLE_ID, commonLink(orderMake.takerOwnableID, routes.IndexController.search(orderMake.takerOwnableID)))
+    @commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, orderMake.makerOwnableSplit.toString)
+    @commonIntInfo(constants.View.EXPIRES_IN, orderMake.expiresIn)
+    @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+    @views.html.component.blockchain.metaProperties(orderMake.immutableMetaProperties.metaPropertyList)
+    @Messages(constants.View.MUTABLE_META_PROPERTIES):
+    @views.html.component.blockchain.metaProperties(orderMake.mutableMetaProperties.metaPropertyList)
+    @Messages(constants.View.IMMUTABLE_PROPERTIES):
+    @views.html.component.blockchain.properties(orderMake.immutableProperties.propertyList)
+    @Messages(constants.View.MUTABLE_PROPERTIES):
+    @views.html.component.blockchain.properties(orderMake.mutableProperties.propertyList)
 }

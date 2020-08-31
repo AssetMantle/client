@@ -1,4 +1,4 @@
-@import models.`abstract`.TransactionMessage
+@import models.Abstract.TransactionMessage
 @import models.common.TransactionMessages.SendCoin
 @import views.html.base._
 
@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[SendCoin]) { sendCoin =>
     @commonHtmlInfo(constants.View.FROM, commonLink(sendCoin.fromAddress, routes.ViewController.account(sendCoin.fromAddress)))
     @commonHtmlInfo(constants.View.TO, commonLink(sendCoin.toAddress, routes.ViewController.account(sendCoin.toAddress)))
-    @commonTextInfo(constants.View.AMOUNTS, sendCoin.amounts.map(amt => s"${amt.amount} ${amt.denom}").mkString(", "))
+    @commonTextInfo(constants.View.AMOUNTS, sendCoin.amounts.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
 }
