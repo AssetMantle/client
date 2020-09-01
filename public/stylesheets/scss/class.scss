@@ -15,10 +15,404 @@
 html, body{
   height: 100%;
   position: relative;
-  background: #F0F0F0;
   @extend %scroller;
 }
 
+%darkModeBorderColor{
+  border-color: $darkModeBorderColor !important;
+}
+
+body.darkMode {
+  ::-webkit-scrollbar-track {
+    background-color:transparent;
+  }
+  &, .comdex .cmuk-overflow-auto, .modal
+  .modalContent .modalBody form .formBody, .modalInfoBlock,
+  .leftContainer .cmuk-card-body, .leftContainer
+  .financial .cmuk-card .cmuk-switcher, .rightContainer
+  .recentActivityContainer .cmuk-card-body .recentActivityMessages,
+  .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer,
+  .documentView .documentList, .switcherCard .cmuk-switcher
+  {
+    scrollbar-color: #484951 #20212A;
+    scrollbar-width: thin;
+  }
+  .banner{
+    border-bottom:1px solid $darkModeBorderColor;
+    background-color: #20212A;
+    .bannerText h3{
+      color: $darkModePrimaryFontColor;
+    }
+  }
+  .tabSection .cmuk-subnav-pill {
+    li a {
+      background-color: $darkModeCardBackground;
+    }
+    li:nth-child(2) {
+      border-top: 1px solid $darkModeBorderColor;
+      border-bottom: 1px solid $darkModeBorderColor;
+    }
+  }
+  .middle .mainTabs .tradeTerms {
+    .traderCommodity .tradeName {
+      color: #ffffff;
+    }
+    .sellerTerm {
+      .documentTermName, .termIdent {
+        color: $darkModePrimaryFontColor;
+      }
+
+      background: $darkModeCardBackground;
+      border: none;
+      filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
+
+      .termIcon {
+        .icon {
+          fill: $darkModeIconColor;
+        }
+      }
+
+      .subTerms .infoRowLabel, .infoRowLabel {
+        color: $darkModePrimaryFontColor;
+        font-weight: bold;
+      }
+
+      .subTerms .infoRowValue, .infoRowValue, p {
+        color: $darkModeSecondaryFontColor;
+      }
+    }
+  }
+  .infoRowValue{
+    color: $darkModeSecondaryFontColor;
+    p{
+      color: $darkModeSecondaryFontColor;
+    }
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(119,131,143,.5);
+    border: none;
+  }
+  .cmuk-navbar-container:not(.cmuk-navbar-transparent){
+    background: #20212A;
+    border-bottom:1px solid $darkModeBorderColor;
+  }
+  .footer{
+    background: #20212A;
+    border-top:1px solid $darkModeBorderColor;
+  }
+  .header {
+    .cmuk-logo{
+      border-right: 1px solid $darkModeBorderColor;
+    }
+    .cmuk-navbar-nav > li > a {
+      color: $darkModeIconColor;
+    }
+    .icon {
+      fill: $darkModeIconColor;
+    }
+    .cmuk-navbar-nav > li > a.active {
+      color: #FFFFFF;
+      .icon {
+        fill: #FE4350;
+      }
+    }
+    .cmuk-navbar-right .cmuk-navbar-nav > li > a{
+      border-left: 1px solid $darkModeBorderColor;
+    }
+  }
+  .cmuk-card-header{
+    @extend %darkModeBorderColor;
+    .icon{
+      fill:$darkModeIconColor;
+    }
+
+  }
+  .financialCard {
+    .cmuk-card-header {
+      .icon {
+        fill: none;
+        stroke:$darkModeIconColor;
+      }
+    }
+  }
+  .cmuk-card-body{
+    @extend %darkModeBorderColor;
+    .uploadDoc{
+      background: $darkModeCardBackground;
+      @extend %darkModeBorderColor;
+    }
+  }
+  .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body{
+    background: $darkModeCardBackground;
+    @extend %darkModeBorderColor;
+  }
+  .commonList{
+    background: $darkModeCardBackground !important;
+    border: none;
+    filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
+  }
+  .cmuk-card-default {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+  .cmuk-card-default,
+  .financialCardSection,
+  .documentItem,
+  .cmuk-input,
+  .cmuk-panel-scrollable{
+    background: $darkModeCardBackground !important;
+    @extend %darkModeBorderColor;
+  }
+  .addBalanceButton{
+    border: none !important;
+  }
+  button , .buttonPrimary, .addBalanceButton {
+    background:#383941;
+    color: #FFFFFF ;
+  }
+   table tr td:not(:first-child),
+  h1, h2, h3, h4, h5, h6, .cmuk-switcher li, p,
+  .cmuk-legend, label,
+  .cmuk-card-header,
+  .timeline-item .timeline-content .activityContent,
+  .infoRowLabel,
+  .cmuk-input,
+  .tableViewCard .infoRow .infoRowLabel,
+  .cmuk-input:focus,
+  .listItemChild .listItemChildTitle,
+  .listItemChild .listItemChildValue
+  {
+    color: $darkModePrimaryFontColor;
+  }
+  .financial {
+    .cmuk-switcher, .financialCard, .financial {
+      ul li {
+        .ctitle {
+          color:$darkModeSecondaryFontColor;
+        }
+        .wallet .cmuk-comment-meta,.receivable .cmuk-comment-meta, .payable .cmuk-comment-meta
+        {
+          color: #FAFAFA;
+        }
+      }
+    }
+  }
+  .modal
+  .modalContent{
+    background: $darkModeCardBackground !important;
+    .closeButton:hover{
+      background: #383941;
+    }
+  }
+  .switcherCard, .switcherCardSecond{
+    .cmuk-subnav, .cmuk-subnav-pill li:not(:last-child) {
+      @extend %darkModeBorderColor;
+    }
+    .cmuk-subnav-pill > .cmuk-active > a{
+      color: #FFFFFF;
+    }
+    .cmuk-subnav-pill>*>a:focus, .cmuk-subnav-pill>*>a:hover{
+      background-color: transparent;
+    }
+    .cmuk-switcher li .commonList .buttonPrimary{
+      background: transparent;
+      border: 1px solid $colorPrimary;
+      color: $colorPrimary;
+      border-radius: 5px;
+    }
+  }
+  .salesQuoteCard{
+    .salesQuoteCardLeft .assetInitialData{
+      .assetTitle{
+        color:$darkModePrimaryFontColor;
+      }
+      .assetQuantity{
+        color: $darkModeSecondaryFontColor;
+      }
+    }
+    .salesQuoteCardRight p {
+      color: $darkModeSecondaryFontColor;
+    }
+    .salesQuoteCardMiddle {
+      border-color: #484951;;
+      p {
+        color: $darkModePrimaryFontColor;
+
+        span {
+          color: $darkModeSecondaryFontColor;
+        }
+      }
+    }
+  }
+  .timeline {
+    &:before{
+      border-color: #4A4B51;;
+    }
+    .timeline-item .timeline-icon {
+      background: #383941;
+    }
+  }
+  hr{
+    border-color: #4A4B51;
+  }
+  .comdex input:-webkit-autofill,
+  .comdex input:-webkit-autofill:hover,
+  .comdex input:-webkit-autofill:focus,
+  .comdex input:-webkit-autofill:active{
+    -webkit-text-fill-color: $darkModePrimaryFontColor;
+    -webkit-box-shadow: 0 0 0 30px $darkModeCardBackground inset;
+  }
+
+  .toolTip .toolTipText{
+    background-color: #383941;
+    color: $colorPrimary;
+    &:after{
+      border-color: #383941 transparent transparent transparent;
+    }
+  }
+  .cmuk-icon-button,  .cmuk-icon-button:hover{
+    background: #383941;
+  }
+  .chat .partner{
+    background: #383941;
+    color: $colorPrimary;
+    &:after{
+      border-color: transparent #383941  #383941 transparent;
+    }
+  }
+  p {
+    color: $darkModePrimaryFontColor;
+  }
+  .documentItem .documentContentTop a{
+    color: $colorPrimary;
+  }
+  .documentView .documentList {
+    .docIcon{
+      background-color: #383941;
+      border-color: #4A4B51;
+    }
+    .seenIcon{
+      background-color: #383941;
+    }
+    .table-scroll {
+      tbody {
+        > * {
+          border-color: $darkModeBorderColor;
+        }
+        tr td:first-child {
+          &, a {
+            color: $darkModePrimaryFontColor;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  .cmuk-button-danger:disabled, .cmuk-button-success {
+    background-color: #5cb85c;
+    color: #fff;
+  }
+  .cmuk-button-danger {
+    background-color: #f0506e;
+    color: #fff;
+  }
+  .logoutContainer form .formBody .commonCheckBox dl{
+    border-color: #4A4B51;
+  }
+  .commodityImage {
+    background: #838388;
+    border: 1.51312px solid #838388;
+  }
+  .cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped>tr:nth-of-type(odd) {
+    background: #2f2d38;
+    border-color:$darkModeBorderColor;
+  }
+  .blockHeightItem {
+    .listItemChild p, a {
+      color: #e50913
+    }
+  }
+  .tableCard{
+    table{
+      tr{
+        border-bottom:1px solid $darkModeBorderColor;
+        th{
+          color:$darkModePrimaryFontColor;
+        }
+        td{
+          color:$darkModeSecondaryFontColor;
+        }
+      }
+    }
+  }
+  .cmuk-alert-danger {
+    background: #7b4852;
+  }
+  .block {
+    border-color: #e5e5e5;
+    .full {
+      background-color: #e5e5e5;
+    }
+  }
+  .searchForm dl .cmuk-search-input{
+    border: none;
+  }
+}
+
+// End Of Dark Mode Styles
+
+body.lightMode {
+  .buttonPrimary {
+    background: $colorPrimary;
+  }
+
+  .cmuk-input {
+    background: #FFFFFF;
+  }
+
+  .header {
+
+
+    .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
+      background: $colorSecondary;
+    }
+
+    .cmuk-navbar-nav > li > a {
+      &, &.active {
+        color: #FFFFFF;
+      }
+    }
+
+  }
+
+  .cmuk-card-default {
+    background: #FAFAFA;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: $buttonBorderRadius;
+  }
+
+  .tabSection .cmuk-subnav-pill {
+    & > .cmuk-active > a {
+      background: $colorSecondary;
+    }
+
+    li {
+      a {
+        background-color: #FAFBFD;
+      }
+
+      &:nth-child(2) {
+        border-top: 1px solid #e7eaf3;
+        border-bottom: 1px solid #e7eaf3;
+      }
+    }
+  }
+
+  .commodityImage {
+    background: #F2F2F2;
+    border: 1.51312px solid #E3E3E3;
+  }
+}
 %scroller{
   scrollbar-color: #E2E4E6 #FFFFFF;
   scrollbar-width: thin;
@@ -115,7 +509,6 @@ html, body{
   min-height: 100vh;
   display: block;
   position: relative;
-  background: #F0F0F0;
   padding-bottom: 115px;
 }
 
@@ -324,6 +717,17 @@ html, body{
   img{
     width: 120px;
   }
+  .darkModeButton{
+    padding:3px 7px 6px 10px;
+    background: $colorSecondary;
+    .dayMode, .darkMode{
+      .icon{
+        width: 16px;
+        height: 15px;
+      }
+    }
+  }
+
 }
 
 .iframeModal{
@@ -993,7 +1397,6 @@ html, body{
   .cmuk-navbar-nav>li>a{
     padding:0 25px;
     font-weight: bold;
-    color: hsla(0,0%,100%,.75);
     font-size:$paragraphFontSizeSmall;
     letter-spacing: 0.4px;
   }
