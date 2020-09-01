@@ -8,6 +8,8 @@ object Blockchain {
   val FirstOrderCompositeIDSeparator = "|"
   val SecondOrderCompositeIDSeparator = "*"
   val OneDec = BigDecimal("1.000000000000000000")
+  val ZeroDec = BigDecimal("0.0")
+  val SmallestDec = BigDecimal("0.000000000000000001")
   val ToHashSeparator = "_"
 
   object Properties {

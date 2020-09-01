@@ -121,7 +121,7 @@ class Metas @Inject()(
   object Utility {
 
     def onReveal(metaReveal: MetaReveal): Future[Unit] = {
-      val upsertMeta = Service.insertOrUpdate(Meta(id = utilities.Hash.getHash(metaReveal.metaFact.getHash), data = metaReveal.metaFact.data))
+      val upsertMeta = Service.insertOrUpdate(Meta(id = metaReveal.metaFact.getHash, data = metaReveal.metaFact.data))
 
       (for {
         _ <- upsertMeta
@@ -132,7 +132,16 @@ class Metas @Inject()(
     }
 
     def auxiliaryScrub(metaPropertyList: Seq[MetaProperty]): Future[Seq[Property]] = {
-      val upsertMetas = Future.traverse(metaPropertyList)(metaProperty => Service.insertOrUpdate(Meta(id = metaProperty.metaFact.getHash, data = metaProperty.metaFact.data)))
+      val upsertMetas = Future.traverse(metaPropertyList) { metaProperty =>
+        val upsertMeta = Service.insertOrUpdate(Meta(id = metaProperty.metaFact.getHash, data = metaProperty.metaFact.data))
+
+        (for {
+          _ <- upsertMeta
+        } yield ()
+          ).recover {
+          case _: BaseException =>
+        }
+      }
 
       (for {
         _ <- upsertMetas
