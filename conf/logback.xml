@@ -50,7 +50,6 @@
     <appender-ref ref="ASYNC_APPLICATION_FILE" />
     <appender-ref ref="ASYNC_ERROR_FILE" />
     <appender-ref ref="ASYNCSTDOUT" />
-    <appender-ref ref="Boxfuse-CloudwatchLogs" />
   </root>
 
 </configuration>
