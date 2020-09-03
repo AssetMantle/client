@@ -39,7 +39,7 @@ class SendAssets @Inject()(
                             masterNegotiations: master.Negotiations,
                             masterOrders: master.Orders,
                             masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
-                            masterTransactionTradeActivities:masterTransaction.TradeActivities,
+                            masterTransactionTradeActivities: masterTransaction.TradeActivities,
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             transaction: utilities.Transaction,
                             utilitiesNotification: utilities.Notification,
@@ -111,7 +111,7 @@ class SendAssets @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sendAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByFromToAddressesAndPegHash(from: String, to: String, pegHash: String)= db.run(sendAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByFromToAddressesAndPegHash(from: String, to: String, pegHash: String) = db.run(sendAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -316,7 +316,7 @@ class SendAssets @Inject()(
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure),Duration.Inf)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }

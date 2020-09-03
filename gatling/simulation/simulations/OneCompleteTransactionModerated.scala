@@ -7,8 +7,6 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-import scala.concurrent.duration.Duration
-
 class OneCompleteTransactionModerated extends Simulation {
 
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
@@ -35,8 +33,8 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(100)
-    )).protocols(http.baseUrl(Test.BASE_URL))
+    oneCompleteModeratedScenario.inject(atOnceUsers(1))
+  ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object CreateZone {
@@ -179,15 +177,12 @@ object CreateBuyer {
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUY_ORGANIZATION_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUY_ORGANIZATION_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
     .exec(SetACLControllerTest.organizationVerifyTrader)
-    .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY+50)
- /* .exec { session => session.set(Test.USER_TYPE, getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
+    .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
+  /*.exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
   .doIf(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER) {
-    asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(150, "seconds")) {
-       pause(Test.LOOP_DELAY)
-
-        .exec { session =>
-          println(session(Test.TEST_BUYER_USERNAME).as[String]+"----------"+session(Test.USER_TYPE).as[String])
-          session.set(Test.USER_TYPE, getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
+    asLongAsDuring(session => session(Test.USER_TYPE).as[String] != constants.User.TRADER, Duration.create(80, "seconds")) {
+       .pause(Test.LOOP_DELAY)
+        .exec { session => session.set(Test.USER_TYPE, AccountControllerTest.getUserType(session(Test.TEST_BUYER_USERNAME).as[String])) }
     }
   }*/
 }
@@ -210,10 +205,10 @@ object IssueFiat {
 
   val issueFiat = scenario("IssueFiat")
     /*.exec(session => session.set(Test.TEST_SELLER_USERNAME, "SELL10cEUVnPV9").set(Test.TEST_SELLER_PASSWORD,"SELL10cEUVnPV9"))
-        .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY1281yUKOdVIf").set(Test.TEST_BUYER_PASSWORD, "BUY1281yUKOdVIf"))
+        .exec(session => session.set(Test.TEST_BUYER_USERNAME, "BUY123TFjb7iV").set(Test.TEST_BUYER_PASSWORD, "BUY123TFjb7iV"))
         .exec { session => session.set(Test.TEST_SELLER_TRADER_ID, getTraderID(session(Test.TEST_SELLER_USERNAME).as[String])) }
-        .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }
-   */ /* .feed(BuyerFeeder.buyerFeed)
+        .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
+    /* .feed(BuyerFeeder.buyerFeed)
      .exec { session => session.set(Test.TEST_BUYER_TRADER_ID, getTraderID(session(Test.TEST_BUYER_USERNAME).as[String])) }*/
     .exec(session => session.set(Test.TEST_USERNAME, session(Test.TEST_BUYER_USERNAME).as[String]).set(Test.TEST_PASSWORD, session(Test.TEST_BUYER_PASSWORD).as[String]))
     .exec(AccountControllerTest.loginScenario)
@@ -399,6 +394,3 @@ object RedeemFiat {
     .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
-
-
-

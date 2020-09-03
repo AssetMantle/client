@@ -121,10 +121,8 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         }
         val forComplete = (for {
           blockResponse <- blockResponse
-          result <- executeSuccessOrFailure(blockResponse, ticketID)
-        } yield {
-          result
-        }
+          _ <- executeSuccessOrFailure(blockResponse, ticketID)
+        } yield Unit
           ).recover {
           case baseException: BaseException =>
             if (baseException.failure.message.matches(responseErrorTransactionHashNotFound) || baseException.failure.message.matches(awaitingKafkaResponse))

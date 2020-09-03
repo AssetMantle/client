@@ -1,7 +1,4 @@
 GET         /                                                                                     controllers.IndexController.index
-#GET         /index2                                                                               controllers.IndexController.index2
-#GET         /indexWs                                                                              controllers.IndexController.indexWs
-#GET         /secret                                                                               controllers.IndexController.indexAWSSecret
 
 GET         /assets/*file                                                                         controllers.Assets.versioned(path="/public", file: Asset)
 

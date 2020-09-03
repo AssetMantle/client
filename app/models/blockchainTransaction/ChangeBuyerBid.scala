@@ -46,10 +46,10 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
                                )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
 
-  def serialize(changeBuyerBid: ChangeBuyerBid): ChangeBuyerBidSerialized = ChangeBuyerBidSerialized(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid.toMicroString, time = changeBuyerBid.time,pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas.toMicroString, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code, createdBy = changeBuyerBid.createdBy, createdOn = changeBuyerBid.createdOn, createdOnTimeZone = changeBuyerBid.createdOnTimeZone, updatedBy = changeBuyerBid.updatedBy, updatedOn = changeBuyerBid.updatedOn, updatedOnTimeZone = changeBuyerBid.updatedOnTimeZone)
+  def serialize(changeBuyerBid: ChangeBuyerBid): ChangeBuyerBidSerialized = ChangeBuyerBidSerialized(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid.toMicroString, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas.toMicroString, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code, createdBy = changeBuyerBid.createdBy, createdOn = changeBuyerBid.createdOn, createdOnTimeZone = changeBuyerBid.createdOnTimeZone, updatedBy = changeBuyerBid.updatedBy, updatedOn = changeBuyerBid.updatedOn, updatedOnTimeZone = changeBuyerBid.updatedOnTimeZone)
 
   case class ChangeBuyerBidSerialized(from: String, to: String, bid: String, time: Int, pegHash: String, gas: String, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = new MicroNumber(BigInt(bid)), time =time,pegHash=pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = new MicroNumber(BigInt(bid)), time = time, pegHash = pegHash, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
@@ -328,7 +328,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem,
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure),Duration.Inf)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }

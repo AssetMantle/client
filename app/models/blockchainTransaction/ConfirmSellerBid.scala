@@ -111,7 +111,7 @@ class ConfirmSellerBids @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(confirmSellerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String)= db.run(confirmSellerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String) = db.run(confirmSellerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -271,7 +271,7 @@ class ConfirmSellerBids @Inject()(
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure),Duration.Inf)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }

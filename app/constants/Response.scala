@@ -26,7 +26,6 @@ object Response {
   val FILE_ILLEGAL_ARGUMENT_EXCEPTION = new Failure("FILE_ILLEGAL_ARGUMENT_EXCEPTION")
   val CLASS_CAST_EXCEPTION = new Failure("CLASS_CAST_EXCEPTION")
   val FILE_UNSUPPORTED_OPERATION_EXCEPTION = new Failure("FILE_UNSUPPORTED_OPERATION_EXCEPTION")
-  val S3_EXCEPTION = new Failure("S3_EXCEPTION")
 
   //Success- for telling if something is done and the further steps opened up because of it
   val SUCCESS = new Success("SUCCESS")

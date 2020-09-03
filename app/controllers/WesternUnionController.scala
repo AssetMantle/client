@@ -37,7 +37,7 @@ class WesternUnionController @Inject()(
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val rtcbSecretKey = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_RTCB_SECRET_KEY)
-  println("WESTERN_UNION_RTCB_SECRET_KEY------"+rtcbSecretKey)
+
   private val wuClientID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_CLIENT_ID)
 
   private val wuServiceID = keyStore.getPassphrase(constants.KeyStore.WESTERN_UNION_SERVICE_ID)

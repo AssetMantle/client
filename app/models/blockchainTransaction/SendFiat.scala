@@ -45,7 +45,7 @@ class SendFiats @Inject()(
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
                            masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
-                           masterTransactionTradeActivities:masterTransaction.TradeActivities,
+                           masterTransactionTradeActivities: masterTransaction.TradeActivities,
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
 
@@ -348,7 +348,7 @@ class SendFiats @Inject()(
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure),Duration.Inf)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }
