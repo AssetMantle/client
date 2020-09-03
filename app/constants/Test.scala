@@ -1,7 +1,7 @@
 package constants
 
 object Test {
-  val NUMBER_OF_USERS = 1500
+  val NUMBER_OF_USERS = 5500
 
   val TEST_IP = "localhost"
 
@@ -9,7 +9,7 @@ object Test {
 
   val TEST_IMAGE_PATH = "/home/prashant/testImages/"
   val REQUEST_DELAY = 2
-  val BLOCKCHAIN_TRANSACTION_DELAY = 40
+  val BLOCKCHAIN_TRANSACTION_DELAY = 100
   val LOOP_DELAY = 1
   val OTP = "999999"
   val GAS = "10"

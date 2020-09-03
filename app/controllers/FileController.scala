@@ -74,7 +74,7 @@ class FileController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKYCFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKYCFilePath(documentType, true))
               Ok
           }
         }
@@ -144,11 +144,11 @@ class FileController @Inject()(
     implicit request =>
       val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
 
-      def getFile(checkFileNameExists: Boolean) = {
+      def getFile(checkFileNameExists: Boolean): Future[Result] = {
         if (checkFileNameExists) {
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getAccountKYCFilePath(documentType))
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)))
@@ -171,7 +171,7 @@ class FileController @Inject()(
     implicit request =>
       (if (s3BucketInUse) {
         for {
-          s3File <- fileResourceManager.getFile(fileName)
+          s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getZoneKYCFilePath(documentType))
         } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
       } else {
         Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName)))
@@ -189,7 +189,7 @@ class FileController @Inject()(
         if (userZoneID == organizationZoneID) {
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getOrganizationKYCFilePath(documentType))
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName)))
@@ -224,7 +224,7 @@ class FileController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAssetFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAssetFilePath(documentType, true))
               Ok
           }
         }
@@ -382,7 +382,7 @@ class FileController @Inject()(
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getNegotiationFilePath(documentType))
+              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getNegotiationFilePath(documentType, true))
               Ok
           }
         }
@@ -598,7 +598,7 @@ class FileController @Inject()(
       def getFile(fileName: String) = {
         if (s3BucketInUse) {
           for {
-            s3File <- fileResourceManager.getFile(fileName)
+            s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getZoneKYCFilePath(documentType))
           } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
         } else {
           Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName)))
@@ -625,7 +625,7 @@ class FileController @Inject()(
       def getFile(fileName: String) = {
         if (s3BucketInUse) {
           for {
-            s3File <- fileResourceManager.getFile(fileName)
+            s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getOrganizationKYCFilePath(documentType))
           } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
         } else {
           Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName)))
@@ -652,11 +652,11 @@ class FileController @Inject()(
 
       def getTraderZoneID(id: String): Future[String] = masterTraders.Service.tryGetZoneID(id)
 
-      def getFile(fileName: String, sellerTraderZoneID: String, buyerTraderZoneID: String, zoneID: String) = {
+      def getFile(fileName: String, sellerTraderZoneID: String, buyerTraderZoneID: String, zoneID: String): Future[Result] = {
         if (sellerTraderZoneID == zoneID || buyerTraderZoneID == zoneID) {
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, fileResourceManager.getNegotiationFilePath(documentType))
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getNegotiationFilePath(documentType), fileName = fileName)))
@@ -693,7 +693,7 @@ class FileController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType, true))
               Ok
           }
         }
@@ -778,7 +778,7 @@ class FileController @Inject()(
       def getFile(path: String) = {
         if (s3BucketInUse) {
           for {
-            s3File <- fileResourceManager.getFile(fileName)
+            s3File <- fileResourceManager.getFile(fileName, path)
           } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
         } else {
           Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
@@ -826,7 +826,7 @@ class FileController @Inject()(
           }
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, path)
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
@@ -885,7 +885,7 @@ class FileController @Inject()(
           }
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, path)
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))
@@ -944,7 +944,7 @@ class FileController @Inject()(
           }
           if (s3BucketInUse) {
             for {
-              s3File <- fileResourceManager.getFile(fileName)
+              s3File <- fileResourceManager.getFile(fileName, path)
             } yield Ok.sendEntity(HttpEntity.Streamed(s3File._1, None, s3File._2.contentType))
           } else {
             Future(Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName)))

@@ -13,7 +13,8 @@ import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class Notification @Inject()(masterTransactionNotifications: masterTransaction.Notifications,
@@ -62,7 +63,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    //val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    val send = wsClient.url(constants.Test.BASE_URL + "/loopback/sendSMS/"+mobileNumber).get()
     (for {
       _ <- send
     } yield ()
@@ -94,7 +96,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    mailerClient.send(Email(
+   /* mailerClient.send(Email(
       subject = messagesApi(email.subject),
       from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
       to = Seq(emailAddress),
@@ -102,7 +104,8 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       charset = Option(emailCharset),
       replyTo = Seq(emailReplyTo),
       bounceAddress = Option(emailBounceAddress),
-    ))
+    ))*/
+    Await.result(wsClient.url(constants.Test.BASE_URL + "/loopback/sendEmail/"+emailAddress).get().map(response => response.toString), Duration.Inf)
   }
 
   def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Future[String] = {

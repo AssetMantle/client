@@ -20,6 +20,8 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
 
+resolvers += "boxfuse-repo" at "https://files.boxfuse.com"
+
 scalaVersion := "2.12.11"
 
 libraryDependencies ++= Seq(ehcache, ws, specs2 % Test, guice)
@@ -63,3 +65,8 @@ libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.5.0-RC1"
 libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19"
 
 libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.2"
+
+libraryDependencies += "com.boxfuse.cloudwatchlogs" % "cloudwatchlogs-java-appender" % "1.1.9.62"
+
+libraryDependencies += "com.amazonaws" % "aws-java-sdk-secretsmanager" % "1.11.851"
+

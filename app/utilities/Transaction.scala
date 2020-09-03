@@ -73,7 +73,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
     }
   }
 
-  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) {
+  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) = {
     val ticketIDsSeq: Future[Seq[String]] = getTickets()
     Thread.sleep(sleepTime)
 
@@ -121,8 +121,10 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         }
         val forComplete = (for {
           blockResponse <- blockResponse
-          _ <- executeSuccessOrFailure(blockResponse, ticketID)
-        } yield Unit
+          result <- executeSuccessOrFailure(blockResponse, ticketID)
+        } yield {
+          result
+        }
           ).recover {
           case baseException: BaseException =>
             if (baseException.failure.message.matches(responseErrorTransactionHashNotFound) || baseException.failure.message.matches(awaitingKafkaResponse))

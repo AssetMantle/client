@@ -18,7 +18,6 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
 
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
-
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
 
@@ -59,7 +58,10 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
       } yield {
         result
       }).recover {
-        case baseException: BaseException => Results.Unauthorized(views.html.index()).withNewSession
+        case baseException: BaseException =>
+          if(baseException.failure.message== constants.Response.USERNAME_NOT_FOUND.message)
+          Results.Ok(views.html.index()).withNewSession
+          else Results.Unauthorized(views.html.index()).withNewSession
       }
     }
   }

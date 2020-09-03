@@ -180,7 +180,7 @@ class AddZoneController @Inject()(
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
+              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType,true))
               Ok
           }
         }
@@ -503,7 +503,7 @@ class AddZoneController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType,true))
               Ok
           }
         }
