@@ -180,7 +180,7 @@ class AddZoneController @Inject()(
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType,true))
+              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
@@ -225,7 +225,7 @@ class AddZoneController @Inject()(
 
       def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocument: ZoneKYC): Future[Unit] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocument = oldDocument,
@@ -503,7 +503,7 @@ class AddZoneController @Inject()(
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.account(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType,true))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
@@ -545,7 +545,7 @@ class AddZoneController @Inject()(
 
       def getOldDocument(id: String): Future[ZoneKYC] = masterZoneKYCs.Service.tryGet(id = id, documentType = documentType)
 
-      def updateFile(oldDocument: ZoneKYC): Future[Unit] = fileResourceManager.updateFile[ZoneKYC](
+      def updateFile(oldDocument: ZoneKYC): Future[Boolean] = fileResourceManager.updateFile[ZoneKYC](
         name = name,
         path = fileResourceManager.getZoneKYCFilePath(documentType),
         oldDocument = oldDocument,

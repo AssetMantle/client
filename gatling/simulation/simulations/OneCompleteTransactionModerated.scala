@@ -1,7 +1,6 @@
 package simulations
 
 import constants.Test
-import controllers.routes
 import scenarios._
 import feeders.JDBCFeeder._
 import feeders._
@@ -12,13 +11,8 @@ import scala.concurrent.duration.Duration
 
 class OneCompleteTransactionModerated extends Simulation {
 
-  val zoneUsername = "ZONE1381bpw3XasE"
-  val zonePassword = "123123123"
-
   val oneCompleteModeratedScenario = scenario("OneCompleteTest")
-    /*.exec(CreateZone.createZone)*/
-    .exec(session => session.set(Test.TEST_ZONE_USERNAME, zoneUsername).set(Test.TEST_ZONE_PASSWORD, zonePassword))
-    .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
+    .exec(CreateZone.createZone)
     .exec(CreateSellerOrganization.createSellerOrganization)
     .exec(CreateBuyerOrganization.createBuyerOrganization)
     .exec(CreateSeller.createSeller)
@@ -41,7 +35,7 @@ class OneCompleteTransactionModerated extends Simulation {
 
 
   setUp(
-    oneCompleteModeratedScenario.inject(atOnceUsers(300)
+    oneCompleteModeratedScenario.inject(atOnceUsers(100)
     )).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -366,7 +360,7 @@ object ModeratedBuyerAndSellerExecuteOrder {
     .exec(OrderControllerTest.moderatedBuyerExecuteOrderScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
     .exec(OrderControllerTest.moderatedSellerExecuteOrderScenario)
-    .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY+20)
+    .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 
 }
 
