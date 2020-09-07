@@ -67,8 +67,6 @@ body.darkMode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
 body.darkMode .footer {
   background: #20212A;
   border-top: 1px solid #31323A; }
-body.darkMode .header .cmuk-logo {
-  border-right: 1px solid #31323A; }
 body.darkMode .header .cmuk-navbar-nav > li > a {
   color: #848589; }
 body.darkMode .header .icon {
@@ -77,8 +75,6 @@ body.darkMode .header .cmuk-navbar-nav > li > a.active {
   color: #FFFFFF; }
   body.darkMode .header .cmuk-navbar-nav > li > a.active .icon {
     fill: #FE4350; }
-body.darkMode .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
-  border-left: 1px solid #31323A; }
 body.darkMode .cmuk-card-header .icon {
   fill: #848589; }
 body.darkMode .financialCard .cmuk-card-header .icon {
@@ -216,7 +212,17 @@ body.darkMode .block {
   body.darkMode .block .full {
     background-color: #e5e5e5; }
 body.darkMode .searchForm dl .cmuk-search-input {
-  border: none; }
+  background: #282934;
+  border-color: #31323A;
+  color: #D0D0D0; }
+body.darkMode table.dataTable.no-footer {
+  border-bottom: 1px solid transparent; }
+body.darkMode table.dataTable tbody tr {
+  background: none; }
+body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]) {
+  background: #282934;
+  border-color: #31323A;
+  color: #D0D0D0; }
 
 body.lightMode .buttonPrimary {
   background: #191616; }
@@ -639,7 +645,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: auto; }
   .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue {
     padding: 3px 12px;
-    display: table-cell; }
+    display: table-cell;
+    vertical-align: baseline; }
 
 .textOverflowCopy {
   display: flex; }
