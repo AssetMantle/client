@@ -31,7 +31,7 @@ object GenesisResponse {
 
   implicit val accountReads: Reads[Account] = Json.reads[Account]
 
-  case class  Auth(accounts: Seq[Account])
+  case class Auth(accounts: Seq[Account])
 
   implicit val authReads: Reads[Auth] = Json.reads[Auth]
 

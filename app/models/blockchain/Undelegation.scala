@@ -177,9 +177,10 @@ class Undelegations @Inject()(
       val allUndelegations = Service.getAll
 
       def checkAndDelete(allUndelegations: Seq[Undelegation]) = Future.traverse(allUndelegations) { undelegation =>
-        val newEntries = Service.insertOrUpdate(undelegation.copy(entries = undelegation.entries.filter(entry => utilities.Date.isMature(initialTimestamp = entry.completionTime, finalTimeStamp = blockTime))))
+        val updatedUndelegation = undelegation.copy(entries = undelegation.entries.filter(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
+        val update = if (updatedUndelegation.entries.nonEmpty) Service.insertOrUpdate(updatedUndelegation) else Service.delete(delegatorAddress = updatedUndelegation.delegatorAddress, validatorAddress = updatedUndelegation.validatorAddress)
         for {
-          _ <- newEntries
+          _ <- update
         } yield ()
       }
 

@@ -20,6 +20,7 @@ import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.TransactionResponse.Msg
 import queries.responses.ValidatorResponse.{Result => ValidatorResult}
 import queries.responses.WSClientBlockResponse.{NewBlockEvents, Response => WSClientBlockResponse}
+import queries.responses.common.Header
 import utilities.MicroNumber
 
 import scala.concurrent.duration.{Duration, DurationInt}
@@ -120,11 +121,11 @@ class Startup @Inject()(
       def insert(validatorResults: Seq[ValidatorResult]) = {
         val insertValidator = blockchainValidators.Service.insertMultiple(validatorResults.map(_.toValidator))
         val insertDelegations = Future.traverse(validatorResults)(validatorResult => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorResult.operator_address), validatorAddress = validatorResult.operator_address))
-//        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
+        //        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
         (for {
           _ <- insertValidator
           _ <- insertDelegations
-//          _ <- insertKeyBaseAccount
+          //          _ <- insertKeyBaseAccount
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.getLocalizedMessage)
         }
@@ -180,7 +181,6 @@ class Startup @Inject()(
 
   object WebSocketBlockchainClient {
 
-    //TODO Check for latestBlockHeight + 1 before start
     def start(): Unit = {
 
       import actors.Service._
@@ -238,19 +238,35 @@ class Startup @Inject()(
     }
 
     private def onNewBlock(newBlock: WSClientBlockResponse): Future[Unit] = {
-      val blockCommitResponse = blocksServices.insertOnBlock(newBlock.result.data.value.block.header.height)
-      val avgBlockTime = blocksServices.setAverageBlockTime(newBlock.result.data.value.block.header)
-      val checksAndUpdatesOnNewBlock = blocksServices.checksAndUpdatesOnNewBlock(newBlock)
+      val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
       val newEventsActions = actionsOnNewBlockEvents(newBlock.result.events)
 
+      def insertBlocksOnNewBlock(latestExplorerHeight: Int, newIncomingHeight: Int): Unit = {
+        (latestExplorerHeight + 1).until(newIncomingHeight).foreach { height =>
+          val blockCommitResponse = blocksServices.insertOnBlock(height)
+
+          def avgBlockTime(blockHeader: Header) = blocksServices.setAverageBlockTime(blockHeader)
+
+          def insertTransactions() = blocksServices.insertTransactionsOnBlock(height)
+
+          def checksAndUpdatesOnNewBlock(blockHeader: Header) = blocksServices.checksAndUpdatesOnBlock(blockHeader)
+
+          (for {
+            blockCommitResponse <- blockCommitResponse
+            transactions <- insertTransactions()
+            avgBlockTime <- avgBlockTime(blockCommitResponse.result.signed_header.header)
+            _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
+            _ <- blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
+          } yield ()).recover {
+            case baseException: BaseException => logger.error(baseException.failure.message)
+          }
+        }
+      }
+
       (for {
-        blockCommitResponse <- blockCommitResponse
-        transactions <- blocksServices.insertTransactionsOnBlock(newBlock.result.data.value.block.header.height)
-        avgBlockTime <- avgBlockTime
-        _ <- checksAndUpdatesOnNewBlock
+        latestExplorerHeight <- latestExplorerHeight
         _ <- newEventsActions
-        _ <- blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
-      } yield ()
+      } yield insertBlocksOnNewBlock(latestExplorerHeight = latestExplorerHeight, newIncomingHeight = newBlock.result.data.value.block.header.height)
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message)
       }

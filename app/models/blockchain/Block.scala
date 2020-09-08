@@ -57,12 +57,10 @@ class Blocks @Inject()(
     }
   }
 
-  private def getTotalRows: Future[Int] = db.run(blockTable.length.result)
-
   private def tryGetLatestBlockHeight: Future[Int] = db.run(blockTable.map(_.height).sortBy(_.desc).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => 0
+      case _: NoSuchElementException => 0
     }
   }
 

@@ -8,4 +8,5 @@ object MnemonicResponse {
   class Response(response: WSResponse) extends BaseResponse {
     val body: String = response.body
   }
+
 }

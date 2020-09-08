@@ -53,7 +53,7 @@ class Block @Inject()(
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
 
-    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.map(_.validator_address))
+    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.filter(_.isDefined).map(_.get.validator_address))
 
     (for {
       blockCommitResponse <- blockCommitResponse
@@ -100,9 +100,10 @@ class Block @Inject()(
 
   def getAverageBlockTime: Future[Double] = blockchainAverageBlockTimes.Service.get
 
-  def checksAndUpdatesOnNewBlock(newBlock: WSClientBlockResponse): Future[Unit] = {
-    val undelegations = blockchainUndelegations.Utility.updateOnNewBlock(newBlock.result.data.value.block.header.time)
-    val redelegations = blockchainRedelegations.Utility.updateOnNewBlock(newBlock.result.data.value.block.header.time)
+  //Should not be called at the same time as when processing txs as it can lead race to update same db table.
+  def checksAndUpdatesOnBlock(blockHeader: BlockHeader): Future[Unit] = {
+    val undelegations = blockchainUndelegations.Utility.updateOnNewBlock(blockHeader.time)
+    val redelegations = blockchainRedelegations.Utility.updateOnNewBlock(blockHeader.time)
     val tokens = blockchainTokens.Utility.updateAll()
 
     (for {
@@ -122,7 +123,7 @@ class Block @Inject()(
       block = actorsMessage.WebSocket.Block(height = blockCommitResponse.result.signed_header.header.height, time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time), proposer = proposer),
       txs = transactions.map(tx => actorsMessage.WebSocket.Tx(hash = tx.hash, status = tx.status, numMsgs = tx.messages.length, fees = tx.fee)),
       averageBlockTime = averageBlockTime,
-      validators = blockCommitResponse.result.signed_header.commit.signatures.map(_.validator_address)
+      validators = blockCommitResponse.result.signed_header.commit.signatures.filter(_.isDefined).map(_.get.validator_address)
     )
 
     (for {
@@ -152,6 +153,8 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stdMsg.message.asInstanceOf[Redelegate])
         case constants.Blockchain.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stdMsg.message.asInstanceOf[Undelegate])
         case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
+        case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
+        case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])
         //Asset
         case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainAssets.Utility.onDefine(stdMsg.message.asInstanceOf[AssetDefine])
         case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(stdMsg.message.asInstanceOf[AssetMint])

@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.{Commission, ValidatorDescription}
-import models.common.TransactionMessages.{CreateValidator, Delegate, EditValidator, Unjail}
+import models.common.TransactionMessages._
 import models.{keyBase, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -291,6 +291,30 @@ class Validators @Inject()(
         _ <- withdrawAddressBalanceUpdate
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onWithdrawDelegationReward(withdrawDelegatorReward: WithdrawDelegatorReward): Future[Unit] = {
+      val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(withdrawDelegatorReward.delegatorAddress)
+
+      (for {
+        _ <- withdrawBalance
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def onWithdrawValidatorCommission(withdrawValidatorCommission: WithdrawValidatorCommission): Future[Unit] = {
+      val accountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.validatorAddress)
+      //TODO
+      val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(accountAddress)
+      val updateAccountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(accountAddress)
+
+      (for {
+        _ <- withdrawBalance
+        _ <- updateAccountBalance
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
       }
     }
 

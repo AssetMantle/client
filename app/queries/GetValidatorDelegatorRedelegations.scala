@@ -25,7 +25,7 @@ class GetValidatorDelegatorRedelegations @Inject()()(implicit wsClient: WSClient
 
   private val url = ip + ":" + port + "/" + path1
 
-  private def action: Future[Response] = wsClient.url(url).get.map { response => utilities.JSON.convertJsonStringToObject[Response](response.body) }
+  private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 
   object Service {
 

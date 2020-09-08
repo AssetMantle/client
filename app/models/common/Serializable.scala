@@ -40,9 +40,17 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber)
 
-  implicit val coinReads: Reads[Coin] = Json.reads[Coin]
+  def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
 
-  implicit val coinWrites: OWrites[Coin] = Json.writes[Coin]
+  implicit val coinReads: Reads[Coin] = (
+    (JsPath \ "denom").read[String] and
+      (JsPath \ "amount").read[String]
+    ) (coinApply _)
+
+  implicit val coinWrites: Writes[Coin] = (coin: Coin) => Json.obj(
+    "denom" -> coin.denom,
+    "amount" -> coin.amount.toMicroString
+  )
 
   case class Fee(amount: Seq[Coin], gas: String)
 

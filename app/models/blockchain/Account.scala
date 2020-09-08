@@ -165,17 +165,14 @@ class Accounts @Inject()(
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
-      val oldAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse, oldAccount: Option[Account]) = Service.insertOrUpdate(oldAccount.fold(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))(x => x.copy(coins = accountResponse.result.value.coins.map(_.toCoin))))
+      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))
 
       (for {
         accountResponse <- accountResponse
-        oldAccount <- oldAccount
-        _ <- upsert(accountResponse, oldAccount)
+        _ <- upsert(accountResponse)
       } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message)
-          throw baseException
+        case _: BaseException => Future()
       }
     }
   }

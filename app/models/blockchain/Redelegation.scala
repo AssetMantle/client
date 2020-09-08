@@ -54,27 +54,35 @@ class Redelegations @Inject()(
   private def add(redelegation: Redelegation): Future[String] = db.run((redelegationTable returning redelegationTable.map(_.delegatorAddress) += serialize(redelegation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DELEGATION_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_INSERT_FAILED, psqlException)
     }
   }
 
   private def addMultiple(redelegations: Seq[Redelegation]): Future[Seq[String]] = db.run((redelegationTable returning redelegationTable.map(_.delegatorAddress) ++= redelegations.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DELEGATION_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(redelegation: Redelegation): Future[Int] = db.run(redelegationTable.insertOrUpdate(serialize(redelegation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DELEGATION_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_UPSERT_FAILED, psqlException)
     }
   }
 
   private def findAllByValidatorSource(address: String): Future[Seq[RedelegationSerialized]] = db.run(redelegationTable.filter(_.validatorSourceAddress === address).result)
 
   private def findAll: Future[Seq[RedelegationSerialized]] = db.run(redelegationTable.result)
+
+  private def deleteByAddresses(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = db.run(redelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorSourceAddress === validatorSourceAddress && x.validatorDestinationAddress === validatorDestinationAddress).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_UPSERT_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.REDELEGATION_NOT_FOUND, noSuchElementException)
+    }
+  }
 
   private[models] class RedelegationTable(tag: Tag) extends Table[RedelegationSerialized](tag, "Redelegation") {
 
@@ -112,6 +120,8 @@ class Redelegations @Inject()(
     def getAllBySourceValidator(address: String): Future[Seq[Redelegation]] = findAllByValidatorSource(address).map(_.map(_.deserialize))
 
     def getAll: Future[Seq[Redelegation]] = findAll.map(_.map(_.deserialize))
+
+    def delete(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = deleteByAddresses(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress)
 
   }
 
@@ -182,9 +192,10 @@ class Redelegations @Inject()(
       val allRedelegations = Service.getAll
 
       def checkAndDelete(allRedelegations: Seq[Redelegation]) = Future.traverse(allRedelegations) { redelegation =>
-        val newEntries = Service.insertOrUpdate(redelegation.copy(entries = redelegation.entries.filter(entry => utilities.Date.isMature(initialTimestamp = entry.completionTime, finalTimeStamp = blockTime))))
+        val updatedRedelegation = redelegation.copy(entries = redelegation.entries.filter(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
+        val update = if (updatedRedelegation.entries.nonEmpty) Service.insertOrUpdate(updatedRedelegation) else Service.delete(delegatorAddress = updatedRedelegation.delegatorAddress, validatorSourceAddress = updatedRedelegation.validatorSourceAddress, validatorDestinationAddress = updatedRedelegation.validatorDestinationAddress)
         for {
-          _ <- newEntries
+          _ <- update
         } yield ()
       }
 
