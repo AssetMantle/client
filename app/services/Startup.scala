@@ -63,7 +63,7 @@ class Startup @Inject()(
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
       genesisSource.close()
-      Await.result(insertOrUpdateAccountBalances(genesis.app_state.auth.accounts.map(_.value)), Duration.Inf)
+      insertOrUpdateAccountBalances(genesis.app_state.auth.accounts.map(_.value))
       val latestBlockHeight = Await.result(blockchainBlocks.Service.getLatestBlockHeight, Duration.Inf)
       val missingBlockHeights = Await.result(blockchainBlocks.Service.getMissingBlocks(1, latestBlockHeight), Duration.Inf)
       Await.result(insertOrUpdateAllValidators(latestBlockHeight), Duration.Inf)
@@ -99,13 +99,16 @@ class Startup @Inject()(
     }
   }
 
-  private def insertOrUpdateAccountBalances(accounts: Seq[AccountValue]) = {
-    val upsert = Future.traverse(accounts)(account => blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.address))
-    (for {
-      _ <- upsert
-    } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
+  //slowing it down as either node or the explorer is unable to handle so many requests when genesis file is huge.
+  private def insertOrUpdateAccountBalances(accounts: Seq[AccountValue]): Unit = {
+    accounts.grouped(100).toList.foreach { accountList =>
+      val upsert = Future.traverse(accountList)(account => blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.address))
+      (for {
+        _ <- upsert
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
   }
 

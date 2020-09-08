@@ -144,6 +144,7 @@ class Block @Inject()(
       stdMsg.messageType match {
         //bank
         case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainAccounts.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
+        case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainAccounts.Utility.onMultiSend(stdMsg.message.asInstanceOf[MultiSend])
         //slashing
         case constants.Blockchain.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(stdMsg.message.asInstanceOf[Unjail])
         //staking

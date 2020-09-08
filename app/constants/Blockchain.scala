@@ -12,6 +12,16 @@ object Blockchain {
   val SmallestDec = BigDecimal("0.000000000000000001")
   val ToHashSeparator = "_"
 
+  object PublicKey {
+    val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
+    val SINGLE = "tendermint/PubKeySecp256k1"
+  }
+
+  object Account {
+    val DELAYED_VESTING = "cosmos-sdk/DelayedVestingAccount"
+    val BASE = "cosmos-sdk/Account"
+  }
+
   object Properties {
     val Burn = "burn"
     val Creation = "creation"
@@ -69,6 +79,7 @@ object Blockchain {
   object TransactionMessage {
     //bank
     val SEND_COIN = "cosmos-sdk/MsgSend"
+    val MULTI_SEND = "cosmos-sdk/MsgMultiSend"
     //crisis
     val VERIFY_INVARIANT = "cosmos-sdk/MsgVerifyInvariant"
     //distribution

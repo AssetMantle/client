@@ -12,6 +12,24 @@ object TransactionMessages {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  case class Input(address: String, coins: Seq[Coin])
+
+  implicit val inputReads: Reads[Input] = Json.reads[Input]
+
+  implicit val inputWrites: OWrites[Input] = Json.writes[Input]
+
+  case class Output(address: String, coins: Seq[Coin])
+
+  implicit val outputReads: Reads[Output] = Json.reads[Output]
+
+  implicit val outputWrites: OWrites[Output] = Json.writes[Output]
+
+  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends TransactionMessage
+
+  implicit val multiSendReads: Reads[MultiSend] = Json.reads[MultiSend]
+
+  implicit val multiSendWrites: OWrites[MultiSend] = Json.writes[MultiSend]
+
   //bank
   case class SendCoin(fromAddress: String, toAddress: String, amounts: Seq[Coin]) extends TransactionMessage
 
@@ -55,7 +73,7 @@ object TransactionMessages {
   //TODO Pending in cosmos-sdk
 
   //gov
-  case class Deposit(proposalID: Long, depositor: String, amount: Seq[Coin]) extends TransactionMessage
+  case class Deposit(proposalID: String, depositor: String, amount: Seq[Coin]) extends TransactionMessage
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
@@ -79,7 +97,7 @@ object TransactionMessages {
 
   implicit val submitProposalWrites: OWrites[SubmitProposal] = Json.writes[SubmitProposal]
 
-  case class Vote(proposalID: Long, voter: String, option: Int) extends TransactionMessage
+  case class Vote(proposalID: String, voter: String, option: Int) extends TransactionMessage
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
@@ -263,6 +281,7 @@ object TransactionMessages {
   implicit val transactionMessageWrites: Writes[TransactionMessage] = {
     //bank
     case sendCoin: SendCoin => Json.toJson(sendCoin)
+    case multiSend: MultiSend => Json.toJson(multiSend)
     //staking
     case createValidator: CreateValidator => Json.toJson(createValidator)
     case editValidator: EditValidator => Json.toJson(editValidator)
@@ -313,6 +332,7 @@ object TransactionMessages {
     msgType match {
       //bank
       case constants.Blockchain.TransactionMessage.SEND_COIN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
+      case constants.Blockchain.TransactionMessage.MULTI_SEND => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MultiSend](value.toString))
       //crisis
       case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[VerifyInvariant](value.toString))
       //distribution

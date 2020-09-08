@@ -27,6 +27,7 @@ object GenesisResponse {
 
   implicit val accountValueReads: Reads[AccountValue] = Json.reads[AccountValue]
 
+  //TODO: make it according to account response
   case class Account(value: AccountValue)
 
   implicit val accountReads: Reads[Account] = Json.reads[Account]
