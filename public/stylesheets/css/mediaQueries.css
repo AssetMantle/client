@@ -132,7 +132,7 @@
       .modal .modalContent .modalBody .infoBlock .infoBlockItem .infoBlockItemRight {
         padding: 0;
         border: none; } }
-@media (min-width: 992px) and (max-width: 1600px) {
+@media (min-width: 992px) and (max-width: 1599px) {
   .modal .modalContent {
     top: 10%;
     max-height: 530px; }
@@ -239,6 +239,8 @@
     padding: 0 15px;
     line-height: 28px;
     font-size: .875rem; }
+  .comdex .walletButtons {
+    margin: 8px 15px; }
 
   form .formBody {
     padding: 20px 50px 0 50px; }
@@ -270,7 +272,7 @@
   .tabSection .cmuk-grid-divider {
     display: block; }
   .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin {
-    margin: 10px 0px 0px 0px; }
+    margin: 10px 0 0 0; }
   .tabSection .cmuk-grid-divider > :not(.cmuk-first-column)::before,
   .tabSection .cmuk-grid-divider.cmuk-grid-stack > .cmuk-grid-margin::before {
     border: none; }
@@ -300,6 +302,8 @@
     margin: 0 20px; }
     .leftContainer .financial .financialCard.cardPaddingRemove ul li:first-child {
       padding-top: 0; }
+    .leftContainer .financial .financialCard.cardPaddingRemove ul li:last-child {
+      padding-bottom: 0; }
   .leftContainer .financial .cmuk-switcher ul li,
   .leftContainer .financial .financialCard ul li {
     padding: 10px 0; }

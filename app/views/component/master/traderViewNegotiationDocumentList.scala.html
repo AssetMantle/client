@@ -81,7 +81,7 @@
                                 }
                             </tr>
                         }
-                        <tr><td colspan="3">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
+                        <tr><td colspan="4">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</td></tr>
                         @negotiationFileList.filter(negotiationFile=> negotiation.documentList.negotiationDocuments.contains(negotiationFile.documentType)|| negotiationFile.documentType == constants.File.Negotiation.CONTRACT).map { negotiationFile=>
                             <tr>
                                 <td colspan="2"><span class="docIcon">@commonIcon("doc2")</span>

@@ -192,7 +192,7 @@
   }
 }
 
-@media (min-width:992px) and (max-width:1600px){
+@media (min-width:992px) and (max-width:1599px){
   .modal .modalContent{
     top:10%;
     max-height: 530px;
@@ -363,6 +363,9 @@
       line-height: 28px;
       font-size: .875rem;
     }
+    .walletButtons {
+      margin: 8px 15px;
+    }
   }
   form .formBody {
     padding: 20px 50px 0 50px;
@@ -409,7 +412,7 @@
       display: block;
     }
     .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin{
-      margin:10px 0px 0px 0px;
+      margin:10px 0 0 0;
     }
     .cmuk-grid-divider>:not(.cmuk-first-column)::before,
     .cmuk-grid-divider.cmuk-grid-stack>.cmuk-grid-margin::before{
@@ -450,7 +453,9 @@
         &:first-child {
           padding-top: 0;
         }
-
+        &:last-child {
+          padding-bottom: 0;
+        }
       }
     }
     .cmuk-switcher ul li,
