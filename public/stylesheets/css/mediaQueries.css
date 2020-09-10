@@ -132,6 +132,14 @@
       .modal .modalContent .modalBody .infoBlock .infoBlockItem .infoBlockItemRight {
         padding: 0;
         border: none; } }
+@media (min-width: 992px) and (max-width: 1400px) {
+  .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
+    padding: 5px 20px; }
+
+  .contactDetails .contactInfoItem {
+    flex-direction: column; }
+    .contactDetails .contactInfoItem .contactUpdateButton button {
+      margin: 5px 0; } }
 @media (min-width: 992px) and (max-width: 1599px) {
   .modal .modalContent {
     top: 10%;
