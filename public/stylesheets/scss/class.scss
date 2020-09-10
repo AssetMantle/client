@@ -1293,6 +1293,7 @@ body.lightMode  {
   background-color: rgba(0, 0, 0, 0.4);
   padding: 30px 30px;
   text-align: center;
+  overflow-y:auto;
   .modalContent {
     transform: translateY(-100px);
     transition: .3s linear;

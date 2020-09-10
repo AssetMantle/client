@@ -926,7 +926,8 @@ body.lightMode .commodityImage {
   right: 0;
   background-color: rgba(0, 0, 0, 0.4);
   padding: 30px 30px;
-  text-align: center; }
+  text-align: center;
+  overflow-y: auto; }
   .modal .modalContent {
     transform: translateY(-100px);
     transition: .3s linear;
