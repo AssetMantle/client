@@ -295,7 +295,7 @@
       .cmuk-card-body{
         height: 255px;
         .chatMessagesContainer {
-          height: 190px;
+          height: 180px;
         }
       }
     }
@@ -327,7 +327,7 @@
   }
   .timeline {
     &:before{
-      left: 19px;
+      left: 16px;
     }
     .timeline-item .timeline-icon {
       left: 0;
@@ -445,14 +445,43 @@
   .iframeModal{
     height: 530px;
   }
+  .header .cmuk-navbar-right .loginIcon{
+    width: 20px;
+    height: 20px;
+  }
+  .header .cmuk-logo img {
+    width: 110px;
+  }
+  .commonList .listItemChild{
+    padding: 10px 5px;
+  }
+  .timeline .timeline-item .timeline-icon {
+   width: 34px;
+    height: 34px;
+    .icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
+  .header .logoutIcon .icon,
+  .leftContainer .cmuk-card-header .icon,
+  .rightContainer .cmuk-card-header .icon,
+  .pageContainer .middle .cmuk-card-header .icon{
+    width: 16px;
+    height: 16px;
+  }
   .leftContainer .financial {
     .financialCard ul li{
     .wallet .walletIcon, .receivable .receivableIcon, .payable .payableIcon{
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       .leftContainer .icon {
         width: 18px;
         height: 18px;
+      }
+      .icon{
+        width: 16px;
+        height: 16px;
       }
     }
     }
@@ -498,6 +527,24 @@
     }
     .cmuk-button-link{
       padding: 10px 0;
+    }
+  }
+  .header .dashboardIcon, .header .traderIcon, .header .accountIcon, .header .transactionIcon {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+  }
+  .header .icon {
+    width: 16px;
+    height: 16px;
+    fill: #FFFFFF;
+    margin-bottom: 3px;
+  }
+  .commodityImage {
+    width: 34px;
+    height: 34px;
+    img{
+      width: 20px;
     }
   }
 }

@@ -169,7 +169,7 @@ body.darkMode .comdex input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px #282934 inset; }
 body.darkMode .toolTip .toolTipText {
   background-color: #383941;
-  color: #0862BE; }
+  color: #D0D0D0; }
   body.darkMode .toolTip .toolTipText:after {
     border-color: #383941 transparent transparent transparent; }
 body.darkMode .cmuk-icon-button, body.darkMode .cmuk-icon-button:hover {
@@ -190,9 +190,11 @@ body.darkMode .documentView .documentList .seenIcon {
   background-color: #DDE8F3; }
 body.darkMode .documentView .documentList .table-scroll tbody > * {
   border-color: #31323A; }
-body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
-  color: #D0D0D0;
-  font-weight: 600; }
+body.darkMode .documentView .documentList .table-scroll tbody tr {
+  background: none; }
+  body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
+    color: #D0D0D0;
+    font-weight: 600; }
 body.darkMode .cmuk-button-danger:disabled, body.darkMode .cmuk-button-success {
   background-color: #5cb85c;
   color: #fff; }
@@ -706,7 +708,8 @@ body.lightMode .commodityImage {
     height: 20px;
     margin-bottom: 5px; }
 .comdex .cmuk-alert p {
-  font-size: 0.875rem; }
+  font-size: 0.875rem;
+  font-weight: bold; }
 .comdex .cmuk-alert .alertName {
   font-weight: bold;
   font-size: 0.875rem; }
@@ -993,7 +996,7 @@ form .formBody {
   form .formBody:after {
     display: block;
     content: '';
-    padding-bottom: 60px; }
+    padding-bottom: 50px; }
 
 .termAccept {
   margin: 0 0 30px 30px; }
@@ -1011,7 +1014,7 @@ form .formBody {
   .modalInfoBlock:after {
     display: block;
     content: '';
-    padding-bottom: 60px; }
+    padding-bottom: 50px; }
 
 .loginForm .formBody .inputField {
   position: relative;

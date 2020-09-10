@@ -278,7 +278,7 @@ body.darkMode {
 
   .toolTip .toolTipText{
     background-color: #383941;
-    color: $colorPrimary;
+    color: $darkModePrimaryFontColor;
     &:after{
       border-color: #383941 transparent transparent transparent;
     }
@@ -312,10 +312,13 @@ body.darkMode {
         > * {
           border-color: $darkModeBorderColor;
         }
-        tr td:first-child {
-          &, a {
-            color: $darkModePrimaryFontColor;
-            font-weight: 600;
+        tr {
+          background: none;
+          td:first-child {
+            &, a {
+              color: $darkModePrimaryFontColor;
+              font-weight: 600;
+            }
           }
         }
       }
@@ -989,6 +992,7 @@ body.lightMode  {
     }
     p{
       font-size: $paragraphFontSizeSmall;
+      font-weight: bold;
     }
     .alertName{
       font-weight: bold;

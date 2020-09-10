@@ -198,7 +198,7 @@
   .rightContainer .chatRoom .cmuk-card-body {
     height: 255px; }
     .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 190px; }
+      height: 180px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
@@ -217,7 +217,7 @@
     height: 190px; }
 
   .timeline:before {
-    left: 19px; }
+    left: 16px; }
   .timeline .timeline-item .timeline-icon {
     left: 0; }
 
@@ -299,12 +299,39 @@
   .iframeModal {
     height: 530px; }
 
+  .header .cmuk-navbar-right .loginIcon {
+    width: 20px;
+    height: 20px; }
+
+  .header .cmuk-logo img {
+    width: 110px; }
+
+  .commonList .listItemChild {
+    padding: 10px 5px; }
+
+  .timeline .timeline-item .timeline-icon {
+    width: 34px;
+    height: 34px; }
+    .timeline .timeline-item .timeline-icon .icon {
+      width: 14px;
+      height: 14px; }
+
+  .header .logoutIcon .icon,
+  .leftContainer .cmuk-card-header .icon,
+  .rightContainer .cmuk-card-header .icon,
+  .pageContainer .middle .cmuk-card-header .icon {
+    width: 16px;
+    height: 16px; }
+
   .leftContainer .financial .financialCard ul li .wallet .walletIcon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon {
-    width: 36px;
-    height: 36px; }
+    width: 32px;
+    height: 32px; }
     .leftContainer .financial .financialCard ul li .wallet .walletIcon .leftContainer .icon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon .leftContainer .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .leftContainer .icon {
       width: 18px;
       height: 18px; }
+    .leftContainer .financial .financialCard ul li .wallet .walletIcon .icon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon .icon, .leftContainer .financial .financialCard ul li .payable .payableIcon .icon {
+      width: 16px;
+      height: 16px; }
   .leftContainer .financial .financialCard.cardPaddingRemove ul li {
     padding: 5px 0;
     margin: 0 20px; }
@@ -338,7 +365,24 @@
   .contactDetails .contactInfoItem .cmuk-card .cmuk-button {
     line-height: 10px; }
   .contactDetails .contactInfoItem .cmuk-card .cmuk-button-link {
-    padding: 10px 0; } }
+    padding: 10px 0; }
+
+  .header .dashboardIcon, .header .traderIcon, .header .accountIcon, .header .transactionIcon {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px; }
+
+  .header .icon {
+    width: 16px;
+    height: 16px;
+    fill: #FFFFFF;
+    margin-bottom: 3px; }
+
+  .commodityImage {
+    width: 34px;
+    height: 34px; }
+    .commodityImage img {
+      width: 20px; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }
