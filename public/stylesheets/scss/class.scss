@@ -2079,6 +2079,7 @@ form{
             .icon {
               width: 16px;
               height: 16px;
+              fill: #053C75;
             }
           }
           .subTerms{
@@ -2599,6 +2600,22 @@ header:before,
     height: 250px;
     overflow: auto;
     @extend %scroller;
+    li{
+      height: 100%;
+      .emptyDocumentSection{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        p{
+          color: #B8B9BA;
+          margin-top: 10px;
+          font-size:$paragraphFontSizeSmall;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+      }
+    }
   }
 
   .documentList{

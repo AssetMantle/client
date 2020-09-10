@@ -250,7 +250,7 @@
     }
     .documentView{
       .cmuk-card-body, .documentList{
-        padding:0px;
+        padding:0;
       }
       .documentList{
         height: 190px;
@@ -285,7 +285,7 @@
       .cmuk-card-body{
         height: 255px;
         .chatMessagesContainer {
-          height: 170px;
+          height: 190px;
         }
       }
     }

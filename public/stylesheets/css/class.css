@@ -1505,7 +1505,8 @@ form .formBody {
       margin-right: 10px; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termIcon .icon {
         width: 16px;
-        height: 16px; }
+        height: 16px;
+        fill: #053C75; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .subTerms {
       text-indent: 20px;
       margin-top: 10px; }
@@ -1846,6 +1847,19 @@ header:before,
 .documentView .documentList {
   height: 250px;
   overflow: auto; }
+  .documentView .documentList li {
+    height: 100%; }
+    .documentView .documentList li .emptyDocumentSection {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%; }
+      .documentView .documentList li .emptyDocumentSection p {
+        color: #B8B9BA;
+        margin-top: 10px;
+        font-size: 0.875rem;
+        font-weight: bold;
+        text-transform: uppercase; }
 .documentView .documentList .cmuk-table td {
   padding: 16px 5px;
   vertical-align: top;

@@ -169,7 +169,7 @@
   .comdex .leftContainer .addBalanceButton {
     padding: 8px 8px; }
   .comdex .leftContainer .documentView .cmuk-card-body, .comdex .leftContainer .documentView .documentList {
-    padding: 0px; }
+    padding: 0; }
   .comdex .leftContainer .documentView .documentList {
     height: 190px; }
   .comdex .leftContainer .documentView .cmuk-card {
@@ -190,7 +190,7 @@
   .rightContainer .chatRoom .cmuk-card-body {
     height: 255px; }
     .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 170px; }
+      height: 190px; }
 
   .switcherViewCard .cmuk-subnav li a {
     padding: 11px; }
