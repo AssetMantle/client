@@ -102,8 +102,8 @@ class Block @Inject()(
 
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnBlock(blockHeader: BlockHeader): Future[Unit] = {
-    val undelegations = blockchainUndelegations.Utility.updateOnNewBlock(blockHeader.time)
-    val redelegations = blockchainRedelegations.Utility.updateOnNewBlock(blockHeader.time)
+    val undelegations = blockchainUndelegations.Utility.onNewBlock(blockHeader.time)
+    val redelegations = blockchainRedelegations.Utility.onNewBlock(blockHeader.time)
     val tokens = blockchainTokens.Utility.updateAll()
 
     (for {

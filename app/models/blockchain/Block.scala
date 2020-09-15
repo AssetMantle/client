@@ -122,23 +122,13 @@ class Blocks @Inject()(
 
     def insertOrUpdate(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height.toInt).map(_.deserialize)
+    def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
-    def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height.toInt)
+    def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
     def getLatestBlock: Future[Block] = tryGetLatestBlock.map(_.deserialize)
-
-    def getMissingBlocks(start: Int, end: Int): Future[Seq[Int]] = {
-      val range = Seq.range(start, end + 1)
-      (for {
-        presentHeights <- tryGetHeights(range)
-      } yield range filterNot (presentHeights contains)
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = getBlocksForPageNumber(offset = (pageNumber - 1) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
 

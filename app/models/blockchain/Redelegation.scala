@@ -79,8 +79,8 @@ class Redelegations @Inject()(
   private def deleteByAddresses(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = db.run(redelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorSourceAddress === validatorSourceAddress && x.validatorDestinationAddress === validatorDestinationAddress).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_UPSERT_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.REDELEGATION_NOT_FOUND, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.REDELEGATION_DELETE_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.REDELEGATION_DELETE_FAILED, noSuchElementException)
     }
   }
 
@@ -188,7 +188,7 @@ class Redelegations @Inject()(
       }
     }
 
-    def updateOnNewBlock(blockTime: String): Future[Unit] = {
+    def onNewBlock(blockTime: String): Future[Unit] = {
       val allRedelegations = Service.getAll
 
       def checkAndDelete(allRedelegations: Seq[Redelegation]) = Future.traverse(allRedelegations) { redelegation =>

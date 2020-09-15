@@ -20,6 +20,7 @@ object Blockchain {
   object Account {
     val DELAYED_VESTING = "cosmos-sdk/DelayedVestingAccount"
     val BASE = "cosmos-sdk/Account"
+    val MODULE = "cosmos-sdk/ModuleAccount"
   }
 
   object Properties {
