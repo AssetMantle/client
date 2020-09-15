@@ -996,7 +996,7 @@ form .formBody {
   form .formBody:after {
     display: block;
     content: '';
-    padding-bottom: 50px; }
+    padding-bottom: 60px; }
 
 .termAccept {
   margin: 0 0 30px 30px; }
@@ -1014,7 +1014,7 @@ form .formBody {
   .modalInfoBlock:after {
     display: block;
     content: '';
-    padding-bottom: 50px; }
+    padding-bottom: 60px; }
 
 .loginForm .formBody .inputField {
   position: relative;

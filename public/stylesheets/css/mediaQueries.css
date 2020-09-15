@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .pageContent {
     margin: 20px; }
 
@@ -19,6 +19,11 @@
   .mobile .cmuk-button {
     background-color: #0862BE; }
 
+  .comdex .cmuk-card-header {
+    padding: 15px 10px; }
+    .comdex .cmuk-card-header .cmuk-button {
+      right: 10px; }
+
   .switcherCard .cmuk-subnav {
     flex-wrap: nowrap;
     justify-content: start;
@@ -31,9 +36,19 @@
   .switcherCard .cmuk-subnav-pill > * > :first-child {
     padding: 5px 20px; }
 
+  .salesQuoteCard .salesQuoteCardLeft .content {
+    flex: initial;
+    padding: 5px 10px 5px 25px; }
+  .salesQuoteCard .salesQuoteCardMiddle {
+    border: none;
+    padding: 0 25px; }
+  .salesQuoteCard .salesQuoteCardRight {
+    display: block;
+    padding: 5px 15px; }
+
   .commonList {
     display: block;
-    padding: 20px; }
+    padding: 10px; }
     .commonList .listItemChild {
       display: flex;
       padding: 5px 0px; }
@@ -43,28 +58,62 @@
         margin: 0px;
         white-space: normal; }
 
+  form .formBody {
+    padding: 25px 35px 0 35px; }
+    form .formBody:after {
+      padding-bottom: 25px; }
+
   .modal {
     padding: 30px 15px; }
     .modal .modalContent {
-      padding: 15px;
       min-height: 150px;
-      max-height: calc(100% - 20px);
       top: auto;
       transform: translateY(0);
       margin: 0 auto;
       width: 600px;
       transition: .3s linear;
       transition-property: opacity,transform; }
-      .modal .modalContent form {
-        text-align: center; }
+      .modal .modalContent .modalBody form {
+        text-align: center;
+        width: auto; }
+
+  .loginForm .formBody .forgotPassword {
+    top: 10px;
+    margin: 0;
+    padding: 0; }
+
+  .logoutContainer form .formBody {
+    padding: 25px 35px 0 25px; }
+    .logoutContainer form .formBody .buttonPrimary {
+      width: 100px; }
+    .logoutContainer form .formBody:after {
+      padding-bottom: 35px; }
 
   .mnemonicQuiz {
     text-align: center; }
     .mnemonicQuiz .verifyMnemonic .verifyMnemonicButton {
       width: 95px; }
+    .mnemonicQuiz form .formBody .buttonPrimary {
+      width: 100%; }
+    .mnemonicQuiz form .formBody .commonInputPassword {
+      display: block; }
+      .mnemonicQuiz form .formBody .commonInputPassword dd input {
+        width: 100%; }
 
+  .pageContainer .middle .mainTabs .tradeTerms .terms .termIdent {
+    margin: 0; }
+  .pageContainer .middle .mainTabs .tradeTerms .commodityTitleSection, .pageContainer .middle .mainTabs .tradeTerms .traderCommodity {
+    display: block; }
+    .pageContainer .middle .mainTabs .tradeTerms .commodityTitleSection button, .pageContainer .middle .mainTabs .tradeTerms .traderCommodity button {
+      margin-top: 10px; }
   .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
-    flex-wrap: wrap; } }
+    flex-wrap: wrap; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termIcon {
+      display: none; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .cmuk-flex {
+      display: block; }
+    .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue {
+      margin: 0; } }
 @media (min-width: 640px) {
   .modalBody form {
     width: 620px;
@@ -140,7 +189,14 @@
     flex-direction: column; }
     .contactDetails .contactInfoItem .contactUpdateButton button {
       margin: 5px 0; } }
-@media (min-width: 992px) and (max-width: 1599px) {
+@media (min-width: 640px) and (max-width: 1599px) {
+  form .formBody {
+    padding: 20px 50px 0 50px; }
+    form .formBody:after {
+      display: block;
+      content: '';
+      padding-bottom: 50px; }
+
   .modal .modalContent {
     top: 10%;
     max-height: 530px; }
@@ -163,72 +219,8 @@
         content: '';
         padding-bottom: 50px; }
 
-  .comdex .leftContainer .financial {
-    margin-bottom: 15px; }
-    .comdex .leftContainer .financial .cmuk-card {
-      height: 302px; }
-      .comdex .leftContainer .financial .cmuk-card .cmuk-switcher {
-        height: 250px;
-        overflow: auto; }
-      .comdex .leftContainer .financial .cmuk-card .financialCard .financialCardSection {
-        padding: 15px 0; }
-    .comdex .leftContainer .financial .financialCard .cmuk-card .financialCardSection {
-      padding: 15px 0; }
-  .comdex .leftContainer .addBalanceButton {
-    padding: 8px 8px; }
-  .comdex .leftContainer .documentView .cmuk-card-body, .comdex .leftContainer .documentView .documentList {
-    padding: 0; }
-  .comdex .leftContainer .documentView .documentList {
-    height: 190px; }
-  .comdex .leftContainer .documentView .cmuk-card {
-    height: 305px; }
-    .comdex .leftContainer .documentView .cmuk-card .cmuk-card-body {
-      height: 305px; }
-  .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body {
-    height: auto; }
-    .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
-      height: 210px; }
-
-  .rightContainer .recentActivityContainer {
-    margin-bottom: 15px; }
-    .rightContainer .recentActivityContainer .cmuk-card-body {
-      height: 250px; }
-      .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
-        height: 250px; }
-  .rightContainer .chatRoom .cmuk-card-body {
-    height: 255px; }
-    .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
-      height: 180px; }
-
-  .switcherViewCard .cmuk-subnav li a {
-    padding: 11px; }
-
-  .comdex .cmuk-height-medium {
-    height: 250px; }
-  .comdex .cmuk-card-header .cmuk-button {
-    line-height: 26px; }
-  .comdex .updateDocumentField button {
-    position: absolute;
-    top: 12px;
-    left: 115px;
-    font-weight: bold; }
-
-  .switcherCard .cmuk-switcher {
-    height: 190px; }
-
-  .timeline:before {
-    left: 16px; }
-  .timeline .timeline-item .timeline-icon {
-    left: 0; }
-
-  .salesQuoteCard .salesQuoteCardLeft {
-    flex: 12%; }
-  .salesQuoteCard .salesQuoteCardMiddle {
-    flex: 13%; }
-  .salesQuoteCard .salesQuoteCardRight {
-    flex: 30%; }
-    .salesQuoteCard .salesQuoteCardRight .cmuk-button {
-      line-height: 28px; } }
+  .loginForm .formBody .forgotPassword {
+    top: 2px; } }
 @media (max-width: 1599px) {
   :root {
     font-size: 13px; }
@@ -249,13 +241,6 @@
     font-size: .875rem; }
   .comdex .walletButtons {
     margin: 8px 15px; }
-
-  form .formBody {
-    padding: 20px 50px 0 50px; }
-    form .formBody:after {
-      display: block;
-      content: '';
-      padding-bottom: 50px; }
 
   .signUpForm .usernameAvailability .checkIcon,
   .signUpForm .usernameAvailability .failureIcon,
@@ -356,9 +341,6 @@
   .rightContainer .chatRoom .cmuk-card-body .chatForm .sendIconButton {
     top: 10px; }
 
-  .loginForm .formBody .forgotPassword {
-    top: 2px; }
-
   .signUpForm .usernameAvailability .result {
     top: 80px; }
 
@@ -382,7 +364,74 @@
     width: 34px;
     height: 34px; }
     .commodityImage img {
-      width: 20px; } }
+      width: 20px; }
+
+  .comdex .leftContainer .financial {
+    margin-bottom: 15px; }
+    .comdex .leftContainer .financial .cmuk-card {
+      height: 302px; }
+      .comdex .leftContainer .financial .cmuk-card .cmuk-switcher {
+        height: 250px;
+        overflow: auto; }
+      .comdex .leftContainer .financial .cmuk-card .financialCard .financialCardSection {
+        padding: 15px 0; }
+    .comdex .leftContainer .financial .financialCard .cmuk-card .financialCardSection {
+      padding: 15px 0; }
+  .comdex .leftContainer .addBalanceButton {
+    padding: 8px 8px; }
+  .comdex .leftContainer .documentView .cmuk-card-body, .comdex .leftContainer .documentView .documentList {
+    padding: 0; }
+  .comdex .leftContainer .documentView .documentList {
+    height: 190px; }
+  .comdex .leftContainer .documentView .cmuk-card {
+    height: 305px; }
+    .comdex .leftContainer .documentView .cmuk-card .cmuk-card-body {
+      height: 305px; }
+  .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body {
+    height: auto; }
+    .comdex .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
+      height: 210px; }
+
+  .rightContainer .recentActivityContainer {
+    margin-bottom: 15px; }
+    .rightContainer .recentActivityContainer .cmuk-card-body {
+      height: 250px; }
+      .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
+        height: 250px; }
+  .rightContainer .chatRoom .cmuk-card-body {
+    height: 255px; }
+    .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer {
+      height: 180px; }
+
+  .switcherViewCard .cmuk-subnav li a {
+    padding: 11px; }
+
+  .comdex .cmuk-height-medium {
+    height: 250px; }
+  .comdex .cmuk-card-header .cmuk-button {
+    line-height: 26px; }
+  .comdex .updateDocumentField button {
+    position: absolute;
+    top: 12px;
+    left: 115px;
+    font-weight: bold; }
+
+  .switcherCard .cmuk-switcher {
+    height: 190px; }
+
+  .timeline:before {
+    left: 16px; }
+  .timeline .timeline-item .timeline-icon {
+    left: 0; }
+
+  .salesQuoteCard .salesQuoteCardLeft {
+    flex: 12%; }
+  .salesQuoteCard .salesQuoteCardMiddle {
+    flex: 13%; }
+  .salesQuoteCard .salesQuoteCardRight {
+    flex: 30%; }
+    .salesQuoteCard .salesQuoteCardRight .cmuk-button {
+      line-height: 28px; } }
 @media (min-width: 1600px) {
   :root {
     font-size: 16px; }
@@ -406,6 +455,10 @@
   .comdex .cmuk-container {
     max-width: 1920px; } }
 @media (max-width: 959px) {
+  body.lightMode .header .cmuk-logo,
+  body.darkMode .header .cmuk-logo {
+    border: none; }
+
   .comdex .mobileNavigationHeader {
     display: flex; }
   .comdex .mobileNavigation {
@@ -426,9 +479,15 @@
     display: block; }
   .comdex .header .cmuk-navbar-nav {
     display: block; }
+  .comdex .header .cmuk-navbar-left .cmuk-navbar-nav {
+    margin: 0; }
   .comdex .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
-    border: none;
-    padding: 0px; } }
+    border: none !important;
+    padding: 0; }
+  .comdex .header .cmuk-navbar-item,
+  .comdex .header .cmuk-navbar-nav > li > a,
+  .comdex .header .cmuk-navbar-toggle {
+    min-height: 55px; } }
 @media (max-width: 1199px) {
   .leftSide, .rightSide {
     position: relative !important;
