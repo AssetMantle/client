@@ -17,7 +17,6 @@ import queries.responses.GenesisResponse._
 import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
-import queries.responses.TransactionResponse.Msg
 import queries.responses.WSClientBlockResponse.{NewBlockEvents, Response => WSClientBlockResponse}
 import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.{Account, Header}
@@ -68,6 +67,7 @@ class Startup @Inject()(
       val latestBlockHeight = Await.result(blockchainBlocks.Service.getLatestBlockHeight, Duration.Inf)
       Await.result(insertAccountsOnStart(genesis.app_state.auth.accounts), Duration.Inf)
       Await.result(updateStakingOnStart(latestBlockHeight, genesis.app_state.staking), Duration.Inf)
+      Await.result(insertGenesisTransactionsOnStart(latestBlockHeight, genesis.app_state.genutil.gentxs), Duration.Inf)
       Await.result(updateDistributionOnStart(latestBlockHeight, genesis.app_state.distribution), Duration.Inf)
       Await.result(insertAllTokensOnStart(latestBlockHeight), Duration.Inf)
       Await.result(insertBlocksOnStart(latestBlockHeight), Duration.Inf)
@@ -115,11 +115,11 @@ class Startup @Inject()(
 
   private def updateStakingOnStart(latestBlockHeight: Int, staking: Staking): Future[Unit] = if (latestBlockHeight == 0) {
     val insertAllSigningInfos = blockchainSigningInfos.Utility.insertAll()
-    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
+    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.getOrElse(Seq.empty).map(_.toValidator))
     //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
 
     def updateDelegations() = {
-      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
+      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.getOrElse(Seq.empty).map(_.toDelegation))
       val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.getOrElse(Seq.empty).map(_.toRedelegation))
       val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.getOrElse(Seq.empty).map(_.toUndelegation))
 
@@ -150,7 +150,20 @@ class Startup @Inject()(
     }
   } else Future()
 
-  private def insertGenesisTransactions(msgs: Seq[Msg]) = Future.traverse(msgs)(msg => blocksServices.actionOnTxMessages(msg.toStdMsg, 0))
+  private def insertGenesisTransactionsOnStart(latestBlockHeight: Int, genTxs: Seq[GenTx]) = if (latestBlockHeight == 0) {
+    val updateTxs = Future.traverse(genTxs) { genTx =>
+      val updateTx = Future.traverse(genTx.value.msg)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg, 0))
+      for {
+        _ <- updateTx
+      } yield ()
+    }
+
+    (for {
+      _ <- updateTxs
+    } yield ()).recover {
+      case baseException: BaseException => throw baseException
+    }
+  } else Future()
 
   private def insertOrUpdateAllValidators(latestBlockHeight: Int): Future[Unit] = if (latestBlockHeight == 0) {
     val bondedValidators = getBondedValidators.Service.get()

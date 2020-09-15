@@ -28,7 +28,7 @@ object GenesisResponse {
 
   implicit val authReads: Reads[Auth] = Json.reads[Auth]
 
-  case class Staking(delegations: Seq[Delegation.Result], redelegations: Option[Seq[Redelegation.Result]], unbonding_delegations: Option[Seq[Undelegation.Result]], validators: Seq[Validator.Result])
+  case class Staking(delegations: Option[Seq[Delegation.Result]], redelegations: Option[Seq[Redelegation.Result]], unbonding_delegations: Option[Seq[Undelegation.Result]], validators: Option[Seq[Validator.Result]])
 
   implicit val stakingReads: Reads[Staking] = Json.reads[Staking]
 
