@@ -51,11 +51,12 @@
     padding: 10px; }
     .commonList .listItemChild {
       display: flex;
-      padding: 5px 0px; }
+      padding: 5px 0;
+      flex-wrap: wrap; }
       .commonList .listItemChild .listItemChildTitle {
         width: 100px; }
       .commonList .listItemChild .listItemChildValue {
-        margin: 0px;
+        margin: 0;
         white-space: normal; }
 
   form .formBody {
@@ -72,10 +73,12 @@
       margin: 0 auto;
       width: 600px;
       transition: .3s linear;
-      transition-property: opacity,transform; }
+      transition-property: opacity, transform; }
       .modal .modalContent .modalBody form {
         text-align: center;
         width: auto; }
+      .modal .modalContent .modalBody .infoRowLabel {
+        width: 125px; }
 
   .loginForm .formBody .forgotPassword {
     top: 10px;
@@ -88,6 +91,14 @@
       width: 100px; }
     .logoutContainer form .formBody:after {
       padding-bottom: 35px; }
+
+  .modalInfoBlock {
+    width: auto;
+    padding: 25px 35px 0 25px; }
+    .modalInfoBlock:after {
+      padding-bottom: 35px; }
+    .modalInfoBlock .infoRow {
+      flex-wrap: wrap; }
 
   .mnemonicQuiz {
     text-align: center; }

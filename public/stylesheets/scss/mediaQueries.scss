@@ -68,12 +68,13 @@
     padding: 10px;
     .listItemChild {
       display: flex;
-      padding: 5px 0px;
+      padding: 5px 0;
+      flex-wrap: wrap;
       .listItemChildTitle{
         width: 100px;
       }
       .listItemChildValue {
-        margin: 0px;
+        margin: 0;
         white-space: normal;
       }
     }
@@ -86,17 +87,23 @@
   }
   .modal{
     padding: 30px 15px;
-    .modalContent{
+    .modalContent {
       min-height: 150px;
-      top:auto;
+      top: auto;
       transform: translateY(0);
       margin: 0 auto;
       width: 600px;
       transition: .3s linear;
-      transition-property: opacity,transform;
-      .modalBody form{
+      transition-property: opacity, transform;
+
+      .modalBody {
+        form {
         text-align: center;
         width: auto;
+      }
+        .infoRowLabel{
+          width: 125px;
+        }
       }
     }
   }
@@ -112,6 +119,16 @@
     }
     &:after{
       padding-bottom: 35px;
+    }
+  }
+  .modalInfoBlock{
+    width: auto;
+    padding: 25px 35px 0 25px;
+    &:after{
+      padding-bottom: 35px;
+    }
+    .infoRow{
+      flex-wrap: wrap;
     }
   }
   .mnemonicQuiz {
