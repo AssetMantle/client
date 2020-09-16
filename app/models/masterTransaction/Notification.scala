@@ -45,7 +45,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += serialize(notification)).asTry).map {
+  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.id) += serialize(notification)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)

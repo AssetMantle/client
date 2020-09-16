@@ -192,7 +192,7 @@ class Redelegations @Inject()(
       val allRedelegations = Service.getAll
 
       def checkAndDelete(allRedelegations: Seq[Redelegation]) = Future.traverse(allRedelegations) { redelegation =>
-        val updatedRedelegation = redelegation.copy(entries = redelegation.entries.filter(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
+        val updatedRedelegation = redelegation.copy(entries = redelegation.entries.filterNot(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
         val update = if (updatedRedelegation.entries.nonEmpty) Service.insertOrUpdate(updatedRedelegation) else Service.delete(delegatorAddress = updatedRedelegation.delegatorAddress, validatorSourceAddress = updatedRedelegation.validatorSourceAddress, validatorDestinationAddress = updatedRedelegation.validatorDestinationAddress)
         for {
           _ <- update

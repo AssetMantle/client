@@ -215,13 +215,13 @@ class Validators @Inject()(
         val insertDelegation = onDelegation(Delegate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.validatorAddress), validatorAddress = createValidator.validatorAddress, amount = createValidator.value))
         val insertSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(createValidator.publicKey)
         val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${createValidator.validatorAddress}'")
-        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
+//        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
 
         for {
           _ <- insertDelegation
           _ <- insertSigningInfos
           _ <- addEvent
-          _ <- insertKeyBaseAccount
+//          _ <- insertKeyBaseAccount
         } yield ()
       }
 
@@ -239,11 +239,11 @@ class Validators @Inject()(
 
       def insertValidator(validator: Validator) = {
         val update = Service.insertOrUpdate(validator)
-        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
+//        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
         val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
         for {
           _ <- update
-          _ <- insertKeyBaseAccount
+//          _ <- insertKeyBaseAccount
           _ <- addEvent
         } yield ()
       }

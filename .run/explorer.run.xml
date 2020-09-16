@@ -12,7 +12,7 @@
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
-        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/Downloads/Telegram Desktop/genesis.json" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="756591059782e9df30eb1709e1f95a67-8b34de1b-1f752e07" />

@@ -47,8 +47,6 @@ class Startup @Inject()(
                          getStakingPool: GetStakingPool,
                          getMintingInflation: GetMintingInflation,
                          getCommunityPool: GetCommunityPool,
-                         getAsset: GetAsset,
-                         getGenesis: GetGenesis,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
@@ -65,9 +63,9 @@ class Startup @Inject()(
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
       genesisSource.close()
       val latestBlockHeight = Await.result(blockchainBlocks.Service.getLatestBlockHeight, Duration.Inf)
-      Await.result(insertAccountsOnStart(genesis.app_state.auth.accounts), Duration.Inf)
+      Await.result(insertAccountsOnStart(latestBlockHeight, genesis.app_state.auth.accounts), Duration.Inf)
       Await.result(updateStakingOnStart(latestBlockHeight, genesis.app_state.staking), Duration.Inf)
-      Await.result(insertGenesisTransactionsOnStart(latestBlockHeight, genesis.app_state.genutil.gentxs), Duration.Inf)
+      Await.result(insertGenesisTransactionsOnStart(latestBlockHeight, genesis.app_state.genutil.gentxs.getOrElse(Seq.empty)), Duration.Inf)
       Await.result(updateDistributionOnStart(latestBlockHeight, genesis.app_state.distribution), Duration.Inf)
       Await.result(insertAllTokensOnStart(latestBlockHeight), Duration.Inf)
       Await.result(insertBlocksOnStart(latestBlockHeight), Duration.Inf)
@@ -101,7 +99,7 @@ class Startup @Inject()(
   }
 
   //slowing it down as either node or the explorer is unable to handle so many requests when genesis file is huge.
-  private def insertAccountsOnStart(accounts: Seq[Account.Result]) = {
+  private def insertAccountsOnStart(latestBlockHeight: Int, accounts: Seq[Account.Result]) = if (latestBlockHeight == 0) {
     Future.traverse(accounts.grouped(100).toList) { accountList =>
       val upsert = Future.traverse(accountList)(account => blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.value.address))
       (for {
@@ -111,7 +109,7 @@ class Startup @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-  }
+  } else Future()
 
   private def updateStakingOnStart(latestBlockHeight: Int, staking: Staking): Future[Unit] = if (latestBlockHeight == 0) {
     val insertAllSigningInfos = blockchainSigningInfos.Utility.insertAll()
