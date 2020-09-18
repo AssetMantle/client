@@ -1015,6 +1015,12 @@ body.lightMode  {
       margin-left: 15px;
       position: absolute;
       right: 20px;
+      .icon{
+        width: 10px;
+        height: 10px;
+        margin: 0;
+        fill:#FFFFFF;
+      }
     }
     .icon{
       fill:$colorSecondary;
@@ -2147,10 +2153,20 @@ form{
         }
       }
     }
-    .cmuk-card-header .icon {
-      width: 18px;
-      height: 18px;
-      margin-bottom: 3px;
+    .cmuk-card-header {
+      .icon {
+        width: 18px;
+        height: 18px;
+        margin-bottom: 3px;
+      }
+      button{
+        .icon{
+          width: 10px;
+          height: 10px;
+          margin: 0;
+          fill:#FFFFFF;
+        }
+      }
     }
   }
 }
