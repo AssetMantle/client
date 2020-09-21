@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object ValidatorOutstandingRewards {
 
-  case class Response(height: String, result: Seq[Coin]) extends BaseResponse
+  case class Response(height: String, result: Option[Seq[Coin]]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

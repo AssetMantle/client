@@ -79,8 +79,8 @@ object TransactionMessageResponses {
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
-  case class ContentValue(title: String, description: String, recipient: String, amount: Seq[Coin]) {
-    def toContentValue: TransactionMessages.ContentValue = TransactionMessages.ContentValue(title = title, description = description, recipient = recipient, amount = amount.map(_.toCoin))
+  case class ContentValue(title: String, description: String) {
+    def toContentValue: TransactionMessages.ContentValue = TransactionMessages.ContentValue(title = title, description = description)
   }
 
   implicit val contentValueReads: Reads[ContentValue] = Json.reads[ContentValue]

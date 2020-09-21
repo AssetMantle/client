@@ -92,7 +92,7 @@ class Startup @Inject()(
         blockHeight = blockHeight + 1
       }
     } catch {
-      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_NOT_FOUND) {
+      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
         throw baseException
       } else Unit
     }

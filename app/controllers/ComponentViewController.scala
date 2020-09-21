@@ -162,7 +162,7 @@ class ComponentViewController @Inject()(
 
     def getRewards(isValidator: Boolean): Future[(MicroNumber, MicroNumber)] = if (isValidator) {
       getValidatorSelfBondAndCommissionRewards.Service.get(operatorAddress).map(x => (x.result.self_bond_rewards.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount)), x.result.val_commission.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount))))
-    } else getDelegatorRewards.Service.get(address).map(x => (x.result.total.headOption.fold(MicroNumber.zero)(_.amount), MicroNumber.zero))
+    } else getDelegatorRewards.Service.get(address).map(x => (x.result.total.fold(MicroNumber.zero)(_.headOption.fold(MicroNumber.zero)(_.amount)), MicroNumber.zero))
 
     def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 

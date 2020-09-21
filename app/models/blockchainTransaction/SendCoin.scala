@@ -40,7 +40,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
     def deserialize: SendCoin = SendCoin(from = from, to = to, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amountSerialized), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(sendCoin: SendCoin): SendCoinSerialized = SendCoinSerialized(from = sendCoin.from, to = sendCoin.to, amountSerialized = Json.toJson(sendCoin.amount).toString, gas = sendCoin.gas.toMicroString, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code, createdBy = sendCoin.createdBy, createdOn = sendCoin.createdOn, createdOnTimeZone = sendCoin.createdOnTimeZone, updatedBy = sendCoin.updatedBy, updatedOn = sendCoin.updatedOn, updatedOnTimeZone = sendCoin.updatedOnTimeZone)
+  def serialize(sendCoin: SendCoin): SendCoinSerialized = SendCoinSerialized(from = sendCoin.from, to = sendCoin.to, amountSerialized = Json.toJson(sendCoin.amount).toString, gas = sendCoin.gas.  toMicroString, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code, createdBy = sendCoin.createdBy, createdOn = sendCoin.createdOn, createdOnTimeZone = sendCoin.createdOnTimeZone, updatedBy = sendCoin.updatedBy, updatedOn = sendCoin.updatedOn, updatedOnTimeZone = sendCoin.updatedOnTimeZone)
 
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

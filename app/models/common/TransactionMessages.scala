@@ -79,7 +79,7 @@ object TransactionMessages {
 
   implicit val depositWrites: OWrites[Deposit] = Json.writes[Deposit]
 
-  case class ContentValue(title: String, description: String, recipient: String, amount: Seq[Coin])
+  case class ContentValue(title: String, description: String)
 
   implicit val contentValueReads: Reads[ContentValue] = Json.reads[ContentValue]
 
