@@ -17,7 +17,7 @@ import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ConfirmSellerBid(from: String, to: String, bid: MicroNumber, time: Int, pegHash: String, sellerContractHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[ConfirmSellerBid] with Logged {
@@ -111,7 +111,7 @@ class ConfirmSellerBids @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(confirmSellerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String)= db.run(confirmSellerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String) = db.run(confirmSellerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -271,7 +271,7 @@ class ConfirmSellerBids @Inject()(
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }

@@ -74,13 +74,13 @@ class LoopBackController @Inject()(
   private var orderList = Seq[Order]()
 
   def transactionModeBasedResponse: Result = transactionMode match {
-    case constants.Transactions.BLOCK_MODE => Ok(Json.toJson(BlockResponse(height = Random.nextInt(999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString, gas_wanted = constants.FormField.GAS.maximumValue.toMicroString, gas_used = constants.FormField.GAS.maximumValue.toMicroString, code = None)))
-    case constants.Transactions.SYNC_MODE => Ok(Json.toJson(SyncResponse(height = Random.nextInt(999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
-    case constants.Transactions.ASYNC_MODE => Ok(Json.toJson(AsyncResponse(height = Random.nextInt(999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
+    case constants.Transactions.BLOCK_MODE => Ok(Json.toJson(BlockResponse(height = Random.nextInt(9999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString, gas_wanted = constants.FormField.GAS.maximumValue.toMicroString, gas_used = constants.FormField.GAS.maximumValue.toMicroString, code = None)))
+    case constants.Transactions.SYNC_MODE => Ok(Json.toJson(SyncResponse(height = Random.nextInt(9999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
+    case constants.Transactions.ASYNC_MODE => Ok(Json.toJson(AsyncResponse(height = Random.nextInt(9999999).toString, txhash = Random.alphanumeric.filter(c => c.isDigit || c.isUpper).take(64).mkString)))
   }
 
   def memberCheckCorporateScan: Action[AnyContent] = Action {
-    Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(8).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)).toString())
+    Ok(Json.toJson(transactions.responses.MemberCheckCorporateScanResponse.Response(Random.alphanumeric.filter(_.isDigit).take(9).mkString.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(6).mkString.toInt, None)).toString())
   }
 
   def memberCheckCorporateScanInfo(request: String): Action[AnyContent] = Action {
@@ -198,7 +198,7 @@ class LoopBackController @Inject()(
     try {
       implicit val requestReads = transactionsIssueAsset.requestReads
       val issueAssetRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsIssueAsset.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-      issueAssetUpdate(Asset(Random.alphanumeric.filter(_.isDigit).take(8).mkString, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.to, if (issueAssetRequest.moderated) true else false, issueAssetRequest.moderated, if (issueAssetRequest.takerAddress == "") None else Some(issueAssetRequest.takerAddress)))
+      issueAssetUpdate(Asset(Random.alphanumeric.filter(_.isDigit).take(10).mkString, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.to, if (issueAssetRequest.moderated) true else false, issueAssetRequest.moderated, if (issueAssetRequest.takerAddress == "") None else Some(issueAssetRequest.takerAddress)))
 
       if (kafkaEnabled) {
         Ok(Json.toJson(KafkaResponse(ticketID = constants.Test.TEST_TICKET_ID_PREFIX.ISSUE_ASSET + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))
@@ -218,7 +218,7 @@ class LoopBackController @Inject()(
     try {
       implicit val requestReads = transactionsIssueFiat.requestReads
       val issueFiatRequest = request.body.asJson.map { requestBody => convertJsonStringToObject[transactionsIssueFiat.Request](requestBody.toString()) }.getOrElse(throw new BaseException(constants.Response.FAILURE))
-      issueFiatUpdate(Fiat(Random.alphanumeric.filter(_.isDigit).take(5).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, new MicroNumber(0)))
+      issueFiatUpdate(Fiat(Random.alphanumeric.filter(_.isDigit).take(10).mkString, issueFiatRequest.to, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount, new MicroNumber(0)))
 
       if (kafkaEnabled) {
         Ok(Json.toJson(KafkaResponse(ticketID = constants.Test.TEST_TICKET_ID_PREFIX.ISSUE_FIAT + Random.alphanumeric.filter(_.isDigit).take(18).mkString)))

@@ -44,7 +44,7 @@ class AddOrganizationController @Inject()(
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
                                            withoutLoginAction: WithoutLoginAction,
-                                           withoutLoginActionAsync: WithoutLoginActionAsync,
+                                           withoutLoginActionAsync: WithoutLoginActionAsync
                                          )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
@@ -526,7 +526,7 @@ class AddOrganizationController @Inject()(
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,
                   updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
                 )
-                
+
                 def sendAddOrganizationTransaction(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
                   entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,

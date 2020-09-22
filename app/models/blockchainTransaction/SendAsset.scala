@@ -20,7 +20,7 @@ import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendAsset(from: String, to: String, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendAsset] with Logged {
@@ -39,7 +39,7 @@ class SendAssets @Inject()(
                             masterNegotiations: master.Negotiations,
                             masterOrders: master.Orders,
                             masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
-                            masterTransactionTradeActivities:masterTransaction.TradeActivities,
+                            masterTransactionTradeActivities: masterTransaction.TradeActivities,
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             transaction: utilities.Transaction,
                             utilitiesNotification: utilities.Notification,
@@ -111,7 +111,7 @@ class SendAssets @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sendAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByFromToAddressesAndPegHash(from: String, to: String, pegHash: String)= db.run(sendAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByFromToAddressesAndPegHash(from: String, to: String, pegHash: String) = db.run(sendAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -316,7 +316,7 @@ class SendAssets @Inject()(
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
     }(schedulerExecutionContext)
   }
 }
