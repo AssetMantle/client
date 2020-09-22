@@ -98,7 +98,7 @@
   .comdex .mobileNavigation {
     display: flex;
     flex: auto; } }
-@media (min-width: 1200px) and (max-width: 1400px) {
+@media (min-width: 1200px) and (max-width: 1470px) {
   .comdex .searchForm dl .cmuk-search-input {
     width: 200px; } }
 @media (min-width: 1200px) {
