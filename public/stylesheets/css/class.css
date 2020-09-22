@@ -726,6 +726,11 @@ body.lightMode .commodityImage {
     margin-left: 15px;
     position: absolute;
     right: 20px; }
+    .comdex .cmuk-card-header .cmuk-button .icon {
+      width: 10px;
+      height: 10px;
+      margin: 0;
+      fill: #FFFFFF; }
   .comdex .cmuk-card-header .icon {
     fill: #053C75; }
 .comdex .cmuk-button {
@@ -1558,6 +1563,11 @@ form .formBody {
     width: 18px;
     height: 18px;
     margin-bottom: 3px; }
+  .pageContainer .middle .cmuk-card-header button .icon {
+    width: 10px;
+    height: 10px;
+    margin: 0;
+    fill: #FFFFFF; }
 
 .leftContainer .financial {
   margin-bottom: 20px; }

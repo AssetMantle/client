@@ -7,7 +7,7 @@
 
 @commonCard(constants.View.UBOS, 'cardIconPath -> "images/icons/icons.svg#ubos") {
     @if(ubos.nonEmpty) {
-        @commonFormButton(constants.Form.ADD_UBO    )
+        @commonFormButton(constants.Form.ADD_UBO, 'icon -> "plus")
     }
 } {
     @if(ubos.isEmpty) {

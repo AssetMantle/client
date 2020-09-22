@@ -1,9 +1,13 @@
 @import play.api.routing.JavaScriptReverseRoute
-
+@import views.html.base._
 @(name: String, route: JavaScriptReverseRoute, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
 
 <button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("buttonPrimary")).mkString(" ")'  onclick="getForm(@utilities.String.getJsRouteString(route, arguments.toMap.get('parameters).map(_.toString).getOrElse("")))">
-@Messages(name)
+    @if(arguments.toMap.get('icon).map(_.toString).isDefined) {
+        @commonIcon(id = arguments.toMap.get('icon).map(_.toString).getOrElse("")) @Messages(name)
+    }else{
+        @Messages(name)
+    }
 </button>
 
 @*Example Usage: @commonModalButton(constants.View.NAME, routes.javascript.AccountController.identificationForm, 'parameters -> "'Abhinav', 1996") *@

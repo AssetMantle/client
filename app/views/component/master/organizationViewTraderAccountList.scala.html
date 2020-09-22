@@ -5,7 +5,7 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.TRADERS, 'cardIconPath -> "images/icons/icons.svg#traders") {
-    @commonFormButton(constants.Form.INVITE_TRADER)
+    @commonFormButton(constants.Form.INVITE_TRADER, 'icon -> "plus")
 }{
     @commonHorizontalSwitcher(ListMap(
         constants.View.ORGANIZATION_VIEW_ACCEPTED_TRADER_REQUESTS -> routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccountList,

@@ -5,7 +5,7 @@
 @()(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.TRADER_RELATION_LIST, 'cardIconPath -> "images/icons/icons.svg#tradeCounterParties") {
-    @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
+    @commonFormButton(constants.Form.TRADER_RELATION_REQUEST, 'icon->"plus")
 } {
     @commonHorizontalSwitcher(ListMap(constants.View.ACCEPTED_TRADER_RELATION_LIST -> routes.javascript.ComponentViewController.acceptedTraderRelationList,
         constants.View.PENDING_RELATION_REQUESTS -> routes.javascript.ComponentViewController.pendingTraderRelationList)
