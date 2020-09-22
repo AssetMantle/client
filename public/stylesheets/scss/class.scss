@@ -278,7 +278,7 @@ body.darkMode {
 
   .toolTip .toolTipText{
     background-color: #383941;
-    color: $colorPrimary;
+    color: $darkModePrimaryFontColor;
     &:after{
       border-color: #383941 transparent transparent transparent;
     }
@@ -312,10 +312,13 @@ body.darkMode {
         > * {
           border-color: $darkModeBorderColor;
         }
-        tr td:first-child {
-          &, a {
-            color: $darkModePrimaryFontColor;
-            font-weight: 600;
+        tr {
+          background: none;
+          td:first-child {
+            &, a {
+              color: $darkModePrimaryFontColor;
+              font-weight: 600;
+            }
           }
         }
       }
@@ -457,7 +460,7 @@ body.lightMode  {
 
 %cmuk-comment-meta{
   color: #061728;
-  font-size: $paragraphFontSizeMedium;
+  font-size: $paragraphFontSizeLarge;
 }
 
 %cmuk-button-link {
@@ -989,6 +992,7 @@ body.lightMode  {
     }
     p{
       font-size: $paragraphFontSizeSmall;
+      font-weight: bold;
     }
     .alertName{
       font-weight: bold;
@@ -1134,7 +1138,7 @@ body.lightMode  {
   }
   .darkModeButton{
     padding:3px 7px 6px 10px;
-    background: $colorSecondary;
+    background: none;
     .dayMode, .darkMode{
       .icon{
         width: 16px;
@@ -1188,6 +1192,11 @@ body.lightMode  {
   background: $colorSecondary;
   .cmuk-navbar-container:not(.cmuk-navbar-transparent){
     padding: 0 0 0 35px;
+  }
+  .cmuk-navbar-left{
+    .cmuk-navbar-nav{
+      margin-left: 20px;
+    }
   }
   .navItemRippleEffect {
     position: relative;
@@ -1288,6 +1297,7 @@ body.lightMode  {
   background-color: rgba(0, 0, 0, 0.4);
   padding: 30px 30px;
   text-align: center;
+  overflow-y:auto;
   .modalContent {
     transform: translateY(-100px);
     transition: .3s linear;
@@ -2074,6 +2084,7 @@ form{
             .icon {
               width: 16px;
               height: 16px;
+              fill: #053C75;
             }
           }
           .subTerms{
@@ -2201,13 +2212,14 @@ form{
     .cmuk-switcher, .financialCard{
       ul li {
         justify-content: space-between;
-        padding: 10px 0;
+        padding: 8px 0;
         margin: 0 20px;
         &:first-child {
           padding-top: 0;
         }
         &:last-child {
           border: 0;
+          padding-bottom: 0;
         }
         .wallet {
           align-items: center;
@@ -2223,7 +2235,8 @@ form{
         .ctitle {
           color:$darkModeSecondaryFontColor;
           line-height: 2;
-          font-size: $paragraphFontSizeSmall;
+          font-family: $fontFamilyPrimary;
+          font-size: $paragraphFontSizeMedium;
         }
 
         .payable {
@@ -2511,7 +2524,7 @@ header:before,
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
-  margin: 10px 0;
+  margin: 20px 0;
   transition: all 0.4s ease;
   &:before {
     content: "";
@@ -2592,6 +2605,22 @@ header:before,
     height: 250px;
     overflow: auto;
     @extend %scroller;
+    li{
+      height: 100%;
+      .emptyDocumentSection{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        p{
+          color: #B8B9BA;
+          margin-top: 10px;
+          font-size:$paragraphFontSizeSmall;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+      }
+    }
   }
 
   .documentList{
@@ -2599,6 +2628,18 @@ header:before,
       padding: 16px 5px;
       vertical-align: top;
       font-size: $paragraphFontSizeSmall;
+      .cmuk-badge {
+        background: none;
+        font-weight: bold;
+        text-transform: capitalize;
+        font-size: 14px;
+      }
+      .cmuk-badge.verified{
+        color: #5EB55C;
+      }
+      .cmuk-badge.pending{
+        color:#faa05a;
+      }
     }
     .docIcon {
       background: #FFFFFF;
@@ -2630,10 +2671,17 @@ header:before,
       tr{
         padding: 6px 0;
         border-bottom: 1px solid #E0E0E0;
+        background: #FAFAFA;
+        &:hover{
+          background: #F0F4F8;
+        }
         td:first-child{
           padding-left: 15px;
-          color: #262525;
-          font-size: $paragraphFontSizeSmall;
+          color: #636363;
+          font-size: $paragraphFontSizeMedium;
+          a{
+            color: #262525;
+          }
         }
         td:last-child{
           padding-right: 10px;
@@ -2847,8 +2895,8 @@ header:before,
   justify-content: space-between;
   background: #FFFFFF;
   border: 1px solid rgba(5, 60, 117, 0.12);
-  border-radius: 2px;
-  margin-bottom: 3px;
+  border-radius: 1.85714px;
+  margin-bottom: 5px;
   overflow:auto;
   flex-wrap: wrap;
   .listItemChild{
@@ -3414,8 +3462,8 @@ figure.zoom {
       font-weight: bold;
       font-size: 12px;
       span{
-        color: #848A91;
-        font-weight: bold;
+        color:$darkModeSecondaryFontColor;
+        font-weight: 500;
         font-size:$paragraphFontSizeSmall;
         word-break:break-word;
       }
@@ -3431,6 +3479,7 @@ figure.zoom {
     flex: 50%;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     .navigationLocation {
       margin: 0 15px;
     }
@@ -3440,13 +3489,14 @@ figure.zoom {
     }
     p{
       margin: 0;
-      color: #4B4B4B;
-      font-weight: bold;
+      color: $darkModeSecondaryFontColor;
       font-size: 12px;
       font-family: $fontFamilyPrimary;
     }
     .arrowIcon{
       width:25px;
+      display: flex;
+      align-items: center;
       .icon{
         width: 25px;
         height: 25px;
@@ -3454,6 +3504,7 @@ figure.zoom {
     }
     .cmuk-button{
       line-height: 36px;
+      font-size:13px;
       &:hover{
         color: #FFFFFF;
         background: $colorPrimary;
