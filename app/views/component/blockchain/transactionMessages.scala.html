@@ -13,6 +13,9 @@
                 case constants.Blockchain.TransactionMessage.SEND_COIN => {
                     @views.html.component.blockchain.txMessages.sendCoin(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.MULTI_SEND => {
+                    @views.html.component.blockchain.txMessages.multiSend(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => {
                     @views.html.component.blockchain.txMessages.createValidator(msg.message)
                 }

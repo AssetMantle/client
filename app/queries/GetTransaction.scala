@@ -33,10 +33,14 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
     def get(txHash: String): Future[Response] = action(txHash).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.TRANSACTION_HASH_QUERY_FAILED.logMessage + ": " + txHash)
+        throw baseException
     }
 
     def getAsWSResponse(txHash: String): Future[WSResponse] = actionResponseAsWSResponse(txHash).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.TRANSACTION_HASH_QUERY_FAILED.logMessage + ": " + txHash)
+        throw baseException
     }
   }
 

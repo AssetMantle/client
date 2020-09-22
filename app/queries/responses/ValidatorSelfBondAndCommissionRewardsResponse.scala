@@ -4,7 +4,7 @@ import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Coin
 import transactions.Abstract.BaseResponse
 
-object ValidatorDistributionResponse {
+object ValidatorSelfBondAndCommissionRewardsResponse {
 
   //TODO Raise an issue for the following
   //Bug in cosmos-sdk, the actual value send in `operator_address` is validator's account address instead of its operator address

@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.Coin
-import models.common.TransactionMessages.SendCoin
+import models.common.TransactionMessages.{MultiSend, SendCoin}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -163,19 +163,27 @@ class Accounts @Inject()(
       }
     }
 
+    def onMultiSend(multiSend: MultiSend): Future[Unit] = {
+      val updateInputs = Future.traverse(multiSend.inputs)(input => insertOrUpdateAccountBalance(input.address))
+      val updateOutputs = Future.traverse(multiSend.outputs)(output => insertOrUpdateAccountBalance(output.address))
+      (for {
+        _ <- updateInputs
+        _ <- updateOutputs
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
-      val oldAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse, oldAccount: Option[Account]) = Service.insertOrUpdate(oldAccount.fold(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.public_key.fold("")(_.value), sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.account_number))(x => x.copy(coins = accountResponse.result.value.coins.map(_.toCoin))))
+      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
 
       (for {
         accountResponse <- accountResponse
-        oldAccount <- oldAccount
-        _ <- upsert(accountResponse, oldAccount)
+        _ <- upsert(accountResponse)
       } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message)
-          throw baseException
+        case _: BaseException => Future()
       }
     }
   }

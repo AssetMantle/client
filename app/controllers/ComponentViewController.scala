@@ -11,7 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.Comet
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.{GetDelegatorRewards, GetValidatorDistributionRewards}
+import queries.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
 
 import scala.collection.immutable.ListMap
@@ -34,7 +34,7 @@ class ComponentViewController @Inject()(
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainValidators: blockchain.Validators,
                                          getDelegatorRewards: GetDelegatorRewards,
-                                         getValidatorDistributionRewards: GetValidatorDistributionRewards,
+                                         getValidatorSelfBondAndCommissionRewards: GetValidatorSelfBondAndCommissionRewards,
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
@@ -161,8 +161,8 @@ class ComponentViewController @Inject()(
     val allSymbols = blockchainTokens.Service.getAllSymbols
 
     def getRewards(isValidator: Boolean): Future[(MicroNumber, MicroNumber)] = if (isValidator) {
-      getValidatorDistributionRewards.Service.get(operatorAddress).map(x => (x.result.self_bond_rewards.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount)), x.result.val_commission.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount))))
-    } else getDelegatorRewards.Service.get(address).map(x => (x.result.total.headOption.fold(MicroNumber.zero)(_.amount), MicroNumber.zero))
+      getValidatorSelfBondAndCommissionRewards.Service.get(operatorAddress).map(x => (x.result.self_bond_rewards.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount)), x.result.val_commission.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount))))
+    } else getDelegatorRewards.Service.get(address).map(x => (x.result.total.fold(MicroNumber.zero)(_.headOption.fold(MicroNumber.zero)(_.amount)), MicroNumber.zero))
 
     def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 

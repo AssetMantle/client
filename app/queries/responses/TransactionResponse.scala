@@ -6,13 +6,13 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.TransactionMessageResponse
+import queries.responses.common.Coin
 import queries.responses.common.TransactionMessageResponses._
-import queries.responses.common.{Coin, Event}
 import transactions.Abstract.BaseResponse
 
 object TransactionResponse {
 
-  case class Log(msg_index: Int, log: String, events: Seq[Event])
+  case class Log(msg_index: Int, log: String)
 
   implicit val logReads: Reads[Log] = Json.reads[Log]
 

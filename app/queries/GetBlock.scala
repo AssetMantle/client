@@ -31,6 +31,8 @@ class GetBlock @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
     def get(height: Int): Future[Response] = action(height).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.BLOCK_QUERY_FAILED.logMessage + ": " + height)
+        throw baseException
     }
   }
 

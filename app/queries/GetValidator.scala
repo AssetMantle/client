@@ -25,7 +25,7 @@ class GetValidator @Inject()()(implicit wsClient: WSClient, configuration: Confi
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(operatorAddress: String): Future[Response] = wsClient.url(url + operatorAddress).get.map { response => utilities.JSON.convertJsonStringToObject[Response](response.body) }
+  private def action(operatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + operatorAddress).get)
 
   object Service {
 

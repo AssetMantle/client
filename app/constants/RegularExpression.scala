@@ -16,4 +16,6 @@ object RegularExpression {
   val SWIFT_CODE: Regex = """^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$""".r
 
   val BLOCKCHAIN_ID_SEPARATOR = s"""\\${constants.Blockchain.IDSeparator}"""
+  val BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR = s"""\\${constants.Blockchain.FirstOrderCompositeIDSeparator}"""
+  val BLOCKCHAIN_SECOND_ORDER_COMPOSITE_ID_SEPARATOR = s"""\\${constants.Blockchain.SecondOrderCompositeIDSeparator}"""
 }

@@ -6,10 +6,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart1
-import queries.responses.MemberCheckMemberScanResultResponse.ResponsePart2
-import queries.responses.MemberCheckMemberScanResultResponse.Response
 import queries.responses.MemberCheckMemberScanResultResponse
+import queries.responses.MemberCheckMemberScanResultResponse.{Response, ResponsePart1, ResponsePart2}
 import utilities.KeyStore
 
 import scala.concurrent.{ExecutionContext, Future}

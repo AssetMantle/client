@@ -40,9 +40,17 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber)
 
-  implicit val coinReads: Reads[Coin] = Json.reads[Coin]
+  def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
 
-  implicit val coinWrites: OWrites[Coin] = Json.writes[Coin]
+  implicit val coinReads: Reads[Coin] = (
+    (JsPath \ "denom").read[String] and
+      (JsPath \ "amount").read[String]
+    ) (coinApply _)
+
+  implicit val coinWrites: Writes[Coin] = (coin: Coin) => Json.obj(
+    "denom" -> coin.denom,
+    "amount" -> coin.amount.toMicroString
+  )
 
   case class Fee(amount: Seq[Coin], gas: String)
 
@@ -85,7 +93,7 @@ object Serializable {
 
   case class Fact(factType: String, hash: String)
 
-  def NewFact(factType: String, data: String): Fact = Fact(factType = factType, hash = utilities.Hash.getHash(data))
+  def NewFact(factType: String, dataValue: DataValue): Fact = Fact(factType = factType, hash = dataValue.GenerateHash)
 
   implicit val factReads: Reads[Fact] = Json.reads[Fact]
 
@@ -108,7 +116,7 @@ object Serializable {
   case class MetaFact(data: Data) {
     def getHash: String = data.value.GenerateHash
 
-    def removeData(): Fact = NewFact(constants.Blockchain.FactType.getFactTypeFromDataType(data.dataType), data.value.AsString)
+    def removeData(): Fact = NewFact(constants.Blockchain.FactType.getFactTypeFromDataType(data.dataType), data.value)
   }
 
   implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]
@@ -126,7 +134,7 @@ object Serializable {
   case class MetaProperties(metaPropertyList: Seq[MetaProperty]) {
     def removeData(): Properties = Properties(metaPropertyList.map(_.removeData()))
 
-    def mutate(metaProperty: MetaProperty): MetaProperties = MetaProperties((metaPropertyList.filterNot(_.id == metaProperty.id) :+ metaProperty))
+    def mutate(metaProperty: MetaProperty): MetaProperties = MetaProperties(metaPropertyList.filterNot(_.id == metaProperty.id) :+ metaProperty)
   }
 
   implicit val metaPropertiesReads: Reads[MetaProperties] = Json.reads[MetaProperties]

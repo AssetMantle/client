@@ -27,7 +27,7 @@ class GetDelegatorRewards @Inject()()(implicit wsClient: WSClient, configuration
 
   private val url = ip + ":" + port + "/" + path1 + "/"
 
-  private def action(delegatorAddress: String): Future[Response] = wsClient.url(url + delegatorAddress + path2).get.map { response => utilities.JSON.convertJsonStringToObject[Response](response.body) }
+  private def action(delegatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + delegatorAddress + path2).get)
 
   object Service {
 

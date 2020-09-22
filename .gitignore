@@ -5,6 +5,7 @@ project/target
 target
 tmp
 .history
+.run
 dist
 /*.iml
 /out

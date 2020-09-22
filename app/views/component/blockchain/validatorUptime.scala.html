@@ -4,8 +4,8 @@
 @(uptime: Double, uptimeMap: ListMap[Int, Boolean], hexAddress: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.UPTIME) {
-} {
     @uptime %
+} {
     <div id="@hexAddress">
         <div id="missingBlocksCounter" style="display: flex; flex-wrap: wrap">
         @defining(uptimeMap.keySet.last) { lastHeight =>

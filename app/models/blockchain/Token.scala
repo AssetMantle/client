@@ -48,10 +48,10 @@ class Tokens @Inject()(
   private[models] val tokenTable = TableQuery[TokenTable]
 
   case class TokenSerialized(symbol: String, totalSupply: String, bondedAmount: String, notBondedAmount: String, communityPool: String, inflation: BigDecimal, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Token = Token(symbol = symbol, totalSupply = new MicroNumber(BigInt(totalSupply)), bondedAmount = new MicroNumber(BigInt(bondedAmount)), notBondedAmount = new MicroNumber(BigInt(notBondedAmount)), communityPool = new MicroNumber(BigInt(communityPool)), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Token = Token(symbol = symbol, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(token: Token): TokenSerialized = TokenSerialized(symbol = token.symbol, totalSupply = token.totalSupply.toMicroString, bondedAmount = token.bondedAmount.toMicroString, notBondedAmount = token.notBondedAmount.toMicroString, communityPool = token.communityPool.toMicroString, inflation = token.inflation, createdBy = token.createdBy, createdOn = token.createdOn, createdOnTimeZone = token.createdOnTimeZone, updatedBy = token.updatedBy, updatedOn = token.updatedOn, updatedOnTimeZone = token.updatedOnTimeZone)
+  def serialize(token: Token): TokenSerialized = TokenSerialized(symbol = token.symbol, totalSupply = token.totalSupply.toString, bondedAmount = token.bondedAmount.toString, notBondedAmount = token.notBondedAmount.toString, communityPool = token.communityPool.toString, inflation = token.inflation, createdBy = token.createdBy, createdOn = token.createdOn, createdOnTimeZone = token.createdOnTimeZone, updatedBy = token.updatedBy, updatedOn = token.updatedOn, updatedOnTimeZone = token.updatedOnTimeZone)
 
   private def add(token: Token): Future[String] = db.run((tokenTable returning tokenTable.map(_.symbol) += serialize(token)).asTry).map {
     case Success(result) => result
@@ -99,14 +99,14 @@ class Tokens @Inject()(
     }
   }
 
-  private def updateBondingTokenBySymbol(symbol: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toMicroString, notBondedAmount.toMicroString)).asTry).map {
+  private def updateBondingTokenBySymbol(symbol: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toString, notBondedAmount.toString)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
     }
   }
 
-  private def updateTotalSupplyAndInflationBySymbol(symbol: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toMicroString, inflation)).asTry).map {
+  private def updateTotalSupplyAndInflationBySymbol(symbol: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toString, inflation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
@@ -160,7 +160,7 @@ class Tokens @Inject()(
 
     def updateTotalSupplyAndInflation(symbol: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationBySymbol(symbol = symbol, totalSupply = totalSupply, inflation = inflation)
 
-    def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber((BigInt(x))))
+    def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }
 
   object Utility {

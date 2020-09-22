@@ -133,22 +133,32 @@ class Splits @Inject()(
   object Utility {
 
     def onSend(splitSend: SplitSend): Future[Unit] = {
-      val oldFromSplit = Service.tryGet(ownerID = splitSend.fromID, ownableID = splitSend.ownableID)
-      val oldToSplit = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
+      val updateFromSplit = {
+        val oldFromSplit = Service.tryGet(ownerID = splitSend.fromID, ownableID = splitSend.ownableID)
 
-      def updateSplits(oldFromSplit: Split, oldToSplit: Option[Split]) = {
-        val updateOrDeleteFromSplit = if ((oldFromSplit.split - splitSend.split) == 0) Service.delete(ownerID = splitSend.fromID, ownableID = splitSend.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitSend.split))
-        val upsertToSplit = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitSend.split)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitSend.split)))
+        def updateOrDeleteFromSplit(oldFromSplit: Split) = if ((oldFromSplit.split - splitSend.split) == 0) Service.delete(ownerID = splitSend.fromID, ownableID = splitSend.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitSend.split))
+
         for {
-          _ <- updateOrDeleteFromSplit
-          _ <- upsertToSplit
+          oldFromSplit <- oldFromSplit
+          _ <- updateOrDeleteFromSplit(oldFromSplit)
+        } yield ()
+      }
+
+      //Do not make `def` to `val` because when `fromID` and `toID` are same, asynchronous issue occurs (the split amount doesn't reset)
+      def updateToSplit() = {
+        val oldToSplit = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
+
+        def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitSend.split)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitSend.split)))
+
+        for {
+          oldToSplit <- oldToSplit
+          _ <- upsertToSplit(oldToSplit)
         } yield ()
       }
 
       (for {
-        oldFromSplit <- oldFromSplit
-        oldToSplit <- oldToSplit
-        _ <- updateSplits(oldFromSplit, oldToSplit)
+        _ <- updateFromSplit
+        _ <- updateToSplit()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -219,22 +229,32 @@ class Splits @Inject()(
     }
 
     def auxiliaryTransfer(fromID: String, toID: String, ownableID: String, splitValue: BigDecimal): Future[Unit] = {
-      val oldFromSplit = Service.tryGet(ownerID = fromID, ownableID = ownableID)
-      val oldToSplit = Service.get(ownerID = toID, ownableID = ownableID)
+      val updateFromSplit = {
+        val oldFromSplit = Service.tryGet(ownerID = fromID, ownableID = ownableID)
 
-      def updateSplits(oldFromSplit: Split, oldToSplit: Option[Split]) = {
-        val updateOrDeleteFromSplit = if ((oldFromSplit.split - splitValue) == 0) Service.delete(ownerID = fromID, ownableID = ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitValue))
-        val upsertToSplit = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = toID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
+        def updateOrDeleteFromSplit(oldFromSplit: Split) = if ((oldFromSplit.split - splitValue) == 0) Service.delete(ownerID = fromID, ownableID = ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitValue))
+
         for {
-          _ <- updateOrDeleteFromSplit
-          _ <- upsertToSplit
+          oldFromSplit <- oldFromSplit
+          _ <- updateOrDeleteFromSplit(oldFromSplit)
+        } yield ()
+      }
+
+      //Do not make `def` to `val` because when `fromID` and `toID` are same, asynchronous issue occurs (the split amount doesn't reset)
+      def updateToSplit() = {
+        val oldToSplit = Service.get(ownerID = toID, ownableID = ownableID)
+
+        def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = toID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
+
+        for {
+          oldToSplit <- oldToSplit
+          _ <- upsertToSplit(oldToSplit)
         } yield ()
       }
 
       (for {
-        oldFromSplit <- oldFromSplit
-        oldToSplit <- oldToSplit
-        _ <- updateSplits(oldFromSplit, oldToSplit)
+        _ <- updateFromSplit
+        _ <- updateToSplit()
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

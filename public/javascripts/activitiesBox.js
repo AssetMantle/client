@@ -94,8 +94,6 @@ function loadMoreActivitiesOnScroll(negotiationID) {
 }
 
 function onNotificationClick(route, inNewPage) {
-    console.log(inNewPage);
-    console.log(route);
     if (route !== "") {
         if (inNewPage) {
             $.ajax({

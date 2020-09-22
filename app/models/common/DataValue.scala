@@ -3,7 +3,7 @@ package models.common
 import exceptions.BaseException
 import models.Abstract.DataValue
 import play.api.Logger
-import play.api.libs.json.{JsObject, Json, OWrites, Reads, Writes}
+import play.api.libs.json._
 
 object DataValue {
 
@@ -14,7 +14,7 @@ object DataValue {
   case class StringDataValue(value: String) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.STRING_DATA
 
-    def GenerateHash: String = utilities.Hash.getHash(value)
+    def GenerateHash: String = if (value == "") "" else utilities.Hash.getHash(value)
 
     def AsString: String = value
 
@@ -32,7 +32,7 @@ object DataValue {
   case class DecDataValue(value: BigDecimal) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.DEC_DATA
 
-    def GenerateHash: String = utilities.Hash.getHash(value.toString)
+    def GenerateHash: String = if (value == constants.Blockchain.SmallestDec) "" else utilities.Hash.getHash(value.toString)
 
     def AsString: String = value.toString
 
@@ -50,7 +50,7 @@ object DataValue {
   case class HeightDataValue(value: Int) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.HEIGHT_DATA
 
-    def GenerateHash: String = utilities.Hash.getHash(value.toString)
+    def GenerateHash: String = if (value == -1) "" else utilities.Hash.getHash(value.toString)
 
     def AsString: String = value.toString
 
@@ -68,7 +68,7 @@ object DataValue {
   case class IDDataValue(value: String) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.ID_DATA
 
-    def GenerateHash: String = utilities.Hash.getHash(value)
+    def GenerateHash: String = if (value == "") "" else utilities.Hash.getHash(value)
 
     def AsString: String = value
 
@@ -91,11 +91,11 @@ object DataValue {
     case _ => throw new BaseException(constants.Response.DATA_TYPE_NOT_FOUND)
   }
 
-  def dataValueApply(dataType: String, value: JsObject): Serializable.Data =  dataType match {
+  def dataValueApply(dataType: String, value: JsObject): Serializable.Data = dataType match {
     case constants.Blockchain.DataType.STRING_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[StringDataValue](value.toString))
-    case constants.Blockchain.DataType.ID_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[IDDataValue](value.toString))
-    case constants.Blockchain.DataType.HEIGHT_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[HeightDataValue](value.toString))
-    case constants.Blockchain.DataType.DEC_DATA =>Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[DecDataValue](value.toString))
+    case constants.Blockchain.DataType.ID_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[IDDataValue](value.toString))
+    case constants.Blockchain.DataType.HEIGHT_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[HeightDataValue](value.toString))
+    case constants.Blockchain.DataType.DEC_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[DecDataValue](value.toString))
   }
 
 }

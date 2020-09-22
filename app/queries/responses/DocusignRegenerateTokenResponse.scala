@@ -1,6 +1,6 @@
 package queries.responses
 
-import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
 
 object DocusignRegenerateTokenResponse {
