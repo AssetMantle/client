@@ -98,4 +98,27 @@ object DataValue {
     case constants.Blockchain.DataType.DEC_DATA => Serializable.Data(dataType, utilities.JSON.convertJsonStringToObject[DecDataValue](value.toString))
   }
 
+  def getShortDataType(dataType: String): String = dataType match {
+    case constants.Blockchain.DataType.STRING_DATA => constants.Blockchain.FactType.STRING
+    case constants.Blockchain.DataType.ID_DATA => constants.Blockchain.FactType.ID
+    case constants.Blockchain.DataType.HEIGHT_DATA => constants.Blockchain.FactType.HEIGHT
+    case constants.Blockchain.DataType.DEC_DATA => constants.Blockchain.FactType.DEC
+    case _ => ""
+  }
+
+  def getDataValue(dataType: String, dataValue: Option[String]): DataValue = try {
+    dataType match {
+      case constants.Blockchain.DataType.STRING_DATA => StringDataValue(dataValue.getOrElse(""))
+      case constants.Blockchain.DataType.ID_DATA => IDDataValue(dataValue.getOrElse(""))
+      case constants.Blockchain.DataType.HEIGHT_DATA => HeightDataValue(dataValue.getOrElse("-1").toInt)
+      case constants.Blockchain.DataType.DEC_DATA => DecDataValue(BigDecimal(dataValue.getOrElse("0.0")))
+      case _ => throw new BaseException(constants.Response.INVALID_DATA_TYPE)
+    }
+  } catch {
+    case baseException: BaseException => throw baseException
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      throw new BaseException(constants.Response.INVALID_DATA_VALUE)
+  }
+
+  def getData(dataType: String, dataValue: Option[String]): Serializable.Data = Serializable.Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))
 }

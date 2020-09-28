@@ -1,0 +1,10 @@
+@import views.companion.blockchain.IdentityProvision
+@import views.html.base._
+
+@(identityProvisionForm: Form[IdentityProvision.Data] = IdentityProvision.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.IDENTITY_PROVISION, identityProvisionForm) {
+    @commonInputText(identityProvisionForm, constants.FormField.FROM)
+    @commonInputText(identityProvisionForm, constants.FormField.IDENTITY_ID)
+    @commonInputText(identityProvisionForm, constants.FormField.TO)
+    @commonInputMicroNumber(identityProvisionForm, constants.FormField.GAS)
+}

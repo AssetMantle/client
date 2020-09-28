@@ -1,43 +1,61 @@
 @import controllers.actions.LoginState
-@import views.html.base.common
+@import views.html.base.{common, commonFormButton}
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
+    @common(Messages(constants.View.DASHBOARD), failures, warnings, successes, infos)(left)(center)(right)
 
-@left = {
-    <div class="leftContainer">
-        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-        <div id="tokensStatistics"  class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
-    </div>
-    <script>
-            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
-            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
-    </script>
-}
+    @left = {
+        <div class="leftContainer">
+            <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
+            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+        </div>
+        <script>
+                componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
+                componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+        </script>
+    }
 
-@center = {
-    <div class="cmuk-container cmuk-margin-bottom">
-        <div class="cmuk-grid-match" cmuk-grid>
-            <div class="cmuk-width-expand@@m">
-                <div id="tokensPrices" class="cardSelectHeader"></div>
+    @center = {
+        <div class="cmuk-container cmuk-margin-bottom">
+            <div class="cmuk-grid-match" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div id="tokensPrices" class="cardSelectHeader"></div>
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-            componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
-    </script>
-}
+        <script>
+                componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
+        </script>
+    @commonFormButton(constants.Form.IDENTITY_NUB)
+    @commonFormButton(constants.Form.IDENTITY_DEFINE)
+    @commonFormButton(constants.Form.IDENTITY_ISSUE)
+    @commonFormButton(constants.Form.IDENTITY_PROVISION)
+    @commonFormButton(constants.Form.IDENTITY_UNPROVISION)
+    @commonFormButton(constants.Form.SPLIT_SEND)
+    @commonFormButton(constants.Form.SPLIT_WRAP)
+    @commonFormButton(constants.Form.SPLIT_UNWRAP)
+    @commonFormButton(constants.Form.ASSET_DEFINE)
+    @commonFormButton(constants.Form.ASSET_MINT)
+    @commonFormButton(constants.Form.ASSET_MUTATE)
+    @commonFormButton(constants.Form.ASSET_BURN)
+    @commonFormButton(constants.Form.ORDER_DEFINE)
+    @commonFormButton(constants.Form.ORDER_MAKE)
+    @commonFormButton(constants.Form.ORDER_TAKE)
+    @commonFormButton(constants.Form.ORDER_CANCEL)
+    @commonFormButton(constants.Form.META_REVEAL)
+    @commonFormButton(constants.Form.MAINTAINER_DEPUTIZE)
+    }
 
-@right = {
-    <div class="rightContainer">
-        <div class="recentActivityContainer">
-            <div id="publicRecentActivities"></div>
+    @right = {
+        <div class="rightContainer">
+            <div class="recentActivityContainer">
+                <div id="publicRecentActivities"></div>
+            </div>
+            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
         </div>
-        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
-    </div>
-    <script>
-            componentResource('publicRecentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
-            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
-    </script>
-}
+        <script>
+                componentResource('publicRecentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
+                componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
+        </script>
+    }

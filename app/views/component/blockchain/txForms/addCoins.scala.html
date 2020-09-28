@@ -1,0 +1,24 @@
+@import constants.FormField.NestedFormField
+@import helper._
+@import views.html.base._
+@import constants.FormField.BooleanFormField
+
+@(form: Form[_], nestedFormField: NestedFormField, addField: BooleanFormField, target: String = "commonModalContent")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @Messages(nestedFormField.name):
+    @defining(Option(nestedFormField)) { implicit optionalNestedFormField =>
+        @repeatWithIndex(form(nestedFormField.name), min = form(nestedFormField.name).indexes.length + 1) { (immutableMetaTraitForm, i) =>
+            @defining(Option(immutableMetaTraitForm)) { implicit immutableMetaTraitFormField =>
+                <div id='@Seq(nestedFormField.name, i).mkString("_")'>
+                    @commonInputText(form, constants.FormField.DENOM)
+                    @commonInputMicroNumber(form, constants.FormField.AMOUNT)
+                    @commonJavascriptButton(constants.View.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
+                </div>
+            }
+        }
+    }
+    @commonCheckbox(form, addField, 'id -> s"${addField.name}", 'containerDivClass -> "hidden")
+<br>
+    @commonJavascriptButton(addField.name, JavaScript(s"addField(this, '${addField.name}', '${target}')"))
+        <script src="@routes.Assets.versioned("javascripts/addField.js")" type="text/javascript"></script>
+</div>

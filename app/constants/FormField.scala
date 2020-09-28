@@ -55,6 +55,19 @@ object FormField {
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
   val SEARCH = new StringFormField("SEARCH_TX_HASH_HEIGHT_BLOCK_HEIGHT_ADDRESS", 1, 1000)
+  val ID = new StringFormField("ID", 1, 100)
+  val DATA_VALUE = new StringFormField("DATA_VALUE", 1, 100)
+  val DATA_NAME = new StringFormField("DATA_NAME", 1, 100)
+  val FROM_ID = new StringFormField("FROM_ID", 1, 200)
+  val TO_ID = new StringFormField("TO_ID", 1, 200)
+  val OWNABLE_ID = new StringFormField("OWNABLE_ID", 1, 200)
+  val NUB_ID = new StringFormField("NUB_ID", 1, 200)
+  val CLASSIFICATION_ID = new StringFormField("CLASSIFICATION_ID", 1, 200)
+  val IDENTITY_ID = new StringFormField("IDENTITY_ID", 1, 200)
+  val DENOM = new StringFormField("DENOM", 1, 100)
+  val MAKER_OWNABLE_ID = new StringFormField("MAKER_OWNABLE_ID", 1, 200)
+  val TAKER_OWNABLE_ID = new StringFormField("TAKER_OWNABLE_ID", 1, 200)
+  val ORDER_ID = new StringFormField("ORDER_ID", 1, 500)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
@@ -66,11 +79,13 @@ object FormField {
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
   val TOKEN_SYMBOL = new SelectFormField("TOKEN_SYMBOL", Seq.empty)
+  val DATA_TYPE = new SelectFormField("DATA_TYPE", constants.SelectFieldOptions.DATA_TYPE)
 
   //IntFormField
   val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
   val RESULT_ID = new IntFormField("RESULT_ID", 0, Int.MaxValue)
-  val SCAN_ID = new IntFormField("SCAN_ID", 0,  Int.MaxValue)
+  val SCAN_ID = new IntFormField("SCAN_ID", 0, Int.MaxValue)
+  val EXPIRES_IN = new IntFormField("EXPIRES_IN", 1, Int.MaxValue)
 
   //DateFormField
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
@@ -82,13 +97,38 @@ object FormField {
   val COMPLETION = new BooleanFormField("COMPLETION")
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_MNEMONIC_NOTED = new BooleanFormField("CONFIRM_MNEMONIC_NOTED")
+  val ADD_IMMUTABLE_META_FIELD = new BooleanFormField("ADD_IMMUTABLE_META_FIELD")
+  val ADD_IMMUTABLE_FIELD = new BooleanFormField("ADD_IMMUTABLE_FIELD")
+  val ADD_MUTABLE_META_FIELD = new BooleanFormField("ADD_MUTABLE_META_FIELD")
+  val ADD_MUTABLE_FIELD = new BooleanFormField("ADD_MUTABLE_FIELD")
+  val ADD_MAINTAINED_TRAITS = new BooleanFormField("ADD_MAINTAINED_TRAITS")
+  val ADD_MAINTAINER = new BooleanFormField("ADD_MAINTAINER")
+  val REMOVE_MAINTAINER = new BooleanFormField("REMOVE_MAINTAINER")
+  val MUTATE_MAINTAINER = new BooleanFormField("MUTATE_MAINTAINER")
+  val ADD_FIELD = new BooleanFormField("ADD_FIELD")
 
   //NestedFormField
   val ADDRESS = new NestedFormField("ADDRESS")
+  val IMMUTABLE_META_TRAITS = new NestedFormField("IMMUTABLE_META_TRAITS")
+  val IMMUTABLE_TRAITS = new NestedFormField("IMMUTABLE_TRAITS")
+  val MUTABLE_META_TRAITS = new NestedFormField("MUTABLE_META_TRAITS")
+  val MUTABLE_TRAITS = new NestedFormField("MUTABLE_TRAITS")
+  val MAINTAINED_TRAITS = new NestedFormField("MAINTAINED_TRAITS")
+  val COINS = new NestedFormField("COINS")
+  val REVEAL_FACT = new NestedFormField("REVEAL_FACT")
+  val IMMUTABLE_META_PROPERTIES = new NestedFormField("IMMUTABLE_META_PROPERTIES")
+  val IMMUTABLE_PROPERTIES = new NestedFormField("IMMUTABLE_PROPERTIES")
+  val MUTABLE_META_PROPERTIES = new NestedFormField("MUTABLE_META_PROPERTIES")
+  val MUTABLE_PROPERTIES = new NestedFormField("MUTABLE_PROPERTIES")
 
   //MicroNumberFormField
   val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+
+  //BigDecimalFormField
+  val SPLIT = new BigDecimalFormField("SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
+  val TAKER_OWNABLE_SPLIT = new BigDecimalFormField("TAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
+  val MAKER_OWNABLE_SPLIT = new BigDecimalFormField("MAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -114,6 +154,11 @@ object FormField {
   class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+  }
+
+  class BigDecimalFormField(fieldName: String, val minimumValue: BigDecimal, val maximumValue: BigDecimal) {
+    val name: String = fieldName
+    val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
   }
 
   class BooleanFormField(fieldName: String) {

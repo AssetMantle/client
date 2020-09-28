@@ -1,0 +1,10 @@
+@import views.companion.blockchain.IdentityUnprovision
+@import views.html.base._
+
+@(identityUnprovisionForm: Form[IdentityUnprovision.Data] = IdentityUnprovision.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.IDENTITY_UNPROVISION, identityUnprovisionForm) {
+    @commonInputText(identityUnprovisionForm, constants.FormField.FROM)
+    @commonInputText(identityUnprovisionForm, constants.FormField.IDENTITY_ID)
+    @commonInputText(identityUnprovisionForm, constants.FormField.TO)
+    @commonInputMicroNumber(identityUnprovisionForm, constants.FormField.GAS)
+}
