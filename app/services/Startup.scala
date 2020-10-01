@@ -335,9 +335,9 @@ class Startup @Inject()(
       }
     }
 
-    def getBlock(message: String): WSClientBlockResponse = utilities.JSON.convertJsonStringToObject[WSClientBlockResponse](message)
+    private def getBlock(message: String): WSClientBlockResponse = utilities.JSON.convertJsonStringToObject[WSClientBlockResponse](message)
 
-    def onStrictMessage(message: String): Unit = {
+    private def onStrictMessage(message: String): Unit = {
       try {
         onNewBlock(getBlock(message))
       } catch {

@@ -14,6 +14,7 @@ object Blockchain {
   val RequestPropertiesSeparator = ","
   val DataNameAndTypeSeparator = ":"
   val DataTypeAndValueSeparator = "|"
+  val MaxTraits = 22
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"

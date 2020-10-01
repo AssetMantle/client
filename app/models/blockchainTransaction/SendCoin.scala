@@ -16,7 +16,6 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
@@ -192,8 +191,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val sendCoin = Service.getTransaction(ticketID)
 
       def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
@@ -213,8 +212,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
         toAccount <- toAccount(accountID)
         _ <- unknownUserTypeUpdate(toAccount)
         fromAccountID <- getAccountID(sendCoin.from)
-        _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)()
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)()
+        _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

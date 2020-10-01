@@ -5,6 +5,8 @@ import models.Abstract.DataValue
 import play.api.Logger
 import play.api.libs.json._
 
+import scala.util.Try
+
 object DataValue {
 
   private implicit val module: String = constants.Module.DATA
@@ -118,6 +120,14 @@ object DataValue {
     case baseException: BaseException => throw baseException
     case exception: Exception => logger.error(exception.getLocalizedMessage)
       throw new BaseException(constants.Response.INVALID_DATA_VALUE)
+  }
+
+  def verifyData(dataType: String, dataValue: Option[String]): Boolean = dataType match {
+    case constants.Blockchain.DataType.STRING_DATA => true
+    case constants.Blockchain.DataType.ID_DATA => true
+    case constants.Blockchain.DataType.HEIGHT_DATA => Try(dataValue.getOrElse("-1").toInt).isSuccess
+    case constants.Blockchain.DataType.DEC_DATA => Try(BigDecimal(dataValue.getOrElse("0.0"))).isSuccess
+    case _ => false
   }
 
   def getData(dataType: String, dataValue: Option[String]): Serializable.Data = Serializable.Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))

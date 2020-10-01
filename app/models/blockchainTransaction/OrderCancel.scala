@@ -12,7 +12,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
@@ -25,12 +24,12 @@ case class OrderCancel(from: String, fromID: String, orderID: String, gas: Micro
 
 @Singleton
 class OrderCancels @Inject()(
-                            transaction: utilities.Transaction,
-                            protected val databaseConfigProvider: DatabaseConfigProvider,
-                            utilitiesNotification: utilities.Notification,
-                            masterAccounts: master.Accounts,
-                            blockchainAccounts: blockchain.Accounts
-                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+                              transaction: utilities.Transaction,
+                              protected val databaseConfigProvider: DatabaseConfigProvider,
+                              utilitiesNotification: utilities.Notification,
+                              masterAccounts: master.Accounts,
+                              blockchainAccounts: blockchain.Accounts
+                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class OrderCancelSerialized(from: String, fromID: String, orderID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: OrderCancel = OrderCancel(from = from, fromID = fromID, orderID = orderID, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
@@ -179,8 +178,8 @@ class OrderCancels @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
 
       (for {
         _ <- markTransactionSuccessful

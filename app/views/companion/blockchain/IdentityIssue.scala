@@ -22,7 +22,7 @@ object IdentityIssue {
       constants.FormField.MUTABLE_PROPERTIES.name -> optional(seq(optional(Property.subFormMapping))),
       constants.FormField.ADD_MUTABLE_FIELD.name -> constants.FormField.ADD_MUTABLE_FIELD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.identityIssue)
   )
 
   case class Data(from: String, fromID: String, classificationID: String, to: String, immutableMetaProperties: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableProperties: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaProperties: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableProperties: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber)

@@ -122,13 +122,13 @@ object FormField {
   val MUTABLE_PROPERTIES = new NestedFormField("MUTABLE_PROPERTIES")
 
   //MicroNumberFormField
-  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
-  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(Double.MaxValue))
+  val GAS = new MicroNumberFormField("GAS", MicroNumber(0.000001), MicroNumber(10))
+  val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.000001), new MicroNumber(Double.MaxValue))
 
   //BigDecimalFormField
-  val SPLIT = new BigDecimalFormField("SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
-  val TAKER_OWNABLE_SPLIT = new BigDecimalFormField("TAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
-  val MAKER_OWNABLE_SPLIT = new BigDecimalFormField("MAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal("1000000000000000000000"))
+  val SPLIT = new BigDecimalFormField("SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
+  val TAKER_OWNABLE_SPLIT = new BigDecimalFormField("TAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
+  val MAKER_OWNABLE_SPLIT = new BigDecimalFormField("MAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
