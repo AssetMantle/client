@@ -2,6 +2,7 @@ package constants
 
 object SelectFieldOptions {
   val CURRENCIES: Seq[String] = Seq("USD")
+  val DATA_TYPE: Seq[String] = Seq(constants.Blockchain.DataType.DEC_DATA, constants.Blockchain.DataType.ID_DATA, constants.Blockchain.DataType.STRING_DATA,constants.Blockchain.DataType.HEIGHT_DATA)
   val COUNTRIES: Seq[String] = Seq("Afghanistan", "Albania", "Algeria",
     "Andorra",
     "Angola",

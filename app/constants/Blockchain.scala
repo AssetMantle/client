@@ -11,6 +11,10 @@ object Blockchain {
   val ZeroDec = BigDecimal("0.0")
   val SmallestDec = BigDecimal("0.000000000000000001")
   val ToHashSeparator = "_"
+  val RequestPropertiesSeparator = ","
+  val DataNameAndTypeSeparator = ":"
+  val DataTypeAndValueSeparator = "|"
+  val MaxTraits = 22
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
@@ -52,13 +56,6 @@ object Blockchain {
     val HEIGHT = "H"
     val ID = "I"
     val DEC = "D"
-
-    def getFactTypeFromDataType(dataType: String): String = dataType match {
-      case DataType.STRING_DATA => STRING
-      case DataType.HEIGHT_DATA => HEIGHT
-      case DataType.ID_DATA => ID
-      case DataType.DEC_DATA => DEC
-    }
   }
 
   object Events {
@@ -74,6 +71,34 @@ object Blockchain {
         case _ => constants.View.UNKNOWN
       }
     }
+
+  }
+
+  object TransactionRequest {
+    //identity
+    val IDENTITY_NUB = "/xprt/identities/nub/request"
+    val IDENTITY_DEFINE = "/xprt/identities/define/request"
+    val IDENTITY_ISSUE = "/xprt/identities/issue/request"
+    val IDENTITY_PROVISION = "/xprt/identities/provision/request"
+    val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/request"
+    //asset
+    val ASSET_DEFINE = "/xprt/assets/define/request"
+    val ASSET_MINT = "/xprt/assets/mint/request"
+    val ASSET_MUTATE = "/xprt/assets/mutate/request"
+    val ASSET_BURN = "/xprt/assets/burn/request"
+    //split
+    val SPLIT_SEND = "/xprt/splits/send/request"
+    val SPLIT_WRAP = "/xprt/splits/wrap/request"
+    val SPLIT_UNWRAP = "/xprt/splits/unwrap/request"
+    //order
+    val ORDER_DEFINE = "/xprt/orders/define/request"
+    val ORDER_MAKE = "/xprt/orders/make/request"
+    val ORDER_TAKE = "/xprt/orders/take/request"
+    val ORDER_CANCEL = "/xprt/orders/cancel/request"
+    //meta
+    val META_REVEAL = "/xprt/metas/reveal/request"
+    //maintainer
+    val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/request"
 
   }
 

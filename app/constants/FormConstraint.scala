@@ -1,7 +1,9 @@
 package constants
 
+import models.common.DataValue
 import play.api.data.validation._
-import views.companion.master.{SignUp, ChangePassword}
+import views.companion.blockchain._
+import views.companion.master.{ChangePassword, SignUp}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -18,6 +20,76 @@ object FormConstraint {
     val errors = {
       if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
       else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val identityDefine: Constraint[IdentityDefine.Data] = Constraint("constraints.identityDefine")({ identityDefineData: IdentityDefine.Data =>
+    val allTraits = identityDefineData.immutableMetaTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.immutableTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.mutableMetaTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.mutableTraits.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allTraits.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allTraits.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val identityIssue: Constraint[IdentityIssue.Data] = Constraint("constraints.identityIssue")({ identityIssueData: IdentityIssue.Data =>
+    val allProperties = identityIssueData.immutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.immutableProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableProperties.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allProperties.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val assetDefine: Constraint[AssetDefine.Data] = Constraint("constraints.identityDefine")({ assetDefineData: AssetDefine.Data =>
+    val allTraits = assetDefineData.immutableMetaTraits.getOrElse(Seq.empty).flatten ++ assetDefineData.immutableTraits.getOrElse(Seq.empty).flatten ++ assetDefineData.mutableMetaTraits.getOrElse(Seq.empty).flatten ++ assetDefineData.mutableTraits.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allTraits.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allTraits.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val assetMint: Constraint[AssetMint.Data] = Constraint("constraints.assetMint")({ assetMintData: AssetMint.Data =>
+    val allProperties = assetMintData.immutableMetaProperties.getOrElse(Seq.empty).flatten ++ assetMintData.immutableProperties.getOrElse(Seq.empty).flatten ++ assetMintData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ assetMintData.mutableProperties.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allProperties.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val assetMutate: Constraint[AssetMutate.Data] = Constraint("constraints.assetMutate")({ assetMutateData: AssetMutate.Data =>
+    val allProperties = assetMutateData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ assetMutateData.mutableProperties.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allProperties.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val orderDefine: Constraint[OrderDefine.Data] = Constraint("constraints.identityDefine")({ orderDefineData: OrderDefine.Data =>
+    val allTraits = orderDefineData.immutableMetaTraits.getOrElse(Seq.empty).flatten ++ orderDefineData.immutableTraits.getOrElse(Seq.empty).flatten ++ orderDefineData.mutableMetaTraits.getOrElse(Seq.empty).flatten ++ orderDefineData.mutableTraits.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allTraits.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allTraits.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val orderMake: Constraint[OrderMake.Data] = Constraint("constraints.orderMake")({ orderMakeData: OrderMake.Data =>
+    val allProperties = orderMakeData.immutableMetaProperties.getOrElse(Seq.empty).flatten ++ orderMakeData.immutableProperties.getOrElse(Seq.empty).flatten ++ orderMakeData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ orderMakeData.mutableProperties.getOrElse(Seq.empty).flatten
+    val errors = {
+      if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allProperties.forall(x => DataValue.verifyData(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

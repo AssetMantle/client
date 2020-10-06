@@ -1,0 +1,12 @@
+@import views.companion.blockchain.AssetMutate
+@import views.html.base._
+
+@(assetMutateForm: Form[AssetMutate.Data] = AssetMutate.form, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ASSET_MUTATE, assetMutateForm) {
+    @commonInputText(assetMutateForm, constants.FormField.FROM)
+    @commonInputText(assetMutateForm, constants.FormField.FROM_ID)
+    @commonInputText(assetMutateForm, constants.FormField.ASSET_ID)
+    @commonInputMicroNumber(assetMutateForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
+    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms)
+}

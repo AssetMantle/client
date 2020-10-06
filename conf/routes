@@ -58,6 +58,48 @@ GET         /account/userViewUploadOrUpdateIdentification        controllers.Acc
 GET         /account/userReviewIdentification                    controllers.AccountController.userReviewIdentificationForm
 POST        /account/userReviewIdentification                    controllers.AccountController.userReviewIdentification
 
+GET         /asset/define                                        controllers.AssetController.defineForm
+POST        /asset/define                                        controllers.AssetController.define
+GET         /asset/mint                                          controllers.AssetController.mintForm
+POST        /asset/mint                                          controllers.AssetController.mint
+GET         /asset/mutate                                        controllers.AssetController.mutateForm
+POST        /asset/mutate                                        controllers.AssetController.mutate
+GET         /asset/burn                                          controllers.AssetController.burnForm
+POST        /asset/burn                                          controllers.AssetController.burn
+
+GET         /identity/nub                                        controllers.IdentityController.nubForm
+POST        /identity/nub                                        controllers.IdentityController.nub
+GET         /identity/issue                                      controllers.IdentityController.issueForm
+POST        /identity/issue                                      controllers.IdentityController.issue
+GET         /identity/define                                     controllers.IdentityController.defineForm
+POST        /identity/define                                     controllers.IdentityController.define
+GET         /identity/provision                                  controllers.IdentityController.provisionForm
+POST        /identity/provision                                  controllers.IdentityController.provision
+GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm
+POST        /identity/unprovision                                controllers.IdentityController.unprovision
+
+GET         /meta/reveal                                         controllers.MetaController.revealForm
+POST        /meta/reveal                                         controllers.MetaController.reveal
+
+GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm
+POST        /maintainer/deputize                                 controllers.MaintainerController.deputize
+
+GET         /order/define                                        controllers.OrderController.defineForm
+POST        /order/define                                        controllers.OrderController.define
+GET         /order/make                                          controllers.OrderController.makeForm
+POST        /order/make                                          controllers.OrderController.make
+GET         /order/take                                          controllers.OrderController.takeForm
+POST        /order/take                                          controllers.OrderController.take
+GET         /order/cancel                                        controllers.OrderController.cancelForm
+POST        /order/cancel                                        controllers.OrderController.cancel
+
+GET         /split/send                                          controllers.SplitController.sendForm
+POST        /split/send                                          controllers.SplitController.send
+GET         /split/wrap                                          controllers.SplitController.wrapForm
+POST        /split/wrap                                          controllers.SplitController.wrap
+GET         /split/unwrap                                        controllers.SplitController.unwrapForm
+POST        /split/unwrap                                        controllers.SplitController.unwrap
+
 GET         /contact                                             controllers.ContactController.contact
 
 GET         /contact/addOrUpdateEmailAddress                     controllers.ContactController.addOrUpdateEmailAddressForm

@@ -116,7 +116,7 @@ object Serializable {
   case class MetaFact(data: Data) {
     def getHash: String = data.value.GenerateHash
 
-    def removeData(): Fact = NewFact(constants.Blockchain.FactType.getFactTypeFromDataType(data.dataType), data.value)
+    def removeData(): Fact = NewFact(DataValue.getShortDataType(data.dataType), data.value)
   }
 
   implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]

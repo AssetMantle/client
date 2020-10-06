@@ -23,6 +23,12 @@ object Form {
   val ADD_IDENTIFICATION = new Form("ADD_IDENTIFICATION", routes.AccountController.addIdentification(), routes.javascript.AccountController.addIdentificationForm)
   val USER_REVIEW_IDENTIFICATION = new Form("USER_REVIEW_IDENTIFICATION", routes.AccountController.userReviewIdentification(), routes.javascript.AccountController.userReviewIdentificationForm)
 
+  //AssetController
+  val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define(), routes.javascript.AssetController.defineForm)
+  val ASSET_MINT = new Form("ASSET_MINT", routes.AssetController.mint(), routes.javascript.AssetController.mintForm)
+  val ASSET_MUTATE = new Form("ASSET_MUTATE", routes.AssetController.mutate(), routes.javascript.AssetController.mutateForm)
+  val ASSET_BURN = new Form("ASSET_BURN", routes.AssetController.burn(), routes.javascript.AssetController.burnForm)
+
   //BackgroundCheckController
   val MEMBER_CHECK_MEMBER_SCAN = new Form("MEMBER_CHECK_MEMBER_SCAN", routes.BackgroundCheckController.memberScan(), routes.javascript.BackgroundCheckController.memberScanForm)
   val MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION", routes.BackgroundCheckController.memberScanResultDecision(), routes.javascript.BackgroundCheckController.memberScanResultDecisionForm)
@@ -43,9 +49,33 @@ object Form {
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.ContactController.verifyEmailAddress(), routes.javascript.ContactController.verifyEmailAddressForm)
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber(), routes.javascript.ContactController.verifyMobileNumberForm)
 
+  //IdentityController
+  val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub(), routes.javascript.IdentityController.nubForm)
+  val IDENTITY_DEFINE = new Form("IDENTITY_DEFINE", routes.IdentityController.define(), routes.javascript.IdentityController.defineForm)
+  val IDENTITY_ISSUE = new Form("IDENTITY_ISSUE", routes.IdentityController.issue(), routes.javascript.IdentityController.issueForm)
+  val IDENTITY_PROVISION = new Form("IDENTITY_PROVISION", routes.IdentityController.provision(), routes.javascript.IdentityController.provisionForm)
+  val IDENTITY_UNPROVISION = new Form("IDENTITY_UNPROVISION", routes.IdentityController.unprovision(), routes.javascript.IdentityController.unprovisionForm)
+
+  //MetaController
+  val META_REVEAL = new Form("META_REVEAL", routes.MetaController.reveal(), routes.javascript.MetaController.revealForm)
+
+  //MaintainerController
+  val MAINTAINER_DEPUTIZE = new Form("MAINTAINER_DEPUTIZE", routes.MaintainerController.deputize(), routes.javascript.MaintainerController.deputizeForm)
+
+  //OrderController
+  val ORDER_DEFINE = new Form("ORDER_DEFINE", routes.OrderController.define(), routes.javascript.OrderController.defineForm)
+  val ORDER_MAKE = new Form("ORDER_MAKE", routes.OrderController.make(), routes.javascript.OrderController.makeForm)
+  val ORDER_TAKE = new Form("ORDER_TAKE", routes.OrderController.take(), routes.javascript.OrderController.takeForm)
+  val ORDER_CANCEL = new Form("ORDER_CANCEL", routes.OrderController.cancel(), routes.javascript.OrderController.cancelForm)
+
   //SendCoinController
   val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin(), routes.javascript.SendCoinController.sendCoinForm)
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin(), routes.javascript.SendCoinController.blockchainSendCoinForm)
+
+  //SplitController
+  val SPLIT_SEND = new Form("SPLIT_SEND", routes.SplitController.send(), routes.javascript.SplitController.sendForm)
+  val SPLIT_WRAP = new Form("SPLIT_WRAP", routes.SplitController.wrap(), routes.javascript.SplitController.wrapForm)
+  val SPLIT_UNWRAP = new Form("SPLIT_UNWRAP", routes.SplitController.unwrap(), routes.javascript.SplitController.unwrapForm)
 
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"

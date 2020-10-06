@@ -26,6 +26,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
 
+        routes.javascript.AssetController.defineForm,
+        routes.javascript.AssetController.mintForm,
+        routes.javascript.AssetController.mutateForm,
+        routes.javascript.AssetController.burnForm,
+
         routes.javascript.ChatController.chatRoom,
         routes.javascript.ChatController.chatWindow,
         routes.javascript.ChatController.sendMessageForm,
@@ -89,7 +94,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateAccountKYCForm,
         routes.javascript.FileController.updateAccountKYC,
 
+        routes.javascript.IdentityController.nubForm,
+        routes.javascript.IdentityController.defineForm,
+        routes.javascript.IdentityController.issueForm,
+        routes.javascript.IdentityController.provisionForm,
+        routes.javascript.IdentityController.unprovisionForm,
+
         routes.javascript.IndexController.search,
+
+        routes.javascript.MetaController.revealForm,
+        routes.javascript.MaintainerController.deputizeForm,
 
         routes.javascript.NotificationController.recentActivityMessages,
         routes.javascript.NotificationController.unreadNotificationCount,
@@ -102,6 +116,15 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ContactController.verifyEmailAddressForm,
 
         routes.javascript.ContactController.verifyMobileNumberForm,
+
+        routes.javascript.OrderController.defineForm,
+        routes.javascript.OrderController.makeForm,
+        routes.javascript.OrderController.takeForm,
+        routes.javascript.OrderController.cancelForm,
+
+        routes.javascript.SplitController.sendForm,
+        routes.javascript.SplitController.wrapForm,
+        routes.javascript.SplitController.unwrapForm,
 
         routes.javascript.ViewController.profile,
         routes.javascript.ViewController.account,

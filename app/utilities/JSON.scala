@@ -29,9 +29,9 @@ object JSON {
           throw new BaseException(new Failure(errorResponse.error, null))
       }
     }.recover {
-      case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
+      case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
         throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
-      case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
+      case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
   }
