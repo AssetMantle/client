@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.{blockchain, master}
+import models.blockchain
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -241,10 +241,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
     }
   }
 
-  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
       Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
-    }(schedulerExecutionContext)
+    }
+  }
+
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
   }
 
 }

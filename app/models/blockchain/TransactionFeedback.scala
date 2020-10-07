@@ -15,7 +15,7 @@ import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class TransactionFeedback(address: String, sendAssetCounts: SendAssetCounts, sendFiatCounts: SendFiatCounts, ibcIssueAssetCounts: IBCIssueAssetCounts, ibcIssueFiatCounts: IBCIssueFiatCounts, buyerExecuteOrderCounts: BuyerExecuteOrderCounts, sellerExecuteOrderCounts: SellerExecuteOrderCounts, changeBuyerBidCounts: ChangeBuyerBidCounts, changeSellerBidCounts: ChangeSellerBidCounts, confirmBuyerBidCounts: ConfirmBuyerBidCounts, confirmSellerBidCounts: ConfirmSellerBidCounts, negotiationCounts: NegotiationCounts, dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
@@ -276,7 +276,11 @@ class TransactionFeedbacks @Inject()(
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    Utility.dirtyEntityUpdater()
-  }(schedulerExecutionContext)
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
+      Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+    }
+  }
+
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
 }

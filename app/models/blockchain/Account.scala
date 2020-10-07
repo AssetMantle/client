@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Account(address: String, username: String, coins: MicroNumber = new MicroNumber(0), publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
@@ -206,7 +206,11 @@ class Accounts @Inject()(
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    Utility.dirtyEntityUpdater()
-  }(schedulerExecutionContext)
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
+      Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+    }
+  }
+
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
 }
