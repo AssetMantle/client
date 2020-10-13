@@ -74,7 +74,7 @@ class Transaction @Inject()(getTransaction: GetTransaction, getResponse: GetResp
     }
   }
 
-  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, String) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) {
+  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, String) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger): Future[Unit] ={
     val ticketIDsSeq: Future[Seq[String]] = getTickets()
     Thread.sleep(sleepTime)
 
