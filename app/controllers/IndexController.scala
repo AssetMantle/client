@@ -60,8 +60,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     if (query.matches(s"${accountPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.account(query)))
-    else if (query.matches(s"${validatorPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.validator(query)))
-    else if (utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
+    else if (query.matches(s"${validatorPrefix}[a-z0-9]{39}") || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
     else if (query.matches("[A-F0-9]{64}")) Future(Redirect(routes.ViewController.transaction(query)))
     else if (query.matches("[0-9]{1,40}")) Future(Redirect(routes.ViewController.block(query.toInt)))
     else {

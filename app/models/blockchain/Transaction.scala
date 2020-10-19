@@ -164,7 +164,7 @@ class Transactions @Inject()(
       def numberOfTransactions(transactions: Seq[Transaction]): Map[Int, Int] = {
         blockHeights.map { height =>
           val tx = transactions.find(_.height == height)
-          height -> (if (tx.isDefined) tx.get.messages.length else 0)
+          height -> tx.map(_.messages.length).getOrElse(0)
         }.toMap
       }
 
