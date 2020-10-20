@@ -178,7 +178,7 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
       //maintainer
       case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => blockchainMaintainers.Utility.onDeputize(stdMsg.message.asInstanceOf[MaintainerDeputize])
-      case _ => Future (logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType))
+      case _ => Future(logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType))
     }
 
     (for {
@@ -194,7 +194,7 @@ class Block @Inject()(
     val validators = blockchainValidators.Service.getAllByHexAddresses(hexAddresses)
     val slashing = blockchainTokens.Utility.onSlashing
 
-    def updateValidatorAndDelegations(validators: Seq[Validator]):Future[Seq[Unit]] = Future.traverse(validators) { validator =>
+    def updateValidatorAndDelegations(validators: Seq[Validator]): Future[Seq[Unit]] = Future.traverse(validators) { validator =>
       val updatedValidator = blockchainValidators.Utility.insertOrUpdateValidator(validator.operatorAddress)
       val updateDelegation = blockchainRedelegations.Utility.onSlashingEvent(validator.operatorAddress)
       val updateUnbonding = blockchainUndelegations.Utility.onSlashingEvent(validator.operatorAddress)

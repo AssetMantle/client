@@ -89,7 +89,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       title <- title
       message <- message
       pushNotificationToken <- pushNotificationToken
-      _ <- pushNotificationToken.map(token=>post(title, message, token)).getOrElse(Future(Unit))
+      _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future(Unit))
     } yield ()
       ).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -165,7 +165,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
     def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.map(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
 
-    def email(implicit language: Lang): Future[String] =notification.email.map(emailNotification=> sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*)).getOrElse(Future(""))
+    def email(implicit language: Lang): Future[String] = notification.email.map(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*)).getOrElse(Future(""))
 
     (for {
       language <- language

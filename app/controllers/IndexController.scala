@@ -11,9 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import services.Startup
 
-import scala.collection.generic.CanBuildFrom
-import scala.concurrent.Future.{InternalCallbackExecutor, successful}
-import scala.concurrent.{BatchingExecutor, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,

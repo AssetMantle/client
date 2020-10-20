@@ -129,7 +129,7 @@ class Startup @Inject()(
         Await.result(forComplete, Duration.Inf)
         blockHeight = blockHeight + 1
       }
-    }catch {
+    } catch {
       case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
         throw baseException
       } else Unit
