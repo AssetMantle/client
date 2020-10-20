@@ -49,7 +49,6 @@ class OrderCancel @Inject()(wsClient: WSClient)(implicit configuration: Configur
   )
 
   private def action(request: Request): Future[WSResponse] = {
-    println(Json.toJson(request).toString())
     wsClient.url(url).post(Json.toJson(request))
   }
 

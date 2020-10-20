@@ -109,7 +109,6 @@ class Startup @Inject()(
     try {
       var blockHeight = latestBlockHeight + 1
       while (true) {
-        println("blockHeight---------" + blockHeight)
         val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
         def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
@@ -128,7 +127,6 @@ class Startup @Inject()(
           _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
         } yield ()
         Await.result(forComplete, Duration.Inf)
-        println("blockHeightAdded---------" + blockHeight)
         blockHeight = blockHeight + 1
       }
     }catch {
