@@ -11,7 +11,9 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import services.Startup
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.generic.CanBuildFrom
+import scala.concurrent.Future.{InternalCallbackExecutor, successful}
+import scala.concurrent.{BatchingExecutor, ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
@@ -54,7 +56,54 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   //      }
   //  }
 
+  def soemdef(l:Int)=Future{
+    println("soemdef--"+l)
+    println("returning--"+l)
+  }
+
+  def traverse[A, B](values: List[A])
+                    (func: A => Future[B]): Future[List[B]] =
+    values.foldLeft(Future.successful(List.empty[B])) { (accum, host) =>
+      //lazy val item = func(host)
+      for {
+        a <- accum
+        i <- func(host)
+      } yield (a :+ i)
+    }
+
   def index: Action[AnyContent] = withoutLoginAction { implicit request =>
+    val l=List(1,2,3,4,5,6,7,8,9)
+
+   // val f=Future(3)
+    //f.z
+ // Future.sequence()
+      traverse(l){l=>
+        println(l)
+        println("arbit--"+l)
+        println("arbitqweqwe--"+l)
+        soemdef(l)
+        Thread.sleep(500)
+       val x=Future{
+          println("sleeping"+l)
+          println("awake--"+l)
+         "3"
+        }
+        x
+      }
+
+   /* val z=Future.traverse(l){ l =>
+      Future {
+        println(l)
+        soemdef(l)
+        /*val x=Future{
+        println("sleeping"+l)
+        Thread.sleep(1000)
+        println("awake--"+l)
+      }
+      x*/
+        "3"
+      }
+    }*/
     Ok(views.html.dashboard())
   }
 

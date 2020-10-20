@@ -58,6 +58,8 @@ class Startup @Inject()(
 
   private val genesisFilePath = configuration.get[String]("blockchain.genesisFilePath")
 
+  private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
+
   private def initialize(): Future[Unit] = {
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
@@ -104,31 +106,35 @@ class Startup @Inject()(
   }
 
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
-    var blockHeight = latestBlockHeight + 1
-    while (true) {
-      val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
+    try {
+      var blockHeight = latestBlockHeight + 1
+      while (true) {
+        println("blockHeight---------" + blockHeight)
+        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
-      def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
+        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
 
-      def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
+        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
 
-      def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
+        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
 
-      def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
+        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
 
-      val forComplete = (for {
-        blockCommitResponse <- blockCommitResponse
-        transactions <- transactions
-        avgBlockTime <- avgBlockTime(blockCommitResponse)
-        _ <- checksAndUpdatesOnBlock(blockCommitResponse)
-        _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
-      } yield ()).recover {
-        case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
-          throw baseException
-        } else Unit
+        val forComplete = for {
+          blockCommitResponse <- blockCommitResponse
+          transactions <- transactions
+          avgBlockTime <- avgBlockTime(blockCommitResponse)
+          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
+          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
+        } yield ()
+        Await.result(forComplete, Duration.Inf)
+        println("blockHeightAdded---------" + blockHeight)
+        blockHeight = blockHeight + 1
       }
-      Await.result(forComplete, Duration.Inf)
-      blockHeight = blockHeight + 1
+    }catch {
+      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
+        throw baseException
+      } else Unit
     }
   }
 
@@ -216,20 +222,16 @@ class Startup @Inject()(
       }
     }
 
-    (for {
+    for {
       bondedValidators <- bondedValidators
       unbondedValidators <- unbondedValidators
       unbondingValidators <- unbondingValidators
       _ <- insert(bondedValidators.result ++ unbondedValidators.result ++ unbondingValidators.result)
       _ <- insertSigningInfos
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   } else Future()
 
   private def insertAllTokensOnStart(latestBlockHeight: Int): Future[Unit] = if (latestBlockHeight == 0) {
-    val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
     val totalSupplyResponse = getTotalSupply.Service.get
     val mintingInflationResponse = getMintingInflation.Service.get
     val stakingPoolResponse = getStakingPool.Service.get
@@ -374,7 +376,8 @@ class Startup @Inject()(
 
     private def onStrictMessage(message: String): Unit = {
       val forComplete = (for {
-        _ <- onNewBlock(getBlock(message))
+        blockResponse <- Future(getBlock(message))
+        _ <- onNewBlock(blockResponse)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.logMessage)
       }
@@ -384,7 +387,8 @@ class Startup @Inject()(
     private def onStreamedMessage(message: Future[String]): Unit = {
       val forComplete = (for {
         message <- message
-        _ <- onNewBlock(getBlock(message))
+        blockResponse <- Future(getBlock(message))
+        _ <- onNewBlock(blockResponse)
       } yield ()
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.logMessage)
