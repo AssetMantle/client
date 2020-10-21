@@ -107,27 +107,30 @@ class Startup @Inject()(
   }
 
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
-    // would lazy work here??
-    val blockHeightList = Seq.range(latestBlockHeight + 1, Int.MaxValue)
-    utilitiesOperations.traverse(blockHeightList) { blockHeight =>
-      val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
+    try {
+      var blockHeight = latestBlockHeight + 1
+      while (true) {
+        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
-      def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
+        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
 
-      def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
+        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
 
-      def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
+        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
 
-      def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
+        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
 
-      for {
-        blockCommitResponse <- blockCommitResponse
-        transactions <- transactions
-        avgBlockTime <- avgBlockTime(blockCommitResponse)
-        _ <- checksAndUpdatesOnBlock(blockCommitResponse)
-        _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
-      } yield ()
-    }.recover {
+        val forComplete = for {
+          blockCommitResponse <- blockCommitResponse
+          transactions <- transactions
+          avgBlockTime <- avgBlockTime(blockCommitResponse)
+          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
+          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
+        } yield ()
+        Await.result(forComplete, Duration.Inf)
+        blockHeight = blockHeight + 1
+      }
+    } catch {
       case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
         throw baseException
       } else ()
