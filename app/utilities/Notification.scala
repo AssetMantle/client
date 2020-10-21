@@ -167,11 +167,14 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
     def email(implicit language: Lang): Future[String] = notification.email.map(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*)).getOrElse(Future(""))
 
+    def sms(implicit language: Lang): Future[Unit] = notification.sms.map(smsNotification => sendSMSByAccountID(accountID = accountID, sms = smsNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
+
     (for {
       language <- language
       notificationID <- notificationID
       _ <- pushNotification(Lang(language))
       _ <- email(Lang(language))
+      _ <- sms(Lang(language))
     } yield notificationID).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
