@@ -48,6 +48,7 @@ class Startup @Inject()(
                          getStakingPool: GetStakingPool,
                          getMintingInflation: GetMintingInflation,
                          getCommunityPool: GetCommunityPool,
+                         utilitiesOperations: utilities.Operations
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
@@ -70,7 +71,7 @@ class Startup @Inject()(
 
     val latestBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
 
-    def insertAccounts(latestBlockHeight: Int, genesis: Genesis): Future[List[Unit]] = insertAccountsOnStart(latestBlockHeight, genesis.app_state.auth.accounts)
+    def insertAccounts(latestBlockHeight: Int, genesis: Genesis): Future[Seq[Unit]] = insertAccountsOnStart(latestBlockHeight, genesis.app_state.auth.accounts)
 
     def updateStaking(latestBlockHeight: Int, genesis: Genesis): Future[Unit] = updateStakingOnStart(latestBlockHeight, genesis.app_state.staking)
 
@@ -106,40 +107,36 @@ class Startup @Inject()(
   }
 
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
-    try {
-      var blockHeight = latestBlockHeight + 1
-      while (true) {
-        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
+    // would lazy work here??
+    val blockHeightList = Seq.range(latestBlockHeight + 1, Int.MaxValue)
+    utilitiesOperations.traverse(blockHeightList) { blockHeight =>
+      val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
-        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
+      def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
 
-        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
+      def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
 
-        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
+      def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
 
-        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
+      def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
 
-        val forComplete = for {
-          blockCommitResponse <- blockCommitResponse
-          transactions <- transactions
-          avgBlockTime <- avgBlockTime(blockCommitResponse)
-          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
-          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
-        } yield ()
-        Await.result(forComplete, Duration.Inf)
-        blockHeight = blockHeight + 1
-      }
-    } catch {
+      for {
+        blockCommitResponse <- blockCommitResponse
+        transactions <- transactions
+        avgBlockTime <- avgBlockTime(blockCommitResponse)
+        _ <- checksAndUpdatesOnBlock(blockCommitResponse)
+        _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
+      } yield ()
+    }.recover {
       case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
         throw baseException
-      } else Unit
+      } else ()
     }
   }
 
-  //slowing it down as either node or the explorer is unable to handle so many requests when genesis file is huge.
-  private def insertAccountsOnStart(latestBlockHeight: Int, accounts: Seq[Account.Result]): Future[List[Unit]] = if (latestBlockHeight == 0) {
-    Future.traverse(accounts.grouped(100).toList) { accountList =>
-      val upsert = Future.traverse(accountList)(account => blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.value.address))
+  private def insertAccountsOnStart(latestBlockHeight: Int, accounts: Seq[Account.Result]): Future[Seq[Unit]] = if (latestBlockHeight == 0) {
+    utilitiesOperations.traverse(accounts) { account =>
+      val upsert = blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.value.address)
       (for {
         _ <- upsert
       } yield ()
@@ -147,7 +144,7 @@ class Startup @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-  } else Future(List.empty)
+  } else Future(Seq.empty)
 
   private def updateStakingOnStart(latestBlockHeight: Int, staking: Staking): Future[Unit] = if (latestBlockHeight == 0) {
     val insertAllSigningInfos = blockchainSigningInfos.Utility.insertAll()
