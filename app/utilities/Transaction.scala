@@ -9,12 +9,11 @@ import queries.{GetResponse, GetTransactionHashResponse}
 import transactions.Abstract.BaseRequest
 import transactions.responses.TransactionResponse
 import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
+class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getResponse: GetResponse,utilitiesOperations:utilities.Operations)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -44,19 +43,19 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
             for {
               response <- response
               _ <- onSuccess(ticketID, response)
-            } yield Unit
+            } yield ()
           case constants.Transactions.ASYNC_MODE => val response = utilities.JSON.getResponseFromJson[AsyncResponse](action(request))
             for {
               response <- response
               _ <- updateTransactionHash(ticketID, response.txhash)
-            } yield Unit
+            } yield ()
           case constants.Transactions.SYNC_MODE => val response = utilities.JSON.getResponseFromJson[SyncResponse](action(request))
             for {
               response <- response
               _ <- updateTransactionHash(ticketID, response.txhash)
-            } yield Unit
+            } yield ()
         }
-      } else Future(Unit)
+      } else Future()
     }
 
     (for {
@@ -74,7 +73,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
   }
 
   def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) = {
-    val ticketIDsSeq: Future[Seq[String]] = getTickets()
+    val ticketIDList: Future[Seq[String]] = getTickets()
     Thread.sleep(sleepTime)
 
     def modeBasedBlockResponse(mode: String, ticketID: String): Future[BlockResponse] = {
@@ -101,8 +100,8 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     def executeSuccessOrFailure(blockResponse: BlockResponse, ticketID: String): Future[Unit] = if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
 
-    def ticketsIterator(ticketIDsSeq: Seq[String]): Unit =
-      ticketIDsSeq.foreach { ticketID =>
+    def ticketsIterator(ticketIDList: Seq[String]): Future[Seq[Unit]] = {
+      utilitiesOperations.traverse(ticketIDList){ticketID =>
         val blockResponse = if (kafkaEnabled) {
           val mode = getMode(ticketID)
           for {
@@ -119,22 +118,23 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
             blockResponse <- getBlockResponse(transactionHash)
           } yield blockResponse
         }
-        val forComplete = (for {
+        (for {
           blockResponse <- blockResponse
           _ <- executeSuccessOrFailure(blockResponse, ticketID)
-        } yield Unit
-          ).recover {
+        } yield ()
+          ).recoverWith {
           case baseException: BaseException =>
             if (baseException.failure.message.matches(responseErrorTransactionHashNotFound) || baseException.failure.message.matches(awaitingKafkaResponse))
-              logger.info(baseException.failure.message, baseException)
+              Future(logger.info(baseException.failure.message, baseException))
             else onFailure(ticketID, baseException.failure.message)
         }
-        Await.result(forComplete, Duration.Inf)
       }
+    }
 
     for {
-      ticketIDsSeq <- ticketIDsSeq
-    } yield ticketsIterator(ticketIDsSeq)
+      ticketIDList <- ticketIDList
+      _<-ticketsIterator(ticketIDList)
+    } yield ()
   }
 }
 

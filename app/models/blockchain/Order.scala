@@ -201,7 +201,7 @@ class Orders @Inject()(actorSystem: ActorSystem,
                     _ <- markOtherNegotiationsAssetAlreadyTraded(sameAssetNegotiationList.filterNot(_.id == masterNegotiation.id))
                     _ <- createReceiveFiat
                   } yield ()
-                } else Future(Unit)
+                } else Future()
               } else if (orderResponse.value.awb_proof_hash == "" && orderResponse.value.fiat_proof_hash == "") {
                 val updateAsset = if (assetPegWallet.nonEmpty) blockchainAssets.Service.update(assetPegWallet.head.copy(ownerAddress = negotiation.sellerAddress)) else Future(0)
                 val buyerMarkDirty = if (fiatPegWallet.nonEmpty) blockchainFiats.Service.markDirty(negotiation.buyerAddress) else Future(0)

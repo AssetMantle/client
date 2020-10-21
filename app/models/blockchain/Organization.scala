@@ -142,7 +142,7 @@ class Organizations @Inject()(
             (for {
               responseAddress <- responseAddress
               _ <- refreshDirty(responseAddress)
-            } yield Unit
+            } yield ()
               ).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
