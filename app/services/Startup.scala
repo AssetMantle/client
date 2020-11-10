@@ -93,6 +93,7 @@ class Startup @Inject()(
       _ <- updateDistribution(latestBlockHeight, genesis)
       _ <- insertAllTokens(latestBlockHeight)
       _ <- insertBlocks(latestBlockHeight)
+      _ <- WebSocketBlockchainClient.start()
     } yield ()
       ).recoverWith {
       case baseException: BaseException => new BaseException(constants.Response.BLOCKCHAIN_CONNECTION_LOST, baseException.exception)
@@ -103,7 +104,6 @@ class Startup @Inject()(
   private def runOnStartup(): Future[Unit] = {
     for {
       _ <- initialize()
-      _ <- WebSocketBlockchainClient.start()
     } yield ()
   }
 
