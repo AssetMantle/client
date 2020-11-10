@@ -62,6 +62,7 @@ class Startup @Inject()(
   private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
 
   private def initialize(): Future[Unit] = {
+    println("entered intialize")
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
@@ -102,14 +103,14 @@ class Startup @Inject()(
   private def runOnStartup(): Future[Unit] = {
     for {
       _ <- initialize()
-      _ <- WebSocketBlockchainClient.start()
-    } yield ()
+    } yield WebSocketBlockchainClient.start()
   }
 
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
     try {
       var blockHeight = latestBlockHeight + 1
       while (true) {
+        println("adding block-----"+blockHeight)
         val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
         def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
@@ -259,7 +260,9 @@ class Startup @Inject()(
 
   def onLosingConnection(): Future[Unit] = {
     actors.Service.appWebSocketActor ! Json.toJson(actors.Message.WebSocket.BlockchainConnectionLost(true)).toString
+    println("entered onLosingConnection")
     Thread.sleep(7000)
+    println("onLosingConnection wait over")
     for {
       _ <- initialize()
     } yield ()
@@ -267,8 +270,8 @@ class Startup @Inject()(
 
   object WebSocketBlockchainClient {
 
-    def start(): Future[Unit] = {
-
+    def start():Unit = {
+      println("entered start creating websocket-")
       import actors.Service._
 
       val wsURL = configuration.get[String]("blockchain.main.wsURL")
@@ -316,8 +319,9 @@ class Startup @Inject()(
           onLosingConnection()
       }(ec)
 
-      closed.flatMap(_ => {
+      closed.foreach(_ => {
         logger.error("Websocket connection to blockchain closed.")
+        println("connection was interrrupted-------------what hashakdhasd happendned")
         onLosingConnection()
       })(ec)
     }
