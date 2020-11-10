@@ -62,7 +62,7 @@ class Startup @Inject()(
   private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
 
   private def initialize(): Future[Unit] = {
-    println("entered intialize")
+    println("starting intialization")
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
@@ -103,7 +103,8 @@ class Startup @Inject()(
   private def runOnStartup(): Future[Unit] = {
     for {
       _ <- initialize()
-    } yield WebSocketBlockchainClient.start()
+      _ <- WebSocketBlockchainClient.start()
+    } yield ()
   }
 
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
@@ -270,8 +271,8 @@ class Startup @Inject()(
 
   object WebSocketBlockchainClient {
 
-    def start():Unit = {
-      println("entered start creating websocket-")
+    def start():Future[Unit] = {
+
       import actors.Service._
 
       val wsURL = configuration.get[String]("blockchain.main.wsURL")
@@ -296,7 +297,7 @@ class Startup @Inject()(
       val source: Source[Message, Promise[Option[Message]]] = Source(List(TextMessage(Json.toJson(BlockRequest(method = "subscribe", id = "dontcare", jsonrpc = "2.0", params = List("tm.event='NewBlock'"))).toString))).concatMat(Source.maybe[Message])(Keep.right)
 
       val flow: Flow[Message, Message, Future[Done]] = Flow.fromSinkAndSourceMat(sink, source)(Keep.left)
-
+      println("creating websocket connection...")
       def runWebSocketConnection(flow: Flow[Message, Message, Future[Done]]): (Future[WebSocketUpgradeResponse], Future[Done]) = {
         Http().singleWebSocketRequest(WebSocketRequest(wsURL), flow)
       }
@@ -319,7 +320,7 @@ class Startup @Inject()(
           onLosingConnection()
       }(ec)
 
-      closed.foreach(_ => {
+      closed.flatMap(_ => {
         logger.error("Websocket connection to blockchain closed.")
         println("connection was interrrupted-------------what hashakdhasd happendned")
         onLosingConnection()
