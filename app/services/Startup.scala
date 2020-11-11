@@ -93,8 +93,7 @@ class Startup @Inject()(
       _ <- updateDistribution(latestBlockHeight, genesis)
       _ <- insertAllTokens(latestBlockHeight)
       _ <- insertBlocks(latestBlockHeight)
-      _ <- WebSocketBlockchainClient.start()
-    } yield ()
+    } yield WebSocketBlockchainClient.start()
       ).recoverWith {
       case baseException: BaseException => new BaseException(constants.Response.BLOCKCHAIN_CONNECTION_LOST, baseException.exception)
         onLosingConnection()
@@ -271,7 +270,7 @@ class Startup @Inject()(
 
   object WebSocketBlockchainClient {
 
-    def start():Future[Unit] = {
+    def start():Unit = {
 
       import actors.Service._
 
@@ -320,9 +319,8 @@ class Startup @Inject()(
           onLosingConnection()
       }(ec)
 
-      closed.flatMap(_ => {
+      closed.foreach(_ => {
         logger.error("Websocket connection to blockchain closed.")
-        println("connection was interrrupted-------------what hashakdhasd happendned")
         onLosingConnection()
       })(ec)
     }
