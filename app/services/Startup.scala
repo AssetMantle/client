@@ -62,7 +62,6 @@ class Startup @Inject()(
   private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
 
   private def initialize(): Future[Unit] = {
-    println("starting intialization")
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
@@ -100,17 +99,11 @@ class Startup @Inject()(
     }
   }
 
-  private def runOnStartup(): Future[Unit] = {
-    for {
-      _ <- initialize()
-    } yield ()
-  }
-
   private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
     try {
       var blockHeight = latestBlockHeight + 1
       while (true) {
-        println("adding block-----"+blockHeight)
+
         val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
         def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
@@ -260,9 +253,7 @@ class Startup @Inject()(
 
   def onLosingConnection(): Future[Unit] = {
     actors.Service.appWebSocketActor ! Json.toJson(actors.Message.WebSocket.BlockchainConnectionLost(true)).toString
-    println("entered onLosingConnection")
     Thread.sleep(7000)
-    println("onLosingConnection wait over")
     for {
       _ <- initialize()
     } yield ()
@@ -296,7 +287,7 @@ class Startup @Inject()(
       val source: Source[Message, Promise[Option[Message]]] = Source(List(TextMessage(Json.toJson(BlockRequest(method = "subscribe", id = "dontcare", jsonrpc = "2.0", params = List("tm.event='NewBlock'"))).toString))).concatMat(Source.maybe[Message])(Keep.right)
 
       val flow: Flow[Message, Message, Future[Done]] = Flow.fromSinkAndSourceMat(sink, source)(Keep.left)
-      println("creating websocket connection...")
+
       def runWebSocketConnection(flow: Flow[Message, Message, Future[Done]]): (Future[WebSocketUpgradeResponse], Future[Done]) = {
         Http().singleWebSocketRequest(WebSocketRequest(wsURL), flow)
       }
@@ -375,18 +366,17 @@ class Startup @Inject()(
 
     private def getBlock(message: String): WSClientBlockResponse = utilities.JSON.convertJsonStringToObject[WSClientBlockResponse](message)
 
-    private def onStrictMessage(message: String): Unit = {
-      val forComplete = (for {
+    private def onStrictMessage(message: String): Future[Unit] = {
+      (for {
         blockResponse <- Future(getBlock(message))
         _ <- onNewBlock(blockResponse)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.logMessage)
       }
-      Await.result(forComplete, Duration.Inf)
     }
 
-    private def onStreamedMessage(message: Future[String]): Unit = {
-      val forComplete = (for {
+    private def onStreamedMessage(message: Future[String]): Future[Unit] = {
+     (for {
         message <- message
         blockResponse <- Future(getBlock(message))
         _ <- onNewBlock(blockResponse)
@@ -394,12 +384,11 @@ class Startup @Inject()(
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.logMessage)
       }
-      Await.result(forComplete, Duration.Inf)
     }
   }
 
   private val initializeRunnable = new Runnable {
-    def run(): Unit = runOnStartup()
+    def run(): Unit = initialize()
   }
 
   actors.Service.actorSystem.scheduler.scheduleOnce(1000.millisecond, initializeRunnable)(schedulerExecutionContext)
