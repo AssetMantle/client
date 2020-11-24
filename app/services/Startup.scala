@@ -260,7 +260,7 @@ class Startup @Inject()(
 
   object WebSocketBlockchainClient {
 
-    def start():Unit = {
+    def start(): Unit = {
 
       import actors.Service._
 
@@ -295,22 +295,22 @@ class Startup @Inject()(
 
       val connected = upgradeResponse.flatMap { upgrade =>
         if (upgrade.response.status == StatusCodes.SwitchingProtocols) {
-          Future(logger.info("Connection upgraded to websocket. StatusCode: " + upgrade.response.status.toString))(ec)
+          Future(logger.info(constants.Log.Messages.Websocket.CONNECTION_UPGARDED + upgrade.response.status.toString))(ec)
         } else {
-          logger.error("Connection upgrade to websocket failed. StatusCode: " + upgrade.response.status.toString)
+          logger.error(constants.Log.Messages.Websocket.CONNECTION_UPGARDE_FAILED + upgrade.response.status.toString)
           onLosingConnection()
         }
       }(ec)
 
       connected.onComplete {
-        case Success(_) => logger.info("Websocket connection to blockchain success.")
+        case Success(_) => logger.info(constants.Log.Messages.Websocket.CONNECTION_SUCCESS)
         case Failure(exception) => logger.error(exception.toString)
-          logger.error("Websocket connection to blockchain failed.")
+          logger.error(constants.Log.Messages.Websocket.CONNECTION_FAILED)
           onLosingConnection()
       }(ec)
 
       closed.foreach(_ => {
-        logger.error("Websocket connection to blockchain closed.")
+        logger.error(constants.Log.Messages.Websocket.CONNECTION_CLOSED)
         onLosingConnection()
       })(ec)
     }
@@ -375,7 +375,7 @@ class Startup @Inject()(
     }
 
     private def onStreamedMessage(message: Future[String]): Future[Unit] = {
-     (for {
+      (for {
         message <- message
         blockResponse <- Future(getBlock(message))
         _ <- onNewBlock(blockResponse)
@@ -387,7 +387,7 @@ class Startup @Inject()(
   }
 
   private val initializeRunnable = new Runnable {
-    def run(): Unit = initialize()
+    def run(): Unit = ()
   }
 
   actors.Service.actorSystem.scheduler.scheduleOnce(1000.millisecond, initializeRunnable)(schedulerExecutionContext)
