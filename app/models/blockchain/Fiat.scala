@@ -265,16 +265,16 @@ class Fiats @Inject()(
                   for {
                     traderID <- traderID
                     _ <- upsert(traderID)
-                  } yield Unit
+                  } yield ()
                 }
-                case None => Future(Unit)
+                case None => Future()
               }
             }
 
             for {
               accountID <- accountID
               _ <- upsertMasterFiat(accountID)
-            } yield Unit
+            } yield ()
           }
 
           for {

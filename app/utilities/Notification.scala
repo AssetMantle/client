@@ -85,7 +85,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       title <- title
       message <- message
       pushNotificationToken <- pushNotificationToken
-      _ <- if (pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
+      _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future())
     } yield ()
       ).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -158,11 +158,11 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val language = masterAccounts.Service.tryGetLanguage(accountID)
     val notificationID = masterTransactionNotifications.Service.create(accountID, notification = notification, messagesParameters: _*)
 
-    def pushNotification(implicit language: Lang): Future[Unit] = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future()
+    def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.map(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
 
-    def email(implicit language: Lang): Future[String] = if (notification.email.isDefined) sendEmailByAccountID(accountID = accountID, email = notification.email.get, messagesParameters: _*) else Future("")
+    def email(implicit language: Lang): Future[String] = notification.email.map(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*)).getOrElse(Future(""))
 
-    def sms(implicit language: Lang): Future[Unit] = if (notification.sms.isDefined) sendSMSByAccountID(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*) else Future()
+    def sms(implicit language: Lang): Future[Unit] = notification.sms.map(smsNotification => sendSMSByAccountID(accountID = accountID, sms = smsNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
 
     (for {
       language <- language

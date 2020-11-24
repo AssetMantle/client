@@ -238,7 +238,7 @@ class SendFiats @Inject()(
           for {
             _ <- updateFiats
             _ <- insertFiats
-          } yield Unit
+          } yield ()
         }
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
