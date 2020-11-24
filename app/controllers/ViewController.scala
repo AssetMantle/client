@@ -47,7 +47,6 @@ class ViewController @Inject()(
 
   def block(height: Int): Action[AnyContent] = withoutLoginAction {
     implicit request =>
-      println("block queried")
       Ok(views.html.block(height))
   }
 
@@ -58,7 +57,6 @@ class ViewController @Inject()(
 
   def transaction(txHash: String): Action[AnyContent] = withoutLoginAction {
     implicit request =>
-      println("transaction query----")
       Ok(views.html.transaction(txHash))
   }
 
