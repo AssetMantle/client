@@ -73,7 +73,7 @@ class Transaction @Inject()(getTransaction: GetTransaction, getResponse: GetResp
     }
   }
 
-  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, String) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) {
+  def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, String) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger): Future[Unit] = {
     val ticketIDList: Future[Seq[String]] = getTickets()
     Thread.sleep(sleepTime)
 
@@ -85,7 +85,7 @@ class Transaction @Inject()(getTransaction: GetTransaction, getResponse: GetResp
       }
     }
 
-    def getTransaction(txHash: String):Future[models.blockchain.Transaction] = blockchainTransactions.Service.tryGet(txHash)
+    def getTransaction(txHash: String): Future[models.blockchain.Transaction] = blockchainTransactions.Service.tryGet(txHash)
 
     def executeSuccessOrFailure(tx: bcTransaction, ticketID: String): Future[Unit] = if (tx.status) onSuccess(ticketID, tx.hash) else onFailure(ticketID, tx.code.get.toString)
 

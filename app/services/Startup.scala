@@ -103,7 +103,6 @@ class Startup @Inject()(
     try {
       var blockHeight = latestBlockHeight + 1
       while (true) {
-
         val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
 
         def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
