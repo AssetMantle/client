@@ -203,7 +203,7 @@ class AccountController @Inject()(
           for {
             _ <- pushNotificationTokenUpdate
             _ <- utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)()
-          } yield Unit
+          } yield ()
         }
 
         def getContactWarnings: Future[Seq[constants.Response.Warning]] = {
@@ -267,7 +267,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.logout(formWithErrors)))
         },
         loginData => {
-          val pushNotificationTokenDelete = if (!loginData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future(Unit)
+          val pushNotificationTokenDelete = if (!loginData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future(0)
 
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 

@@ -12,7 +12,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-
+import play.libs.ws.{WSRequest, WSResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -89,7 +89,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       title <- title
       message <- message
       pushNotificationToken <- pushNotificationToken
-      _ <- if (pushNotificationToken.isDefined) post(title, message, pushNotificationToken.get) else Future(None)
+      _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future(Unit))
     } yield ()
       ).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -163,15 +163,18 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     val language = masterAccounts.Service.tryGetLanguage(accountID)
     val notificationID = masterTransactionNotifications.Service.create(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters: _*)
 
-    def pushNotification(implicit language: Lang): Future[Unit] = if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*) else Future()
+    def pushNotification(implicit language: Lang): Future[Unit] =notification.pushNotification.fold(Future())(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*))
 
-    def email(implicit language: Lang): Future[String] = if (notification.email.isDefined) sendEmailByAccountID(accountID = accountID, email = notification.email.get, messagesParameters: _*) else Future("")
+    def email(implicit language: Lang): Future[String] =notification.email.fold(Future(""))(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*))
+
+    def sms(implicit language: Lang): Future[Unit] =notification.sms.fold(Future())(smsNotification => sendSMSByAccountID(accountID = accountID, sms = smsNotification, messageParameters = messagesParameters: _*))
 
     (for {
       language <- language
       notificationID <- notificationID
       _ <- pushNotification(Lang(language))
       _ <- email(Lang(language))
+      _ <- sms(Lang(language))
     } yield notificationID).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException

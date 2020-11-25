@@ -7,14 +7,12 @@ import models.blockchain.{Validator, Transaction => blockchainTransaction}
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
-import play.api.libs.json.JsObject
 import play.api.{Configuration, Logger}
 import play.libs.Json
 import queries._
 import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
 import queries.responses.TransactionResponse.{Response => TransactionResponse}
-import queries.responses.WSClientBlockResponse.{Response => WSClientBlockResponse}
 import queries.responses.common.{Header => BlockHeader}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +51,7 @@ class Block @Inject()(
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
 
-    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.filter(_.isDefined).map(_.get.validator_address))
+    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address))
 
     (for {
       blockCommitResponse <- blockCommitResponse
@@ -67,14 +65,14 @@ class Block @Inject()(
   def insertTransactionsOnBlock(height: Int): Future[Seq[blockchainTransaction]] = {
     val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height)
 
-    def getTransactionsHash(transactionsByHeightResponse: TransactionByHeightResponse) = transactionsByHeightResponse.result.txs.map(_.hash)
+    def getTransactionsHash(transactionsByHeightResponse: TransactionByHeightResponse): Seq[String] = transactionsByHeightResponse.result.txs.map(_.hash)
 
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactionResponses = Future.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash))
 
       def getTransactions(transactionResponses: Seq[TransactionResponse]): Future[Seq[blockchainTransaction]] = Future(transactionResponses.map(_.toTransaction))
 
-      def insertTxs(transactions: Seq[blockchainTransaction]) = blockchainTransactions.Service.insertMultiple(transactions)
+      def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
       for {
         transactionResponses <- transactionResponses
@@ -119,11 +117,11 @@ class Block @Inject()(
   def sendNewBlockWebSocketMessage(blockCommitResponse: BlockCommitResponse, transactions: Seq[blockchainTransaction], averageBlockTime: Double): Future[Unit] = {
     val proposer = blockchainValidators.Service.tryGetProposerName(blockCommitResponse.result.signed_header.header.proposer_address)
 
-    def getWebSocketNewBlock(proposer: String) = actorsMessage.WebSocket.NewBlock(
+    def getWebSocketNewBlock(proposer: String): actorsMessage.WebSocket.NewBlock = actorsMessage.WebSocket.NewBlock(
       block = actorsMessage.WebSocket.Block(height = blockCommitResponse.result.signed_header.header.height, time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time), proposer = proposer),
       txs = transactions.map(tx => actorsMessage.WebSocket.Tx(hash = tx.hash, status = tx.status, numMsgs = tx.messages.length, fees = tx.fee)),
       averageBlockTime = averageBlockTime,
-      validators = blockCommitResponse.result.signed_header.commit.signatures.filter(_.isDefined).map(_.get.validator_address)
+      validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address)
     )
 
     (for {
@@ -136,10 +134,11 @@ class Block @Inject()(
 
   private def actionsOnTransactions(transactions: Seq[blockchainTransaction], height: Int): Future[Seq[Seq[Unit]]] = Future.traverse(transactions) { transaction =>
     if (transaction.status) Future.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg, height = height))
-    else Future(Seq())
+    else Future(Seq.empty)
   }
 
   def actionOnTxMessages(stdMsg: StdMsg, height: Int): Future[Unit] = {
+
     try {
       stdMsg.messageType match {
         //bank
@@ -180,12 +179,11 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
         //maintainer
         case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => blockchainMaintainers.Utility.onDeputize(stdMsg.message.asInstanceOf[MaintainerDeputize])
-        case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType)
-          Future()
+        case _ => Future(logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType))
       }
     } catch {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-        Future()
+      case exception: Exception => Future(logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType))
+
     }
   }
 
@@ -194,7 +192,7 @@ class Block @Inject()(
     val validators = blockchainValidators.Service.getAllByHexAddresses(hexAddresses)
     val slashing = blockchainTokens.Utility.onSlashing
 
-    def updateValidatorAndDelegations(validators: Seq[Validator]) = Future.traverse(validators) { validator =>
+    def updateValidatorAndDelegations(validators: Seq[Validator]): Future[Seq[Unit]] = Future.traverse(validators) { validator =>
       val updatedValidator = blockchainValidators.Utility.insertOrUpdateValidator(validator.operatorAddress)
       val updateDelegation = blockchainRedelegations.Utility.onSlashingEvent(validator.operatorAddress)
       val updateUnbonding = blockchainUndelegations.Utility.onSlashingEvent(validator.operatorAddress)
@@ -208,7 +206,7 @@ class Block @Inject()(
       } yield ()
     }
 
-    def addEvents(validators: Seq[Validator]) = Future.traverse(slashAddresses) { slashAddress =>
+    def addEvents(validators: Seq[Validator]): Future[Seq[Unit]] = Future.traverse(slashAddresses) { slashAddress =>
       val index = slashAddresses.indexOf(slashAddress)
       val validator = validators.find(x => x.hexAddress == utilities.Bech32.convertConsensusAddressToHexAddress(slashAddress)).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))
       val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_SLASHED,
@@ -236,7 +234,7 @@ class Block @Inject()(
 
   def onMissedBlockEvent(livenessAddresses: Seq[String], livenessMissedBlocksCounter: Seq[String], livenessHeights: Seq[String]): Future[Unit] = {
 
-    def addEvent(validator: Validator, missedBlockCounter: String, height: String) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker.getOrElse(validator.operatorAddress), missedBlockCounter, height)(validator.operatorAddress)
+    def addEvent(validator: Validator, missedBlockCounter: String, height: String): Future[String] = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker.getOrElse(validator.operatorAddress), missedBlockCounter, height)(validator.operatorAddress)
 
     val update = Future.traverse(livenessAddresses) { consensusAddress =>
       val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))

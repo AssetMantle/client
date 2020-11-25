@@ -101,9 +101,6 @@ body.darkMode {
     border-top:1px solid $darkModeBorderColor;
   }
   .header {
-    .cmuk-logo{
-      border-right: 1px solid $darkModeBorderColor;
-    }
     .cmuk-navbar-nav > li > a {
       color: $darkModeIconColor;
     }
@@ -115,9 +112,6 @@ body.darkMode {
       .icon {
         fill: #FE4350;
       }
-    }
-    .cmuk-navbar-right .cmuk-navbar-nav > li > a{
-      border-left: 1px solid $darkModeBorderColor;
     }
   }
   .cmuk-card-header{
@@ -355,7 +349,20 @@ body.darkMode {
     }
   }
   .searchForm dl .cmuk-search-input{
-    border: none;
+    background: $darkModeCardBackground;
+    border-color: $darkModeBorderColor;
+    color:$darkModePrimaryFontColor;
+  }
+  table.dataTable.no-footer{
+    border-bottom: 1px solid transparent;
+  }
+  table.dataTable tbody tr{
+    background: none;
+  }
+  .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]){
+    background: $darkModeCardBackground;
+    border-color: $darkModeBorderColor;
+    color:$darkModePrimaryFontColor;
   }
 }
 
@@ -918,6 +925,7 @@ body.lightMode {
     .infoRowLabel, .infoRowValue {
       padding: 3px 12px;
       display: table-cell;
+      vertical-align: baseline;
     }
   }
 }
