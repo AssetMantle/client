@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SplitUnwrap]) { splitUnwrap =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(splitUnwrap.from, routes.ViewController.account(splitUnwrap.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(splitUnwrap.from, routes.ViewController.wallet(splitUnwrap.from)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(splitUnwrap.fromID, routes.IndexController.search(splitUnwrap.fromID)))
     @commonHtmlInfo(constants.View.OWNABLE_ID, commonLink(splitUnwrap.ownableID, routes.IndexController.search(splitUnwrap.ownableID)))
     @commonTextInfo(constants.View.SPLIT, splitUnwrap.split.toString)

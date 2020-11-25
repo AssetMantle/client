@@ -7,12 +7,12 @@
 @defining(msg.asInstanceOf[MultiSend]) { multiSend =>
     @Messages(constants.View.INPUTS):
     @multiSend.inputs.map { input =>
-        @commonHtmlInfo(constants.View.ADDRESS, commonLink(input.address, routes.ViewController.account(input.address)))
+        @commonHtmlInfo(constants.View.ADDRESS, commonLink(input.address, routes.ViewController.wallet(input.address)))
         @commonTextInfo(constants.View.AMOUNTS, input.coins.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
     }
     @Messages(constants.View.OUTPUTS):
     @multiSend.outputs.map { output =>
-        @commonHtmlInfo(constants.View.ADDRESS, commonLink(output.address, routes.ViewController.account(output.address)))
+        @commonHtmlInfo(constants.View.ADDRESS, commonLink(output.address, routes.ViewController.wallet(output.address)))
         @commonTextInfo(constants.View.AMOUNTS, output.coins.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
     }
 }

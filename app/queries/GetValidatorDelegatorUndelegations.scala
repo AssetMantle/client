@@ -17,9 +17,9 @@ class GetValidatorDelegatorUndelegations @Inject()()(implicit wsClient: WSClient
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
   private val path1 = "staking/delegators"
 

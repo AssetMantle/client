@@ -3,14 +3,14 @@ package models.Abstract
 abstract class DataValue {
   val dataType: String
 
-  def GenerateHash: String
+  def generateHash: String
 
-  def AsString: String
+  def asString: String
 
-  def AsDec: BigDecimal
+  def asDec: BigDecimal
 
-  def AsHeight: Int
+  def asHeight: Int
 
-  def AsID: String
+  def asID: String
 
 }

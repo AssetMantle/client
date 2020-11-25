@@ -5,6 +5,6 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[IdentityNub]) { identityNub =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(identityNub.from, routes.ViewController.account(identityNub.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(identityNub.from, routes.ViewController.wallet(identityNub.from)))
     @commonTextInfo(constants.View.NUB_ID, identityNub.nubID)
 }

@@ -2,6 +2,9 @@ package constants
 
 object Blockchain {
   val MnemonicShown = 3
+  val FullFundraiserPath = "44'/118'/0'/0/0"
+  val AccountPrefix = "cosmos"
+  val ValidatorPrefix = "cosmosvaloper"
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
@@ -74,6 +77,17 @@ object Blockchain {
 
   }
 
+  object Entity {
+    val IDENTITY_DEFINITION = "IDENTITY_DEFINITION"
+    val IDENTITY = "IDENTITY"
+    val ASSET_DEFINITION = "ASSET_DEFINITION"
+    val ASSET = "ASSET"
+    val ORDER_DEFINITION = "ORDER_DEFINITION"
+    val ORDER = "ORDER"
+    val WRAPPED_COIN = "WRAPPED_COIN"
+  }
+
+
   object TransactionRequest {
     //identity
     val IDENTITY_NUB = "/xprt/identities/nub/request"
@@ -99,7 +113,6 @@ object Blockchain {
     val META_REVEAL = "/xprt/metas/reveal/request"
     //maintainer
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/request"
-
   }
 
   object TransactionMessage {

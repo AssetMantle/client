@@ -5,10 +5,12 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchainTransaction
+import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import views.companion.{blockchain => blockchainCompanion}
+import views.html.component.blockchain.{txForms => blockchainForms}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,6 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SplitController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
+                                 masterAccounts: master.Accounts,
                                  withLoginAction: WithLoginAction,
                                  withUnknownLoginAction: WithUnknownLoginAction,
                                  transactionsSplitSend: transactions.blockchain.SplitSend,
@@ -36,95 +39,131 @@ class SplitController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def sendForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.blockchain.txForms.splitSend())
+  def sendForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(blockchainForms.splitSend(ownableID = ownableID))
   }
 
-  def send: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    views.companion.blockchain.SplitSend.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.txForms.splitSend(formWithErrors)))
-      },
-      sendData => {
-        val ticketID = transaction.process[blockchainTransaction.SplitSend, transactionsSplitSend.Request](
-          entity = blockchainTransaction.SplitSend(from = sendData.from, fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split, gas = sendData.gas, ticketID = "", mode = transactionMode),
-          blockchainTransactionCreate = blockchainTransactionSplitSends.Service.create,
-          request = transactionsSplitSend.Request(transactionsSplitSend.Message(transactionsSplitSend.BaseReq(from = sendData.from, gas = sendData.gas), fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split)),
-          action = transactionsSplitSend.Service.post,
-          onSuccess = blockchainTransactionSplitSends.Utility.onSuccess,
-          onFailure = blockchainTransactionSplitSends.Utility.onFailure,
-          updateTransactionHash = blockchainTransactionSplitSends.Service.updateTransactionHash
-        )
-        (for {
-          ticketID <- ticketID
-        } yield Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
+  def send: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.SplitSend.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.splitSend(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name))))
+        },
+        sendData => {
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendData.password)
 
-  def wrapForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.blockchain.txForms.splitWrap())
-  }
-
-  def wrap: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    views.companion.blockchain.SplitWrap.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.txForms.splitWrap(formWithErrors)))
-      },
-      wrapData => {
-        if (wrapData.addField) {
-          Future(PartialContent(views.html.component.blockchain.txForms.splitWrap(splitWrapForm = views.companion.blockchain.SplitWrap.form.fill(wrapData.copy(addField = false)))))
-        } else {
-          val ticketID = transaction.process[blockchainTransaction.SplitWrap, transactionsSplitWrap.Request](
-            entity = blockchainTransaction.SplitWrap(from = wrapData.from, fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin), gas = wrapData.gas, ticketID = "", mode = transactionMode),
-            blockchainTransactionCreate = blockchainTransactionSplitWraps.Service.create,
-            request = transactionsSplitWrap.Request(transactionsSplitWrap.Message(transactionsSplitWrap.BaseReq(from = wrapData.from, gas = wrapData.gas), fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin))),
-            action = transactionsSplitWrap.Service.post,
-            onSuccess = blockchainTransactionSplitWraps.Utility.onSuccess,
-            onFailure = blockchainTransactionSplitWraps.Utility.onFailure,
-            updateTransactionHash = blockchainTransactionSplitWraps.Service.updateTransactionHash
+          def broadcastTx = transaction.process[blockchainTransaction.SplitSend, transactionsSplitSend.Request](
+            entity = blockchainTransaction.SplitSend(from = loginState.address, fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split, gas = sendData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSplitSends.Service.create,
+            request = transactionsSplitSend.Request(transactionsSplitSend.Message(transactionsSplitSend.BaseReq(from = loginState.address, gas = sendData.gas), fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split)),
+            action = transactionsSplitSend.Service.post,
+            onSuccess = blockchainTransactionSplitSends.Utility.onSuccess,
+            onFailure = blockchainTransactionSplitSends.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSplitSends.Service.updateTransactionHash
           )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID)))
+
           (for {
-            ticketID <- ticketID
-          } yield Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
-      }
-    )
+      )
   }
 
-  def unwrapForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.blockchain.txForms.splitUnwrap())
+  def wrapForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(blockchainForms.splitWrap())
   }
 
-  def unwrap: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    views.companion.blockchain.SplitUnwrap.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.txForms.splitUnwrap(formWithErrors)))
-      },
-      unwrapData => {
-        val ticketID = transaction.process[blockchainTransaction.SplitUnwrap, transactionsSplitUnwrap.Request](
-          entity = blockchainTransaction.SplitUnwrap(from = unwrapData.from, fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split, gas = unwrapData.gas, ticketID = "", mode = transactionMode),
-          blockchainTransactionCreate = blockchainTransactionSplitUnwraps.Service.create,
-          request = transactionsSplitUnwrap.Request(transactionsSplitUnwrap.Message(transactionsSplitUnwrap.BaseReq(from = unwrapData.from, gas = unwrapData.gas), fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split)),
-          action = transactionsSplitUnwrap.Service.post,
-          onSuccess = blockchainTransactionSplitUnwraps.Utility.onSuccess,
-          onFailure = blockchainTransactionSplitUnwraps.Utility.onFailure,
-          updateTransactionHash = blockchainTransactionSplitUnwraps.Service.updateTransactionHash
-        )
-        (for {
-          ticketID <- ticketID
-        } yield Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+  def wrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.SplitWrap.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.splitWrap(formWithErrors)))
+        },
+        wrapData => {
+          if (wrapData.addField) {
+            Future(PartialContent(blockchainForms.splitWrap(splitWrapForm = blockchainCompanion.SplitWrap.form.fill(wrapData.copy(addField = false)))))
+          } else {
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = wrapData.password)
+
+            def broadcastTx = transaction.process[blockchainTransaction.SplitWrap, transactionsSplitWrap.Request](
+              entity = blockchainTransaction.SplitWrap(from = loginState.address, fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin), gas = wrapData.gas, ticketID = "", mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionSplitWraps.Service.create,
+              request = transactionsSplitWrap.Request(transactionsSplitWrap.Message(transactionsSplitWrap.BaseReq(from = loginState.address, gas = wrapData.gas), fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin))),
+              action = transactionsSplitWrap.Service.post,
+              onSuccess = blockchainTransactionSplitWraps.Utility.onSuccess,
+              onFailure = blockchainTransactionSplitWraps.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSplitWraps.Service.updateTransactionHash
+            )
+
+            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+              for {
+                ticketID <- broadcastTx
+                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              } yield result
+            } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+
+            (for {
+              verifyPassword <- verifyPassword
+              result <- broadcastTxAndGetResult(verifyPassword)
+            } yield result
+              ).recover {
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
+          }
         }
-      }
-    )
+      )
+  }
+
+  def unwrapForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(blockchainForms.splitUnwrap(ownableID = ownableID))
+  }
+
+  def unwrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.SplitUnwrap.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.splitUnwrap(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name))))
+        },
+        unwrapData => {
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unwrapData.password)
+
+          def broadcastTx = transaction.process[blockchainTransaction.SplitUnwrap, transactionsSplitUnwrap.Request](
+            entity = blockchainTransaction.SplitUnwrap(from = loginState.address, fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split, gas = unwrapData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSplitUnwraps.Service.create,
+            request = transactionsSplitUnwrap.Request(transactionsSplitUnwrap.Message(transactionsSplitUnwrap.BaseReq(from = loginState.address, gas = unwrapData.gas), fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split)),
+            action = transactionsSplitUnwrap.Service.post,
+            onSuccess = blockchainTransactionSplitUnwraps.Utility.onSuccess,
+            onFailure = blockchainTransactionSplitUnwraps.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSplitUnwraps.Service.updateTransactionHash
+          )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID)))
+
+          (for {
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
 }

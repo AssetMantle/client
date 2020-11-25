@@ -235,7 +235,7 @@ class Startup @Inject()(
 
       import actors.Service._
 
-      val wsURL = configuration.get[String]("blockchain.main.wsURL")
+      val wsURL = configuration.get[String]("blockchain.wsURL")
 
       case class BlockRequest(method: String, id: String, jsonrpc: String, params: List[String])
 

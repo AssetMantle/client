@@ -6,6 +6,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.TransactionMessages.{SplitSend, SplitUnwrap, SplitWrap}
+import models.master
+import models.master.{Split => masterSplit}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -23,6 +25,7 @@ class Splits @Inject()(
                         configuration: Configuration,
                         blockchainAccounts: Accounts,
                         getSplit: GetSplit,
+                        masterSplits: master.Splits
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -59,6 +62,8 @@ class Splits @Inject()(
   }
 
   private def getByOwnerID(ownerID: String) = db.run(splitTable.filter(_.ownerID === ownerID).result)
+
+  private def getAllByOwnerIDs(ownerIDs: Seq[String]) = db.run(splitTable.filter(_.ownerID.inSet(ownerIDs)).result)
 
   private def getByOwnableID(ownableID: String) = db.run(splitTable.filter(_.ownableID === ownableID).result)
 
@@ -112,6 +117,8 @@ class Splits @Inject()(
 
     def getByOwner(ownerID: String): Future[Seq[Split]] = getByOwnerID(ownerID)
 
+    def getByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[Split]] = getAllByOwnerIDs(ownerIDs)
+
     def getByOwnable(ownableID: String): Future[Seq[Split]] = getByOwnableID(ownableID)
 
     def getByOwnerOrOwnable(id: String): Future[Seq[Split]] = getByOwnerOrOwnableID(id)
@@ -133,35 +140,44 @@ class Splits @Inject()(
   object Utility {
 
     def onSend(splitSend: SplitSend): Future[Unit] = {
-      val updateFromSplit = {
+      if (splitSend.fromID != splitSend.toID) {
         val oldFromSplit = Service.tryGet(ownerID = splitSend.fromID, ownableID = splitSend.ownableID)
+        val oldToSplit = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
 
         def updateOrDeleteFromSplit(oldFromSplit: Split) = if ((oldFromSplit.split - splitSend.split) == 0) Service.delete(ownerID = splitSend.fromID, ownableID = splitSend.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitSend.split))
 
-        for {
-          oldFromSplit <- oldFromSplit
-          _ <- updateOrDeleteFromSplit(oldFromSplit)
-        } yield ()
-      }
-
-      //Do not make `def` to `val` because when `fromID` and `toID` are same, asynchronous issue occurs (the split amount doesn't reset)
-      def updateToSplit() = {
-        val oldToSplit = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
-
         def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitSend.split)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitSend.split)))
 
-        for {
-          oldToSplit <- oldToSplit
-          _ <- upsertToSplit(oldToSplit)
-        } yield ()
-      }
+        def masterOperations(oldFromSplitDeleted: Boolean) = {
+          val oldFromMasterSplit = masterSplits.Service.tryGet(entityID = splitSend.ownableID, ownerID = splitSend.fromID)
+          val oldToSplitExists = masterSplits.Service.checkExists(entityID = splitSend.ownableID, ownerID = splitSend.toID)
 
-      (for {
-        _ <- updateFromSplit
-        _ <- updateToSplit()
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
-      }
+          def updateSplits(oldFromMasterSplit: masterSplit, oldToSplitExists: Boolean) = {
+            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(entityID = splitSend.ownableID, ownerID = splitSend.fromID) else Future(0)
+            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(entityID = splitSend.ownableID, ownerID = splitSend.toID, entityType = oldFromMasterSplit.entityType, label = oldFromMasterSplit.label, status = Option(true))) else Future(0)
+            for {
+              _ <- updateOrDeleteFromSplit
+              _ <- updateToSplit
+            } yield ()
+          }
+
+          for {
+            oldFromMasterSplit <- oldFromMasterSplit
+            oldToSplitExists <- oldToSplitExists
+            _ <- updateSplits(oldFromMasterSplit = oldFromMasterSplit, oldToSplitExists = oldToSplitExists)
+          } yield ()
+        }
+
+        (for {
+          oldFromSplit <- oldFromSplit
+          oldToSplit <- oldToSplit
+          _ <- updateOrDeleteFromSplit(oldFromSplit)
+          _ <- upsertToSplit(oldToSplit)
+          _ <- masterOperations((oldFromSplit.split - splitSend.split) == 0)
+        } yield ()).recover {
+          case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        }
+      } else Future()
     }
 
     def onWrap(splitWrap: SplitWrap): Future[Unit] = {
@@ -177,9 +193,21 @@ class Splits @Inject()(
         } yield ()
       }
 
+      val masterOperations = Future.traverse(splitWrap.coins) { coin =>
+        val oldSplit = masterSplits.Service.get(entityID = coin.denom, ownerID = splitWrap.fromID)
+
+        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(entityID = coin.denom, ownerID = splitWrap.fromID, entityType = constants.Blockchain.Entity.WRAPPED_COIN, label = None, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(entityID = coin.denom, ownerID = splitWrap.fromID))
+
+        for {
+          oldSplit <- oldSplit
+          _ <- upsertSplits(oldSplit)
+        } yield ()
+      }
+
       (for {
         _ <- updateAccountBalance
         _ <- updateSplits
+        _ <- masterOperations
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -191,10 +219,13 @@ class Splits @Inject()(
 
       def updateSplits(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) Service.delete(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitUnwrap.split))
 
+      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) masterSplits.Service.delete(entityID = splitUnwrap.ownableID, ownerID = splitUnwrap.fromID) else Future(0)
+
       (for {
         oldFromSplit <- oldFromSplit
         _ <- updateSplits(oldFromSplit)
         _ <- updateAccountBalance
+        _ <- masterOperations(oldFromSplit)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -205,9 +236,21 @@ class Splits @Inject()(
 
       def upsertSplit(oldSplit: Option[Split]) = oldSplit.fold(Service.insertOrUpdate(Split(ownerID = ownerID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
 
+      val masterOperations = {
+        val oldSplit = masterSplits.Service.get(entityID = ownableID, ownerID = ownerID)
+
+        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(entityID = ownableID, ownerID = ownerID, entityType = constants.Blockchain.Entity.ASSET, label = None, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(entityID = ownableID, ownerID = ownerID))
+
+        for {
+          oldSplit <- oldSplit
+          _ <- upsertSplits(oldSplit)
+        } yield ()
+      }
+
       (for {
         oldSplit <- oldSplit
         _ <- upsertSplit(oldSplit)
+        _ <- masterOperations
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -219,9 +262,12 @@ class Splits @Inject()(
 
       def updateOrDelete(oldSplit: Split) = if ((oldSplit.split - splitValue) == 0) Service.delete(ownerID = ownerID, ownableID = ownableID) else Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split - splitValue))
 
+      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitValue) == 0) masterSplits.Service.delete(entityID = ownableID, ownerID = ownerID) else Future(0)
+
       (for {
         oldSplit <- oldSplit
         _ <- updateOrDelete(oldSplit)
+        _ <- masterOperations(oldSplit)
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -229,35 +275,45 @@ class Splits @Inject()(
     }
 
     def auxiliaryTransfer(fromID: String, toID: String, ownableID: String, splitValue: BigDecimal): Future[Unit] = {
-      val updateFromSplit = {
+      if (fromID != toID) {
         val oldFromSplit = Service.tryGet(ownerID = fromID, ownableID = ownableID)
+        val oldToSplit = Service.get(ownerID = toID, ownableID = ownableID)
 
         def updateOrDeleteFromSplit(oldFromSplit: Split) = if ((oldFromSplit.split - splitValue) == 0) Service.delete(ownerID = fromID, ownableID = ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitValue))
 
-        for {
-          oldFromSplit <- oldFromSplit
-          _ <- updateOrDeleteFromSplit(oldFromSplit)
-        } yield ()
-      }
-
-      //Do not make `def` to `val` because when `fromID` and `toID` are same, asynchronous issue occurs (the split amount doesn't reset)
-      def updateToSplit() = {
-        val oldToSplit = Service.get(ownerID = toID, ownableID = ownableID)
-
         def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = toID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
 
-        for {
-          oldToSplit <- oldToSplit
-          _ <- upsertToSplit(oldToSplit)
-        } yield ()
-      }
+        def masterOperations(oldFromSplitDeleted: Boolean) = {
+          val oldFromMasterSplit = masterSplits.Service.tryGet(entityID = ownableID, ownerID = fromID)
+          val oldToSplitExists = masterSplits.Service.checkExists(entityID = ownableID, ownerID = toID)
 
-      (for {
-        _ <- updateFromSplit
-        _ <- updateToSplit()
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+          def updateSplits(oldFromMasterSplit: masterSplit, oldToSplitExists: Boolean) = {
+            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(entityID = ownableID, ownerID = fromID) else Future(0)
+            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(entityID = ownableID, ownerID = toID, entityType = oldFromMasterSplit.entityType, label = oldFromMasterSplit.label, status = Option(true))) else Future(0)
+            for {
+              _ <- updateOrDeleteFromSplit
+              _ <- updateToSplit
+            } yield ()
+          }
+
+          for {
+            oldFromMasterSplit <- oldFromMasterSplit
+            oldToSplitExists <- oldToSplitExists
+            _ <- updateSplits(oldFromMasterSplit = oldFromMasterSplit, oldToSplitExists = oldToSplitExists)
+          } yield ()
+        }
+
+        (for {
+          oldFromSplit <- oldFromSplit
+          oldToSplit <- oldToSplit
+          _ <- updateOrDeleteFromSplit(oldFromSplit)
+          _ <- upsertToSplit(oldToSplit)
+          _ <- masterOperations((oldFromSplit.split - splitValue) == 0)
+        } yield ()).recover {
+          case baseException: BaseException => throw baseException
+        }
+      } else Future()
     }
   }
+
 }

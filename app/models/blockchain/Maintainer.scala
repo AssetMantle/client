@@ -132,10 +132,11 @@ class Maintainers @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.main.chainID")
+    private val chainID = configuration.get[String]("blockchain.chainID")
 
     def onDeputize(maintainerDeputize: MaintainerDeputize): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(Maintainer(id = getID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.fromID), maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
+      val toMaintainerID = getID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID)
+      val upsert = Service.insertOrUpdate(Maintainer(id = toMaintainerID, maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
       (for {
         _ <- upsert
@@ -154,7 +155,7 @@ class Maintainers @Inject()(
       }
     }
 
-    private def getID(classificationID: String, identityID: String) = Seq(classificationID, identityID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+    def getID(classificationID: String, identityID: String): String = Seq(classificationID, identityID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 
   }
 

@@ -5,10 +5,12 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchainTransaction
+import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import views.companion.{blockchain => blockchainCompanion}
+import views.html.component.blockchain.{txForms => blockchainForms}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,6 +19,7 @@ class MetaController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
                                 transaction: utilities.Transaction,
                                 withLoginAction: WithLoginAction,
+                                masterAccounts: master.Accounts,
                                 withUnknownLoginAction: WithUnknownLoginAction,
                                 transactionsMetaReveal: transactions.blockchain.MetaReveal,
                                 blockchainTransactionMetaReveals: blockchainTransaction.MetaReveals,
@@ -33,32 +36,44 @@ class MetaController @Inject()(
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   def revealForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.blockchain.txForms.metaReveal())
+    Ok(blockchainForms.metaReveal())
   }
 
-  def reveal: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    views.companion.blockchain.MetaReveal.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.txForms.metaReveal(formWithErrors)))
-      },
-      revealData => {
-        val ticketID = transaction.process[blockchainTransaction.MetaReveal, transactionsMetaReveal.Request](
-          entity = blockchainTransaction.MetaReveal(from = revealData.from, metaFact = revealData.revealFact.toMetaFact, gas = revealData.gas, ticketID = "", mode = transactionMode),
-          blockchainTransactionCreate = blockchainTransactionMetaReveals.Service.create,
-          request = transactionsMetaReveal.Request(transactionsMetaReveal.Message(transactionsMetaReveal.BaseReq(from = revealData.from, gas = revealData.gas), metaFact = revealData.revealFact)),
-          action = transactionsMetaReveal.Service.post,
-          onSuccess = blockchainTransactionMetaReveals.Utility.onSuccess,
-          onFailure = blockchainTransactionMetaReveals.Utility.onFailure,
-          updateTransactionHash = blockchainTransactionMetaReveals.Service.updateTransactionHash
-        )
-        (for {
-          ticketID <- ticketID
-        } yield Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+  def reveal: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.MetaReveal.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.metaReveal(formWithErrors)))
+        },
+        revealData => {
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = revealData.password)
+
+          def broadcastTx = transaction.process[blockchainTransaction.MetaReveal, transactionsMetaReveal.Request](
+            entity = blockchainTransaction.MetaReveal(from = loginState.address, metaFact = revealData.revealFact.toMetaFact, gas = revealData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionMetaReveals.Service.create,
+            request = transactionsMetaReveal.Request(transactionsMetaReveal.Message(transactionsMetaReveal.BaseReq(from = loginState.address, gas = revealData.gas), metaFact = revealData.revealFact)),
+            action = transactionsMetaReveal.Service.post,
+            onSuccess = blockchainTransactionMetaReveals.Utility.onSuccess,
+            onFailure = blockchainTransactionMetaReveals.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionMetaReveals.Service.updateTransactionHash
+          )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+
+          (for {
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+          }
         }
-      }
-    )
+      )
   }
 
 }

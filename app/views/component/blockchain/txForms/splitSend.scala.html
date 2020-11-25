@@ -1,12 +1,12 @@
 @import views.companion.blockchain.SplitSend
 @import views.html.base._
 
-@(splitSendForm: Form[SplitSend.Data] = SplitSend.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(splitSendForm: Form[SplitSend.Data] = SplitSend.form, ownableID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SPLIT_SEND, splitSendForm) {
-    @commonInputText(splitSendForm, constants.FormField.FROM)
     @commonInputText(splitSendForm, constants.FormField.FROM_ID)
     @commonInputText(splitSendForm, constants.FormField.TO_ID)
-    @commonInputText(splitSendForm, constants.FormField.OWNABLE_ID)
+    @commonInputText(splitSendForm, constants.FormField.OWNABLE_ID, 'value -> ownableID)
     @commonInputBigDecimal(splitSendForm, constants.FormField.SPLIT)
     @commonInputMicroNumber(splitSendForm, constants.FormField.GAS)
+    @commonInputText(splitSendForm, constants.FormField.PASSWORD)
 }

@@ -9,8 +9,8 @@ object IdentityDefine {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.FROM.name -> constants.FormField.FROM.field,
       constants.FormField.FROM_ID.name -> constants.FormField.FROM_ID.field,
+      constants.FormField.LABEL.name -> constants.FormField.LABEL.field,
       constants.FormField.IMMUTABLE_META_TRAITS.name -> optional(seq(optional(Property.subFormMapping))),
       constants.FormField.ADD_IMMUTABLE_META_FIELD.name -> constants.FormField.ADD_IMMUTABLE_META_FIELD.field,
       constants.FormField.IMMUTABLE_TRAITS.name -> optional(seq(optional(Property.subFormMapping))),
@@ -20,9 +20,10 @@ object IdentityDefine {
       constants.FormField.MUTABLE_TRAITS.name -> optional(seq(optional(Property.subFormMapping))),
       constants.FormField.ADD_MUTABLE_FIELD.name -> constants.FormField.ADD_MUTABLE_FIELD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.identityDefine)
   )
 
-  case class Data(from: String, fromID: String, immutableMetaTraits: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableTraits: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaTraits: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableTraits: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber)
+  case class Data(fromID: String, label: String, immutableMetaTraits: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableTraits: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaTraits: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableTraits: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: String)
 
 }

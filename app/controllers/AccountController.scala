@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{LoginState, WithLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -11,9 +11,10 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.responses.KeyResponse
 import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
-import views.companion.master.{Login, Logout, SignUp}
+import views.companion.master.{ImportWallet, Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +29,6 @@ class AccountController @Inject()(
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
-                                   queriesMnemonic: queries.GetMnemonic,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
@@ -61,12 +61,11 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
       },
       signUpData => {
-        val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
+        val mnemonics = utilities.Bip39.getMnemonics()
 
         def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
 
         (for {
-          mnemonics <- mnemonics
           _ <- addLogin(mnemonics)
         } yield {
           PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
@@ -81,7 +80,7 @@ class AccountController @Inject()(
   def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
     val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
-    def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) queriesMnemonic.Service.get().map(_.body.split(" ")) else throw new BaseException(constants.Response.UNAUTHORIZED)
+    def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
     def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
       masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
@@ -107,9 +106,9 @@ class AccountController @Inject()(
         val masterAccount = masterAccounts.Service.tryGet(createWalletData.username)
 
         def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
-          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, password = createWalletData.password, seed = Seq(masterAccount.partialMnemonic.mkString(" "), createWalletData.mnemonics).mkString(" ")))
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, mnemonic = Seq(masterAccount.partialMnemonic.getOrElse(throw new BaseException(constants.Response.MNEMONIC_NOT_FOUND)).mkString(" "), createWalletData.mnemonics).mkString(" ")))
 
-          def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, username = createWalletData.username, publicKey = addKeyResponse.pubkey)
+          def createAccount(addKeyResponse: KeyResponse.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.result.keyOutput.address, username = createWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey)
 
           for {
             addKeyResponse <- addKeyResponse
@@ -125,6 +124,52 @@ class AccountController @Inject()(
           .recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
+      }
+    )
+  }
+
+  def checkMnemonics(mnemonics: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    if (utilities.Bip39.check(mnemonics)) Ok else NoContent
+  }
+
+  def importWalletForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.importWallet())
+  }
+
+  def importWallet: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+    ImportWallet.form.bindFromRequest().fold(
+      formWithErrors => {
+        Future(BadRequest(views.html.component.master.importWallet(formWithErrors)))
+      },
+      importWalletData => {
+        val validMnemonics = utilities.Bip39.check(importWalletData.mnemonics)
+
+        val createAccountAndGetResult: Future[Result] = if (validMnemonics && importWalletData.password == importWalletData.confirmPassword) {
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = importWalletData.username, mnemonic = importWalletData.mnemonics))
+
+          def createBCAccount(addKeyResponse: KeyResponse.Response): Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey, coins = Seq.empty, accountNumber = "", sequence = ""))
+
+          def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(addKeyResponse.result.keyOutput.address)
+
+          def createMasterAccount(): Future[String] = {
+            val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
+            masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
+          }
+
+          for {
+            addKeyResponse <- addKeyResponse
+            _ <- createBCAccount(addKeyResponse)
+            _ <- updateBCAccount(addKeyResponse)
+            _ <- createMasterAccount()
+          } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
+        } else if (!validMnemonics) Future(BadRequest(views.html.component.master.importWallet(ImportWallet.form.fill(importWalletData).withGlobalError(constants.Response.INVALID_MNEMONICS.message))))
+        else Future(BadRequest(views.html.component.master.importWallet(ImportWallet.form.fill(importWalletData).withGlobalError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))))
+
+        (for {
+          result <- createAccountAndGetResult
+        } yield result).recover {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
       }
     )
   }
@@ -170,11 +215,8 @@ class AccountController @Inject()(
           } yield utilities.Contact.getWarnings(mobile, email)
         }
 
-        def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
-          loginState.userType match {
-            case constants.User.USER => withUsernameToken.Ok(views.html.profile(warnings = warnings))
-            case _ => withUsernameToken.Ok(views.html.dashboard(warnings = warnings))
-          }
+        def getResult(address: String, warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
+          withUsernameToken.Ok(views.html.profile()) //(address = address, warnings = warnings))
         }
 
         def checkLoginAndGetResult(validateUsernamePassword: Boolean, bcAccountExists: Boolean): Future[Result] = {
@@ -186,15 +228,14 @@ class AccountController @Inject()(
                 userType <- firstLoginUserTypeUpdate(account.userType)
                 _ <- sendNotification(loginData.username)
                 contactWarnings <- getContactWarnings
-                result <- getResult(contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
+                result <- getResult(address, contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
               } yield result
             } else {
-              val mnemonics = queriesMnemonic.Service.get().map(_.body.split(" "))
+              val mnemonics = utilities.Bip39.getMnemonics()
 
               def updatePartialMnemonic(mnemonics: Seq[String]) = masterAccounts.Service.updatePartialMnemonic(id = loginData.username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
 
               for {
-                mnemonics <- mnemonics
                 _ <- updatePartialMnemonic(mnemonics)
               } yield PartialContent(views.html.component.master.createWallet(username = loginData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             }
@@ -324,7 +365,7 @@ class AccountController @Inject()(
           if (validOTP) {
             val account = masterAccounts.Service.tryGet(forgotPasswordData.username)
 
-            def post(partialMnemonic: Seq[String]) = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(partialMnemonic.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+            def post(partialMnemonic: Option[Seq[String]]) = partialMnemonic.fold(throw new BaseException(constants.Response.MNEMONIC_NOT_FOUND))(x => transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = Seq(x.mkString(" "), forgotPasswordData.mnemonic).mkString(" "), newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword)))
 
             def updatePassword(): Future[Int] = masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
 

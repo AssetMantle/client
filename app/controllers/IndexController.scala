@@ -34,10 +34,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
-  private val accountPrefix = configuration.get[String]("blockchain.prefix.account")
-
-  private val validatorPrefix = configuration.get[String]("blockchain.prefix.validator")
-
   //  def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
   //    implicit request =>
   //      (loginState.userType match {
@@ -59,8 +55,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   }
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    if (query.matches(s"${accountPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.account(query)))
-    else if (query.matches(s"${validatorPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.validator(query)))
+    if (query.matches(s"${constants.Blockchain.AccountPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.wallet(query)))
+    else if (query.matches(s"${constants.Blockchain.ValidatorPrefix}[a-z0-9]{39}")) Future(Redirect(routes.ViewController.validator(query)))
     else if (utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
     else if (query.matches("[A-F0-9]{64}")) Future(Redirect(routes.ViewController.transaction(query)))
     else if (query.matches("[0-9]{1,40}")) Future(Redirect(routes.ViewController.block(query.toInt)))
@@ -69,7 +65,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
       val identity = blockchainIdentities.Service.get(query)
       val order = blockchainOrders.Service.get(query)
-      val meta = blockchainMetas.Service.get(query)
+      val metaList = blockchainMetas.Service.get(Seq(query))
       val classification = blockchainClassifications.Service.get(query)
       val maintainer = blockchainMaintainers.Service.get(query)
 
@@ -78,12 +74,12 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         splits <- splits
         identity <- identity
         order <- order
-        meta <- meta
+        metaList <- metaList
         classification <- classification
         maintainer <- maintainer
       } yield {
-        if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && meta.isEmpty && classification.isEmpty && maintainer.isEmpty) InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-        else Ok(views.html.search(query, asset, identity, splits, order, meta, classification, maintainer))
+        if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+        else Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer))
       }).recover {
         case _: BaseException => InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
       }

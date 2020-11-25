@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[MetaReveal]) { metaReveal =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(metaReveal.from, routes.ViewController.account(metaReveal.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(metaReveal.from, routes.ViewController.wallet(metaReveal.from)))
     @Messages(constants.View.META_FACT):
     @views.html.component.blockchain.data(metaReveal.metaFact.data)
 }

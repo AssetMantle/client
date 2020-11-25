@@ -1,12 +1,12 @@
 @import views.companion.blockchain.IdentityDefine
 @import views.html.base._
-@import helper._
 
 @(identityDefineForm: Form[IdentityDefine.Data] = IdentityDefine.form, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.IDENTITY_DEFINE, identityDefineForm) {
-    @commonInputText(identityDefineForm, constants.FormField.FROM)
     @commonInputText(identityDefineForm, constants.FormField.FROM_ID)
+    @commonInputText(identityDefineForm, constants.FormField.LABEL)
     @commonInputMicroNumber(identityDefineForm, constants.FormField.GAS)
+    @commonInputText(identityDefineForm, constants.FormField.PASSWORD)
     @views.html.component.blockchain.txForms.addProperties(identityDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(identityDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(identityDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)

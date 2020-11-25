@@ -35,7 +35,7 @@ object Bech32 {
     }
   }
 
-  //probably byteSeq converts operatorAddress to hexAddress and then encode converts into account address
+  //probably byteSeq converts operatorAddress to hexAddress and then encode converts into wallet address
   def convertOperatorAddressToAccountAddress(operatorAddress: String, hrp: String = "cosmos"): String = {
     val byteSeq = decode(operatorAddress) match {
       case Success(value: (String, Seq[Int5])) => value._2

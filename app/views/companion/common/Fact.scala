@@ -13,11 +13,11 @@ object Fact {
   )(Data.apply)(Data.unapply)
 
   case class Data(dataType: String, dataValue: String) {
-    def toRequestString: String = s"${DataValue.getShortDataType(dataType)}${constants.Blockchain.DataTypeAndValueSeparator}${dataValue}"
+    def toRequestString: String = s"${DataValue.getFactTypeFromDataType(dataType)}${constants.Blockchain.DataTypeAndValueSeparator}${dataValue}"
 
     def toMetaFact: MetaFact = MetaFact(DataValue.getData(dataType = dataType, dataValue = Option(dataValue)))
 
-    def toFact: SerializableFact = NewFact(factType = dataType, dataValue = DataValue.getDataValue(dataType = dataType, dataValue = Option(dataValue)))
+    def toFact: SerializableFact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = Option(dataValue)))
   }
 
 }

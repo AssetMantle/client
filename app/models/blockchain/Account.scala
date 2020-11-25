@@ -2,12 +2,12 @@ package models.blockchain
 
 import java.sql.Timestamp
 
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.common.TransactionMessages.{MultiSend, SendCoin}
+import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -24,9 +24,9 @@ case class Account(address: String, username: String, coins: Seq[Coin], publicKe
 @Singleton
 class Accounts @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
-                          actorSystem: ActorSystem,
                           getAccount: GetAccount,
-                          configuration: Configuration
+                          configuration: Configuration,
+                          masterAccounts: master.Accounts
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -176,12 +176,17 @@ class Accounts @Inject()(
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
+      val bcAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = address, username = address, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
+      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(Account(address = address, username = bcAccount.fold(address)(_.username), coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
+
+//      def masterInsert(bcAccount: Option[Account]) = if (bcAccount.isEmpty) masterAccounts.Service.addWithoutSignUp(address) else Future("")
 
       (for {
         accountResponse <- accountResponse
-        _ <- upsert(accountResponse)
+        bcAccount <- bcAccount
+        _ <- upsert(accountResponse, bcAccount)
+//        _ <- masterInsert(bcAccount)
       } yield ()).recover {
         case _: BaseException => Future()
       }

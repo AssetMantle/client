@@ -9,12 +9,12 @@ object MetaReveal {
 
   val form: Form[Data] = Form(
     mapping(
-      constants.FormField.FROM.name -> constants.FormField.FROM.field,
       constants.FormField.REVEAL_FACT.name -> Fact.subFormMapping,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, revealFact: Fact.Data, gas: MicroNumber)
+  case class Data(revealFact: Fact.Data, gas: MicroNumber, password: String)
 
 }

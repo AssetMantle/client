@@ -1,10 +1,10 @@
 @import views.companion.blockchain.AssetBurn
 @import views.html.base._
 
-@(assetBurnForm: Form[AssetBurn.Data] = AssetBurn.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(assetBurnForm: Form[AssetBurn.Data] = AssetBurn.form, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ASSET_BURN, assetBurnForm) {
-    @commonInputText(assetBurnForm, constants.FormField.FROM)
     @commonInputText(assetBurnForm, constants.FormField.FROM_ID)
-    @commonInputText(assetBurnForm, constants.FormField.ASSET_ID)
+    @commonInputText(assetBurnForm, constants.FormField.ASSET_ID, 'value -> assetID)
     @commonInputMicroNumber(assetBurnForm, constants.FormField.GAS)
+    @commonInputText(assetBurnForm, constants.FormField.PASSWORD)
 }

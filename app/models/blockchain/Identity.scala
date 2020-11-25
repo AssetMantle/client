@@ -8,6 +8,8 @@ import models.Trait.Logged
 import models.common.DataValue.IDDataValue
 import models.common.Serializable._
 import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub, IdentityProvision, IdentityUnprovision}
+import models.master
+import models.master.{Classification => masterClassification, Identity => masterIdentity}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -32,6 +34,9 @@ class Identities @Inject()(
                             blockchainMetas: Metas,
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
+                            masterClassifications: master.Classifications,
+                            masterIdentities: master.Identities,
+                            masterProperties: master.Properties,
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -82,7 +87,31 @@ class Identities @Inject()(
 
   private def getByID(id: String) = db.run(identityTable.filter(_.id === id).result.headOption)
 
+  private def checkExistsByID(id: String) = db.run(identityTable.filter(_.id === id).exists.result)
+
   private def getAllIdentities = db.run(identityTable.result)
+
+  private def getAllIdentityIDsByProvisionedAddress(address: String) = db.run(identityTable.filter(_.provisionedAddressList.like(s"""%$address%""")).map(_.id).result)
+
+  private def getAllIdentitiesByProvisionedAddress(address: String) = db.run(identityTable.filter(_.provisionedAddressList.like(s"""%$address%""")).result)
+
+  private def getAllIdentityIDsByUnprovisionedAddress(address: String) = db.run(identityTable.filter(_.unprovisionedAddressList.like(s"""%$address%""")).map(_.id).result)
+
+  private def getAllIdentitiesByUnprovisionedAddress(address: String) = db.run(identityTable.filter(_.unprovisionedAddressList.like(s"""%$address%""")).result)
+
+  private def getAllProvisionedAddressByID(id: String) = db.run(identityTable.filter(_.id === id).map(_.provisionedAddressList).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ASSET_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def getAllUnprovisionedAddressByID(id: String) = db.run(identityTable.filter(_.id === id).map(_.unprovisionedAddressList).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ASSET_NOT_FOUND, noSuchElementException)
+    }
+  }
 
   private def deleteByID(id: String): Future[Int] = db.run(identityTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -134,11 +163,23 @@ class Identities @Inject()(
     def insertOrUpdate(identity: Identity): Future[Int] = upsert(identity)
 
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def getAllIDsByProvisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByProvisionedAddress(address)
+
+    def getAllIDsByUnprovisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByUnprovisionedAddress(address)
+
+    def getAllByProvisioned(address: String): Future[Seq[Identity]] = getAllIdentitiesByProvisionedAddress(address).map(_.map(_.deserialize))
+
+    def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
+
+    def getAllProvisionAddresses(id: String): Future[Seq[String]] = getAllProvisionedAddressByID(id).map(x => utilities.JSON.convertJsonStringToObject[Seq[String]](x))
+
+    def getAllUnprovisionAddresses(id: String): Future[Seq[String]] = getAllUnprovisionedAddressByID(id).map(x => utilities.JSON.convertJsonStringToObject[Seq[String]](x))
   }
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.main.chainID")
+    private val chainID = configuration.get[String]("blockchain.chainID")
 
     def onDefine(identityDefine: IdentityDefine): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityDefine.immutableMetaTraits.metaPropertyList)
@@ -152,14 +193,29 @@ class Identities @Inject()(
 
         for {
           classificationID <- defineAuxiliary
-          _ <- superAuxiliary(classificationID = classificationID)
+          _ <- superAuxiliary(classificationID)
         } yield classificationID
+      }
+
+      def masterOperations(classificationID: String) = {
+        val classification = masterClassifications.Service.get(classificationID)
+
+        def insertProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, entityID = classificationID, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits) else Future("")
+
+        def upsert(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = identityDefine.fromID, label = None, status = Option(true)))(_ => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION))
+
+        for {
+          classification <- classification
+          _ <- upsert(classification)
+          _ <- insertProperties(classification)
+        } yield ()
       }
 
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        _ <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -172,14 +228,33 @@ class Identities @Inject()(
 
       def insertOrUpdate(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
         val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityIssue.immutableProperties.propertyList))
-        Service.insertOrUpdate(Identity(id = getID(classificationID = identityIssue.classificationID, immutables = immutables), provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityIssue.mutableProperties.propertyList)), immutables = immutables)
-        )
+        val identityID = getID(classificationID = identityIssue.classificationID, immutables = immutables)
+        val upsert = Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityIssue.mutableProperties.propertyList)), immutables = immutables))
+
+        for {
+          _ <- upsert
+        } yield identityID
+      }
+
+      def masterOperations(identityID: String) = {
+        val identity = masterIdentities.Service.get(identityID)
+
+        def insertProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = identityIssue.immutableMetaProperties, immutables = identityIssue.immutableProperties, mutableMetas = identityIssue.mutableMetaProperties, mutables = identityIssue.mutableProperties) else Future("")
+
+        def upsert(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
+
+        for {
+          identity <- identity
+          _ <- upsert(identity)
+          _ <- insertProperties(identity)
+        } yield ()
       }
 
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        _ <- insertOrUpdate(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        identityID <- insertOrUpdate(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(identityID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -215,31 +290,50 @@ class Identities @Inject()(
     }
 
     def onNub(identityNub: IdentityNub): Future[Unit] = {
-      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(identityNub.nubID))))))
+      val nubMetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(identityNub.nubID))))
+      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(nubMetaProperty))
 
       def defineAndUpsert(nubProperty: Property) = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
         val mutables = Mutables(Properties(Seq()))
         val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), mutables)
 
-        def upsert(classificationID: String) = Service.insertOrUpdate(Identity(id = getID(classificationID = classificationID, immutables = immutables), provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
+        def getIdentityID(classificationID: String) = Future(getID(classificationID = classificationID, immutables = immutables))
+
+        def upsert(identityID: String) = Service.insertOrUpdate(Identity(id = identityID, provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
 
         for {
           classificationID <- defineClassification
-          _ <- upsert(classificationID)
+          identityID <- getIdentityID(classificationID)
+          _ <- upsert(identityID)
+        } yield identityID
+      }
+
+      def masterOperations(identityID: String) = {
+        val identity = masterIdentities.Service.get(identityID)
+
+        def insertProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
+
+        def upsert(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
+
+        for {
+          identity <- identity
+          _ <- upsert(identity)
+          _ <- insertProperties(identity)
         } yield ()
       }
 
       (for {
         nubProperty <- nubProperty
-        _ <- defineAndUpsert(nubProperty.head)
+        identityID <- defineAndUpsert(nubProperty.head)
+        _ <- masterOperations(identityID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    private def getID(classificationID: String, immutables: Immutables) = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+    def getID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
   }
 

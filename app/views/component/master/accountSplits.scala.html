@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import models.master.Split
+@import views.html.base._
+
+@(splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ACCOUNT_SPLITS) {
+    @commonFormButton(constants.Form.SPLIT_WRAP)
+} {
+    @splits.map { split =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ID, split.entityID)
+            @commonVerticalTextInfo(constants.View.LABEL, split.label.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.ENTITY_TYPE, split.entityType)
+            @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, split.status)
+            @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> split.entityID)
+            @if(split.entityType == constants.Blockchain.Entity.WRAPPED_COIN) {
+                @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> split.entityID)
+            }
+        }
+    }
+}

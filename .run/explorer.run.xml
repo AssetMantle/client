@@ -7,7 +7,7 @@
       <map>
         <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
-        <entry key="BLOCKCHAIN_HOST" value="localhost" />
+        <entry key="BLOCKCHAIN_HOST" value="128.199.30.153" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />

@@ -6,6 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.Serializable
 import models.common.Serializable.{MetaProperties, Properties}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -30,6 +31,9 @@ class IdentityDefines @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  utilitiesNotification: utilities.Notification,
                                  masterAccounts: master.Accounts,
+                                 masterProperties: master.Properties,
+                                 masterClassifications: master.Classifications,
+                                 blockchainClassifications: blockchain.Classifications,
                                  blockchainAccounts: blockchain.Accounts
                                )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -175,7 +179,7 @@ class IdentityDefines @Inject()(
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[IdentityDefine] = findByTicketID(ticketID).map(_.deserialize)
+    def tryGet(ticketID: String): Future[IdentityDefine] = findByTicketID(ticketID).map(_.deserialize)
 
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
@@ -186,22 +190,39 @@ class IdentityDefines @Inject()(
   }
 
   object Utility {
+
+    private val chainID = configuration.get[String]("blockchain.chainID")
+
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
+      val tx = Service.tryGet(ticketID)
+
+      def delete(tx: IdentityDefine) = {
+        val entityID = blockchainClassifications.Utility.getID(immutables = Serializable.Immutables(Serializable.Properties(tx.immutableMetaTraits.removeData().propertyList ++ tx.immutableTraits.propertyList)), mutables = Serializable.Mutables(Serializable.Properties(tx.mutableMetaTraits.removeData().propertyList ++ tx.mutableTraits.propertyList)))
+        val deleteProperties = masterProperties.Service.deleteAll(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
+        val deleteMasterClassification = masterClassifications.Service.delete(entityID)
+
+        for {
+          _ <- deleteProperties
+          _ <- deleteMasterClassification
+        } yield ()
+      }
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+        tx <- tx
+        _ <- delete(tx)
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

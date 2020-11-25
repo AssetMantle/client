@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.SendCoin
 
+@import views.companion.blockchain.SendCoin
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_COIN, sendCoinForm) {
     @commonInputText(sendCoinForm, constants.FormField.TO)

@@ -14,11 +14,11 @@ object Property {
   )(Data.apply)(Data.unapply)
 
   case class Data(dataType: String, dataName: String, dataValue: Option[String]) {
-    def toRequestString: String = s"${dataName}${constants.Blockchain.DataNameAndTypeSeparator}${DataValue.getShortDataType(dataType)}${constants.Blockchain.DataTypeAndValueSeparator}${dataValue.getOrElse("")}"
+    def toRequestString: String = s"${dataName}${constants.Blockchain.DataNameAndTypeSeparator}${DataValue.getFactTypeFromDataType(dataType)}${constants.Blockchain.DataTypeAndValueSeparator}${dataValue.getOrElse("")}"
 
     def toMetaProperty: MetaProperty = MetaProperty(id = dataName, metaFact = MetaFact(DataValue.getData(dataType = dataType, dataValue = dataValue)))
 
-    def toProperty: SerializableProperty = SerializableProperty(id = dataName, fact = NewFact(factType = dataType, dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
+    def toProperty: SerializableProperty = SerializableProperty(id = dataName, fact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
   }
 
 }

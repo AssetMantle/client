@@ -3,11 +3,11 @@
 
 @(metaRevealForm: Form[MetaReveal.Data] = MetaReveal.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.META_REVEAL, metaRevealForm) {
-    @commonInputText(metaRevealForm, constants.FormField.FROM)
     @Messages(constants.FormField.REVEAL_FACT.name):
     @defining(Option(constants.FormField.REVEAL_FACT)) { implicit nestedFormField =>
         @commonSelect(metaRevealForm, constants.FormField.DATA_TYPE)
         @commonInputText(metaRevealForm, constants.FormField.DATA_VALUE)
     }
     @commonInputMicroNumber(metaRevealForm, constants.FormField.GAS)
+    @commonInputText(metaRevealForm, constants.FormField.PASSWORD)
 }

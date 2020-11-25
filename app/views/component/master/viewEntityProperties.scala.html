@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import models.master.Property
+@import views.html.base._
+
+@(properties: Seq[Property])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@properties.map { property =>
+    @commonVerticalInfoBox() {
+        @commonInfoBox() {
+            @commonTextInfo(constants.View.NAME, property.name)
+            @commonTextInfo(constants.View.VALUE, property.value)
+            @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
+            @commonTextInfo(constants.View.HASH_ID, property.hashID)
+            @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
+            @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
+            @commonBooleanInfo(constants.View.IS_REVEALED, Option(property.isRevealed))
+        }
+    }
+}

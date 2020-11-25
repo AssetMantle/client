@@ -1,0 +1,19 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.master.Classification
+
+@(classifications: Seq[Classification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.IDENTITY_DEFINITIONS) {
+    @commonFormButton(constants.Form.IDENTITY_DEFINE)
+} {
+    @classifications.map{classification =>
+        @commonVerticalInfoBox(){
+            @commonVerticalTextInfo(constants.View.CLASSIFICATION_ID, classification.id)
+            @commonVerticalHtmlInfo(constants.View.LABEL, classification.label.fold(Html("ADD LABEL"))(x => Html(x)))
+            @commonVerticalBooleanInfo(constants.View.STATUS, classification.status)
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
+            @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")
+        }
+    }
+}
