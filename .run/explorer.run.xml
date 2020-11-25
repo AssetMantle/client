@@ -14,7 +14,7 @@
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
         <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/comdexKeyStore" />
-        <entry key="KEY_STORE_PASSWORD" value="PUT_CORRECT_PASSWORD" />
+        <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
         <entry key="MAILGUN_USER" value="postmaster@dev.comdex.sg" />
         <entry key="MEMBER_CHECK_URL" value="https://demo.membercheck.com" />

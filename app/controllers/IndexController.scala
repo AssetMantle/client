@@ -56,7 +56,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   }
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ViewController.account(query)))
+    if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ViewController.wallet(query)))
     else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
     else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ViewController.transaction(query)))
     else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ViewController.block(query.toInt)))

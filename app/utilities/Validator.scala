@@ -2,6 +2,6 @@ package utilities
 
 object Validator {
 
-  def isHexAddress(query: String): Boolean = query.matches("[A-F0-9]{40}")
+  def isHexAddress(query: String): Boolean = query.matches(constants.RegularExpression.VALIDATOR_HEX_ADDRESS.regex)
 
 }
