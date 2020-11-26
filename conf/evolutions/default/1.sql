@@ -166,6 +166,20 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
     PRIMARY KEY ("id")
 );
 
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Parameter"
+(
+    "parameterType"     VARCHAR NOT NULL,
+    "value"             VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("parameterType")
+);
+
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"
 (
     "delegatorAddress"            VARCHAR NOT NULL,
@@ -183,18 +197,16 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."SigningInfo"
 (
-    "consensusAddress"    VARCHAR NOT NULL,
-    "startHeight"         INTEGER NOT NULL,
-    "indexOffset"         INTEGER NOT NULL,
-    "jailedUntil"         VARCHAR NOT NULL,
-    "tombstoned"          BOOLEAN NOT NULL,
-    "missedBlocksCounter" INTEGER NOT NULL,
-    "createdBy"           VARCHAR,
-    "createdOn"           TIMESTAMP,
-    "createdOnTimeZone"   VARCHAR,
-    "updatedBy"           VARCHAR,
-    "updatedOn"           TIMESTAMP,
-    "updatedOnTimeZone"   VARCHAR,
+    "consensusAddress"  VARCHAR NOT NULL,
+    "startHeight"       INTEGER NOT NULL,
+    "jailedUntil"       VARCHAR NOT NULL,
+    "tombstoned"        BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("consensusAddress")
 );
 
@@ -214,7 +226,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Split_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
 (
-    "symbol"            VARCHAR NOT NULL,
+    "denom"             VARCHAR NOT NULL,
     "totalSupply"       VARCHAR NOT NULL,
     "bondedAmount"      VARCHAR NOT NULL,
     "notBondedAmount"   VARCHAR NOT NULL,
@@ -226,7 +238,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("symbol")
+    PRIMARY KEY ("denom")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Transaction"
@@ -960,7 +972,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Property"
     "entityID"          VARCHAR NOT NULL,
     "entityType"        VARCHAR NOT NULL,
     "name"              VARCHAR NOT NULL,
-    "value"             VARCHAR NOT NULL,
+    "value"             VARCHAR,
     "dataType"          VARCHAR NOT NULL,
     "isMeta"            BOOLEAN NOT NULL,
     "isRevealed"        BOOLEAN NOT NULL,
@@ -1090,7 +1102,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
 (
     "serial"            SERIAL  NOT NULL,
-    "symbol"            VARCHAR NOT NULL,
+    "denom"             VARCHAR NOT NULL,
     "price"             NUMERIC NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1098,7 +1110,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("serial")
+    PRIMARY KEY ("denom")
 );
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
@@ -1396,6 +1408,11 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORDER_BC_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Order_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PARAMETER_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Parameter"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER REDELEGATION_LOG
@@ -1754,6 +1771,7 @@ DROP TRIGGER IF EXISTS IDENTITY_BC_LOG ON BLOCKCHAIN."Identity_BC" CASCADE;
 DROP TRIGGER IF EXISTS MAINTAINER_BC_LOG ON BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TRIGGER IF EXISTS META_BC_LOG ON BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
+DROP TRIGGER IF EXISTS PARAMETER_LOG ON BLOCKCHAIN."Parameter" CASCADE;
 DROP TRIGGER IF EXISTS REDELEGATION_LOG ON BLOCKCHAIN."Redelegation" CASCADE;
 DROP TRIGGER IF EXISTS SIGNING_INFO_LOG ON BLOCKCHAIN."SigningInfo" CASCADE;
 DROP TRIGGER IF EXISTS SPLIT_BC_LOG ON BLOCKCHAIN."Split_BC" CASCADE;
@@ -1837,6 +1855,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Identity_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Parameter" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Redelegation" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."SigningInfo" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Split_BC" CASCADE;

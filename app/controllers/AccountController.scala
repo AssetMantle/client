@@ -145,6 +145,8 @@ class AccountController @Inject()(
         val validMnemonics = utilities.Bip39.check(importWalletData.mnemonics)
 
         val createAccountAndGetResult: Future[Result] = if (validMnemonics && importWalletData.password == importWalletData.confirmPassword) {
+          //TODO Correct This: If same user gives mnemonic again with different username, Account_BC updates username and master.Account creates new row
+          //TODO Possible Solution: 1. Generate address locally and check, 2. Blockchain should prohibit addition of keys with same address and different name
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = importWalletData.username, mnemonic = importWalletData.mnemonics))
 
           def createBCAccount(addKeyResponse: KeyResponse.Response): Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey, coins = Seq.empty, accountNumber = "", sequence = ""))

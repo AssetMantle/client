@@ -1,37 +1,35 @@
 package services
 
-import akka.Done
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest, WebSocketUpgradeResponse}
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.actor.Cancellable
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.{Token, Transaction}
+import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
+import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import play.libs.Json
 import queries._
-import queries.responses.BlockCommitResponse
+import queries.responses.ABCIInfoResponse.{Response => ABCIInfoResponse}
+import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
+import queries.responses.BlockResultResponse.{Response => BlockResultResponse}
 import queries.responses.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.responses.GenesisResponse._
 import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
-import queries.responses.WSClientBlockResponse.{NewBlockEvents, Response => WSClientBlockResponse}
 import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.{Account, Header}
 import utilities.MicroNumber
 
 import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
-import scala.util.{Failure, Success}
 
 @Singleton
 class Startup @Inject()(
                          blockchainAccounts: blockchain.Accounts,
                          blockchainBlocks: blockchain.Blocks,
+                         blockchainParameters: blockchain.Parameters,
                          blockchainDelegations: blockchain.Delegations,
                          blockchainSigningInfos: blockchain.SigningInfos,
                          blockchainValidators: blockchain.Validators,
@@ -41,6 +39,8 @@ class Startup @Inject()(
                          blockchainUndelegations: blockchain.Undelegations,
                          blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
                          keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
+                         getABCIInfo: GetABCIInfo,
+                         getBlockResults: GetBlockResults,
                          getBondedValidators: GetBondedValidators,
                          getUnbondedValidators: GetUnbondedValidators,
                          getUnbondingValidators: GetUnbondingValidators,
@@ -59,9 +59,13 @@ class Startup @Inject()(
 
   private val genesisFilePath = configuration.get[String]("blockchain.genesisFilePath")
 
-  private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
-  private def initialize(): Future[Unit] = {
+  private val explorerInitialDelay = configuration.get[Int]("blockchain.explorer.initialDelay").millis
+
+  private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
+
+  private def onGenesis(): Future[Unit] = {
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
       val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
@@ -69,68 +73,52 @@ class Startup @Inject()(
       genesis
     }
 
-    val latestBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
-
-    def insertAccounts(latestBlockHeight: Int, genesis: Genesis): Future[Seq[Unit]] = insertAccountsOnStart(latestBlockHeight, genesis.app_state.auth.accounts)
-
-    def updateStaking(latestBlockHeight: Int, genesis: Genesis): Future[Unit] = updateStakingOnStart(latestBlockHeight, genesis.app_state.staking)
-
-    def insertGenesisTransactions(latestBlockHeight: Int, genesis: Genesis): Future[Unit] = insertGenesisTransactionsOnStart(latestBlockHeight, genesis.app_state.genutil.gentxs.getOrElse(Seq.empty))
-
-    def updateDistribution(latestBlockHeight: Int, genesis: Genesis): Future[Unit] = updateDistributionOnStart(latestBlockHeight, genesis.app_state.distribution)
-
-    def insertAllTokens(latestBlockHeight: Int): Future[Unit] = insertAllTokensOnStart(latestBlockHeight)
-
-    def insertBlocks(latestBlockHeight: Int): Future[Unit] = insertBlocksOnStart(latestBlockHeight)
-
     (for {
       genesis <- genesis
-      latestBlockHeight <- latestBlockHeight
-      _ <- insertAccounts(latestBlockHeight, genesis)
-      _ <- updateStaking(latestBlockHeight, genesis)
-      _ <- insertGenesisTransactions(latestBlockHeight, genesis)
-      _ <- updateDistribution(latestBlockHeight, genesis)
-      _ <- insertAllTokens(latestBlockHeight)
-      _ <- insertBlocks(latestBlockHeight)
-    } yield WebSocketBlockchainClient.start()
-      ).recoverWith {
-      case baseException: BaseException => new BaseException(constants.Response.BLOCKCHAIN_CONNECTION_LOST, baseException.exception)
-        onLosingConnection()
+      _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
+      _ <- updateStakingOnStart(genesis.app_state.staking)
+      _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gentxs.getOrElse(Seq.empty))
+      _ <- updateDistributionOnStart(genesis.app_state.distribution)
+      _ <- updateSlashingOnStart(genesis.app_state.slashing)
+      _ <- insertAllTokensOnStart()
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
     }
   }
 
-  private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
-    try {
-      var blockHeight = latestBlockHeight + 1
-      while (true) {
-        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
+  //  private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
+  //    try {
+  //      var blockHeight = latestBlockHeight + 1
+  //      while (true) {
+  //        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
+  //
+  //        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
+  //
+  //        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
+  //
+  //        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
+  //
+  //        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
+  //
+  //        val forComplete = for {
+  //          blockCommitResponse <- blockCommitResponse
+  //          transactions <- transactions
+  //          avgBlockTime <- avgBlockTime(blockCommitResponse)
+  //          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
+  //          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
+  //        } yield ()
+  //        Await.result(forComplete, Duration.Inf)
+  //        blockHeight = blockHeight + 1
+  //      }
+  //    } catch {
+  //      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
+  //        throw baseException
+  //      } else ()
+  //    }
+  //  }
 
-        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
-
-        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
-
-        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
-
-        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
-
-        val forComplete = for {
-          blockCommitResponse <- blockCommitResponse
-          transactions <- transactions
-          avgBlockTime <- avgBlockTime(blockCommitResponse)
-          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
-          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
-        } yield ()
-        Await.result(forComplete, Duration.Inf)
-        blockHeight = blockHeight + 1
-      }
-    } catch {
-      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
-        throw baseException
-      } else ()
-    }
-  }
-
-  private def insertAccountsOnStart(latestBlockHeight: Int, accounts: Seq[Account.Result]): Future[Seq[Unit]] = if (latestBlockHeight == 0) {
+  private def insertAccountsOnStart(accounts: Seq[Account.Result]): Future[Seq[Unit]] = {
     utilitiesOperations.traverse(accounts) { account =>
       val upsert = blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.value.address)
       (for {
@@ -140,11 +128,12 @@ class Startup @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-  } else Future(Seq.empty)
+  }
 
-  private def updateStakingOnStart(latestBlockHeight: Int, staking: Staking): Future[Unit] = if (latestBlockHeight == 0) {
+  private def updateStakingOnStart(staking: Staking): Future[Unit] = {
     val insertAllSigningInfos = blockchainSigningInfos.Utility.insertAll()
     val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.getOrElse(Seq.empty).map(_.toValidator))
+    val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = BigInt(staking.params.unbonding_time), maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
     //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
 
     def updateDelegations(): Future[Unit] = {
@@ -163,23 +152,34 @@ class Startup @Inject()(
       _ <- insertAllValidators
       _ <- updateDelegations()
       _ <- insertAllSigningInfos
+      _ <- insertStakingParameters
       //          _ <- insertKeyBaseAccount
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
-  } else Future()
+  }
 
-  private def updateDistributionOnStart(latestBlockHeight: Int, distribution: Distribution): Future[Unit] = if (latestBlockHeight == 0) {
+  private def updateDistributionOnStart(distribution: Distribution): Future[Unit] = {
     val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.getOrElse(Seq.empty).map(_.toWithdrawAddress))
-
+    val insertDistributionParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.DISTRIBUTION, value = DistributionParameter(communityTax = distribution.params.community_tax, baseProposerReward = distribution.params.base_proposer_reward, bonusProposerReward = distribution.params.bonus_proposer_reward, withdrawAddrEnabled = distribution.params.withdraw_addr_enabled)))
     (for {
       _ <- insertAllWithdrawAddresses
+      _ <- insertDistributionParameters
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
-  } else Future()
+  }
 
-  private def insertGenesisTransactionsOnStart(latestBlockHeight: Int, genTxs: Seq[GenTx]): Future[Unit] = if (latestBlockHeight == 0) {
+  private def updateSlashingOnStart(slashing: Slashing): Future[Unit] = {
+    val insertSlashingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.SLASHING, value = SlashingParameter(signedBlocksWindow = slashing.params.signed_blocks_window.toInt, minSignedPerWindow = slashing.params.min_signed_per_window, downtimeJailDuration = BigInt(slashing.params.downtime_jail_duration), slashFractionDoubleSign = slashing.params.slash_fraction_double_sign, slashFractionDowntime = slashing.params.slash_fraction_downtime)))
+    (for {
+      _ <- insertSlashingParameters
+    } yield ()).recover {
+      case baseException: BaseException => throw baseException
+    }
+  }
+
+  private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx]): Future[Unit] = {
     val updateTxs = Future.traverse(genTxs) { genTx =>
       val updateTx = Future.traverse(genTx.value.msg)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg, 0))
       for {
@@ -192,9 +192,9 @@ class Startup @Inject()(
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
-  } else Future()
+  }
 
-  private def insertOrUpdateAllValidators(latestBlockHeight: Int): Future[Unit] = if (latestBlockHeight == 0) {
+  private def insertOrUpdateAllValidators(): Future[Unit] = {
     val bondedValidators = getBondedValidators.Service.get()
     val unbondedValidators = getUnbondedValidators.Service.get()
     val unbondingValidators = getUnbondingValidators.Service.get()
@@ -209,7 +209,7 @@ class Startup @Inject()(
         _ <- insertDelegations
         //          _ <- insertKeyBaseAccount
       } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.getLocalizedMessage)
+        case baseException: BaseException => throw baseException
       }
     }
 
@@ -220,20 +220,20 @@ class Startup @Inject()(
       _ <- insert(bondedValidators.result ++ unbondedValidators.result ++ unbondingValidators.result)
       _ <- insertSigningInfos
     } yield ()
-  } else Future()
+  }
 
-  private def insertAllTokensOnStart(latestBlockHeight: Int): Future[Unit] = if (latestBlockHeight == 0) {
+  private def insertAllTokensOnStart(): Future[Unit] = {
     val totalSupplyResponse = getTotalSupply.Service.get
     val mintingInflationResponse = getMintingInflation.Service.get
     val stakingPoolResponse = getStakingPool.Service.get
     val communityPoolResponse = getCommunityPool.Service.get
 
     def insert(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = {
-      blockchainTokens.Service.insertMultiple(totalSupplyResponse.result.map(x => Token(symbol = x.denom, totalSupply = x.amount,
-        bondedAmount = if (x.denom == stakingTokenSymbol) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
-        notBondedAmount = if (x.denom == stakingTokenSymbol) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
+      blockchainTokens.Service.insertMultiple(totalSupplyResponse.result.map(x => Token(denom = x.denom, totalSupply = x.amount,
+        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
+        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
         communityPool = communityPoolResponse.result.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
-        inflation = if (x.denom == stakingTokenSymbol) mintingInflationResponse.result else BigDecimal(0.0)
+        inflation = if (x.denom == stakingDenom) mintingInflationResponse.result else BigDecimal(0.0)
       )))
     }
 
@@ -245,151 +245,94 @@ class Startup @Inject()(
       _ <- insert(totalSupplyResponse, mintingInflationResponse, stakingPoolResponse, communityPoolResponse)
     } yield ()
       ).recover {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
+      case baseException: BaseException => throw baseException
     }
-  } else Future()
-
-  def onLosingConnection(): Future[Unit] = {
-    actors.Service.appWebSocketActor ! Json.toJson(actors.Message.WebSocket.BlockchainConnectionLost(true)).toString
-    Thread.sleep(7000)
-    for {
-      _ <- initialize()
-    } yield ()
   }
 
-  object WebSocketBlockchainClient {
+  private def insertBlock(height: Int): Future[Unit] = {
+    val blockCommitResponse = blocksServices.insertOnBlock(height)
+    val blockResultResponse = getBlockResults.Service.get(height)
 
-    def start(): Unit = {
+    def insertTransactions(): Future[Seq[blockchainTransaction]] = blocksServices.insertTransactionsOnBlock(height)
 
-      import actors.Service._
+    def averageBlockTime(blockHeader: Header): Future[Double] = blocksServices.setAverageBlockTime(blockHeader)
 
-      val wsURL = configuration.get[String]("blockchain.wsURL")
+    def checksAndUpdatesOnNewBlock(blockHeader: Header): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockHeader)
 
-      case class BlockRequest(method: String, id: String, jsonrpc: String, params: List[String])
+    def sendNewBlockWebSocketMessage(blockCommitResponse: BlockCommitResponse, transactions: Seq[blockchainTransaction], averageBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
 
-      implicit val ec: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
-      def convertTextStreamToString(source: Source[String, _]): Future[String] = {
-        val sink = Sink.fold[String, String]("") { case (acc, str) =>
-          acc + str
-        }
-        source.runWith[Future[String]](sink)
-      }
-
-      val sink: Sink[Message, Future[Done]] =
-        Sink.foreach[Message] {
-          case strictMessage: TextMessage.Strict => onStrictMessage(strictMessage.text)
-          case streamedMessage: TextMessage.Streamed => onStreamedMessage(convertTextStreamToString(streamedMessage.textStream))
-        }
-
-      val source: Source[Message, Promise[Option[Message]]] = Source(List(TextMessage(Json.toJson(BlockRequest(method = "subscribe", id = "dontcare", jsonrpc = "2.0", params = List("tm.event='NewBlock'"))).toString))).concatMat(Source.maybe[Message])(Keep.right)
-
-      val flow: Flow[Message, Message, Future[Done]] = Flow.fromSinkAndSourceMat(sink, source)(Keep.left)
-
-      def runWebSocketConnection(flow: Flow[Message, Message, Future[Done]]): (Future[WebSocketUpgradeResponse], Future[Done]) = {
-        Http().singleWebSocketRequest(WebSocketRequest(wsURL), flow)
-      }
-
-      val (upgradeResponse, closed) = runWebSocketConnection(flow)
-
-      val connected = upgradeResponse.flatMap { upgrade =>
-        if (upgrade.response.status == StatusCodes.SwitchingProtocols) {
-          Future(logger.info(constants.Log.Messages.Websocket.CONNECTION_UPGARDED + upgrade.response.status.toString))(ec)
-        } else {
-          logger.error(constants.Log.Messages.Websocket.CONNECTION_UPGARDE_FAILED + upgrade.response.status.toString)
-          onLosingConnection()
-        }
-      }(ec)
-
-      connected.onComplete {
-        case Success(_) => logger.info(constants.Log.Messages.Websocket.CONNECTION_SUCCESS)
-        case Failure(exception) => logger.error(exception.toString)
-          logger.error(constants.Log.Messages.Websocket.CONNECTION_FAILED)
-          onLosingConnection()
-      }(ec)
-
-      closed.foreach(_ => {
-        logger.error(constants.Log.Messages.Websocket.CONNECTION_CLOSED)
-        onLosingConnection()
-      })(ec)
+    (for {
+      blockCommitResponse <- blockCommitResponse
+      transactions <- insertTransactions()
+      averageBlockTime <- averageBlockTime(blockCommitResponse.result.signed_header.header)
+      _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
+      blockResultResponse <- blockResultResponse
+      _ <- actionsOnEvents(blockResultResponse)
+      _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
+    } yield ()).recover {
+      case baseException: BaseException => throw baseException
     }
+  }
 
-    private def onNewBlock(newBlock: WSClientBlockResponse): Future[Unit] = {
-      val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
-      val newEventsActions = actionsOnNewBlockEvents(newBlock.result.events)
+  private def actionsOnEvents(blockResultResponse: BlockResultResponse): Future[Unit] = {
+    val slashing = blocksServices.onSlashingEvent(blockResultResponse.result.begin_block_events.filter(_.eventType == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
+    val missedBlock = blocksServices.onMissedBlockEvent(blockResultResponse.result.begin_block_events.filter(_.eventType == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
+    (for {
+      _ <- slashing
+      _ <- missedBlock
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  }
 
-      def insertBlocksOnNewBlock(latestExplorerHeight: Int, newIncomingHeight: Int): Unit = {
-        (latestExplorerHeight + 1).until(newIncomingHeight).foreach { height =>
-          val blockCommitResponse = blocksServices.insertOnBlock(height)
+  private val explorerRunnable = new Runnable {
+    def run(): Unit = {
+      //TODO Bug Source: Continuously emits sometimes when app starts - queries.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
+      //TODO java.lang.IllegalStateException: Closed
+      //TODO (Runtime Exception) Explorer keeps on working fine
+      //TODO (also may be akka.dispatch.TaskInvocation)
+      //TODO ILLEGAL_STATE_EXCEPTION comes only once at start if the GET request is done Await.result(getABCIInfo.Service.get(), Duration, Inf)
+      //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
+      val abciInfo = getABCIInfo.Service.get()
 
-          def avgBlockTime(blockHeader: Header): Future[Double] = blocksServices.setAverageBlockTime(blockHeader)
+      def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
 
-          def insertTransactions(): Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(height)
+      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerHeight: Int) = if (latestExplorerHeight == 0) {
+        for {
+          _ <- onGenesis()
+          _ <- insertBlock(1)
+        } yield ()
+      } else {
+        val updateBlockHeight = latestExplorerHeight + 1
+        if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
+        else Future()
+      }
 
-          def checksAndUpdatesOnNewBlock(blockHeader: Header): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockHeader)
-
-          (for {
-            blockCommitResponse <- blockCommitResponse
-            transactions <- insertTransactions()
-            avgBlockTime <- avgBlockTime(blockCommitResponse.result.signed_header.header)
-            _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
-            _ <- blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
-          } yield ()).recover {
-            case baseException: BaseException => logger.error(baseException.failure.message)
+      val forComplete = (for {
+        abciInfo <- abciInfo
+        latestExplorerHeight <- latestExplorerHeight
+        _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
+          actors.Service.appWebSocketActor ! Json.toJson(actors.Message.WebSocket.BlockchainConnectionLost(true)).toString
+        } else {
+          val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
+          for {
+            latestExplorerHeight <- latestExplorerHeight
+          } yield {
+            logger.error(constants.Log.Messages.blockchainHeightUpdateFailed(latestExplorerHeight + 1))
           }
         }
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
-
-      (for {
-        latestExplorerHeight <- latestExplorerHeight
-        _ <- newEventsActions
-      } yield insertBlocksOnNewBlock(latestExplorerHeight = latestExplorerHeight, newIncomingHeight = newBlock.result.data.value.block.header.height)
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message)
-      }
-    }
-
-    private def actionsOnNewBlockEvents(newBlockEvents: NewBlockEvents): Future[Unit] = {
-      val slashing = blocksServices.onSlashingEvent(slashAddresses = newBlockEvents.slashAddress.getOrElse(Seq.empty), slashReasons = newBlockEvents.slashReason.getOrElse(Seq.empty), slashJailed = newBlockEvents.slashJailed.getOrElse(Seq.empty))
-      val missedBlock = blocksServices.onMissedBlockEvent(livenessAddresses = newBlockEvents.livenessAddress.getOrElse(Seq.empty), livenessHeights = newBlockEvents.livenessHeight.getOrElse(Seq.empty), livenessMissedBlocksCounter = newBlockEvents.livenessMissedBlocksCounter.getOrElse(Seq.empty))
-
-      (for {
-        _ <- slashing
-        _ <- missedBlock
-      } yield ()
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.logMessage)
-      }
-    }
-
-    private def getBlock(message: String): WSClientBlockResponse = utilities.JSON.convertJsonStringToObject[WSClientBlockResponse](message)
-
-    private def onStrictMessage(message: String): Future[Unit] = {
-      (for {
-        blockResponse <- Future(getBlock(message))
-        _ <- onNewBlock(blockResponse)
-      } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.logMessage)
-      }
-    }
-
-    private def onStreamedMessage(message: Future[String]): Future[Unit] = {
-      (for {
-        message <- message
-        blockResponse <- Future(getBlock(message))
-        _ <- onNewBlock(blockResponse)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.logMessage)
-      }
+      //This Await ensures next app doesn't starts updating next block without completing the current one.
+      Await.result(forComplete, Duration.Inf)
     }
   }
 
-  private val initializeRunnable = new Runnable {
-    def run(): Unit = ()
-  }
-
-  actors.Service.actorSystem.scheduler.scheduleOnce(1000.millisecond, initializeRunnable)(schedulerExecutionContext)
+  //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
+  def start(): Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = explorerInitialDelay, delay = explorerFixedDelay)(explorerRunnable)(schedulerExecutionContext)
 
 }

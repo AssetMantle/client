@@ -35,11 +35,10 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
   object Service {
 
     def post(request: Request): Future[Response] = action(request).recover {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
       case baseException: BaseException => throw baseException
       case e: Exception => logger.error(e.getMessage)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION, e)
     }
   }
 

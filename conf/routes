@@ -110,6 +110,8 @@ POST        /split/unwrap                                        controllers.Spl
 
 GET         /entity/addLabel                                     controllers.EntityController.addLabelForm(entityID: String, entityType: String)
 POST        /entity/addLabel                                     controllers.EntityController.addLabel
+GET         /entity/addPrivateProperty                           controllers.EntityController.addPrivatePropertyForm(entityID: String, entityType: String, name: String)
+POST        /entity/addPrivateProperty                           controllers.EntityController.addPrivateProperty
 
 GET         /contact                                             controllers.ContactController.contact
 

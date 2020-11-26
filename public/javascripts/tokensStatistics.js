@@ -1,11 +1,11 @@
-function showStatistics(symbolList) {
-    let symbols = symbolList.replace('Vector(', '').replace(')', '').split(', ');
-    for (let i = 0; i < symbols.length; i++) {
-        $('#tokenStatistics_' + symbols[i]).hide();
+function showStatistics(denomList) {
+    let denoms = denomList.replace('Vector(', '').replace(')', '').split(', ');
+    for (let i = 0; i < denoms.length; i++) {
+        $('#tokenStatistics_' + denoms[i]).hide();
     }
-    $('#tokenStatistics_' + $('#tokensStatisticsSymbolSelect').val()).show();
+    $('#tokenStatistics_' + $('#tokensStatisticsDenomSelect').val()).show();
 }
 
 $(document).ready(function () {
-    $('#tokenStatistics_' + $('#tokensStatisticsSymbolSelect').val()).show();
+    $('#tokenStatistics_' + $('#tokensStatisticsDenomSelect').val()).show();
 });

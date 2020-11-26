@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.blockchain
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -19,7 +18,6 @@ case class Identity(id: String, label: Option[String], status: Option[Boolean], 
 @Singleton
 class Identities @Inject()(
                             configuration: Configuration,
-                            blockchainClassifications: blockchain.Classifications,
                             protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_IDENTITY
@@ -32,7 +30,7 @@ class Identities @Inject()(
 
   import databaseConfig.profile.api._
 
-  private[models] val identityTable = TableQuery[AccountTable]
+  private[models] val identityTable = TableQuery[IdentityTable]
 
   private def add(identity: Identity): Future[String] = db.run((identityTable returning identityTable.map(_.id) += identity).asTry).map {
     case Success(result) => result
@@ -75,7 +73,7 @@ class Identities @Inject()(
 
   private def getAllByIdentityIDs(ids: Seq[String]) = db.run(identityTable.filter(_.id.inSet(ids)).result)
 
-  private[models] class AccountTable(tag: Tag) extends Table[Identity](tag, "Identity") {
+  private[models] class IdentityTable(tag: Tag) extends Table[Identity](tag, "Identity") {
 
     def * = (id, label.?, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Identity.tupled, Identity.unapply)
 

@@ -5,6 +5,8 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.master
+import models.master.{Classification => masterClassification}
 import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -26,8 +28,6 @@ case class Classification(id: String, immutableTraits: Immutables, mutableTraits
 class Classifications @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  configuration: Configuration,
-                                 getClassification: GetClassification,
-                                 blockchainMetas: Metas
                                )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

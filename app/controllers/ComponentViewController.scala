@@ -59,7 +59,7 @@ class ComponentViewController @Inject()(
 
   private val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
 
-  private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
@@ -123,7 +123,7 @@ class ComponentViewController @Inject()(
     val tokens = blockchainTokens.Service.getAll
     (for {
       tokens <- tokens
-    } yield Ok(views.html.component.blockchain.tokensStatistics(tokens = tokens, stakingTokenSymbol = stakingTokenSymbol))
+    } yield Ok(views.html.component.blockchain.tokensStatistics(tokens = tokens, stakingDenom = stakingDenom))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
     }
@@ -143,16 +143,16 @@ class ComponentViewController @Inject()(
   }
 
   def tokensPrices(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    val allSymbols = blockchainTokens.Service.getAllSymbols
+    val allDenoms = blockchainTokens.Service.getAllDenoms
 
-    def allTokenPrices(allSymbols: Seq[String]) = masterTransactionTokenPrices.Service.getLatest(n = 5, totalTokens = allSymbols.length)
+    def allTokenPrices(allDenoms: Seq[String]) = masterTransactionTokenPrices.Service.getLatest(n = 5, totalTokens = allDenoms.length)
 
-    def getTokenPricesMap(allTokenPrices: Seq[TokenPrice], allSymbols: Seq[String]): Map[String, ListMap[String, Double]] = allSymbols.map(symbol => symbol -> ListMap(allTokenPrices.filter(_.symbol == symbol).map(tokenPrice => (tokenPrice.createdOn.getOrElse(throw new BaseException(constants.Response.TIME_NOT_FOUND)).toString, tokenPrice.price)): _*))(collection.breakOut)
+    def getTokenPricesMap(allTokenPrices: Seq[TokenPrice], allDenoms: Seq[String]): Map[String, ListMap[String, Double]] = allDenoms.map(denom => denom -> ListMap(allTokenPrices.filter(_.denom == denom).map(tokenPrice => (tokenPrice.createdOn.getOrElse(throw new BaseException(constants.Response.TIME_NOT_FOUND)).toString, tokenPrice.price)): _*))(collection.breakOut)
 
     (for {
-      allSymbols <- allSymbols
-      allTokenPrices <- allTokenPrices(allSymbols)
-    } yield Ok(views.html.component.blockchain.tokensPrices(getTokenPricesMap(allTokenPrices, allSymbols)))
+      allDenoms <- allDenoms
+      allTokenPrices <- allTokenPrices(allDenoms)
+    } yield Ok(views.html.component.blockchain.tokensPrices(getTokenPricesMap(allTokenPrices, allDenoms)))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
     }
@@ -164,7 +164,7 @@ class ComponentViewController @Inject()(
     val account = blockchainAccounts.Service.tryGet(address)
     val delegations = blockchainDelegations.Service.getAllForDelegator(address)
     val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
-    val allSymbols = blockchainTokens.Service.getAllSymbols
+    val allDenoms = blockchainTokens.Service.getAllDenoms
 
     def getRewards(isValidator: Boolean): Future[(MicroNumber, MicroNumber)] = if (isValidator) {
       getValidatorSelfBondAndCommissionRewards.Service.get(operatorAddress).map(x => (x.result.self_bond_rewards.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount)), x.result.val_commission.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount))))
@@ -183,8 +183,8 @@ class ComponentViewController @Inject()(
       delegations <- delegations
       undelegations <- undelegations
       validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))
-      allSymbols <- allSymbols
-    } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = account.coins, delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingTokenSymbol = stakingTokenSymbol, totalTokens = allSymbols.length))
+      allDenoms <- allDenoms
+    } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = account.coins, delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
       ).recover {
       case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
     }

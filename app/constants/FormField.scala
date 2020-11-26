@@ -70,6 +70,7 @@ object FormField {
   val ORDER_ID = new StringFormField("ORDER_ID", 1, 500)
   val LABEL = new StringFormField("LABEL", 1, 200)
   val ENTITY_ID = new StringFormField("ENTITY_ID", 1, 500)
+  val VALUE = new StringFormField("VALUE", 1, 1000)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
@@ -80,7 +81,7 @@ object FormField {
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
-  val TOKEN_SYMBOL = new SelectFormField("TOKEN_SYMBOL", Seq.empty)
+  val TOKEN_DENOM = new SelectFormField("TOKEN_DENOM", Seq.empty)
   val DATA_TYPE = new SelectFormField("DATA_TYPE", constants.SelectFieldOptions.DATA_TYPE)
   val ENTITY_TYPE = new SelectFormField("ENTITY_TYPE", constants.SelectFieldOptions.ENTITY_TYPE)
 

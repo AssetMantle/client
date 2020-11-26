@@ -306,27 +306,35 @@ class Identities @Inject()(
           classificationID <- defineClassification
           identityID <- getIdentityID(classificationID)
           _ <- upsert(identityID)
-        } yield identityID
+        } yield (classificationID, identityID)
       }
 
-      def masterOperations(identityID: String) = {
+      def masterOperations(classificationID: String, identityID: String) = {
         val identity = masterIdentities.Service.get(identityID)
+        val classification = masterClassifications.Service.get(classificationID)
 
-        def insertProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
+        def insertIdentityProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
 
-        def upsert(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
+        def upsertIdentity(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
+
+        def insertClassificationProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, entityID = classificationID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
+
+        def upsertClassification(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = identityID, label = None, status = Option(true)))(x => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION))
 
         for {
           identity <- identity
-          _ <- upsert(identity)
-          _ <- insertProperties(identity)
+          classification <- classification
+          _ <- upsertIdentity(identity)
+          _ <- insertIdentityProperties(identity)
+          _ <- upsertClassification(classification)
+          _ <- insertClassificationProperties(classification)
         } yield ()
       }
 
       (for {
         nubProperty <- nubProperty
-        identityID <- defineAndUpsert(nubProperty.head)
-        _ <- masterOperations(identityID)
+        (classificationID, identityID) <- defineAndUpsert(nubProperty.head)
+        _ <- masterOperations(classificationID = classificationID, identityID = identityID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)

@@ -4,7 +4,8 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction, master}
+import models.master.Property
+import models.{blockchain, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -48,7 +49,7 @@ class EntityController @Inject()(
         addLabelData => {
           val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-          def verifyAndUpdate(identityIDs: Seq[String]) = addLabelData.label match {
+          def verifyAndUpdate(identityIDs: Seq[String]) = addLabelData.entityType match {
             case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
               val classificationFromID = masterClassifications.Service.tryGetFromID(id = addLabelData.entityID, entityType = addLabelData.entityType)
 
@@ -101,7 +102,7 @@ class EntityController @Inject()(
                 ownerID <- ownerID
                 _ <- checkAndUpdate(ownerID)
               } yield ()
-            case _ => throw new BaseException(constants.Response.UNAUTHORIZED)
+            case _ => Future(throw new BaseException(constants.Response.UNAUTHORIZED))
           }
 
           (for {
@@ -116,5 +117,70 @@ class EntityController @Inject()(
       )
   }
 
+  def addPrivatePropertyForm(entityID: String, entityType: String, name: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(masterComponent.addPrivateProperty(entityID = entityID, entityType = entityType, name = name))
+  }
+
+  def addPrivateProperty(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      masterCompanion.AddPrivatProperty.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(masterComponent.addPrivateProperty(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.ENTITY_TYPE.name, ""), formWithErrors.data.getOrElse(constants.FormField.NAME.name, ""))))
+        },
+        addPrivatePropertyData => {
+          val property = masterProperties.Service.tryGet(entityID = addPrivatePropertyData.entityID, entityType = addPrivatePropertyData.entityType, name = addPrivatePropertyData.name)
+          val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+
+          def verifyAndUpdate(identityIDs: Seq[String], property: Property) = {
+            if (utilities.Hash.getHash(addPrivatePropertyData.value) == property.hashID) {
+              val verifiedOwner = addPrivatePropertyData.entityType match {
+                case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
+                  val classificationFromID = masterClassifications.Service.tryGetFromID(id = addPrivatePropertyData.entityID, entityType = addPrivatePropertyData.entityType)
+                  for {
+                    classificationFromID <- classificationFromID
+                  } yield identityIDs.contains(classificationFromID)
+                case constants.Blockchain.Entity.ASSET =>
+                  val ownerID = masterAssets.Service.tryGetOwnerID(addPrivatePropertyData.entityID)
+                  for {
+                    ownerID <- ownerID
+                  } yield identityIDs.contains(ownerID)
+                case constants.Blockchain.Entity.IDENTITY => Future(identityIDs.contains(addPrivatePropertyData.entityID))
+                case constants.Blockchain.Entity.ORDER =>
+                  val makerID = masterOrders.Service.tryGetMakerID(addPrivatePropertyData.entityID)
+
+                  for {
+                    makerID <- makerID
+                  } yield identityIDs.contains(makerID)
+                case constants.Blockchain.Entity.WRAPPED_COIN =>
+                  val ownerID = masterSplits.Service.tryGetOwnerID(entityID = addPrivatePropertyData.entityID, entityType = addPrivatePropertyData.entityType)
+
+                  for {
+                    ownerID <- ownerID
+                  } yield identityIDs.contains(ownerID)
+                case _ => Future(throw new BaseException(constants.Response.UNAUTHORIZED))
+              }
+
+              def checkAndUpdate(verifiedOwner: Boolean) = if (verifiedOwner) masterProperties.Service.updateValue(entityID = addPrivatePropertyData.entityID, entityType = addPrivatePropertyData.entityType, name = addPrivatePropertyData.name, value = addPrivatePropertyData.value)
+              else Future(throw new BaseException(constants.Response.UNAUTHORIZED))
+
+              for {
+                verifiedOwner <- verifiedOwner
+                _ <- checkAndUpdate(verifiedOwner)
+                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.VALUE_UPDATED)))
+              } yield result
+            } else Future(BadRequest(masterComponent.addPrivateProperty(masterCompanion.AddPrivatProperty.form.fill(addPrivatePropertyData).withGlobalError(constants.Response.INCORRECT_PROPERTY_VALUE.message), entityID = addPrivatePropertyData.entityID, entityType = addPrivatePropertyData.entityType, name = addPrivatePropertyData.name)))
+          }
+
+          (for {
+            property <- property
+            identityIDs <- identityIDs
+            result <- verifyAndUpdate(identityIDs, property)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
 
 }

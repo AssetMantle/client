@@ -104,6 +104,7 @@ object Response {
   val ZONE_RELEASED_ASSET = new Success("ZONE_RELEASED_ASSET")
   val ACCOUNT_CREATED = new Success("ACCOUNT_CREATED")
   val LABEL_UPDATED = new Success("LABEL_UPDATED")
+  val VALUE_UPDATED = new Success("VALUE_UPDATED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)
@@ -125,6 +126,7 @@ object Response {
   val EMAIL_ADDRESS_TAKEN = new Failure("EMAIL_ADDRESS_TAKEN")
   val MOBILE_NUMBER_TAKEN = new Failure("MOBILE_NUMBER_TAKEN")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
+  val ILLEGAL_STATE_EXCEPTION = new Failure("ILLEGAL_STATE_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
   val INCORRECT_LOG_IN = new Failure("INCORRECT_LOG_IN")
@@ -187,6 +189,8 @@ object Response {
   val UNEXPECTED_EVENT = new Failure("UNEXPECTED_EVENT")
   val ACCOUNT_KYC_PENDING = new Failure("ACCOUNT_KYC_PENDING")
   val CONTACT_VERIFICATION_PENDING = new Failure("CONTACT_VERIFICATION_PENDING")
+  val INVALID_BASE64_ENCODING = new Failure("INVALID_BASE64_ENCODING")
+  val INCORRECT_PROPERTY_VALUE = new Failure("INCORRECT_PROPERTY_VALUE")
 
   val INDEX_OUT_OF_BOUND = new Failure("INDEX_OUT_OF_BOUND")
   val JSON_UNMARSHALLING_ERROR = new Failure("JSON_UNMARSHALLING_ERROR")

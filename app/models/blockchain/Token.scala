@@ -20,11 +20,10 @@ import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Token(symbol: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Token(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Tokens @Inject()(
-                        actorSystem: ActorSystem,
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
                         getTotalSupply: GetTotalSupply,
@@ -37,7 +36,7 @@ class Tokens @Inject()(
 
   val db = databaseConfig.db
 
-  private val stakingTokenSymbol = configuration.get[String]("blockchain.token.stakingSymbol")
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -47,20 +46,20 @@ class Tokens @Inject()(
 
   private[models] val tokenTable = TableQuery[TokenTable]
 
-  case class TokenSerialized(symbol: String, totalSupply: String, bondedAmount: String, notBondedAmount: String, communityPool: String, inflation: BigDecimal, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Token = Token(symbol = symbol, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class TokenSerialized(denom: String, totalSupply: String, bondedAmount: String, notBondedAmount: String, communityPool: String, inflation: BigDecimal, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Token = Token(denom = denom, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(token: Token): TokenSerialized = TokenSerialized(symbol = token.symbol, totalSupply = token.totalSupply.toString, bondedAmount = token.bondedAmount.toString, notBondedAmount = token.notBondedAmount.toString, communityPool = token.communityPool.toString, inflation = token.inflation, createdBy = token.createdBy, createdOn = token.createdOn, createdOnTimeZone = token.createdOnTimeZone, updatedBy = token.updatedBy, updatedOn = token.updatedOn, updatedOnTimeZone = token.updatedOnTimeZone)
+  def serialize(token: Token): TokenSerialized = TokenSerialized(denom = token.denom, totalSupply = token.totalSupply.toString, bondedAmount = token.bondedAmount.toString, notBondedAmount = token.notBondedAmount.toString, communityPool = token.communityPool.toString, inflation = token.inflation, createdBy = token.createdBy, createdOn = token.createdOn, createdOnTimeZone = token.createdOnTimeZone, updatedBy = token.updatedBy, updatedOn = token.updatedOn, updatedOnTimeZone = token.updatedOnTimeZone)
 
-  private def add(token: Token): Future[String] = db.run((tokenTable returning tokenTable.map(_.symbol) += serialize(token)).asTry).map {
+  private def add(token: Token): Future[String] = db.run((tokenTable returning tokenTable.map(_.denom) += serialize(token)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.CRYPTO_TOKEN_INSERT_FAILED, psqlException)
     }
   }
 
-  private def addMultiple(tokens: Seq[Token]): Future[Seq[String]] = db.run((tokenTable returning tokenTable.map(_.symbol) ++= tokens.map(x => serialize(x))).asTry).map {
+  private def addMultiple(tokens: Seq[Token]): Future[Seq[String]] = db.run((tokenTable returning tokenTable.map(_.denom) ++= tokens.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.CRYPTO_TOKEN_INSERT_FAILED, psqlException)
@@ -74,7 +73,7 @@ class Tokens @Inject()(
     }
   }
 
-  private def findBySymbol(symbol: String): Future[TokenSerialized] = db.run(tokenTable.filter(_.symbol === symbol).result.head.asTry).map {
+  private def findBydenom(denom: String): Future[TokenSerialized] = db.run(tokenTable.filter(_.denom === denom).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
@@ -83,30 +82,30 @@ class Tokens @Inject()(
 
   private def getAllTokens: Future[Seq[TokenSerialized]] = db.run(tokenTable.result)
 
-  private def getAllTokenSymbols: Future[Seq[String]] = db.run(tokenTable.map(_.symbol).result)
+  private def getAllTokendenoms: Future[Seq[String]] = db.run(tokenTable.map(_.denom).result)
 
-  private def getTotalBondedTokenAmount: Future[String] = db.run(tokenTable.filter(_.symbol === stakingTokenSymbol).map(_.bondedAmount).result.head.asTry).map {
+  private def getTotalBondedTokenAmount: Future[String] = db.run(tokenTable.filter(_.denom === stakingDenom).map(_.bondedAmount).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def updateBySymbol(token: Token): Future[Int] = db.run(tokenTable.filter(_.symbol === token.symbol).update(serialize(token)).asTry).map {
+  private def updateBydenom(token: Token): Future[Int] = db.run(tokenTable.filter(_.denom === token.denom).update(serialize(token)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, psqlException)
     }
   }
 
-  private def updateBondingTokenBySymbol(symbol: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toString, notBondedAmount.toString)).asTry).map {
+  private def updateBondingTokenBydenom(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toString, notBondedAmount.toString)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
     }
   }
 
-  private def updateTotalSupplyAndInflationBySymbol(symbol: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.symbol === symbol).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toString, inflation)).asTry).map {
+  private def updateTotalSupplyAndInflationBydenom(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toString, inflation)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
@@ -115,9 +114,9 @@ class Tokens @Inject()(
 
   private[models] class TokenTable(tag: Tag) extends Table[TokenSerialized](tag, "Token") {
 
-    def * = (symbol, totalSupply, bondedAmount, notBondedAmount, communityPool, inflation, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TokenSerialized.tupled, TokenSerialized.unapply)
+    def * = (denom, totalSupply, bondedAmount, notBondedAmount, communityPool, inflation, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TokenSerialized.tupled, TokenSerialized.unapply)
 
-    def symbol = column[String]("symbol", O.PrimaryKey)
+    def denom = column[String]("denom", O.PrimaryKey)
 
     def totalSupply = column[String]("totalSupply")
 
@@ -146,19 +145,19 @@ class Tokens @Inject()(
 
     def create(token: Token): Future[String] = add(token)
 
-    def get(symbol: String): Future[Token] = findBySymbol(symbol).map(_.deserialize)
+    def get(denom: String): Future[Token] = findBydenom(denom).map(_.deserialize)
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
 
-    def getAllSymbols: Future[Seq[String]] = getAllTokenSymbols
+    def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
     def insertOrUpdate(token: Token): Future[Int] = upsert(token)
 
-    def updateStakingAmounts(symbol: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenBySymbol(symbol = symbol, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
+    def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenBydenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflation(symbol: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationBySymbol(symbol = symbol, totalSupply = totalSupply, inflation = inflation)
+    def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationBydenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }
@@ -168,7 +167,7 @@ class Tokens @Inject()(
     def onSlashing: Future[Unit] = {
       val stakingPoolResponse = getStakingPool.Service.get
 
-      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(symbol = stakingTokenSymbol, bondedAmount = stakingPoolResponse.result.bonded_tokens, notBondedAmount = stakingPoolResponse.result.not_bonded_tokens)
+      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = stakingDenom, bondedAmount = stakingPoolResponse.result.bonded_tokens, notBondedAmount = stakingPoolResponse.result.not_bonded_tokens)
 
       (for {
         stakingPoolResponse <- stakingPoolResponse
@@ -186,11 +185,11 @@ class Tokens @Inject()(
       val communityPoolResponse = getCommunityPool.Service.get
 
       def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.result) { token =>
-        Service.insertOrUpdate(Token(symbol = token.denom, totalSupply = token.amount,
-          bondedAmount = if (token.denom == stakingTokenSymbol) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
-          notBondedAmount = if (token.denom == stakingTokenSymbol) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
+        Service.insertOrUpdate(Token(denom = token.denom, totalSupply = token.amount,
+          bondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
+          notBondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
           communityPool = communityPoolResponse.result.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
-          inflation = if (token.denom == stakingTokenSymbol) mintingInflationResponse.result else BigDecimal(0.0)
+          inflation = if (token.denom == stakingDenom) mintingInflationResponse.result else BigDecimal(0.0)
         ))
       }
 

@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class TokenPrice(serial: Int = 0, symbol: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class TokenPrices @Inject()(
@@ -52,17 +52,17 @@ class TokenPrices @Inject()(
     }
   }
 
-  private def getPrices(symbol: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.symbol === symbol).sortBy(_.serial.desc).take(n).result)
+  private def getPrices(denom: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).take(n).result)
 
   private def getLatestPrices(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.sortBy(_.serial.desc).take(n * totalTokens).result)
 
   private[models] class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") {
 
-    def * = (serial, symbol, price, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TokenPrice.tupled, TokenPrice.unapply)
+    def * = (serial, denom, price, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TokenPrice.tupled, TokenPrice.unapply)
 
     def serial = column[Int]("serial", O.PrimaryKey, O.AutoInc)
 
-    def symbol = column[String]("symbol")
+    def denom = column[String]("denom")
 
     def price = column[Double]("price")
 
@@ -81,11 +81,11 @@ class TokenPrices @Inject()(
 
   object Service {
 
-    def create(symbol: String, price: Double): Future[Int] = add(TokenPrice(symbol = symbol, price = price))
+    def create(denom: String, price: Double): Future[Int] = add(TokenPrice(denom = denom, price = price))
 
-    def get(symbol: String, from: Timestamp, to: Timestamp, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Future[Seq[TokenPrice]] = getPrices(symbol, 5)
+    def get(denom: String, from: Timestamp, to: Timestamp, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Future[Seq[TokenPrice]] = getPrices(denom, 5)
 
-    def get(symbol: String, n: Int): Future[Seq[TokenPrice]] = getPrices(symbol, n)
+    def get(denom: String, n: Int): Future[Seq[TokenPrice]] = getPrices(denom, n)
 
     def getLatest(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = getLatestPrices(n = n, totalTokens = totalTokens)
 
@@ -94,21 +94,21 @@ class TokenPrices @Inject()(
   object Utility {
     def insertPrice(): Future[Unit] = {
       val r = new Random(System.currentTimeMillis())
-      val symbols = blockchainTokens.Service.getAllSymbols
+      val denoms = blockchainTokens.Service.getAllDenoms
 
-      def update(symbols: Seq[String]) = {
-        Future.traverse(symbols) { symbol =>
+      def update(denoms: Seq[String]) = {
+        Future.traverse(denoms) { denom =>
           val price = Future(2.5 + 5 * r.nextDouble())
           for {
             price <- price
-            _ <- Service.create(symbol = symbol, price = price)
+            _ <- Service.create(denom = denom, price = price)
           } yield ()
         }
       }
 
       (for {
-        symbols <- symbols
-        _ <- update(symbols)
+        denoms <- denoms
+        _ <- update(denoms)
       } yield ()
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

@@ -52,6 +52,7 @@ object Form {
 
   //EntityController
   val ADD_ENTITY_LABEL = new Form("ADD_ENTITY_LABEL", routes.EntityController.addLabel(), routes.javascript.EntityController.addLabelForm)
+  val ADD_PRIVATE_PROPERTY = new Form("ADD_PRIVATE_PROPERTY", routes.EntityController.addPrivateProperty(), routes.javascript.EntityController.addPrivatePropertyForm)
 
   //IdentityController
   val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub(), routes.javascript.IdentityController.nubForm)

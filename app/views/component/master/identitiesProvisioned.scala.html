@@ -5,10 +5,12 @@
 @(identities: Seq[Identity])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.PROVISIONED_IDENTITIES) {
+    @commonFormButton(constants.Form.IDENTITY_NUB)
 } {
     @identities.map { identity =>
         @commonVerticalInfoBox() {
             @commonVerticalTextInfo(constants.View.LABEL, identity.label.getOrElse(""))
+            @commonFormButton(constants.Form.ADD_ENTITY_LABEL, 'parameters -> s"'${identity.id}', '${constants.Blockchain.Entity.IDENTITY}'")
             @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
             @commonVerticalBooleanInfo(constants.View.STATUS, identity.status)
             @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${identity.id}', '${constants.Blockchain.Entity.IDENTITY}'")

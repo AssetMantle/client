@@ -17,11 +17,11 @@ import views.companion.common.Property.{Data => companionPropertyData}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Property(entityID: String, entityType: String, name: String, value: String, dataType: String, isMeta: Boolean, isRevealed: Boolean, isMutable: Boolean, hashID: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Property(entityID: String, entityType: String, name: String, value: Option[String], dataType: String, isMeta: Boolean, isRevealed: Boolean, isMutable: Boolean, hashID: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
-  def toSerializableMetaProperty: Serializable.MetaProperty = Serializable.MetaProperty(id = name, metaFact = Serializable.MetaFact(DataValue.getData(dataType = dataType, dataValue = Option(value))))
+  def toSerializableMetaProperty: Serializable.MetaProperty = Serializable.MetaProperty(id = name, metaFact = Serializable.MetaFact(DataValue.getData(dataType = dataType, dataValue = value)))
 
-  def toSerializableProperty: Serializable.Property = Serializable.Property(id = name, fact = Serializable.NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = Option(value))))
+  def toSerializableProperty: Serializable.Property = Serializable.Property(id = name, fact = Serializable.NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = value)))
 
 }
 
@@ -42,7 +42,7 @@ class Properties @Inject()(
 
   import databaseConfig.profile.api._
 
-  private[models] val propertyTable = TableQuery[AccountTable]
+  private[models] val propertyTable = TableQuery[PropertyTable]
 
   private def add(property: Property): Future[String] = db.run((propertyTable returning propertyTable.map(_.entityID) += property).asTry).map {
     case Success(result) => result
@@ -65,6 +65,21 @@ class Properties @Inject()(
     }
   }
 
+  private def tryGetByEntityIDEntityTypeAndName(entityID: String, entityType: String, name: String) = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType && x.name === name).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def updateValueByEntityIDEntityTypeAndName(entityID: String, entityType: String, name: String, value: String): Future[Int] = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType && x.name === name).map(_.value).update(value).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def getAllByEntityIDAndEntityType(entityID: String, entityType: String): Future[Seq[Property]] = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).result)
 
   private def deleteByEntityIDAndEntityType(entityID: String, entityType: String) = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).delete.asTry).map {
@@ -77,9 +92,9 @@ class Properties @Inject()(
 
   private def findEntityIDByNameValueAndEntityType(name: String, values: Seq[String], hashedValues: Seq[String], entityType: String) = db.run(propertyTable.filter(x => x.name === name && x.entityType === entityType && (x.value.inSet(values) || x.value.inSet(hashedValues))).map(_.entityID).result)
 
-  private[models] class AccountTable(tag: Tag) extends Table[Property](tag, "Property") {
+  private[models] class PropertyTable(tag: Tag) extends Table[Property](tag, "Property") {
 
-    def * = (entityID, entityType, name, value, dataType, isMeta, isRevealed, isMutable, hashID, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Property.tupled, Property.unapply)
+    def * = (entityID, entityType, name, value.?, dataType, isMeta, isRevealed, isMutable, hashID, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Property.tupled, Property.unapply)
 
     def entityID = column[String]("entityID", O.PrimaryKey)
 
@@ -121,6 +136,10 @@ class Properties @Inject()(
 
     def insertMultiple(properties: Seq[Property]): Future[Seq[String]] = addMultiple(properties)
 
+    def tryGet(entityID: String, entityType: String, name: String): Future[Property] = tryGetByEntityIDEntityTypeAndName(entityID = entityID, entityType = entityType, name = name)
+
+    def updateValue(entityID: String, entityType: String, name: String, value: String): Future[Int] = updateValueByEntityIDEntityTypeAndName(entityID = entityID, entityType = entityType, name = name, value = value)
+
     def insertOrUpdate(property: Property): Future[Int] = upsert(property)
 
     def deleteAll(entityID: String, entityType: String): Future[Int] = deleteByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
@@ -138,10 +157,10 @@ class Properties @Inject()(
       val metas = blockchainMetas.Service.get(immutables.map(_.toProperty).map(_.fact.hash) ++ mutables.map(_.toProperty).map(_.fact.hash))
 
       def upsert(metas: Seq[Meta]) = {
-        val upsertImmutableMetas = Future.traverse(immutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = false, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
-        val upsertImmutables = Future.traverse(immutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = false, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
-        val upsertMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
-        val upsertMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val upsertImmutableMetas = Future.traverse(immutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = false, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val upsertImmutables = Future.traverse(immutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = false, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val upsertMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val upsertMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
         for {
           _ <- upsertImmutableMetas
           _ <- upsertImmutables
@@ -164,8 +183,8 @@ class Properties @Inject()(
       val metas = blockchainMetas.Service.get(mutables.map(_.toProperty).map(_.fact.hash))
 
       def update(metas: Seq[Meta]) = {
-        val updateMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
-        val updateMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue.getOrElse(""), dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val updateMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
+        val updateMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isRevealed = metas.exists(_.id == x.toProperty.fact.hash), isMutable = true, hashID = DataValue.getHash(dataType = x.dataType, dataValue = x.dataValue.getOrElse("")))))
         for {
           _ <- updateMutableMetas
           _ <- updateMutables
@@ -184,10 +203,10 @@ class Properties @Inject()(
       val metas = blockchainMetas.Service.get(immutables.propertyList.map(_.fact.hash) ++ mutables.propertyList.map(_.fact.hash))
 
       def upsert(metas: Seq[Meta]) = {
-        val upsertImmutableMetas = Future.traverse(immutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = x.metaFact.data.value.asString, dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = false, hashID = x.metaFact.data.value.generateHash)))
-        val upsertImmutables = Future.traverse(immutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold("")(_.dataValue), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = false, hashID = x.fact.hash)))
-        val upsertMutableMetas = Future.traverse(mutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = x.metaFact.data.value.asString, dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = x.metaFact.data.value.generateHash)))
-        val upsertMutables = Future.traverse(mutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold("")(_.dataValue), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = true, hashID = x.fact.hash)))
+        val upsertImmutableMetas = Future.traverse(immutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = Option(x.metaFact.data.value.asString), dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = false, hashID = x.metaFact.data.value.generateHash)))
+        val upsertImmutables = Future.traverse(immutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold[Option[String]](None)(x => Option(x.dataValue)), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = false, hashID = x.fact.hash)))
+        val upsertMutableMetas = Future.traverse(mutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = Option(x.metaFact.data.value.asString), dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = x.metaFact.data.value.generateHash)))
+        val upsertMutables = Future.traverse(mutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold[Option[String]](None)(x => Option(x.dataValue)), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = true, hashID = x.fact.hash)))
 
         for {
           _ <- upsertImmutableMetas
@@ -209,8 +228,8 @@ class Properties @Inject()(
       val metas = blockchainMetas.Service.get(mutables.propertyList.map(_.fact.hash))
 
       def update(metas: Seq[Meta]) = {
-        val updateMutableMetas = Future.traverse(mutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = x.metaFact.data.value.asString, dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = x.metaFact.data.value.generateHash)))
-        val updateMutables = Future.traverse(mutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold("")(_.dataValue), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = true, hashID = x.fact.hash)))
+        val updateMutableMetas = Future.traverse(mutableMetas.metaPropertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = Option(x.metaFact.data.value.asString), dataType = x.metaFact.data.dataType, isMeta = true, isRevealed = true, isMutable = true, hashID = x.metaFact.data.value.generateHash)))
+        val updateMutables = Future.traverse(mutables.propertyList)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.id, value = metas.find(_.id == x.id).fold[Option[String]](None)(x => Option(x.dataValue)), dataType = DataValue.getDataTypeFromFactType(x.fact.factType), isMeta = false, isRevealed = metas.exists(_.id == x.id), isMutable = true, hashID = x.fact.hash)))
 
         for {
           _ <- updateMutableMetas

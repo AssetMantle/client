@@ -16,7 +16,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SigningInfo(consensusAddress: String, startHeight: Int, indexOffset: Int, jailedUntil: String, tombstoned: Boolean = false, missedBlocksCounter: Int = 0, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class SigningInfo(consensusAddress: String, startHeight: Int, jailedUntil: String, tombstoned: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class SigningInfos @Inject()(
@@ -70,19 +70,15 @@ class SigningInfos @Inject()(
 
   private[models] class SigningInfoTable(tag: Tag) extends Table[SigningInfo](tag, "SigningInfo") {
 
-    def * = (consensusAddress, startHeight, indexOffset, jailedUntil, tombstoned, missedBlocksCounter, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SigningInfo.tupled, SigningInfo.unapply)
+    def * = (consensusAddress, startHeight, jailedUntil, tombstoned, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (SigningInfo.tupled, SigningInfo.unapply)
 
     def consensusAddress = column[String]("consensusAddress", O.PrimaryKey)
 
     def startHeight = column[Int]("startHeight")
 
-    def indexOffset = column[Int]("indexOffset")
-
     def jailedUntil = column[String]("jailedUntil")
 
     def tombstoned = column[Boolean]("tombstoned")
-
-    def missedBlocksCounter = column[Int]("missedBlocksCounter")
 
     def createdBy = column[String]("createdBy")
 

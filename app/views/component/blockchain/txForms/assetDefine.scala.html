@@ -6,7 +6,7 @@
     @commonInputText(assetDefineForm, constants.FormField.FROM_ID)
     @commonInputText(assetDefineForm, constants.FormField.LABEL)
     @commonInputMicroNumber(assetDefineForm, constants.FormField.GAS)
-    @commonInputText(assetDefineForm, constants.FormField.PASSWORD)
+    @commonInputPassword(assetDefineForm, constants.FormField.PASSWORD)
     @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)

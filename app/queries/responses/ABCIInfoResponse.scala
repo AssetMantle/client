@@ -13,7 +13,7 @@ object ABCIInfoResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(jsonrpc: String, id: String, result: Result) extends BaseResponse
+  case class Response(jsonrpc: String, id: Int, result: Result) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

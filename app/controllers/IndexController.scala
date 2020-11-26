@@ -85,4 +85,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
     }
   }
+
+  startup.start()
 }

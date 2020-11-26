@@ -6,14 +6,14 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.ABCIInfoResponse.Response
+import queries.responses.BlockResultResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetBlockResults @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ABCI_INFO
+  private implicit val module: String = constants.Module.QUERIES_GET_BLOCK_RESULTS
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -21,16 +21,16 @@ class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val port = configuration.get[String]("blockchain.abciPort")
 
-  private val path = "abci_info?"
+  private val path = "block_results?height="
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
+  private def action(height: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + height).get)
 
   object Service {
-    def get(): Future[Response] = action().recover {
+
+    def get(height: Int): Future[Response] = action(height).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
-      case illegalStateException: IllegalStateException => throw new BaseException(constants.Response.ILLEGAL_STATE_EXCEPTION, illegalStateException)
     }
   }
 

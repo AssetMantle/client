@@ -10,7 +10,8 @@
     @classifications.map{classification =>
         @commonVerticalInfoBox(){
             @commonVerticalTextInfo(constants.View.CLASSIFICATION_ID, classification.id)
-            @commonVerticalHtmlInfo(constants.View.LABEL, classification.label.fold(Html("ADD LABEL"))(x => Html(x)))
+            @commonVerticalTextInfo(constants.View.LABEL, classification.label.getOrElse(""))
+            @commonFormButton(constants.Form.ADD_ENTITY_LABEL, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
             @commonVerticalBooleanInfo(constants.View.STATUS, classification.status)
             @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
             @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")

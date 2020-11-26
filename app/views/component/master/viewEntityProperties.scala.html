@@ -5,15 +5,16 @@
 @(properties: Seq[Property])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @properties.map { property =>
-    @commonVerticalInfoBox() {
-        @commonInfoBox() {
-            @commonTextInfo(constants.View.NAME, property.name)
-            @commonTextInfo(constants.View.VALUE, property.value)
-            @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
-            @commonTextInfo(constants.View.HASH_ID, property.hashID)
-            @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
-            @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
-            @commonBooleanInfo(constants.View.IS_REVEALED, Option(property.isRevealed))
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.NAME, property.name)
+        @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
+        @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
+        @commonTextInfo(constants.View.HASH_ID, property.hashID)
+        @if(property.hashID != "" && property.value.getOrElse("") == "") {
+            @commonFormButton(constants.Form.ADD_PRIVATE_PROPERTY, 'parameters -> s"'${property.entityID}', '${property.entityType}', '${property.name}'")
         }
+        @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
+        @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
+        @commonBooleanInfo(constants.View.IS_REVEALED, Option(property.isRevealed))
     }
 }
