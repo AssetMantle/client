@@ -238,27 +238,27 @@ class Block @Inject()(
     def addEvent(validator: Validator, missedBlockCounter: Int, height: Int, slashingParameter: SlashingParameter): Future[String] = {
       //TODO criteria needs to be set to send notification
       //TODO In future if private notifications is asked for missing blocks then it needs to be done from here.
-      if (missedBlockCounter % (slashingParameter.minSignedPerWindow * BigDecimal(slashingParameter.signedBlocksWindow) / 10) == 0) {
+      val slashingOnMissingBlocks = slashingParameter.minSignedPerWindow * BigDecimal(slashingParameter.signedBlocksWindow)
+      if ((missedBlockCounter % (slashingOnMissingBlocks / 10) == 0) && missedBlockCounter != slashingOnMissingBlocks) {
         masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker.getOrElse(validator.operatorAddress), missedBlockCounter.toString, height.toString)(validator.operatorAddress)
       } else Future("")
     }
 
-    def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) {
-      event =>
-        val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
-        val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.fold(0)(_.toInt))
-        val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
+    def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
+      val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
+      val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.fold(0)(_.toInt))
+      val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
 
-        def updateSigningInfo(validator: Validator) = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
+      def updateSigningInfo(validator: Validator) = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
 
-        (for {
-          validator <- validator
-          _ <- updateSigningInfo(validator)
-          _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
-        } yield ()
-          ).recover {
-          case baseException: BaseException => throw baseException
-        }
+      (for {
+        validator <- validator
+        _ <- updateSigningInfo(validator)
+        _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
 
     (for {
