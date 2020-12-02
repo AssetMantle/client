@@ -17,7 +17,7 @@
     </div>
 } {
     @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
-    @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.account(selfDelegationAddress)))
+    @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.wallet(selfDelegationAddress)))
     @commonTextInfo(constants.View.COMMISSION_RATE, validator.commission.commissionRates.rate.toString + "%")
     @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
     @validator.description.identity match {

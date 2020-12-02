@@ -20,11 +20,11 @@ class MetaReveal @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private val path = "xprt/metas/reveal"
 

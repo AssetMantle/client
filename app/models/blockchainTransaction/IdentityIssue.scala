@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityIssue] with Logged {
-  def mutateTicketID(newTicketID: String): IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityIssue] with Logged {
+  def mutateTicketID(newTicketID: String): IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaProperties = immutableMetaProperties, immutableProperties = immutableProperties, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -33,11 +33,11 @@ class IdentityIssues @Inject()(
                                 blockchainAccounts: blockchain.Accounts
                               )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  case class IdentityIssueSerialized(from: String, to: String, fromID: String, classificationID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class IdentityIssueSerialized(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Properties](immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(identityIssue: IdentityIssue): IdentityIssueSerialized = IdentityIssueSerialized(from = identityIssue.from, to = identityIssue.to, fromID = identityIssue.fromID, classificationID = identityIssue.classificationID, immutableMetaTraits = Json.toJson(identityIssue.immutableMetaTraits).toString, immutableTraits = Json.toJson(identityIssue.immutableTraits).toString, mutableMetaTraits = Json.toJson(identityIssue.mutableMetaTraits).toString, mutableTraits = Json.toJson(identityIssue.mutableTraits).toString, gas = identityIssue.gas.toMicroString, status = identityIssue.status, txHash = identityIssue.txHash, ticketID = identityIssue.ticketID, mode = identityIssue.mode, code = identityIssue.code, createdBy = identityIssue.createdBy, createdOn = identityIssue.createdOn, createdOnTimeZone = identityIssue.createdOnTimeZone, updatedBy = identityIssue.updatedBy, updatedOn = identityIssue.updatedOn, updatedOnTimeZone = identityIssue.updatedOnTimeZone)
+  def serialize(identityIssue: IdentityIssue): IdentityIssueSerialized = IdentityIssueSerialized(from = identityIssue.from, to = identityIssue.to, fromID = identityIssue.fromID, classificationID = identityIssue.classificationID, immutableMetaProperties = Json.toJson(identityIssue.immutableMetaProperties).toString, immutableProperties = Json.toJson(identityIssue.immutableProperties).toString, mutableMetaProperties = Json.toJson(identityIssue.mutableMetaProperties).toString, mutableProperties = Json.toJson(identityIssue.mutableProperties).toString, gas = identityIssue.gas.toMicroString, status = identityIssue.status, txHash = identityIssue.txHash, ticketID = identityIssue.ticketID, mode = identityIssue.mode, code = identityIssue.code, createdBy = identityIssue.createdBy, createdOn = identityIssue.createdOn, createdOnTimeZone = identityIssue.createdOnTimeZone, updatedBy = identityIssue.updatedBy, updatedOn = identityIssue.updatedOn, updatedOnTimeZone = identityIssue.updatedOnTimeZone)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -124,7 +124,7 @@ class IdentityIssues @Inject()(
 
   private[models] class IdentityIssueTable(tag: Tag) extends Table[IdentityIssueSerialized](tag, "IdentityIssue") {
 
-    def * = (from, to, fromID, classificationID, immutableMetaTraits, immutableTraits, mutableMetaTraits, mutableTraits, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentityIssueSerialized.tupled, IdentityIssueSerialized.unapply)
+    def * = (from, to, fromID, classificationID, immutableMetaProperties, immutableProperties, mutableMetaProperties, mutableProperties, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentityIssueSerialized.tupled, IdentityIssueSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -134,13 +134,13 @@ class IdentityIssues @Inject()(
 
     def classificationID = column[String]("classificationID")
 
-    def immutableMetaTraits = column[String]("immutableMetaTraits")
+    def immutableMetaProperties = column[String]("immutableMetaProperties")
 
-    def immutableTraits = column[String]("immutableTraits")
+    def immutableProperties = column[String]("immutableProperties")
 
-    def mutableMetaTraits = column[String]("mutableMetaTraits")
+    def mutableMetaProperties = column[String]("mutableMetaProperties")
 
-    def mutableTraits = column[String]("mutableTraits")
+    def mutableProperties = column[String]("mutableProperties")
 
     def gas = column[String]("gas")
 

@@ -17,9 +17,9 @@ class GetBlock @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.abciPort")
+  private val port = configuration.get[String]("blockchain.abciPort")
 
   private val path = "block?height="
 

@@ -40,7 +40,8 @@ object TransactionResponse {
   implicit val txReads: Reads[Tx] = Json.reads[Tx]
 
   case class Response(height: String, txhash: String, code: Option[Int], raw_log: String, logs: Option[Seq[Log]], gas_wanted: String, gas_used: String, tx: Tx, timestamp: String) extends BaseResponse {
-    def toTransaction: Transaction = Transaction(hash = txhash, height = height.toInt, code = code, rawLog = raw_log, status = code.isEmpty, gasWanted = gas_wanted, gasUsed = gas_used,
+    def toTransaction: Transaction = Transaction(hash = txhash, height = height.toInt, code = code, rawLog = raw_log, gasWanted = gas_wanted, gasUsed = gas_used,
+      status = code.fold(true)(x => x == 0),
       messages = tx.value.msg.map(_.toStdMsg),
       fee = tx.value.fee.toFee,
       timestamp = timestamp)

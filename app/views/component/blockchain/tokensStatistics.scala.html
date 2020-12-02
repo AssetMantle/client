@@ -4,21 +4,21 @@
 @import views.html.helper.select
 @import scala.collection.immutable.ListMap
 
-@(tokens: Seq[Token], stakingTokenSymbol: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(tokens: Seq[Token], stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKENS_STATISTICS) {
     @if(tokens.nonEmpty) {
         <div class="cardHeaderSelect">
-        @select(Field(form = views.companion.blockchain.TokenSymbol.form, name = constants.FormField.TOKEN_SYMBOL.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(tokens.head.symbol)), for(symbol <- tokens.map(_.symbol)) yield (symbol, symbol), 'id -> "tokensStatisticsSymbolSelect", 'value -> s"'${tokens.head.symbol}'", 'onClick -> s"showStatistics('${tokens.map(_.symbol)}')", 'class -> "cmuk-select", 'label -> "")
+        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(tokens.head.denom)), for(denom <- tokens.map(_.denom)) yield (denom, denom), 'id -> "tokensStatisticsDenomSelect", 'value -> s"'${tokens.head.denom}'", 'onClick -> s"showStatistics('${tokens.map(_.denom)}')", 'class -> "cmuk-select", 'label -> "")
         </div>
     }
 } {
     @if(tokens.nonEmpty) {
         @tokens.map { token =>
-            <div id="@Seq("tokenStatistics", token.symbol).mkString("_")" class="hidden">
+            <div id="@Seq("tokenStatistics", token.denom).mkString("_")" class="hidden">
                 @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
                 @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
-                @if(token.symbol == stakingTokenSymbol) {
+                @if(token.denom == stakingDenom) {
                     @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
                     @commonPieChart("bondingTokenStatisticsChart", ListMap(
                         constants.View.BONDED_AMOUNT -> token.bondedAmount.toDouble,

@@ -25,6 +25,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
+        routes.javascript.AccountController.checkMnemonics,
+        routes.javascript.AccountController.importWalletForm,
 
         routes.javascript.AssetController.defineForm,
         routes.javascript.AssetController.mintForm,
@@ -74,6 +76,17 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.validatorTransactions,
         routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
+        routes.javascript.ComponentViewController.entityProperties,
+
+        routes.javascript.ComponentViewController.identitiesDefinition,
+        routes.javascript.ComponentViewController.identitiesProvisioned,
+        routes.javascript.ComponentViewController.identitiesUnprovisioned,
+        routes.javascript.ComponentViewController.assetsDefinition,
+        routes.javascript.ComponentViewController.assetsMinted,
+        routes.javascript.ComponentViewController.ordersDefinition,
+        routes.javascript.ComponentViewController.ordersMade,
+        routes.javascript.ComponentViewController.ordersTake,
+
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
@@ -81,6 +94,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.DocusignController.send,
         routes.javascript.DocusignController.sign,
         routes.javascript.DocusignController.authorization,
+
+        routes.javascript.EntityController.addLabelForm,
+        routes.javascript.EntityController.addPrivatePropertyForm,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -111,7 +127,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NotificationController.publicRecentActivityMessages,
 
         routes.javascript.SendCoinController.sendCoinForm,
-        routes.javascript.SendCoinController.blockchainSendCoinForm,
 
         routes.javascript.ContactController.verifyEmailAddressForm,
 
@@ -127,7 +142,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SplitController.unwrapForm,
 
         routes.javascript.ViewController.profile,
-        routes.javascript.ViewController.account,
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.block,
         routes.javascript.ViewController.transaction,

@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[AssetBurn]) { assetBurn =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(assetBurn.from, routes.ViewController.account(assetBurn.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(assetBurn.from, routes.ViewController.wallet(assetBurn.from)))
     @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetBurn.assetID, routes.IndexController.search(assetBurn.assetID)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(assetBurn.fromID, routes.IndexController.search(assetBurn.fromID)))
 }

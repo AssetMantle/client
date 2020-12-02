@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMutate] with Logged {
-  def mutateTicketID(newTicketID: String): AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMutate] with Logged {
+  def mutateTicketID(newTicketID: String): AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -33,11 +33,11 @@ class AssetMutates @Inject()(
                               blockchainAccounts: blockchain.Accounts
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  case class AssetMutateSerialized(from: String, fromID: String, assetID: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class AssetMutateSerialized(from: String, fromID: String, assetID: String, mutableMetaProperties: String, mutableProperties: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(assetMutate: AssetMutate): AssetMutateSerialized = AssetMutateSerialized(from = assetMutate.from, fromID = assetMutate.fromID, assetID = assetMutate.assetID, mutableMetaTraits = Json.toJson(assetMutate.mutableMetaTraits).toString, mutableTraits = Json.toJson(assetMutate.mutableTraits).toString, gas = assetMutate.gas.toMicroString, status = assetMutate.status, txHash = assetMutate.txHash, ticketID = assetMutate.ticketID, mode = assetMutate.mode, code = assetMutate.code, createdBy = assetMutate.createdBy, createdOn = assetMutate.createdOn, createdOnTimeZone = assetMutate.createdOnTimeZone, updatedBy = assetMutate.updatedBy, updatedOn = assetMutate.updatedOn, updatedOnTimeZone = assetMutate.updatedOnTimeZone)
+  def serialize(assetMutate: AssetMutate): AssetMutateSerialized = AssetMutateSerialized(from = assetMutate.from, fromID = assetMutate.fromID, assetID = assetMutate.assetID, mutableMetaProperties = Json.toJson(assetMutate.mutableMetaProperties).toString, mutableProperties = Json.toJson(assetMutate.mutableProperties).toString, gas = assetMutate.gas.toMicroString, status = assetMutate.status, txHash = assetMutate.txHash, ticketID = assetMutate.ticketID, mode = assetMutate.mode, code = assetMutate.code, createdBy = assetMutate.createdBy, createdOn = assetMutate.createdOn, createdOnTimeZone = assetMutate.createdOnTimeZone, updatedBy = assetMutate.updatedBy, updatedOn = assetMutate.updatedOn, updatedOnTimeZone = assetMutate.updatedOnTimeZone)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -124,7 +124,7 @@ class AssetMutates @Inject()(
 
   private[models] class AssetMutateTable(tag: Tag) extends Table[AssetMutateSerialized](tag, "AssetMutate") {
 
-    def * = (from, fromID, assetID, mutableMetaTraits, mutableTraits, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMutateSerialized.tupled, AssetMutateSerialized.unapply)
+    def * = (from, fromID, assetID, mutableMetaProperties, mutableProperties, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMutateSerialized.tupled, AssetMutateSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -132,9 +132,9 @@ class AssetMutates @Inject()(
 
     def assetID = column[String]("assetID")
 
-    def mutableMetaTraits = column[String]("mutableMetaTraits")
+    def mutableMetaProperties = column[String]("mutableMetaProperties")
 
-    def mutableTraits = column[String]("mutableTraits")
+    def mutableProperties = column[String]("mutableProperties")
 
     def gas = column[String]("gas")
 

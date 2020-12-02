@@ -7,6 +7,8 @@ import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
+import models.master
+import models.master.{Asset => masterAsset, Classification => masterClassification}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -31,7 +33,10 @@ class Assets @Inject()(
                         blockchainClassifications: Classifications,
                         blockchainSplits: Splits,
                         blockchainMetas: Metas,
-                        blockchainMaintainers: Maintainers
+                        blockchainMaintainers: Maintainers,
+                        masterClassifications: master.Classifications,
+                        masterAssets: master.Assets,
+                        masterProperties: master.Properties,
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -92,6 +97,8 @@ class Assets @Inject()(
     }
   }
 
+  private def checkExistsByID(id: String) = db.run(assetTable.filter(_.id === id).exists.result)
+
   private[models] class AssetTable(tag: Tag) extends Table[AssetSerialized](tag, "Asset_BC") {
 
     def * = (id, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
@@ -130,6 +137,8 @@ class Assets @Inject()(
     def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
 
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }
 
   object Utility {
@@ -150,10 +159,25 @@ class Assets @Inject()(
         } yield classificationID
       }
 
+      def masterOperations(classificationID: String) = {
+        val classification = masterClassifications.Service.get(classificationID)
+
+        def insertProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ASSET_DEFINITION, entityID = classificationID, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits) else Future("")
+
+        def upsert(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.ASSET_DEFINITION, fromID = assetDefine.fromID, label = None, status = Option(true)))(_ => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.ASSET_DEFINITION))
+
+        for {
+          classification <- classification
+          _ <- upsert(classification)
+          _ <- insertProperties(classification)
+        } yield ()
+      }
+
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        _ <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -173,13 +197,28 @@ class Assets @Inject()(
         for {
           _ <- mintAuxiliary
           _ <- upsertAsset
+        } yield assetID
+      }
+
+      def masterOperations(assetID: String) = {
+        val asset = masterAssets.Service.get(assetID)
+
+        def insertProperties(asset: Option[masterAsset]) = if (asset.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ASSET, entityID = assetID, immutableMetas = assetMint.immutableMetaProperties, immutables = assetMint.immutableProperties, mutableMetas = assetMint.mutableMetaProperties, mutables = assetMint.mutableProperties) else Future("")
+
+        def upsertMaster(asset: Option[masterAsset]) = asset.fold(masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, label = None, ownerID = assetMint.toID, status = Option(true))))(x => masterAssets.Service.insertOrUpdate(x.copy(status = Option(true))))
+
+        for {
+          asset <- asset
+          _ <- upsertMaster(asset)
+          _ <- insertProperties(asset)
         } yield ()
       }
 
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        _ <- upsert(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        assetID <- upsert(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(assetID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -192,10 +231,19 @@ class Assets @Inject()(
 
       def upsertAsset(oldAsset: Asset, scrubbedMutableMetaProperties: Seq[Property]) = Service.insertOrUpdate(oldAsset.copy(mutables = oldAsset.mutables.mutate(scrubbedMutableMetaProperties ++ assetMutate.mutableProperties.propertyList)))
 
+      def masterOperations(assetID: String) = {
+        val updateProperties = masterProperties.Utilities.updateProperties(entityType = constants.Blockchain.Entity.ASSET, entityID = assetID, mutableMetas = assetMutate.mutableMetaProperties, mutables = assetMutate.mutableProperties)
+
+        for {
+          _ <- updateProperties
+        } yield ()
+      }
+
       (for {
         oldAsset <- oldAsset
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
         _ <- upsertAsset(oldAsset, scrubbedMutableMetaProperties)
+        _ <- masterOperations(assetMutate.assetID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -206,16 +254,27 @@ class Assets @Inject()(
       val burnAuxiliary = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.SmallestDec)
       val deleteAsset = Service.delete(assetBurn.assetID)
 
+      def masterOperations(assetID: String) = {
+        val deleteProperties = masterProperties.Service.deleteAll(entityType = constants.Blockchain.Entity.ASSET, entityID = assetID)
+        val deleteAsset = masterAssets.Service.delete(assetID)
+
+        for {
+          _ <- deleteProperties
+          _ <- deleteAsset
+        } yield ()
+      }
+
       (for {
         _ <- burnAuxiliary
         _ <- deleteAsset
+        _ <- masterOperations(assetBurn.assetID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    private def getID(classificationID: String, immutables: Immutables) = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+    def getID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
   }
 

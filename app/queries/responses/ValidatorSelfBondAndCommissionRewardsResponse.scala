@@ -7,7 +7,7 @@ import transactions.Abstract.BaseResponse
 object ValidatorSelfBondAndCommissionRewardsResponse {
 
   //TODO Raise an issue for the following
-  //Bug in cosmos-sdk, the actual value send in `operator_address` is validator's account address instead of its operator address
+  //Bug in cosmos-sdk, the actual value send in `operator_address` is validator's wallet address instead of its operator address
   case class Result(operator_address: String, self_bond_rewards: Option[Seq[Coin]], val_commission: Option[Seq[Coin]])
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]

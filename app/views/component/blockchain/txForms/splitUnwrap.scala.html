@@ -1,11 +1,11 @@
 @import views.companion.blockchain.SplitUnwrap
 @import views.html.base._
 
-@(splitUnwrapForm: Form[SplitUnwrap.Data] = SplitUnwrap.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(splitUnwrapForm: Form[SplitUnwrap.Data] = SplitUnwrap.form, ownableID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SPLIT_UNWRAP, splitUnwrapForm) {
-    @commonInputText(splitUnwrapForm, constants.FormField.FROM)
     @commonInputText(splitUnwrapForm, constants.FormField.FROM_ID)
-    @commonInputText(splitUnwrapForm, constants.FormField.OWNABLE_ID)
+    @commonInputText(splitUnwrapForm, constants.FormField.OWNABLE_ID, 'value -> ownableID)
     @commonInputBigDecimal(splitUnwrapForm, constants.FormField.SPLIT)
     @commonInputMicroNumber(splitUnwrapForm, constants.FormField.GAS)
+    @commonInputPassword(splitUnwrapForm, constants.FormField.PASSWORD)
 }

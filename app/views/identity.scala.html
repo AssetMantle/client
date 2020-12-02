@@ -1,0 +1,55 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+
+@views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
+
+@left = {
+    <div class="leftContainer">
+        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+    </div>
+    <script>
+            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
+            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+    </script>
+}
+
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="identitiesDefinition"></div>
+            </div>
+        </div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="identitiesProvisioned"></div>
+            </div>
+        </div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="identitiesUnprovisioned"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+            componentResource('identitiesDefinition', jsRoutes.controllers.ComponentViewController.identitiesDefinition());
+            componentResource('identitiesProvisioned', jsRoutes.controllers.ComponentViewController.identitiesProvisioned());
+            componentResource('identitiesUnprovisioned', jsRoutes.controllers.ComponentViewController.identitiesUnprovisioned());
+    </script>
+}
+
+@right = {
+    <div class="rightContainer">
+        <div class="recentActivityContainer">
+            <div id="recentActivities"></div>
+        </div>
+        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
+    </script>
+}

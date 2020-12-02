@@ -5,6 +5,8 @@ import java.sql.Timestamp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.master
+import models.master.{Classification => masterClassification}
 import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -26,8 +28,6 @@ case class Classification(id: String, immutableTraits: Immutables, mutableTraits
 class Classifications @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  configuration: Configuration,
-                                 getClassification: GetClassification,
-                                 blockchainMetas: Metas
                                )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -78,6 +78,8 @@ class Classifications @Inject()(
 
   private def getByID(id: String) = db.run(classificationTable.filter(_.id === id).result.headOption)
 
+  private def checkExistsByID(id: String) = db.run(classificationTable.filter(_.id === id).exists.result)
+
   private def getAllClassifications = db.run(classificationTable.result)
 
   private def deleteByID(id: String): Future[Int] = db.run(classificationTable.filter(_.id === id).delete.asTry).map {
@@ -126,14 +128,16 @@ class Classifications @Inject()(
     def insertOrUpdate(classification: Classification): Future[Int] = upsert(classification)
 
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.main.chainID")
+    private val chainID = configuration.get[String]("blockchain.chainID")
 
     def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[String] = {
-      val classificationID = getID(chainID = chainID, immutables = immutables, mutables = mutables)
+      val classificationID = getID(immutables = immutables, mutables = mutables)
       val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
 
       (for {
@@ -144,7 +148,7 @@ class Classifications @Inject()(
       }
     }
 
-    private def getID(chainID: String, immutables: Immutables, mutables: Mutables) = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
+    def getID(immutables: Immutables, mutables: Mutables): String = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
   }
 

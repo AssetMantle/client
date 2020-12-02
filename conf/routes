@@ -19,13 +19,17 @@ GET         /docusign/authorizationCallBack                      controllers.Doc
 
 GET         /profile                                             controllers.ViewController.profile
 GET         /dashboard                                           controllers.ViewController.dashboard
-GET         /account                                             controllers.ViewController.account(address: String)
+GET         /wallet                                              controllers.ViewController.wallet(address: String)
 GET         /blocks                                              controllers.ViewController.blocks
 GET         /transactions                                        controllers.ViewController.transactions
 GET         /validators                                          controllers.ViewController.validators
 GET         /block                                               controllers.ViewController.block(height: Int)
 GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
 GET         /validator                                           controllers.ViewController.validator(address: String)
+GET         /identity                                            controllers.ViewController.identity
+GET         /account                                             controllers.ViewController.account
+GET         /asset                                               controllers.ViewController.asset
+GET         /order                                               controllers.ViewController.order
 
 GET         /profilePicture                                      controllers.ComponentViewController.profilePicture
 
@@ -34,6 +38,10 @@ POST        /account/signUp                                      controllers.Acc
 
 GET         /account/createWallet                                controllers.AccountController.createWalletForm(username: String)
 POST        /account/createWallet                                controllers.AccountController.createWallet
+
+GET         /account/checkMnemonics                              controllers.AccountController.checkMnemonics(mnemonics: String)
+GET         /account/importWallet                                controllers.AccountController.importWalletForm
+POST        /account/importWallet                                controllers.AccountController.importWallet
 
 GET         /account/login                                       controllers.AccountController.loginForm
 POST        /account/login                                       controllers.AccountController.login
@@ -60,22 +68,22 @@ POST        /account/userReviewIdentification                    controllers.Acc
 
 GET         /asset/define                                        controllers.AssetController.defineForm
 POST        /asset/define                                        controllers.AssetController.define
-GET         /asset/mint                                          controllers.AssetController.mintForm
+GET         /asset/mint                                          controllers.AssetController.mintForm(classificationID: String)
 POST        /asset/mint                                          controllers.AssetController.mint
-GET         /asset/mutate                                        controllers.AssetController.mutateForm
+GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String)
 POST        /asset/mutate                                        controllers.AssetController.mutate
-GET         /asset/burn                                          controllers.AssetController.burnForm
+GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String)
 POST        /asset/burn                                          controllers.AssetController.burn
 
 GET         /identity/nub                                        controllers.IdentityController.nubForm
 POST        /identity/nub                                        controllers.IdentityController.nub
-GET         /identity/issue                                      controllers.IdentityController.issueForm
+GET         /identity/issue                                      controllers.IdentityController.issueForm(classificationID: String)
 POST        /identity/issue                                      controllers.IdentityController.issue
 GET         /identity/define                                     controllers.IdentityController.defineForm
 POST        /identity/define                                     controllers.IdentityController.define
-GET         /identity/provision                                  controllers.IdentityController.provisionForm
+GET         /identity/provision                                  controllers.IdentityController.provisionForm(identityID: String)
 POST        /identity/provision                                  controllers.IdentityController.provision
-GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm
+GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String)
 POST        /identity/unprovision                                controllers.IdentityController.unprovision
 
 GET         /meta/reveal                                         controllers.MetaController.revealForm
@@ -86,19 +94,24 @@ POST        /maintainer/deputize                                 controllers.Mai
 
 GET         /order/define                                        controllers.OrderController.defineForm
 POST        /order/define                                        controllers.OrderController.define
-GET         /order/make                                          controllers.OrderController.makeForm
+GET         /order/make                                          controllers.OrderController.makeForm(classificationID: String)
 POST        /order/make                                          controllers.OrderController.make
-GET         /order/take                                          controllers.OrderController.takeForm
+GET         /order/take                                          controllers.OrderController.takeForm(orderID: String)
 POST        /order/take                                          controllers.OrderController.take
-GET         /order/cancel                                        controllers.OrderController.cancelForm
+GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String)
 POST        /order/cancel                                        controllers.OrderController.cancel
 
-GET         /split/send                                          controllers.SplitController.sendForm
+GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String)
 POST        /split/send                                          controllers.SplitController.send
 GET         /split/wrap                                          controllers.SplitController.wrapForm
 POST        /split/wrap                                          controllers.SplitController.wrap
-GET         /split/unwrap                                        controllers.SplitController.unwrapForm
+GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String)
 POST        /split/unwrap                                        controllers.SplitController.unwrap
+
+GET         /entity/addLabel                                     controllers.EntityController.addLabelForm(entityID: String, entityType: String)
+POST        /entity/addLabel                                     controllers.EntityController.addLabel
+GET         /entity/addPrivateProperty                           controllers.EntityController.addPrivatePropertyForm(entityID: String, entityType: String, name: String)
+POST        /entity/addPrivateProperty                           controllers.EntityController.addPrivateProperty
 
 GET         /contact                                             controllers.ContactController.contact
 
@@ -155,6 +168,19 @@ GET         /component/validatorDelegations                      controllers.Com
 GET         /component/validatorTransactions                     controllers.ComponentViewController.validatorTransactions(address: String)
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
+GET         /component/entityProperties                          controllers.ComponentViewController.entityProperties(entityID: String, entityType: String)
+
+GET         /component/identitiesDefinition                      controllers.ComponentViewController.identitiesDefinition
+GET         /component/identitiesProvisioned                     controllers.ComponentViewController.identitiesProvisioned
+GET         /component/identitiesUnprovisioned                   controllers.ComponentViewController.identitiesUnprovisioned
+
+GET         /component/assetsDefinition                          controllers.ComponentViewController.assetsDefinition
+GET         /component/assetsMinted                              controllers.ComponentViewController.assetsMinted
+
+GET         /component/ordersDefinition                          controllers.ComponentViewController.ordersDefinition
+GET         /component/ordersMade                                controllers.ComponentViewController.ordersMade
+GET         /component/ordersTake                                controllers.ComponentViewController.ordersTake
+
 GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
 GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)
@@ -206,6 +232,3 @@ GET         /chat/replyToMessage                                 controllers.Cha
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                              controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                   controllers.WesternUnionController.westernUnionPortalRedirect
-
-GET         /blockchain/sendCoin                                 controllers.SendCoinController.blockchainSendCoinForm
-POST        /blockchain/sendCoin                                 controllers.SendCoinController.blockchainSendCoin

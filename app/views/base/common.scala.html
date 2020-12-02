@@ -68,40 +68,53 @@
                             <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                         </a>
                         <ul class="cmuk-navbar-nav">
-                            <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
-                            @commonIcon("dashBoard")
-                            </span>
-                                @Messages(constants.View.DASHBOARD)
-                            </a>
-                            </li>
-                            <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
-                            @commonIcon("blocks")
-                            </span>
-                                @Messages(constants.View.BLOCKS)
-                            </a>
-                            </li>
-                            <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
-                            @commonIcon("transactions")
-                            </span>
-                                @Messages(constants.View.TRANSACTIONS)
-                            </a>
-                            </li>
-                            <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
-                            @commonIcon("validators")
-                            </span>
-                                @Messages(constants.View.VALIDATORS)
-                            </a>
-                            </li>
                         @loginState match {
-                            case null => {}
-                            case default => {
-                                <li><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
-                                @commonIcon("dashboard")
+                            case null => {
+                                <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                @commonIcon("dashBoard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect"><span class="accountIcon">
+                                <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
+                                @commonIcon("blocks")
+                                </span>
+                                    @Messages(constants.View.BLOCKS)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
+                                @commonIcon("transactions")
+                                </span>
+                                    @Messages(constants.View.TRANSACTIONS)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
+                                @commonIcon("validators")
+                                </span>
+                                    @Messages(constants.View.VALIDATORS)
+                                </a>
+                                </li>
+                            }
+                            case default => {
+                                <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect"><span class="accountIcon">
+                                @commonIcon("identity")
+                                </span>
+                                    @Messages(constants.View.IDENTITY)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.asset()" class="navItemRippleEffect"><span class="accountIcon">
+                                @commonIcon("asset")
+                                </span>
+                                    @Messages(constants.View.ASSET)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.order()" class="navItemRippleEffect"><span class="accountIcon">
+                                @commonIcon("order")
+                                </span>
+                                    @Messages(constants.View.ORDER)
+                                </a>
+                                </li>
+                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect"><span class="accountIcon">
                                 @commonIcon("account")
                                 </span>
                                     @Messages(constants.View.ACCOUNT)
@@ -141,7 +154,7 @@
                                     <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
 
                                     <li class="login-nav-item">
-                                        <a href="@controllers.routes.ViewController.account(loginState.address)" class="navItemRippleEffect">
+                                        <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
                                             @loginState.username
                                         <span cmuk-icon="user" class="loginIcon"></span>
                                         </a>

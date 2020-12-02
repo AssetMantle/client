@@ -25,19 +25,27 @@ class ViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
-  def profile: Action[AnyContent] = withLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        (for {
-          result <- withUsernameToken.Ok(views.html.profile())
-        } yield result).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
+  def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.profile())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def account(address: String): Action[AnyContent] = withoutLoginAction {
+  def account: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(views.html.account(address))
+      (for {
+        result <- withUsernameToken.Ok(views.html.account())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def wallet(address: String): Action[AnyContent] = withoutLoginAction {
+    implicit request =>
+      Ok(views.html.wallet(address))
   }
 
   def blocks(): Action[AnyContent] = withoutLoginAction {
@@ -74,5 +82,33 @@ class ViewController @Inject()(
     implicit request =>
       Ok(views.html.dashboard())
   }
+
+  def identity: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.identity())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def asset: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.asset())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def order: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.order())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
 
 }

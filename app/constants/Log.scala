@@ -11,6 +11,8 @@ object Log {
 
   object Messages {
 
+    def blockchainHeightUpdateFailed(height: Int) = s"Blockchain height update failed: ${height}"
+
     object Websocket {
       val CONNECTION_UPGARDED = "Connection upgraded to websocket. StatusCode: "
       val CONNECTION_UPGARDE_FAILED = "Connection upgrade to websocket failed. StatusCode: "

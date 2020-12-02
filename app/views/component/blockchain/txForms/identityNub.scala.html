@@ -3,7 +3,8 @@
 
 @(identityNubForm: Form[IdentityNub.Data] = IdentityNub.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.IDENTITY_NUB, identityNubForm) {
-    @commonInputText(identityNubForm, constants.FormField.FROM)
     @commonInputText(identityNubForm, constants.FormField.NUB_ID)
+    @commonInputText(identityNubForm, constants.FormField.LABEL)
     @commonInputMicroNumber(identityNubForm, constants.FormField.GAS)
+    @commonInputPassword(identityNubForm, constants.FormField.PASSWORD)
 }
