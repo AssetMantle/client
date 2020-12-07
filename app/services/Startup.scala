@@ -2,7 +2,6 @@ package services
 
 import akka.actor.Cancellable
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
@@ -21,6 +20,7 @@ import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.{Account, Header}
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
@@ -294,7 +294,7 @@ class Startup @Inject()(
       //TODO (also may be akka.dispatch.TaskInvocation)
       //TODO ILLEGAL_STATE_EXCEPTION comes only once at start if the GET request is done Await.result(getABCIInfo.Service.get(), Duration, Inf)
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
-      val abciInfo = Await.result(getABCIInfo.Service.get(), Duration.Inf)
+      val abciInfo = getABCIInfo.Service.get()
 
       def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
 
@@ -310,7 +310,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-//        abciInfo <- abciInfo
+        abciInfo <- abciInfo
         latestExplorerHeight <- latestExplorerHeight
         _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
       } yield ()
