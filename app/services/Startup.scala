@@ -294,7 +294,7 @@ class Startup @Inject()(
       //TODO (also may be akka.dispatch.TaskInvocation)
       //TODO ILLEGAL_STATE_EXCEPTION comes only once at start if the GET request is done Await.result(getABCIInfo.Service.get(), Duration, Inf)
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
-      val abciInfo = getABCIInfo.Service.get()
+      val abciInfo = Await.result(getABCIInfo.Service.get(), Duration.Inf)
 
       def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
 
@@ -310,7 +310,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-        abciInfo <- abciInfo
+//        abciInfo <- abciInfo
         latestExplorerHeight <- latestExplorerHeight
         _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
       } yield ()
