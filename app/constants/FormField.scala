@@ -17,7 +17,7 @@ object FormField {
   val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
-  val PASSWORD = new StringFormField("PASSWORD", 0, 128)
+  val PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val MOBILE_NUMBER = new StringFormField("MOBILE_NUMBER", 6, 15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
   val TO = new StringFormField("TO", 45, 45)
