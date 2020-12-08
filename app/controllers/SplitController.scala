@@ -67,7 +67,7 @@ class SplitController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID)))
+          } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID)))
 
           (for {
             verifyPassword <- verifyPassword
@@ -111,7 +111,7 @@ class SplitController @Inject()(
                 ticketID <- broadcastTx
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword
@@ -153,7 +153,7 @@ class SplitController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID)))
+          } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID)))
 
           (for {
             verifyPassword <- verifyPassword

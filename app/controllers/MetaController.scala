@@ -63,7 +63,7 @@ class MetaController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+          } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
             verifyPassword <- verifyPassword

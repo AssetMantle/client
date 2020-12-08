@@ -987,6 +987,23 @@ CREATE TABLE IF NOT EXISTS MASTER."Property"
     PRIMARY KEY ("entityID", "entityType", "name")
 );
 
+
+CREATE TABLE IF NOT EXISTS MASTER."Split"
+(
+    "entityID"          VARCHAR NOT NULL,
+    "ownerID"           VARCHAR NOT NULL,
+    "entityType"        VARCHAR NOT NULL,
+    "label"             VARCHAR,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("entityID", "ownerID")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
 (
     "id"                VARCHAR NOT NULL,
