@@ -54,7 +54,7 @@ class MaintainerController @Inject()(
               maintainerDeputizeForm = views.companion.blockchain.MaintainerDeputize.form.fill(deputizeData.copy(addMaintainedTraits = false)),
               maintainedTraitsForm = getNumberOfFields(deputizeData.addMaintainedTraits, deputizeData.maintainedTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password.getOrElse(""))
 
             def broadcastTx = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
               entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = Properties(deputizeData.maintainedTraits.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer, gas = deputizeData.gas, ticketID = "", mode = transactionMode),
