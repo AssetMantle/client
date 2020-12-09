@@ -66,7 +66,7 @@ class SendCoinController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.sendCoin(blockchainCompanion.SendCoin.form.fill(sendCoinData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+          } else Future(BadRequest(blockchainForms.sendCoin(blockchainCompanion.SendCoin.form.fill(sendCoinData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
             verifyPassword <- verifyPassword

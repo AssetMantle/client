@@ -71,7 +71,7 @@ class MaintainerController @Inject()(
                 ticketID <- broadcastTx
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword

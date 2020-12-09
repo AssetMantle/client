@@ -114,7 +114,7 @@ class AccountController @Inject()(
             addKeyResponse <- addKeyResponse
             _ <- createAccount(addKeyResponse)
           } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
-        } else Future(BadRequest(views.html.component.master.createWallet(views.companion.master.CreateWallet.form.withGlobalError(constants.Response.INCORRECT_PASSWORD.message), username = createWalletData.username, mnemonics = createWalletData.mnemonics.split(" "))))
+        } else Future(BadRequest(views.html.component.master.createWallet(views.companion.master.CreateWallet.form.withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), username = createWalletData.username, mnemonics = createWalletData.mnemonics.split(" "))))
 
         (for {
           validateUsernamePassword <- validateUsernamePassword

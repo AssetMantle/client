@@ -110,7 +110,7 @@ class AssetController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword
@@ -185,7 +185,7 @@ class AssetController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, assetExists = assetExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
+            } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -248,7 +248,7 @@ class AssetController @Inject()(
                 ticketID <- updateAndBroadcast(assetExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID)))
+            } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -290,7 +290,7 @@ class AssetController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), burnData.assetID)))
+          } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID)))
 
           (for {
             verifyPassword <- verifyPassword
