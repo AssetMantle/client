@@ -106,20 +106,44 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Delegation"
     PRIMARY KEY ("delegatorAddress", "validatorAddress")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Identity_BC"
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityProperties_BC"
 (
-    "id"                       VARCHAR NOT NULL,
-    "provisionedAddressList"   VARCHAR NOT NULL,
-    "unprovisionedAddressList" VARCHAR NOT NULL,
-    "immutables"               VARCHAR NOT NULL,
-    "mutables"                 VARCHAR NOT NULL,
-    "createdBy"                VARCHAR,
-    "createdOn"                TIMESTAMP,
-    "createdOnTimeZone"        VARCHAR,
-    "updatedBy"                VARCHAR,
-    "updatedOn"                TIMESTAMP,
-    "updatedOnTimeZone"        VARCHAR,
+    "id"                VARCHAR NOT NULL,
+    "immutables"        VARCHAR NOT NULL,
+    "mutables"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityProvisioned_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "address")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityUnprovisioned_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Maintainer_BC"
@@ -1284,6 +1308,10 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
 
 ALTER TABLE BLOCKCHAIN."Delegation"
     ADD CONSTRAINT Delegation_Validator_operatorAddress FOREIGN KEY ("validatorAddress") REFERENCES BLOCKCHAIN."Validator" ("operatorAddress");
+ALTER TABLE BLOCKCHAIN."IdentityProvisioned_BC"
+    ADD CONSTRAINT Identity_ID_Provisioned FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
+ALTER TABLE BLOCKCHAIN."IdentityUnprovisioned_BC"
+    ADD CONSTRAINT Identity_ID_Unprovisioned FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 ALTER TABLE BLOCKCHAIN."Redelegation"
     ADD CONSTRAINT Redelegation_Validator_validatorSourceAddress FOREIGN KEY ("validatorSourceAddress") REFERENCES BLOCKCHAIN."Validator" ("operatorAddress");
 ALTER TABLE BLOCKCHAIN."Redelegation"
@@ -1390,9 +1418,19 @@ CREATE TRIGGER DELEGATION_LOG
     ON BLOCKCHAIN."Delegation"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER IDENTITY_BC_LOG
+CREATE TRIGGER IDENTITY_PROPERTIES_BC_LOG
     BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."Identity_BC"
+    ON BLOCKCHAIN."IdentityProperties_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_PROVISIONED_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."IdentityProvisioned_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_UNPROVISIONED_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."IdentityUnprovisioned_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER MAINTAINER_BC_LOG
@@ -1767,7 +1805,9 @@ DROP TRIGGER IF EXISTS AVERAGE_BLOCK_TIME_LOG ON BLOCKCHAIN."AverageBlockTime" C
 DROP TRIGGER IF EXISTS BLOCK_LOG ON BLOCKCHAIN."Block" CASCADE;
 DROP TRIGGER IF EXISTS CLASSIFICATION_BC_LOG ON BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TRIGGER IF EXISTS DELEGATION_LOG ON BLOCKCHAIN."Delegation" CASCADE;
-DROP TRIGGER IF EXISTS IDENTITY_BC_LOG ON BLOCKCHAIN."Identity_BC" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_PROPERTIES_BC_LOG ON BLOCKCHAIN."IdentityProperties_BC" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_PROVISIONED_BC_LOG ON BLOCKCHAIN."IdentityProvisioned_BC" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_UNPROVISIONED_BC_LOG ON BLOCKCHAIN."IdentityUnprovisioned_BC" CASCADE;
 DROP TRIGGER IF EXISTS MAINTAINER_BC_LOG ON BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TRIGGER IF EXISTS META_BC_LOG ON BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
@@ -1851,7 +1891,9 @@ DROP TABLE IF EXISTS BLOCKCHAIN."AverageBlockTime" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Block" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Delegation" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Identity_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityProperties_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityProvisioned_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityUnprovisioned_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;

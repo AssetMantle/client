@@ -2,7 +2,6 @@ package services
 
 import akka.actor.Cancellable
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
@@ -21,6 +20,7 @@ import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.{Account, Header}
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
