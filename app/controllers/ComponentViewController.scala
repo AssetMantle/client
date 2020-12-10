@@ -576,7 +576,8 @@ class ComponentViewController @Inject()(
 
   def entityProperties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val provisionedIdentityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val unprovisionedIdentityIDs = blockchainIdentities.Service.getAllIDsByUnprovisioned(loginState.address)
       val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
 
       def verifyOwner(identityIDs: Seq[String]): Future[Boolean] = {
@@ -602,8 +603,9 @@ class ComponentViewController @Inject()(
       }
 
       (for {
-        identityIDs <- identityIDs
-        isOwner <- verifyOwner(identityIDs)
+        provisionedIdentityIDs <- provisionedIdentityIDs
+        unprovisionedIdentityIDs <- unprovisionedIdentityIDs
+        isOwner <- verifyOwner(provisionedIdentityIDs ++ unprovisionedIdentityIDs)
         properties <- properties
       } yield {
         if (isOwner) Ok(views.html.component.master.viewEntityProperties(properties))
