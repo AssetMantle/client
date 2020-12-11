@@ -1355,10 +1355,6 @@ ALTER TABLE MASTER."Asset"
     ADD CONSTRAINT Asset_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES MASTER."Identity" ("id");
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_Maker_Ownable_id FOREIGN KEY ("makerOwnableID") REFERENCES MASTER."Split" ("entityID");
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_Taker_Ownable_id FOREIGN KEY ("takerOwnableID") REFERENCES MASTER."Split" ("entityID");
 ALTER TABLE MASTER."Split"
     ADD CONSTRAINT Split_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
 
