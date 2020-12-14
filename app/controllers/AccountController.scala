@@ -272,7 +272,7 @@ class AccountController @Inject()(
     Ok(views.html.component.master.logout())
   }
 
-  def logout: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
     implicit request =>
       Logout.form.bindFromRequest().fold(
         formWithErrors => {
