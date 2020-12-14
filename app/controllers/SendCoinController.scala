@@ -38,7 +38,8 @@ class SendCoinController @Inject()(
 
   private val denom = configuration.get[String]("blockchain.denom")
 
-  def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.sendCoin())
   }
 

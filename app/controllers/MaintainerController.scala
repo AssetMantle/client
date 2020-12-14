@@ -38,7 +38,8 @@ class MaintainerController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def deputizeForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def deputizeForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.maintainerDeputize())
   }
 

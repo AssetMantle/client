@@ -32,11 +32,13 @@ class FileController @Inject()(
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }
 
-  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
   }
 
@@ -128,11 +130,13 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
-  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 

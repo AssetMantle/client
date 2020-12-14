@@ -16,10 +16,8 @@ class ViewController @Inject()(
                                 blockchainAccounts: blockchain.Accounts,
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginAction: WithLoginAction,
-                                withOrWithoutLoginAction: WithOrWithoutLoginAction,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
-                                withoutLoginAction: WithoutLoginAction,
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -44,7 +42,7 @@ class ViewController @Inject()(
       }
   }
 
-  def wallet(address: String): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def wallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -55,7 +53,7 @@ class ViewController @Inject()(
       }
   }
 
-  def blocks(): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def blocks(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -67,7 +65,7 @@ class ViewController @Inject()(
 
   }
 
-  def block(height: Int): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def block(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -78,7 +76,7 @@ class ViewController @Inject()(
       }
   }
 
-  def transactions(): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def transactions(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -89,7 +87,7 @@ class ViewController @Inject()(
       }
   }
 
-  def transaction(txHash: String): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def transaction(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -100,7 +98,7 @@ class ViewController @Inject()(
       }
   }
 
-  def validators(): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def validators(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -111,7 +109,7 @@ class ViewController @Inject()(
       }
   }
 
-  def validator(address: String): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def validator(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {
@@ -122,7 +120,7 @@ class ViewController @Inject()(
       }
   }
 
-  def dashboard: Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def dashboard: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
         case Some(loginState) => {

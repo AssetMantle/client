@@ -51,7 +51,8 @@ class AssetController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetDefine())
   }
 
@@ -124,7 +125,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMint(classificationID = classificationID))
   }
 
@@ -199,7 +201,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMutate(assetID = assetID))
   }
 
@@ -262,7 +265,8 @@ class AssetController @Inject()(
       )
   }
 
-  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetBurn(assetID = assetID))
   }
 

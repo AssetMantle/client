@@ -50,7 +50,8 @@ class OrderController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderDefine())
   }
 
@@ -125,7 +126,8 @@ class OrderController @Inject()(
       )
   }
 
-  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderMake(classificationID = classificationID))
   }
 
@@ -199,7 +201,8 @@ class OrderController @Inject()(
       )
   }
 
-  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderTake(orderID = orderID))
   }
 
@@ -240,7 +243,8 @@ class OrderController @Inject()(
       )
   }
 
-  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderCancel(orderID = orderID))
   }
 

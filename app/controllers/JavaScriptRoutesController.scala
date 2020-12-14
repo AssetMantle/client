@@ -11,7 +11,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def javascriptRoutes = withoutLoginAction { implicit request =>
+  def javascriptRoutes = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.AccountController.signUpForm,

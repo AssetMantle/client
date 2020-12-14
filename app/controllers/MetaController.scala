@@ -35,7 +35,8 @@ class MetaController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def revealForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def revealForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.metaReveal())
   }
 

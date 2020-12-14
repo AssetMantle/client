@@ -28,7 +28,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 blockchainClassifications: blockchain.Classifications,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
-                                withOrWithoutLoginAction: WithOrWithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -53,12 +52,18 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   //      }
   //  }
 
-  def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future (Ok(views.html.index()))
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.index())
+        }
+        case None => Future(Ok(views.html.index()))
+      }
   }
 
-  def search(query: String): Action[AnyContent] = withOrWithoutLoginAction.authenticated { implicit loginState =>
+  def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
 
       if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ViewController.wallet(query)))
