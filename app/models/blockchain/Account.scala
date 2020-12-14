@@ -15,7 +15,6 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
-import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -190,12 +189,7 @@ class Accounts @Inject()(
     }
 
     private def subtractCoinsFromAccount(fromAccount: Account, subtractCoins: Seq[Coin]) = {
-      val subtractDenomList = subtractCoins.map(_.denom)
-      val updatedCoins = fromAccount.coins.map { coin =>
-        if (subtractDenomList.contains(coin.denom)) {
-          Coin(denom = coin.denom, amount = coin.amount - subtractCoins.find(_.denom == coin.denom).fold(MicroNumber.zero)(_.amount))
-        } else coin
-      }
+      val updatedCoins = fromAccount.coins.map(accountCoin => subtractCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(subtractCoin => Coin(denom = accountCoin.denom, amount = accountCoin.amount - subtractCoin.amount)))
       for {
         _ <- Service.insertOrUpdate(fromAccount.copy(coins = updatedCoins))
       } yield ()
@@ -212,17 +206,14 @@ class Accounts @Inject()(
           _ <- insert(accountResponse)
         } yield ()
       } { account => {
-        val addCoinDenomList = addCoins.map(_.denom)
-        val updatedCoins = account.coins.map { coin =>
-          if (addCoinDenomList.contains(coin.denom)) {
-            Coin(denom = coin.denom, amount = coin.amount - addCoins.find(_.denom == coin.denom).fold(MicroNumber.zero)(_.amount))
-          } else coin
-        }
+        val updatedCoins = addCoins.map(addCoin => account.coins.find(_.denom == addCoin.denom).fold(addCoin)(accountCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
         for {
           _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
         } yield ()
-      }}
+      }
+      }
     }
+
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
