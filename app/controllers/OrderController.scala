@@ -50,7 +50,8 @@ class OrderController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderDefine())
   }
 
@@ -69,7 +70,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten
@@ -110,7 +111,7 @@ class OrderController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
 
             (for {
@@ -125,7 +126,8 @@ class OrderController @Inject()(
       )
   }
 
-  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderMake(classificationID = classificationID))
   }
 
@@ -145,7 +147,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(makeData.addMutableMetaField, makeData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(makeData.addMutableField, makeData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password.getOrElse(""))
             val immutableMetas = makeData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = makeData.immutableProperties.getOrElse(Seq.empty).flatten
             val mutableMetas = makeData.mutableMetaProperties.getOrElse(Seq.empty).flatten
@@ -158,7 +160,7 @@ class OrderController @Inject()(
               val create = masterOrders.Service.create(masterOrder(id = entityID, label = Option(makeData.label), makerID = makeData.fromID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, status = None))
 
               def broadcastTx = transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
-                entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, makerOwnableSplit = makeData.makerOwnableSplit, expiresIn = makeData.expiresIn, immutableMetaTraits = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableTraits = Properties(immutables.map(_.toProperty)), mutableMetaTraits = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableTraits = Properties(mutables.map(_.toProperty)), gas = makeData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, makerOwnableSplit = makeData.makerOwnableSplit, expiresIn = makeData.expiresIn, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = makeData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionOrderMakes.Service.create,
                 request = transactionsOrderMake.Request(transactionsOrderMake.Message(transactionsOrderMake.BaseReq(from = loginState.address, gas = makeData.gas), fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, expiresIn = makeData.expiresIn, makerOwnableSplit = makeData.makerOwnableSplit, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsOrderMake.Service.post,
@@ -185,7 +187,7 @@ class OrderController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, orderExists = orderExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
+            } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name,constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -199,7 +201,8 @@ class OrderController @Inject()(
       )
   }
 
-  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderTake(orderID = orderID))
   }
 
@@ -227,7 +230,7 @@ class OrderController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.orderTake(blockchainCompanion.OrderTake.form.fill(takeData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), takeData.orderID)))
+          } else Future(BadRequest(blockchainForms.orderTake(blockchainCompanion.OrderTake.form.fill(takeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), takeData.orderID)))
 
           (for {
             verifyPassword <- verifyPassword
@@ -240,7 +243,8 @@ class OrderController @Inject()(
       )
   }
 
-  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderCancel(orderID = orderID))
   }
 
@@ -268,7 +272,7 @@ class OrderController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID)))
+          } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID)))
 
           (for {
             verifyPassword <- verifyPassword

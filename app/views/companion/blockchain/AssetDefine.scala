@@ -20,10 +20,10 @@ object AssetDefine {
       constants.FormField.MUTABLE_TRAITS.name -> optional(seq(optional(Property.subFormMapping))),
       constants.FormField.ADD_MUTABLE_FIELD.name -> constants.FormField.ADD_MUTABLE_FIELD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
+      constants.FormField.PASSWORD.name -> optional(constants.FormField.PASSWORD.field)
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.assetDefine)
   )
 
-  case class Data(fromID: String, label: String, immutableMetaTraits: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableTraits: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaTraits: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableTraits: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: String)
+  case class Data(fromID: String, label: String, immutableMetaTraits: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableTraits: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaTraits: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableTraits: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: Option[String])
 
 }

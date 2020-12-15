@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetMint(from: String, fromID: String, toID: String, classificationID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMint] with Logged {
-  def mutateTicketID(newTicketID: String): AssetMint = AssetMint(from = from, fromID = fromID, toID = toID, classificationID = classificationID, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class AssetMint(from: String, fromID: String, toID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMint] with Logged {
+  def mutateTicketID(newTicketID: String): AssetMint = AssetMint(from = from, fromID = fromID, toID = toID, classificationID = classificationID, immutableMetaProperties = immutableMetaProperties, immutableProperties = immutableProperties, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -33,11 +33,11 @@ class AssetMints @Inject()(
                             blockchainAccounts: blockchain.Accounts
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  case class AssetMintSerialized(from: String, fromID: String, toID: String, classificationID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetMint = AssetMint(from = from, fromID = fromID, toID = toID, classificationID = classificationID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class AssetMintSerialized(from: String, fromID: String, toID: String, classificationID: String, immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: AssetMint = AssetMint(from = from, fromID = fromID, toID = toID, classificationID = classificationID, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Properties](immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(assetMint: AssetMint): AssetMintSerialized = AssetMintSerialized(from = assetMint.from, fromID = assetMint.fromID, toID = assetMint.toID, classificationID = assetMint.classificationID, immutableMetaTraits = Json.toJson(assetMint.immutableMetaTraits).toString, immutableTraits = Json.toJson(assetMint.immutableTraits).toString, mutableMetaTraits = Json.toJson(assetMint.mutableMetaTraits).toString, mutableTraits = Json.toJson(assetMint.mutableTraits).toString, gas = assetMint.gas.toMicroString, status = assetMint.status, txHash = assetMint.txHash, ticketID = assetMint.ticketID, mode = assetMint.mode, code = assetMint.code, createdBy = assetMint.createdBy, createdOn = assetMint.createdOn, createdOnTimeZone = assetMint.createdOnTimeZone, updatedBy = assetMint.updatedBy, updatedOn = assetMint.updatedOn, updatedOnTimeZone = assetMint.updatedOnTimeZone)
+  def serialize(assetMint: AssetMint): AssetMintSerialized = AssetMintSerialized(from = assetMint.from, fromID = assetMint.fromID, toID = assetMint.toID, classificationID = assetMint.classificationID, immutableMetaProperties = Json.toJson(assetMint.immutableMetaProperties).toString, immutableProperties = Json.toJson(assetMint.immutableProperties).toString, mutableMetaProperties = Json.toJson(assetMint.mutableMetaProperties).toString, mutableProperties = Json.toJson(assetMint.mutableProperties).toString, gas = assetMint.gas.toMicroString, status = assetMint.status, txHash = assetMint.txHash, ticketID = assetMint.ticketID, mode = assetMint.mode, code = assetMint.code, createdBy = assetMint.createdBy, createdOn = assetMint.createdOn, createdOnTimeZone = assetMint.createdOnTimeZone, updatedBy = assetMint.updatedBy, updatedOn = assetMint.updatedOn, updatedOnTimeZone = assetMint.updatedOnTimeZone)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -124,7 +124,7 @@ class AssetMints @Inject()(
 
   private[models] class AssetMintTable(tag: Tag) extends Table[AssetMintSerialized](tag, "AssetMint") {
 
-    def * = (from, fromID, toID, classificationID, immutableMetaTraits, immutableTraits, mutableMetaTraits, mutableTraits, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMintSerialized.tupled, AssetMintSerialized.unapply)
+    def * = (from, fromID, toID, classificationID, immutableMetaProperties, immutableProperties, mutableMetaProperties, mutableProperties, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMintSerialized.tupled, AssetMintSerialized.unapply)
 
     def from = column[String]("from")
 
@@ -134,13 +134,13 @@ class AssetMints @Inject()(
 
     def classificationID = column[String]("classificationID")
 
-    def immutableMetaTraits = column[String]("immutableMetaTraits")
+    def immutableMetaProperties = column[String]("immutableMetaProperties")
 
-    def immutableTraits = column[String]("immutableTraits")
+    def immutableProperties = column[String]("immutableProperties")
 
-    def mutableMetaTraits = column[String]("mutableMetaTraits")
+    def mutableMetaProperties = column[String]("mutableMetaProperties")
 
-    def mutableTraits = column[String]("mutableTraits")
+    def mutableProperties = column[String]("mutableProperties")
 
     def gas = column[String]("gas")
 
@@ -216,6 +216,6 @@ class AssetMints @Inject()(
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actors.Service.actorSystem.scheduler.scheduleAtFixedRate(initialDelay = schedulerInitialDelay, interval = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

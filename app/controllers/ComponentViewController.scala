@@ -78,7 +78,8 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.recentActivities()))
   }
 
-  def publicRecentActivities: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def publicRecentActivities: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.publicRecentActivities()))
   }
 
@@ -103,7 +104,8 @@ class ComponentViewController @Inject()(
       } yield Ok(views.html.component.master.identification(identification = identification, accountKYC = accountKYC))
   }
 
-  def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val latestBlock = blockchainBlocks.Service.getLatestBlock
     val averageBlockTime = blockchainAverageBlockTimes.Service.get
 
@@ -119,7 +121,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensStatistics(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def tokensStatistics(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val tokens = blockchainTokens.Service.getAll
     (for {
       tokens <- tokens
@@ -129,7 +132,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def votingPowers(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def votingPowers(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val allValidators = blockchainValidators.Service.getAll
 
     def getVotingPowerMap(validators: Seq[Validator]): ListMap[String, Double] = validators.map(validator => validator.description.moniker.getOrElse("") -> validator.tokens.toDouble)(collection.breakOut)
@@ -142,7 +146,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensPrices(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def tokensPrices(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val allDenoms = blockchainTokens.Service.getAllDenoms
 
     def allTokenPrices(allDenoms: Seq[String]) = masterTransactionTokenPrices.Service.getLatest(n = 5, totalTokens = allDenoms.length)
@@ -158,7 +163,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountWallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def accountWallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val operatorAddress = utilities.Bech32.convertAccountAddressToOperatorAddress(address)
     val isValidator = blockchainValidators.Service.exists(operatorAddress)
     val account = blockchainAccounts.Service.tryGet(address)
@@ -190,7 +196,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountDelegations(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def accountDelegations(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val delegations = blockchainDelegations.Service.getAllForDelegator(address)
     val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
     val validators = blockchainValidators.Service.getAll
@@ -211,11 +218,13 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountTransactions(address: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def accountTransactions(address: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.accountTransactions(address))
   }
 
-  def accountTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def accountTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
 
     (for {
@@ -226,11 +235,13 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def blockList(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockList(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.blockList())
   }
 
-  def blockListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
 
     def getResult = if (pageNumber <= 0) Future(BadRequest) else {
       val blocks = blockchainBlocks.Service.getBlocksPerPage(pageNumber)
@@ -261,7 +272,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def blockDetails(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockDetails(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val block = blockchainBlocks.Service.tryGet(height)
     val numTxs = blockchainTransactions.Service.getNumberOfTransactions(height)
 
@@ -277,7 +289,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def blockTransactions(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockTransactions(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val transactions = blockchainTransactions.Service.getTransactions(height)
 
     (for {
@@ -288,11 +301,13 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionList(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def transactionList(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.transactionList())
   }
 
-  def transactionListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def transactionListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
 
     def getResult = if (pageNumber <= 0) Future(BadRequest) else {
       val transactions = blockchainTransactions.Service.getTransactionsPerPage(pageNumber)
@@ -310,7 +325,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionDetails(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def transactionDetails(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val transaction = blockchainTransactions.Service.tryGet(txHash)
 
     (for {
@@ -321,7 +337,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionMessages(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def transactionMessages(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val messages = blockchainTransactions.Service.tryGetMessages(txHash)
 
     (for {
@@ -332,11 +349,13 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorList(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def validatorList(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.validatorList())
   }
 
-  def activeValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def activeValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val validators = blockchainValidators.Service.getAllActiveValidatorList
     (for {
       validators <- validators
@@ -346,7 +365,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def inactiveValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def inactiveValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val validators = blockchainValidators.Service.getAllInactiveValidatorList
     (for {
       validators <- validators
@@ -356,7 +376,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorDetails(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def validatorDetails(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val validator = blockchainValidators.Service.tryGet(address)
     val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
     (for {
@@ -368,7 +389,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorUptime(address: String, n: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def validatorUptime(address: String, n: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetHexAddress(address)
     val lastNBlocks = blockchainBlocks.Service.getLastNBlocks(n)
 
@@ -385,7 +407,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorDelegations(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def validatorDelegations(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
     val validator = blockchainValidators.Service.tryGet(address)
 
@@ -409,7 +432,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorTransactions(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def validatorTransactions(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
     (for {
       operatorAddress <- operatorAddress
@@ -419,7 +443,8 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def validatorTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
 
     (for {
@@ -611,6 +636,23 @@ class ComponentViewController @Inject()(
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
       }
+  }
+
+  def viewIdentityInfo(identityID:String)= withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val identity = blockchainIdentities.Service.get(identityID)
+      (for(
+        identity<-identity
+      ) yield {
+        identity match {
+          case Some(identity)=> Ok(views.html.component.blockchain.identity(identity))
+          case None=> throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+
   }
 
 }

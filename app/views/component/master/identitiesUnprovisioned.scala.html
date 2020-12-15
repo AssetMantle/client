@@ -11,7 +11,7 @@
             @commonVerticalTextInfo(constants.View.LABEL, identity.label.getOrElse(""))
             @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
             @commonVerticalBooleanInfo(constants.View.STATUS, identity.status)
-            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${identity.id}', '${constants.Blockchain.Entity.IDENTITY}'")
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.viewIdentityInfo, 'parameters -> s"'${identity.id}'")
         }
     }
 }

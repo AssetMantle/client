@@ -68,8 +68,7 @@
                             <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                         </a>
                         <ul class="cmuk-navbar-nav">
-                        @loginState match {
-                            case null => {
+
                                 <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
                                 @commonIcon("dashBoard")
                                 </span>
@@ -94,8 +93,9 @@
                                     @Messages(constants.View.VALIDATORS)
                                 </a>
                                 </li>
-                            }
-                            case default => {
+                            @loginState match {
+                                case null=>{}
+                                case default => {
                                 <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect"><span class="accountIcon">
                                 @commonIcon("identity")
                                 </span>

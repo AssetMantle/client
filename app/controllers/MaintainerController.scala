@@ -38,7 +38,8 @@ class MaintainerController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def deputizeForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def deputizeForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.maintainerDeputize())
   }
 
@@ -54,7 +55,7 @@ class MaintainerController @Inject()(
               maintainerDeputizeForm = views.companion.blockchain.MaintainerDeputize.form.fill(deputizeData.copy(addMaintainedTraits = false)),
               maintainedTraitsForm = getNumberOfFields(deputizeData.addMaintainedTraits, deputizeData.maintainedTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password.getOrElse(""))
 
             def broadcastTx = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
               entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = Properties(deputizeData.maintainedTraits.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer, gas = deputizeData.gas, ticketID = "", mode = transactionMode),
@@ -71,7 +72,7 @@ class MaintainerController @Inject()(
                 ticketID <- broadcastTx
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword

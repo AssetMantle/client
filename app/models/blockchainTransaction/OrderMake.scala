@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderMake] with Logged {
-  def mutateTicketID(newTicketID: String): OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderMake] with Logged {
+  def mutateTicketID(newTicketID: String): OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties, immutableProperties = immutableProperties, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -33,13 +33,13 @@ class OrderMakes @Inject()(
                             blockchainAccounts: blockchain.Accounts
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  case class TraitsSerialized(immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String)
+  case class PropertiesSerialized(immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String)
 
-  case class OrderMakeSerialized(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, traitsSerialized: TraitsSerialized, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](traitsSerialized.immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](traitsSerialized.immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](traitsSerialized.mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](traitsSerialized.mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  case class OrderMakeSerialized(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, propertiesSerialized: PropertiesSerialized, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](propertiesSerialized.immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Properties](propertiesSerialized.immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](propertiesSerialized.mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](propertiesSerialized.mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(orderMake: OrderMake): OrderMakeSerialized = OrderMakeSerialized(from = orderMake.from, fromID = orderMake.fromID, classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, expiresIn = orderMake.expiresIn, makerOwnableSplit = orderMake.makerOwnableSplit, traitsSerialized = TraitsSerialized(immutableMetaTraits = Json.toJson(orderMake.immutableMetaTraits).toString, immutableTraits = Json.toJson(orderMake.immutableTraits).toString, mutableMetaTraits = Json.toJson(orderMake.mutableMetaTraits).toString, mutableTraits = Json.toJson(orderMake.mutableTraits).toString), gas = orderMake.gas.toMicroString, status = orderMake.status, txHash = orderMake.txHash, ticketID = orderMake.ticketID, mode = orderMake.mode, code = orderMake.code, createdBy = orderMake.createdBy, createdOn = orderMake.createdOn, createdOnTimeZone = orderMake.createdOnTimeZone, updatedBy = orderMake.updatedBy, updatedOn = orderMake.updatedOn, updatedOnTimeZone = orderMake.updatedOnTimeZone)
+  def serialize(orderMake: OrderMake): OrderMakeSerialized = OrderMakeSerialized(from = orderMake.from, fromID = orderMake.fromID, classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, expiresIn = orderMake.expiresIn, makerOwnableSplit = orderMake.makerOwnableSplit, propertiesSerialized = PropertiesSerialized(immutableMetaProperties = Json.toJson(orderMake.immutableMetaProperties).toString, immutableProperties = Json.toJson(orderMake.immutableProperties).toString, mutableMetaProperties = Json.toJson(orderMake.mutableMetaProperties).toString, mutableProperties = Json.toJson(orderMake.mutableProperties).toString), gas = orderMake.gas.toMicroString, status = orderMake.status, txHash = orderMake.txHash, ticketID = orderMake.ticketID, mode = orderMake.mode, code = orderMake.code, createdBy = orderMake.createdBy, createdOn = orderMake.createdOn, createdOnTimeZone = orderMake.createdOnTimeZone, updatedBy = orderMake.updatedBy, updatedOn = orderMake.updatedOn, updatedOnTimeZone = orderMake.updatedOnTimeZone)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -127,23 +127,23 @@ class OrderMakes @Inject()(
   private[models] class OrderMakeTable(tag: Tag) extends Table[OrderMakeSerialized](tag, "OrderMake") {
 
     def * = (from, fromID, classificationID, makerOwnableID, takerOwnableID, expiresIn, makerOwnableSplit,
-      (immutableMetaTraits, immutableTraits, mutableMetaTraits, mutableTraits),
+      (immutableMetaProperties, immutableProperties, mutableMetaProperties, mutableProperties),
       gas, status.?, txHash.?, ticketID, mode, code.?,
       createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?).shaped <> ( {
       case (from, fromID, classificationID, makerOwnableID, takerOwnableID, expiresIn, makerOwnableSplit,
-      traitsSerialized,
+      propertiesSerialized,
       gas, status, txHash, ticketID, mode, code,
       createdBy, createdOn, createdOnTimeZone, updatedBy, updatedOn, updatedOnTimeZone) => OrderMakeSerialized(
         from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit,
-        traitsSerialized = TraitsSerialized.tupled.apply(traitsSerialized),
+        propertiesSerialized = PropertiesSerialized.tupled.apply(propertiesSerialized),
         gas = gas, status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code,
         createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone
       )
     }, { orderMakeSerialized: OrderMakeSerialized =>
-      def f1(traitsSerialized: TraitsSerialized) = TraitsSerialized.unapply(traitsSerialized).get
+      def f1(propertiesSerialized: PropertiesSerialized) = PropertiesSerialized.unapply(propertiesSerialized).get
 
       Some((orderMakeSerialized.from, orderMakeSerialized.fromID, orderMakeSerialized.classificationID, orderMakeSerialized.makerOwnableID, orderMakeSerialized.takerOwnableID, orderMakeSerialized.expiresIn, orderMakeSerialized.makerOwnableSplit,
-        f1(orderMakeSerialized.traitsSerialized),
+        f1(orderMakeSerialized.propertiesSerialized),
         orderMakeSerialized.gas, orderMakeSerialized.status, orderMakeSerialized.txHash, orderMakeSerialized.ticketID,
         orderMakeSerialized.mode, orderMakeSerialized.code,
         orderMakeSerialized.createdBy, orderMakeSerialized.createdOn, orderMakeSerialized.createdOnTimeZone,
@@ -165,13 +165,13 @@ class OrderMakes @Inject()(
 
     def makerOwnableSplit = column[BigDecimal]("makerOwnableSplit")
 
-    def immutableMetaTraits = column[String]("immutableMetaTraits")
+    def immutableMetaProperties = column[String]("immutableMetaProperties")
 
-    def immutableTraits = column[String]("immutableTraits")
+    def immutableProperties = column[String]("immutableProperties")
 
-    def mutableMetaTraits = column[String]("mutableMetaTraits")
+    def mutableMetaProperties = column[String]("mutableMetaProperties")
 
-    def mutableTraits = column[String]("mutableTraits")
+    def mutableProperties = column[String]("mutableProperties")
 
     def gas = column[String]("gas")
 
@@ -247,6 +247,6 @@ class OrderMakes @Inject()(
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actors.Service.actorSystem.scheduler.scheduleAtFixedRate(initialDelay = schedulerInitialDelay, interval = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

@@ -51,7 +51,8 @@ class IdentityController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def nubForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityNub())
   }
 
@@ -77,7 +78,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
             verifyPassword <- verifyPassword
@@ -90,7 +91,8 @@ class IdentityController @Inject()(
       )
   }
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityDefine())
   }
 
@@ -109,7 +111,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
 
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
@@ -152,7 +154,7 @@ class IdentityController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword
@@ -166,7 +168,8 @@ class IdentityController @Inject()(
       )
   }
 
-  def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityIssue(classificationID = classificationID))
   }
 
@@ -186,7 +189,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(issueData.addMutableMetaField, issueData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(issueData.addMutableField, issueData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password.getOrElse(""))
             val immutableMetas = issueData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = issueData.immutableProperties.getOrElse(Seq.empty).flatten
             val mutableMetas = issueData.mutableMetaProperties.getOrElse(Seq.empty).flatten
@@ -225,7 +228,7 @@ class IdentityController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, identityExists = identityExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(issueData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), issueData.classificationID)))
+            } else Future(BadRequest(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(issueData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), issueData.classificationID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -240,7 +243,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {
+  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityProvision(identityID = identityID))
   }
@@ -268,7 +271,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityProvision(blockchainCompanion.IdentityProvision.form.fill(provisionData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), provisionData.identityID)))
+          } else Future(BadRequest(blockchainForms.identityProvision(blockchainCompanion.IdentityProvision.form.fill(provisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), provisionData.identityID)))
 
           (for {
             verifyPassword <- verifyPassword
@@ -281,7 +284,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {
+  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityUnprovision(identityID = identityID))
   }
@@ -309,7 +312,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID)))
+          } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID)))
 
           (for {
             verifyPassword <- verifyPassword

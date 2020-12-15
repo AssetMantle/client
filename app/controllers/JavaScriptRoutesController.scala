@@ -11,7 +11,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def javascriptRoutes = withoutLoginAction { implicit request =>
+  def javascriptRoutes = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.AccountController.signUpForm,
@@ -77,6 +78,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
         routes.javascript.ComponentViewController.entityProperties,
+        routes.javascript.ComponentViewController.viewIdentityInfo,
 
         routes.javascript.ComponentViewController.identitiesDefinition,
         routes.javascript.ComponentViewController.identitiesProvisioned,

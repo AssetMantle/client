@@ -251,6 +251,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actors.Service.actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

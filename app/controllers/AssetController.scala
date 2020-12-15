@@ -51,7 +51,8 @@ class AssetController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetDefine())
   }
 
@@ -70,7 +71,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten
@@ -110,7 +111,7 @@ class AssetController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+            } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
               verifyPassword <- verifyPassword
@@ -124,7 +125,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMint(classificationID = classificationID))
   }
 
@@ -144,7 +146,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mintData.addMutableMetaField, mintData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mintData.addMutableField, mintData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mintData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mintData.password.getOrElse(""))
 
             val immutableMetas = mintData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = mintData.immutableProperties.getOrElse(Seq.empty).flatten
@@ -158,7 +160,7 @@ class AssetController @Inject()(
               val createSplit = masterSplits.Service.create(masterSplit(entityID = entityID, ownerID = mintData.toID, entityType = constants.Blockchain.Entity.ASSET, label = Option(mintData.label), status = None))
 
               def broadcastTx = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
-                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaTraits = MetaProperties(mintData.immutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), immutableTraits = Properties(mintData.immutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), mutableMetaTraits = MetaProperties(mintData.mutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), mutableTraits = Properties(mintData.mutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), gas = mintData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = MetaProperties(mintData.immutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), immutableProperties = Properties(mintData.immutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), mutableMetaProperties = MetaProperties(mintData.mutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), mutableProperties = Properties(mintData.mutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), gas = mintData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
                 request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = mintData.gas), fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = mintData.immutableMetaProperties.getOrElse(Seq.empty).flatten, immutableProperties = mintData.immutableProperties.getOrElse(Seq.empty).flatten, mutableMetaProperties = mintData.mutableMetaProperties.getOrElse(Seq.empty).flatten, mutableProperties = mintData.mutableProperties.getOrElse(Seq.empty).flatten)),
                 action = transactionsAssetMint.Service.post,
@@ -185,7 +187,7 @@ class AssetController @Inject()(
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, assetExists = assetExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
+            } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -199,7 +201,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMutate(assetID = assetID))
   }
 
@@ -217,7 +220,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mutateData.addMutableMetaField, mutateData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mutateData.addMutableField, mutateData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password.getOrElse(""))
 
             val mutableMetas = mutateData.mutableMetaProperties.getOrElse(Seq.empty).flatten
             val mutables = mutateData.mutableProperties.getOrElse(Seq.empty).flatten
@@ -248,7 +251,7 @@ class AssetController @Inject()(
                 ticketID <- updateAndBroadcast(assetExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID)))
+            } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -262,7 +265,8 @@ class AssetController @Inject()(
       )
   }
 
-  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetBurn(assetID = assetID))
   }
 
@@ -290,7 +294,7 @@ class AssetController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), burnData.assetID)))
+          } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID)))
 
           (for {
             verifyPassword <- verifyPassword

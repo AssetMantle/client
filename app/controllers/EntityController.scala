@@ -36,7 +36,8 @@ class EntityController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ENTITY
 
-  def addLabelForm(entityID: String, entityType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def addLabelForm(entityID: String, entityType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(masterComponent.addEntityLabel(entityID = entityID, entityType = entityType))
   }
 
@@ -117,7 +118,8 @@ class EntityController @Inject()(
       )
   }
 
-  def addPrivatePropertyForm(entityID: String, entityType: String, name: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def addPrivatePropertyForm(entityID: String, entityType: String, name: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(masterComponent.addPrivateProperty(entityID = entityID, entityType = entityType, name = name))
   }
 

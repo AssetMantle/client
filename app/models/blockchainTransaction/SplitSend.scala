@@ -208,6 +208,6 @@ class SplitSends @Inject()(
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actors.Service.actorSystem.scheduler.scheduleAtFixedRate(initialDelay = schedulerInitialDelay, interval = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }
