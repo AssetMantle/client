@@ -78,6 +78,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ComponentViewController.entityProperties,
         routes.javascript.ComponentViewController.viewIdentityInfo,
+
         routes.javascript.ComponentViewController.identitiesDefinition,
         routes.javascript.ComponentViewController.identitiesProvisioned,
         routes.javascript.ComponentViewController.identitiesUnprovisioned,
