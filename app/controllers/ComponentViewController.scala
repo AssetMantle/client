@@ -638,4 +638,21 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def viewIdentityInfo(identityID:String)= withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val identity = blockchainIdentities.Service.get(identityID)
+      (for(
+        identity<-identity
+      ) yield {
+        identity match {
+          case Some(identity)=> Ok(views.html.component.blockchain.identity(identity))
+          case None=> throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+
+  }
+
 }
