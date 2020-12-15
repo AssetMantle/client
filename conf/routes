@@ -169,6 +169,7 @@ GET         /component/validatorTransactions                     controllers.Com
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
 GET         /component/entityProperties                          controllers.ComponentViewController.entityProperties(entityID: String, entityType: String)
+GET         /component/identityInfo                              controllers.ComponentViewController.viewIdentityInfo(identityID: String)
 
 GET         /component/identitiesDefinition                      controllers.ComponentViewController.identitiesDefinition
 GET         /component/identitiesProvisioned                     controllers.ComponentViewController.identitiesProvisioned

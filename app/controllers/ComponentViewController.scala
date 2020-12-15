@@ -577,7 +577,6 @@ class ComponentViewController @Inject()(
   def entityProperties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val provisionedIdentityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
-      val unprovisionedIdentityIDs = blockchainIdentities.Service.getAllIDsByUnprovisioned(loginState.address)
       val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
 
       def verifyOwner(identityIDs: Seq[String]): Future[Boolean] = {
@@ -604,8 +603,7 @@ class ComponentViewController @Inject()(
 
       (for {
         provisionedIdentityIDs <- provisionedIdentityIDs
-        unprovisionedIdentityIDs <- unprovisionedIdentityIDs
-        isOwner <- verifyOwner(provisionedIdentityIDs ++ unprovisionedIdentityIDs)
+        isOwner <- verifyOwner(provisionedIdentityIDs)
         properties <- properties
       } yield {
         if (isOwner) Ok(views.html.component.master.viewEntityProperties(properties))
@@ -613,6 +611,23 @@ class ComponentViewController @Inject()(
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
       }
+  }
+
+  def viewIdentityInfo(identityID:String)= withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val identity = blockchainIdentities.Service.get(identityID)
+      (for(
+        identity<-identity
+      ) yield {
+        identity match {
+          case Some(identity)=> Ok(views.html.component.blockchain.identity(identity))
+          case None=> throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
+
   }
 
 }
