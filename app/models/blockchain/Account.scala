@@ -1,9 +1,6 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.common.TransactionMessages.{MultiSend, SendCoin}
@@ -15,8 +12,9 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import queries.responses.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
-import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -87,6 +85,8 @@ class Accounts @Inject()(
     }
   }
 
+  private def getUsernameByAddress(address: String): Future[Option[String]] = db.run(accountTable.filter(_.address === address).map(_.username).result.headOption)
+
   private def findAddressByID(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -149,6 +149,8 @@ class Accounts @Inject()(
 
     def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
 
+    def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
+
     def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
@@ -190,12 +192,7 @@ class Accounts @Inject()(
     }
 
     private def subtractCoinsFromAccount(fromAccount: Account, subtractCoins: Seq[Coin]) = {
-      val subtractDenomList = subtractCoins.map(_.denom)
-      val updatedCoins = fromAccount.coins.map { coin =>
-        if (subtractDenomList.contains(coin.denom)) {
-          Coin(denom = coin.denom, amount = coin.amount - subtractCoins.find(_.denom == coin.denom).fold(MicroNumber.zero)(_.amount))
-        } else coin
-      }
+      val updatedCoins = fromAccount.coins.map { accountCoin => subtractCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(subtractCoin => Coin(denom = accountCoin.denom, amount = accountCoin.amount - subtractCoin.amount)) }
       for {
         _ <- Service.insertOrUpdate(fromAccount.copy(coins = updatedCoins))
       } yield ()
@@ -212,16 +209,12 @@ class Accounts @Inject()(
           _ <- insert(accountResponse)
         } yield ()
       } { account => {
-        val addCoinDenomList = addCoins.map(_.denom)
-        val updatedCoins = account.coins.map { coin =>
-          if (addCoinDenomList.contains(coin.denom)) {
-            Coin(denom = coin.denom, amount = coin.amount - addCoins.find(_.denom == coin.denom).fold(MicroNumber.zero)(_.amount))
-          } else coin
-        }
+        val updatedCoins = account.coins.map { accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = addCoin.amount + accountCoin.amount)) }
         for {
           _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
         } yield ()
-      }}
+      }
+      }
     }
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
