@@ -47,7 +47,8 @@ class BackgroundCheckController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_BACKGROUND_CHECK
 
   //UBO CHECKS
-  def memberScanForm(uboID: String, firstName: String, lastName: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def memberScanForm(uboID: String, firstName: String, lastName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName)))
   }
 
@@ -93,7 +94,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def memberScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def memberScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val result = getMemberCheckMemberScanResult.Service.get(resultID.toString)
     (for {
       result <- result
@@ -102,7 +104,8 @@ class BackgroundCheckController @Inject()(
     }
   }
 
-  def memberScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def memberScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckMemberScanSingleResultDecision(resultID = resultID)))
   }
 
@@ -124,7 +127,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.addUBOMemberCheck(uboID = uboID, scanID = scanID, resultID = resultID)))
   }
 
@@ -152,7 +156,8 @@ class BackgroundCheckController @Inject()(
   }
 
   //CORPORATE SCAN
-  def corporateScanForm(organizationID: String, companyName: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def corporateScanForm(organizationID: String, companyName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckCorporateScan(organizationID = organizationID, companyName = companyName)))
   }
 
@@ -198,7 +203,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def corporateScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def corporateScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
     (for {
       result <- result
@@ -207,7 +213,8 @@ class BackgroundCheckController @Inject()(
     }
   }
 
-  def corporateScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def corporateScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckCorporateScanSingleResultDecision(resultID = resultID)))
   }
 
@@ -229,7 +236,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.addOrganizationMemberCheck(organizationID = organizationID, scanID = scanID, resultID = resultID)))
   }
 
@@ -254,7 +262,8 @@ class BackgroundCheckController @Inject()(
   }
 
   //VESSEL SCAN
-  def vesselScanForm(assetID: String, vesselName: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def vesselScanForm(assetID: String, vesselName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckVesselScan(assetID = assetID, vesselName = vesselName)))
   }
 
@@ -300,7 +309,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def vesselScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def vesselScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
     (for {
       result <- result
@@ -309,7 +319,8 @@ class BackgroundCheckController @Inject()(
     }
   }
 
-  def vesselScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def vesselScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.memberCheckVesselScanSingleResultDecision(resultID = resultID)))
   }
 
@@ -331,7 +342,8 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Future(Ok(views.html.component.master.addAssetMemberCheck(assetID = assetID, scanID = scanID, resultID = resultID)))
   }
 

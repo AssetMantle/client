@@ -51,7 +51,8 @@ class IdentityController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def nubForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityNub())
   }
 
@@ -90,7 +91,8 @@ class IdentityController @Inject()(
       )
   }
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityDefine())
   }
 
@@ -109,7 +111,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
 
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
@@ -166,7 +168,8 @@ class IdentityController @Inject()(
       )
   }
 
-  def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.identityIssue(classificationID = classificationID))
   }
 
@@ -186,7 +189,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(issueData.addMutableMetaField, issueData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(issueData.addMutableField, issueData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password.getOrElse(""))
             val immutableMetas = issueData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = issueData.immutableProperties.getOrElse(Seq.empty).flatten
             val mutableMetas = issueData.mutableMetaProperties.getOrElse(Seq.empty).flatten
@@ -240,7 +243,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {
+  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityProvision(identityID = identityID))
   }
@@ -281,7 +284,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {
+  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityUnprovision(identityID = identityID))
   }

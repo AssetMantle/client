@@ -51,11 +51,13 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.signUp())
   }
 
-  def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
@@ -77,7 +79,8 @@ class AccountController @Inject()(
     )
   }
 
-  def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
     def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -96,7 +99,8 @@ class AccountController @Inject()(
     }
   }
 
-  def createWallet(): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def createWallet(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.master.CreateWallet.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.createWallet(formWithErrors, formWithErrors.data(constants.FormField.USERNAME.name), formWithErrors.data(constants.FormField.MNEMONICS.name).split(" "))))
@@ -128,15 +132,18 @@ class AccountController @Inject()(
     )
   }
 
-  def checkMnemonics(mnemonics: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def checkMnemonics(mnemonics: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     if (utilities.Bip39.check(mnemonics)) Ok else NoContent
   }
 
-  def importWalletForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def importWalletForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.importWallet())
   }
 
-  def importWallet: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def importWallet: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     ImportWallet.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.importWallet(formWithErrors)))
@@ -176,11 +183,13 @@ class AccountController @Inject()(
     )
   }
 
-  def loginForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def loginForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.login())
   }
 
-  def login: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def login: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.login(formWithErrors)))
@@ -258,7 +267,8 @@ class AccountController @Inject()(
     )
   }
 
-  def logoutForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def logoutForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.logout())
   }
 
@@ -291,7 +301,8 @@ class AccountController @Inject()(
       )
   }
 
-  def changePasswordForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def changePasswordForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.changePassword())
   }
 
@@ -328,11 +339,13 @@ class AccountController @Inject()(
       )
   }
 
-  def emailOTPForgotPasswordForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def emailOTPForgotPasswordForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.emailOTPForgotPassword())
   }
 
-  def emailOTPForgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def emailOTPForgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.master.EmailOTPForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.emailOTPForgotPassword(formWithErrors)))
@@ -351,11 +364,13 @@ class AccountController @Inject()(
     )
   }
 
-  def forgotPasswordForm(username: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def forgotPasswordForm(username: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.forgotPassword(username = username))
   }
 
-  def forgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def forgotPassword: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.master.ForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.master.forgotPassword(formWithErrors, formWithErrors(constants.FormField.USERNAME.name).value.getOrElse(""))))
@@ -391,7 +406,8 @@ class AccountController @Inject()(
     )
   }
 
-  def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
     for {
       checkUsernameAvailable <- checkUsernameAvailable

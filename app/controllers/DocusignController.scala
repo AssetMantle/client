@@ -70,7 +70,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
 
     val account = blockchainAccounts.Service.tryGet("accountAddress")

@@ -35,7 +35,8 @@ class NotificationController @Inject()(
       }
   }
 
-  def publicRecentActivityMessages(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def publicRecentActivityMessages(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
 
     val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.getPublic(pageNumber)
 

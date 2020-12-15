@@ -11,7 +11,7 @@
     @commonInputInt(orderMakeForm, constants.FormField.EXPIRES_IN)
     @commonInputBigDecimal(orderMakeForm, constants.FormField.MAKER_OWNABLE_SPLIT)
     @commonInputMicroNumber(orderMakeForm, constants.FormField.GAS)
-    @commonInputPassword(orderMakeForm, constants.FormField.PASSWORD)
+    @commonInputPassword(orderMakeForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)

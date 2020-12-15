@@ -50,7 +50,8 @@ class OrderController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderDefine())
   }
 
@@ -69,7 +70,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten
@@ -125,7 +126,8 @@ class OrderController @Inject()(
       )
   }
 
-  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderMake(classificationID = classificationID))
   }
 
@@ -145,7 +147,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(makeData.addMutableMetaField, makeData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(makeData.addMutableField, makeData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password.getOrElse(""))
             val immutableMetas = makeData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = makeData.immutableProperties.getOrElse(Seq.empty).flatten
             val mutableMetas = makeData.mutableMetaProperties.getOrElse(Seq.empty).flatten
@@ -199,7 +201,8 @@ class OrderController @Inject()(
       )
   }
 
-  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderTake(orderID = orderID))
   }
 
@@ -240,7 +243,8 @@ class OrderController @Inject()(
       )
   }
 
-  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.orderCancel(orderID = orderID))
   }
 

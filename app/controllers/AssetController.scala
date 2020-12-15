@@ -51,7 +51,8 @@ class AssetController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def defineForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetDefine())
   }
 
@@ -70,7 +71,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten
@@ -124,7 +125,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMint(classificationID = classificationID))
   }
 
@@ -144,7 +146,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mintData.addMutableMetaField, mintData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mintData.addMutableField, mintData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mintData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mintData.password.getOrElse(""))
 
             val immutableMetas = mintData.immutableMetaProperties.getOrElse(Seq.empty).flatten
             val immutables = mintData.immutableProperties.getOrElse(Seq.empty).flatten
@@ -199,7 +201,8 @@ class AssetController @Inject()(
       )
   }
 
-  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def mutateForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetMutate(assetID = assetID))
   }
 
@@ -217,7 +220,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mutateData.addMutableMetaField, mutateData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mutateData.addMutableField, mutateData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password.getOrElse(""))
 
             val mutableMetas = mutateData.mutableMetaProperties.getOrElse(Seq.empty).flatten
             val mutables = mutateData.mutableProperties.getOrElse(Seq.empty).flatten
@@ -262,7 +265,8 @@ class AssetController @Inject()(
       )
   }
 
-  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def burnForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.assetBurn(assetID = assetID))
   }
 

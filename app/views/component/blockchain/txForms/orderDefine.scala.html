@@ -6,7 +6,7 @@
     @commonInputText(orderDefineForm, constants.FormField.FROM_ID)
     @commonInputText(orderDefineForm, constants.FormField.LABEL)
     @commonInputMicroNumber(orderDefineForm, constants.FormField.GAS)
-    @commonInputPassword(orderDefineForm, constants.FormField.PASSWORD)
+    @commonInputPassword(orderDefineForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)

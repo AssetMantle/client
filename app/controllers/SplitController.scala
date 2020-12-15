@@ -39,7 +39,8 @@ class SplitController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def sendForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def sendForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.splitSend(ownableID = ownableID))
   }
 
@@ -80,7 +81,8 @@ class SplitController @Inject()(
       )
   }
 
-  def wrapForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def wrapForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.splitWrap())
   }
 
@@ -125,7 +127,8 @@ class SplitController @Inject()(
       )
   }
 
-  def unwrapForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def unwrapForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(blockchainForms.splitUnwrap(ownableID = ownableID))
   }
 

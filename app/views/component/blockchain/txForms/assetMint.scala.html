@@ -8,7 +8,7 @@
     @commonInputText(assetMintForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID)
     @commonInputText(assetMintForm, constants.FormField.LABEL)
     @commonInputMicroNumber(assetMintForm, constants.FormField.GAS)
-    @commonInputPassword(assetMintForm, constants.FormField.PASSWORD)
+    @commonInputPassword(assetMintForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
