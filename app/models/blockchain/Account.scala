@@ -206,7 +206,7 @@ class Accounts @Inject()(
           _ <- insert(accountResponse)
         } yield ()
       } { account => {
-        val updatedCoins = addCoins.map(addCoin => account.coins.find(_.denom == addCoin.denom).fold(addCoin)(accountCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
+        val updatedCoins = account.coins.map(accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
         for {
           _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
         } yield ()
