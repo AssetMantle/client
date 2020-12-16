@@ -1,9 +1,6 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.common.TransactionMessages.{MultiSend, SendCoin}
@@ -16,6 +13,8 @@ import queries.GetAccount
 import queries.responses.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -86,6 +85,8 @@ class Accounts @Inject()(
     }
   }
 
+  private def getUsernameByAddress(address: String): Future[Option[String]] = db.run(accountTable.filter(_.address === address).map(_.username).result.headOption)
+
   private def findAddressByID(username: String): Future[String] = db.run(accountTable.filter(_.username === username).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -147,6 +148,8 @@ class Accounts @Inject()(
     def tryGetByUsername(username: String): Future[Account] = findByUsername(username).map(_.deserialize)
 
     def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
+
+    def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
 
     def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
@@ -213,7 +216,6 @@ class Accounts @Inject()(
       }
       }
     }
-
 
     def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
