@@ -192,7 +192,7 @@ class Accounts @Inject()(
     }
 
     private def subtractCoinsFromAccount(fromAccount: Account, subtractCoins: Seq[Coin]) = {
-      val updatedCoins = fromAccount.coins.map { accountCoin => subtractCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(subtractCoin => Coin(denom = accountCoin.denom, amount = accountCoin.amount - subtractCoin.amount)) }
+      val updatedCoins = fromAccount.coins.map(accountCoin => subtractCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(subtractCoin => Coin(denom = accountCoin.denom, amount = accountCoin.amount - subtractCoin.amount)))
       for {
         _ <- Service.insertOrUpdate(fromAccount.copy(coins = updatedCoins))
       } yield ()
@@ -209,7 +209,7 @@ class Accounts @Inject()(
           _ <- insert(accountResponse)
         } yield ()
       } { account => {
-        val updatedCoins = account.coins.map { accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = addCoin.amount + accountCoin.amount)) }
+        val updatedCoins = account.coins.map(accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = addCoin.amount + accountCoin.amount)))
         for {
           _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
         } yield ()
