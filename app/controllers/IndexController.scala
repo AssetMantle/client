@@ -85,9 +85,14 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
             loginState match {
               case Some(loginState) => {
                 implicit val loginStateImplicit: LoginState = loginState
-                withUsernameToken.Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer))
+                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
+                  withUsernameToken.Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+                } else withUsernameToken.Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer))
               }
-              case None => Future(Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer)))
+              case None =>
+                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
+                  Future(Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
+                } else Future(Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer)))
             }
           }
         }
@@ -107,5 +112,4 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
-  startup.start()
 }
