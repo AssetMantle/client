@@ -1,14 +1,17 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import constants.Response.Success
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Coin
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import views.companion.{blockchain => blockchainCompanion}
+import views.html.component.blockchain.{txForms => blockchainForms}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,6 +20,7 @@ class SendCoinController @Inject()(
                                     messagesControllerComponents: MessagesControllerComponents,
                                     transaction: utilities.Transaction,
                                     withLoginAction: WithLoginAction,
+                                    masterAccounts: master.Accounts,
                                     withUnknownLoginAction: WithUnknownLoginAction,
                                     transactionsSendCoin: transactions.SendCoin,
                                     blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
@@ -34,19 +38,22 @@ class SendCoinController @Inject()(
 
   private val denom = configuration.get[String]("blockchain.denom")
 
-  def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.master.sendCoin())
+  def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+    Ok(blockchainForms.sendCoin())
   }
 
   def sendCoin: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.SendCoin.form.bindFromRequest().fold(
+      blockchainCompanion.SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.sendCoin(formWithErrors)))
+          Future(BadRequest(blockchainForms.sendCoin(formWithErrors)))
         },
         sendCoinData => {
-          val transactionProcess = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = Seq(Coin("stake", sendCoinData.amount)), gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendCoinData.password)
+
+          def broadcastTx = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = Seq(Coin(denom, sendCoinData.amount)), gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
             request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = transactionMode),
             action = transactionsSendCoin.Service.post,
@@ -54,35 +61,22 @@ class SendCoinController @Inject()(
             onFailure = blockchainTransactionSendCoins.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
           )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.sendCoin(blockchainCompanion.SendCoin.form.fill(sendCoinData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
+
           (for {
-            _ <- transactionProcess
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.account(loginState.address, failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
         }
       )
-  }
-
-  def blockchainSendCoinForm: Action[AnyContent] = withoutLoginAction { implicit request =>
-    Ok(views.html.component.blockchain.sendCoin())
-  }
-
-  def blockchainSendCoin: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
-    views.companion.blockchain.SendCoin.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.sendCoin(formWithErrors)))
-      },
-      sendCoinData => {
-        val postRequest = transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = sendCoinData.mode))
-        (for {
-          _ <- postRequest
-        } yield Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
   }
 }

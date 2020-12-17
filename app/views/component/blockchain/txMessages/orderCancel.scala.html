@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[OrderCancel]) { orderCancel =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(orderCancel.from, routes.ViewController.account(orderCancel.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(orderCancel.from, routes.ViewController.wallet(orderCancel.from)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderCancel.fromID, routes.IndexController.search(orderCancel.fromID)))
     @commonHtmlInfo(constants.View.ORDER_ID, commonLink(orderCancel.orderID, routes.IndexController.search(orderCancel.orderID)))
 }

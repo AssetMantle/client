@@ -8,6 +8,7 @@ case class Immutables(value: Immutables.Value) {
 }
 
 object Immutables {
+
   case class Value(properties: Properties)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]

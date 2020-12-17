@@ -17,9 +17,9 @@ class GetBlockCommit @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.abciPort")
+  private val port = configuration.get[String]("blockchain.abciPort")
 
   private val path = "commit?height="
 
@@ -31,7 +31,8 @@ class GetBlockCommit @Inject()()(implicit wsClient: WSClient, configuration: Con
     def get(height: Int): Future[Response] = action(height).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
       case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR) {
-        throw new BaseException(constants.Response.BLOCK_NOT_FOUND, baseException)
+        logger.error(constants.Response.BLOCK_QUERY_FAILED.logMessage + ": " + height)
+        throw new BaseException(constants.Response.BLOCK_QUERY_FAILED, baseException)
       } else throw baseException
     }
   }

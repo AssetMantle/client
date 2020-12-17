@@ -15,6 +15,24 @@ object TransactionMessageResponses {
 
   implicit val logger: Logger = Logger(this.getClass)
 
+  case class Input(address: String, coins: Seq[Coin]) {
+    def toInput: TransactionMessages.Input = TransactionMessages.Input(address = address, coins = coins.map(_.toCoin))
+  }
+
+  implicit val inputReads: Reads[Input] = Json.reads[Input]
+
+  case class Output(address: String, coins: Seq[Coin]) {
+    def toOutput: TransactionMessages.Output = TransactionMessages.Output(address = address, coins = coins.map(_.toCoin))
+  }
+
+  implicit val outputReads: Reads[Output] = Json.reads[Output]
+
+  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.MultiSend(inputs = inputs.map(_.toInput), outputs = outputs.map(_.toOutput))
+  }
+
+  implicit val multiSendReads: Reads[MultiSend] = Json.reads[MultiSend]
+
   //  bank
   case class SendCoin(from_address: String, to_address: String, amount: Seq[Coin]) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.SendCoin(fromAddress = from_address, toAddress = to_address, amounts = amount.map(x => Serializable.Coin(denom = x.denom, amount = x.amount)))
@@ -55,14 +73,14 @@ object TransactionMessageResponses {
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
 
   //gov
-  case class Deposit(proposal_id: Long, depositor: String, amount: Seq[Coin]) extends TransactionMessageResponse {
+  case class Deposit(proposal_id: String, depositor: String, amount: Seq[Coin]) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Deposit(proposalID = proposal_id, depositor = depositor, amount = amount.map(_.toCoin))
   }
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
-  case class ContentValue(title: String, description: String, recipient: String, amount: Seq[Coin]) {
-    def toContentValue: TransactionMessages.ContentValue = TransactionMessages.ContentValue(title = title, description = description, recipient = recipient, amount = amount.map(_.toCoin))
+  case class ContentValue(title: String, description: String) {
+    def toContentValue: TransactionMessages.ContentValue = TransactionMessages.ContentValue(title = title, description = description)
   }
 
   implicit val contentValueReads: Reads[ContentValue] = Json.reads[ContentValue]
@@ -79,7 +97,7 @@ object TransactionMessageResponses {
 
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
-  case class Vote(proposal_id: Long, voter: String, option: Int) extends TransactionMessageResponse {
+  case class Vote(proposal_id: String, voter: String, option: Int) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Vote(proposalID = proposal_id, voter = voter, option = option)
   }
 
@@ -260,6 +278,7 @@ object TransactionMessageResponses {
     msgType match {
       //bank
       case constants.Blockchain.TransactionMessage.SEND_COIN => Msg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
+      case constants.Blockchain.TransactionMessage.MULTI_SEND => Msg(msgType, utilities.JSON.convertJsonStringToObject[MultiSend](value.toString))
       //crisis
       case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => Msg(msgType, utilities.JSON.convertJsonStringToObject[VerifyInvariant](value.toString))
       //distribution

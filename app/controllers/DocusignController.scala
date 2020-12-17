@@ -70,7 +70,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
 
     val account = blockchainAccounts.Service.tryGet("accountAddress")
@@ -141,7 +142,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def authorization: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
-        case baseException: BaseException => InternalServerError(views.html.account(address = loginState.address, failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
@@ -150,7 +151,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {
         _ <- updateAccessToken
-      } yield Ok(views.html.account(address = loginState.address, successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
+      } yield Ok(views.html.account(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

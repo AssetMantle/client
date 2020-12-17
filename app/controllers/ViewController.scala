@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ViewController @Inject()(
@@ -18,61 +18,145 @@ class ViewController @Inject()(
                                 withLoginAction: WithLoginAction,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
-                                withoutLoginAction: WithoutLoginAction,
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
-  def profile: Action[AnyContent] = withLoginAction.authenticated {
-    implicit loginState =>
-      implicit request =>
-        (for {
-          result <- withUsernameToken.Ok(views.html.profile())
-        } yield result).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+  def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.profile())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def account: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.account())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def wallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.wallet(address))
         }
+        case None => Future(Ok(views.html.wallet(address)))
+      }
   }
 
-  def account(address: String): Action[AnyContent] = withoutLoginAction {
+  def blocks(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.account(address))
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.blocks())
+        }
+        case None => Future(Ok(views.html.blocks()))
+      }
+
   }
 
-  def blocks(): Action[AnyContent] = withoutLoginAction {
+  def block(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.blocks())
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.block(height))
+        }
+        case None => Future(Ok(views.html.block(height)))
+      }
   }
 
-  def block(height: Int): Action[AnyContent] = withoutLoginAction {
+  def transactions(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.block(height))
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.transactions())
+        }
+        case None => Future(Ok(views.html.transactions()))
+      }
   }
 
-  def transactions(): Action[AnyContent] = withoutLoginAction {
+  def transaction(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.transactions())
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.transaction(txHash))
+        }
+        case None => Future(Ok(views.html.transaction(txHash)))
+      }
   }
 
-  def transaction(txHash: String): Action[AnyContent] = withoutLoginAction {
+  def validators(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.transaction(txHash))
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.validators())
+        }
+        case None => Future(Ok(views.html.validators()))
+      }
   }
 
-  def validators(): Action[AnyContent] = withoutLoginAction {
+  def validator(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.validators())
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.validator(address))
+        }
+        case None => Future(Ok(views.html.validator(address)))
+      }
   }
 
-  def validator(address: String): Action[AnyContent] = withoutLoginAction {
+  def dashboard: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      Ok(views.html.validator(address))
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.dashboard())
+        }
+        case None => Future(Ok(views.html.dashboard()))
+      }
   }
 
-  def dashboard: Action[AnyContent] = withoutLoginAction {
+  def identity: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(views.html.dashboard())
+      (for {
+        result <- withUsernameToken.Ok(views.html.identity())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
+
+  def asset: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.asset())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def order: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.order())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
 
 }

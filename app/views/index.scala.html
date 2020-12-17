@@ -5,7 +5,7 @@
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+    @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
     @left = {
         <div class="leftContainer">
@@ -19,7 +19,16 @@
     }
 
     @center = {
-
+        <div class="cmuk-container cmuk-margin-bottom">
+            <div class="cmuk-grid-match" cmuk-grid>
+                <div class="cmuk-width-expand@@m">
+                    <div id="tokensPrices" class="cardSelectHeader"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+                componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
+        </script>
     }
 
     @right = {
@@ -30,7 +39,7 @@
             <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
         </div>
         <script>
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.publicRecentActivities());
                 componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
         </script>
     }

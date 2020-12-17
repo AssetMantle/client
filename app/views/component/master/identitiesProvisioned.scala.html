@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import models.master.Identity
+@import views.html.base._
+
+@(identities: Seq[Identity])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.PROVISIONED_IDENTITIES) {
+    @commonFormButton(constants.Form.IDENTITY_NUB)
+} {
+    @identities.map { identity =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.LABEL, identity.label.getOrElse(""))
+            @commonFormButton(constants.Form.ADD_ENTITY_LABEL, 'parameters -> s"'${identity.id}', '${constants.Blockchain.Entity.IDENTITY}'")
+            @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
+            @commonVerticalBooleanInfo(constants.View.STATUS, identity.status)
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.viewIdentityInfo, 'parameters -> s"'${identity.id}'")
+            @commonFormButton(constants.Form.IDENTITY_PROVISION, 'parameters -> s"'${identity.id}'")
+            @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identity.id}'")
+        }
+    }
+}

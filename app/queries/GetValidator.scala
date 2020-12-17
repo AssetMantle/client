@@ -17,15 +17,15 @@ class GetValidator @Inject()()(implicit wsClient: WSClient, configuration: Confi
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
   private val path = "staking/validators"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(operatorAddress: String): Future[Response] = wsClient.url(url + operatorAddress).get.map { response => utilities.JSON.convertJsonStringToObject[Response](response.body) }
+  private def action(operatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + operatorAddress).get)
 
   object Service {
 

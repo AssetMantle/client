@@ -11,9 +11,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def javascriptRoutes = withoutLoginAction { implicit request =>
+  def javascriptRoutes = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
+        routes.javascript.Assets.versioned,
+
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.loginForm,
         routes.javascript.AccountController.logoutForm,
@@ -25,6 +28,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
+        routes.javascript.AccountController.checkMnemonics,
+        routes.javascript.AccountController.importWalletForm,
+
+        routes.javascript.AssetController.defineForm,
+        routes.javascript.AssetController.mintForm,
+        routes.javascript.AssetController.mutateForm,
+        routes.javascript.AssetController.burnForm,
 
         routes.javascript.ChatController.chatRoom,
         routes.javascript.ChatController.chatWindow,
@@ -69,6 +79,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.validatorTransactions,
         routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
+        routes.javascript.ComponentViewController.entityProperties,
+        routes.javascript.ComponentViewController.viewIdentityInfo,
+
+        routes.javascript.ComponentViewController.identitiesDefinition,
+        routes.javascript.ComponentViewController.identitiesProvisioned,
+        routes.javascript.ComponentViewController.identitiesUnprovisioned,
+        routes.javascript.ComponentViewController.assetsDefinition,
+        routes.javascript.ComponentViewController.assetsMinted,
+        routes.javascript.ComponentViewController.ordersDefinition,
+        routes.javascript.ComponentViewController.ordersMade,
+        routes.javascript.ComponentViewController.ordersTake,
+
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
@@ -76,6 +98,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.DocusignController.send,
         routes.javascript.DocusignController.sign,
         routes.javascript.DocusignController.authorization,
+
+        routes.javascript.EntityController.addLabelForm,
+        routes.javascript.EntityController.addPrivatePropertyForm,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -89,7 +114,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateAccountKYCForm,
         routes.javascript.FileController.updateAccountKYC,
 
+        routes.javascript.IdentityController.nubForm,
+        routes.javascript.IdentityController.defineForm,
+        routes.javascript.IdentityController.issueForm,
+        routes.javascript.IdentityController.provisionForm,
+        routes.javascript.IdentityController.unprovisionForm,
+
         routes.javascript.IndexController.search,
+
+        routes.javascript.MetaController.revealForm,
+        routes.javascript.MaintainerController.deputizeForm,
 
         routes.javascript.NotificationController.recentActivityMessages,
         routes.javascript.NotificationController.unreadNotificationCount,
@@ -97,14 +131,21 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NotificationController.publicRecentActivityMessages,
 
         routes.javascript.SendCoinController.sendCoinForm,
-        routes.javascript.SendCoinController.blockchainSendCoinForm,
 
         routes.javascript.ContactController.verifyEmailAddressForm,
 
         routes.javascript.ContactController.verifyMobileNumberForm,
 
+        routes.javascript.OrderController.defineForm,
+        routes.javascript.OrderController.makeForm,
+        routes.javascript.OrderController.takeForm,
+        routes.javascript.OrderController.cancelForm,
+
+        routes.javascript.SplitController.sendForm,
+        routes.javascript.SplitController.wrapForm,
+        routes.javascript.SplitController.unwrapForm,
+
         routes.javascript.ViewController.profile,
-        routes.javascript.ViewController.account,
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.block,
         routes.javascript.ViewController.transaction,

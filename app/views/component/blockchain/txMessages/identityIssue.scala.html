@@ -6,8 +6,8 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[IdentityIssue]) { identityIssue =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(identityIssue.from, routes.ViewController.account(identityIssue.from)))
-    @commonHtmlInfo(constants.View.TO, commonLink(identityIssue.to, routes.ViewController.account(identityIssue.to)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(identityIssue.from, routes.ViewController.wallet(identityIssue.from)))
+    @commonHtmlInfo(constants.View.TO, commonLink(identityIssue.to, routes.ViewController.wallet(identityIssue.to)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(identityIssue.fromID, routes.IndexController.search(identityIssue.fromID)))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(identityIssue.classificationID, routes.IndexController.search(identityIssue.classificationID)))
     @Messages(constants.View.IMMUTABLE_META_PROPERTIES):

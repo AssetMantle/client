@@ -17,9 +17,9 @@ class GetTransactionsByHeight @Inject()()(implicit wsClient: WSClient, configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.abciPort")
+  private val port = configuration.get[String]("blockchain.abciPort")
 
   private val url = ip + ":" + port + "/"
 
@@ -28,6 +28,8 @@ class GetTransactionsByHeight @Inject()()(implicit wsClient: WSClient, configura
   object Service {
     def get(height: Int): Future[Response] = action(height).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.TRANSACTION_BY_HEIGHT_QUERY_FAILED.logMessage + ": " + height)
+        throw baseException
     }
   }
 

@@ -6,10 +6,10 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-
-import scala.concurrent.{ExecutionContext, Future}
 import queries.responses.TruliooDetailedConsentsResponse.Response
 import utilities.KeyStore
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetTruliooDetailedConsents @Inject()(wsClient: WSClient, keyStore: KeyStore)(implicit configuration: Configuration, executionContext: ExecutionContext) {

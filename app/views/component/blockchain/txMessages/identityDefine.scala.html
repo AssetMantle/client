@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[IdentityDefine]) { identityDefine =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(identityDefine.from, routes.ViewController.account(identityDefine.from)))
+    @commonHtmlInfo(constants.View.FROM, commonLink(identityDefine.from, routes.ViewController.wallet(identityDefine.from)))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(identityDefine.fromID, routes.IndexController.search(identityDefine.fromID)))
     @Messages(constants.View.IMMUTABLE_META_TRAITS):
     @views.html.component.blockchain.metaProperties(identityDefine.immutableMetaTraits.metaPropertyList)

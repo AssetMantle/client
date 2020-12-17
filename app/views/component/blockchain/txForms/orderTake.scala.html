@@ -1,0 +1,11 @@
+@import views.companion.blockchain.OrderTake
+@import views.html.base._
+
+@(orderTakeForm: Form[OrderTake.Data] = OrderTake.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ORDER_TAKE, orderTakeForm) {
+    @commonInputText(orderTakeForm, constants.FormField.FROM_ID)
+    @commonInputText(orderTakeForm, constants.FormField.ORDER_ID, 'value -> orderID)
+    @commonInputBigDecimal(orderTakeForm, constants.FormField.TAKER_OWNABLE_SPLIT)
+    @commonInputMicroNumber(orderTakeForm, constants.FormField.GAS)
+    @commonInputPassword(orderTakeForm, constants.FormField.PASSWORD)
+}

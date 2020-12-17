@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import models.master.Asset
+@import views.html.base._
+
+@(assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ASSETS_MINTED) {
+} {
+    @assets.map { asset =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ASSET_ID, asset.id)
+            @commonVerticalTextInfo(constants.View.LABEL, asset.label.getOrElse(""))
+            @commonVerticalBooleanInfo(constants.View.STATUS, asset.status)
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${asset.id}', '${constants.Blockchain.Entity.ASSET}'")
+            @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${asset.id}'")
+            @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${asset.id}'")
+            @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${asset.id}'")
+        }
+    }
+}

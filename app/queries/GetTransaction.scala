@@ -17,9 +17,9 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
   private val path = "txs"
 
@@ -33,10 +33,14 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
     def get(txHash: String): Future[Response] = action(txHash).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.TRANSACTION_HASH_QUERY_FAILED.logMessage + ": " + txHash)
+        throw baseException
     }
 
     def getAsWSResponse(txHash: String): Future[WSResponse] = actionResponseAsWSResponse(txHash).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => logger.error(constants.Response.TRANSACTION_HASH_QUERY_FAILED.logMessage + ": " + txHash)
+        throw baseException
     }
   }
 

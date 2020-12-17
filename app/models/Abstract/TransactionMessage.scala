@@ -1,4 +1,4 @@
 package models.Abstract
 
-abstract class TransactionMessage() {
+abstract class TransactionMessage {
 }

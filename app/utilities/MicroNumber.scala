@@ -121,10 +121,10 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   override def equals(that: Any): Boolean = that match {
     case that: MicroNumber => this equals that
     case that: BigInt => this.value.equals(that)
-    case that: Int => isValidInt && this.toInt == that
-    case that: Long => isValidLong && this.toLong == that
-    case that: Double => isValidDouble && this.toDouble == that
-    case that: Float => isValidFloat && this.toFloat == that
+    case that: Int => isValidInt && this == new MicroNumber(that)
+    case that: Long => isValidLong && this == new MicroNumber(that)
+    case that: Double => isValidDouble && this == new MicroNumber(that)
+    case that: Float => isValidFloat && this == new MicroNumber(that)
     case that: Char => isValidChar && (toInt == that.toInt)
     case that: Byte => isValidByte && (toByte == that)
     case that: Short => isValidShort && (toShort == that)

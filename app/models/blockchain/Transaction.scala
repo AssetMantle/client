@@ -66,8 +66,10 @@ class Transactions @Inject()(
     }
   }
 
+  //TODO messages.like
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
+  //TODO messages.like
   private def findTransactionsPerPageForAddress(address: String, offset: Int, limit: Int): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).drop(offset).take(limit).result)
 
   private def tryGetTransactionByHash(hash: String): Future[TransactionSerialized] = db.run(transactionTable.filter(_.hash === hash).result.head.asTry).map {
@@ -164,7 +166,7 @@ class Transactions @Inject()(
       def numberOfTransactions(transactions: Seq[Transaction]): Map[Int, Int] = {
         blockHeights.map { height =>
           val tx = transactions.find(_.height == height)
-          height -> (if (tx.isDefined) tx.get.messages.length else 0)
+          height -> tx.map(_.messages.length).getOrElse(0)
         }.toMap
       }
 

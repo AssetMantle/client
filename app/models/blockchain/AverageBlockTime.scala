@@ -89,8 +89,9 @@ class AverageBlockTimes @Inject()(
 
     def set(blockHeader: BlockHeader): Future[Double] = {
       if (blockHeader.height == 1) {
-        upsert(AverageBlockTime(AVERAGE_BLOCK_TIME, 1, 0, blockHeader.time))
-        Future(0.0)
+        for {
+          _ <- upsert(AverageBlockTime(AVERAGE_BLOCK_TIME, 1, 0, blockHeader.time))
+        } yield 0.0
       } else {
 
         def calculateAvgTime(previousAvgBlockTime: AverageBlockTime): Long = {
@@ -104,7 +105,7 @@ class AverageBlockTimes @Inject()(
           } yield calculateAvgTime(previousAvgBlockTime)
         }
 
-        def update(average: Long) = upsert(AverageBlockTime(AVERAGE_BLOCK_TIME, blockHeader.height, average, blockHeader.time))
+        def update(average: Long): Future[Int] = upsert(AverageBlockTime(AVERAGE_BLOCK_TIME, blockHeader.height, average, blockHeader.time))
 
         (for {
           average <- average

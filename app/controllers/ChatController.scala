@@ -119,7 +119,8 @@ class ChatController @Inject()(
   }
 
   //send chat form
-  def sendMessageForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def sendMessageForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.sendMessage())
   }
 

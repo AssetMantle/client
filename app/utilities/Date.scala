@@ -44,11 +44,11 @@ object Date {
     }
   }
 
-  def isMature(initialTimestamp: String, finalTimeStamp: String): Boolean = {
+  def isMature(completionTimestamp: String, currentTimeStamp: String): Boolean = {
     try {
-      val initialTime = ZonedDateTime.parse(initialTimestamp)
-      val finalTime = ZonedDateTime.parse(finalTimeStamp)
-      finalTime.isEqual(initialTime) || finalTime.isAfter(initialTime)
+      val completionTime = ZonedDateTime.parse(completionTimestamp)
+      val currentTime = ZonedDateTime.parse(currentTimeStamp)
+      currentTime.isEqual(completionTime) || currentTime.isAfter(completionTime)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
         throw new BaseException(constants.Response.DATE_FORMAT_ERROR)

@@ -171,6 +171,6 @@ class ValidatorAccounts @Inject()(
     def run(): Unit = Utility.scheduleUpdates()
   }
 
-  actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(keyBaseAccountInitialDelay.milliseconds, keyBaseAccountUpdateRate.days)(runnable)(schedulerExecutionContext)
+  actors.Service.actorSystem.scheduler.scheduleAtFixedRate(keyBaseAccountInitialDelay.milliseconds, keyBaseAccountUpdateRate.days)(runnable)(schedulerExecutionContext)
 
 }

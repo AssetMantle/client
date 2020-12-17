@@ -15,7 +15,8 @@ class ConfigurationController @Inject()(messagesControllerComponents: MessagesCo
 
   //  WARNING: This method can give any configuration value from conf file. Disabling it to prevent key store password leakage.
 
-  //  def queryConfigurationVariable(query: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  //  def queryConfigurationVariable(query: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  //  implicit request =>
   //    Ok(configuration.get[String](query))
   //  }
 }

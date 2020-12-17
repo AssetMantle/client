@@ -1,0 +1,15 @@
+@import views.companion.blockchain.MaintainerDeputize
+@import views.html.base._
+
+@(maintainerDeputizeForm: Form[MaintainerDeputize.Data] = MaintainerDeputize.form, maintainedTraitsForm: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.MAINTAINER_DEPUTIZE, maintainerDeputizeForm) {
+    @commonInputText(maintainerDeputizeForm, constants.FormField.FROM_ID)
+    @commonInputText(maintainerDeputizeForm, constants.FormField.TO_ID)
+    @commonInputText(maintainerDeputizeForm, constants.FormField.CLASSIFICATION_ID)
+    @commonCheckbox(maintainerDeputizeForm, constants.FormField.ADD_MAINTAINER)
+    @commonCheckbox(maintainerDeputizeForm, constants.FormField.MUTATE_MAINTAINER)
+    @commonCheckbox(maintainerDeputizeForm, constants.FormField.REMOVE_MAINTAINER)
+    @commonInputMicroNumber(maintainerDeputizeForm, constants.FormField.GAS)
+    @commonInputPassword(maintainerDeputizeForm, constants.FormField.PASSWORD, 'required -> false)
+    @views.html.component.blockchain.txForms.addProperties(maintainerDeputizeForm, constants.FormField.MAINTAINED_TRAITS, constants.FormField.ADD_MAINTAINED_TRAITS, maintainedTraitsForm)
+}
