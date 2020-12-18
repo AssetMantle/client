@@ -22,7 +22,6 @@ function onError(event) {
 
 function onMessage(event) {
     let receivedData = JSON.parse(event.data);
-    console.log(receivedData.messageType);
     switch (receivedData.messageType) {
         case 'NEW_BLOCK':
             onNewBlock(receivedData.messageValue);
@@ -61,7 +60,7 @@ function onPrivateMessage(message) {
             onAsset(message.messageContent);
             break;
         default :
-            console.log("Unknown Private Message Type");
+            console.log("Unknown Private Message Subject Type");
             break;
     }
 }
