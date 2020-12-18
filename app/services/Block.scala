@@ -2,19 +2,18 @@ package services
 
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain.{Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.{Configuration, Logger}
-import play.libs.Json
 import queries._
 import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.TransactionResponse.{Response => TransactionResponse}
 import queries.responses.common.{Event, Header => BlockHeader}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -125,7 +124,7 @@ class Block @Inject()(
 
     (for {
       proposer <- proposer
-    } yield actors.Service.appWebSocketActor ! Json.toJson(getWebSocketNewBlock(proposer)).toString
+    } yield actors.Service.appWebSocketActor ! getWebSocketNewBlock(proposer)
       ).recover {
       case baseException: BaseException => throw baseException
     }

@@ -4,7 +4,6 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -13,6 +12,7 @@ import play.api.{Configuration, Logger}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -53,7 +53,7 @@ class IdentityController @Inject()(
 
   def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.identityNub())
+      Ok(blockchainForms.identityNub())
   }
 
   def nub: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -93,7 +93,7 @@ class IdentityController @Inject()(
 
   def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.identityDefine())
+      Ok(blockchainForms.identityDefine())
   }
 
   def define: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -170,7 +170,7 @@ class IdentityController @Inject()(
 
   def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.identityIssue(classificationID = classificationID))
+      Ok(blockchainForms.identityIssue(classificationID = classificationID))
   }
 
   def issue: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -243,7 +243,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
+  def provisionForm(identityID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityProvision(identityID = identityID))
   }
@@ -284,7 +284,7 @@ class IdentityController @Inject()(
       )
   }
 
-  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction {implicit loginState =>
+  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.identityUnprovision(identityID = identityID))
   }

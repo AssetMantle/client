@@ -1,20 +1,19 @@
 package models.masterTransaction
 
-import java.sql.Timestamp
-
+import actors.Message.WebSocket.RemovePrivateActor
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import slick.ast.JoinType.Inner
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
@@ -152,18 +151,24 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
     def deleteSessionTokens(ids: Seq[String]): Future[Int] = deleteByIDs(ids)
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    val ids = Service.getTimedOutIDs
-    (for {
-      ids <- ids
-    } yield {
-      ids.foreach { id =>
-        actors.Service.Comet.shutdownUserActor(id)
+  private val runnable = new Runnable {
+    def run(): Unit = {
+      val ids = Service.getTimedOutIDs
+
+      def deleteSessionTokens(ids: Seq[String]) = Service.deleteSessionTokens(ids)
+
+      val forComplete = (for {
+        ids <- ids
+        _ <- deleteSessionTokens(ids)
+      } yield {
+        ids.foreach(id => actors.Service.appWebSocketActor ! RemovePrivateActor(id))
+      }).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message)
       }
-      Service.deleteSessionTokens(ids)
-    }).recover {
-      case baseException: BaseException => logger.info(baseException.failure.message)
+      Await.result(forComplete, Duration.Inf)
     }
-  }(schedulerExecutionContext)
+  }
+
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(runnable)(schedulerExecutionContext)
 }
 

@@ -122,7 +122,7 @@ class Messages @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getChatIDs(chatID: String): Future[Seq[String]] = findAllChatIDsByChatWindowID(chatID)
 
-    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => actors.Service.cometActor ! actors.Message.makeCometMessage(x, constants.Comet.CHAT, message))
+    def sendMessageToChatActors(participants: Seq[String], message: Message): Unit = participants.foreach(x => actors.Service.appWebSocketActor ! actors.Message.WebSocket.Chat(toUser = x, chatID = message.chatID))
   }
 
 }
