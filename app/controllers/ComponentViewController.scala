@@ -2,19 +2,17 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
-import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -82,7 +80,7 @@ class ComponentViewController @Inject()(
         profilePicture <- profilePicture
       } yield Ok(views.html.profilePicture(profilePicture))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.profilePicture())
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -90,10 +88,13 @@ class ComponentViewController @Inject()(
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       val identification = masterIdentifications.Service.get(loginState.username)
-      for {
+      (for {
         accountKYC <- accountKYC
         identification <- identification
       } yield Ok(views.html.component.master.identification(identification = identification, accountKYC = accountKYC))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
@@ -109,7 +110,7 @@ class ComponentViewController @Inject()(
         proposer <- getProposer(latestBlock.proposerAddress)
       } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -120,7 +121,7 @@ class ComponentViewController @Inject()(
         tokens <- tokens
       } yield Ok(views.html.component.blockchain.tokensStatistics(tokens = tokens, stakingDenom = stakingDenom))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -134,7 +135,7 @@ class ComponentViewController @Inject()(
         allValidators <- allValidators
       } yield Ok(views.html.component.blockchain.votingPowers(votingPowerMap = getVotingPowerMap(allValidators.filter(x => x.status == bondedStatus)), totalActiveValidators = allValidators.count(x => x.status == bondedStatus), totalValidators = allValidators.length))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -151,7 +152,7 @@ class ComponentViewController @Inject()(
         allTokenPrices <- allTokenPrices(allDenoms)
       } yield Ok(views.html.component.blockchain.tokensPrices(getTokenPricesMap(allTokenPrices, allDenoms)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -184,7 +185,7 @@ class ComponentViewController @Inject()(
         allDenoms <- allDenoms
       } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = account.coins, delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -206,7 +207,7 @@ class ComponentViewController @Inject()(
         validators <- validators
       } yield Ok(views.html.component.blockchain.accountDelegations(delegations = getDelegationsMap(delegations, validators), undelegations = getUndelegationsMap(undelegations), validatorsMoniker = getValidatorsMoniker(validators)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -223,7 +224,7 @@ class ComponentViewController @Inject()(
         transactions <- transactions
       } yield Ok(views.html.component.blockchain.accountTransactionsPerPage(transactions))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -260,7 +261,7 @@ class ComponentViewController @Inject()(
         result <- result
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -277,7 +278,7 @@ class ComponentViewController @Inject()(
         proposer <- getProposer(block.proposerAddress)
       } yield Ok(views.html.component.blockchain.blockDetails(block, proposer, numTxs))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.blocks(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -289,7 +290,7 @@ class ComponentViewController @Inject()(
         transactions <- transactions
       } yield Ok(views.html.component.blockchain.blockTransactions(height, transactions))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.blocks(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -313,7 +314,7 @@ class ComponentViewController @Inject()(
         result <- getResult
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -325,7 +326,7 @@ class ComponentViewController @Inject()(
         transaction <- transaction
       } yield Ok(views.html.component.blockchain.transactionDetails(transaction))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -337,7 +338,7 @@ class ComponentViewController @Inject()(
         messages <- messages
       } yield Ok(views.html.component.blockchain.transactionMessages(txHash, messages))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.transactions(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -353,7 +354,7 @@ class ComponentViewController @Inject()(
         validators <- validators
       } yield Ok(views.html.component.blockchain.activeValidatorList(validators, validators.map(_.tokens).sum))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -364,7 +365,7 @@ class ComponentViewController @Inject()(
         validators <- validators
       } yield Ok(views.html.component.blockchain.inactiveValidatorList(validators))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -377,7 +378,7 @@ class ComponentViewController @Inject()(
         totalBondedAmount <- totalBondedAmount
       } yield Ok(views.html.component.blockchain.validatorDetails(validator, utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), bondedStatus))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -395,7 +396,7 @@ class ComponentViewController @Inject()(
         lastNBlocks <- lastNBlocks
       } yield Ok(views.html.component.blockchain.validatorUptime(uptime = getUptime(lastNBlocks, hexAddress), uptimeMap = getUptimeMap(lastNBlocks, hexAddress), hexAddress = hexAddress))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -420,7 +421,7 @@ class ComponentViewController @Inject()(
         (delegationsMap, selfDelegatedPercentage, othersDelegatedPercentage) <- getDelegationsMap(delegations, validator)
       } yield Ok(views.html.component.blockchain.validatorDelegations(delegationsMap = delegationsMap, selfDelegatedPercentage = selfDelegatedPercentage, othersDelegatedPercentage = othersDelegatedPercentage))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -431,7 +432,7 @@ class ComponentViewController @Inject()(
         operatorAddress <- operatorAddress
       } yield Ok(views.html.component.blockchain.validatorTransactions(operatorAddress))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -443,7 +444,7 @@ class ComponentViewController @Inject()(
         transactions <- transactions
       } yield Ok(views.html.component.blockchain.validatorTransactionsPerPage(transactions))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -458,7 +459,7 @@ class ComponentViewController @Inject()(
         classifications <- getIdentitiesDefined(identityIDs)
       } yield Ok(views.html.component.master.identitiesDefinition(classifications))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -473,7 +474,7 @@ class ComponentViewController @Inject()(
         identities <- getIdentitiesIssued(identityIDs)
       } yield Ok(views.html.component.master.identitiesProvisioned(identities))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -488,7 +489,7 @@ class ComponentViewController @Inject()(
         identities <- getIdentitiesIssued(identityIDs)
       } yield Ok(views.html.component.master.identitiesUnprovisioned(identities))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -503,7 +504,7 @@ class ComponentViewController @Inject()(
         classifications <- getAssetsDefined(identityIDs)
       } yield Ok(views.html.component.master.assetsDefinition(classifications))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -518,7 +519,7 @@ class ComponentViewController @Inject()(
         assets <- getAssetsMinted(identityIDs)
       } yield Ok(views.html.component.master.assetsMinted(assets))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -533,7 +534,7 @@ class ComponentViewController @Inject()(
         classifications <- getOrdersDefined(identityIDs)
       } yield Ok(views.html.component.master.ordersDefinition(classifications))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -548,7 +549,7 @@ class ComponentViewController @Inject()(
         orders <- getOrdersMade(identityIDs)
       } yield Ok(views.html.component.master.ordersMade(orders))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -563,7 +564,6 @@ class ComponentViewController @Inject()(
 
       def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
 
-      ()
       (for {
         identityIDs <- identityIDs
         publicOrderIDs <- publicTakeOrderIDs
@@ -572,7 +572,7 @@ class ComponentViewController @Inject()(
         privateOrders <- getPrivateOrders(privateOrderIDs)
       } yield Ok(views.html.component.master.ordersTake(publicOrders = publicOrders, privateOrders = privateOrders))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -587,7 +587,7 @@ class ComponentViewController @Inject()(
         splits <- getSplits(identityIDs)
       } yield Ok(views.html.component.master.accountSplits(splits))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.validators(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -626,7 +626,7 @@ class ComponentViewController @Inject()(
         if (isOwner) Ok(views.html.component.master.viewEntityProperties(properties))
         else throw new BaseException(constants.Response.PROPERTIES_NOT_FOUND)
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -642,7 +642,7 @@ class ComponentViewController @Inject()(
           case None => throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
 
   }

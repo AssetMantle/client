@@ -15,6 +15,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
     implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
+        routes.javascript.Assets.versioned,
+
         routes.javascript.AccountController.signUpForm,
         routes.javascript.AccountController.loginForm,
         routes.javascript.AccountController.logoutForm,
