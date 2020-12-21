@@ -1335,6 +1335,12 @@ body.lightMode {
   }
 }
 
+.profileDropdown{
+  padding: 10px;
+  .cmuk-navbar-dropdown-nav>li>a:focus, .cmuk-navbar-dropdown-nav>li>a:hover{
+    background: #f8f8f8;
+  }
+}
 .formNote{
   font-size: 1.15rem;
 }

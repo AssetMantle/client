@@ -937,6 +937,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-input:focus, .comdex .cmuk-select:focus, .comdex .cmuk-textarea:focus {
   border-color: #191616; }
 
+.profileDropdown {
+  padding: 10px; }
+  .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
+    background: #f8f8f8; }
+
 .formNote {
   font-size: 1.15rem; }
 
