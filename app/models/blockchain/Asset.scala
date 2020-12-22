@@ -8,7 +8,7 @@ import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import models.master
-import models.master.{Asset => masterAsset, Classification => masterClassification, Split => masterSplit}
+import models.master.{Asset => masterAsset, Classification => masterClassification}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -36,7 +36,6 @@ class Assets @Inject()(
                         blockchainMaintainers: Maintainers,
                         masterClassifications: master.Classifications,
                         masterAssets: master.Assets,
-                        masterSplits: master.Splits,
                         masterProperties: master.Properties,
                       )(implicit executionContext: ExecutionContext) {
 
