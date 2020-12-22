@@ -316,7 +316,7 @@ class Startup @Inject()(
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
-          actors.Service.appWebSocketActor ! Json.toJson(actors.Message.WebSocket.BlockchainConnectionLost(true)).toString
+          actors.Service.appWebSocketActor ! actors.Message.WebSocket.BlockchainConnectionLost(true)
         } else {
           val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
           for {

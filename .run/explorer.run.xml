@@ -7,12 +7,12 @@
       <map>
         <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
-        <entry key="BLOCKCHAIN_HOST" value="localhost" />
+        <entry key="BLOCKCHAIN_HOST" value="13.126.196.140" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
-        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />

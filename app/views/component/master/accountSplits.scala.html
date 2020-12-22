@@ -14,9 +14,13 @@
             @commonVerticalTextInfo(constants.View.ENTITY_TYPE, split.entityType)
             @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
             @commonVerticalBooleanInfo(constants.View.STATUS, split.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> split.entityID)
+            </div>
             @if(split.entityType == constants.Blockchain.Entity.WRAPPED_COIN) {
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> split.entityID)
+                </div>
             }
         }
     }

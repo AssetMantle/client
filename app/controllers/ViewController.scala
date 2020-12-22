@@ -47,7 +47,7 @@ class ViewController @Inject()(
       loginState match {
         case Some(loginState) => {
           implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.wallet(address))
+          withUsernameToken.Ok(views.html.account())
         }
         case None => Future(Ok(views.html.wallet(address)))
       }
