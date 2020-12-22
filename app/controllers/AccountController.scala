@@ -1,5 +1,6 @@
 package controllers
 
+import actors.Message.WebSocket.RemovePrivateActor
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -237,9 +238,7 @@ class AccountController @Inject()(
             } yield utilities.Contact.getWarnings(mobile, email)
           }
 
-          def getResult(address: String, warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = {
-            withUsernameToken.Ok(views.html.profile()) //(address = address, warnings = warnings))
-          }
+          def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.account(warnings = warnings))
 
           def checkLoginAndGetResult(validateUsernamePassword: Boolean, bcAccountExists: Boolean): Future[Result] = {
             if (validateUsernamePassword) {
@@ -250,7 +249,7 @@ class AccountController @Inject()(
                   userType <- firstLoginUserTypeUpdate(account.userType)
                   _ <- sendNotification(loginData.username)
                   contactWarnings <- getContactWarnings
-                  result <- getResult(address, contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
+                  result <- getResult(contactWarnings)(LoginState(username = loginData.username, userType = userType, address = address))
                 } yield result
               } else {
                 val mnemonics = utilities.Bip39.getMnemonics()
@@ -289,13 +288,13 @@ class AccountController @Inject()(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.logout(formWithErrors)))
         },
-        loginData => {
-          val pushNotificationTokenDelete = if (!loginData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future(0)
+        logoutData => {
+          val pushNotificationTokenDelete = if (!logoutData.receiveNotifications) masterTransactionPushNotificationTokens.Service.delete(loginState.username) else Future(0)
 
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
           def shutdownActorsAndGetResult = {
-            actors.Service.Comet.shutdownUserActor(loginState.username)
+            actors.Service.appWebSocketActor ! RemovePrivateActor(loginState.username)
             Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
@@ -303,9 +302,8 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield {
-            shutdownActorsAndGetResult
-          }).recover {
+          } yield shutdownActorsAndGetResult
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }
         }

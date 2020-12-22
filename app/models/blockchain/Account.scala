@@ -209,7 +209,10 @@ class Accounts @Inject()(
           _ <- insert(accountResponse)
         } yield ()
       } { account => {
-        val updatedCoins = account.coins.map(accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
+        val updatedCoins = if (account.coins.nonEmpty) {
+          val updatedAccountOldCoins = account.coins.map(accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
+          updatedAccountOldCoins ++ addCoins.filter(x => !updatedAccountOldCoins.map(_.denom).contains(x.denom))
+        } else addCoins
         for {
           _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
         } yield ()

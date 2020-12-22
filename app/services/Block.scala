@@ -2,19 +2,18 @@ package services
 
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain.{Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.{Configuration, Logger}
-import play.libs.Json
 import queries._
 import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.TransactionResponse.{Response => TransactionResponse}
 import queries.responses.common.{Event, Header => BlockHeader}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -125,7 +124,7 @@ class Block @Inject()(
 
     (for {
       proposer <- proposer
-    } yield actors.Service.appWebSocketActor ! Json.toJson(getWebSocketNewBlock(proposer)).toString
+    } yield actors.Service.appWebSocketActor ! getWebSocketNewBlock(proposer)
       ).recover {
       case baseException: BaseException => throw baseException
     }
@@ -150,6 +149,7 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.DELEGATE => blockchainValidators.Utility.onDelegation(stdMsg.message.asInstanceOf[Delegate])
         case constants.Blockchain.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stdMsg.message.asInstanceOf[Redelegate])
         case constants.Blockchain.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stdMsg.message.asInstanceOf[Undelegate])
+        //distribution
         case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
         case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
         case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])

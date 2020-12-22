@@ -163,16 +163,9 @@ class Transactions @Inject()(
     def getNumberOfTransactions(blockHeights: Seq[Int]): Future[Map[Int, Int]] = {
       val transactions = getTransactionsByHeightList(blockHeights).map(_.map(_.deserialize))
 
-      def numberOfTransactions(transactions: Seq[Transaction]): Map[Int, Int] = {
-        blockHeights.map { height =>
-          val tx = transactions.find(_.height == height)
-          height -> tx.map(_.messages.length).getOrElse(0)
-        }.toMap
-      }
-
       for {
         transactions <- transactions
-      } yield numberOfTransactions(transactions)
+      } yield blockHeights.map(height => height -> transactions.count(_.height == height)).toMap
     }
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
