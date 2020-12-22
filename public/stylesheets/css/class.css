@@ -1062,7 +1062,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     position: relative;
     max-width: 100%;
     width: auto;
-    max-height: 750px;
+    max-height: calc(100vh - 200px);
     display: inline-block; }
     .modal .modalContent .modalBody {
       text-align: center; }
@@ -1081,7 +1081,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
         border-radius: 0;
         box-shadow: none; }
       .modal .modalContent .modalBody form .formBody {
-        max-height: 600px;
+        max-height: calc(100vh - 350px);
         overflow: auto; }
         .modal .modalContent .modalBody form .formBody .inputField {
           margin-top: 10px; }
@@ -2607,5 +2607,11 @@ figure.zoom {
   .transactionMessages .cmuk-card-body .cmuk-card-body .cmuk-card-body .title {
     padding-left: 12px;
     font-weight: 700; }
+
+.componentError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; }
 
 /*# sourceMappingURL=class.css.map */

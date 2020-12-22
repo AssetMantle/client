@@ -23,9 +23,9 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
                 let imageElement= document.createElement('img');
                 const imageRoute =jsRoutes.controllers.Assets.versioned("images/exclamation.png");
                 imageElement.src= imageRoute.url;
-                div.addClass("centerText");
+                div.addClass("centerText componentError cmuk-card cmuk-card-default commonCard cmuk-animation-fade cmuk-card-body cmuk-height-medium cmuk-overflow-auto");
                 div.html(imageElement);
-                div.append("<br>"+"<p>"+data.responseText+"</p>")
+                div.append("<p>"+data.responseText+"</p>")
 
             }
         }
