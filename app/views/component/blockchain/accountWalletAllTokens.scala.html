@@ -4,14 +4,18 @@
 
 @(accountBalances: Seq[Coin])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
-    <div>
+    @if(accountBalances.nonEmpty) {
+        <div>
         @accountBalances.map { balance =>
             @commonTextInfo(balance.denom, utilities.NumericOperation.formatNumber(balance.amount.toMicroDouble))
         }
-    </div>
-    @defining[ListMap[String, Double]](
-        ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)
-    ) { data =>
-        @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)
+        </div>
+        @defining[ListMap[String, Double]](
+            ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)
+        ) { data =>
+            @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)
+        }
+    } else {
+        @Messages(constants.View.EMPTY_WALLET)
     }
 </div>

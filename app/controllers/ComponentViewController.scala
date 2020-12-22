@@ -2,20 +2,17 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
-import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
-import play.api.libs.Comet
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -57,16 +54,9 @@ class ComponentViewController @Inject()(
 
   private val bondedStatus = configuration.get[Int]("blockchain.validator.status.bonded")
 
-  private val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
-
   private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
   private val chainID = configuration.get[String]("blockchain.chainID")
-
-  def comet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username, keepAliveDuration) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
-  }
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -246,7 +236,7 @@ class ComponentViewController @Inject()(
   def blockListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
 
-      def getResult = if (pageNumber <= 0) Future(BadRequest) else {
+      val result = if (pageNumber <= 0) Future(BadRequest) else {
         val blocks = blockchainBlocks.Service.getBlocksPerPage(pageNumber)
         val validators = blockchainValidators.Service.getAll
 
@@ -268,7 +258,7 @@ class ComponentViewController @Inject()(
       }
 
       (for {
-        result <- getResult
+        result <- result
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -574,7 +564,6 @@ class ComponentViewController @Inject()(
 
       def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
 
-      ()
       (for {
         identityIDs <- identityIDs
         publicOrderIDs <- publicTakeOrderIDs

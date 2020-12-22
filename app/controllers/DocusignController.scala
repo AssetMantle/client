@@ -2,14 +2,13 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
-import models.{docusign, master, masterTransaction, blockchain}
+import models.master.{AccountKYC, Email}
+import models.{blockchain, docusign, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import models.master.Email
-import models.master.AccountKYC
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -72,50 +71,47 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
   def callBack(id: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-    val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
+      val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(id)
 
-    val account = blockchainAccounts.Service.tryGet("accountAddress")
-    val counterPartyAccount = blockchainAccounts.Service.tryGet("counterPartyAccountAddress")
+      val account = blockchainAccounts.Service.tryGet("accountAddress")
+      val counterPartyAccount = blockchainAccounts.Service.tryGet("counterPartyAccountAddress")
 
-    def updateStatus(docusignEnvelope: docusign.Envelope, accountIDs: Seq[String]) = event match {
-      case constants.External.Docusign.SEND => {
-        docusignEnvelopes.Service.markSent(id)
+      def updateStatus(docusignEnvelope: docusign.Envelope, accountIDs: Seq[String]) = event match {
+        case constants.External.Docusign.SEND => {
+          docusignEnvelopes.Service.markSent(id)
+        }
+        case constants.External.Docusign.SIGNING_COMPLETE => {
+          val oldFile = masterAccountKYCs.Service.tryGet(docusignEnvelope.id, docusignEnvelope.documentType)
+          val signedFileNameList = utilitiesDocusign.updateSignedDocumentList(id, Seq(docusignEnvelope.documentType))
+
+          def updateFile(accountKYC: AccountKYC, newFileNme: Seq[String]) = masterAccountKYCs.Service.updateOldDocument(accountKYC.updateFileName(newFileNme.headOption.getOrElse(throw new BaseException(constants.Response.FAILED_TO_FETCH_SIGNED_DOCUMENT))))
+
+          def markSigningComplete = docusignEnvelopes.Service.markComplete(id)
+
+          def updateStatus(id: String, documentType: String) = masterAccountKYCs.Service.verify(id, documentType)
+
+          for {
+            oldFile <- oldFile
+            signedFileNameList <- signedFileNameList
+            _ <- updateFile(oldFile, signedFileNameList)
+            _ <- markSigningComplete
+            _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
+            _ <- utilitiesNotification.send(accountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
+            _ <- utilitiesNotification.send(accountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
+          } yield 0
+        }
+        case _ => throw new BaseException(constants.Response.UNEXPECTED_EVENT)
       }
-      case constants.External.Docusign.SIGNING_COMPLETE => {
-        val oldFile = masterAccountKYCs.Service.tryGet(docusignEnvelope.id, docusignEnvelope.documentType)
-        val signedFileNameList = utilitiesDocusign.updateSignedDocumentList(id, Seq(docusignEnvelope.documentType))
 
-        def updateFile(accountKYC: AccountKYC, newFileNme: Seq[String]) = masterAccountKYCs.Service.updateOldDocument(accountKYC.updateFileName(newFileNme.headOption.getOrElse(throw new BaseException(constants.Response.FAILED_TO_FETCH_SIGNED_DOCUMENT))))
-
-        def markSigningComplete = docusignEnvelopes.Service.markComplete(id)
-
-        def updateStatus(id: String, documentType: String) = masterAccountKYCs.Service.verify(id, documentType)
-
-        for {
-          oldFile <- oldFile
-          signedFileNameList <- signedFileNameList
-          _ <- updateFile(oldFile, signedFileNameList)
-          _ <- markSigningComplete
-          _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
-          _ <- utilitiesNotification.send(accountIDs(0), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
-          _ <- utilitiesNotification.send(accountIDs(1), constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
-        } yield 0
+      (for {
+        envelope <- envelope
+        account <- account
+        counterPartyAccount <- counterPartyAccount
+        _ <- updateStatus(envelope, Seq(account.username, counterPartyAccount.username))
+      } yield Ok(views.html.component.master.docusignCallBackView(event))
+        ).recover {
+        case _: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
       }
-      case _ => throw new BaseException(constants.Response.UNEXPECTED_EVENT)
-    }
-
-    (for {
-      envelope <- envelope
-      account <- account
-      counterPartyAccount <- counterPartyAccount
-      _ <- updateStatus(envelope, Seq(account.username, counterPartyAccount.username))
-    } yield {
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = account.username, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = counterPartyAccount.username, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
-      Ok(views.html.component.master.docusignCallBackView(event))
-    }).recover {
-      case baseException: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
-    }
   }
 
   def sign(id: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

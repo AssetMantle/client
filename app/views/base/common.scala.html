@@ -23,7 +23,6 @@
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/webSocket.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/comet.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/activitiesBox.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
@@ -117,21 +116,8 @@
                                     </li>
                                 }
                                 case default => {
-                                    <script type="text/javascript">
-                                        var cometMessage = function (message) {
-                                            cometMessageHandler(message);
-                                        }
-                                    </script>
-                                    <iframe class="hidden" src="@routes.ComponentViewController.comet()"></iframe>
-
-@*                                    <li class="login-nav-item">*@
-@*                                        <a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">*@
-@*                                            @loginState.username*@
-@*                                        <span cmuk-icon="user" class="loginIcon"></span>*@
-@*                                        </a>*@
-@*                                    </li>*@
                                     <li>
-                                        <a  class="navItemRippleEffect">
+                                        <a class="navItemRippleEffect">
                                             @loginState.username
                                         <span cmuk-icon="user" class="loginIcon"></span>
                                         </a>

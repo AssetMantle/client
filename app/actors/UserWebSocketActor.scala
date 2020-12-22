@@ -1,7 +1,7 @@
 package actors
 
-import akka.actor._
 import actors.Message.WebSocket._
+import akka.actor._
 
 object UserWebSocketActor {
   def props(out: ActorRef) = Props(new UserWebSocketActor(out))
@@ -9,10 +9,8 @@ object UserWebSocketActor {
 
 class UserWebSocketActor(out: ActorRef) extends Actor {
   def receive = {
-    case msg: String => if (msg == "START") actors.Service.appWebSocketActor ! AddActor(out)
+    case msg: String => if (msg == "START") actors.Service.appWebSocketActor ! AddPublicActor(out)
   }
 
-  override def postStop(): Unit = {
-    actors.Service.appWebSocketActor ! RemoveActor(out)
-  }
+  override def postStop(): Unit = actors.Service.appWebSocketActor ! RemovePublicActor(out)
 }

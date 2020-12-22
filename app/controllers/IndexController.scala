@@ -3,7 +3,6 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain
 import models.blockchain.{Maintainer, Meta}
 import models.master._
@@ -12,6 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import services.Startup
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 

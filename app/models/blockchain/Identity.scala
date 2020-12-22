@@ -424,7 +424,7 @@ class Identities @Inject()(
     }
 
     def onNub(identityNub: IdentityNub): Future[Unit] = {
-      val nubMetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(identityNub.nubID))))
+      val nubMetaProperty = getNubMetaProperty(identityNub.nubID)
       val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(nubMetaProperty))
 
       def defineAndUpsert(nubProperty: Property) = {
@@ -477,6 +477,7 @@ class Identities @Inject()(
 
     def getID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
+    def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(nubID))))
   }
 
 }
