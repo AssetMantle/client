@@ -67,8 +67,12 @@
             <div class="tradeList switcherCard">
                 <div id="traderViewAcceptedNegotiationList"></div>
             </div>
+            <div class="salesQuoteList">
+                <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
+            </div>
             <script>
                     componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }
         case constants.User.USER => {}
@@ -82,9 +86,14 @@
         <div class="recentActivityContainer">
             <div id="recentActivities"></div>
         </div>
+
+        <div class="cmuk-width-expand@@m">
+            <div id="traderRelationList" class="traderRelationList switcherCard"></div>
+        </div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+            componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
     </script>
 
 }
