@@ -44,7 +44,7 @@
     <option name="play2OpenUrl" value="http://localhost:9000" />
     <option name="play2isAutoReloadEnabled" value="true" />
     <option name="selectedOptions">
-      <set />
+      <list />
     </option>
     <method v="2">
       <option name="Make" enabled="true" />
