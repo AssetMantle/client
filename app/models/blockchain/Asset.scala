@@ -208,13 +208,10 @@ class Assets @Inject()(
 
         def upsertMaster(asset: Option[masterAsset]) = asset.fold(masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, label = None, ownerID = assetMint.toID, status = Option(true))))(x => masterAssets.Service.insertOrUpdate(x.copy(status = Option(true))))
 
-        def upsertSplit = masterSplits.Service.insertOrUpdate(masterSplit(entityID = assetID, ownerID = assetMint.toID, entityType = constants.Blockchain.Entity.ASSET, label = None, status = Option(true)))
-
         for {
           asset <- asset
           _ <- upsertMaster(asset)
           _ <- insertProperties(asset)
-          _ <- upsertSplit
         } yield ()
       }
 
