@@ -120,6 +120,8 @@ class AssetBurns @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[AssetBurnSerialized]] = db.run(assetBurnTable.filter(_.from === fromAddress).result)
+
   private[models] class AssetBurnTable(tag: Tag) extends Table[AssetBurnSerialized](tag, "AssetBurn") {
 
     def * = (from, fromID, assetID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetBurnSerialized.tupled, AssetBurnSerialized.unapply)
@@ -175,6 +177,7 @@ class AssetBurns @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

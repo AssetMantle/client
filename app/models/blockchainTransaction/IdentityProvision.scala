@@ -120,6 +120,8 @@ class IdentityProvisions @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[IdentityProvisionSerialized]] = db.run(identityProvisionTable.filter(_.from === fromAddress).result)
+
   private[models] class IdentityProvisionTable(tag: Tag) extends Table[IdentityProvisionSerialized](tag, "IdentityProvision") {
 
     def * = (from, to, identityID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentityProvisionSerialized.tupled, IdentityProvisionSerialized.unapply)
@@ -175,6 +177,7 @@ class IdentityProvisions @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

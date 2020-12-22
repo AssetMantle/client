@@ -8,7 +8,7 @@ import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import models.master
-import models.master.{Asset => masterAsset, Classification => masterClassification}
+import models.master.{Asset => masterAsset, Classification => masterClassification, Split => masterSplit}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -36,6 +36,7 @@ class Assets @Inject()(
                         blockchainMaintainers: Maintainers,
                         masterClassifications: master.Classifications,
                         masterAssets: master.Assets,
+                        masterSplits: master.Splits,
                         masterProperties: master.Properties,
                       )(implicit executionContext: ExecutionContext) {
 
@@ -207,10 +208,13 @@ class Assets @Inject()(
 
         def upsertMaster(asset: Option[masterAsset]) = asset.fold(masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, label = None, ownerID = assetMint.toID, status = Option(true))))(x => masterAssets.Service.insertOrUpdate(x.copy(status = Option(true))))
 
+        def upsertSplit = masterSplits.Service.insertOrUpdate(masterSplit(entityID = assetID, ownerID = assetMint.toID, entityType = constants.Blockchain.Entity.ASSET, label = None, status = Option(true)))
+
         for {
           asset <- asset
           _ <- upsertMaster(asset)
           _ <- insertProperties(asset)
+          _ <- upsertSplit
         } yield ()
       }
 

@@ -60,9 +60,13 @@ class OrderDefine @Inject()(wsClient: WSClient)(implicit configuration: Configur
 
   object Service {
 
-    def post(request: Request): Future[WSResponse] = action(request).recover {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+    def post(request: Request): Future[WSResponse] = {
+      println(Json.toJson(request))
+      println(Json.toJson(request).toString())
+      action(request).recover {
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      }
     }
 
   }
