@@ -1,6 +1,5 @@
 package models.masterTransaction
 
-import actors.Message.WebSocket.RemovePrivateActor
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import models.Trait.Logged
@@ -160,9 +159,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
       val forComplete = (for {
         ids <- ids
         _ <- deleteSessionTokens(ids)
-      } yield {
-        ids.foreach(id => actors.Service.appWebSocketActor ! RemovePrivateActor(id))
-      }).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message)
       }
       Await.result(forComplete, Duration.Inf)
