@@ -27,7 +27,6 @@ class AssetController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
                                  withLoginAction: WithLoginAction,
-                                 withUnknownLoginAction: WithUnknownLoginAction,
                                  transactionsAssetDefine: transactions.blockchain.AssetDefine,
                                  blockchainTransactionAssetDefines: blockchainTransaction.AssetDefines,
                                  transactionsAssetMint: transactions.blockchain.AssetMint,
@@ -37,7 +36,6 @@ class AssetController @Inject()(
                                  transactionsAssetBurn: transactions.blockchain.AssetBurn,
                                  blockchainTransactionAssetBurns: blockchainTransaction.AssetBurns,
                                  masterAccounts: master.Accounts,
-                                 withUserLoginAction: WithUserLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync
@@ -109,7 +107,7 @@ class AssetController @Inject()(
               for {
                 classificationExists <- classificationExists
                 ticketID <- insertAndBroadcast(classificationExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -160,9 +158,9 @@ class AssetController @Inject()(
               val createSplit = masterSplits.Service.create(masterSplit(entityID = entityID, ownerID = mintData.toID, entityType = constants.Blockchain.Entity.ASSET, label = Option(mintData.label), status = None))
 
               def broadcastTx = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
-                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = MetaProperties(mintData.immutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), immutableProperties = Properties(mintData.immutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), mutableMetaProperties = MetaProperties(mintData.mutableMetaProperties.fold[Seq[MetaProperty]](Seq.empty)(_.flatten.map(_.toMetaProperty))), mutableProperties = Properties(mintData.mutableProperties.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), gas = mintData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = mintData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
-                request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = mintData.gas), fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = mintData.immutableMetaProperties.getOrElse(Seq.empty).flatten, immutableProperties = mintData.immutableProperties.getOrElse(Seq.empty).flatten, mutableMetaProperties = mintData.mutableMetaProperties.getOrElse(Seq.empty).flatten, mutableProperties = mintData.mutableProperties.getOrElse(Seq.empty).flatten)),
+                request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = mintData.gas), fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsAssetMint.Service.post,
                 onSuccess = blockchainTransactionAssetMints.Utility.onSuccess,
                 onFailure = blockchainTransactionAssetMints.Utility.onFailure,
@@ -185,7 +183,7 @@ class AssetController @Inject()(
                 classificationExists <- classificationExists
                 assetExists <- assetExists
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, assetExists = assetExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
 
@@ -249,7 +247,7 @@ class AssetController @Inject()(
               for {
                 assetExists <- assetExists
                 ticketID <- updateAndBroadcast(assetExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID)))
 
@@ -292,7 +290,7 @@ class AssetController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID)))
 

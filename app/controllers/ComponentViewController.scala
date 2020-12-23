@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
@@ -11,7 +12,6 @@ import play.api.{Configuration, Logger}
 import queries.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
 
-import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -68,9 +68,9 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.recentActivities()))
   }
 
-  def publicRecentActivities: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def publicRecentActivities: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.publicRecentActivities()))
+      Ok(views.html.component.master.publicRecentActivities())
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -302,18 +302,14 @@ class ComponentViewController @Inject()(
   def transactionListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
 
-      def getResult = if (pageNumber <= 0) Future(BadRequest) else {
+      (if (pageNumber <= 0) {
+        Future(BadRequest)
+      } else {
         val transactions = blockchainTransactions.Service.getTransactionsPerPage(pageNumber)
-
         for {
           transactions <- transactions
         } yield Ok(views.html.component.blockchain.transactionListPage(transactions))
-      }
-
-      (for {
-        result <- getResult
-      } yield result
-        ).recover {
+      }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }

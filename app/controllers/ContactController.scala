@@ -182,9 +182,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             _ <- verifyEmailAddress(otpVerified)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)()
-          } yield {
-            result
-          }
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
@@ -224,9 +222,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             _ <- verifyMobileNumber(otpVerified)
             result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.SUCCESS)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)()
-          } yield {
-            result
-          }).recover {
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         }

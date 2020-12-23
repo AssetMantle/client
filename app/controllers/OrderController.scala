@@ -109,7 +109,7 @@ class OrderController @Inject()(
               for {
                 classificationExists <- classificationExists
                 ticketID <- insertAndBroadcast(classificationExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -185,7 +185,7 @@ class OrderController @Inject()(
                 classificationExists <- classificationExists
                 orderExists <- orderExists
                 ticketID <- insertAndBroadcast(classificationExists = classificationExists, orderExists = orderExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name,constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
@@ -270,7 +270,7 @@ class OrderController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID)))
 

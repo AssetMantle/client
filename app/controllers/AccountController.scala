@@ -4,6 +4,7 @@ import actors.Message.WebSocket.RemovePrivateActor
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
@@ -16,7 +17,6 @@ import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -82,18 +82,18 @@ class AccountController @Inject()(
 
   def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
+      val blockchainAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
-      def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
+      def getMnemonics(blockchainAccountExists: Boolean): Future[Seq[String]] = if (!blockchainAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
-      def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
+      def updatePartialMnemonic(mnemonics: Seq[String], blockchainAccountExists: Boolean) = if (!blockchainAccountExists) {
         masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
       } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
-        bcAccountExists <- bcAccountExists
-        mnemonics <- getMnemonics(bcAccountExists)
-        - <- updatePartialMnemonic(mnemonics, bcAccountExists)
+        blockchainAccountExists <- blockchainAccountExists
+        mnemonics <- getMnemonics(blockchainAccountExists)
+        _ <- updatePartialMnemonic(mnemonics, blockchainAccountExists)
       } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
@@ -364,9 +364,8 @@ class AccountController @Inject()(
           (for {
             otp <- otp
             _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)()
-          } yield {
-            PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
-          }).recover {
+          } yield PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
+          ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }
         }
