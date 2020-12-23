@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms._
 
-object AddEntityLabel {
+object UpsertEntityLabel {
 
   val form = Form(
     mapping(

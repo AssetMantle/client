@@ -1,22 +1,19 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.DataValue._
 import models.common.Serializable._
 import models.common.TransactionMessages.{OrderCancel, OrderDefine, OrderMake, OrderTake}
 import models.master
-import models.master.{Classification => masterClassification, Order => masterOrder}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.GetOrder
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -49,7 +46,6 @@ case class Order(id: String, immutables: Immutables, mutables: Mutables, created
 class Orders @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
-                        getOrder: GetOrder,
                         blockchainSplits: Splits,
                         blockchainMetas: Metas,
                         blockchainClassifications: Classifications,
@@ -184,16 +180,10 @@ class Orders @Inject()(
       }
 
       def masterOperations(classificationID: String) = {
-        val classification = masterClassifications.Service.get(classificationID)
-
-        def insertProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ORDER_DEFINITION, entityID = classificationID, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits) else Future("")
-
-        def upsert(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, fromID = orderDefine.fromID, label = None, status = Option(true)))(_ => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION))
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, maintainerID = orderDefine.fromID, status = Option(true))
 
         for {
-          classification <- classification
-          _ <- upsert(classification)
-          _ <- insertProperties(classification)
+          _ <- insert
         } yield ()
       }
 
@@ -214,7 +204,7 @@ class Orders @Inject()(
 
       def getImmutables(scrubbedImmutableMetaProperties: Seq[Property]) = Future(Immutables(Properties(scrubbedImmutableMetaProperties ++ orderMake.immutableProperties.propertyList)))
 
-      def getOrderID(immutables: Immutables) = Future(getID(classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, immutables = immutables))
+      def getOrderID(immutables: Immutables) = Future(utilities.IDGenerator.getOrderID(classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, immutables = immutables))
 
       def getOldOrder(orderID: String) = Service.get(orderID)
 
@@ -244,16 +234,10 @@ class Orders @Inject()(
       }
 
       def masterOperations(orderID: String, mutableMetaProperties: Seq[MetaProperty]) = {
-        val order = masterOrders.Service.get(orderID)
-
-        def insertProperties(order: Option[masterOrder]) = if (order.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ORDER, entityID = orderID, immutableMetas = orderMake.immutableMetaProperties, immutables = orderMake.immutableProperties, mutableMetas = MetaProperties(mutableMetaProperties), mutables = orderMake.mutableProperties) else Future("")
-
-        def upsertMaster(order: Option[masterOrder]) = order.fold(masterOrders.Service.insertOrUpdate(masterOrder(id = orderID, label = None, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, status = Option(true))))(x => masterOrders.Service.insertOrUpdate(x.copy(status = Option(true))))
+        val insert = masterOrders.Service.insertOrUpdate(master.Order(id = orderID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, status = Option(true)))
 
         for {
-          order <- order
-          _ <- upsertMaster(order)
-          _ <- insertProperties(order)
+          _ <- insert
         } yield ()
       }
 
@@ -379,9 +363,6 @@ class Orders @Inject()(
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
-
-    def getID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, immutables: Immutables): String = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, immutables.getHashID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
-
   }
 
 }

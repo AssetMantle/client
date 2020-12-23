@@ -70,9 +70,9 @@ GET         /asset/define                                        controllers.Ass
 POST        /asset/define                                        controllers.AssetController.define
 GET         /asset/mint                                          controllers.AssetController.mintForm(classificationID: String)
 POST        /asset/mint                                          controllers.AssetController.mint
-GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String)
+GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String, fromID: String)
 POST        /asset/mutate                                        controllers.AssetController.mutate
-GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String)
+GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String, fromID: String)
 POST        /asset/burn                                          controllers.AssetController.burn
 
 GET         /identity/nub                                        controllers.IdentityController.nubForm
@@ -101,17 +101,17 @@ POST        /order/take                                          controllers.Ord
 GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String)
 POST        /order/cancel                                        controllers.OrderController.cancel
 
-GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String)
+GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String, fromID: String)
 POST        /split/send                                          controllers.SplitController.send
 GET         /split/wrap                                          controllers.SplitController.wrapForm
 POST        /split/wrap                                          controllers.SplitController.wrap
-GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String)
+GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String, fromID: String)
 POST        /split/unwrap                                        controllers.SplitController.unwrap
 
-GET         /entity/addLabel                                     controllers.EntityController.addLabelForm(entityID: String, entityType: String)
-POST        /entity/addLabel                                     controllers.EntityController.addLabel
-GET         /entity/addPrivateProperty                           controllers.EntityController.addPrivatePropertyForm(entityID: String, entityType: String, name: String)
-POST        /entity/addPrivateProperty                           controllers.EntityController.addPrivateProperty
+GET         /entity/upsertLabel                                  controllers.EntityController.upsertLabelForm(entityID: String, entityType: String)
+POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
+GET         /entity/updatePrivateProperty                        controllers.EntityController.updatePrivatePropertyForm(entityID: String, entityType: String, name: String)
+POST        /entity/updatePrivateProperty                        controllers.EntityController.updatePrivateProperty
 
 GET         /contact                                             controllers.ContactController.contact
 
@@ -128,7 +128,6 @@ GET         /contact/verifyMobileNumber                          controllers.Con
 POST        /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumber
 
 GET         /notification/recentActivityMessages                 controllers.NotificationController.recentActivityMessages(pageNumber: Int)
-GET         /notification/publicRecentActivityMessages           controllers.NotificationController.publicRecentActivityMessages(pageNumber: Int)
 GET         /notification/unreadNotificationCount                controllers.NotificationController.unreadNotificationCount
 GET         /notification/markNotificationAsRead                 controllers.NotificationController.markNotificationRead(notificationID: String)
 
@@ -138,7 +137,6 @@ GET         /component/recentActivities                          controllers.Com
 
 GET         /component/latestBlockHeight                         controllers.ComponentViewController.latestBlockHeight
 GET         /component/tokensStatistics                          controllers.ComponentViewController.tokensStatistics
-GET         /component/publicRecentActivities                    controllers.ComponentViewController.publicRecentActivities
 GET         /component/votingPowers                              controllers.ComponentViewController.votingPowers
 
 GET         /component/tokensPrices                              controllers.ComponentViewController.tokensPrices

@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMutate] with Logged {
+case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: Seq[BaseProperty], mutableProperties: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMutate] with Logged {
   def mutateTicketID(newTicketID: String): AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,11 +29,12 @@ class AssetMutates @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
+                              masterProperties: master.Properties,
                               blockchainAccounts: blockchain.Accounts
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class AssetMutateSerialized(from: String, fromID: String, assetID: String, mutableMetaProperties: String, mutableProperties: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(assetMutate: AssetMutate): AssetMutateSerialized = AssetMutateSerialized(from = assetMutate.from, fromID = assetMutate.fromID, assetID = assetMutate.assetID, mutableMetaProperties = Json.toJson(assetMutate.mutableMetaProperties).toString, mutableProperties = Json.toJson(assetMutate.mutableProperties).toString, gas = assetMutate.gas.toMicroString, status = assetMutate.status, txHash = assetMutate.txHash, ticketID = assetMutate.ticketID, mode = assetMutate.mode, code = assetMutate.code, createdBy = assetMutate.createdBy, createdOn = assetMutate.createdOn, createdOnTimeZone = assetMutate.createdOnTimeZone, updatedBy = assetMutate.updatedBy, updatedOn = assetMutate.updatedOn, updatedOnTimeZone = assetMutate.updatedOnTimeZone)
@@ -186,10 +186,21 @@ class AssetMutates @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val assetMutate = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def updateProperties(assetMutate: AssetMutate) = masterProperties.Utilities.upsertProperties(entityID = assetMutate.assetID, entityType = constants.Blockchain.Entity.ASSET, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = assetMutate.mutableMetaProperties, mutables = assetMutate.mutableProperties)
+
+      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MUTATED, assetID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        assetMutate <- assetMutate
+        assetID <- updateProperties(assetMutate)
+        accountID <- getAccountID(assetMutate.from)
+        _ <- sendNotifications(accountID = accountID, assetID = assetID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -199,7 +210,7 @@ class AssetMutates @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

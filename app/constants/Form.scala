@@ -51,8 +51,8 @@ object Form {
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber(), routes.javascript.ContactController.verifyMobileNumberForm)
 
   //EntityController
-  val ADD_ENTITY_LABEL = new Form("ADD_ENTITY_LABEL", routes.EntityController.addLabel(), routes.javascript.EntityController.addLabelForm)
-  val ADD_PRIVATE_PROPERTY = new Form("ADD_PRIVATE_PROPERTY", routes.EntityController.addPrivateProperty(), routes.javascript.EntityController.addPrivatePropertyForm)
+  val UPSERT_ENTITY_LABEL = new Form("UPSERT_ENTITY_LABEL", routes.EntityController.upsertLabel(), routes.javascript.EntityController.upsertLabelForm)
+  val UPDATE_PRIVATE_PROPERTY = new Form("UPDATE_PRIVATE_PROPERTY", routes.EntityController.updatePrivateProperty(), routes.javascript.EntityController.updatePrivatePropertyForm)
 
   //IdentityController
   val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub(), routes.javascript.IdentityController.nubForm)

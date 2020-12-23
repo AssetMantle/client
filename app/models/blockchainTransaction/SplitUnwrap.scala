@@ -182,10 +182,18 @@ class SplitUnwraps @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val splitUnwrap = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, ownableID: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_UNWRAPPED, ownableID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        splitUnwrap <- splitUnwrap
+        accountID <- getAccountID(splitUnwrap.from)
+        _ <- sendNotifications(accountID = accountID, ownableID = splitUnwrap.ownableID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -195,7 +203,7 @@ class SplitUnwraps @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

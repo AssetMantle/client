@@ -21,8 +21,6 @@ class Delegations @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
                              getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
-                             getAllValidatorDelegations: GetAllValidatorDelegations,
-                             getValidator: GetValidator,
                            )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

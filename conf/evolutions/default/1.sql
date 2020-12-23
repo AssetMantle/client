@@ -866,7 +866,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
     "id"                VARCHAR NOT NULL,
     "label"             VARCHAR,
-    "ownerID"           VARCHAR NOT NULL,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -880,8 +879,8 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 CREATE TABLE IF NOT EXISTS MASTER."Classification"
 (
     "id"                VARCHAR NOT NULL,
+    "maintainerID"      VARCHAR NOT NULL,
     "entityType"        VARCHAR NOT NULL,
-    "fromID"            VARCHAR NOT NULL,
     "label"             VARCHAR,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
@@ -890,7 +889,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Classification"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "entityType")
+    PRIMARY KEY ("id", "maintainerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Email"
@@ -1014,10 +1013,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Property"
 
 CREATE TABLE IF NOT EXISTS MASTER."Split"
 (
-    "entityID"          VARCHAR NOT NULL,
+    "ownableID"         VARCHAR NOT NULL,
     "ownerID"           VARCHAR NOT NULL,
     "entityType"        VARCHAR NOT NULL,
-    "label"             VARCHAR,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1025,7 +1023,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Split"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("entityID", "ownerID")
+    PRIMARY KEY ("ownableID", "ownerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
@@ -1351,12 +1349,10 @@ ALTER TABLE MASTER."Mobile"
     ADD CONSTRAINT Mobile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Asset"
-    ADD CONSTRAINT Asset_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
 ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES MASTER."Identity" ("id");
-ALTER TABLE MASTER."Split"
-    ADD CONSTRAINT Split_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
+    ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
+ALTER TABLE MASTER."Classification"
+    ADD CONSTRAINT Classification_Identity_Maintainer FOREIGN KEY ("maintainerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");

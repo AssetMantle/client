@@ -11,7 +11,7 @@
         @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
         @commonTextInfo(constants.View.HASH_ID, property.hashID)
         @if(property.hashID != "" && property.value.getOrElse("") == "") {
-            @commonFormButton(constants.Form.ADD_PRIVATE_PROPERTY, 'parameters -> s"'${property.entityID}', '${property.entityType}', '${property.name}'")
+            @commonFormButton(constants.Form.UPDATE_PRIVATE_PROPERTY, 'parameters -> s"'${property.entityID}', '${property.entityType}', '${property.name}'")
         }
         @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
         @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))

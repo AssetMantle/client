@@ -28,7 +28,6 @@ class Redelegations @Inject()(
                                configuration: Configuration,
                                getValidatorDelegatorRedelegations: GetValidatorDelegatorRedelegations,
                                getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
-                               getValidator: GetValidator,
                                blockchainValidators: Validators,
                                blockchainWithdrawAddresses: WithdrawAddresses,
                              )(implicit executionContext: ExecutionContext) {
@@ -127,6 +126,7 @@ class Redelegations @Inject()(
 
   object Utility {
 
+    //TODO check changes in active validator set using delegation
     def onRedelegation(redelegate: Redelegate): Future[Unit] = {
       val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorSrcAddress)

@@ -1,9 +1,6 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.{blockchain, master}
@@ -14,6 +11,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -180,10 +179,18 @@ class IdentityUnprovisions @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val identityUnprovision = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_UNPROVISIONED, identityID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        identityUnprovision <- identityUnprovision
+        accountID <- getAccountID(identityUnprovision.from)
+        _ <- sendNotifications(accountID = accountID, identityID = identityUnprovision.identityID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -193,7 +200,7 @@ class IdentityUnprovisions @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

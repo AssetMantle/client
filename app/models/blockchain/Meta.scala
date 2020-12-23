@@ -23,7 +23,7 @@ case class Meta(id: String, dataType: String, dataValue: String, createdBy: Opti
 class Metas @Inject()(
                        protected val databaseConfigProvider: DatabaseConfigProvider,
                        configuration: Configuration,
-                       getMeta: GetMeta,
+                       utilitiesOperations: utilities.Operations,
                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -140,7 +140,7 @@ class Metas @Inject()(
 
     //TODO Can be optimized by directly doing removeData() wherever auxiliaryScrub is called. Haven't done to keep logic in same order as BC
     def auxiliaryScrub(metaPropertyList: Seq[MetaProperty]): Future[Seq[Property]] = {
-      val upsertMetas = Future.traverse(metaPropertyList) { metaProperty =>
+      val upsertMetas = utilitiesOperations.traverse(metaPropertyList) { metaProperty =>
         if (metaProperty.metaFact.getHash != "") {
           val upsertMeta = Service.insertOrUpdate(metaProperty.metaFact.data)
 

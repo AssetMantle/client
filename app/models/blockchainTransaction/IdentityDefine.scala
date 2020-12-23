@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.common.Serializable
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IdentityDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityDefine] with Logged {
+case class IdentityDefine(from: String, fromID: String, immutableMetaTraits: Seq[BaseProperty], immutableTraits: Seq[BaseProperty], mutableMetaTraits: Seq[BaseProperty], mutableTraits: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityDefine] with Logged {
   def mutateTicketID(newTicketID: String): IdentityDefine = IdentityDefine(from = from, fromID = fromID, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -32,13 +32,11 @@ class IdentityDefines @Inject()(
                                  utilitiesNotification: utilities.Notification,
                                  masterAccounts: master.Accounts,
                                  masterProperties: master.Properties,
-                                 masterClassifications: master.Classifications,
-                                 blockchainClassifications: blockchain.Classifications,
                                  blockchainAccounts: blockchain.Accounts
                                )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class IdentityDefineSerialized(from: String, fromID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: IdentityDefine = IdentityDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: IdentityDefine = IdentityDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(identityDefine: IdentityDefine): IdentityDefineSerialized = IdentityDefineSerialized(from = identityDefine.from, fromID = identityDefine.fromID, immutableMetaTraits = Json.toJson(identityDefine.immutableMetaTraits).toString, immutableTraits = Json.toJson(identityDefine.immutableTraits).toString, mutableMetaTraits = Json.toJson(identityDefine.mutableMetaTraits).toString, mutableTraits = Json.toJson(identityDefine.mutableTraits).toString, gas = identityDefine.gas.toMicroString, status = identityDefine.status, txHash = identityDefine.txHash, ticketID = identityDefine.ticketID, mode = identityDefine.mode, code = identityDefine.code, createdBy = identityDefine.createdBy, createdOn = identityDefine.createdOn, createdOnTimeZone = identityDefine.createdOnTimeZone, updatedBy = identityDefine.updatedBy, updatedOn = identityDefine.updatedOn, updatedOnTimeZone = identityDefine.updatedOnTimeZone)
@@ -195,9 +193,21 @@ class IdentityDefines @Inject()(
 
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val identityDefine = Service.tryGet(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertProperties(identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty)))),
+        entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_DEFINED, classificationID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
+        identityDefine <- identityDefine
+        classificationID <- insertProperties(identityDefine)
+        accountID <- getAccountID(identityDefine.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
@@ -205,23 +215,8 @@ class IdentityDefines @Inject()(
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
-      val tx = Service.tryGet(ticketID)
-
-      def delete(tx: IdentityDefine) = {
-        val entityID = blockchainClassifications.Utility.getID(immutables = Serializable.Immutables(Serializable.Properties(tx.immutableMetaTraits.removeData().propertyList ++ tx.immutableTraits.propertyList)), mutables = Serializable.Mutables(Serializable.Properties(tx.mutableMetaTraits.removeData().propertyList ++ tx.mutableTraits.propertyList)))
-        val deleteProperties = masterProperties.Service.deleteAll(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
-        val deleteMasterClassification = masterClassifications.Service.delete(entityID)
-
-        for {
-          _ <- deleteProperties
-          _ <- deleteMasterClassification
-        } yield ()
-      }
-
       (for {
         _ <- markTransactionFailed
-        tx <- tx
-        _ <- delete(tx)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -4,7 +4,6 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.common.Serializable._
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -113,45 +112,23 @@ class IdentityController @Inject()(
           } else {
             val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
 
-            val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten
-            val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten
-            val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten
-            val mutables = defineData.mutableTraits.getOrElse(Seq.empty).flatten
+            val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutables = defineData.mutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
 
-            val entityID = blockchainClassifications.Utility.getID(immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))), mutables = Mutables(Properties((mutableMetas ++ mutables).map(_.toProperty))))
-
-            def insertAndBroadcast(classificationExists: Boolean) = if (!classificationExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterClassifications.Service.create(id = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = defineData.fromID, label = Option(defineData.label), status = None)
-
-              def broadcastTx = transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
-                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableTraits = Properties(immutables.map(_.toProperty)), mutableMetaTraits = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableTraits = Properties(mutables.map(_.toProperty)), gas = defineData.gas, ticketID = "", mode = transactionMode),
+            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+              val broadcastTx = transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
+                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutableMetas, gas = defineData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityDefines.Service.create,
                 request = transactionsIdentityDefine.Request(transactionsIdentityDefine.Message(transactionsIdentityDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
                 action = transactionsIdentityDefine.Service.post,
                 onSuccess = blockchainTransactionIdentityDefines.Utility.onSuccess,
                 onFailure = blockchainTransactionIdentityDefines.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionIdentityDefines.Service.updateTransactionHash
-              )
-
-              (for {
-                _ <- insertProperties
-                _ <- create
-                ticketID <- broadcastTx
-              } yield ticketID
-                ).recoverWith {
-                case baseException: BaseException => masterProperties.Service.deleteAll(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
-                  masterClassifications.Service.delete(entityID)
-                  throw baseException
-              }
-            } else Future(throw new BaseException(constants.Response.CLASSIFICATION_ALREADY_EXISTS))
-
-            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
-              val classificationExists = blockchainClassifications.Service.checkExists(entityID)
+                updateTransactionHash = blockchainTransactionIdentityDefines.Service.updateTransactionHash)
 
               for {
-                classificationExists <- classificationExists
-                ticketID <- insertAndBroadcast(classificationExists)
+                ticketID <- broadcastTx
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
@@ -190,42 +167,23 @@ class IdentityController @Inject()(
               numMutableForms = getNumberOfFields(issueData.addMutableField, issueData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
             val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password.getOrElse(""))
-            val immutableMetas = issueData.immutableMetaProperties.getOrElse(Seq.empty).flatten
-            val immutables = issueData.immutableProperties.getOrElse(Seq.empty).flatten
-            val mutableMetas = issueData.mutableMetaProperties.getOrElse(Seq.empty).flatten
-            val mutables = issueData.mutableProperties.getOrElse(Seq.empty).flatten
-            val entityID = blockchainIdentities.Utility.getID(classificationID = issueData.classificationID, immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))))
+            val immutableMetas = issueData.immutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val immutables = issueData.immutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutableMetas = issueData.mutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutables = issueData.mutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
 
-            def insertAndBroadcast(classificationExists: Boolean, identityExists: Boolean) = if (classificationExists && !identityExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterIdentities.Service.create(master.Identity(id = entityID, label = Option(issueData.label), status = None))
-
-              def broadcastTx = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
-                entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = issueData.gas, ticketID = "", mode = transactionMode),
+            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+              val broadcastTx = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+                entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = issueData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
                 request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = issueData.gas), fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsIdentityIssue.Service.post,
                 onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
                 onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash
-              )
+                updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
 
               for {
-                _ <- insertProperties
-                _ <- create
                 ticketID <- broadcastTx
-              } yield ticketID
-            } else if (!classificationExists) Future(throw new BaseException(constants.Response.CLASSIFICATION_NOT_FOUND))
-            else Future(throw new BaseException(constants.Response.IDENTITY_ALREADY_EXISTS))
-
-            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
-              val classificationExists = blockchainClassifications.Service.checkExists(issueData.classificationID)
-              val identityExists = blockchainIdentities.Service.checkExists(entityID)
-
-              for {
-                classificationExists <- classificationExists
-                identityExists <- identityExists
-                ticketID <- insertAndBroadcast(classificationExists = classificationExists, identityExists = identityExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(issueData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), issueData.classificationID)))

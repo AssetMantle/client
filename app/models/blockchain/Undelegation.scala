@@ -32,7 +32,6 @@ class Undelegations @Inject()(
                                blockchainValidators: Validators,
                                blockchainDelegations: Delegations,
                                blockchainWithdrawAddresses: WithdrawAddresses,
-                               getValidator: GetValidator,
                              )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -131,6 +130,7 @@ class Undelegations @Inject()(
 
   object Utility {
 
+    //TODO check changes in active validator set using delegation
     def onUndelegation(undelegate: Undelegate): Future[Unit] = {
       val undelegationsResponse = getValidatorDelegatorUndelegations.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)

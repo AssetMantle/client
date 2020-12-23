@@ -1,9 +1,6 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.{blockchain, master}
@@ -14,6 +11,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -180,12 +179,21 @@ class OrderTakes @Inject()(
   }
 
   object Utility {
+    //Properties mutated/deleted in blockchain schema
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val orderTake = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_TAKEN, orderID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        orderTake <- orderTake
+        accountID <- getAccountID(orderTake.from)
+        _ <- sendNotifications(accountID = accountID, orderID = orderTake.orderID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -195,7 +203,7 @@ class OrderTakes @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

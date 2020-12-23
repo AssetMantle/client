@@ -114,7 +114,6 @@ object Blockchain {
       val Delegator = "delegator"
       val CompletionTime = "completion_time"
     }
-
   }
 
   object Properties {

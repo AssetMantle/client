@@ -184,6 +184,7 @@ class Block @Inject()(
     }
   }
 
+  //TODO check changes in active validator set using delegation
   def onSlashingEvent(slashingEvents: Seq[Event], height: Int): Future[Unit] = if (slashingEvents.nonEmpty) {
     val hexAddresses = slashingEvents.flatMap(_.attributes.find(x => constants.Blockchain.Event.Attribute.Address == x.key && x.value.isDefined).map(x => utilities.Bech32.convertConsensusAddressToHexAddress(x.value.get))).distinct
     val validators = blockchainValidators.Service.getAllByHexAddresses(hexAddresses)

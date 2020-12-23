@@ -1,9 +1,6 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.{blockchain, master}
@@ -14,6 +11,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -28,7 +27,8 @@ class OrderCancels @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              blockchainAccounts: blockchain.Accounts
+                              blockchainAccounts: blockchain.Accounts,
+                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class OrderCancelSerialized(from: String, fromID: String, orderID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -180,10 +180,21 @@ class OrderCancels @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val orderCancel = Service.getTransaction(ticketID)
+
+      def deleteProperties(orderCancel: OrderCancel) = masterProperties.Service.deleteAll(entityType = constants.Blockchain.Entity.ORDER, entityID = orderCancel.orderID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_CANCELLED, orderID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        orderCancel <- orderCancel
+        _ <- deleteProperties(orderCancel)
+        accountID <- getAccountID(orderCancel.from)
+        _ <- sendNotifications(accountID = accountID, orderID = orderCancel.orderID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -193,7 +204,7 @@ class OrderCancels @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

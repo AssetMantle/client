@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetDefine] with Logged {
+case class AssetDefine(from: String, fromID: String, immutableMetaTraits: Seq[BaseProperty], immutableTraits: Seq[BaseProperty], mutableMetaTraits: Seq[BaseProperty], mutableTraits: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetDefine] with Logged {
   def mutateTicketID(newTicketID: String): AssetDefine = AssetDefine(from = from, fromID = fromID, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,11 +29,13 @@ class AssetDefines @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              blockchainAccounts: blockchain.Accounts
+                              blockchainAccounts: blockchain.Accounts,
+                              blockchainClassifications: blockchain.Classifications,
+                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class AssetDefineSerialized(from: String, fromID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: AssetDefine = AssetDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: AssetDefine = AssetDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(assetDefine: AssetDefine): AssetDefineSerialized = AssetDefineSerialized(from = assetDefine.from, fromID = assetDefine.fromID, immutableMetaTraits = Json.toJson(assetDefine.immutableMetaTraits).toString, immutableTraits = Json.toJson(assetDefine.immutableTraits).toString, mutableMetaTraits = Json.toJson(assetDefine.mutableMetaTraits).toString, mutableTraits = Json.toJson(assetDefine.mutableTraits).toString, gas = assetDefine.gas.toMicroString, status = assetDefine.status, txHash = assetDefine.txHash, ticketID = assetDefine.ticketID, mode = assetDefine.mode, code = assetDefine.code, createdBy = assetDefine.createdBy, createdOn = assetDefine.createdOn, createdOnTimeZone = assetDefine.createdOnTimeZone, updatedBy = assetDefine.updatedBy, updatedOn = assetDefine.updatedOn, updatedOnTimeZone = assetDefine.updatedOnTimeZone)
@@ -186,12 +187,27 @@ class AssetDefines @Inject()(
   }
 
   object Utility {
+
+    private val chainID = configuration.get[String]("blockchain.chainID")
+
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val assetDefine = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty)))),
+        entityType = constants.Blockchain.Entity.ASSET_DEFINITION, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_DEFINED, classificationID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        assetDefine <- assetDefine
+        classificationID <- insertProperties(assetDefine)
+        accountID <- getAccountID(assetDefine.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }

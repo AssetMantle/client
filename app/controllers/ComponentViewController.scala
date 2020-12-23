@@ -63,14 +63,9 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.commonHome()))
   }
 
-  def recentActivities: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def recentActivities: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.recentActivities()))
-  }
-
-  def publicRecentActivities: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.component.master.publicRecentActivities()))
+      Ok(views.html.component.master.recentActivities())
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -512,12 +507,15 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-      def getAssetsMinted(identityIDs: Seq[String]) = masterAssets.Service.getAllByOwnerIDs(identityIDs)
+      def getAssetSplits(identityIDs: Seq[String]) = masterSplits.Service.getAllAssetsByOwnerIDs(identityIDs)
+
+      def getAssets(assetIDs: Seq[String]) = masterAssets.Service.getAllByIDs(assetIDs)
 
       (for {
         identityIDs <- identityIDs
-        assets <- getAssetsMinted(identityIDs)
-      } yield Ok(views.html.component.master.assetsMinted(assets))
+        splits <- getAssetSplits(identityIDs)
+        assets <- getAssets(splits.map(_.ownableID))
+      } yield Ok(views.html.component.master.assetsMinted(assets, splits))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -579,13 +577,18 @@ class ComponentViewController @Inject()(
   def accountSplits(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val allDenoms = blockchainTokens.Service.getAllDenoms
 
-      def getSplits(identityIDs: Seq[String]) = masterSplits.Service.getAllByOwnerIDs(identityIDs)
+      def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getByOwnerIDs(identityIDs)
+
+      def getAssets(splitIDs: Seq[String]) = masterAssets.Service.getAllByIDs(splitIDs)
 
       (for {
         identityIDs <- identityIDs
-        splits <- getSplits(identityIDs)
-      } yield Ok(views.html.component.master.accountSplits(splits))
+        splits <- getBlockchainSplits(identityIDs)
+        allDenoms <- allDenoms
+        masterAssets <- getAssets(splits.filterNot(x => allDenoms.contains(x.ownableID)).map(_.ownableID))
+      } yield Ok(views.html.component.master.accountSplits(splits, allDenoms, masterAssets))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -599,13 +602,13 @@ class ComponentViewController @Inject()(
       def verifyOwner(identityIDs: Seq[String]): Future[Boolean] = {
         entityType match {
           case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
-            val fromID = masterClassifications.Service.tryGetFromID(id = entityID, entityType = entityType)
+            val fromID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
             for {
               fromID <- fromID
             } yield identityIDs.contains(fromID)
           case constants.Blockchain.Entity.IDENTITY => Future(identityIDs.contains(entityID))
           case constants.Blockchain.Entity.ASSET | constants.Blockchain.Entity.WRAPPED_COIN =>
-            val ownerID = masterSplits.Service.tryGetOwnerID(entityID = entityID, entityType = entityType)
+            val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
             for {
               ownerID <- ownerID
             } yield identityIDs.contains(ownerID)
@@ -624,7 +627,7 @@ class ComponentViewController @Inject()(
         properties <- properties
       } yield {
         if (isOwner) Ok(views.html.component.master.viewEntityProperties(properties))
-        else throw new BaseException(constants.Response.PROPERTIES_NOT_FOUND)
+        else throw new BaseException(constants.Response.UNAUTHORIZED)
       }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

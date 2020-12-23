@@ -1,0 +1,10 @@
+@import views.companion.master.UpdatePrivatProperty
+@import views.html.base._
+
+@(updatePrivatePropertyForm: Form[UpdatePrivatProperty.Data] = UpdatePrivatProperty.form, entityID: String, entityType: String, name: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.UPDATE_PRIVATE_PROPERTY, updatePrivatePropertyForm) {
+    @commonInputText(updatePrivatePropertyForm, constants.FormField.ENTITY_ID, 'value -> entityID, 'readonly -> true)
+    @commonSelect(updatePrivatePropertyForm, constants.FormField.ENTITY_TYPE , 'value -> entityType, 'readonly -> true)
+    @commonInputText(updatePrivatePropertyForm, constants.FormField.NAME, 'value -> name, 'readonly -> true)
+    @commonInputText(updatePrivatePropertyForm, constants.FormField.VALUE)
+}

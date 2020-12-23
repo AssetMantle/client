@@ -1,9 +1,6 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.TransactionMessages.{SplitSend, SplitUnwrap, SplitWrap}
 import models.master
@@ -11,9 +8,10 @@ import models.master.{Split => masterSplit}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.GetSplit
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -24,7 +22,6 @@ class Splits @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
                         blockchainAccounts: Accounts,
-                        getSplit: GetSplit,
                         masterSplits: master.Splits
                       )(implicit executionContext: ExecutionContext) {
 
@@ -149,12 +146,12 @@ class Splits @Inject()(
         def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = splitSend.toID, ownableID = splitSend.ownableID, split = splitSend.split)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitSend.split)))
 
         def masterOperations(oldFromSplitDeleted: Boolean) = {
-          val oldFromMasterSplit = masterSplits.Service.tryGet(entityID = splitSend.ownableID, ownerID = splitSend.fromID)
-          val oldToSplitExists = masterSplits.Service.checkExists(entityID = splitSend.ownableID, ownerID = splitSend.toID)
+          val oldFromMasterSplit = masterSplits.Service.tryGet(ownableID = splitSend.ownableID, ownerID = splitSend.fromID)
+          val oldToSplitExists = masterSplits.Service.checkExists(ownableID = splitSend.ownableID, ownerID = splitSend.toID)
 
           def updateSplits(oldFromMasterSplit: masterSplit, oldToSplitExists: Boolean) = {
-            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(entityID = splitSend.ownableID, ownerID = splitSend.fromID) else Future(0)
-            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(entityID = splitSend.ownableID, ownerID = splitSend.toID, entityType = oldFromMasterSplit.entityType, label = oldFromMasterSplit.label, status = Option(true))) else Future(0)
+            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(ownableID = splitSend.ownableID, ownerID = splitSend.fromID) else Future(0)
+            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(ownableID = splitSend.ownableID, ownerID = splitSend.toID, entityType = oldFromMasterSplit.entityType, status = Option(true))) else Future(0)
             for {
               _ <- updateOrDeleteFromSplit
               _ <- updateToSplit
@@ -194,9 +191,9 @@ class Splits @Inject()(
       }
 
       val masterOperations = Future.traverse(splitWrap.coins) { coin =>
-        val oldSplit = masterSplits.Service.get(entityID = coin.denom, ownerID = splitWrap.fromID)
+        val oldSplit = masterSplits.Service.get(ownableID = coin.denom, ownerID = splitWrap.fromID)
 
-        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(entityID = coin.denom, ownerID = splitWrap.fromID, entityType = constants.Blockchain.Entity.WRAPPED_COIN, label = None, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(entityID = coin.denom, ownerID = splitWrap.fromID))
+        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(ownableID = coin.denom, ownerID = splitWrap.fromID, entityType = constants.Blockchain.Entity.WRAPPED_COIN, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(ownableID = coin.denom, ownerID = splitWrap.fromID))
 
         for {
           oldSplit <- oldSplit
@@ -219,7 +216,7 @@ class Splits @Inject()(
 
       def updateSplits(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) Service.delete(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitUnwrap.split))
 
-      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) masterSplits.Service.delete(entityID = splitUnwrap.ownableID, ownerID = splitUnwrap.fromID) else Future(0)
+      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) masterSplits.Service.delete(ownableID = splitUnwrap.ownableID, ownerID = splitUnwrap.fromID) else Future(0)
 
       (for {
         oldFromSplit <- oldFromSplit
@@ -237,9 +234,9 @@ class Splits @Inject()(
       def upsertSplit(oldSplit: Option[Split]) = oldSplit.fold(Service.insertOrUpdate(Split(ownerID = ownerID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
 
       val masterOperations = {
-        val oldSplit = masterSplits.Service.get(entityID = ownableID, ownerID = ownerID)
+        val oldSplit = masterSplits.Service.get(ownableID = ownableID, ownerID = ownerID)
 
-        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(entityID = ownableID, ownerID = ownerID, entityType = constants.Blockchain.Entity.ASSET, label = None, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(entityID = ownableID, ownerID = ownerID))
+        def upsertSplits(oldSplit: Option[masterSplit]) = oldSplit.fold(masterSplits.Service.insertOrUpdate(masterSplit(ownableID = ownableID, ownerID = ownerID, entityType = constants.Blockchain.Entity.ASSET, status = Option(true))))(_ => masterSplits.Service.markStatusSuccessful(ownableID = ownableID, ownerID = ownerID))
 
         for {
           oldSplit <- oldSplit
@@ -262,7 +259,7 @@ class Splits @Inject()(
 
       def updateOrDelete(oldSplit: Split) = if ((oldSplit.split - splitValue) == 0) Service.delete(ownerID = ownerID, ownableID = ownableID) else Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split - splitValue))
 
-      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitValue) == 0) masterSplits.Service.delete(entityID = ownableID, ownerID = ownerID) else Future(0)
+      def masterOperations(oldFromSplit: Split) = if ((oldFromSplit.split - splitValue) == 0) masterSplits.Service.delete(ownableID = ownableID, ownerID = ownerID) else Future(0)
 
       (for {
         oldSplit <- oldSplit
@@ -284,12 +281,12 @@ class Splits @Inject()(
         def upsertToSplit(oldToSplit: Option[Split]) = oldToSplit.fold(Service.insertOrUpdate(Split(ownerID = toID, ownableID = ownableID, split = splitValue)))(oldSplit => Service.insertOrUpdate(oldSplit.copy(split = oldSplit.split + splitValue)))
 
         def masterOperations(oldFromSplitDeleted: Boolean) = {
-          val oldFromMasterSplit = masterSplits.Service.tryGet(entityID = ownableID, ownerID = fromID)
-          val oldToSplitExists = masterSplits.Service.checkExists(entityID = ownableID, ownerID = toID)
+          val oldFromMasterSplit = masterSplits.Service.tryGet(ownableID = ownableID, ownerID = fromID)
+          val oldToSplitExists = masterSplits.Service.checkExists(ownableID = ownableID, ownerID = toID)
 
           def updateSplits(oldFromMasterSplit: masterSplit, oldToSplitExists: Boolean) = {
-            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(entityID = ownableID, ownerID = fromID) else Future(0)
-            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(entityID = ownableID, ownerID = toID, entityType = oldFromMasterSplit.entityType, label = oldFromMasterSplit.label, status = Option(true))) else Future(0)
+            val updateOrDeleteFromSplit = if (oldFromSplitDeleted) masterSplits.Service.delete(ownableID = ownableID, ownerID = fromID) else Future(0)
+            val updateToSplit = if (!oldToSplitExists) masterSplits.Service.insertOrUpdate(masterSplit(ownableID = ownableID, ownerID = toID, entityType = oldFromMasterSplit.entityType, status = Option(true))) else Future(0)
             for {
               _ <- updateOrDeleteFromSplit
               _ <- updateToSplit

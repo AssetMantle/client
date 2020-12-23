@@ -1,11 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.Serializable.{BaseProperty, Immutables, Mutables, Properties}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,6 +12,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -28,7 +28,9 @@ class IdentityNubs @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              blockchainAccounts: blockchain.Accounts
+                              blockchainAccounts: blockchain.Accounts,
+                              blockchainIdentities: blockchain.Identities,
+                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class IdentityNubSerialized(from: String, nubID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -176,12 +178,31 @@ class IdentityNubs @Inject()(
   }
 
   object Utility {
+
+    private val chainID = configuration.get[String]("blockchain.chainID")
+
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val identityNub = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData()))), Mutables(Properties(Seq.empty))),
+        entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = Seq.empty, immutables = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None)), mutableMetas = Seq.empty, mutables = Seq.empty)
+
+      def insertIdentityProperties(identityNub: IdentityNub, classificationID: String) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = classificationID, Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData())))),
+        entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = Some(identityNub.nubID))), immutables = Seq.empty, mutableMetas = Seq.empty, mutables = Seq.empty)
+
+      def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_NUB, identityID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        identityNub <- identityNub
+        classificationID <- insertClassificationProperties(identityNub)
+        identityID <- insertIdentityProperties(identityNub, classificationID)
+        accountID <- getAccountID(identityNub.from)
+        _ <- sendNotifications(accountID = accountID, identityID = identityID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -191,7 +212,7 @@ class IdentityNubs @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

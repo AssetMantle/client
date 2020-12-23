@@ -6,12 +6,11 @@ import models.common.DataValue.IDDataValue
 import models.common.Serializable._
 import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub, IdentityProvision, IdentityUnprovision}
 import models.master
-import models.master.{Classification => masterClassification, Identity => masterIdentity}
+import models.master.{Identity => masterIdentity}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.GetIdentity
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -29,7 +28,6 @@ case class Identity(id: String, provisionedAddressList: Seq[String], unprovision
 class Identities @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             configuration: Configuration,
-                            getIdentity: GetIdentity,
                             blockchainMetas: Metas,
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
@@ -222,6 +220,7 @@ class Identities @Inject()(
 
     def create(identity: Identity): Future[String] = {
       val insertProperties = upsertProperty(identity)
+
       //Should be called after inserting properties due to FK constraint.
       def insertAddress() = {
         val insertProvisioned = addMultipleProvisionedAddresses(identity)
@@ -337,16 +336,9 @@ class Identities @Inject()(
       }
 
       def masterOperations(classificationID: String) = {
-        val classification = masterClassifications.Service.get(classificationID)
-
-        def insertProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, entityID = classificationID, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits) else Future("")
-
-        def upsert(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = identityDefine.fromID, label = None, status = Option(true)))(_ => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION))
-
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
         for {
-          classification <- classification
-          _ <- upsert(classification)
-          _ <- insertProperties(classification)
+          _ <- insert
         } yield ()
       }
 
@@ -367,7 +359,7 @@ class Identities @Inject()(
 
       def insertOrUpdate(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
         val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityIssue.immutableProperties.propertyList))
-        val identityID = getID(classificationID = identityIssue.classificationID, immutables = immutables)
+        val identityID = utilities.IDGenerator.getIdentityID(classificationID = identityIssue.classificationID, immutables = immutables)
         val upsert = Service.create(Identity(id = identityID, provisionedAddressList = Seq(identityIssue.to), unprovisionedAddressList = Seq.empty[String], mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityIssue.mutableProperties.propertyList)), immutables = immutables))
 
         for {
@@ -376,16 +368,9 @@ class Identities @Inject()(
       }
 
       def masterOperations(identityID: String) = {
-        val identity = masterIdentities.Service.get(identityID)
-
-        def insertProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = identityIssue.immutableMetaProperties, immutables = identityIssue.immutableProperties, mutableMetas = identityIssue.mutableMetaProperties, mutables = identityIssue.mutableProperties) else Future("")
-
-        def upsert(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
-
+        val insert = masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, status = Option(true)))
         for {
-          identity <- identity
-          _ <- upsert(identity)
-          _ <- insertProperties(identity)
+          _ <- insert
         } yield ()
       }
 
@@ -402,7 +387,6 @@ class Identities @Inject()(
 
     def onProvision(identityProvision: IdentityProvision): Future[Unit] = {
       val add = Service.addProvisionAddress(id = identityProvision.identityID, address = identityProvision.to)
-
       (for {
         _ <- add
       } yield ()
@@ -432,7 +416,7 @@ class Identities @Inject()(
         val mutables = Mutables(Properties(Seq()))
         val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), mutables)
 
-        def getIdentityID(classificationID: String) = Future(getID(classificationID = classificationID, immutables = immutables))
+        def getIdentityID(classificationID: String) = Future(utilities.IDGenerator.getIdentityID(classificationID = classificationID, immutables = immutables))
 
         def upsert(identityID: String) = Service.create(Identity(id = identityID, provisionedAddressList = Seq(identityNub.from), unprovisionedAddressList = Seq.empty[String], immutables = immutables, mutables = mutables))
 
@@ -444,24 +428,12 @@ class Identities @Inject()(
       }
 
       def masterOperations(classificationID: String, identityID: String) = {
-        val identity = masterIdentities.Service.get(identityID)
-        val classification = masterClassifications.Service.get(classificationID)
-
-        def insertIdentityProperties(identity: Option[masterIdentity]) = if (identity.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY, entityID = identityID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
-
-        def upsertIdentity(identity: Option[masterIdentity]) = identity.fold(masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = None, status = Option(true))))(x => masterIdentities.Service.insertOrUpdate(x.copy(status = Option(true))))
-
-        def insertClassificationProperties(classification: Option[masterClassification]) = if (classification.isEmpty) masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, entityID = classificationID, immutableMetas = MetaProperties(Seq(nubMetaProperty)), immutables = Properties(Seq.empty), mutableMetas = MetaProperties(Seq.empty), mutables = Properties(Seq.empty)) else Future("")
-
-        def upsertClassification(classification: Option[masterClassification]) = classification.fold(masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = identityID, label = None, status = Option(true)))(x => masterClassifications.Service.markStatusSuccessful(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION))
+        val insertIdentity = masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, status = Option(true)))
+        val insertClassification = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityID, status = Option(true))
 
         for {
-          identity <- identity
-          classification <- classification
-          _ <- upsertIdentity(identity)
-          _ <- insertIdentityProperties(identity)
-          _ <- upsertClassification(classification)
-          _ <- insertClassificationProperties(classification)
+          _ <- insertIdentity
+          _ <- insertClassification
         } yield ()
       }
 
@@ -474,8 +446,6 @@ class Identities @Inject()(
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
-
-    def getID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
 
     def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(nubID))))
   }

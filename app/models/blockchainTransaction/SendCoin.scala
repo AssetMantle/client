@@ -214,7 +214,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
         fromAccountID <- getAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, txHash)()
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
@@ -240,7 +240,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
         sendCoin <- sendCoin
         fromAccountID <- getAccountID(sendCoin.from)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

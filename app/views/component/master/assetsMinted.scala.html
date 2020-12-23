@@ -1,20 +1,23 @@
 @import controllers.actions.LoginState
-@import models.master.Asset
+@import models.master.{Asset, Split}
 @import views.html.base._
 
-@(assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(assets: Seq[Asset], splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ASSETS_MINTED) {
 } {
-    @assets.map { asset =>
+    @splits.map { split =>
         @commonVerticalInfoBox() {
-            @commonVerticalTextInfo(constants.View.ASSET_ID, asset.id)
-            @commonVerticalTextInfo(constants.View.LABEL, asset.label.getOrElse(""))
-            @commonVerticalBooleanInfo(constants.View.STATUS, asset.status)
-            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${asset.id}', '${constants.Blockchain.Entity.ASSET}'")
-            @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${asset.id}'")
-            @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${asset.id}'")
-            @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${asset.id}'")
+            @defining(assets.find(_.id == split.ownableID)) { asset =>
+                @commonVerticalTextInfo(constants.View.ASSET_ID, split.ownableID)
+                @commonVerticalTextInfo(constants.View.LABEL, asset.fold("")(_.label.getOrElse("")))
+                @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
+                @commonVerticalBooleanInfo(constants.View.STATUS, asset.fold[Option[Boolean]](None)(_.status))
+                @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
+                @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+            }
         }
     }
 }

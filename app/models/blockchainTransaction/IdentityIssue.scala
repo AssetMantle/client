@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityIssue] with Logged {
+case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: Seq[BaseProperty], immutableProperties: Seq[BaseProperty], mutableMetaProperties: Seq[BaseProperty], mutableProperties: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityIssue] with Logged {
   def mutateTicketID(newTicketID: String): IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaProperties = immutableMetaProperties, immutableProperties = immutableProperties, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,11 +29,12 @@ class IdentityIssues @Inject()(
                                 protected val databaseConfigProvider: DatabaseConfigProvider,
                                 utilitiesNotification: utilities.Notification,
                                 masterAccounts: master.Accounts,
+                                masterProperties: master.Properties,
                                 blockchainAccounts: blockchain.Accounts
                               )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class IdentityIssueSerialized(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Properties](immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: IdentityIssue = IdentityIssue(from = from, fromID = fromID, to = to, classificationID = classificationID, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(identityIssue: IdentityIssue): IdentityIssueSerialized = IdentityIssueSerialized(from = identityIssue.from, to = identityIssue.to, fromID = identityIssue.fromID, classificationID = identityIssue.classificationID, immutableMetaProperties = Json.toJson(identityIssue.immutableMetaProperties).toString, immutableProperties = Json.toJson(identityIssue.immutableProperties).toString, mutableMetaProperties = Json.toJson(identityIssue.mutableMetaProperties).toString, mutableProperties = Json.toJson(identityIssue.mutableProperties).toString, gas = identityIssue.gas.toMicroString, status = identityIssue.status, txHash = identityIssue.txHash, ticketID = identityIssue.ticketID, mode = identityIssue.mode, code = identityIssue.code, createdBy = identityIssue.createdBy, createdOn = identityIssue.createdOn, createdOnTimeZone = identityIssue.createdOnTimeZone, updatedBy = identityIssue.updatedBy, updatedOn = identityIssue.updatedOn, updatedOnTimeZone = identityIssue.updatedOnTimeZone)
@@ -192,10 +192,22 @@ class IdentityIssues @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val identityIssue = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertProperties(identityIssue: IdentityIssue) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = identityIssue.classificationID, Immutables(Properties((identityIssue.immutableMetaProperties ++ identityIssue.immutableProperties).map(_.toProperty)))),
+        entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = identityIssue.immutableMetaProperties, immutables = identityIssue.immutableProperties, mutableMetas = identityIssue.mutableMetaProperties, mutables = identityIssue.mutableProperties)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_ISSUED, classificationID, txHash)(txHash)
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        identityIssue <- identityIssue
+        classificationID <- insertProperties(identityIssue)
+        accountID <- getAccountID(identityIssue.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -205,7 +217,7 @@ class IdentityIssues @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

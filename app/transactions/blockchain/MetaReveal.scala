@@ -1,9 +1,6 @@
 package transactions.blockchain
 
-import java.net.ConnectException
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
@@ -11,6 +8,8 @@ import transactions.Abstract.BaseRequest
 import utilities.MicroNumber
 import views.companion.common._
 
+import java.net.ConnectException
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

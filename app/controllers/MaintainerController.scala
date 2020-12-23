@@ -4,8 +4,7 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
-import models.common.Serializable.{Properties, Property}
+import models.common.Serializable.BaseProperty
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -13,6 +12,7 @@ import play.api.{Configuration, Logger}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -40,7 +40,7 @@ class MaintainerController @Inject()(
 
   def deputizeForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.maintainerDeputize())
+      Ok(blockchainForms.maintainerDeputize())
   }
 
   def deputize: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -58,9 +58,9 @@ class MaintainerController @Inject()(
             val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password.getOrElse(""))
 
             def broadcastTx = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
-              entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = Properties(deputizeData.maintainedTraits.fold[Seq[Property]](Seq.empty)(_.flatten.map(_.toProperty))), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer, gas = deputizeData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = deputizeData.maintainedTraits.fold[Seq[BaseProperty]](Seq.empty)(_.flatten.map(_.toBaseProperty)), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer, gas = deputizeData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
-              request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeData.gas), fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = deputizeData.maintainedTraits.getOrElse(Seq.empty).flatten, addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer)),
+              request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeData.gas), fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = deputizeData.maintainedTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer)),
               action = transactionsMaintainerDeputize.Service.post,
               onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
               onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
