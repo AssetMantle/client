@@ -10,12 +10,20 @@
     @identities.map { identity =>
         @commonVerticalInfoBox() {
             @commonVerticalTextInfo(constants.View.LABEL, identity.label.getOrElse(""))
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${identity.id}', '${constants.Blockchain.Entity.IDENTITY}'")
+            </div>
             @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
             @commonVerticalBooleanInfo(constants.View.STATUS, identity.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.viewIdentityInfo, 'parameters -> s"'${identity.id}'")
+            </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.IDENTITY_PROVISION, 'parameters -> s"'${identity.id}'")
+            </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identity.id}'")
+            </div>
         }
     }
 }

@@ -11,10 +11,16 @@
         @commonVerticalInfoBox(){
             @commonVerticalTextInfo(constants.View.CLASSIFICATION_ID, classification.id)
             @commonVerticalTextInfo(constants.View.LABEL, classification.label.getOrElse(""))
-            @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
+            </div>
             @commonVerticalBooleanInfo(constants.View.STATUS, classification.status)
-            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
-            @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
+            </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")
+            </div>
         }
     }
 }

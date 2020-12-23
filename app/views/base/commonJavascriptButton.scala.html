@@ -1,7 +1,14 @@
 @(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+@import views.html.base._
 
 <button type="button" id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-button", arguments.toMap.get('class).map(_.toString).getOrElse("buttonPrimary")).mkString(" ")'  onclick="@function">
-@Messages(name)
+
+    @if(arguments.toMap.get('icon).map(_.toString).isDefined) {
+        @commonIcon(id = arguments.toMap.get('icon).map(_.toString).getOrElse("")) @Messages(name)
+    }else{
+        @Messages(name)
+    }
+
 </button>
 
 @* Example Usage: @commonJavascriptButton(constants.View.IDENTIFICATION_DETAILS, JavaScript("""componentResource('identificationDetails', jsRoutes.controllers.ComponentViewController.identificationDetails('Abhinav', 1996))""")) *@

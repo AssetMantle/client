@@ -13,10 +13,18 @@
                 @commonVerticalTextInfo(constants.View.LABEL, asset.fold("")(_.label.getOrElse("")))
                 @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
                 @commonVerticalBooleanInfo(constants.View.STATUS, asset.fold[Option[Boolean]](None)(_.status))
-                @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
-                @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
-                @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
-                @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
+                </div>
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
             }
         }
     }

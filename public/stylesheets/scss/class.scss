@@ -1335,6 +1335,12 @@ body.lightMode {
   }
 }
 
+.profileDropdown{
+  padding: 10px;
+  .cmuk-navbar-dropdown-nav>li>a:focus, .cmuk-navbar-dropdown-nav>li>a:hover{
+    background: #f8f8f8;
+  }
+}
 .formNote{
   font-size: 1.15rem;
 }
@@ -1490,7 +1496,7 @@ body.lightMode {
     position: relative;
     max-width: 100%;
     width: auto;
-    max-height:750px;
+    max-height: calc(100vh - 200px);
     display: inline-block;
     .modalBody {
       text-align:center;
@@ -1515,7 +1521,7 @@ body.lightMode {
           box-shadow: none;
         }
         .formBody{
-          max-height:600px;
+          max-height: calc(100vh - 350px);
           overflow: auto;
           @extend %scroller;
           .inputField{
@@ -3643,4 +3649,11 @@ figure.zoom {
       }
     }
   }
+}
+
+.componentError{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }

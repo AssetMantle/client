@@ -19,8 +19,12 @@
                 }
                 @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
                 @commonVerticalDoubleInfo(constants.View.AMOUNT, split.split.toDouble)
-                @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
-                @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
             }
         }
     }
