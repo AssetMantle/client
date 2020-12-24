@@ -7,7 +7,7 @@
     @commonInputText(assetMutateForm, constants.FormField.ASSET_ID, 'value -> assetID)
     @commonInputText(assetMutateForm, constants.FormField.LABEL)
     @commonInputMicroNumber(assetMutateForm, constants.FormField.GAS)
-    @commonInputPassword(assetMutateForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms)
+    @commonInputPassword(assetMutateForm, constants.FormField.PASSWORD, 'required -> false)
 }

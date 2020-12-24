@@ -54,7 +54,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def findNotificationsByAccountId(accountID: Option[String], offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID.? === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
 
-  private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === status).length.result.asTry).map {
+  private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(x => x.accountID === accountID && x.read === status).length.result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)

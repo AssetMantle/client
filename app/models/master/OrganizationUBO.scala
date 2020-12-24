@@ -51,7 +51,7 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def findByOrganizationID(organizationID: String): Future[Seq[OrganizationUBO]] = db.run(organizationUBOTable.filter(_.organizationID === organizationID).result)
 
-  private def checkOrganizationIDAndStatus(organizationID: String, status: Boolean): Future[Boolean] = db.run(organizationUBOTable.filter(_.organizationID === organizationID).filter(_.status === status).exists.result)
+  private def checkOrganizationIDAndStatus(organizationID: String, status: Boolean): Future[Boolean] = db.run(organizationUBOTable.filter(x => x.organizationID === organizationID && x.status === status).exists.result)
 
   private def updateStatus(id: String, status: Boolean): Future[Int] = db.run(organizationUBOTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => result
@@ -62,7 +62,7 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
 
-  private def deleteById(id: String, organizationID: String): Future[Int] = db.run(organizationUBOTable.filter(_.id === id).filter(_.organizationID === organizationID).delete.asTry).map {
+  private def deleteById(id: String, organizationID: String): Future[Int] = db.run(organizationUBOTable.filter(x => x.id === id && x.organizationID === organizationID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)

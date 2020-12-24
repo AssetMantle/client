@@ -46,7 +46,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileTable.filter(_.id === id).filter(_.status === status).map(_.mobileNumber).result.head.asTry).map {
+  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileTable.filter(x => x.id === id && x.status === status).map(_.mobileNumber).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
