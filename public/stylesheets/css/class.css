@@ -199,6 +199,9 @@ body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk
   border-color: #31323A; }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
   color: #e50913; }
+body.darkMode .loginForm .formBody .forgotPassword {
+  background: none;
+  color: #D0D0D0; }
 body.darkMode .tableCard table tr {
   border-bottom: 1px solid #31323A; }
   body.darkMode .tableCard table tr th {

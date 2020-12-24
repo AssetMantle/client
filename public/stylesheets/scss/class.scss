@@ -326,6 +326,10 @@ body.darkMode {
       color: #e50913
     }
   }
+  .loginForm .formBody .forgotPassword{
+    background: none;
+    color:$darkModePrimaryFontColor;
+  }
   .tableCard{
     table{
       tr{
