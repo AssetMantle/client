@@ -38,13 +38,13 @@ object FormConstraint {
   })
 
   val identityIssue: Constraint[IdentityIssue.Data] = Constraint("constraints.identityIssue")({ identityIssueData: IdentityIssue.Data =>
-//    val allProperties = identityIssueData.immutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.immutableProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableProperties.getOrElse(Seq.empty).flatten
+    val allProperties = identityIssueData.immutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.immutableProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableMetaProperties.getOrElse(Seq.empty).flatten ++ identityIssueData.mutableProperties.getOrElse(Seq.empty).flatten
     val errors = {
-//      if ((!identityIssueData.addImmutableMetaField && !identityIssueData.addImmutableField && !identityIssueData.addMutableMetaField && !identityIssueData.addMutableField) && identityIssueData.password.isEmpty) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
-//      else if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
-//      else if (!allProperties.forall(x => DataValue.verifyDataType(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
-//      else if (allProperties.map(_.dataName).distinct.length != allProperties.map(_.dataName).length) Seq(ValidationError(constants.Response.DATA_NAME_REPEATED.message))
-//      else Nil
+      if ((!identityIssueData.addImmutableMetaField && !identityIssueData.addImmutableField && !identityIssueData.addMutableMetaField && !identityIssueData.addMutableField) && identityIssueData.password.isEmpty) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
+      else if (allProperties.length > constants.Blockchain.MaxTraits) Seq(ValidationError(constants.Response.MAXIMUM_NUMBER_OF_TRAITS_LIMIT_REACHED.message))
+      else if (!allProperties.forall(x => DataValue.verifyDataType(dataType = x.dataType, dataValue = x.dataValue))) Seq(ValidationError(constants.Response.DATA_TYPE_AND_DATA_VALUE_MISMATCH.message))
+      else if (allProperties.map(_.dataName).distinct.length != allProperties.map(_.dataName).length) Seq(ValidationError(constants.Response.DATA_NAME_REPEATED.message))
+      else Nil
       Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
