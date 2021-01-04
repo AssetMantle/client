@@ -11,7 +11,5 @@
         @commonCheckbox(maintainerDeputizeForm, constants.FormField.REMOVE_MAINTAINER)
         @commonInputMicroNumber(maintainerDeputizeForm, constants.FormField.GAS)
         @commonInputPassword(maintainerDeputizeForm, constants.FormField.PASSWORD, 'required -> false)
-        @defining(numMaintainedTraitsForm == 0) { addFields =>
-            @views.html.component.blockchain.txForms.addProperties(maintainerDeputizeForm, constants.FormField.MAINTAINED_TRAITS, constants.FormField.ADD_MAINTAINED_TRAITS, numMaintainedTraitsForm, addFields = addFields, deleteFields = true)
-        }
+    @views.html.component.blockchain.txForms.addProperties(maintainerDeputizeForm, constants.FormField.MAINTAINED_TRAITS, constants.FormField.ADD_MAINTAINED_TRAITS, numMaintainedTraitsForm, addFields = true, deleteFields = true)
     }
