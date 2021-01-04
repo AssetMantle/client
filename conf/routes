@@ -98,7 +98,7 @@ GET         /order/make                                          controllers.Ord
 POST        /order/make                                          controllers.OrderController.make
 GET         /order/take                                          controllers.OrderController.takeForm(orderID: String)
 POST        /order/take                                          controllers.OrderController.take
-GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String)
+GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String, makerID: String)
 POST        /order/cancel                                        controllers.OrderController.cancel
 
 GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String, fromID: String)
@@ -112,6 +112,7 @@ GET         /entity/upsertLabel                                  controllers.Ent
 POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
 GET         /entity/updatePrivateProperty                        controllers.EntityController.updatePrivatePropertyForm(entityID: String, entityType: String, name: String)
 POST        /entity/updatePrivateProperty                        controllers.EntityController.updatePrivateProperty
+GET         /component/entityProperties                          controllers.EntityController.properties(entityID: String, entityType: String)
 
 GET         /contact                                             controllers.ContactController.contact
 
@@ -166,7 +167,6 @@ GET         /component/validatorDelegations                      controllers.Com
 GET         /component/validatorTransactions                     controllers.ComponentViewController.validatorTransactions(address: String)
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
-GET         /component/entityProperties                          controllers.ComponentViewController.entityProperties(entityID: String, entityType: String)
 GET         /component/provisionedAddresses                      controllers.ComponentViewController.provisionedAddresses(identityID: String)
 GET         /component/unprovisionedAddresses                    controllers.ComponentViewController.unprovisionedAddresses(identityID: String)
 
@@ -180,6 +180,8 @@ GET         /component/assetsMinted                              controllers.Com
 GET         /component/ordersDefinition                          controllers.ComponentViewController.ordersDefinition
 GET         /component/ordersMade                                controllers.ComponentViewController.ordersMade
 GET         /component/ordersTake                                controllers.ComponentViewController.ordersTake
+GET         /component/ordersTakePublic                          controllers.ComponentViewController.ordersTakePublic
+GET         /component/ordersTakePrivate                         controllers.ComponentViewController.ordersTakePrivate
 
 GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 

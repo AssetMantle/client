@@ -16,7 +16,7 @@
                 </div>
                 @commonVerticalBooleanInfo(constants.View.STATUS, asset.fold[Option[Boolean]](None)(_.status))
                 <div class="listItemChild cmuk-flex cmuk-flex-middle">
-                    @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
+                    @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
                 </div>
                 <div class="listItemChild cmuk-flex cmuk-flex-middle">
                     @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")

@@ -90,8 +90,6 @@ class Properties @Inject()(
     }
   }
 
-  private def findEntityIDByNameValueAndEntityType(name: String, values: Seq[String], hashedValues: Seq[String], entityType: String) = db.run(propertyTable.filter(x => x.name === name && x.entityType === entityType && (x.value.inSet(values) || x.value.inSet(hashedValues))).map(_.entityID).result)
-
   private[models] class PropertyTable(tag: Tag) extends Table[Property](tag, "Property") {
 
     def * = (entityID, entityType, name, value.?, dataType, isMeta, isMutable, hashID, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Property.tupled, Property.unapply)
@@ -142,20 +140,17 @@ class Properties @Inject()(
 
     def deleteAll(entityID: String, entityType: String): Future[Int] = deleteByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
 
-    def getAllPrivateOrderIDs(takerIDs: Seq[String]): Future[Seq[String]] = findEntityIDByNameValueAndEntityType(name = constants.Blockchain.Properties.TakerID, values = takerIDs, hashedValues = takerIDs.map(utilities.Hash.getHash(_)), entityType = constants.Blockchain.Entity.ORDER)
-
   }
 
   object Utilities {
 
     private val chainID = configuration.get[String]("blockchain.chainID")
 
-    //Value of meta properties need not to be fetched from Meta as values already came from the user but exists does need to be checked
     def upsertProperties(entityType: String, entityID: String, immutableMetas: Seq[BaseProperty], immutables: Seq[BaseProperty], mutableMetas: Seq[BaseProperty], mutables: Seq[BaseProperty]): Future[String] = {
-      val upsertImmutableMetas = Future.traverse(immutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = false, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
-      val upsertImmutables = Future.traverse(immutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = false, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
-      val upsertMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
-      val upsertMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val upsertImmutableMetas = utilitiesOperations.traverse(immutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = false, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val upsertImmutables = utilitiesOperations.traverse(immutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = false, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val upsertMutableMetas = utilitiesOperations.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val upsertMutables = utilitiesOperations.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
       (for {
         _ <- upsertImmutableMetas
         _ <- upsertImmutables
@@ -167,10 +162,9 @@ class Properties @Inject()(
       }
     }
 
-    //Value of meta properties need not to be fetched from Meta as values already came from the user but exists does need to be checked
     def updateProperties(entityType: String, entityID: String, mutableMetas: Seq[BaseProperty], mutables: Seq[BaseProperty]): Future[String] = {
-      val updateMutableMetas = Future.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
-      val updateMutables = Future.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val updateMutableMetas = utilitiesOperations.traverse(mutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
+      val updateMutables = utilitiesOperations.traverse(mutables)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = false, isMutable = true, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
       (for {
         _ <- updateMutableMetas
         _ <- updateMutables

@@ -16,7 +16,7 @@
             </div>
             @commonVerticalBooleanInfo(constants.View.STATUS, classification.status)
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
-                @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
+                @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
             </div>
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")

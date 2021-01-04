@@ -8,8 +8,10 @@
     @commonInputText(assetMintForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID)
     @commonInputMicroNumber(assetMintForm, constants.FormField.GAS)
     @commonInputPassword(assetMintForm, constants.FormField.PASSWORD, 'required -> false)
-    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addOrDeleteNewFields = numImmutableMetaForms == 0)
-    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addOrDeleteNewFields = numImmutableForms == 0)
-    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addOrDeleteNewFields = numMutableMetaForms == 0)
-    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addOrDeleteNewFields = numMutableForms == 0)
+    @defining((numImmutableMetaForms + numImmutableForms + numMutableMetaForms + numMutableForms) == 0) { addAndDeleteFields =>
+        @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+        @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+        @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+        @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+    }
 }

@@ -156,7 +156,7 @@ class Undelegations @Inject()(
     def onSlashingEvent(validatorAddress: String): Future[Unit] = {
       val undelegations = Service.getAllByValidator(validatorAddress)
 
-      def updateUndelegations(undelegations: Seq[Undelegation]) = if (undelegations.nonEmpty) {
+      def updateUndelegations(undelegations: Seq[Undelegation]): Future[Unit] = if (undelegations.nonEmpty) {
         val allValidatorUndelegations = getAllValidatorUndelegations.Service.get(validatorAddress)
 
         def update(allValidatorUndelegations: AllValidatorUndelegationsResponse) = Future.traverse(undelegations)(undelegation => allValidatorUndelegations.result.find(_.delegator_address == undelegation.delegatorAddress).fold(Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress))(undelegationResponse => Service.insertOrUpdate(undelegationResponse.toUndelegation)))
@@ -165,9 +165,7 @@ class Undelegations @Inject()(
           allValidatorUndelegations <- allValidatorUndelegations
           _ <- update(allValidatorUndelegations)
         } yield ()
-      } else {
-        Future()
-      }
+      } else Future()
 
       (for {
         undelegations <- undelegations

@@ -1,7 +1,7 @@
 @import constants.FormField.{BooleanFormField, NestedFormField}
 @import helper._
 @import views.html.base._
-@(form: Form[_], nestedFormField: NestedFormField, addField: BooleanFormField, numForms: Int, addOrDeleteNewFields: Boolean, target: String = "commonModalContent")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(form: Form[_], nestedFormField: NestedFormField, addField: BooleanFormField, numForms: Int, addFields: Boolean, deleteFields: Boolean, target: String = "commonModalContent")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div>
     @Messages(nestedFormField.name):
     @defining(Option(nestedFormField)) { implicit optionalNestedFormField =>
@@ -11,7 +11,7 @@
                     @commonSelect(form, constants.FormField.DATA_TYPE)
                     @commonInputText(form, constants.FormField.DATA_NAME)
                     @commonInputText(form, constants.FormField.DATA_VALUE, 'required -> false)
-                    @if(addOrDeleteNewFields) {
+                    @if(deleteFields) {
                         @commonJavascriptButton(constants.View.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
                     }
                 </div>
@@ -19,7 +19,7 @@
         }
     }
 <br>
-    @if(addOrDeleteNewFields) {
+    @if(addFields) {
         @commonCheckbox(form, addField, 'id -> s"${addField.name}", 'containerDivClass -> "hidden")
         @commonJavascriptButton(addField.name, JavaScript(s"addField(this, '${addField.name}', '${target}')"))
     }

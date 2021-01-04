@@ -3,6 +3,7 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+import models.common.Serializable.{Immutables, Mutables, Properties}
 import models.{blockchain, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -22,6 +23,10 @@ class EntityController @Inject()(
                                   masterIdentities: master.Identities,
                                   masterOrders: master.Orders,
                                   blockchainIdentities: blockchain.Identities,
+                                  blockchainClassifications: blockchain.Classifications,
+                                  blockchainMetas: blockchain.Metas,
+                                  blockchainAssets: blockchain.Assets,
+                                  blockchainOrders: blockchain.Orders,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   withLoginAction: WithLoginAction,
                                   withUnknownLoginAction: WithUnknownLoginAction,
@@ -163,6 +168,60 @@ class EntityController @Inject()(
           }
         }
       )
+  }
+
+  def properties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+
+      val checkAndGet: Future[(Boolean, Boolean, Immutables, Mutables)] = entityType match {
+        case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
+          val maintainerID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
+          val classification = blockchainClassifications.Service.tryGet(entityID)
+          for {
+            maintainerID <- maintainerID
+            provisionedAddresses <- getProvisionedAddresses(maintainerID)
+            classification <- classification
+          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), classification.immutableTraits, classification.mutableTraits)
+        case constants.Blockchain.Entity.IDENTITY =>
+          val identity = blockchainIdentities.Service.tryGet(entityID)
+          for {
+            provisionedAddresses <- getProvisionedAddresses(entityID)
+            identity <- identity
+          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
+        case constants.Blockchain.Entity.ASSET =>
+          val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
+          val asset = blockchainAssets.Service.tryGet(entityID)
+          for {
+            ownerID <- ownerID
+            provisionedAddresses <- getProvisionedAddresses(ownerID)
+            asset <- asset
+          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
+        case constants.Blockchain.Entity.ORDER =>
+          val makerID = masterOrders.Service.tryGetMakerID(entityID)
+          val order = blockchainOrders.Service.tryGet(entityID)
+          val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+          for {
+            makerID <- makerID
+            order <- order
+            identityIDs <- identityIDs
+          } yield (identityIDs.contains(makerID), order.getTakerID.fact.hash == "" || identityIDs.map(utilities.Hash.getHash(_)).contains(order.getTakerID.fact.hash), order.immutables, order.mutables)
+        case _ => Future((false, false, Immutables(Properties(Seq.empty)), Mutables(Properties(Seq.empty))))
+      }
+      val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
+
+      def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getList(hashIDs)
+
+      (for {
+        (isOwner, canSee, immutables, mutables) <- checkAndGet
+        properties <- properties
+        metas <- getBlockchainMetas(properties.map(_.hashID))
+      } yield {
+        if (isOwner || canSee) Ok(views.html.component.master.entityProperties(isOwner = isOwner, properties = properties, immutables = immutables, mutables = mutables, metas = metas))
+        else throw new BaseException(constants.Response.UNAUTHORIZED)
+      }).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
 }

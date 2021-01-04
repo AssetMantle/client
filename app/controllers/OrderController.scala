@@ -110,6 +110,7 @@ class OrderController @Inject()(
       val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
 
       def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+
       (for {
         properties <- properties
         maintainerID <- maintainerID
@@ -223,16 +224,16 @@ class OrderController @Inject()(
       )
   }
 
-  def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def cancelForm(orderID: String, makerID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.orderCancel(orderID = orderID))
+      Ok(blockchainForms.orderCancel(orderID = orderID, makerID = makerID))
   }
 
   def cancel: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderCancel.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.orderCancel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""))))
+          Future(BadRequest(blockchainForms.orderCancel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.FROM_ID.name, ""))))
         },
         cancelData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = cancelData.password)
@@ -252,7 +253,7 @@ class OrderController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID)))
+          } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID, cancelData.fromID)))
 
           (for {
             verifyPassword <- verifyPassword

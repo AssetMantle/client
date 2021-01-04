@@ -17,7 +17,7 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def this(value: Double) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
-  def this(value: Float) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
+  def this(value: Float) = this((BigDecimal(value.toDouble) * MicroNumber.factor).toBigInt)
 
   def toMicroString: String = this.value.toString
 

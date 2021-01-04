@@ -3,7 +3,6 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.blockchain._
-import models.common.Serializable.{Immutables, Mutables, Properties}
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -556,22 +555,37 @@ class ComponentViewController @Inject()(
 
   def ordersTake(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      Future(Ok(views.html.component.master.ordersTake()))
+  }
+
+  def ordersTakePublic(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
       val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDs
 
       def getPublicOrders(publicOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(publicOrderIDs)
 
-      def getPrivateOrderIDs(identityIDs: Seq[String]) = masterProperties.Service.getAllPrivateOrderIDs(identityIDs)
+      (for {
+        publicOrderIDs <- publicTakeOrderIDs
+        publicOrders <- getPublicOrders(publicOrderIDs)
+      } yield Ok(views.html.component.master.ordersTakePublic(publicOrders = publicOrders))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def ordersTakePrivate(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+
+      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs)
 
       def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
 
       (for {
         identityIDs <- identityIDs
-        publicOrderIDs <- publicTakeOrderIDs
         privateOrderIDs <- getPrivateOrderIDs(identityIDs)
-        publicOrders <- getPublicOrders(publicOrderIDs)
         privateOrders <- getPrivateOrders(privateOrderIDs)
-      } yield Ok(views.html.component.master.ordersTake(publicOrders = publicOrders, privateOrders = privateOrders))
+      } yield Ok(views.html.component.master.ordersTakePrivate(privateOrders = privateOrders))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -593,59 +607,6 @@ class ComponentViewController @Inject()(
         masterAssets <- getAssets(splits.filterNot(x => allDenoms.contains(x.ownableID)).map(_.ownableID))
       } yield Ok(views.html.component.master.accountSplits(splits, allDenoms, masterAssets))
         ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def entityProperties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
-
-      val verifyOwner: Future[(Boolean, Immutables, Mutables)] = entityType match {
-        case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
-          val maintainerID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
-          val classification = blockchainClassifications.Service.tryGet(entityID)
-          for {
-            maintainerID <- maintainerID
-            provisionedAddresses <- getProvisionedAddresses(maintainerID)
-            classification <- classification
-          } yield (provisionedAddresses.contains(loginState.address), classification.immutableTraits, classification.mutableTraits)
-        case constants.Blockchain.Entity.IDENTITY =>
-          val identity = blockchainIdentities.Service.tryGet(entityID)
-          for {
-            provisionedAddresses <- getProvisionedAddresses(entityID)
-            identity <- identity
-          } yield (provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
-        case constants.Blockchain.Entity.ASSET =>
-          val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
-          val asset = blockchainAssets.Service.tryGet(entityID)
-          for {
-            ownerID <- ownerID
-            provisionedAddresses <- getProvisionedAddresses(ownerID)
-            asset <- asset
-          } yield (provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
-        case constants.Blockchain.Entity.ORDER =>
-          val makerID = masterOrders.Service.tryGetMakerID(entityID)
-          val order = blockchainOrders.Service.tryGet(entityID)
-          for {
-            makerID <- makerID
-            provisionedAddresses <- getProvisionedAddresses(makerID)
-            order <- order
-          } yield (provisionedAddresses.contains(loginState.address), order.immutables, order.mutables)
-        case _ => Future((false, Immutables(Properties(Seq.empty)), Mutables(Properties(Seq.empty))))
-      }
-      val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
-
-      def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getList(hashIDs)
-
-      (for {
-        (isOwner, immutables, mutables) <- verifyOwner
-        properties <- properties
-        metas <- getBlockchainMetas(properties.map(_.hashID))
-      } yield {
-        if (isOwner) Ok(views.html.component.master.entityProperties(properties, immutables, mutables, metas))
-        else throw new BaseException(constants.Response.UNAUTHORIZED)
-      }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
