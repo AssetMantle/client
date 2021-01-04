@@ -91,7 +91,6 @@ class EntityController @Inject()(
                 provisionedAddresses <- getProvisionedAddress(makerID)
                 _ <- checkAndUpdate(provisionedAddresses)
               } yield ()
-            //case constants.Blockchain.Entity.WRAPPED_COIN =>//TODO Remove master Splits table?
             case _ => Future(throw new BaseException(constants.Response.UNAUTHORIZED))
           }
 

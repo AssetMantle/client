@@ -186,7 +186,7 @@ class AssetBurns @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_BURNED, assetID, txHash)(txHash)
+      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_BURNED, assetID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

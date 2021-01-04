@@ -8,6 +8,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
@@ -35,6 +36,7 @@ class OrderController @Inject()(
                                  transactionsOrderCancel: transactions.blockchain.OrderCancel,
                                  blockchainTransactionOrderCancels: blockchainTransaction.OrderCancels,
                                  withUserLoginAction: WithUserLoginAction,
+                                 blockchainIdentities: blockchain.Identities,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync
@@ -102,9 +104,31 @@ class OrderController @Inject()(
       )
   }
 
-  def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def makeForm(classificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.orderMake(classificationID = classificationID))
+      val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION)
+      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
+
+      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+      (for {
+        properties <- properties
+        maintainerID <- maintainerID
+        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+      } yield {
+        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+          val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          //Special Case need to remove expiry and makerOwnableSplit from Mutables Meta
+          val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable && x.name != constants.Blockchain.Properties.Expiry && x.name != constants.Blockchain.Properties.MakerOwnableSplit).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          Ok(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(blockchainCompanion.OrderMake.Data(fromID = maintainerID, classificationID = classificationID, makerOwnableID = "", takerOwnableID = "", expiresIn = 0, makerOwnableSplit = 0.0, immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+        } else {
+          Ok(blockchainForms.orderMake(classificationID = classificationID))
+        }
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def make: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

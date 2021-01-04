@@ -192,7 +192,7 @@ class AssetMutates @Inject()(
 
       def updateProperties(assetMutate: AssetMutate) = masterProperties.Utilities.upsertProperties(entityID = assetMutate.assetID, entityType = constants.Blockchain.Entity.ASSET, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = assetMutate.mutableMetaProperties, mutables = assetMutate.mutableProperties)
 
-      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MUTATED, assetID, txHash)(txHash)
+      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MUTATED, assetID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

@@ -29,7 +29,8 @@ class MaintainerDeputizes @Inject()(
                                      protected val databaseConfigProvider: DatabaseConfigProvider,
                                      utilitiesNotification: utilities.Notification,
                                      masterAccounts: master.Accounts,
-                                     blockchainAccounts: blockchain.Accounts
+                                     blockchainAccounts: blockchain.Accounts,
+                                     masterProperties: master.Properties
                                    )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class MaintainerDeputizeSerialized(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -193,13 +194,16 @@ class MaintainerDeputizes @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val maintainerDeputize = Service.getTransaction(ticketID)
 
+      def insertProperties(maintainerDeputize: MaintainerDeputize) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = maintainerDeputize.maintainedTraits)
+
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.MAINTAINER_DEPUTIZED, classificationID, txHash)(txHash)
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.MAINTAINER_DEPUTIZED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         maintainerDeputize <- maintainerDeputize
+        _ <- insertProperties(maintainerDeputize)
         accountID <- getAccountID(maintainerDeputize.from)
         _ <- sendNotifications(accountID = accountID, classificationID = maintainerDeputize.classificationID)
       } yield ()).recover {

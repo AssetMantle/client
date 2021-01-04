@@ -11,7 +11,9 @@
             @defining(assets.find(_.id == split.ownableID)) { asset =>
                 @commonVerticalTextInfo(constants.View.ASSET_ID, split.ownableID)
                 @commonVerticalTextInfo(constants.View.LABEL, asset.fold("")(_.label.getOrElse("")))
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
+                </div>
                 @commonVerticalBooleanInfo(constants.View.STATUS, asset.fold[Option[Boolean]](None)(_.status))
                 <div class="listItemChild cmuk-flex cmuk-flex-middle">
                     @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")

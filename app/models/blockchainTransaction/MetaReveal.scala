@@ -3,7 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.MetaFact
+import models.common.Serializable.{MetaFact, metaFactReads}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -29,6 +29,7 @@ class MetaReveals @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              utilitiesNotification: utilities.Notification,
                              masterAccounts: master.Accounts,
+                             masterProperties: master.Properties,
                              blockchainAccounts: blockchain.Accounts
                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -183,7 +184,7 @@ class MetaReveals @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, metaFact: String) = utilitiesNotification.send(accountID, constants.Notification.META_REVEALED, metaFact, txHash)(txHash)
+      def sendNotifications(accountID: String, metaFact: String) = utilitiesNotification.send(accountID, constants.Notification.META_REVEALED, metaFact, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

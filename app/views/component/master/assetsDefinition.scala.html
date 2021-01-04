@@ -18,6 +18,9 @@
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.ASSET_MINT, 'parameters -> s"'${classification.id}'")
             </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            @commonFormButton(constants.Form.MAINTAINER_DEPUTIZE, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.ASSET_DEFINITION}'")
+            </div>
         }
     }
 }

@@ -9,7 +9,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.{GetBondedValidators, GetValidator}
+import queries._
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
@@ -26,7 +26,6 @@ class Validators @Inject()(
                             configuration: Configuration,
                             getValidator: GetValidator,
                             getBondedValidators: GetBondedValidators,
-                            blockchainSigningInfos: SigningInfos,
                             masterTransactionNotifications: masterTransaction.Notifications,
                             blockchainDelegations: Delegations,
                             blockchainAccounts: Accounts,
@@ -207,19 +206,16 @@ class Validators @Inject()(
 
   object Utility {
 
-    //TODO check changes in active validator set using delegation and remove signing infos
     def onCreateValidator(createValidator: CreateValidator): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(createValidator.validatorAddress)
 
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(Delegate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.validatorAddress), validatorAddress = createValidator.validatorAddress, amount = createValidator.value))
-        val insertSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(createValidator.publicKey)
         val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${createValidator.validatorAddress}'")
         //        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
 
         for {
           _ <- insertDelegation
-          _ <- insertSigningInfos
           _ <- addEvent
           //          _ <- insertKeyBaseAccount
         } yield ()
@@ -228,6 +224,7 @@ class Validators @Inject()(
       (for {
         _ <- upsertValidator
         _ <- updateOtherDetails()
+        _ <- updateActiveValidatorSet()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -253,28 +250,20 @@ class Validators @Inject()(
       }
     }
 
-    //TODO check changes in active validator set using delegation
     def onUnjail(unjail: Unjail): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(unjail.address)
 
-      def updateAndAddEvent(validator: Validator) = {
-        val updateSigningInfos = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
-        for {
-          _ <- updateSigningInfos
-          _ <- addEvent
-        } yield ()
-      }
+      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
 
       (for {
         validator <- upsertValidator
-        _ <- updateAndAddEvent(validator)
+        _ <- updateActiveValidatorSet()
+        _ <- addEvent(validator)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    //TODO check changes in active validator set using delegation
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
       val accountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
@@ -286,6 +275,7 @@ class Validators @Inject()(
         _ <- accountBalance
         _ <- insertDelegation
         _ <- withdrawAddressBalanceUpdate
+        _ <- updateActiveValidatorSet()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -329,7 +319,6 @@ class Validators @Inject()(
       }
     }
 
-    //TODO
     def updateActiveValidatorSet(): Future[Unit] = {
       val explorerAllActiveValidators = Service.getAllActiveValidatorList.map(_.map(_.operatorAddress))
       val bcAllActiveValidators = getBondedValidators.Service.get().map(_.result.map(_.operator_address))

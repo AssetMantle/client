@@ -195,15 +195,18 @@ class OrderDefines @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty)))),
+      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.ORDER_DEFINITION, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits)
 
-      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_DEFINED, classificationID, txHash)(txHash)
+      def insertMaintainerProperties(classificationID: String, orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = orderDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         orderDefine <- orderDefine
         classificationID <- insertProperties(orderDefine)
+        maintainerID <- insertMaintainerProperties(classificationID, orderDefine)
         accountID <- getAccountID(orderDefine.from)
         _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
       } yield ()).recover {

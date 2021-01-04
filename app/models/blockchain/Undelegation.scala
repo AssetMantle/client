@@ -1,9 +1,9 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.UndelegationEntry
@@ -13,6 +13,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries._
+import queries.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegations}
 import queries.responses.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
 import queries.responses.ValidatorDelegatorUndelegationsResponse.{Response => ValidatorDelegatorUndelegationsResponse}
 import slick.jdbc.JdbcProfile
@@ -130,7 +131,6 @@ class Undelegations @Inject()(
 
   object Utility {
 
-    //TODO check changes in active validator set using delegation
     def onUndelegation(undelegate: Undelegate): Future[Unit] = {
       val undelegationsResponse = getValidatorDelegatorUndelegations.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
@@ -139,12 +139,15 @@ class Undelegations @Inject()(
 
       def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationsResponse) = Service.insertOrUpdate(undelegationsResponse.result.toUndelegation)
 
+      def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
+
       (for {
         undelegationsResponse <- undelegationsResponse
         _ <- updateValidator
         _ <- upsertUndelegation(undelegationsResponse)
         _ <- withdrawAddressBalanceUpdate
         _ <- updateOrDeleteDelegation
+        _ <- updateActiveValidatorSet()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }

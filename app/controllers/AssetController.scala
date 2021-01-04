@@ -8,6 +8,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
@@ -29,6 +30,10 @@ class AssetController @Inject()(
                                  transactionsAssetBurn: transactions.blockchain.AssetBurn,
                                  blockchainTransactionAssetBurns: blockchainTransaction.AssetBurns,
                                  masterAccounts: master.Accounts,
+                                 masterProperties: master.Properties,
+                                 masterSplits: master.Splits,
+                                 masterClassifications: master.Classifications,
+                                 blockchainIdentities: blockchain.Identities,
                                  withUserLoginAction: WithUserLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,
@@ -99,9 +104,31 @@ class AssetController @Inject()(
       )
   }
 
-  def mintForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def mintForm(classificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.assetMint(classificationID = classificationID))
+      val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.ASSET_DEFINITION)
+      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
+
+      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+
+      (for {
+        properties <- properties
+        maintainerID <- maintainerID
+        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+      } yield {
+        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+          val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          Ok(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(blockchainCompanion.AssetMint.Data(fromID = maintainerID, classificationID = classificationID, toID = "", immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+        } else {
+          Ok(blockchainForms.assetMint(classificationID = classificationID))
+        }
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def mint: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -155,9 +182,28 @@ class AssetController @Inject()(
       )
   }
 
-  def mutateForm(assetID: String, fromID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def mutateForm(assetID: String, fromID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.assetMutate(assetID = assetID, fromID = fromID))
+      val properties = masterProperties.Service.getAll(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET)
+      val ownerID = masterSplits.Service.tryGetOwnerID(assetID)
+
+      def getProvisionedAddresses(ownerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(ownerID)
+
+      (for {
+        properties <- properties
+        ownerID <- ownerID
+        provisionedAddresses <- getProvisionedAddresses(ownerID)
+      } yield {
+        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+          val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          Ok(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(blockchainCompanion.AssetMutate.Data(fromID = fromID, assetID = assetID, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), assetID = assetID, fromID = fromID, numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+        } else {
+          Ok(blockchainForms.assetMutate(assetID = assetID, fromID = fromID))
+        }
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def mutate: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -170,8 +216,7 @@ class AssetController @Inject()(
           if (mutateData.addMutableMetaField || mutateData.addMutableField) {
             Future(PartialContent(blockchainForms.assetMutate(
               assetMutateForm = blockchainCompanion.AssetMutate.form.fill(mutateData.copy(addMutableMetaField = false, addMutableField = false)),
-              assetID = mutateData.assetID,
-              fromID = mutateData.fromID,
+              assetID = mutateData.assetID, fromID = mutateData.fromID,
               numMutableMetaForms = getNumberOfFields(mutateData.addMutableMetaField, mutateData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mutateData.addMutableField, mutateData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {

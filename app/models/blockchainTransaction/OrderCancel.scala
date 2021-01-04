@@ -186,7 +186,7 @@ class OrderCancels @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_CANCELLED, orderID, txHash)(txHash)
+      def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_CANCELLED, orderID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

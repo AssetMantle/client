@@ -3,7 +3,7 @@
 
 @(identityProvisionForm: Form[IdentityProvision.Data] = IdentityProvision.form, identityID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.IDENTITY_PROVISION, identityProvisionForm) {
-    @commonInputText(identityProvisionForm, constants.FormField.IDENTITY_ID, 'value -> identityID)
+    @commonInputText(identityProvisionForm, constants.FormField.IDENTITY_ID, 'value -> identityID, 'readonly -> true)
     @commonInputText(identityProvisionForm, constants.FormField.TO)
     @commonInputMicroNumber(identityProvisionForm, constants.FormField.GAS)
     @commonInputPassword(identityProvisionForm, constants.FormField.PASSWORD)

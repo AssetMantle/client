@@ -81,7 +81,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
           routes.javascript.ComponentViewController.entityProperties,
-          routes.javascript.ComponentViewController.viewIdentityInfo,
+          routes.javascript.ComponentViewController.provisionedAddresses,
+          routes.javascript.ComponentViewController.unprovisionedAddresses,
 
           routes.javascript.ComponentViewController.identitiesDefinition,
           routes.javascript.ComponentViewController.identitiesProvisioned,

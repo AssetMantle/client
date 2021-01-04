@@ -199,7 +199,7 @@ class AssetMints @Inject()(
       def insertProperties(assetMint: AssetMint) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getAssetID(classificationID = assetMint.classificationID, Immutables(Properties((assetMint.immutableMetaProperties ++ assetMint.immutableProperties).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.ASSET, immutableMetas = assetMint.immutableMetaProperties, immutables = assetMint.immutableProperties, mutableMetas = assetMint.mutableMetaProperties, mutables = assetMint.mutableProperties)
 
-      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MINTED, assetID, txHash)(txHash)
+      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MINTED, assetID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

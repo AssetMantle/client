@@ -187,7 +187,7 @@ class SplitSends @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, ownableID: String, toID: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_SENT, ownableID, toID, txHash)(txHash)
+      def sendNotifications(accountID: String, ownableID: String, toID: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_SENT, ownableID, toID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

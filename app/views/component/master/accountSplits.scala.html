@@ -15,13 +15,17 @@
                 @commonVerticalTextInfo(constants.View.ENTITY_TYPE, entityType)
                 @if(entityType == constants.Blockchain.Entity.ASSET) {
                     @commonVerticalTextInfo(constants.View.LABEL, assets.find(_.id == split.ownableID).fold("")(_.label.getOrElse("")))
+                    <div class="listItemChild cmuk-flex cmuk-flex-middle">
                     @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${entityType}'")
+                    </div>
                 }
                 @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
                 @commonVerticalDoubleInfo(constants.View.AMOUNT, split.split.toDouble)
-                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                @if(entityType != constants.Blockchain.Entity.ASSET) {
+                    <div class="listItemChild cmuk-flex cmuk-flex-middle">
                     @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
-                </div>
+                    </div>
+                }
                 <div class="listItemChild cmuk-flex cmuk-flex-middle">
                     @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
                 </div>

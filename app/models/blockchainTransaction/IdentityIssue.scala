@@ -199,7 +199,7 @@ class IdentityIssues @Inject()(
       def insertProperties(identityIssue: IdentityIssue) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = identityIssue.classificationID, Immutables(Properties((identityIssue.immutableMetaProperties ++ identityIssue.immutableProperties).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = identityIssue.immutableMetaProperties, immutables = identityIssue.immutableProperties, mutableMetas = identityIssue.mutableMetaProperties, mutables = identityIssue.mutableProperties)
 
-      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_ISSUED, classificationID, txHash)(txHash)
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_ISSUED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

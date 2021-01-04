@@ -429,7 +429,7 @@ class Identities @Inject()(
 
       def masterOperations(classificationID: String, identityID: String) = {
         val insertIdentity = masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, status = Option(true)))
-        val insertClassification = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityID, status = Option(true))
+        val insertClassification = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = "", status = Option(true))
 
         for {
           _ <- insertIdentity

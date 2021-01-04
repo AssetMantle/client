@@ -1,14 +1,15 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries._
+import queries.GetValidatorDelegatorDelegation
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -196,15 +196,18 @@ class AssetDefines @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty)))),
+      def insertClassificationProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.ASSET_DEFINITION, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits)
 
-      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_DEFINED, classificationID, txHash)(txHash)
+      def insertMaintainerProperties(classificationID: String, assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = assetDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         assetDefine <- assetDefine
-        classificationID <- insertProperties(assetDefine)
+        classificationID <- insertClassificationProperties(assetDefine)
+        maintainerID <- insertMaintainerProperties(classificationID, assetDefine)
         accountID <- getAccountID(assetDefine.from)
         _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
       } yield ()).recover {

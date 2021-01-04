@@ -3,6 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.blockchain._
+import models.common.Serializable.{Immutables, Mutables, Properties}
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -19,11 +20,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComponentViewController @Inject()(
                                          blockchainAccounts: blockchain.Accounts,
                                          blockchainAssets: blockchain.Assets,
+                                         blockchainClassifications: blockchain.Classifications,
                                          blockchainDelegations: blockchain.Delegations,
                                          blockchainIdentities: blockchain.Identities,
                                          blockchainOrders: blockchain.Orders,
                                          blockchainRedelegations: blockchain.Redelegations,
                                          blockchainSplits: blockchain.Splits,
+                                         blockchainMetas: blockchain.Metas,
                                          blockchainUndelegations: blockchain.Undelegations,
                                          blockchainBlocks: blockchain.Blocks,
                                          blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
@@ -596,58 +599,77 @@ class ComponentViewController @Inject()(
 
   def entityProperties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+
+      val verifyOwner: Future[(Boolean, Immutables, Mutables)] = entityType match {
+        case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
+          val maintainerID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
+          val classification = blockchainClassifications.Service.tryGet(entityID)
+          for {
+            maintainerID <- maintainerID
+            provisionedAddresses <- getProvisionedAddresses(maintainerID)
+            classification <- classification
+          } yield (provisionedAddresses.contains(loginState.address), classification.immutableTraits, classification.mutableTraits)
+        case constants.Blockchain.Entity.IDENTITY =>
+          val identity = blockchainIdentities.Service.tryGet(entityID)
+          for {
+            provisionedAddresses <- getProvisionedAddresses(entityID)
+            identity <- identity
+          } yield (provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
+        case constants.Blockchain.Entity.ASSET =>
+          val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
+          val asset = blockchainAssets.Service.tryGet(entityID)
+          for {
+            ownerID <- ownerID
+            provisionedAddresses <- getProvisionedAddresses(ownerID)
+            asset <- asset
+          } yield (provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
+        case constants.Blockchain.Entity.ORDER =>
+          val makerID = masterOrders.Service.tryGetMakerID(entityID)
+          val order = blockchainOrders.Service.tryGet(entityID)
+          for {
+            makerID <- makerID
+            provisionedAddresses <- getProvisionedAddresses(makerID)
+            order <- order
+          } yield (provisionedAddresses.contains(loginState.address), order.immutables, order.mutables)
+        case _ => Future((false, Immutables(Properties(Seq.empty)), Mutables(Properties(Seq.empty))))
+      }
       val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
 
-      def verifyOwner(identityIDs: Seq[String]): Future[Boolean] = {
-        entityType match {
-          case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
-            val fromID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
-            for {
-              fromID <- fromID
-            } yield identityIDs.contains(fromID)
-          case constants.Blockchain.Entity.IDENTITY => Future(identityIDs.contains(entityID))
-          case constants.Blockchain.Entity.ASSET | constants.Blockchain.Entity.WRAPPED_COIN =>
-            val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
-            for {
-              ownerID <- ownerID
-            } yield identityIDs.contains(ownerID)
-          case constants.Blockchain.Entity.ORDER =>
-            val ownerID = masterOrders.Service.tryGetMakerID(entityID)
-            for {
-              ownerID <- ownerID
-            } yield identityIDs.contains(ownerID)
-          case _ => Future(false)
-        }
-      }
+      def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getList(hashIDs)
 
       (for {
-        identityIDs <- identityIDs
-        isOwner <- verifyOwner(identityIDs)
+        (isOwner, immutables, mutables) <- verifyOwner
         properties <- properties
+        metas <- getBlockchainMetas(properties.map(_.hashID))
       } yield {
-        if (isOwner) Ok(views.html.component.master.viewEntityProperties(properties))
+        if (isOwner) Ok(views.html.component.master.entityProperties(properties, immutables, mutables, metas))
         else throw new BaseException(constants.Response.UNAUTHORIZED)
       }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
-  def viewIdentityInfo(identityID: String) = withLoginAction.authenticated { implicit loginState =>
+  def provisionedAddresses(identityID: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-
-      val identity = blockchainIdentities.Service.get(identityID)
+      val provisionedAddresses = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
       (for (
-        identity <- identity
-      ) yield {
-        identity match {
-          case Some(identity) => Ok(views.html.component.blockchain.identity(identity))
-          case None => throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)
-        }
-      }).recover {
+        provisionedAddresses <- provisionedAddresses
+      ) yield Ok(views.html.component.blockchain.provisionedAddresses(identityID, provisionedAddresses))
+        ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
 
+  def unprovisionedAddresses(identityID: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val unprovisionedAddresses = blockchainIdentities.Service.getAllUnprovisionAddresses(identityID)
+      (for (
+        unprovisionedAddresses <- unprovisionedAddresses
+      ) yield Ok(views.html.component.blockchain.unprovisionedAddresses(identityID, unprovisionedAddresses))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
 }

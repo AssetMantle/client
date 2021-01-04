@@ -83,13 +83,13 @@ GET         /identity/define                                     controllers.Ide
 POST        /identity/define                                     controllers.IdentityController.define
 GET         /identity/provision                                  controllers.IdentityController.provisionForm(identityID: String)
 POST        /identity/provision                                  controllers.IdentityController.provision
-GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String)
+GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String, address: String)
 POST        /identity/unprovision                                controllers.IdentityController.unprovision
 
 GET         /meta/reveal                                         controllers.MetaController.revealForm
 POST        /meta/reveal                                         controllers.MetaController.reveal
 
-GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm
+GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm(classificationID: String, entityType: String)
 POST        /maintainer/deputize                                 controllers.MaintainerController.deputize
 
 GET         /order/define                                        controllers.OrderController.defineForm
@@ -167,7 +167,8 @@ GET         /component/validatorTransactions                     controllers.Com
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
 GET         /component/entityProperties                          controllers.ComponentViewController.entityProperties(entityID: String, entityType: String)
-GET         /component/identityInfo                              controllers.ComponentViewController.viewIdentityInfo(identityID: String)
+GET         /component/provisionedAddresses                      controllers.ComponentViewController.provisionedAddresses(identityID: String)
+GET         /component/unprovisionedAddresses                    controllers.ComponentViewController.unprovisionedAddresses(identityID: String)
 
 GET         /component/identitiesDefinition                      controllers.ComponentViewController.identitiesDefinition
 GET         /component/identitiesProvisioned                     controllers.ComponentViewController.identitiesProvisioned

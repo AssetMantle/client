@@ -185,7 +185,7 @@ class SplitWraps @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, ownableIDs: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_WRAPPED, ownableIDs, txHash)(txHash)
+      def sendNotifications(accountID: String, ownableIDs: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_WRAPPED, ownableIDs, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

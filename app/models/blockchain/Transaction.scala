@@ -1,9 +1,6 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.{Fee, StdMsg}
 import org.postgresql.util.PSQLException
@@ -12,6 +9,8 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -66,10 +65,8 @@ class Transactions @Inject()(
     }
   }
 
-  //TODO messages.like
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
-  //TODO messages.like
   private def findTransactionsPerPageForAddress(address: String, offset: Int, limit: Int): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).drop(offset).take(limit).result)
 
   private def tryGetTransactionByHash(hash: String): Future[TransactionSerialized] = db.run(transactionTable.filter(_.hash === hash).result.head.asTry).map {
@@ -91,6 +88,13 @@ class Transactions @Inject()(
   }
 
   private def tryGetStatusByHash(hash: String): Future[Boolean] = db.run(transactionTable.filter(_.hash === hash).map(_.status).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def tryGetHeightByHash(hash: String): Future[Int] = db.run(transactionTable.filter(_.hash === hash).map(_.height).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND, noSuchElementException)
@@ -151,6 +155,8 @@ class Transactions @Inject()(
     def tryGetMessages(hash: String): Future[Seq[StdMsg]] = tryGetMessagesByHash(hash).map(x => utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](x))
 
     def tryGetStatus(hash: String): Future[Boolean] = tryGetStatusByHash(hash)
+
+    def tryGetHeight(hash: String): Future[Int] = tryGetHeightByHash(hash)
 
     def getTransactions(height: Int): Future[Seq[Transaction]] = getTransactionsByHeight(height).map(x => x.map(_.deserialize))
 

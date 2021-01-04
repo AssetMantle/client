@@ -4,11 +4,10 @@
 @(assetDefineForm: Form[AssetDefine.Data] = AssetDefine.form, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ASSET_DEFINE, assetDefineForm) {
     @commonInputText(assetDefineForm, constants.FormField.FROM_ID)
-    @commonInputText(assetDefineForm, constants.FormField.LABEL)
     @commonInputMicroNumber(assetDefineForm, constants.FormField.GAS)
     @commonInputPassword(assetDefineForm, constants.FormField.PASSWORD, 'required -> false)
-    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
-    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
-    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
-    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.MUTABLE_TRAITS, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms)
+    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addOrDeleteNewFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addOrDeleteNewFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addOrDeleteNewFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetDefineForm, constants.FormField.MUTABLE_TRAITS, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addOrDeleteNewFields = true)
 }

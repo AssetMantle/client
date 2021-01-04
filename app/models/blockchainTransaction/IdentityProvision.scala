@@ -184,7 +184,7 @@ class IdentityProvisions @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_PROVISIONED, identityID, txHash)(txHash)
+      def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_PROVISIONED, identityID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful

@@ -8,10 +8,10 @@ import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.{Configuration, Logger}
-import queries._
 import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.TransactionResponse.{Response => TransactionResponse}
 import queries.responses.common.{Event, Header => BlockHeader}
+import queries.{GetBlockCommit, GetTransaction, GetTransactionsByHeight}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +30,6 @@ class Block @Inject()(
                        blockchainMaintainers: blockchain.Maintainers,
                        blockchainOrders: blockchain.Orders,
                        blockchainRedelegations: blockchain.Redelegations,
-                       blockchainSigningInfos: blockchain.SigningInfos,
                        blockchainSplits: blockchain.Splits,
                        blockchainTransactions: blockchain.Transactions,
                        blockchainTokens: blockchain.Tokens,
@@ -184,7 +183,6 @@ class Block @Inject()(
     }
   }
 
-  //TODO check changes in active validator set using delegation
   def onSlashingEvent(slashingEvents: Seq[Event], height: Int): Future[Unit] = if (slashingEvents.nonEmpty) {
     val hexAddresses = slashingEvents.flatMap(_.attributes.find(x => constants.Blockchain.Event.Attribute.Address == x.key && x.value.isDefined).map(x => utilities.Bech32.convertConsensusAddressToHexAddress(x.value.get))).distinct
     val validators = blockchainValidators.Service.getAllByHexAddresses(hexAddresses)
@@ -194,13 +192,13 @@ class Block @Inject()(
       val updatedValidator = blockchainValidators.Utility.insertOrUpdateValidator(validator.operatorAddress)
       val updateDelegation = blockchainRedelegations.Utility.onSlashingEvent(validator.operatorAddress)
       val updateUnbonding = blockchainUndelegations.Utility.onSlashingEvent(validator.operatorAddress)
-      val updateSigningInfo = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
+      val updateActiveValidatorSet = blockchainValidators.Utility.updateActiveValidatorSet()
 
       for {
         _ <- updatedValidator
         _ <- updateDelegation
         _ <- updateUnbonding
-        _ <- updateSigningInfo
+        _ <- updateActiveValidatorSet
       } yield ()
     }
 
@@ -250,11 +248,8 @@ class Block @Inject()(
       val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.fold(0)(_.toInt))
       val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
 
-      def updateSigningInfo(validator: Validator) = blockchainSigningInfos.Utility.insertOrUpdate(validator.consensusPublicKey)
-
       (for {
         validator <- validator
-        _ <- updateSigningInfo(validator)
         _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
       } yield ()
         ).recover {

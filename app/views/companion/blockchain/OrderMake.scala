@@ -11,7 +11,6 @@ object OrderMake {
     mapping(
       constants.FormField.FROM_ID.name -> constants.FormField.FROM_ID.field,
       constants.FormField.CLASSIFICATION_ID.name -> constants.FormField.CLASSIFICATION_ID.field,
-      constants.FormField.LABEL.name -> constants.FormField.LABEL.field,
       constants.FormField.MAKER_OWNABLE_ID.name -> constants.FormField.MAKER_OWNABLE_ID.field,
       constants.FormField.TAKER_OWNABLE_ID.name -> constants.FormField.TAKER_OWNABLE_ID.field,
       constants.FormField.EXPIRES_IN.name -> constants.FormField.EXPIRES_IN.field,
@@ -29,6 +28,6 @@ object OrderMake {
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.orderMake)
   )
 
-  case class Data(fromID: String, classificationID: String, label: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableProperties: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaProperties: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableProperties: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: Option[String])
+  case class Data(fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: Option[Seq[Option[Property.Data]]], addImmutableMetaField: Boolean, immutableProperties: Option[Seq[Option[Property.Data]]], addImmutableField: Boolean, mutableMetaProperties: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableProperties: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: Option[String])
 
 }

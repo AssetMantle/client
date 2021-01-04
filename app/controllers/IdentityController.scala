@@ -8,6 +8,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
@@ -21,6 +22,7 @@ class IdentityController @Inject()(
                                     blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
                                     blockchainTransactionIdentityProvisions: blockchainTransaction.IdentityProvisions,
                                     blockchainTransactionIdentityUnprovisions: blockchainTransaction.IdentityUnprovisions,
+                                    blockchainMetas: blockchain.Metas,
                                     blockchainIdentities: blockchain.Identities,
                                     blockchainClassifications: blockchain.Classifications,
                                     messagesControllerComponents: MessagesControllerComponents,
@@ -119,7 +121,7 @@ class IdentityController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
-                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutableMetas, gas = defineData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityDefines.Service.create,
                 request = transactionsIdentityDefine.Request(transactionsIdentityDefine.Message(transactionsIdentityDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
                 action = transactionsIdentityDefine.Service.post,
@@ -145,9 +147,31 @@ class IdentityController @Inject()(
       )
   }
 
-  def issueForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def issueForm(classificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.identityIssue(classificationID = classificationID))
+      val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
+      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
+
+      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+
+      (for {
+        properties <- properties
+        maintainerID <- maintainerID
+        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+      } yield {
+        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+          val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          Ok(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(blockchainCompanion.IdentityIssue.Data(fromID = maintainerID, classificationID = classificationID, to = "", immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+        } else {
+          Ok(blockchainForms.identityIssue(classificationID = classificationID))
+        }
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issue: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -242,16 +266,16 @@ class IdentityController @Inject()(
       )
   }
 
-  def unprovisionForm(identityID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def unprovisionForm(identityID: String, address: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.identityUnprovision(identityID = identityID))
+      Ok(blockchainForms.identityUnprovision(identityID = identityID, address = address))
   }
 
   def unprovision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityUnprovision.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.identityUnprovision(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.IDENTITY_ID.name, ""))))
+          Future(BadRequest(blockchainForms.identityUnprovision(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.IDENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.TO.name, ""))))
         },
         unprovisionData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unprovisionData.password)
@@ -270,7 +294,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID)))
+          } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID, unprovisionData.to)))
 
           (for {
             verifyPassword <- verifyPassword
