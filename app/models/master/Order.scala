@@ -66,10 +66,12 @@ class Orders @Inject()(
   }
 
   private def updateLabelByID(id: String, label: Option[String]): Future[Int] = db.run(orderTable.filter(x => x.id === id).map(_.label.?).update(label).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

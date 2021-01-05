@@ -4,7 +4,7 @@
 @(splitWrapForm: Form[SplitWrap.Data] = SplitWrap.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SPLIT_WRAP, splitWrapForm) {
     @commonInputText(splitWrapForm, constants.FormField.FROM_ID)
-    @views.html.component.blockchain.txForms.addCoins(splitWrapForm, constants.FormField.COINS, constants.FormField.ADD_FIELD)
     @commonInputMicroNumber(splitWrapForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addCoins(splitWrapForm, constants.FormField.COINS, constants.FormField.ADD_FIELD)
     @commonInputPassword(splitWrapForm, constants.FormField.PASSWORD)
 }

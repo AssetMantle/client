@@ -46,7 +46,7 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileTable.filter(_.id === id).filter(_.status === status).map(_.mobileNumber).result.head.asTry).map {
+  private def tryGetMobileNumberByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(mobileTable.filter(x => x.id === id && x.status === status).map(_.mobileNumber).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -79,7 +79,10 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   }
 
   private def updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.status).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }

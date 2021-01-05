@@ -24,9 +24,7 @@ class NotificationController @Inject()(
 
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.get(accountID = loginState.username, pageNumber = pageNumber)
-
       (for {
         notifications <- notifications
       } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
@@ -37,15 +35,13 @@ class NotificationController @Inject()(
 
   def publicRecentActivityMessages(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-
-    val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.getPublic(pageNumber)
-
-    (for {
-      notifications <- notifications
-    } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
-      ).recover {
-      case baseException: BaseException => InternalServerError(baseException.failure.message)
-    }
+      val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else masterTransactionNotifications.Service.getPublic(pageNumber)
+      (for {
+        notifications <- notifications
+      } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

@@ -76,7 +76,7 @@ class IdentityController @Inject()(
               updateTransactionHash = blockchainTransactionIdentityNubs.Service.updateTransactionHash)
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -138,7 +138,7 @@ class IdentityController @Inject()(
               for {
                 classificationExists <- classificationExists
                 ticketID <- broadcast(classificationExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -182,7 +182,7 @@ class IdentityController @Inject()(
             val mutables = issueData.mutableProperties.getOrElse(Seq.empty).flatten
             val entityID = blockchainIdentities.Utility.getID(classificationID = issueData.classificationID, immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))))
 
-            def insertAndBroadcast(classificationExists: Boolean, identityExists: Boolean) = if (classificationExists && !identityExists) {
+            def broadcast(classificationExists: Boolean, identityExists: Boolean) = if (classificationExists && !identityExists) {
               transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                 entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = issueData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
@@ -202,8 +202,8 @@ class IdentityController @Inject()(
               for {
                 classificationExists <- classificationExists
                 identityExists <- identityExists
-                ticketID <- insertAndBroadcast(classificationExists = classificationExists, identityExists = identityExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                ticketID <- broadcast(classificationExists = classificationExists, identityExists = identityExists)
+                result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(issueData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), issueData.classificationID)))
 
@@ -246,7 +246,7 @@ class IdentityController @Inject()(
             )
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.identityProvision(blockchainCompanion.IdentityProvision.form.fill(provisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), provisionData.identityID)))
 
@@ -287,7 +287,7 @@ class IdentityController @Inject()(
             )
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID)))
 

@@ -76,7 +76,7 @@ class OrderController @Inject()(
             val mutables = defineData.mutableTraits.getOrElse(Seq.empty).flatten
             val entityID = blockchainClassifications.Utility.getID(immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))), mutables = Mutables(Properties((mutableMetas ++ mutables).map(_.toProperty))))
 
-            def insertAndBroadcast(classificationExists: Boolean) = if (!classificationExists) {
+            def broadcast(classificationExists: Boolean) = if (!classificationExists) {
               transaction.process[blockchainTransaction.OrderDefine, transactionsOrderDefine.Request](
                 entity = blockchainTransaction.OrderDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableTraits = Properties(immutables.map(_.toProperty)), mutableMetaTraits = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableTraits = Properties(mutables.map(_.toProperty)), gas = defineData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionOrderDefines.Service.create,
@@ -93,8 +93,8 @@ class OrderController @Inject()(
 
               for {
                 classificationExists <- classificationExists
-                ticketID <- insertAndBroadcast(classificationExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                ticketID <- broadcast(classificationExists)
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -161,7 +161,7 @@ class OrderController @Inject()(
                 classificationExists <- classificationExists
                 orderExists <- orderExists
                 ticketID <- broadcast(classificationExists = classificationExists, orderExists = orderExists)
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
@@ -246,7 +246,7 @@ class OrderController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID)))
 

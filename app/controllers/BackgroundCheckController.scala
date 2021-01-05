@@ -1,22 +1,18 @@
 package controllers
 
-import java.nio.file.Files
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
-import models.{blockchain, master, masterTransaction, memberCheck}
+import models.{master, memberCheck}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.{GetMemberCheckCorporateScan, GetMemberCheckCorporateScanResult, GetMemberCheckMemberScan, GetMemberCheckMemberScanResult}
 import transactions.{MemberCheckCorporateScan, MemberCheckCorporateScanResultDecision, MemberCheckMemberScan, MemberCheckMemberScanResultDecision}
-import views.companion.master.FileUpload
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BackgroundCheckController @Inject()(
@@ -47,16 +43,16 @@ class BackgroundCheckController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_BACKGROUND_CHECK
 
   //UBO CHECKS
-  def memberScanForm(uboID: String, firstName: String, lastName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def memberScanForm(uboID: String, firstName: String, lastName: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName)))
+     Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName))
   }
 
   def memberScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckMemberScan.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.memberCheckMemberScan(formWithErrors, formWithErrors.data(constants.FormField.UBO_ID.name),formWithErrors.data(constants.FormField.FIRST_NAME.name), formWithErrors.data(constants.FormField.LAST_NAME.name))))
+          Future(BadRequest(views.html.component.master.memberCheckMemberScan(formWithErrors, formWithErrors.data(constants.FormField.UBO_ID.name), formWithErrors.data(constants.FormField.FIRST_NAME.name), formWithErrors.data(constants.FormField.LAST_NAME.name))))
         },
         memberCheckMemberScanData => {
           val scanID = memberCheckMemberScans.Service.getScanID(memberCheckMemberScanData.firstName, memberCheckMemberScanData.lastName)
@@ -96,17 +92,17 @@ class BackgroundCheckController @Inject()(
 
   def memberScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-    val result = getMemberCheckMemberScanResult.Service.get(resultID.toString)
-    (for {
-      result <- result
-    } yield Ok(views.html.component.master.memberCheckMemberScanResult(result))).recover {
-      case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
-    }
+      val result = getMemberCheckMemberScanResult.Service.get(resultID.toString)
+      (for {
+        result <- result
+      } yield Ok(views.html.component.master.memberCheckMemberScanResult(result))).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
 
-  def memberScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def memberScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckMemberScanSingleResultDecision(resultID = resultID)))
+      Ok(views.html.component.master.memberCheckMemberScanSingleResultDecision(resultID = resultID))
   }
 
 
@@ -127,21 +123,22 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.addUBOMemberCheck(uboID = uboID, scanID = scanID, resultID = resultID)))
+      Ok(views.html.component.master.addUBOMemberCheck(uboID = uboID, scanID = scanID, resultID = resultID))
   }
-
 
   def addUBOMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddUBOMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addUBOMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt,  Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
+          Future(BadRequest(views.html.component.master.addUBOMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
         addUBOBackgroundCheckData => {
           val memberScan = memberCheckMemberScans.Service.tryGetByScanID(addUBOBackgroundCheckData.scanID)
+
           def createMemberCheckUBODecision = memberCheckMemberScanDecisions.Service.insertOrUpdate(addUBOBackgroundCheckData.uboID, addUBOBackgroundCheckData.scanID, addUBOBackgroundCheckData.resultID, addUBOBackgroundCheckData.status)
+
           def updateUBOStatus = masterOrganizationUBOs.Service.markVerified(addUBOBackgroundCheckData.uboID, addUBOBackgroundCheckData.status)
 
           (for {
@@ -156,16 +153,16 @@ class BackgroundCheckController @Inject()(
   }
 
   //CORPORATE SCAN
-  def corporateScanForm(organizationID: String, companyName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def corporateScanForm(organizationID: String, companyName: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckCorporateScan(organizationID = organizationID, companyName = companyName)))
+      Ok(views.html.component.master.memberCheckCorporateScan(organizationID = organizationID, companyName = companyName))
   }
 
   def corporateScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckCorporateScan.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.memberCheckCorporateScan(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name),formWithErrors.data(constants.FormField.COMPANY_NAME.name))))
+          Future(BadRequest(views.html.component.master.memberCheckCorporateScan(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.COMPANY_NAME.name))))
         },
         memberCheckCorporateScanData => {
           val scanID = memberCheckCorporateScans.Service.getScanID(memberCheckCorporateScanData.companyName)
@@ -205,17 +202,17 @@ class BackgroundCheckController @Inject()(
 
   def corporateScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-    val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
-    (for {
-      result <- result
-    } yield Ok(views.html.component.master.memberCheckCorporateScanResult(result))).recover {
-      case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
-    }
+      val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
+      (for {
+        result <- result
+      } yield Ok(views.html.component.master.memberCheckCorporateScanResult(result))).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
 
-  def corporateScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def corporateScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckCorporateScanSingleResultDecision(resultID = resultID)))
+     Ok(views.html.component.master.memberCheckCorporateScanSingleResultDecision(resultID = resultID))
   }
 
 
@@ -236,9 +233,9 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.addOrganizationMemberCheck(organizationID = organizationID, scanID = scanID, resultID = resultID)))
+      Ok(views.html.component.master.addOrganizationMemberCheck(organizationID = organizationID, scanID = scanID, resultID = resultID))
   }
 
 
@@ -246,11 +243,13 @@ class BackgroundCheckController @Inject()(
     implicit request =>
       views.companion.master.AddOrganizationMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addOrganizationMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt,  Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
+          Future(BadRequest(views.html.component.master.addOrganizationMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
         addOrganizationBackgroundCheckData => {
           val corporateScan = memberCheckCorporateScans.Service.tryGetByScanID(addOrganizationBackgroundCheckData.scanID)
+
           def createMemberCheckOrganizationDecision = memberCheckCorporateScanDecisions.Service.insertOrUpdate(addOrganizationBackgroundCheckData.organizationID, addOrganizationBackgroundCheckData.scanID, addOrganizationBackgroundCheckData.resultID, addOrganizationBackgroundCheckData.status)
+
           (for {
             _ <- corporateScan
             _ <- createMemberCheckOrganizationDecision
@@ -262,9 +261,9 @@ class BackgroundCheckController @Inject()(
   }
 
   //VESSEL SCAN
-  def vesselScanForm(assetID: String, vesselName: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def vesselScanForm(assetID: String, vesselName: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckVesselScan(assetID = assetID, vesselName = vesselName)))
+      Ok(views.html.component.master.memberCheckVesselScan(assetID = assetID, vesselName = vesselName))
   }
 
   def vesselScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -311,19 +310,18 @@ class BackgroundCheckController @Inject()(
 
   def vesselScanResult(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-    val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
-    (for {
-      result <- result
-    } yield Ok(views.html.component.master.memberCheckVesselScanResult(result))).recover {
-      case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
-    }
+      val result = getMemberCheckCorporateScanResult.Service.get(resultID.toString)
+      (for {
+        result <- result
+      } yield Ok(views.html.component.master.memberCheckVesselScanResult(result))).recover {
+        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+      }
   }
 
-  def vesselScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def vesselScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.memberCheckVesselScanSingleResultDecision(resultID = resultID)))
+      Ok(views.html.component.master.memberCheckVesselScanSingleResultDecision(resultID = resultID))
   }
-
 
   def vesselScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -342,9 +340,9 @@ class BackgroundCheckController @Inject()(
         })
   }
 
-  def addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Future(Ok(views.html.component.master.addAssetMemberCheck(assetID = assetID, scanID = scanID, resultID = resultID)))
+     Ok(views.html.component.master.addAssetMemberCheck(assetID = assetID, scanID = scanID, resultID = resultID))
   }
 
 
@@ -352,11 +350,13 @@ class BackgroundCheckController @Inject()(
     implicit request =>
       views.companion.master.AddAssetMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addAssetMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt,  Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
+          Future(BadRequest(views.html.component.master.addAssetMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
         addAssetBackgroundCheckData => {
           val corporateScan = memberCheckVesselScans.Service.tryGetByScanID(addAssetBackgroundCheckData.scanID)
+
           def createMemberCheckVesselDecision = memberCheckVesselScanDecisions.Service.insertOrUpdate(addAssetBackgroundCheckData.assetID, addAssetBackgroundCheckData.scanID, addAssetBackgroundCheckData.resultID, addAssetBackgroundCheckData.status)
+
           (for {
             _ <- corporateScan
             _ <- createMemberCheckVesselDecision
