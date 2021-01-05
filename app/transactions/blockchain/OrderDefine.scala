@@ -64,7 +64,6 @@ class OrderDefine @Inject()(wsClient: WSClient)(implicit configuration: Configur
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
-
   }
 
 }

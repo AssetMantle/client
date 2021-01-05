@@ -122,6 +122,8 @@ class AssetMints @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[AssetMintSerialized]] = db.run(assetMintTable.filter(_.from === fromAddress).result)
+
   private[models] class AssetMintTable(tag: Tag) extends Table[AssetMintSerialized](tag, "AssetMint") {
 
     def * = (from, fromID, toID, classificationID, immutableMetaProperties, immutableProperties, mutableMetaProperties, mutableProperties, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMintSerialized.tupled, AssetMintSerialized.unapply)
@@ -187,6 +189,7 @@ class AssetMints @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

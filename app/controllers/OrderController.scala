@@ -6,7 +6,6 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
-import models.master.{Order => masterOrder}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -52,7 +51,7 @@ class OrderController @Inject()(
 
   def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.orderDefine())
+      Ok(blockchainForms.orderDefine())
   }
 
   def define: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -78,10 +77,7 @@ class OrderController @Inject()(
             val entityID = blockchainClassifications.Utility.getID(immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))), mutables = Mutables(Properties((mutableMetas ++ mutables).map(_.toProperty))))
 
             def insertAndBroadcast(classificationExists: Boolean) = if (!classificationExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterClassifications.Service.create(id = entityID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, fromID = defineData.fromID, label = Option(defineData.label), status = None)
-
-              def broadcastTx = transaction.process[blockchainTransaction.OrderDefine, transactionsOrderDefine.Request](
+              transaction.process[blockchainTransaction.OrderDefine, transactionsOrderDefine.Request](
                 entity = blockchainTransaction.OrderDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableTraits = Properties(immutables.map(_.toProperty)), mutableMetaTraits = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableTraits = Properties(mutables.map(_.toProperty)), gas = defineData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionOrderDefines.Service.create,
                 request = transactionsOrderDefine.Request(transactionsOrderDefine.Message(transactionsOrderDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
@@ -90,17 +86,6 @@ class OrderController @Inject()(
                 onFailure = blockchainTransactionOrderDefines.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionOrderDefines.Service.updateTransactionHash
               )
-
-              (for {
-                _ <- insertProperties
-                _ <- create
-                ticketID <- broadcastTx
-              } yield ticketID
-                ).recoverWith {
-                case baseException: BaseException => masterProperties.Service.deleteAll(entityID = entityID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION)
-                  masterClassifications.Service.delete(entityID)
-                  throw baseException
-              }
             } else Future(throw new BaseException(constants.Response.CLASSIFICATION_ALREADY_EXISTS))
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
@@ -128,7 +113,7 @@ class OrderController @Inject()(
 
   def makeForm(classificationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.orderMake(classificationID = classificationID))
+      Ok(blockchainForms.orderMake(classificationID = classificationID))
   }
 
   def make: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -155,11 +140,8 @@ class OrderController @Inject()(
 
             val entityID = blockchainOrders.Utility.getID(classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, makerID = makeData.fromID, immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))))
 
-            def insertAndBroadcast(classificationExists: Boolean, orderExists: Boolean) = if (classificationExists && !orderExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.ORDER, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterOrders.Service.create(masterOrder(id = entityID, label = Option(makeData.label), makerID = makeData.fromID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, status = None))
-
-              def broadcastTx = transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
+            def broadcast(classificationExists: Boolean, orderExists: Boolean) = if (classificationExists && !orderExists) {
+              transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
                 entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, makerOwnableSplit = makeData.makerOwnableSplit, expiresIn = makeData.expiresIn, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = makeData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionOrderMakes.Service.create,
                 request = transactionsOrderMake.Request(transactionsOrderMake.Message(transactionsOrderMake.BaseReq(from = loginState.address, gas = makeData.gas), fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, expiresIn = makeData.expiresIn, makerOwnableSplit = makeData.makerOwnableSplit, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
@@ -168,12 +150,6 @@ class OrderController @Inject()(
                 onFailure = blockchainTransactionOrderMakes.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionOrderMakes.Service.updateTransactionHash
               )
-
-              for {
-                _ <- insertProperties
-                _ <- create
-                ticketID <- broadcastTx
-              } yield ticketID
             } else if (!classificationExists) Future(throw new BaseException(constants.Response.CLASSIFICATION_NOT_FOUND))
             else Future(throw new BaseException(constants.Response.ORDER_ALREADY_EXISTS))
 
@@ -184,10 +160,10 @@ class OrderController @Inject()(
               for {
                 classificationExists <- classificationExists
                 orderExists <- orderExists
-                ticketID <- insertAndBroadcast(classificationExists = classificationExists, orderExists = orderExists)
+                ticketID <- broadcast(classificationExists = classificationExists, orderExists = orderExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
-            } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name,constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
+            } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
             (for {
               verifyPassword <- verifyPassword
@@ -203,7 +179,7 @@ class OrderController @Inject()(
 
   def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.orderTake(orderID = orderID))
+      Ok(blockchainForms.orderTake(orderID = orderID))
   }
 
   def take: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -245,7 +221,7 @@ class OrderController @Inject()(
 
   def cancelForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.orderCancel(orderID = orderID))
+      Ok(blockchainForms.orderCancel(orderID = orderID))
   }
 
   def cancel: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

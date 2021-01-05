@@ -120,11 +120,8 @@ class IdentityController @Inject()(
 
             val entityID = blockchainClassifications.Utility.getID(immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))), mutables = Mutables(Properties((mutableMetas ++ mutables).map(_.toProperty))))
 
-            def insertAndBroadcast(classificationExists: Boolean) = if (!classificationExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterClassifications.Service.create(id = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, fromID = defineData.fromID, label = Option(defineData.label), status = None)
-
-              def broadcastTx = transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
+            def broadcast(classificationExists: Boolean) = if (!classificationExists) {
+              transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
                 entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableTraits = Properties(immutables.map(_.toProperty)), mutableMetaTraits = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableTraits = Properties(mutables.map(_.toProperty)), gas = defineData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityDefines.Service.create,
                 request = transactionsIdentityDefine.Request(transactionsIdentityDefine.Message(transactionsIdentityDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
@@ -133,17 +130,6 @@ class IdentityController @Inject()(
                 onFailure = blockchainTransactionIdentityDefines.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionIdentityDefines.Service.updateTransactionHash
               )
-
-              (for {
-                _ <- insertProperties
-                _ <- create
-                ticketID <- broadcastTx
-              } yield ticketID
-                ).recoverWith {
-                case baseException: BaseException => masterProperties.Service.deleteAll(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
-                  masterClassifications.Service.delete(entityID)
-                  throw baseException
-              }
             } else Future(throw new BaseException(constants.Response.CLASSIFICATION_ALREADY_EXISTS))
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
@@ -151,7 +137,7 @@ class IdentityController @Inject()(
 
               for {
                 classificationExists <- classificationExists
-                ticketID <- insertAndBroadcast(classificationExists)
+                ticketID <- broadcast(classificationExists)
                 result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
@@ -197,10 +183,7 @@ class IdentityController @Inject()(
             val entityID = blockchainIdentities.Utility.getID(classificationID = issueData.classificationID, immutables = Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))))
 
             def insertAndBroadcast(classificationExists: Boolean, identityExists: Boolean) = if (classificationExists && !identityExists) {
-              val insertProperties = masterProperties.Utilities.upsertProperties(entityID = entityID, entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = immutableMetas, immutables = immutables, mutableMetas = mutableMetas, mutables = mutables)
-              val create = masterIdentities.Service.create(master.Identity(id = entityID, label = Option(issueData.label), status = None))
-
-              def broadcastTx = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+              transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                 entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = MetaProperties(immutableMetas.map(_.toMetaProperty)), immutableProperties = Properties(immutables.map(_.toProperty)), mutableMetaProperties = MetaProperties(mutableMetas.map(_.toMetaProperty)), mutableProperties = Properties(mutables.map(_.toProperty)), gas = issueData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
                 request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = issueData.gas), fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
@@ -209,12 +192,6 @@ class IdentityController @Inject()(
                 onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash
               )
-
-              for {
-                _ <- insertProperties
-                _ <- create
-                ticketID <- broadcastTx
-              } yield ticketID
             } else if (!classificationExists) Future(throw new BaseException(constants.Response.CLASSIFICATION_NOT_FOUND))
             else Future(throw new BaseException(constants.Response.IDENTITY_ALREADY_EXISTS))
 

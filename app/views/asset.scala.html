@@ -27,10 +27,16 @@
                 <div id="assetsMinted"></div>
             </div>
         </div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="assetTransactions"></div>
+            </div>
+        </div>
     </div>
     <script>
             componentResource('assetsDefinition', jsRoutes.controllers.ComponentViewController.assetsDefinition());
             componentResource('assetsMinted', jsRoutes.controllers.ComponentViewController.assetsMinted());
+            componentResource('assetTransactions', jsRoutes.controllers.ComponentViewController.moduleTransactions('@constants.View.ASSET'));
     </script>
 }
 
