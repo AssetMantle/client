@@ -46,8 +46,6 @@ class AssetController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val chainID = configuration.get[String]("blockchain.chainID")
-
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
   def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>

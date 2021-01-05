@@ -119,6 +119,8 @@ class IdentityUnprovisions @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[IdentityUnprovisionSerialized]] = db.run(identityUnprovisionTable.filter(_.from === fromAddress).result)
+
   private[models] class IdentityUnprovisionTable(tag: Tag) extends Table[IdentityUnprovisionSerialized](tag, "IdentityUnprovision") {
 
     def * = (from, to, identityID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentityUnprovisionSerialized.tupled, IdentityUnprovisionSerialized.unapply)
@@ -174,6 +176,7 @@ class IdentityUnprovisions @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

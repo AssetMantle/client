@@ -183,6 +183,9 @@ GET         /component/ordersTake                                controllers.Com
 GET         /component/ordersTakePublic                          controllers.ComponentViewController.ordersTakePublic
 GET         /component/ordersTakePrivate                         controllers.ComponentViewController.ordersTakePrivate
 
+GET         /component/moduleTransactions                        controllers.ComponentViewController.moduleTransactions(module: String)
+GET         /component/getTransaction                            controllers.ComponentViewController.getTransaction(transactionType: String)
+
 GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
 GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)

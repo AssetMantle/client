@@ -122,6 +122,8 @@ class AssetMutates @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[AssetMutateSerialized]] = db.run(assetMutateTable.filter(_.from === fromAddress).result)
+
   private[models] class AssetMutateTable(tag: Tag) extends Table[AssetMutateSerialized](tag, "AssetMutate") {
 
     def * = (from, fromID, assetID, mutableMetaProperties, mutableProperties, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetMutateSerialized.tupled, AssetMutateSerialized.unapply)
@@ -181,6 +183,7 @@ class AssetMutates @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

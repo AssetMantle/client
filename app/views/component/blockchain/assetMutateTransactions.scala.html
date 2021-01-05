@@ -1,0 +1,15 @@
+@import views.html.base._
+@import models.blockchainTransaction.AssetMutate
+
+@(assetMutateTransactions: Seq[AssetMutate])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="defineAsset">
+    @assetMutateTransactions.map { mutateTransaction =>
+        @commonVerticalInfoBox(){
+            @commonVerticalTextInfo(constants.View.TX_HASH, mutateTransaction.txHash.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.FROM_ID, mutateTransaction.fromID)
+            @commonVerticalTextInfo(constants.View.ASSET_ID, mutateTransaction.assetID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, mutateTransaction.status)
+        }
+    }
+</div>

@@ -119,6 +119,8 @@ class OrderTakes @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[OrderTakeSerialized]] = db.run(orderTakeTable.filter(_.from === fromAddress).result)
+
   private[models] class OrderTakeTable(tag: Tag) extends Table[OrderTakeSerialized](tag, "OrderTake") {
 
     def * = (from, fromID, takerOwnableSplit, orderID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrderTakeSerialized.tupled, OrderTakeSerialized.unapply)
@@ -176,6 +178,7 @@ class OrderTakes @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

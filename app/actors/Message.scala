@@ -2,9 +2,7 @@ package actors
 
 import akka.actor.ActorRef
 import models.common.Serializable.Fee
-import play.api.libs.json.{JsObject, JsValue, Json, OWrites, Writes}
-
-import java.sql.Timestamp
+import play.api.libs.json.{Json, OWrites, Writes}
 
 object Message {
 
@@ -16,13 +14,9 @@ object Message {
 
   object WebSocket {
 
-    case class AddPublicActor(actorRef: ActorRef)
+    case class AddActor(username: Option[String], actorRef: ActorRef)
 
-    case class AddPrivateActor(actorRef: ActorRef, username: String)
-
-    case class RemovePublicActor(actorRef: ActorRef)
-
-    case class RemovePrivateActor(username: String)
+    case class RemoveActor(username: Option[String], actorRef: ActorRef)
 
     abstract class MessageValue
 
@@ -69,6 +63,6 @@ object Message {
       case privateMessage: PrivateMessage => Json.toJson(privateMessage)
     }
 
- }
+  }
 
 }
