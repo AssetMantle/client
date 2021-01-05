@@ -40,10 +40,12 @@ class MessageReads @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private def getAllChatsByRead(messageIDs: Seq[String]): Future[Seq[MessageRead]] = db.run(messageReadTable.filter(x => x.messageID.inSet(messageIDs) && x.read).result)
 
   private def updateReadByMessageIDsAndToAccountID(messageIDs: Seq[String], toAccountID: String, read: Boolean): Future[Int] = db.run(messageReadTable.filter(x => x.messageID.inSet(messageIDs) && x.accountID === toAccountID).map(_.read).update(read).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 

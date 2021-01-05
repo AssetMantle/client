@@ -219,7 +219,6 @@ class ComponentViewController @Inject()(
   def accountTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
-
       (for {
         transactions <- transactions
       } yield Ok(views.html.component.blockchain.accountTransactionsPerPage(transactions))

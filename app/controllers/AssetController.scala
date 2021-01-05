@@ -219,7 +219,6 @@ class AssetController @Inject()(
               numMutableForms = getNumberOfFields(mutateData.addMutableField, mutateData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
             val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password.getOrElse(""))
-
             val mutableMetas = mutateData.mutableMetaProperties.getOrElse(Seq.empty).flatten
             val mutables = mutateData.mutableProperties.getOrElse(Seq.empty).flatten
 

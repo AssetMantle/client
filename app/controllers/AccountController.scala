@@ -70,9 +70,7 @@ class AccountController @Inject()(
 
           (for {
             _ <- addLogin(mnemonics)
-          } yield {
-            PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
-          }
+          } yield PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -505,17 +503,12 @@ class AccountController @Inject()(
           def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
               val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
-
-              def getResult: Future[Result] = {
-                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
-              }
-
               for {
                 _ <- updateCompletionStatus
                 //TODO: Remove this when Trulioo is integrated
                 _ <- masterIdentifications.Service.markVerified(loginState.username)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)()
-                result <- getResult
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               val identification = masterIdentifications.Service.get(loginState.username)

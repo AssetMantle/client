@@ -54,10 +54,12 @@ class OrganizationUBOs @Inject()(protected val databaseConfigProvider: DatabaseC
   private def checkOrganizationIDAndStatus(organizationID: String, status: Boolean): Future[Boolean] = db.run(organizationUBOTable.filter(x => x.organizationID === organizationID && x.status === status).exists.result)
 
   private def updateStatus(id: String, status: Boolean): Future[Int] = db.run(organizationUBOTable.filter(_.id === id).map(_.status).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 

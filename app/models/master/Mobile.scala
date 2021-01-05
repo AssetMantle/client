@@ -79,7 +79,10 @@ class Mobiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
   }
 
   private def updateMobileNumberVerificationStatusOnMobileNumber(mobileNumber: String, status: Boolean): Future[Int] = db.run(mobileTable.filter(_.mobileNumber === mobileNumber).map(_.status).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }

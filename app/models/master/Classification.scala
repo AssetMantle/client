@@ -56,18 +56,22 @@ class Classifications @Inject()(
   }
 
   private def updateStatusByIDAndEntityType(id: String, entityType: String, status: Option[Boolean]): Future[Int] = db.run(identityTable.filter(x => x.id === id && x.entityType === entityType).map(_.status.?).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def updateLabelByIDAndEntityType(id: String, entityType: String, label: Option[String]): Future[Int] = db.run(identityTable.filter(x => x.id === id && x.entityType === entityType).map(_.label.?).update(label).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
