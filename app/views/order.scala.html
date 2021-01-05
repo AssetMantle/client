@@ -32,11 +32,17 @@
                 <div id="ordersTake"></div>
             </div>
         </div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="orderTransactions"></div>
+            </div>
+        </div>
     </div>
     <script>
             componentResource('ordersDefinition', jsRoutes.controllers.ComponentViewController.ordersDefinition());
             componentResource('ordersMade', jsRoutes.controllers.ComponentViewController.ordersMade());
             componentResource('ordersTake', jsRoutes.controllers.ComponentViewController.ordersTake());
+            componentResource('orderTransactions', jsRoutes.controllers.ComponentViewController.moduleTransactions('@constants.View.ORDER'));
     </script>
 }
 

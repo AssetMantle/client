@@ -130,6 +130,8 @@ class OrderDefines @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[OrderDefineSerialized]] = db.run(orderDefineTable.filter(_.from === fromAddress).result)
+
   private[models] class OrderDefineTable(tag: Tag) extends Table[OrderDefineSerialized](tag, "OrderDefine") {
 
     def * = (from, fromID, immutableMetaTraits, immutableTraits, mutableMetaTraits, mutableTraits, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrderDefineSerialized.tupled, OrderDefineSerialized.unapply)
@@ -191,6 +193,7 @@ class OrderDefines @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

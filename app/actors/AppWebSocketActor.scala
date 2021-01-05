@@ -5,10 +5,9 @@ import akka.actor.{Actor, ActorRef, ActorSystem}
 import akka.dispatch.{PriorityGenerator, UnboundedStablePriorityMailbox}
 import akka.routing.{BroadcastRoutingLogic, Router}
 import com.typesafe.config.Config
+import javax.inject.Singleton
 import play.api.Logger
 import play.api.libs.json.{Json, OWrites}
-
-import javax.inject.Singleton
 
 @Singleton
 class AppWebSocketActor extends Actor {
@@ -43,19 +42,20 @@ class AppWebSocketActor extends Actor {
     case chat: Chat => broadcastToUser(username = chat.toUser, privateMessageContent = chat, subject = constants.Actor.MessageType.CHAT)
     case asset: Asset => broadcastToUser(username = asset.toUser, privateMessageContent = asset, subject = constants.Actor.MessageType.ASSET)
     case privateMessage: PrivateMessage => broadcastToUser(username = privateMessage.messageContent.toUser, privateMessageContent = privateMessage.messageContent, subject = privateMessage.subject)
-    case addPublicActor: AddPublicActor => publicRouter = publicRouter.addRoutee(addPublicActor.actorRef)
-    case addPrivateActor: AddPrivateActor => privateActorMap += (addPrivateActor.username -> addPrivateActor.actorRef)
-    case removePublicActor: RemovePublicActor => publicRouter = publicRouter.removeRoutee(removePublicActor.actorRef)
-    case removePrivateActor: RemovePrivateActor => privateActorMap -= removePrivateActor.username
+    case addActor: AddActor => {
+      publicRouter = publicRouter.addRoutee(addActor.actorRef)
+      addActor.username.map(username => privateActorMap += (username -> addActor.actorRef))
+    }
+    case removeActor: RemoveActor => {
+      publicRouter = publicRouter.removeRoutee(removeActor.actorRef)
+      removeActor.username.map(username => privateActorMap -= username)
+    }
   }
-
 }
 
 class AppWebSocketActorMailBox(settings: ActorSystem.Settings, config: Config) extends UnboundedStablePriorityMailbox(
   PriorityGenerator {
-    case _: RemovePublicActor => 0
-    case _: RemovePrivateActor => 1
-    case _: AddPublicActor => 2
-    case _: AddPrivateActor => 3
-    case _ => 4
+    case _: RemoveActor => 0
+    case _: AddActor => 1
+    case _ => 2
   })

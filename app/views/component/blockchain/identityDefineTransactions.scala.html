@@ -1,0 +1,14 @@
+@import views.html.base._
+@import models.blockchainTransaction.IdentityDefine
+
+@(identityDefineTransactions: Seq[IdentityDefine])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="defineTransaction">
+    @identityDefineTransactions.map {defineTransaction =>
+        @commonVerticalInfoBox(){
+            @commonVerticalTextInfo(constants.View.TX_HASH, defineTransaction.txHash.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.FROM_ID, defineTransaction.fromID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, defineTransaction.status)
+        }
+}
+</div>

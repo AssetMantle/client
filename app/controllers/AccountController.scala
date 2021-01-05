@@ -1,6 +1,5 @@
 package controllers
 
-import actors.Message.WebSocket.RemovePrivateActor
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -291,16 +290,11 @@ class AccountController @Inject()(
 
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
-          def shutdownActorsAndGetResult = {
-            actors.Service.appWebSocketActor ! RemovePrivateActor(loginState.username)
-            Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
-          }
-
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield shutdownActorsAndGetResult
+          } yield Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }

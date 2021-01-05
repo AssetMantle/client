@@ -128,6 +128,8 @@ class OrderCancels @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[OrderCancelSerialized]] = db.run(orderCancelTable.filter(_.from === fromAddress).result)
+
   private[models] class OrderCancelTable(tag: Tag) extends Table[OrderCancelSerialized](tag, "OrderCancel") {
 
     def * = (from, fromID, orderID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrderCancelSerialized.tupled, OrderCancelSerialized.unapply)
@@ -183,6 +185,7 @@ class OrderCancels @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

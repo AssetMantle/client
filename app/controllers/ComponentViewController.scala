@@ -6,6 +6,8 @@ import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
 import models.{blockchain, master, masterTransaction}
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -28,6 +30,19 @@ class ComponentViewController @Inject()(
                                          blockchainBlocks: blockchain.Blocks,
                                          blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                                          blockchainTransactions: blockchain.Transactions,
+                                         blockchainTransactionsIdentityDefines: blockchainTransaction.IdentityDefines,
+                                         blockchainTransactionsIdentityNubs: blockchainTransaction.IdentityNubs,
+                                         blockchainTransactionsIdentityIssues: blockchainTransaction.IdentityIssues,
+                                         blockchainTransactionsIdentityProvisions: blockchainTransaction.IdentityProvisions,
+                                         blockchainTransactionsIdentityUnprovisions: blockchainTransaction.IdentityUnprovisions,
+                                         blockchainTransactionsAssetDefines: blockchainTransaction.AssetDefines,
+                                         blockchainTransactionsAssetMints: blockchainTransaction.AssetMints,
+                                         blockchainTransactionsAssetMutates: blockchainTransaction.AssetMutates,
+                                         blockchainTransactionsAssetBurns: blockchainTransaction.AssetBurns,
+                                         blockchainTransactionsOrderDefines: blockchainTransaction.OrderDefines,
+                                         blockchainTransactionsOrderMakes: blockchainTransaction.OrderMakes,
+                                         blockchainTransactionsOrderTakes: blockchainTransaction.OrderTakes,
+                                         blockchainTransactionsOrderCancels: blockchainTransaction.OrderCancels,
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainValidators: blockchain.Validators,
                                          getDelegatorRewards: GetDelegatorRewards,
@@ -639,7 +654,102 @@ class ComponentViewController @Inject()(
       }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
 
+  def getTransaction(transactionType: String) = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      transactionType match {
+        case constants.Blockchain.TransactionRequest.IDENTITY_NUB => {
+          val nubTransactions = blockchainTransactionsIdentityNubs.Service.getTransactionList(loginState.address)
+          for {
+            nubTransactions <- nubTransactions
+          } yield Ok(views.html.component.blockchain.identityNubTransactions(nubTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.IDENTITY_DEFINE => {
+          val identityDefinitionTxs = blockchainTransactionsIdentityDefines.Service.getTransactionList(loginState.address)
+          for {
+            identityDefinitionTxs <- identityDefinitionTxs
+          } yield Ok(views.html.component.blockchain.identityDefineTransactions(identityDefinitionTxs))
+        }
+        case constants.Blockchain.TransactionRequest.IDENTITY_ISSUE => {
+          val issueTransaction = blockchainTransactionsIdentityIssues.Service.getTransactionList(loginState.address)
+          for {
+            issueTransaction <- issueTransaction
+          } yield Ok(views.html.component.blockchain.identityIssueTransactions(issueTransaction))
+        }
+        case constants.Blockchain.TransactionRequest.IDENTITY_PROVISION => {
+          val provisionTransaction = blockchainTransactionsIdentityProvisions.Service.getTransactionList(loginState.address)
+          for {
+            provisionTransaction <- provisionTransaction
+          } yield Ok(views.html.component.blockchain.identityProvisionTransactions(provisionTransaction))
+        }
+        case constants.Blockchain.TransactionRequest.IDENTITY_UNPROVISION => {
+          val unprovisionTransaction = blockchainTransactionsIdentityUnprovisions.Service.getTransactionList(loginState.address)
+          for {
+            unprovisionTransaction <- unprovisionTransaction
+          } yield Ok(views.html.component.blockchain.identityUnprovisionTransactions(unprovisionTransaction))
+        }
+        case constants.Blockchain.TransactionRequest.ASSET_DEFINE => {
+          val assetDefineTransactions = blockchainTransactionsAssetDefines.Service.getTransactionList(loginState.address)
+          for {
+            assetDefineTransactions <- assetDefineTransactions
+          } yield Ok(views.html.component.blockchain.assetDefineTransactions(assetDefineTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ASSET_MINT => {
+          val assetMintTransactions = blockchainTransactionsAssetMints.Service.getTransactionList(loginState.address)
+          for {
+            assetMintTransactions <- assetMintTransactions
+          } yield Ok(views.html.component.blockchain.assetMintTransactions(assetMintTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ASSET_MUTATE => {
+          val assetMutateTransactions = blockchainTransactionsAssetMutates.Service.getTransactionList(loginState.address)
+          for {
+            assetMutateTransactions <- assetMutateTransactions
+          } yield Ok(views.html.component.blockchain.assetMutateTransactions(assetMutateTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ASSET_BURN => {
+          val assetBurnTransactions = blockchainTransactionsAssetBurns.Service.getTransactionList(loginState.address)
+          for {
+            assetBurnTransactions <- assetBurnTransactions
+          } yield Ok(views.html.component.blockchain.assetBurnTransactions(assetBurnTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ORDER_DEFINE => {
+          val orderDefineTransactions = blockchainTransactionsOrderDefines.Service.getTransactionList(loginState.address)
+          for {
+            orderDefineTransactions <- orderDefineTransactions
+          } yield Ok(views.html.component.blockchain.orderDefineTransactions(orderDefineTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ORDER_MAKE => {
+          val orderMakeTransactions = blockchainTransactionsOrderMakes.Service.getTransactionList(loginState.address)
+          for {
+            orderMakeTransactions <- orderMakeTransactions
+          } yield Ok(views.html.component.blockchain.orderMakeTransactions(orderMakeTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ORDER_TAKE => {
+          val orderTakeTransactions = blockchainTransactionsOrderTakes.Service.getTransactionList(loginState.address)
+          for {
+            orderTakeTransactions <- orderTakeTransactions
+          } yield Ok(views.html.component.blockchain.orderTakeTransactions(orderTakeTransactions))
+        }
+        case constants.Blockchain.TransactionRequest.ORDER_CANCEL => {
+          val orderCancelsTransactions = blockchainTransactionsOrderCancels.Service.getTransactionList(loginState.address)
+          for {
+            orderCancelsTransactions <- orderCancelsTransactions
+          } yield Ok(views.html.component.blockchain.orderCancelTransaction(orderCancelsTransactions))
+        }
+        case _ => Future(throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND))
+      }
+  }
+
+  def moduleTransactions(currentModule: String) = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      currentModule match {
+        case constants.View.IDENTITY => Future(Ok(views.html.component.blockchain.identityTransactions()))
+        case constants.View.ASSET => Future(Ok(views.html.component.blockchain.assetTransactions()))
+        case constants.View.ORDER => Future(Ok(views.html.component.blockchain.orderTransactions()))
+        case _ => Future(throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND))
+      }
   }
 
 }

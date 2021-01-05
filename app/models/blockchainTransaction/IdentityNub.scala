@@ -128,6 +128,8 @@ class IdentityNubs @Inject()(
     }
   }
 
+  private def getTransactionListByFromAddress(fromAddress: String): Future[Seq[IdentityNubSerialized]] = db.run(identityNubTable.filter(_.from === fromAddress).result)
+
   private[models] class IdentityNubTable(tag: Tag) extends Table[IdentityNubSerialized](tag, "IdentityNub") {
 
     def * = (from, nubID, gas, status.?, txHash.?, ticketID, mode, code.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentityNubSerialized.tupled, IdentityNubSerialized.unapply)
@@ -181,6 +183,7 @@ class IdentityNubs @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {

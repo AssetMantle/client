@@ -49,7 +49,7 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
         result <- verifySessionTokenUserTypeAndGetResult(username, sessionToken)
       } yield result).recover {
         case baseException: BaseException =>
-          Results.InternalServerError(views.html.index(Seq(baseException.failure)))
+          Results.InternalServerError(views.html.index(Seq(baseException.failure))).withNewSession
       }
     }
   }
