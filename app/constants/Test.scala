@@ -1,13 +1,13 @@
 package constants
 
 object Test {
-  val NUMBER_OF_USERS = 150
+  val NUMBER_OF_USERS = 1500
 
   val TEST_IP = "localhost"
 
   val BASE_URL = "http://" + TEST_IP + ":9000"
 
-  val TEST_IMAGE_PATH = "/home/persistence-1/testImages/"
+  val TEST_IMAGE_PATH = "/home/prashant/testImages/"
   val REQUEST_DELAY = 2
   val BLOCKCHAIN_TRANSACTION_DELAY = 40
   val LOOP_DELAY = 1
