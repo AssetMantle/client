@@ -62,9 +62,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(mobileNumber: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang): Future[Unit] = {
-   // val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
+    val send = Future(Message.creator(new PhoneNumber(mobileNumber), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create())
     (for {
-      _ <- Future(0)
+      _ <- send
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
@@ -94,7 +94,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    /*mailerClient.send(Email(
+    mailerClient.send(Email(
       subject = messagesApi(email.subject),
       from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
       to = Seq(emailAddress),
@@ -102,8 +102,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       charset = Option(emailCharset),
       replyTo = Seq(emailReplyTo),
       bounceAddress = Option(emailBounceAddress),
-    ))*/
-    ""
+    ))
   }
 
   def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Future[String] = {
