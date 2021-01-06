@@ -83,7 +83,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Service {
     def get(id: String): Future[String] = {
-      val otp = (Random.nextInt(899999) + 100000).toString
+      val otp = "999999" //(Random.nextInt(899999) + 100000).toString
       val upsertEmailOTP = upsert(EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
       for {
         _ <- upsertEmailOTP

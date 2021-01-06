@@ -86,14 +86,20 @@
         <div class="recentActivityContainer">
             <div id="recentActivities"></div>
         </div>
-
-        <div class="cmuk-width-expand@@m">
-            <div id="traderRelationList" class="traderRelationList switcherCard"></div>
-        </div>
+        <script>
+                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+        </script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderRelationList" class="traderRelationList switcherCard"></div>
+                </div>
+                <script>
+                   componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+                 </script>
+            }
+            case _=>{}
+        }
     </div>
-    <script>
-            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-            componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
-    </script>
 
 }
