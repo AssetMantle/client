@@ -170,7 +170,7 @@ object Serializable {
   implicit val msgWrites: OWrites[StdMsg] = Json.writes[StdMsg]
 
   case class BaseProperty(dataType: String, dataName: String, dataValue: Option[String]) {
-    def toRequestString: String = s"${dataName}${constants.Blockchain.DataNameAndTypeSeparator}${DataValue.getFactTypeFromDataType(dataType)}${constants.Blockchain.DataTypeAndValueSeparator}${dataValue.getOrElse("")}"
+    def toRequestString: String = utilities.String.getPropertyRequestWithValue(dataNameWithType = utilities.String.getPropertyRequestNameAndType(dataType = dataType, dataName = dataName), dataValue = dataValue)
 
     def toMetaProperty: MetaProperty = MetaProperty(id = dataName, metaFact = MetaFact(DataValue.getData(dataType = dataType, dataValue = dataValue)))
 
