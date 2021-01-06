@@ -92,6 +92,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.ordersMade,
         routes.javascript.ComponentViewController.ordersTake,
 
+        routes.javascript.ComponentViewController.moduleTransactions,
+        routes.javascript.ComponentViewController.getTransaction,
+
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,

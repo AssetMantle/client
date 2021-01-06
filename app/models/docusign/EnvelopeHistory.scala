@@ -36,14 +36,14 @@ class EnvelopeHistories @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def tryGetByID(id: String, documentType: String): Future[EnvelopeHistory] = db.run(envelopeHistoryTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def tryGetByID(id: String, documentType: String): Future[EnvelopeHistory] = db.run(envelopeHistoryTable.filter(x => x.id === id && x.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def getByID(id: String, documentType: String) = db.run(envelopeHistoryTable.filter(_.id === id).filter(_.documentType === documentType).result.headOption)
+  private def getByID(id: String, documentType: String) = db.run(envelopeHistoryTable.filter(x => x.id === id&& x.documentType === documentType).result.headOption)
 
   private def getAllByID(id: String) = db.run(envelopeHistoryTable.filter(_.id === id).result)
 

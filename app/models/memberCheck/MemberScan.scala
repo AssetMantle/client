@@ -53,7 +53,7 @@ class MemberScans @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def findScanIDByFirstNameAndLastName(firstName: String, lastName: String): Future[Option[Int]] = db.run(memberScanTable.filter(_.firstName === firstName).filter(_.lastName === lastName).map(_.scanID).result.headOption)
+  private def findScanIDByFirstNameAndLastName(firstName: String, lastName: String): Future[Option[Int]] = db.run(memberScanTable.filter(x => x.firstName === firstName && x.lastName === lastName).map(_.scanID).result.headOption)
 
   private def deleteById(id: String): Future[Int] = db.run(memberScanTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result

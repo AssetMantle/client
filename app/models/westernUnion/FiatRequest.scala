@@ -49,10 +49,9 @@ class FiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private def findAllByTraderIDs(traderIDs: Seq[String]): Future[Seq[FiatRequest]] = db.run(fiatRequestTable.filter(_.traderID inSet traderIDs).result)
 
   private def updateStatusByID(id: String, status: String): Future[Int] = db.run(fiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
-    case Success(result) => if (result > 0) {
-      result
-    } else {
-      throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = " + id))
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED FOR TRANSACTION ID = " + id))
+      case _ => result
     }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)

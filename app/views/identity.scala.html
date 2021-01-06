@@ -33,11 +33,17 @@
                 <div id="identitiesUnprovisioned"></div>
             </div>
         </div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="identityTransactions"></div>
+            </div>
+        </div>
     </div>
     <script>
             componentResource('identitiesDefinition', jsRoutes.controllers.ComponentViewController.identitiesDefinition());
             componentResource('identitiesProvisioned', jsRoutes.controllers.ComponentViewController.identitiesProvisioned());
             componentResource('identitiesUnprovisioned', jsRoutes.controllers.ComponentViewController.identitiesUnprovisioned());
+            componentResource('identityTransactions', jsRoutes.controllers.ComponentViewController.moduleTransactions('@constants.View.IDENTITY'));
     </script>
 }
 

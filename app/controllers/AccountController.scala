@@ -1,9 +1,9 @@
 package controllers
 
-import actors.Message.WebSocket.RemovePrivateActor
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
@@ -16,7 +16,6 @@ import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -70,9 +69,7 @@ class AccountController @Inject()(
 
           (for {
             _ <- addLogin(mnemonics)
-          } yield {
-            PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
-          }
+          } yield PartialContent(views.html.component.master.createWallet(username = signUpData.username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -82,18 +79,18 @@ class AccountController @Inject()(
 
   def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val bcAccountExists = blockchainAccounts.Service.checkAccountExists(username)
+      val blockchainAccountExists = blockchainAccounts.Service.checkAccountExists(username)
 
-      def getMnemonics(bcAccountExists: Boolean): Future[Seq[String]] = if (!bcAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
+      def getMnemonics(blockchainAccountExists: Boolean): Future[Seq[String]] = if (!blockchainAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
-      def updatePartialMnemonic(mnemonics: Seq[String], bcAccountExists: Boolean) = if (!bcAccountExists) {
+      def updatePartialMnemonic(mnemonics: Seq[String], blockchainAccountExists: Boolean) = if (!blockchainAccountExists) {
         masterAccounts.Service.updatePartialMnemonic(id = username, partialMnemonic = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown))
       } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
-        bcAccountExists <- bcAccountExists
-        mnemonics <- getMnemonics(bcAccountExists)
-        - <- updatePartialMnemonic(mnemonics, bcAccountExists)
+        blockchainAccountExists <- blockchainAccountExists
+        mnemonics <- getMnemonics(blockchainAccountExists)
+        _ <- updatePartialMnemonic(mnemonics, blockchainAccountExists)
       } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
@@ -293,16 +290,11 @@ class AccountController @Inject()(
 
           def transactionSessionTokensDelete: Future[Int] = masterTransactionSessionTokens.Service.delete(loginState.username)
 
-          def shutdownActorsAndGetResult = {
-            actors.Service.appWebSocketActor ! RemovePrivateActor(loginState.username)
-            Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
-          }
-
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield shutdownActorsAndGetResult
+          } yield Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }
@@ -364,9 +356,8 @@ class AccountController @Inject()(
           (for {
             otp <- otp
             _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)()
-          } yield {
-            PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
-          }).recover {
+          } yield PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
+          ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }
         }
@@ -506,17 +497,12 @@ class AccountController @Inject()(
           def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
             if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
               val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
-
-              def getResult: Future[Result] = {
-                withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
-              }
-
               for {
                 _ <- updateCompletionStatus
                 //TODO: Remove this when Trulioo is integrated
                 _ <- masterIdentifications.Service.markVerified(loginState.username)
                 _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)()
-                result <- getResult
+                result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
               } yield result
             } else {
               val identification = masterIdentifications.Service.get(loginState.username)

@@ -1,0 +1,14 @@
+@import views.html.base._
+@import models.blockchainTransaction.OrderCancel
+
+@(orderCancelTransactions: Seq[OrderCancel])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="orderTransaction">
+    @orderCancelTransactions.map {cancelTransaction =>
+        @commonVerticalInfoBox(){
+            @commonVerticalTextInfo(constants.View.TX_HASH, cancelTransaction.txHash.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.FROM_ID, cancelTransaction.fromID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, cancelTransaction.status)
+        }
+    }
+</div>

@@ -46,7 +46,7 @@ class CorporateScanDecisions @Inject()(protected val databaseConfigProvider: Dat
 
   private def findById(id: String): Future[Option[CorporateScanDecision]] = db.run(corporateScanDecisionTable.filter(_.id === id).result.headOption)
 
-  private def checkOrganizationAndStatus(id: String, status: Boolean): Future[Boolean] = db.run(corporateScanDecisionTable.filter(_.id === id).filter(_.status === status).exists.result)
+  private def checkOrganizationAndStatus(id: String, status: Boolean): Future[Boolean] = db.run(corporateScanDecisionTable.filter(x=>x.id === id && x.status === status).exists.result)
 
   private def deleteById(id: String): Future[Int] = db.run(corporateScanDecisionTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result

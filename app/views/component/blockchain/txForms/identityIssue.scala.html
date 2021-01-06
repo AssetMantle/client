@@ -9,9 +9,9 @@
     @commonInputText(identityIssueForm, constants.FormField.TO)
     @commonInputText(identityIssueForm, constants.FormField.LABEL)
     @commonInputMicroNumber(identityIssueForm, constants.FormField.GAS)
-    @commonInputPassword(identityIssueForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms)
     @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
     @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms)
+    @commonInputPassword(identityIssueForm, constants.FormField.PASSWORD, 'required -> false)
 }
