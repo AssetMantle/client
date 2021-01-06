@@ -368,6 +368,17 @@ body.darkMode {
     border-color: $darkModeBorderColor;
     color:$darkModePrimaryFontColor;
   }
+  .cmuk-alert-success{
+    background-color: #338667;
+
+  }
+  .cmuk-alert-danger {
+    background: #7b4852;
+  }
+  .cmuk-alert-warning {
+    background: #63472f !important;
+  }
+
 }
 
 // End Of Dark Mode Styles
@@ -422,6 +433,16 @@ body.lightMode {
   .commodityImage {
     background: #F2F2F2;
     border: 1.51312px solid #E3E3E3;
+  }
+  .cmuk-alert-success{
+    background-color: #32d296;
+
+  }
+  .cmuk-alert-danger {
+    background: #e2a1ae;
+  }
+  .cmuk-alert-warning {
+    background: #fff6ee;
   }
 }
 %scroller{
@@ -1089,7 +1110,6 @@ body.lightMode {
     }
   }
   .cmuk-alert-success{
-    background-color: #32d296;
     color: #FFFFFF;
     .successIcon .icon{
       fill: #FFFFFF;
@@ -3660,4 +3680,14 @@ figure.zoom {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.buttonsListChild{
+  display: flex;
+  flex-direction: column;
+  button:first-child{
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: center;
+  }
 }

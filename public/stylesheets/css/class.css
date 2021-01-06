@@ -226,6 +226,12 @@ body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size])
   background: #282934;
   border-color: #31323A;
   color: #D0D0D0; }
+body.darkMode .cmuk-alert-success {
+  background-color: #338667; }
+body.darkMode .cmuk-alert-danger {
+  background: #7b4852; }
+body.darkMode .cmuk-alert-warning {
+  background: #63472f !important; }
 
 body.lightMode .buttonPrimary {
   background: #191616; }
@@ -249,6 +255,12 @@ body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
 body.lightMode .commodityImage {
   background: #F2F2F2;
   border: 1.51312px solid #E3E3E3; }
+body.lightMode .cmuk-alert-success {
+  background-color: #32d296; }
+body.lightMode .cmuk-alert-danger {
+  background: #e2a1ae; }
+body.lightMode .cmuk-alert-warning {
+  background: #fff6ee; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -764,7 +776,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-weight: bold;
   font-size: 0.875rem; }
 .comdex .cmuk-alert-success {
-  background-color: #32d296;
   color: #FFFFFF; }
   .comdex .cmuk-alert-success .successIcon .icon {
     fill: #FFFFFF; }
@@ -2616,5 +2627,13 @@ figure.zoom {
   align-items: center;
   justify-content: center;
   flex-direction: column; }
+
+.buttonsListChild {
+  display: flex;
+  flex-direction: column; }
+  .buttonsListChild button:first-child {
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: center; }
 
 /*# sourceMappingURL=class.css.map */
