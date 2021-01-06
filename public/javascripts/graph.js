@@ -36,3 +36,67 @@ function updateGraph(chartID, label, data, maxNumberOfPoints = 10) {
 }
 
 // https://www.chartjs.org/docs/latest/
+
+function lineChart(chartID) {
+
+    var barChartData = {
+        labels: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ],
+        datasets: [
+            {
+                label: "Buy",
+                backgroundColor: "#3348C0",
+                borderWidth: 1,
+                data: [60,66,36,76,34, 50, 36, 87,43, 58, 56, 76]
+            },
+            {
+                label: "Sell",
+                backgroundColor: "#DDE2EA",
+                borderWidth: 1,
+                data: [20,70,40,60,40, 70, 37, 67, 77,71,74,69]
+            }
+        ]
+    };
+
+    let ctx = $('#' + chartID);
+    let chart = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            maintainAspectRatio:false,
+            scales: {
+                xAxes: [{
+                    categoryPercentage: 0.7,
+                    barPercentage: 0.5,
+                    barThickness: 18,
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            legend: {
+                // position: "bottom",
+                // align: "middle",
+                labels: {
+                    boxWidth: 15
+                }
+            }
+
+        }
+    });
+
+}

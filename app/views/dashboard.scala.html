@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
+@import views.html.component.master._
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -66,6 +67,9 @@
         case constants.User.TRADER => {
             <div class="tradeList switcherCard">
                 <div id="traderViewAcceptedNegotiationList"></div>
+            </div>
+            <div class="tradeList switcherCard">
+                @statistics()
             </div>
             <script>
                     componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
