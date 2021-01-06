@@ -20,7 +20,7 @@ import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: MicroNumber, quantityUnit: String, assetQuantity: MicroNumber, moderated: Boolean, gas: MicroNumber, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IssueAsset] with Logged {
@@ -336,12 +336,15 @@ class IssueAssets @Inject()(
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
+  }
 
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+    }
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
-    }(schedulerExecutionContext)
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
   }
 }

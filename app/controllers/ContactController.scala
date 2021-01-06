@@ -63,9 +63,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           def addOrUpdateEmailAddress(emailAddress: Option[Email]): Future[Unit] = {
             emailAddress match {
               case Some(email) => if (email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
-                for {_ <- updateEmail} yield Unit
-              } else Future(Unit)
-              case None => for {_ <- addEmail} yield Unit
+                for {_ <- updateEmail} yield ()
+              } else Future()
+              case None => for {_ <- addEmail} yield ()
             }
           }
 
@@ -114,9 +114,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
               case Some(mobile) => if (mobile.mobileNumber != Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-")) {
-                for {_ <- updateMobile} yield Unit
-              } else Future(Unit)
-              case None => for {_ <- addMobile} yield Unit
+                for {_ <- updateMobile} yield ()
+              } else Future()
+              case None => for {_ <- addMobile} yield ()
             }
           }
 

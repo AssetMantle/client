@@ -21,7 +21,7 @@ import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendFiat(from: String, to: String, amount: MicroNumber, pegHash: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendFiat] with Logged {
@@ -45,7 +45,7 @@ class SendFiats @Inject()(
                            masterNegotiations: master.Negotiations,
                            masterOrders: master.Orders,
                            masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
-                           masterTransactionTradeActivities:masterTransaction.TradeActivities,
+                           masterTransactionTradeActivities: masterTransaction.TradeActivities,
                          )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
 
@@ -238,7 +238,7 @@ class SendFiats @Inject()(
           for {
             _ <- updateFiats
             _ <- insertFiats
-          } yield Unit
+          } yield ()
         }
         case None => throw new BaseException(constants.Response.FIAT_PEG_WALLET_NOT_FOUND)
       }
@@ -346,9 +346,13 @@ class SendFiats @Inject()(
     }
   }
 
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+    }
+  }
+
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
-    }(schedulerExecutionContext)
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
   }
 }

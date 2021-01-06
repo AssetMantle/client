@@ -14,7 +14,7 @@ function graph(title, chartID) {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
-                    }
+                    },
                 }]
             }
         }
@@ -81,10 +81,15 @@ function lineChart(chartID) {
                     categoryPercentage: 0.7,
                     barPercentage: 0.5,
                     barThickness: 18,
+                    gridLines: {
+                        color: '#E6E6E6',
+                        borderDash: [8, 4]
+                    }
                 }],
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        stepSize: 30,
                     }
                 }]
             },
@@ -92,7 +97,8 @@ function lineChart(chartID) {
                 // position: "bottom",
                 // align: "middle",
                 labels: {
-                    boxWidth: 15
+                    boxWidth: 15,
+                    boxHeight: 2
                 }
             }
 

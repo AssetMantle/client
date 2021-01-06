@@ -17,7 +17,7 @@ import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class RedeemFiat(from: String, to: String, redeemAmount: MicroNumber, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[RedeemFiat] with Logged {
@@ -32,13 +32,13 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
                             blockchainAccounts: blockchain.Accounts,
                             masterTransactionRedeemFiats: masterTransaction.RedeemFiatRequests,
                             utilitiesNotification: utilities.Notification)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
-  
+
   def serialize(redeemFiat: RedeemFiat): RedeemFiatSerialized = RedeemFiatSerialized(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount.toMicroString, gas = redeemFiat.gas.toMicroString, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code, createdBy = redeemFiat.createdBy, createdOn = redeemFiat.createdOn, createdOnTimeZone = redeemFiat.createdOnTimeZone, updatedBy = redeemFiat.updatedBy, updatedOn = redeemFiat.updatedOn, updatedOnTimeZone = redeemFiat.updatedOnTimeZone)
 
   case class RedeemFiatSerialized(from: String, to: String, redeemAmount: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = new MicroNumber(BigInt(redeemAmount)), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
-  
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -248,9 +248,13 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
     }
   }
 
+  val scheduledTask = new Runnable {
+    override def run(): Unit = {
+      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+    }
+  }
+
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
-    }(schedulerExecutionContext)
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
   }
 }

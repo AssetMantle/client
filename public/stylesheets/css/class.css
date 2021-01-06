@@ -592,8 +592,8 @@ body.lightMode .commodityImage {
   margin: 5px;
   border-radius: 5px; }
 
-.graphCard {
-  margin-bottom: 20px; }
+.graphCard .scroller {
+  padding: 10px 20px; }
 
 .textLineOverflow {
   display: -webkit-box;

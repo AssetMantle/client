@@ -394,6 +394,3 @@ object RedeemFiat {
     .exec(AccountControllerTest.logoutScenario)
     .pause(Test.BLOCKCHAIN_TRANSACTION_DELAY)
 }
-
-
-
