@@ -52,7 +52,6 @@ object Form {
 
   //EntityController
   val UPSERT_ENTITY_LABEL = new Form("UPSERT_ENTITY_LABEL", routes.EntityController.upsertLabel(), routes.javascript.EntityController.upsertLabelForm)
-  val UPDATE_PRIVATE_PROPERTY = new Form("UPDATE_PRIVATE_PROPERTY", routes.EntityController.updatePrivateProperty(), routes.javascript.EntityController.updatePrivatePropertyForm)
 
   //IdentityController
   val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub(), routes.javascript.IdentityController.nubForm)

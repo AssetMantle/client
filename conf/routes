@@ -110,8 +110,6 @@ POST        /split/unwrap                                        controllers.Spl
 
 GET         /entity/upsertLabel                                  controllers.EntityController.upsertLabelForm(entityID: String, entityType: String)
 POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
-GET         /entity/updatePrivateProperty                        controllers.EntityController.updatePrivatePropertyForm(entityID: String, entityType: String, name: String)
-POST        /entity/updatePrivateProperty                        controllers.EntityController.updatePrivateProperty
 GET         /component/entityProperties                          controllers.EntityController.properties(entityID: String, entityType: String)
 
 GET         /contact                                             controllers.ContactController.contact

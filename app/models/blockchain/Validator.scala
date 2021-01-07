@@ -233,18 +233,13 @@ class Validators @Inject()(
     def onEditValidator(editValidator: EditValidator): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(editValidator.validatorAddress)
 
-      def insertValidator(validator: Validator) = {
-        //        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
-        for {
-          //          _ <- insertKeyBaseAccount
-          _ <- addEvent
-        } yield ()
-      }
+      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
+
+      //        def insertKeyBaseAccount(validator: Validator) = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
 
       (for {
         validator <- upsertValidator
-        _ <- insertValidator(validator)
+        _ <- addEvent(validator)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }

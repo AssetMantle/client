@@ -110,71 +110,11 @@ class EntityController @Inject()(
       )
   }
 
-  def updatePrivatePropertyForm(entityID: String, entityType: String, name: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(masterComponent.updatePrivateProperty(entityID = entityID, entityType = entityType, name = name))
-  }
-
-  def updatePrivateProperty(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      masterCompanion.UpdatePrivatProperty.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(masterComponent.updatePrivateProperty(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.ENTITY_TYPE.name, ""), formWithErrors.data.getOrElse(constants.FormField.NAME.name, ""))))
-        },
-        updatePrivatePropertyData => {
-          val property = masterProperties.Service.tryGet(entityID = updatePrivatePropertyData.entityID, entityType = updatePrivatePropertyData.entityType, name = updatePrivatePropertyData.name)
-
-          def getProvisionedAddress(maintainer: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainer)
-
-          val verifiedOwner = updatePrivatePropertyData.entityType match {
-            case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
-              val maintainerID = masterClassifications.Service.tryGetMaintainerID(id = updatePrivatePropertyData.entityID)
-              for {
-                maintainerID <- maintainerID
-                provisionedAddresses <- getProvisionedAddress(maintainerID)
-              } yield provisionedAddresses.contains(loginState.address)
-            case constants.Blockchain.Entity.ASSET =>
-              val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = updatePrivatePropertyData.entityID)
-              for {
-                ownerID <- ownerID
-                provisionedAddresses <- getProvisionedAddress(ownerID)
-              } yield provisionedAddresses.contains(loginState.address)
-            case constants.Blockchain.Entity.IDENTITY =>
-              for {
-                provisionedAddresses <- getProvisionedAddress(updatePrivatePropertyData.entityID)
-              } yield provisionedAddresses.contains(loginState.address)
-            case constants.Blockchain.Entity.ORDER =>
-              val makerID = masterOrders.Service.tryGetMakerID(updatePrivatePropertyData.entityID)
-
-              for {
-                makerID <- makerID
-                provisionedAddresses <- getProvisionedAddress(makerID)
-              } yield provisionedAddresses.contains(loginState.address)
-            case _ => Future(throw new BaseException(constants.Response.UNAUTHORIZED))
-          }
-
-          def checkAndUpdate(verifiedOwner: Boolean, property: master.Property) = if (!verifiedOwner) throw new BaseException(constants.Response.UNAUTHORIZED)
-          else if (utilities.Hash.getHash(updatePrivatePropertyData.value) == property.hashID) throw new BaseException(constants.Response.INVALID_PROPERTY_VALUE)
-          else masterProperties.Service.updateValue(entityID = updatePrivatePropertyData.entityID, entityType = updatePrivatePropertyData.entityType, name = updatePrivatePropertyData.name, value = updatePrivatePropertyData.value)
-
-          (for {
-            property <- property
-            verifiedOwner <- verifiedOwner
-            _ <- checkAndUpdate(verifiedOwner, property)
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.VALUE_UPDATED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def properties(entityID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
 
-      val checkAndGet: Future[(Boolean, Boolean, Immutables, Mutables)] = entityType match {
+      val checkAndGet: Future[(Boolean, Immutables, Mutables)] = entityType match {
         case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
           val maintainerID = masterClassifications.Service.tryGetMaintainerID(id = entityID)
           val classification = blockchainClassifications.Service.tryGet(entityID)
@@ -182,13 +122,13 @@ class EntityController @Inject()(
             maintainerID <- maintainerID
             provisionedAddresses <- getProvisionedAddresses(maintainerID)
             classification <- classification
-          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), classification.immutableTraits, classification.mutableTraits)
+          } yield (provisionedAddresses.contains(loginState.address), classification.immutableTraits, classification.mutableTraits)
         case constants.Blockchain.Entity.IDENTITY =>
           val identity = blockchainIdentities.Service.tryGet(entityID)
           for {
             provisionedAddresses <- getProvisionedAddresses(entityID)
             identity <- identity
-          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
+          } yield (provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
         case constants.Blockchain.Entity.ASSET =>
           val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
           val asset = blockchainAssets.Service.tryGet(entityID)
@@ -196,7 +136,7 @@ class EntityController @Inject()(
             ownerID <- ownerID
             provisionedAddresses <- getProvisionedAddresses(ownerID)
             asset <- asset
-          } yield (provisionedAddresses.contains(loginState.address), provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
+          } yield (provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
         case constants.Blockchain.Entity.ORDER =>
           val makerID = masterOrders.Service.tryGetMakerID(entityID)
           val order = blockchainOrders.Service.tryGet(entityID)
@@ -205,19 +145,19 @@ class EntityController @Inject()(
             makerID <- makerID
             order <- order
             identityIDs <- identityIDs
-          } yield (identityIDs.contains(makerID), order.getTakerID.fact.hash == "" || identityIDs.map(utilities.Hash.getHash(_)).contains(order.getTakerID.fact.hash), order.immutables, order.mutables)
-        case _ => Future((false, false, Immutables(Properties(Seq.empty)), Mutables(Properties(Seq.empty))))
+          } yield (identityIDs.contains(makerID), order.immutables, order.mutables)
+        case _ => Future((false, Immutables(Properties(Seq.empty)), Mutables(Properties(Seq.empty))))
       }
       val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
 
       def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getList(hashIDs)
 
       (for {
-        (isOwner, canSee, immutables, mutables) <- checkAndGet
+        (isOwner, immutables, mutables) <- checkAndGet
         properties <- properties
         metas <- getBlockchainMetas(properties.map(_.hashID))
       } yield {
-        if (isOwner || canSee) Ok(views.html.component.master.entityProperties(isOwner = isOwner, properties = properties, immutables = immutables, mutables = mutables, metas = metas))
+        if (isOwner) Ok(views.html.component.master.entityProperties(isOwner = isOwner, properties = properties, immutables = immutables, mutables = mutables, metas = metas))
         else throw new BaseException(constants.Response.UNAUTHORIZED)
       }).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)

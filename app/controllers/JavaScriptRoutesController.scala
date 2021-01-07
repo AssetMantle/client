@@ -106,7 +106,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.DocusignController.authorization,
 
           routes.javascript.EntityController.upsertLabelForm,
-          routes.javascript.EntityController.updatePrivatePropertyForm,
           routes.javascript.EntityController.properties,
 
           routes.javascript.FileController.uploadAccountFileForm,
