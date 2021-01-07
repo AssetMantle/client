@@ -11,16 +11,12 @@
             @commonVerticalTextInfo(constants.View.ASSET_ID, asset.id)
             @commonVerticalTextInfo(constants.View.LABEL, asset.label.getOrElse(""))
             @commonVerticalBooleanInfo(constants.View.STATUS, asset.status)
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            <div class="buttonsListChild">
             @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${asset.id}', '${constants.Blockchain.Entity.ASSET}'")
-            </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${asset.id}'")
             </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            <div class="buttonsListChild">
             @commonFormButton(constants.Form.ASSET_BURN, 'parameters -> s"'${asset.id}'")
-            </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${asset.id}'")
             </div>
         }

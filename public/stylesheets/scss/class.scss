@@ -378,7 +378,21 @@ body.darkMode {
   .cmuk-alert-warning {
     background: #63472f !important;
   }
+  .cmuk-navbar-dropdown{
+    background:$darkModeCardBackground;
 
+  }
+  .profileDropdown{
+    .cmuk-navbar-dropdown-nav>li>a:focus, .cmuk-navbar-dropdown-nav>li>a:hover{
+      background: $darkModeCardBackground;
+    }
+  }
+  .cmuk-navbar-dropdown-nav>li>a{
+    color: $darkModePrimaryFontColor;
+  }
+  .timeline-content:hover{
+    background: #383941;
+  }
 }
 
 // End Of Dark Mode Styles
@@ -443,6 +457,13 @@ body.lightMode {
   }
   .cmuk-alert-warning {
     background: #fff6ee;
+  }
+  .cmuk-navbar-dropdown{
+    background:#fff;
+    color: #666;
+  }
+  .timeline-content:hover{
+    background: #e7eaf3;
   }
 }
 %scroller{
@@ -1361,9 +1382,6 @@ body.lightMode {
 
 .profileDropdown{
   padding: 10px;
-  .cmuk-navbar-dropdown-nav>li>a:focus, .cmuk-navbar-dropdown-nav>li>a:hover{
-    background: #f8f8f8;
-  }
 }
 .formNote{
   font-size: 1.15rem;
@@ -1582,7 +1600,7 @@ form{
 }
 .modalInfoBlock{
   width: 620px;
-  max-height: 600px;
+  max-height: calc(100vh - 350px);
   overflow: auto;
   padding: 20px 60px 60px 60px;
   @extend %scroller;
@@ -2754,7 +2772,7 @@ header:before,
       width: 40px;
       height: 40px;
       position: relative;
-      top: 5;
+      top: 5px;
       display: inline-block;
       left: 10px;
       overflow: hidden;
@@ -2776,9 +2794,6 @@ header:before,
         color: #000000;
         font-size: $paragraphFontSizeSmall;
       }
-    }
-    .timeline-content:hover{
-      background: #e7eaf3;
     }
     .timeline-content.right {
       float: right; }
@@ -3685,6 +3700,10 @@ figure.zoom {
 .buttonsListChild{
   display: flex;
   flex-direction: column;
+  padding: 20px 0;
+  button{
+    line-height: 28px;
+  }
   button:first-child{
     margin-bottom: 5px;
     align-items: center;

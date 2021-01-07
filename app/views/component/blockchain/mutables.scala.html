@@ -5,7 +5,7 @@
 @(mutables: Mutables)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonInfoBox() {
-    @Messages(constants.View.MUTABLE_PROPERTIES):
+    <div class="cmuk-text-left title"> @Messages(constants.View.MUTABLE_PROPERTIES):</div>
     @if(mutables.properties.propertyList.isEmpty) {
         @Messages(constants.View.MUTABLES_NOT_FOUND)
     } else {

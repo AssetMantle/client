@@ -232,6 +232,14 @@ body.darkMode .cmuk-alert-danger {
   background: #7b4852; }
 body.darkMode .cmuk-alert-warning {
   background: #63472f !important; }
+body.darkMode .cmuk-navbar-dropdown {
+  background: #282934; }
+body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
+  background: #282934; }
+body.darkMode .cmuk-navbar-dropdown-nav > li > a {
+  color: #D0D0D0; }
+body.darkMode .timeline-content:hover {
+  background: #383941; }
 
 body.lightMode .buttonPrimary {
   background: #191616; }
@@ -261,6 +269,11 @@ body.lightMode .cmuk-alert-danger {
   background: #e2a1ae; }
 body.lightMode .cmuk-alert-warning {
   background: #fff6ee; }
+body.lightMode .cmuk-navbar-dropdown {
+  background: #fff;
+  color: #666; }
+body.lightMode .timeline-content:hover {
+  background: #e7eaf3; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -953,8 +966,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .profileDropdown {
   padding: 10px; }
-  .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
-    background: #f8f8f8; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -1116,7 +1127,7 @@ form .formBody {
 
 .modalInfoBlock {
   width: 620px;
-  max-height: 600px;
+  max-height: calc(100vh - 350px);
   overflow: auto;
   padding: 20px 60px 60px 60px; }
   .modalInfoBlock .traderCommodity {
@@ -1942,7 +1953,7 @@ header:before,
       width: 40px;
       height: 40px;
       position: relative;
-      top: 5;
+      top: 5px;
       display: inline-block;
       left: 10px;
       overflow: hidden;
@@ -1962,8 +1973,6 @@ header:before,
       .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
         font-size: 0.875rem; }
-    .timeline .timeline-item .timeline-content:hover {
-      background: #e7eaf3; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
     .timeline .timeline-item .timeline-content.right:before {
@@ -2630,7 +2639,10 @@ figure.zoom {
 
 .buttonsListChild {
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  padding: 20px 0; }
+  .buttonsListChild button {
+    line-height: 28px; }
   .buttonsListChild button:first-child {
     margin-bottom: 5px;
     align-items: center;
