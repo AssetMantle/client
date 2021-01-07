@@ -14,7 +14,7 @@ function graph(title, chartID) {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
-                    },
+                    }
                 }]
             }
         }
