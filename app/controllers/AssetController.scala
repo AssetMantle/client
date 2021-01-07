@@ -20,7 +20,6 @@ class AssetController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
                                  withLoginAction: WithLoginAction,
-                                 withUnknownLoginAction: WithUnknownLoginAction,
                                  transactionsAssetDefine: transactions.blockchain.AssetDefine,
                                  blockchainTransactionAssetDefines: blockchainTransaction.AssetDefines,
                                  transactionsAssetMint: transactions.blockchain.AssetMint,
@@ -278,7 +277,7 @@ class AssetController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID, burnData.fromID)))
 

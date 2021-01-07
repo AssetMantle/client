@@ -45,7 +45,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def update(accountFile: AccountFile): Future[Int] = db.run(accountFileTable.filter(_.id === accountFile.id).filter(_.documentType === accountFile.documentType).update(accountFile).asTry).map {
+  private def update(accountFile: AccountFile): Future[Int] = db.run(accountFileTable.filter(x => x.id === accountFile.id && x.documentType === accountFile.documentType).update(accountFile).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -53,21 +53,21 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def tryGetByIDAndDocumentType(id: String, documentType: String): Future[AccountFile] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def tryGetByIDAndDocumentType(id: String, documentType: String): Future[AccountFile] = db.run(accountFileTable.filter(x => x.id === id && x.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def tryGetFileNameByIDAndDocumentType(id: String, documentType: String): Future[String] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def tryGetFileNameByIDAndDocumentType(id: String, documentType: String): Future[String] = db.run(accountFileTable.filter(x => x.id === id && x.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def getFileByIdDocumentType(id: String, documentType: String): Future[Array[Byte]] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.file).result.head.asTry).map {
+  private def getFileByIdDocumentType(id: String, documentType: String): Future[Array[Byte]] = db.run(accountFileTable.filter(x => x.id === id && x.documentType === documentType).map(_.file).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => documentType match {
@@ -87,9 +87,9 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountFileTable.filter(x => x.id === id && x.documentType === documentType).exists.result)
 
-  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(accountFileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(accountFileTable.filter(x => x.id === id && x.fileName === fileName).exists.result)
 
   private[models] class AccountFileTable(tag: Tag) extends Table[AccountFile](tag, "AccountFile") {
 

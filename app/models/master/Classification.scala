@@ -52,11 +52,13 @@ class Classifications @Inject()(
     }
   }
 
-  private def updateLabelByIDAndMaintainer(id: String, maintainerID: String, label: Option[String]): Future[Int] = db.run(identityTable.filter(x => x.id === id && x.maintainerID === maintainerID).map(_.label.?).update(label).asTry).map {
-    case Success(result) => result
+  private def updateLabelByIDAndMaintainerID(id: String, maintainerID: String, label: Option[String]): Future[Int] = db.run(identityTable.filter(x => x.id === id && x.maintainerID === maintainerID).map(_.label.?).update(label).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -129,7 +131,7 @@ class Classifications @Inject()(
 
     def get(id: String): Future[Option[Classification]] = getByID(id)
 
-    def updateLabel(id: String, maintainerID: String, label: String): Future[Int] = updateLabelByIDAndMaintainer(id = id, maintainerID = maintainerID, label = Option(label))
+    def updateLabel(id: String, maintainerID: String, label: String): Future[Int] = updateLabelByIDAndMaintainerID(id = id, maintainerID = maintainerID, label = Option(label))
 
     def getByIdentityIDs(identities: Seq[String]): Future[Seq[Classification]] = getByMaintainers(identities)
 

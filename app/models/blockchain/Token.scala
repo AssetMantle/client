@@ -93,21 +93,30 @@ class Tokens @Inject()(
   }
 
   private def updateBydenom(token: Token): Future[Int] = db.run(tokenTable.filter(_.denom === token.denom).update(serialize(token)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, psqlException)
     }
   }
 
-  private def updateBondingTokenBydenom(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toString, notBondedAmount.toString)).asTry).map {
-    case Success(result) => result
+  private def updateBondingTokenByDenom(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toString, notBondedAmount.toString)).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
     }
   }
 
-  private def updateTotalSupplyAndInflationBydenom(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toString, inflation)).asTry).map {
-    case Success(result) => result
+  private def updateTotalSupplyAndInflationByDenom(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toString, inflation)).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
     }
@@ -156,9 +165,9 @@ class Tokens @Inject()(
 
     def insertOrUpdate(token: Token): Future[Int] = upsert(token)
 
-    def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenBydenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
+    def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationBydenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
+    def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationByDenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }

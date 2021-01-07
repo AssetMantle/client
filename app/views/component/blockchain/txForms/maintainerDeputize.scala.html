@@ -10,6 +10,6 @@
     @commonCheckbox(maintainerDeputizeForm, constants.FormField.MUTATE_MAINTAINER)
     @commonCheckbox(maintainerDeputizeForm, constants.FormField.REMOVE_MAINTAINER)
     @commonInputMicroNumber(maintainerDeputizeForm, constants.FormField.GAS)
-    @commonInputPassword(maintainerDeputizeForm, constants.FormField.PASSWORD, 'required -> false)
     @views.html.component.blockchain.txForms.addProperties(maintainerDeputizeForm, constants.FormField.MAINTAINED_TRAITS, constants.FormField.ADD_MAINTAINED_TRAITS, numMaintainedTraitsForm, addFields = true, deleteFields = true)
+    @commonInputPassword(maintainerDeputizeForm, constants.FormField.PASSWORD, 'required -> false)
 }

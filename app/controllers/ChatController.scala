@@ -56,7 +56,7 @@ class ChatController @Inject()(
           chats <- getChats
         } yield Ok(views.html.component.master.chatRoom(chatID = chatID, chats = chats))
         ).recover {
-        case baseException: BaseException => InternalServerError
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -85,7 +85,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
@@ -114,7 +114,7 @@ class ChatController @Inject()(
         result <- getResult(userIsParticipant)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 

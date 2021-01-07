@@ -66,9 +66,9 @@ class Splits @Inject()(
 
   private def getByOwnerOrOwnableID(id: String) = db.run(splitTable.filter(x => x.ownerID === id || x.ownableID === id).result)
 
-  private def getByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(_.ownableID === ownableID).filter(_.ownerID === ownerID).result.headOption)
+  private def getByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x=>x.ownableID === ownableID && x.ownerID === ownerID).result.headOption)
 
-  private def tryGetByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(_.ownableID === ownableID).filter(_.ownerID === ownerID).result.head.asTry).map {
+  private def tryGetByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x=>x.ownableID === ownableID && x.ownerID === ownerID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SPLIT_NOT_FOUND, noSuchElementException)
@@ -77,7 +77,7 @@ class Splits @Inject()(
 
   private def getAllSplits = db.run(splitTable.result)
 
-  private def deleteByIDs(ownerID: String, ownableID: String): Future[Int] = db.run(splitTable.filter(_.ownerID === ownerID).filter(_.ownableID === ownableID).delete.asTry).map {
+  private def deleteByIDs(ownerID: String, ownableID: String): Future[Int] = db.run(splitTable.filter(x => x.ownerID === ownerID && x.ownableID === ownableID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.SPLIT_UPSERT_FAILED, psqlException)
@@ -300,15 +300,13 @@ class Splits @Inject()(
           } yield ()
         }
 
-        (for {
+        for {
           oldFromSplit <- oldFromSplit
           oldToSplit <- oldToSplit
           _ <- updateOrDeleteFromSplit(oldFromSplit)
           _ <- upsertToSplit(oldToSplit)
           _ <- masterOperations((oldFromSplit.split - splitValue) == 0)
-        } yield ()).recover {
-          case baseException: BaseException => throw baseException
-        }
+        } yield ()
       } else Future()
     }
   }

@@ -46,14 +46,14 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def tryGetEmailAddressByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(emailTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.head.asTry).map {
+  private def tryGetEmailAddressByIDAndStatus(id: String, status: Boolean): Future[String] = db.run(emailTable.filter(x => x.id === id && x.status === status).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def getEmailAddressById(id: String, status: Boolean): Future[Option[String]] = db.run(emailTable.filter(_.id === id).filter(_.status === status).map(_.emailAddress).result.headOption)
+  private def getEmailAddressById(id: String, status: Boolean): Future[Option[String]] = db.run(emailTable.filter(x => x.id === id && x.status === status).map(_.emailAddress).result.headOption)
 
   private def getAccountIDByEmailAddress(emailAddress: String): Future[Option[String]] = db.run(emailTable.filter(_.emailAddress === emailAddress).map(_.id).result.headOption)
 
@@ -76,7 +76,10 @@ class Emails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   private def updateEmailAddressVerificationStatusOnEmailAddress(emailAddress: String, verificationStatus: Boolean): Future[Int] = db.run(emailTable.filter(_.emailAddress === emailAddress).map(_.status).update(verificationStatus).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }

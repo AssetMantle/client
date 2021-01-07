@@ -19,7 +19,7 @@
                 @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
                 @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
                 @commonBooleanInfo(constants.View.IS_REVEALED, Option(isRevealed))
-                @if(!isRevealed) {
+                @if(!isRevealed && property.hashID != "") {
                     @commonFormButton(constants.Form.META_REVEAL, 'parameters -> s"'${property.value.getOrElse("")}', '${property.dataType}'")
                 }
             }

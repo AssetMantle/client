@@ -36,22 +36,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
-  //  def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-  //    implicit request =>
-  //      (loginState.userType match {
-  //        case constants.User.USER => withUsernameToken.Ok(views.html.profile())
-  //        case constants.User.WITHOUT_LOGIN =>
-  //          val markUserTypeUser = masterAccounts.Service.markUserTypeUser(loginState.username)
-  //          for {
-  //            _ <- markUserTypeUser
-  //            result <- withUsernameToken.Ok(views.html.profile())
-  //          } yield result
-  //        case _ => withUsernameToken.Ok(views.html.dashboard())
-  //      }).recover {
-  //        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-  //      }
-  //  }
-
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
