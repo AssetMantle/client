@@ -1,5 +1,5 @@
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(timePeriods:Seq[String], buyTradesMonthly:Seq[Int], sellTradesMonthly:Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 @import views.html.base._
 
 @commonCard(constants.View.FINANCIAL_GRAPH) {
@@ -10,4 +10,4 @@
 <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.min.js")"></script>
 <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.bundle.min.js")"></script>
 <script src="@routes.Assets.versioned("javascripts/graph.js")" type="text/javascript"></script>
-<script>lineChart("blockTimes")</script>
+<script>lineChart("blockTimes", "@timePeriods.mkString(",")","@buyTradesMonthly.mkString(",")","@sellTradesMonthly.mkString(",")" )</script>
