@@ -1,5 +1,6 @@
 package controllers
 
+import java.text.DecimalFormat
 import java.time.Year
 import java.util.Calendar
 
@@ -3106,7 +3107,7 @@ class ComponentViewController @Inject()(
 
       def getBuyTradeList(traderID: String) = masterNegotiations.Service.getAllContractSignedNegotiationListByBuyerTraderID(traderID)
 
-      def getBuyTradeHistoryList(traderID: String) = masterNegotiations.Service.getAllContractSignedNegotiationListByBuyerTraderID(traderID)
+      def getBuyTradeHistoryList(traderID: String) = masterNegotiationHistories.Service.getAllCompletedNegotiationListByBuyerTraderID(traderID)
 
       for {
         traderID <- traderID
@@ -3117,17 +3118,14 @@ class ComponentViewController @Inject()(
       } yield {
         val currentYear = Year.now().getValue
         val currentMonth = Calendar.getInstance.get(Calendar.MONTH)
-
-        val timePeriods = (1 to 12).map { x =>
-          if (x - 1 <= currentMonth) Seq(currentYear.toString, if (x < 9) "0" + x.toString else x.toString).mkString("-")
-          else Seq((currentYear - 1).toString, if (x < 9) "0" + x.toString else x.toString).mkString("-")
-        }.sorted
+        val twoDecimalFormat = new DecimalFormat("00")
+        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, twoDecimalFormat.format(x)).mkString("-") }.sorted
 
         val sellTradesMonthly = timePeriods.map { timePeriod =>
-          sellTradeList.count(x => x.updatedOn.get.toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
+          sellTradeList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
         }
         val buyTradesMonthly = timePeriods.map { timePeriod =>
-          buyTraderList.count(x => x.updatedOn.get.toString.slice(0, 7) == timePeriod) + buyTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
+          buyTraderList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + buyTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
         }
         Ok(views.html.component.master.statistics(timePeriods, buyTradesMonthly, sellTradesMonthly))
       }
