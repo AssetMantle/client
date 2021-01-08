@@ -30,7 +30,6 @@ object OrderResponse {
 
   implicit val ordersReads: Reads[Orders] = Json.reads[Orders]
 
-  //TODO update when updated
   case class Value(Orders: Orders)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]

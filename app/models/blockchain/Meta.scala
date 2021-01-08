@@ -1,9 +1,6 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.DataValue
 import models.common.Serializable._
@@ -11,9 +8,10 @@ import models.common.TransactionMessages.MetaReveal
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.GetMeta
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -23,7 +21,7 @@ case class Meta(id: String, dataType: String, dataValue: String, createdBy: Opti
 class Metas @Inject()(
                        protected val databaseConfigProvider: DatabaseConfigProvider,
                        configuration: Configuration,
-                       getMeta: GetMeta,
+                       utilitiesOperations: utilities.Operations,
                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -113,6 +111,8 @@ class Metas @Inject()(
 
     def getDataList(ids: Seq[String]): Future[Seq[Data]] = getByIDs(ids.filter(x => x != "")).map(_.map(meta => DataValue.getData(dataType = meta.dataType, dataValue = Option(meta.dataValue))))
 
+    def getList(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
+
     def insertMultiple(metaList: Seq[Meta]): Future[Seq[String]] = addMultiple(metaList)
 
     def insertMultipleData(dataList: Seq[Data]): Future[Seq[String]] = addMultiple(dataList.map(x => Meta(id = x.value.generateHash, dataType = x.dataType, dataValue = x.value.asString)))
@@ -129,7 +129,6 @@ class Metas @Inject()(
 
     def onReveal(metaReveal: MetaReveal): Future[Unit] = {
       val upsertMeta = Service.insertOrUpdate(metaReveal.metaFact.data)
-
       (for {
         _ <- upsertMeta
       } yield ()
@@ -138,9 +137,8 @@ class Metas @Inject()(
       }
     }
 
-    //TODO Can be optimized by directly doing removeData() wherever auxiliaryScrub is called. Haven't done to keep logic in same order as BC
     def auxiliaryScrub(metaPropertyList: Seq[MetaProperty]): Future[Seq[Property]] = {
-      val upsertMetas = Future.traverse(metaPropertyList) { metaProperty =>
+      val upsertMetas = utilitiesOperations.traverse(metaPropertyList) { metaProperty =>
         if (metaProperty.metaFact.getHash != "") {
           val upsertMeta = Service.insertOrUpdate(metaProperty.metaFact.data)
 

@@ -71,12 +71,12 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                 implicit val loginStateImplicit: LoginState = loginState
                 if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
                   withUsernameToken.Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-                } else withUsernameToken.Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer))
+                } else withUsernameToken.Ok(views.html.search(asset, identity, splits, order, metaList, classification, maintainer))
               }
               case None =>
                 if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
                   Future(Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
-                } else Future(Ok(views.html.search(query, asset, identity, splits, order, metaList, classification, maintainer)))
+                } else Future(Ok(views.html.search(asset, identity, splits, order, metaList, classification, maintainer)))
             }
           }
         }

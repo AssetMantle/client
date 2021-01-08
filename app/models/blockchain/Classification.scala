@@ -1,20 +1,16 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.master
-import models.master.{Classification => masterClassification}
 import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.GetClassification
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -136,8 +132,9 @@ class Classifications @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.chainID")
 
+    //Insert in master.Classification happens in respective txs
     def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[String] = {
-      val classificationID = getID(immutables = immutables, mutables = mutables)
+      val classificationID = utilities.IDGenerator.getClassificationID(chainID = chainID, immutables = immutables, mutables = mutables)
       val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
 
       (for {
@@ -147,9 +144,6 @@ class Classifications @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-
-    def getID(immutables: Immutables, mutables: Mutables): String = Seq(chainID, utilities.Hash.getHash(utilities.Hash.getHash(immutables.properties.propertyList.map(_.id): _*), utilities.Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
-
   }
 
 }

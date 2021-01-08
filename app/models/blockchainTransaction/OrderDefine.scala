@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrderDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderDefine] with Logged {
+case class OrderDefine(from: String, fromID: String, immutableMetaTraits: Seq[BaseProperty], immutableTraits: Seq[BaseProperty], mutableMetaTraits: Seq[BaseProperty], mutableTraits: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderDefine] with Logged {
   def mutateTicketID(newTicketID: String): OrderDefine = OrderDefine(from = from, fromID = fromID, immutableMetaTraits = immutableMetaTraits, immutableTraits = immutableTraits, mutableMetaTraits = mutableMetaTraits, mutableTraits = mutableTraits, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,11 +29,12 @@ class OrderDefines @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
+                              masterProperties: master.Properties,
                               blockchainAccounts: blockchain.Accounts
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class OrderDefineSerialized(from: String, fromID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: OrderDefine = OrderDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Properties](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[MetaProperties](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Properties](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: OrderDefine = OrderDefine(from = from, fromID = fromID, immutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableMetaTraits), immutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](immutableTraits), mutableMetaTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableMetaTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](mutableTraits), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(orderDefine: OrderDefine): OrderDefineSerialized = OrderDefineSerialized(from = orderDefine.from, fromID = orderDefine.fromID, immutableMetaTraits = Json.toJson(orderDefine.immutableMetaTraits).toString, immutableTraits = Json.toJson(orderDefine.immutableTraits).toString, mutableMetaTraits = Json.toJson(orderDefine.mutableMetaTraits).toString, mutableTraits = Json.toJson(orderDefine.mutableTraits).toString, gas = orderDefine.gas.toMicroString, status = orderDefine.status, txHash = orderDefine.txHash, ticketID = orderDefine.ticketID, mode = orderDefine.mode, code = orderDefine.code, createdBy = orderDefine.createdBy, createdOn = orderDefine.createdOn, createdOnTimeZone = orderDefine.createdOnTimeZone, updatedBy = orderDefine.updatedBy, updatedOn = orderDefine.updatedOn, updatedOnTimeZone = orderDefine.updatedOnTimeZone)
@@ -197,12 +197,30 @@ class OrderDefines @Inject()(
   }
 
   object Utility {
+
+    private val chainID = configuration.get[String]("blockchain.chainID")
+
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val orderDefine = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty)))),
+        entityType = constants.Blockchain.Entity.ORDER_DEFINITION, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits)
+
+      def insertMaintainerProperties(classificationID: String, orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = orderDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        orderDefine <- orderDefine
+        classificationID <- insertProperties(orderDefine)
+        maintainerID <- insertMaintainerProperties(classificationID, orderDefine)
+        accountID <- getAccountID(orderDefine.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -212,7 +230,7 @@ class OrderDefines @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

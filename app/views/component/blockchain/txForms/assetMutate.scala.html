@@ -1,13 +1,14 @@
 @import views.companion.blockchain.AssetMutate
 @import views.html.base._
 
-@(assetMutateForm: Form[AssetMutate.Data] = AssetMutate.form, assetID: String, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(assetMutateForm: Form[AssetMutate.Data] = AssetMutate.form, assetID: String, fromID: String, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ASSET_MUTATE, assetMutateForm) {
-    @commonInputText(assetMutateForm, constants.FormField.FROM_ID)
-    @commonInputText(assetMutateForm, constants.FormField.ASSET_ID, 'value -> assetID)
-    @commonInputText(assetMutateForm, constants.FormField.LABEL)
+    @commonInputText(assetMutateForm, constants.FormField.FROM_ID, 'value -> fromID, 'readonly -> true)
+    @commonInputText(assetMutateForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true)
     @commonInputMicroNumber(assetMutateForm, constants.FormField.GAS)
-    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms)
-    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms)
+    @defining((numMutableMetaForms + numMutableForms) == 0) { addAndDeleteFields =>
+        @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+        @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
+    }
     @commonInputPassword(assetMutateForm, constants.FormField.PASSWORD, 'required -> false)
 }

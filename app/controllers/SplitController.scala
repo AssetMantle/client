@@ -4,7 +4,6 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -12,6 +11,7 @@ import play.api.{Configuration, Logger}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -39,16 +39,16 @@ class SplitController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def sendForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def sendForm(ownableID: String, fromID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.splitSend(ownableID = ownableID))
+      Ok(blockchainForms.splitSend(ownableID = ownableID, fromID = fromID))
   }
 
   def send: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       blockchainCompanion.SplitSend.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.splitSend(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name))))
+          Future(BadRequest(blockchainForms.splitSend(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name), formWithErrors.data(constants.FormField.FROM_ID.name))))
         },
         sendData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendData.password)
@@ -68,7 +68,7 @@ class SplitController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID)))
+          } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID, sendData.fromID)))
 
           (for {
             verifyPassword <- verifyPassword
@@ -83,7 +83,7 @@ class SplitController @Inject()(
 
   def wrapForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.splitWrap())
+      Ok(blockchainForms.splitWrap())
   }
 
   def wrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -127,16 +127,16 @@ class SplitController @Inject()(
       )
   }
 
-  def unwrapForm(ownableID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def unwrapForm(ownableID: String, fromID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.splitUnwrap(ownableID = ownableID))
+      Ok(blockchainForms.splitUnwrap(ownableID = ownableID, fromID = fromID))
   }
 
   def unwrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       blockchainCompanion.SplitUnwrap.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.splitUnwrap(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name))))
+          Future(BadRequest(blockchainForms.splitUnwrap(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name), formWithErrors.data(constants.FormField.FROM_ID.name))))
         },
         unwrapData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unwrapData.password)
@@ -156,7 +156,7 @@ class SplitController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID)))
+          } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID, unwrapData.fromID)))
 
           (for {
             verifyPassword <- verifyPassword

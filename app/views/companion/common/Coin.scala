@@ -1,8 +1,7 @@
 package views.companion.common
 
-import models.common.DataValue
 import models.common.Serializable
-import play.api.data.Forms.{mapping, optional}
+import play.api.data.Forms.mapping
 import play.api.data.Mapping
 import utilities.MicroNumber
 
@@ -14,7 +13,7 @@ object Coin {
   )(Data.apply)(Data.unapply)
 
   case class Data(denom: String, amount: MicroNumber) {
-    def toCoin: Serializable.Coin = Serializable.Coin(denom =denom , amount = amount)
+    def toCoin: Serializable.Coin = Serializable.Coin(denom = denom, amount = amount)
   }
 
 }

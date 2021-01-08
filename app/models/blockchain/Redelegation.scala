@@ -1,8 +1,8 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.RedelegationEntry
@@ -12,6 +12,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries._
+import queries.{GetValidatorDelegatorDelegation, GetValidatorDelegatorRedelegations}
 import queries.responses.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
 import queries.responses.ValidatorDelegatorRedelegationsResponse.{Response => ValidatorDelegatorRedelegationsResponse}
 import slick.jdbc.JdbcProfile
@@ -28,7 +29,6 @@ class Redelegations @Inject()(
                                configuration: Configuration,
                                getValidatorDelegatorRedelegations: GetValidatorDelegatorRedelegations,
                                getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
-                               getValidator: GetValidator,
                                blockchainValidators: Validators,
                                blockchainWithdrawAddresses: WithdrawAddresses,
                              )(implicit executionContext: ExecutionContext) {
@@ -143,6 +143,8 @@ class Redelegations @Inject()(
 
       def upsertRedelegation(redelegationsResponse: ValidatorDelegatorRedelegationsResponse) = Service.insertOrUpdate(redelegationsResponse.result.find(x => x.delegator_address == redelegate.delegatorAddress && x.validator_src_address == redelegate.validatorSrcAddress && x.validator_dst_address == redelegate.validatorDstAddress).getOrElse(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)).toRedelegation)
 
+      def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
+
       (for {
         redelegationsResponse <- redelegationsResponse
         _ <- upsertRedelegation(redelegationsResponse)
@@ -150,6 +152,7 @@ class Redelegations @Inject()(
         _ <- updateDstValidatorDelegation
         _ <- withdrawAddressBalanceUpdate
         _ <- updateValidators
+        _ <- updateActiveValidatorSet()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }

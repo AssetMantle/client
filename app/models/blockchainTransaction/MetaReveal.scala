@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.MetaFact
+import models.common.Serializable.{MetaFact, metaFactReads}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,6 +13,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -30,6 +29,7 @@ class MetaReveals @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              utilitiesNotification: utilities.Notification,
                              masterAccounts: master.Accounts,
+                             masterProperties: master.Properties,
                              blockchainAccounts: blockchain.Accounts
                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -188,10 +188,18 @@ class MetaReveals @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val metaReveal = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, metaFact: String) = utilitiesNotification.send(accountID, constants.Notification.META_REVEALED, metaFact, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        metaReveal <- metaReveal
+        accountID <- getAccountID(metaReveal.from)
+        _ <- sendNotifications(accountID = accountID, metaFact = metaReveal.metaFact.data.value.asString)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -201,7 +209,7 @@ class MetaReveals @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

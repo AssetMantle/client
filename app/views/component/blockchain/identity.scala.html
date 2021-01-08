@@ -8,8 +8,8 @@
 @commonCard(constants.View.IDENTITY) {
 } {
     @commonTextInfo(constants.View.IDENTITY_ID, identity.id)
-    @commonTextInfo(constants.View.PROVISIONED_ADDRESS_LIST, identity.provisionedAddressList.mkString(", "))
-    @commonTextInfo(constants.View.UNPROVISIONED_ADDRESS_LIST, identity.unprovisionedAddressList.mkString(", "))
+    @commonHtmlInfo(constants.View.PROVISIONED_ADDRESS_LIST, commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.provisionedAddresses,  'parameters -> s"'${identity.id}'"))
+    @commonHtmlInfo(constants.View.UNPROVISIONED_ADDRESS_LIST, commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.unprovisionedAddresses,  'parameters -> s"'${identity.id}'"))
     @immutables(identity.immutables)
     @mutables(identity.mutables)
 }

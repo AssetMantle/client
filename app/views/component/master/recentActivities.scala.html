@@ -2,7 +2,7 @@
 @import models.masterTransaction.Notification
 @import views.html.base._
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
 @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#recentActivity") {
 } {

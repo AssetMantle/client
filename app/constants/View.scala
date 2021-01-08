@@ -421,6 +421,7 @@ object View {
   val MAKE = "MAKE"
   val TAKE = "TAKE"
   val CANCEL = "CANCEL"
+  val AMOUNT = "AMOUNT"
 
   val DOUBLE_SIGNING = "DOUBLE_SIGNING"
   val MISSING_SIGNATURE = "MISSING_SIGNATURE"

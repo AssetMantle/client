@@ -8,6 +8,7 @@ import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import play.libs.Json
 import queries._
+import queries.{GetABCIInfo, GetBlockResults, GetBondedValidators, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
 import queries.responses.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.BlockResultResponse.{Response => BlockResultResponse}
@@ -31,7 +32,6 @@ class Startup @Inject()(
                          blockchainBlocks: blockchain.Blocks,
                          blockchainParameters: blockchain.Parameters,
                          blockchainDelegations: blockchain.Delegations,
-                         blockchainSigningInfos: blockchain.SigningInfos,
                          blockchainValidators: blockchain.Validators,
                          blocksServices: Block,
                          blockchainTokens: blockchain.Tokens,
@@ -131,7 +131,6 @@ class Startup @Inject()(
   }
 
   private def updateStakingOnStart(staking: Staking): Future[Unit] = {
-    val insertAllSigningInfos = blockchainSigningInfos.Utility.insertAll()
     val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.getOrElse(Seq.empty).map(_.toValidator))
     val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = BigInt(staking.params.unbonding_time), maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
     //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
@@ -151,7 +150,6 @@ class Startup @Inject()(
     (for {
       _ <- insertAllValidators
       _ <- updateDelegations()
-      _ <- insertAllSigningInfos
       _ <- insertStakingParameters
       //          _ <- insertKeyBaseAccount
     } yield ()).recover {
@@ -192,34 +190,6 @@ class Startup @Inject()(
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
-  }
-
-  private def insertOrUpdateAllValidators(): Future[Unit] = {
-    val bondedValidators = getBondedValidators.Service.get()
-    val unbondedValidators = getUnbondedValidators.Service.get()
-    val unbondingValidators = getUnbondingValidators.Service.get()
-    val insertSigningInfos = blockchainSigningInfos.Utility.insertAll()
-
-    def insert(validatorResults: Seq[ValidatorResult]): Future[Unit] = {
-      val insertValidator = blockchainValidators.Service.insertMultiple(validatorResults.map(_.toValidator))
-      val insertDelegations = Future.traverse(validatorResults)(validatorResult => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorResult.operator_address), validatorAddress = validatorResult.operator_address))
-      //        val insertKeyBaseAccount = Future.traverse(validatorResults)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operator_address, validator.description.identity))
-      (for {
-        _ <- insertValidator
-        _ <- insertDelegations
-        //          _ <- insertKeyBaseAccount
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
-    for {
-      bondedValidators <- bondedValidators
-      unbondedValidators <- unbondedValidators
-      unbondingValidators <- unbondingValidators
-      _ <- insert(bondedValidators.result ++ unbondedValidators.result ++ unbondingValidators.result)
-      _ <- insertSigningInfos
-    } yield ()
   }
 
   private def insertAllTokensOnStart(): Future[Unit] = {
@@ -288,7 +258,7 @@ class Startup @Inject()(
 
   private val explorerRunnable = new Runnable {
     def run(): Unit = {
-      //TODO Bug Source: Continuously emits sometimes when app starts - queries.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
+      //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
       //TODO java.lang.IllegalStateException: Closed
       //TODO (Runtime Exception) Explorer keeps on working fine
       //TODO (also may be akka.dispatch.TaskInvocation)

@@ -70,9 +70,9 @@ GET         /asset/define                                        controllers.Ass
 POST        /asset/define                                        controllers.AssetController.define
 GET         /asset/mint                                          controllers.AssetController.mintForm(classificationID: String)
 POST        /asset/mint                                          controllers.AssetController.mint
-GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String)
+GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String, fromID: String)
 POST        /asset/mutate                                        controllers.AssetController.mutate
-GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String)
+GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String, fromID: String)
 POST        /asset/burn                                          controllers.AssetController.burn
 
 GET         /identity/nub                                        controllers.IdentityController.nubForm
@@ -83,13 +83,13 @@ GET         /identity/define                                     controllers.Ide
 POST        /identity/define                                     controllers.IdentityController.define
 GET         /identity/provision                                  controllers.IdentityController.provisionForm(identityID: String)
 POST        /identity/provision                                  controllers.IdentityController.provision
-GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String)
+GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String, address: String)
 POST        /identity/unprovision                                controllers.IdentityController.unprovision
 
 GET         /meta/reveal                                         controllers.MetaController.revealForm
 POST        /meta/reveal                                         controllers.MetaController.reveal
 
-GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm
+GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm(classificationID: String, entityType: String)
 POST        /maintainer/deputize                                 controllers.MaintainerController.deputize
 
 GET         /order/define                                        controllers.OrderController.defineForm
@@ -98,20 +98,19 @@ GET         /order/make                                          controllers.Ord
 POST        /order/make                                          controllers.OrderController.make
 GET         /order/take                                          controllers.OrderController.takeForm(orderID: String)
 POST        /order/take                                          controllers.OrderController.take
-GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String)
+GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String, makerID: String)
 POST        /order/cancel                                        controllers.OrderController.cancel
 
-GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String)
+GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String, fromID: String)
 POST        /split/send                                          controllers.SplitController.send
 GET         /split/wrap                                          controllers.SplitController.wrapForm
 POST        /split/wrap                                          controllers.SplitController.wrap
-GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String)
+GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String, fromID: String)
 POST        /split/unwrap                                        controllers.SplitController.unwrap
 
-GET         /entity/addLabel                                     controllers.EntityController.addLabelForm(entityID: String, entityType: String)
-POST        /entity/addLabel                                     controllers.EntityController.addLabel
-GET         /entity/addPrivateProperty                           controllers.EntityController.addPrivatePropertyForm(entityID: String, entityType: String, name: String)
-POST        /entity/addPrivateProperty                           controllers.EntityController.addPrivateProperty
+GET         /entity/upsertLabel                                  controllers.EntityController.upsertLabelForm(entityID: String, entityType: String)
+POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
+GET         /component/entityProperties                          controllers.EntityController.properties(entityID: String, entityType: String)
 
 GET         /contact                                             controllers.ContactController.contact
 
@@ -128,7 +127,6 @@ GET         /contact/verifyMobileNumber                          controllers.Con
 POST        /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumber
 
 GET         /notification/recentActivityMessages                 controllers.NotificationController.recentActivityMessages(pageNumber: Int)
-GET         /notification/publicRecentActivityMessages           controllers.NotificationController.publicRecentActivityMessages(pageNumber: Int)
 GET         /notification/unreadNotificationCount                controllers.NotificationController.unreadNotificationCount
 GET         /notification/markNotificationAsRead                 controllers.NotificationController.markNotificationRead(notificationID: String)
 
@@ -138,7 +136,6 @@ GET         /component/recentActivities                          controllers.Com
 
 GET         /component/latestBlockHeight                         controllers.ComponentViewController.latestBlockHeight
 GET         /component/tokensStatistics                          controllers.ComponentViewController.tokensStatistics
-GET         /component/publicRecentActivities                    controllers.ComponentViewController.publicRecentActivities
 GET         /component/votingPowers                              controllers.ComponentViewController.votingPowers
 
 GET         /component/tokensPrices                              controllers.ComponentViewController.tokensPrices
@@ -168,8 +165,8 @@ GET         /component/validatorDelegations                      controllers.Com
 GET         /component/validatorTransactions                     controllers.ComponentViewController.validatorTransactions(address: String)
 GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
-GET         /component/entityProperties                          controllers.ComponentViewController.entityProperties(entityID: String, entityType: String)
-GET         /component/identityInfo                              controllers.ComponentViewController.viewIdentityInfo(identityID: String)
+GET         /component/provisionedAddresses                      controllers.ComponentViewController.provisionedAddresses(identityID: String)
+GET         /component/unprovisionedAddresses                    controllers.ComponentViewController.unprovisionedAddresses(identityID: String)
 
 GET         /component/identitiesDefinition                      controllers.ComponentViewController.identitiesDefinition
 GET         /component/identitiesProvisioned                     controllers.ComponentViewController.identitiesProvisioned
@@ -181,6 +178,8 @@ GET         /component/assetsMinted                              controllers.Com
 GET         /component/ordersDefinition                          controllers.ComponentViewController.ordersDefinition
 GET         /component/ordersMade                                controllers.ComponentViewController.ordersMade
 GET         /component/ordersTake                                controllers.ComponentViewController.ordersTake
+GET         /component/ordersTakePublic                          controllers.ComponentViewController.ordersTakePublic
+GET         /component/ordersTakePrivate                         controllers.ComponentViewController.ordersTakePrivate
 
 GET         /component/moduleTransactions                        controllers.ComponentViewController.moduleTransactions(module: String)
 GET         /component/getTransaction                            controllers.ComponentViewController.getTransaction(transactionType: String)

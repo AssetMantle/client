@@ -13,10 +13,12 @@ object DataValue {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val DecDataTypePrecision: Int = 18
+
   case class StringDataValue(value: String) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.STRING_DATA
 
-    def generateHash: String = getHash(dataType = constants.Blockchain.DataType.STRING_DATA, dataValue = value)
+    def generateHash: String = getHash(this)
 
     def asString: String = value
 
@@ -34,11 +36,18 @@ object DataValue {
   case class DecDataValue(value: BigDecimal) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.DEC_DATA
 
-    def generateHash: String = getHash(dataType = constants.Blockchain.DataType.DEC_DATA, dataValue = value.toString)
+    private def integerPart: String = value.bigDecimal.stripTrailingZeros.toPlainString.split("\\.")(0)
 
-    def asString: String = value.toString
+    private def decimalPart: String = {
+      val integerDecimalSplit = value.bigDecimal.stripTrailingZeros.toPlainString.split("\\.")
+      if (integerDecimalSplit.length == 1) "0" * DecDataTypePrecision else (integerDecimalSplit(1) + "0" * DecDataTypePrecision).take(DecDataTypePrecision)
+    }
 
-    def asDec: BigDecimal = value
+    def generateHash: String = getHash(this)
+
+    def asString: String = Seq(integerPart, decimalPart).mkString(".")
+
+    def asDec: BigDecimal = BigDecimal(asString)
 
     def asHeight: Int = 0
 
@@ -52,7 +61,7 @@ object DataValue {
   case class HeightDataValue(value: Int) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.HEIGHT_DATA
 
-    def generateHash: String = getHash(dataType = constants.Blockchain.DataType.HEIGHT_DATA, dataValue = value.toString)
+    def generateHash: String = getHash(this)
 
     def asString: String = value.toString
 
@@ -70,7 +79,7 @@ object DataValue {
   case class IDDataValue(value: String) extends DataValue {
     val dataType: String = constants.Blockchain.DataType.ID_DATA
 
-    def generateHash: String = getHash(dataType = constants.Blockchain.DataType.ID_DATA, dataValue = value)
+    def generateHash: String = getHash(this)
 
     def asString: String = value
 
@@ -120,8 +129,8 @@ object DataValue {
     dataType match {
       case constants.Blockchain.DataType.STRING_DATA => StringDataValue(dataValue.getOrElse(""))
       case constants.Blockchain.DataType.ID_DATA => IDDataValue(dataValue.getOrElse(""))
-      case constants.Blockchain.DataType.HEIGHT_DATA => HeightDataValue(dataValue.getOrElse("-1").toInt)
-      case constants.Blockchain.DataType.DEC_DATA => DecDataValue(BigDecimal(dataValue.getOrElse("0.0")))
+      case constants.Blockchain.DataType.HEIGHT_DATA => HeightDataValue(dataValue.fold(constants.Blockchain.HeightDataDefaultValue)(_.toInt))
+      case constants.Blockchain.DataType.DEC_DATA => DecDataValue(dataValue.fold(constants.Blockchain.SmallestDec)(BigDecimal(_)))
       case _ => throw new BaseException(constants.Response.INVALID_DATA_TYPE)
     }
   } catch {
@@ -133,18 +142,18 @@ object DataValue {
   def verifyDataType(dataType: String, dataValue: Option[String]): Boolean = dataType match {
     case constants.Blockchain.DataType.STRING_DATA => true
     case constants.Blockchain.DataType.ID_DATA => true
-    case constants.Blockchain.DataType.HEIGHT_DATA => Try(dataValue.getOrElse("-1").toInt).isSuccess
-    case constants.Blockchain.DataType.DEC_DATA => Try(BigDecimal(dataValue.getOrElse("0.0"))).isSuccess
+    case constants.Blockchain.DataType.HEIGHT_DATA => Try(dataValue.fold(constants.Blockchain.HeightDataDefaultValue)(_.toInt)).isSuccess
+    case constants.Blockchain.DataType.DEC_DATA => Try(dataValue.fold(constants.Blockchain.SmallestDec)(BigDecimal(_))).isSuccess
     case _ => false
   }
 
   def getData(dataType: String, dataValue: Option[String]): Serializable.Data = Serializable.Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))
 
-  def getHash(dataType: String, dataValue: String): String = dataType match {
-    case constants.Blockchain.DataType.STRING_DATA => if (dataValue == "") "" else utilities.Hash.getHash(dataValue)
-    case constants.Blockchain.DataType.ID_DATA => if (dataValue == "") "" else utilities.Hash.getHash(dataValue)
-    case constants.Blockchain.DataType.HEIGHT_DATA => if (dataValue == (-1).toString) "" else utilities.Hash.getHash(dataValue)
-    case constants.Blockchain.DataType.DEC_DATA => if (dataValue == constants.Blockchain.ZeroDec.toString) "" else utilities.Hash.getHash(dataValue)
+  def getHash(dataValue: DataValue): String = dataValue.dataType match {
+    case constants.Blockchain.DataType.STRING_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)
+    case constants.Blockchain.DataType.ID_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)
+    case constants.Blockchain.DataType.HEIGHT_DATA => if (dataValue.asHeight == constants.Blockchain.HeightDataDefaultValue) "" else utilities.Hash.getHash(dataValue.asString)
+    case constants.Blockchain.DataType.DEC_DATA => if (dataValue.asDec == constants.Blockchain.ZeroDec) "" else utilities.Hash.getHash(dataValue.asString)
     case _ => ""
   }
 }

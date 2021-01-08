@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(identityID: String, unprovisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@commonTextInfo(constants.View.IDENTITY_ID, identityID)
+@unprovisionedAddresses.map { address =>
+    @commonInfoBox() {
+        @address
+    }
+    <br>
+}
