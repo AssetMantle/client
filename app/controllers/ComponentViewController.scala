@@ -1,5 +1,9 @@
 package controllers
 
+import java.text.DecimalFormat
+import java.time.Year
+import java.util.Calendar
+
 import controllers.actions._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -3090,6 +3094,40 @@ class ComponentViewController @Inject()(
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def tradeStatisticsGraph = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def getSellTradeList(traderID: String) = masterNegotiations.Service.getAllContractSignedNegotiationListBySellerTraderID(traderID)
+
+      def getSellTradeHistoryList(traderID: String) = masterNegotiationHistories.Service.getAllCompletedNegotiationListBySellerTraderID(traderID)
+
+      def getBuyTradeList(traderID: String) = masterNegotiations.Service.getAllContractSignedNegotiationListByBuyerTraderID(traderID)
+
+      def getBuyTradeHistoryList(traderID: String) = masterNegotiationHistories.Service.getAllCompletedNegotiationListByBuyerTraderID(traderID)
+
+      for {
+        traderID <- traderID
+        sellTradeList <- getSellTradeList(traderID)
+        sellTradeHistoryList <- getSellTradeHistoryList(traderID)
+        buyTraderList <- getBuyTradeList(traderID)
+        buyTradeHistoryList <- getBuyTradeHistoryList(traderID)
+      } yield {
+        val currentYear = Year.now().getValue
+        val currentMonth = Calendar.getInstance.get(Calendar.MONTH)
+        val twoDecimalFormat = new DecimalFormat("00")
+        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, twoDecimalFormat.format(x)).mkString("-") }.sorted
+
+        val sellTradesMonthly = timePeriods.map { timePeriod =>
+          sellTradeList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
+        }
+        val buyTradesMonthly = timePeriods.map { timePeriod =>
+          buyTraderList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + buyTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
+        }
+        Ok(views.html.component.master.statistics(timePeriods, buyTradesMonthly, sellTradesMonthly))
       }
   }
 

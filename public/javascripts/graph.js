@@ -36,3 +36,60 @@ function updateGraph(chartID, label, data, maxNumberOfPoints = 10) {
 }
 
 // https://www.chartjs.org/docs/latest/
+
+function lineChart(chartID, timePeriods, buyTradesMonthly, sellTradesMonthly) {
+
+    var barChartData = {
+        labels: timePeriods.split(","),
+        datasets: [
+            {
+                label: "Buy",
+                backgroundColor: "#3348C0",
+                borderWidth: 1,
+                data: buyTradesMonthly.split(",")
+            },
+            {
+                label: "Sell",
+                backgroundColor: "#DDE2EA",
+                borderWidth: 1,
+                data: sellTradesMonthly.split(",")
+            }
+        ]
+    };
+
+    let ctx = $('#' + chartID);
+    let chart = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            maintainAspectRatio:false,
+            scales: {
+                xAxes: [{
+                    categoryPercentage: 0.7,
+                    barPercentage: 0.5,
+                    barThickness: 18,
+                    gridLines: {
+                        color: '#E6E6E6',
+                        borderDash: [8, 4]
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 30,
+                    }
+                }]
+            },
+            legend: {
+                // position: "bottom",
+                // align: "middle",
+                labels: {
+                    boxWidth: 15,
+                    boxHeight: 2
+                }
+            }
+
+        }
+    });
+
+}

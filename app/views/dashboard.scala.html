@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
+@import views.html.component.master.statistics
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -67,11 +68,15 @@
             <div class="tradeList switcherCard">
                 <div id="traderViewAcceptedNegotiationList"></div>
             </div>
+            <div class="tradeList switcherCard graphCard">
+            <div id="tradeStatisticsGraph"></div>
+            </div>
             <div class="salesQuoteList">
                 <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
             </div>
             <script>
                     componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('tradeStatisticsGraph', jsRoutes.controllers.ComponentViewController.tradeStatisticsGraph());
                     componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }

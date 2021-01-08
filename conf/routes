@@ -377,6 +377,8 @@ GET         /component/traderTradeStatistics                                    
 
 GET         /component/organizationDeclarations                                                   controllers.ComponentViewController.organizationDeclarations
 
+GET         /component/tradeStatisticsGraph                                                       controllers.ComponentViewController.tradeStatisticsGraph
+
 GET         /zone/inviteZone                                                                      controllers.AddZoneController.inviteZoneForm
 POST        /zone/inviteZone                                                                      controllers.AddZoneController.inviteZone
 GET         /zone/acceptInvitation                                                                controllers.AddZoneController.acceptInvitation(token: String)
