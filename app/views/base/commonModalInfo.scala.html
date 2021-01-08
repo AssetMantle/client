@@ -1,5 +1,4 @@
-
-@(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
+@(title: String)(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
 
     <legend class="cmuk-legend">
         @Messages(title)

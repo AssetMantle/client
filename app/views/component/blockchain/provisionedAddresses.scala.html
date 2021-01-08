@@ -4,7 +4,6 @@
 @(identityID: String, provisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
     @commonModalInfo(constants.View.PROVISIONED_ADDRESS_LIST) {
-    } {
         @commonTextInfo(constants.View.IDENTITY_ID, identityID)
         @provisionedAddresses.map { address =>
             @address
