@@ -2,17 +2,17 @@ package models.docusign
 
 import java.net.ConnectException
 import java.sql.Timestamp
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.DocusignRegenerateTokenResponse.Response
+import transactions.responses.docuSign.RegenerateTokenResponse.Response
 import slick.jdbc.JdbcProfile
-import transactions.DocusignRegenerateToken
+import transactions.docusign.RegenerateToken
 import utilities.KeyStore
 
 import scala.concurrent.duration._
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class OAuthToken(id: String, accessToken: String, expiresAt: Long, refreshToken: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, docusignRegenerateToken: DocusignRegenerateToken, utilitiesNotification: utilities.Notification, keyStore: KeyStore)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, docusignRegenerateToken: RegenerateToken, utilitiesNotification: utilities.Notification, keyStore: KeyStore)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.DOCUSIGN_OAUTH_TOKEN
 

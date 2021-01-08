@@ -6,17 +6,15 @@ import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction
 import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
-import play.libs.Json
-import queries._
-import queries.{GetABCIInfo, GetBlockResults, GetBondedValidators, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
-import queries.responses.ABCIInfoResponse.{Response => ABCIInfoResponse}
-import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
-import queries.responses.BlockResultResponse.{Response => BlockResultResponse}
-import queries.responses.CommunityPoolResponse.{Response => CommunityPoolResponse}
-import queries.responses.GenesisResponse._
-import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
-import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}
-import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
+import queries.blockchain.{GetABCIInfo, GetBlockResults, GetBondedValidators, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
+import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
+import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
+import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
+import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
+import queries.responses.blockchain.GenesisResponse._
+import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
+import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
+import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.{Account, Header}
 import utilities.MicroNumber

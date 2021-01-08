@@ -8,10 +8,10 @@ import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.{Configuration, Logger}
-import queries.responses.BlockCommitResponse.{Response => BlockCommitResponse}
-import queries.responses.TransactionResponse.{Response => TransactionResponse}
+import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
+import queries.responses.blockchain.TransactionResponse.{Response => TransactionResponse}
 import queries.responses.common.{Event, Header => BlockHeader}
-import queries.{GetBlockCommit, GetTransaction, GetTransactionsByHeight}
+import queries.blockchain.{GetBlockCommit, GetTransaction, GetTransactionsByHeight}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

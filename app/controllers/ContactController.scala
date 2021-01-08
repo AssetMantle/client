@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.WithLoginActionAsync
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -19,7 +19,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
                                   utilitiesNotification: utilities.Notification,
                                   masterEmails: master.Emails,
                                   masterMobiles: master.Mobiles,
-                                  withLoginAction: WithLoginAction,
+                                  withLoginActionAsync: WithLoginActionAsync,
                                   masterTransactionEmailOTPs: masterTransaction.EmailOTPs,
                                   masterTransactionSMSOTPs: masterTransaction.SMSOTPs,
                                   withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -31,7 +31,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
   implicit val emailAddressWrites: OWrites[master.Email] = Json.writes[master.Email]
   implicit val mobileNumberWrites: OWrites[master.Mobile] = Json.writes[master.Mobile]
 
-  def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val contact = masterEmails.Service.get(loginState.username)
 
@@ -47,7 +47,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def addOrUpdateEmailAddress(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateEmailAddress(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       AddOrUpdateEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
@@ -82,7 +82,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def addOrUpdateMobileNumberForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateMobileNumberForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val contact = masterMobiles.Service.get(loginState.username)
 
@@ -98,7 +98,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def addOrUpdateMobileNumber(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateMobileNumber(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       AddOrUpdateMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
@@ -133,7 +133,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def contact: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val emailAddress = masterEmails.Service.get(loginState.username)
       val mobileNumber = masterMobiles.Service.get(loginState.username)
@@ -146,7 +146,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val emailAddress: Future[String] = masterEmails.Service.tryGetUnverifiedEmailAddress(loginState.username)
 
@@ -166,7 +166,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def verifyEmailAddress: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
@@ -190,7 +190,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def verifyMobileNumberForm: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val mobileNumber = masterMobiles.Service.tryGetUnverifiedMobileNumber(loginState.username)
 
@@ -206,7 +206,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def verifyMobileNumber: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def verifyMobileNumber: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {

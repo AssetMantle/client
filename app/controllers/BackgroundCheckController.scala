@@ -3,14 +3,15 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+
 import javax.inject._
 import models.{master, memberCheck}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.{GetMemberCheckCorporateScan, GetMemberCheckCorporateScanResult, GetMemberCheckMemberScan, GetMemberCheckMemberScanResult}
-import transactions.{MemberCheckCorporateScan, MemberCheckCorporateScanResultDecision, MemberCheckMemberScan, MemberCheckMemberScanResultDecision}
+import queries.memberCheck.{GetCorporateScan, GetCorporateScanResult, GetMemberScan, GetMemberScanResult}
+import transactions.memberCheck.{CorporateScan, CorporateScanResultDecision, MemberScan, MemberScanResultDecision}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -24,15 +25,15 @@ class BackgroundCheckController @Inject()(
                                            memberCheckCorporateScanDecisions: memberCheck.CorporateScanDecisions,
                                            memberCheckVesselScans: memberCheck.VesselScans,
                                            memberCheckVesselScanDecisions: memberCheck.VesselScanDecisions,
-                                           getMemberCheckMemberScan: GetMemberCheckMemberScan,
-                                           getMemberCheckMemberScanResult: GetMemberCheckMemberScanResult,
-                                           postMemberCheckMemberScan: MemberCheckMemberScan,
-                                           postMemberCheckMemberScanResultDecision: MemberCheckMemberScanResultDecision,
-                                           getMemberCheckCorporateScan: GetMemberCheckCorporateScan,
-                                           getMemberCheckCorporateScanResult: GetMemberCheckCorporateScanResult,
-                                           postMemberCheckCorporateScan: MemberCheckCorporateScan,
-                                           postMemberCheckCorporateScanResultDecision: MemberCheckCorporateScanResultDecision,
-                                           withLoginAction: WithLoginAction,
+                                           getMemberCheckMemberScan: GetMemberScan,
+                                           getMemberCheckMemberScanResult: GetMemberScanResult,
+                                           postMemberCheckMemberScan: MemberScan,
+                                           postMemberCheckMemberScanResultDecision: MemberScanResultDecision,
+                                           getMemberCheckCorporateScan: GetCorporateScan,
+                                           getMemberCheckCorporateScanResult: GetCorporateScanResult,
+                                           postMemberCheckCorporateScan: CorporateScan,
+                                           postMemberCheckCorporateScanResultDecision: CorporateScanResultDecision,
+                                           withLoginActionAsync: WithLoginActionAsync,
                                            withUsernameToken: WithUsernameToken,
                                            withoutLoginAction: WithoutLoginAction,
                                            withoutLoginActionAsync: WithoutLoginActionAsync,
@@ -48,7 +49,7 @@ class BackgroundCheckController @Inject()(
      Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName))
   }
 
-  def memberScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def memberScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckMemberScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -106,7 +107,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def memberScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def memberScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckMemberScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -128,7 +129,7 @@ class BackgroundCheckController @Inject()(
       Ok(views.html.component.master.addUBOMemberCheck(uboID = uboID, scanID = scanID, resultID = resultID))
   }
 
-  def addUBOMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addUBOMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.AddUBOMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
@@ -158,7 +159,7 @@ class BackgroundCheckController @Inject()(
       Ok(views.html.component.master.memberCheckCorporateScan(organizationID = organizationID, companyName = companyName))
   }
 
-  def corporateScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def corporateScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckCorporateScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -216,7 +217,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def corporateScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def corporateScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckCorporateScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -239,7 +240,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def addOrganizationMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addOrganizationMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.AddOrganizationMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
@@ -266,7 +267,7 @@ class BackgroundCheckController @Inject()(
       Ok(views.html.component.master.memberCheckVesselScan(assetID = assetID, vesselName = vesselName))
   }
 
-  def vesselScan: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def vesselScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckVesselScan.form.bindFromRequest().fold(
         formWithErrors => {
@@ -323,7 +324,7 @@ class BackgroundCheckController @Inject()(
       Ok(views.html.component.master.memberCheckVesselScanSingleResultDecision(resultID = resultID))
   }
 
-  def vesselScanResultDecision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def vesselScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.MemberCheckVesselScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -346,7 +347,7 @@ class BackgroundCheckController @Inject()(
   }
 
 
-  def addAssetMemberCheck: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def addAssetMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.AddAssetMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {

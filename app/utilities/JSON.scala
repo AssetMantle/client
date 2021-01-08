@@ -8,7 +8,7 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
 import transactions.Abstract.BaseResponse
-import transactions.responses.TransactionResponse.ErrorResponse
+import transactions.responses.blockchain.TransactionResponse.ErrorResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 

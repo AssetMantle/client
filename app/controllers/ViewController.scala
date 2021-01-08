@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ViewController @Inject()(
                                 blockchainAccounts: blockchain.Accounts,
                                 messagesControllerComponents: MessagesControllerComponents,
-                                withLoginAction: WithLoginAction,
+                                withLoginActionAsync: WithLoginActionAsync,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -24,7 +24,7 @@ class ViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
-  def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.profile())
@@ -33,7 +33,7 @@ class ViewController @Inject()(
       }
   }
 
-  def account: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def account: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.account())
@@ -131,7 +131,7 @@ class ViewController @Inject()(
       }
   }
 
-  def identity: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def identity: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.identity())
@@ -140,7 +140,7 @@ class ViewController @Inject()(
       }
   }
 
-  def asset: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def asset: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.asset())
@@ -149,7 +149,7 @@ class ViewController @Inject()(
       }
   }
 
-  def order: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def order: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.order())

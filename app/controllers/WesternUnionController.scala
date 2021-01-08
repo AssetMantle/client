@@ -2,7 +2,7 @@ package controllers
 
 
 import constants.Form
-import controllers.actions.WithLoginAction
+import controllers.actions.WithLoginActionAsync
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.Account
@@ -23,7 +23,7 @@ class WesternUnionController @Inject()(
                                         masterEmails: master.Emails,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
                                         westernUnionRTCBs: westernUnion.RTCBs,
-                                        withLoginAction: WithLoginAction,
+                                        withLoginActionAsync: WithLoginActionAsync,
                                         keyStore: KeyStore
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -76,7 +76,7 @@ class WesternUnionController @Inject()(
       }
   }
 
-  def westernUnionPortalRedirect(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def westernUnionPortalRedirect(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
         formWithErrors => {

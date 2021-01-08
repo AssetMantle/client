@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
 import exceptions.BaseException
 import models.master.{AccountKYC, Email}
 import models.{blockchain, docusign, master}
@@ -16,7 +16,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
                                    utilitiesDocusign: utilities.Docusign,
                                    utilitiesNotification: utilities.Notification,
                                    masterEmails: master.Emails,
-                                   withLoginAction: WithLoginAction,
+                                   withLoginActionAsync: WithLoginActionAsync,
                                    masterAccountKYCs: master.AccountKYCs,
                                    docusignEnvelopes: docusign.Envelopes,
                                    blockchainAccounts: blockchain.Accounts,
@@ -26,7 +26,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.CONTROLLERS_DOCUSIGN
 
-  def send(id: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def send(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val verifyDocumentOwnership = true
       val envelope = docusignEnvelopes.Service.get(id, documentType)
@@ -114,7 +114,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def sign(id: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def sign(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val envelope = docusignEnvelopes.Service.tryGet(id, documentType)
@@ -135,14 +135,14 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def authorization: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def authorization: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
-  def authorizationCallBack(code: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def authorizationCallBack(code: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {

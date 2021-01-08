@@ -12,10 +12,9 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries._
-import queries.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegations}
-import queries.responses.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
-import queries.responses.ValidatorDelegatorUndelegationsResponse.{Response => ValidatorDelegatorUndelegationsResponse}
+import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegations}
+import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
+import queries.responses.blockchain.ValidatorDelegatorUndelegationsResponse.{Response => ValidatorDelegatorUndelegationsResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}

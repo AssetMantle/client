@@ -10,11 +10,11 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries._
-import queries.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
-import queries.responses.CommunityPoolResponse.{Response => CommunityPoolResponse}
-import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
-import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}
-import queries.responses.TotalSupplyResponse.{Response => TotalSupplyResponse}
+import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
+import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
+import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
+import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
+import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 

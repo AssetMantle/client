@@ -1,0 +1,12 @@
+package queries.responses.trulioo
+
+import play.api.libs.json.{JsValue, Json, Reads}
+import transactions.Abstract.BaseResponse
+
+object TruliooFieldsResponse {
+
+  case class Response(title: String, `type`: String, properties: JsValue) extends BaseResponse
+
+  implicit val responseReads: Reads[Response] = Json.reads[Response]
+
+}

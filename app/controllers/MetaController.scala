@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class MetaController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
                                 transaction: utilities.Transaction,
-                                withLoginAction: WithLoginAction,
+                                withLoginActionAsync: WithLoginActionAsync,
                                 masterAccounts: master.Accounts,
                                 withUnknownLoginAction: WithUnknownLoginAction,
                                 transactionsMetaReveal: transactions.blockchain.MetaReveal,
@@ -40,7 +40,7 @@ class MetaController @Inject()(
       Ok(blockchainForms.metaReveal())
   }
 
-  def reveal: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def reveal: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.MetaReveal.form.bindFromRequest().fold(
         formWithErrors => {

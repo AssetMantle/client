@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import queries.responses.MemberCheckCorporateScanResultResponse
 @import base._
+@import queries.responses.memberCheck.CorporateScanResultResponse
 
-@(response: MemberCheckCorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(response: CorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <legend class="cmuk-legend">
     @Messages(constants.View.MEMBER_CHECK_VESSEL_SCAN_RESULT)
 </legend>

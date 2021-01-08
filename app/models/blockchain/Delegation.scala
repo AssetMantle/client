@@ -9,7 +9,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries._
-import queries.GetValidatorDelegatorDelegation
+import queries.blockchain.GetValidatorDelegatorDelegation
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}

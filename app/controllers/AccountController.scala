@@ -3,6 +3,7 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
@@ -11,7 +12,8 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import transactions.responses.KeyResponse
+import transactions.blockchain.{AddKey, ChangePassword, ForgotPassword}
+import transactions.responses.blockchain.KeyResponse
 import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
@@ -21,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AccountController @Inject()(
                                    utilitiesNotification: utilities.Notification,
-                                   withLoginAction: WithLoginAction,
+                                   withLoginActionAsync: WithLoginActionAsync,
                                    withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
@@ -29,9 +31,9 @@ class AccountController @Inject()(
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
-                                   transactionAddKey: transactions.AddKey,
-                                   transactionForgotPassword: transactions.ForgotPassword,
-                                   transactionChangePassword: transactions.ChangePassword,
+                                   transactionAddKey: AddKey,
+                                   transactionForgotPassword: ForgotPassword,
+                                   transactionChangePassword: ChangePassword,
                                    messagesControllerComponents: MessagesControllerComponents,
                                    masterEmails: master.Emails,
                                    masterMobiles: master.Mobiles,
@@ -279,7 +281,7 @@ class AccountController @Inject()(
       Ok(views.html.component.master.logout())
   }
 
-  def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
+  def logout: Action[AnyContent] = withLoginActionAsync { loginState =>
     implicit request =>
       Logout.form.bindFromRequest().fold(
         formWithErrors => {
@@ -307,7 +309,7 @@ class AccountController @Inject()(
       Ok(views.html.component.master.changePassword())
   }
 
-  def changePassword: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def changePassword: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.ChangePassword.form.bindFromRequest().fold(
         formWithErrors => {
@@ -455,7 +457,7 @@ class AccountController @Inject()(
       )
   }
 
-  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       for {
@@ -464,7 +466,7 @@ class AccountController @Inject()(
       } yield result
   }
 
-  def userReviewIdentificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userReviewIdentificationForm: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
@@ -477,7 +479,7 @@ class AccountController @Inject()(
       }
   }
 
-  def userReviewIdentification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def userReviewIdentification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
         formWithErrors => {

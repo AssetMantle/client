@@ -27,7 +27,7 @@ class IdentityController @Inject()(
                                     blockchainClassifications: blockchain.Classifications,
                                     messagesControllerComponents: MessagesControllerComponents,
                                     transaction: utilities.Transaction,
-                                    withLoginAction: WithLoginAction,
+                                    withLoginActionAsync: WithLoginActionAsync,
                                     withUnknownLoginAction: WithUnknownLoginAction,
                                     transactionsIdentityNub: transactions.blockchain.IdentityNub,
                                     transactionsIdentityDefine: transactions.blockchain.IdentityDefine,
@@ -57,7 +57,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityNub())
   }
 
-  def nub: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def nub: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityNub.form.bindFromRequest().fold(
         formWithErrors => {
@@ -97,7 +97,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityDefine())
   }
 
-  def define: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityDefine.form.bindFromRequest().fold(
         formWithErrors => {
@@ -147,24 +147,23 @@ class IdentityController @Inject()(
       )
   }
 
-  def issueForm(classificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def issueForm(classificationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION)
-      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
-
-      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+      val maintainerIDs = masterClassifications.Service.getMaintainerIDs(classificationID)
+      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
       (for {
         properties <- properties
-        maintainerID <- maintainerID
-        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+        maintainerIDs <- maintainerIDs
+        identityIDs <- identityIDs
       } yield {
-        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+        if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
           val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
-          Ok(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(blockchainCompanion.IdentityIssue.Data(fromID = maintainerID, classificationID = classificationID, to = "", immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+          Ok(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(blockchainCompanion.IdentityIssue.Data(fromID = maintainerIDs.intersect(identityIDs).head, classificationID = classificationID, to = "", immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
         } else {
           Ok(blockchainForms.identityIssue(classificationID = classificationID))
         }
@@ -174,7 +173,7 @@ class IdentityController @Inject()(
       }
   }
 
-  def issue: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def issue: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityIssue.form.bindFromRequest().fold(
         formWithErrors => {
@@ -230,7 +229,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityProvision(identityID = identityID))
   }
 
-  def provision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def provision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityProvision.form.bindFromRequest().fold(
         formWithErrors => {
@@ -271,7 +270,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityUnprovision(identityID = identityID, address = address))
   }
 
-  def unprovision: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def unprovision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityUnprovision.form.bindFromRequest().fold(
         formWithErrors => {
