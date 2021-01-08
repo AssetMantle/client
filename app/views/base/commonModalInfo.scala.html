@@ -1,0 +1,10 @@
+
+@(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
+
+    <legend class="cmuk-legend">
+        @Messages(title)
+    </legend>
+    <hr>
+    <div class="modalInfoBlock">
+        @content
+    </div>

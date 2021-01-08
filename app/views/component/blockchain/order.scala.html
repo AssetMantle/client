@@ -4,12 +4,9 @@
 @import models.blockchain.Order
 
 @(order: Order)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<legend class="cmuk-legend">
-    @Messages(constants.View.PROPERTIES)
-</legend>
-<hr>
-<div class="modalInfoBlock">
+@commonModalInfo(constants.View.PROPERTIES) {
+} {
     @commonTextInfo(constants.View.ORDER_ID, order.id)
     @immutables(order.immutables)
     @mutables(order.mutables)
-</div>
+}

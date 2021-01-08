@@ -3,22 +3,18 @@
 @import views.html.base._
 
 @(properties: Seq[Property])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
-
-<legend class="cmuk-legend">
-    @Messages(constants.View.PROPERTIES)
-</legend>
-<hr>
-<div class="modalInfoBlock">
-@properties.map { property =>
-        @commonTextInfo(constants.View.NAME, property.name)
-        @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
-        @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
-        @commonTextInfo(constants.View.HASH_ID, property.hashID)
-        @if(property.hashID != "" && property.value.getOrElse("") == "") {
-            @commonFormButton(constants.Form.ADD_PRIVATE_PROPERTY, 'parameters -> s"'${property.entityID}', '${property.entityType}', '${property.name}'")
+        @commonModalInfo(constants.View.PROPERTIES) {
+        } {
+                @properties.map { property =>
+                        @commonTextInfo(constants.View.NAME, property.name)
+                        @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
+                        @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
+                        @commonTextInfo(constants.View.HASH_ID, property.hashID)
+                        @if(property.hashID != "" && property.value.getOrElse("") == "") {
+                                @commonFormButton(constants.Form.ADD_PRIVATE_PROPERTY, 'parameters -> s"'${property.entityID}', '${property.entityType}', '${property.name}'")
+                        }
+                        @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
+                        @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
+                        @commonBooleanInfo(constants.View.IS_REVEALED, Option(property.isRevealed))
+                }
         }
-        @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
-        @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
-        @commonBooleanInfo(constants.View.IS_REVEALED, Option(property.isRevealed))
-}
-</div>

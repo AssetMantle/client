@@ -4,12 +4,9 @@
 @import models.blockchain.Asset
 
 @(asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<legend class="cmuk-legend">
-    @Messages(constants.View.PROPERTIES)
-</legend>
-<hr>
-<div class="modalInfoBlock">
-@commonTextInfo(constants.View.ASSET_ID, asset.id)
-@immutables(asset.immutables)
-@mutables(asset.mutables)
-</div>
+@commonModalInfo(constants.View.PROPERTIES) {
+} {
+    @commonTextInfo(constants.View.ASSET_ID, asset.id)
+    @immutables(asset.immutables)
+    @mutables(asset.mutables)
+}
