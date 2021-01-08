@@ -4,6 +4,7 @@
 @import models.blockchain.Asset
 
 @(asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
 @commonCard(constants.View.ASSET) {
 } {
     @commonTextInfo(constants.View.ASSET_ID, asset.id)

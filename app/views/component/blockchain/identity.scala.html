@@ -4,6 +4,7 @@
 @import models.blockchain.Identity
 
 @(identity: Identity)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
 @commonCard(constants.View.IDENTITY) {
 } {
     @commonTextInfo(constants.View.IDENTITY_ID, identity.id)
