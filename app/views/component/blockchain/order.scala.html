@@ -4,7 +4,7 @@
 @import models.blockchain.Order
 
 @(order: Order)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonModalInfo(constants.View.PROPERTIES) {
+@commonCard(constants.View.ORDER) {
 } {
     @commonTextInfo(constants.View.ORDER_ID, order.id)
     @immutables(order.immutables)
