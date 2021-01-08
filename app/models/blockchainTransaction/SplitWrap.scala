@@ -1,9 +1,6 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
 import models.common.Serializable.{Coin, coinReads}
@@ -16,6 +13,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -190,10 +189,18 @@ class SplitWraps @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val splitWrap = Service.getTransaction(ticketID)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, ownableIDs: String) = utilitiesNotification.send(accountID, constants.Notification.SPLIT_WRAPPED, ownableIDs, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        splitWrap <- splitWrap
+        accountID <- getAccountID(splitWrap.from)
+        _ <- sendNotifications(accountID = accountID, ownableIDs = splitWrap.coins.map(_.denom).mkString(" "))
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -203,7 +210,7 @@ class SplitWraps @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

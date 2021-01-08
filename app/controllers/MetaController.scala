@@ -4,7 +4,6 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -12,6 +11,7 @@ import play.api.{Configuration, Logger}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -35,9 +35,9 @@ class MetaController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def revealForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def revealForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.metaReveal())
+      Ok(blockchainForms.metaReveal())
   }
 
   def reveal: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

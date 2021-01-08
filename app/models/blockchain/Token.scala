@@ -1,15 +1,16 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries._
+import queries.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
 import queries.responses.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.responses.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.StakingPoolResponse.{Response => StakingPoolResponse}

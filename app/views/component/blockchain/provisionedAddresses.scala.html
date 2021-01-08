@@ -1,0 +1,18 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@(identityID: String, provisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
+
+@commonTextInfo(constants.View.IDENTITY_ID, identityID)
+@provisionedAddresses.map { address =>
+    @commonInfoBox() {
+        @address
+        @loginState match {
+            case Some(login) => {
+                @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identityID}', '${address}'")
+            }
+            case None => {}
+        }
+    }
+    <br>
+}

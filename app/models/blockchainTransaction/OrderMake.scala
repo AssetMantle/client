@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.{MetaProperties, Properties}
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderMake] with Logged {
+case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: Seq[BaseProperty], immutableProperties: Seq[BaseProperty], mutableMetaProperties: Seq[BaseProperty], mutableProperties: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[OrderMake] with Logged {
   def mutateTicketID(newTicketID: String): OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties, immutableProperties = immutableProperties, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,13 +29,15 @@ class OrderMakes @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             utilitiesNotification: utilities.Notification,
                             masterAccounts: master.Accounts,
-                            blockchainAccounts: blockchain.Accounts
+                            blockchainAccounts: blockchain.Accounts,
+                            blockchainTransactions: blockchain.Transactions,
+                            masterProperties: master.Properties
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class PropertiesSerialized(immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String)
 
   case class OrderMakeSerialized(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, propertiesSerialized: PropertiesSerialized, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](propertiesSerialized.immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Properties](propertiesSerialized.immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[MetaProperties](propertiesSerialized.mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Properties](propertiesSerialized.mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: OrderMake = OrderMake(from = from, fromID = fromID, classificationID = classificationID, makerOwnableID = makerOwnableID, takerOwnableID = takerOwnableID, expiresIn = expiresIn, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](propertiesSerialized.immutableMetaProperties), immutableProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](propertiesSerialized.immutableProperties), mutableMetaProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](propertiesSerialized.mutableMetaProperties), mutableProperties = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](propertiesSerialized.mutableProperties), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(orderMake: OrderMake): OrderMakeSerialized = OrderMakeSerialized(from = orderMake.from, fromID = orderMake.fromID, classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, expiresIn = orderMake.expiresIn, makerOwnableSplit = orderMake.makerOwnableSplit, propertiesSerialized = PropertiesSerialized(immutableMetaProperties = Json.toJson(orderMake.immutableMetaProperties).toString, immutableProperties = Json.toJson(orderMake.immutableProperties).toString, mutableMetaProperties = Json.toJson(orderMake.mutableMetaProperties).toString, mutableProperties = Json.toJson(orderMake.mutableProperties).toString), gas = orderMake.gas.toMicroString, status = orderMake.status, txHash = orderMake.txHash, ticketID = orderMake.ticketID, mode = orderMake.mode, code = orderMake.code, createdBy = orderMake.createdBy, createdOn = orderMake.createdOn, createdOnTimeZone = orderMake.createdOnTimeZone, updatedBy = orderMake.updatedBy, updatedOn = orderMake.updatedOn, updatedOnTimeZone = orderMake.updatedOnTimeZone)
@@ -234,10 +235,30 @@ class OrderMakes @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val orderMake = Service.getTransaction(ticketID)
+      val getTxHeight = blockchainTransactions.Service.tryGetHeight(txHash)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def insertProperties(orderMake: OrderMake) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getOrderID(classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, immutables = Immutables(Properties((orderMake.immutableMetaProperties ++ orderMake.immutableProperties).map(_.toProperty)))),
+        entityType = constants.Blockchain.Entity.ORDER, immutableMetas = orderMake.immutableMetaProperties, immutables = orderMake.immutableProperties, mutableMetas = orderMake.mutableMetaProperties, mutables = orderMake.mutableProperties)
+
+      def updateExpiry(orderID: String, height: Int, orderMake: OrderMake) = masterProperties.Service.insertOrUpdate(master.Property(entityID = orderID, entityType = constants.Blockchain.Entity.ORDER, name = constants.Blockchain.Properties.Expiry, value = Option((height + orderMake.expiresIn).toString), dataType = constants.Blockchain.DataType.HEIGHT_DATA, isMeta = true, isMutable = true, hashID = utilities.Hash.getHash((height + orderMake.expiresIn).toString)))
+
+      def updateMakerOwnableSplit(orderID: String, orderMake: OrderMake) = masterProperties.Service.insertOrUpdate(master.Property(entityID = orderID, entityType = constants.Blockchain.Entity.ORDER, name = constants.Blockchain.Properties.MakerOwnableSplit, value = Option(orderMake.makerOwnableSplit.toString), dataType = constants.Blockchain.DataType.DEC_DATA, isMeta = true, isMutable = true, hashID = utilities.Hash.getHash(orderMake.makerOwnableSplit.toString)))
+
+      def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_MADE, orderID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        orderMake <- orderMake
+        height <- getTxHeight
+        orderID <- insertProperties(orderMake)
+        _ <- updateExpiry(orderID, height, orderMake)
+        _ <- updateMakerOwnableSplit(orderID, orderMake)
+        accountID <- getAccountID(orderMake.from)
+        _ <- sendNotifications(accountID = accountID, orderID = orderID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -247,7 +268,7 @@ class OrderMakes @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

@@ -1,11 +1,11 @@
 @import views.companion.blockchain.IdentityUnprovision
 @import views.html.base._
 
-@(identityUnprovisionForm: Form[IdentityUnprovision.Data] = IdentityUnprovision.form, identityID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(identityUnprovisionForm: Form[IdentityUnprovision.Data] = IdentityUnprovision.form, identityID: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonForm(constants.Form.IDENTITY_UNPROVISION, identityUnprovisionForm) {
-    @commonInputText(identityUnprovisionForm, constants.FormField.IDENTITY_ID, 'value -> identityID)
-    @commonInputText(identityUnprovisionForm, constants.FormField.TO)
+    @commonInputText(identityUnprovisionForm, constants.FormField.IDENTITY_ID, 'value -> identityID, 'readonly -> true)
+    @commonInputText(identityUnprovisionForm, constants.FormField.TO, 'value -> address, 'readonly -> (address != ""))
     @commonInputMicroNumber(identityUnprovisionForm, constants.FormField.GAS)
     @commonInputPassword(identityUnprovisionForm, constants.FormField.PASSWORD)
 }

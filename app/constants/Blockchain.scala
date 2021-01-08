@@ -18,6 +18,7 @@ object Blockchain {
   val DataNameAndTypeSeparator = ":"
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
+  val HeightDataDefaultValue = -1
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
@@ -156,6 +157,7 @@ object Blockchain {
     val ORDER_DEFINITION = "ORDER_DEFINITION"
     val ORDER = "ORDER"
     val WRAPPED_COIN = "WRAPPED_COIN"
+    val MAINTAINER = "MAINTAINER"
   }
 
 

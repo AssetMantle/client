@@ -219,21 +219,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"
     PRIMARY KEY ("delegatorAddress", "validatorSourceAddress", "validatorDestinationAddress")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."SigningInfo"
-(
-    "consensusAddress"  VARCHAR NOT NULL,
-    "startHeight"       INTEGER NOT NULL,
-    "jailedUntil"       VARCHAR NOT NULL,
-    "tombstoned"        BOOLEAN NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("consensusAddress")
-);
-
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Split_BC"
 (
     "ownerID"           VARCHAR NOT NULL,
@@ -866,7 +851,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
     "id"                VARCHAR NOT NULL,
     "label"             VARCHAR,
-    "ownerID"           VARCHAR NOT NULL,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -880,8 +864,8 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
 CREATE TABLE IF NOT EXISTS MASTER."Classification"
 (
     "id"                VARCHAR NOT NULL,
+    "maintainerID"      VARCHAR NOT NULL,
     "entityType"        VARCHAR NOT NULL,
-    "fromID"            VARCHAR NOT NULL,
     "label"             VARCHAR,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
@@ -890,7 +874,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Classification"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id", "entityType")
+    PRIMARY KEY ("id", "maintainerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Email"
@@ -999,7 +983,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Property"
     "value"             VARCHAR,
     "dataType"          VARCHAR NOT NULL,
     "isMeta"            BOOLEAN NOT NULL,
-    "isRevealed"        BOOLEAN NOT NULL,
     "isMutable"         BOOLEAN NOT NULL,
     "hashID"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
@@ -1014,10 +997,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Property"
 
 CREATE TABLE IF NOT EXISTS MASTER."Split"
 (
-    "entityID"          VARCHAR NOT NULL,
+    "ownableID"         VARCHAR NOT NULL,
     "ownerID"           VARCHAR NOT NULL,
     "entityType"        VARCHAR NOT NULL,
-    "label"             VARCHAR,
     "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1025,7 +1007,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Split"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("entityID", "ownerID")
+    PRIMARY KEY ("ownableID", "ownerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Chat"
@@ -1351,12 +1333,10 @@ ALTER TABLE MASTER."Mobile"
     ADD CONSTRAINT Mobile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Asset"
-    ADD CONSTRAINT Asset_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
 ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES MASTER."Identity" ("id");
-ALTER TABLE MASTER."Split"
-    ADD CONSTRAINT Split_Owner_id FOREIGN KEY ("ownerID") REFERENCES MASTER."Identity" ("id");
+    ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
+ALTER TABLE MASTER."Classification"
+    ADD CONSTRAINT Classification_Identity_Maintainer FOREIGN KEY ("maintainerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
@@ -1479,11 +1459,6 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER REDELEGATION_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Redelegation"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER SIGNING_INFO_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."SigningInfo"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER SPLIT_BC_LOG
@@ -1841,7 +1816,6 @@ DROP TRIGGER IF EXISTS META_BC_LOG ON BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
 DROP TRIGGER IF EXISTS PARAMETER_LOG ON BLOCKCHAIN."Parameter" CASCADE;
 DROP TRIGGER IF EXISTS REDELEGATION_LOG ON BLOCKCHAIN."Redelegation" CASCADE;
-DROP TRIGGER IF EXISTS SIGNING_INFO_LOG ON BLOCKCHAIN."SigningInfo" CASCADE;
 DROP TRIGGER IF EXISTS SPLIT_BC_LOG ON BLOCKCHAIN."Split_BC" CASCADE;
 DROP TRIGGER IF EXISTS TOKEN_LOG ON BLOCKCHAIN."Token" CASCADE;
 DROP TRIGGER IF EXISTS TRANSACTION_LOG ON BLOCKCHAIN."Transaction" CASCADE;
@@ -1928,7 +1902,6 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Parameter" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Redelegation" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."SigningInfo" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Split_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Token" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Transaction" CASCADE;

@@ -15,8 +15,8 @@
             @commonVerticalTextInfo(constants.View.TAKER_OWNABLE_ID, order.takerOwnableID)
             @commonVerticalBooleanInfo(constants.View.STATUS, order.status)
             <div class="buttonsListChild">
-            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.entityProperties, 'parameters -> s"'${order.id}', '${constants.Blockchain.Entity.ORDER}'")
-            @commonFormButton(constants.Form.ORDER_CANCEL, 'parameters -> s"'${order.id}'")
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${order.id}', '${constants.Blockchain.Entity.ORDER}'")
+            @commonFormButton(constants.Form.ORDER_CANCEL, 'parameters -> s"'${order.id}', '${order.makerID}'")
             </div>
         }
     }

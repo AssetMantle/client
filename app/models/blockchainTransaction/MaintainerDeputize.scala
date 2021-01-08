@@ -1,12 +1,9 @@
 package models.blockchainTransaction
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
-import models.common.Serializable.Properties
+import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,11 +13,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[MaintainerDeputize] with Logged {
+case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Seq[BaseProperty], addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[MaintainerDeputize] with Logged {
   def mutateTicketID(newTicketID: String): MaintainerDeputize = MaintainerDeputize(from = from, fromID = fromID, toID = toID, classificationID = classificationID, maintainedTraits = maintainedTraits, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -30,11 +29,12 @@ class MaintainerDeputizes @Inject()(
                                      protected val databaseConfigProvider: DatabaseConfigProvider,
                                      utilitiesNotification: utilities.Notification,
                                      masterAccounts: master.Accounts,
-                                     blockchainAccounts: blockchain.Accounts
+                                     blockchainAccounts: blockchain.Accounts,
+                                     masterProperties: master.Properties
                                    )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class MaintainerDeputizeSerialized(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: MaintainerDeputize = MaintainerDeputize(from = from, fromID = fromID, toID = toID, classificationID = classificationID, maintainedTraits = utilities.JSON.convertJsonStringToObject[Properties](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: MaintainerDeputize = MaintainerDeputize(from = from, fromID = fromID, toID = toID, classificationID = classificationID, maintainedTraits = utilities.JSON.convertJsonStringToObject[Seq[BaseProperty]](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
   }
 
   def serialize(maintainerDeputize: MaintainerDeputize): MaintainerDeputizeSerialized = MaintainerDeputizeSerialized(from = maintainerDeputize.from, fromID = maintainerDeputize.fromID, toID = maintainerDeputize.toID, classificationID = maintainerDeputize.classificationID, maintainedTraits = Json.toJson(maintainerDeputize.maintainedTraits).toString, addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer, gas = maintainerDeputize.gas.toMicroString, status = maintainerDeputize.status, txHash = maintainerDeputize.txHash, ticketID = maintainerDeputize.ticketID, mode = maintainerDeputize.mode, code = maintainerDeputize.code, createdBy = maintainerDeputize.createdBy, createdOn = maintainerDeputize.createdOn, createdOnTimeZone = maintainerDeputize.createdOnTimeZone, updatedBy = maintainerDeputize.updatedBy, updatedOn = maintainerDeputize.updatedOn, updatedOnTimeZone = maintainerDeputize.updatedOnTimeZone)
@@ -200,10 +200,21 @@ class MaintainerDeputizes @Inject()(
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
+      val maintainerDeputize = Service.getTransaction(ticketID)
+
+      def insertProperties(maintainerDeputize: MaintainerDeputize) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = maintainerDeputize.maintainedTraits)
+
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.MAINTAINER_DEPUTIZED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
-      } yield {}).recover {
+        maintainerDeputize <- maintainerDeputize
+        _ <- insertProperties(maintainerDeputize)
+        accountID <- getAccountID(maintainerDeputize.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = maintainerDeputize.classificationID)
+      } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
@@ -213,7 +224,7 @@ class MaintainerDeputizes @Inject()(
 
       (for {
         _ <- markTransactionFailed
-      } yield {}).recover {
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

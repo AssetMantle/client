@@ -25,7 +25,8 @@ class Accounts @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getAccount: GetAccount,
                           configuration: Configuration,
-                          masterAccounts: master.Accounts
+                          masterAccounts: master.Accounts,
+                          utilitiesOperations: utilities.Operations
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -160,32 +161,24 @@ class Accounts @Inject()(
   object Utility {
 
     def onSendCoin(sendCoin: SendCoin): Future[Unit] = {
-      val fromAccount = Service.tryGet(sendCoin.fromAddress)
-      val toAccount = Service.get(sendCoin.toAddress)
+      val fromAccount = insertOrUpdateAccountBalance(sendCoin.fromAddress)
+      val toAccount = insertOrUpdateAccountBalance(sendCoin.toAddress)
 
       (for {
         fromAccount <- fromAccount
         toAccount <- toAccount
-        _ <- subtractCoinsFromAccount(fromAccount, sendCoin.amounts)
-        _ <- addCoinsToAccount(sendCoin.toAddress, toAccount, sendCoin.amounts)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
     def onMultiSend(multiSend: MultiSend): Future[Unit] = {
-      val inputAccounts = Service.getList(multiSend.inputs.map(_.address))
-      val outputAccounts = Service.getList(multiSend.outputs.map(_.address))
-
-      def updateInputs(inputAccounts: Seq[Account]) = Future.traverse(multiSend.inputs)(input => inputAccounts.find(_.address == input.address).fold(insertOrUpdateAccountBalance(input.address))(account => subtractCoinsFromAccount(account, input.coins)))
-
-      def updateOutputs(outputAccounts: Seq[Account]) = Future.traverse(multiSend.outputs)(output => outputAccounts.find(_.address == output.address).fold(insertOrUpdateAccountBalance(output.address))(account => addCoinsToAccount(output.address, Option(account), output.coins)))
+      val inputAccounts = utilitiesOperations.traverse(multiSend.inputs)(input => insertOrUpdateAccountBalance(input.address))
+      val outputAccounts = utilitiesOperations.traverse(multiSend.outputs)(output => insertOrUpdateAccountBalance(output.address))
 
       (for {
         inputAccounts <- inputAccounts
         outputAccounts <- outputAccounts
-        _ <- updateInputs(inputAccounts)
-        _ <- updateOutputs(outputAccounts)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
@@ -202,7 +195,7 @@ class Accounts @Inject()(
       toAccount.fold {
         val accountResponse = getAccount.Service.get(toAddress)
 
-        def insert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = toAddress, username = toAddress, coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
+        def insert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = toAddress, username = toAddress, coins = addCoins, publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
 
         for {
           accountResponse <- accountResponse

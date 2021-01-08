@@ -11,7 +11,6 @@ object AssetMutate {
     mapping(
       constants.FormField.FROM_ID.name -> constants.FormField.FROM_ID.field,
       constants.FormField.ASSET_ID.name -> constants.FormField.ASSET_ID.field,
-      constants.FormField.LABEL.name -> constants.FormField.LABEL.field,
       constants.FormField.MUTABLE_META_PROPERTIES.name -> optional(seq(optional(Property.subFormMapping))),
       constants.FormField.ADD_MUTABLE_META_FIELD.name -> constants.FormField.ADD_MUTABLE_META_FIELD.field,
       constants.FormField.MUTABLE_PROPERTIES.name -> optional(seq(optional(Property.subFormMapping))),
@@ -21,6 +20,6 @@ object AssetMutate {
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.assetMutate)
   )
 
-  case class Data(fromID: String, assetID: String, label: String, mutableMetaProperties: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableProperties: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: Option[String])
+  case class Data(fromID: String, assetID: String, mutableMetaProperties: Option[Seq[Option[Property.Data]]], addMutableMetaField: Boolean, mutableProperties: Option[Seq[Option[Property.Data]]], addMutableField: Boolean, gas: MicroNumber, password: Option[String])
 
 }

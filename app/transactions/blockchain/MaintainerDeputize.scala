@@ -1,16 +1,15 @@
 package transactions.blockchain
 
-import java.net.ConnectException
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
+import models.common.Serializable._
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import utilities.MicroNumber
-import views.companion.common._
 
+import java.net.ConnectException
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -38,7 +37,7 @@ class MaintainerDeputize @Inject()(wsClient: WSClient)(implicit configuration: C
     "gas" -> baseReq.gas.toMicroString
   )
 
-  case class Message(baseReq: BaseReq, fromID: String, toID: String, classificationID: String, maintainedTraits: Seq[Property.Data], addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean)
+  case class Message(baseReq: BaseReq, fromID: String, toID: String, classificationID: String, maintainedTraits: Seq[BaseProperty], addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean)
 
   private implicit val messageWrites: Writes[Message] = (message: Message) => Json.obj(
     "baseReq" -> Json.toJson(message.baseReq),

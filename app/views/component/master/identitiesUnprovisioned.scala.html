@@ -12,7 +12,10 @@
             @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
             @commonVerticalBooleanInfo(constants.View.STATUS, identity.status)
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
-            @commonModalButton(constants.View.PROPERTIES, routes.javascript.ComponentViewController.viewIdentityInfo, 'parameters -> s"'${identity.id}'")
+            @commonModalButton(constants.View.PROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.provisionedAddresses, 'parameters -> s"'${identity.id}'")
+            </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            @commonModalButton(constants.View.UNPROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.unprovisionedAddresses, 'parameters -> s"'${identity.id}'")
             </div>
         }
     }

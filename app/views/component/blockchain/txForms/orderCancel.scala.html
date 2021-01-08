@@ -1,10 +1,10 @@
 @import views.companion.blockchain.OrderCancel
 @import views.html.base._
 
-@(orderCancelForm: Form[OrderCancel.Data] = OrderCancel.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(orderCancelForm: Form[OrderCancel.Data] = OrderCancel.form, orderID: String, makerID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ORDER_CANCEL, orderCancelForm) {
-    @commonInputText(orderCancelForm, constants.FormField.FROM_ID)
-    @commonInputText(orderCancelForm, constants.FormField.ORDER_ID, 'value -> orderID)
+    @commonInputText(orderCancelForm, constants.FormField.FROM_ID, 'value -> makerID, 'readonly -> true)
+    @commonInputText(orderCancelForm, constants.FormField.ORDER_ID, 'value -> orderID, 'readonly -> true)
     @commonInputMicroNumber(orderCancelForm, constants.FormField.GAS)
     @commonInputPassword(orderCancelForm, constants.FormField.PASSWORD)
 }
