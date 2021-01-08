@@ -3,9 +3,15 @@
 @import models.master.Negotiation
 @import models.master.Trader
 
-@(tradeCompletedBuyNegotiationList: Seq[Negotiation], tradeCompletedSellNegotiationList: Seq[Negotiation], traderList: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.ORGANIZATION_TRADE_STATISTICS){
-}{
+@(timePeriods:Seq[String], buyTradesMonthly:Seq[Int], sellTradesMonthly:Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-}
+    @commonCard(constants.View.ORGANIZATION_TRADE_STATISTICS){
+    }{
+        <canvas id="blockTimes"></canvas>
+    }
+
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.bundle.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/graph.js")" type="text/javascript"></script>
+    <script>lineChart("blockTimes", "@timePeriods.mkString(",")","@buyTradesMonthly.mkString(",")","@sellTradesMonthly.mkString(",")" )</script>
