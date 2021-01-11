@@ -1979,8 +1979,7 @@ class ComponentViewController @Inject()(
       } yield {
         val currentYear = Year.now().getValue
         val currentMonth = Calendar.getInstance.get(Calendar.MONTH)
-        val twoDecimalFormat = new DecimalFormat("00")
-        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, twoDecimalFormat.format(x)).mkString("-") }.sorted
+        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, new DecimalFormat("00").format(x)).mkString("-") }.sorted
 
         val sellTradesMonthly = timePeriods.map { timePeriod =>
           sellTradeList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
@@ -2016,8 +2015,7 @@ class ComponentViewController @Inject()(
       } yield {
         val currentYear = Year.now().getValue
         val currentMonth = Calendar.getInstance.get(Calendar.MONTH)
-        val twoDecimalFormat = new DecimalFormat("00")
-        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, twoDecimalFormat.format(x)).mkString("-") }.sorted
+        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, new DecimalFormat("00").format(x)).mkString("-") }.sorted
 
         val sellTradesMonthly = timePeriods.map { timePeriod =>
           sellTradeList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
@@ -2055,8 +2053,7 @@ class ComponentViewController @Inject()(
       } yield {
         val currentYear = Year.now().getValue
         val currentMonth = Calendar.getInstance.get(Calendar.MONTH)
-        val twoDecimalFormat = new DecimalFormat("00")
-        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, twoDecimalFormat.format(x)).mkString("-") }.sorted
+        val timePeriods = (1 to 12).map { x => Seq(if (x - 1 <= currentMonth) currentYear else currentYear - 1, new DecimalFormat("00").format(x)).mkString("-") }.sorted
 
         val sellTradesMonthly = timePeriods.map { timePeriod =>
           sellTradeList.count(x => x.updatedOn.getOrElse("").toString.slice(0, 7) == timePeriod) + sellTradeHistoryList.count(x => x.updatedOn.getOrElse(x.createdOn.getOrElse("")).toString.slice(0, 7) == timePeriod)
