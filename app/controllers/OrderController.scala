@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class OrderController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
-                                 withLoginAction: WithLoginAction,
+                                 withLoginActionAsync: WithLoginActionAsync,
                                  withUnknownLoginAction: WithUnknownLoginAction,
                                  blockchainOrders: blockchain.Orders,
                                  blockchainClassifications: blockchain.Classifications,
@@ -55,7 +55,7 @@ class OrderController @Inject()(
       Ok(blockchainForms.orderDefine())
   }
 
-  def define: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderDefine.form.bindFromRequest().fold(
         formWithErrors => {
@@ -104,25 +104,24 @@ class OrderController @Inject()(
       )
   }
 
-  def makeForm(classificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def makeForm(classificationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION)
-      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
-
-      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+      val maintainerIDs = masterClassifications.Service.getMaintainerIDs(classificationID)
+      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
       (for {
         properties <- properties
-        maintainerID <- maintainerID
-        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+        maintainerIDs <- maintainerIDs
+        identityIDs <- identityIDs
       } yield {
-        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+        if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
           val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           //Special Case need to remove expiry and makerOwnableSplit from Mutables Meta
           val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable && x.name != constants.Blockchain.Properties.Expiry && x.name != constants.Blockchain.Properties.MakerOwnableSplit).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
           val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
-          Ok(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(blockchainCompanion.OrderMake.Data(fromID = maintainerID, classificationID = classificationID, makerOwnableID = "", takerOwnableID = "", expiresIn = 0, makerOwnableSplit = 0.0, immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+          Ok(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(blockchainCompanion.OrderMake.Data(fromID = maintainerIDs.intersect(identityIDs).head, classificationID = classificationID, makerOwnableID = "", takerOwnableID = "", expiresIn = 0, makerOwnableSplit = 0.0, immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
         } else {
           Ok(blockchainForms.orderMake(classificationID = classificationID))
         }
@@ -132,7 +131,7 @@ class OrderController @Inject()(
       }
   }
 
-  def make: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def make: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderMake.form.bindFromRequest().fold(
         formWithErrors => {
@@ -187,7 +186,7 @@ class OrderController @Inject()(
       Ok(blockchainForms.orderTake(orderID = orderID))
   }
 
-  def take: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def take: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderTake.form.bindFromRequest().fold(
         formWithErrors => {
@@ -229,7 +228,7 @@ class OrderController @Inject()(
       Ok(blockchainForms.orderCancel(orderID = orderID, makerID = makerID))
   }
 
-  def cancel: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def cancel: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderCancel.form.bindFromRequest().fold(
         formWithErrors => {

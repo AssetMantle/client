@@ -22,7 +22,7 @@ class FileController @Inject()(
                                 fileResourceManager: utilities.FileResourceManager,
                                 masterAccountFiles: master.AccountFiles,
                                 masterAccountKYCs: master.AccountKYCs,
-                                withLoginAction: WithLoginAction,
+                                withLoginActionAsync: WithLoginActionAsync,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
@@ -63,7 +63,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val storeFile = fileResourceManager.storeFile[AccountKYC](
         name = name,
@@ -89,7 +89,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val oldDocument = masterAccountKYCs.Service.tryGet(id = loginState.username, documentType = documentType)
 
@@ -118,7 +118,7 @@ class FileController @Inject()(
       }
   }
 
-  def getAccountKYCFile(fileName: String, documentType: String) = withLoginAction.authenticated { implicit loginState =>
+  def getAccountKYCFile(fileName: String, documentType: String) = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
 
@@ -160,7 +160,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val storeFile = fileResourceManager.storeFile[AccountFile](
         name = name,
@@ -177,7 +177,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val oldDocument = masterAccountFiles.Service.tryGet(id = loginState.username, documentType = documentType)
 
@@ -198,7 +198,7 @@ class FileController @Inject()(
       }
   }
 
-  def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def file(fileName: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val path: Future[String] = loginState.userType match {
         case constants.User.USER =>

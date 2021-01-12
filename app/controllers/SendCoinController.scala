@@ -4,12 +4,14 @@ import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Coin
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.SendCoin
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
@@ -19,10 +21,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class SendCoinController @Inject()(
                                     messagesControllerComponents: MessagesControllerComponents,
                                     transaction: utilities.Transaction,
-                                    withLoginAction: WithLoginAction,
+                                    withLoginActionAsync: WithLoginActionAsync,
                                     masterAccounts: master.Accounts,
                                     withUnknownLoginAction: WithUnknownLoginAction,
-                                    transactionsSendCoin: transactions.SendCoin,
+                                    transactionsSendCoin: SendCoin,
                                     blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                     withUserLoginAction: WithUserLoginAction,
                                     withUsernameToken: WithUsernameToken,
@@ -43,7 +45,7 @@ class SendCoinController @Inject()(
     Ok(blockchainForms.sendCoin())
   }
 
-  def sendCoin: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def sendCoin: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.SendCoin.form.bindFromRequest().fold(
         formWithErrors => {

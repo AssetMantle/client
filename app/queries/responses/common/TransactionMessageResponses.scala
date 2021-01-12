@@ -6,7 +6,7 @@ import models.common.{Serializable, TransactionMessages}
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TransactionMessageResponse
-import queries.responses.TransactionResponse.Msg
+import queries.responses.blockchain.TransactionResponse.Msg
 import utilities.MicroNumber
 
 object TransactionMessageResponses {

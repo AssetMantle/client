@@ -2,18 +2,16 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
-import models.{blockchain, master, masterTransaction}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
+import queries.blockchain.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,7 +60,7 @@ class ComponentViewController @Inject()(
                                          masterSplits: master.Splits,
                                          masterIdentifications: master.Identifications,
                                          masterProperties: master.Properties,
-                                         withLoginAction: WithLoginAction,
+                                         withLoginActionAsync: WithLoginActionAsync,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -75,7 +73,7 @@ class ComponentViewController @Inject()(
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
-  def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.commonHome()))
   }
@@ -85,7 +83,7 @@ class ComponentViewController @Inject()(
       Ok(views.html.component.master.recentActivities())
   }
 
-  def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def profilePicture(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
       (for {
@@ -96,7 +94,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def identification: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def identification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       val identification = masterIdentifications.Service.get(loginState.username)
@@ -454,7 +452,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def identitiesDefinition(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def identitiesDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -469,7 +467,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def identitiesProvisioned(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def identitiesProvisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -484,7 +482,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def identitiesUnprovisioned(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def identitiesUnprovisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByUnprovisioned(loginState.address)
 
@@ -499,7 +497,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def assetsDefinition(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def assetsDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -514,7 +512,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def assetsMinted(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def assetsMinted(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -532,7 +530,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def ordersDefinition(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def ordersDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -547,7 +545,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def ordersMade(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def ordersMade(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -562,12 +560,12 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def ordersTake(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def ordersTake(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.ordersTake()))
   }
 
-  def ordersTakePublic(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def ordersTakePublic(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDs
 
@@ -582,7 +580,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def ordersTakePrivate(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def ordersTakePrivate(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
@@ -600,7 +598,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def accountSplits(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def accountSplits(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
       val allDenoms = blockchainTokens.Service.getAllDenoms
@@ -642,7 +640,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def getTransaction(transactionType: String) = withLoginAction.authenticated { implicit loginState =>
+  def getTransaction(transactionType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
 
       transactionType match {
@@ -728,7 +726,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def moduleTransactions(currentModule: String) = withLoginAction.authenticated { implicit loginState =>
+  def moduleTransactions(currentModule: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       currentModule match {
         case constants.View.IDENTITY => Future(Ok(views.html.component.blockchain.identityTransactions()))

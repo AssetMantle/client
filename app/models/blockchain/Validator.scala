@@ -10,6 +10,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries._
+import queries.blockchain.{GetBondedValidators, GetValidator}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 

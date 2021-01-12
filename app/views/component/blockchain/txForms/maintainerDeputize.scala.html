@@ -3,7 +3,7 @@
 
 @(maintainerDeputizeForm: Form[MaintainerDeputize.Data] = MaintainerDeputize.form, classificationID: String, fromID: String, numMaintainedTraitsForm: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.MAINTAINER_DEPUTIZE, maintainerDeputizeForm) {
-    @commonInputText(maintainerDeputizeForm, constants.FormField.FROM_ID, 'value -> fromID, 'readonly -> true)
+    @commonInputText(maintainerDeputizeForm, constants.FormField.FROM_ID, 'value -> fromID)
     @commonInputText(maintainerDeputizeForm, constants.FormField.TO_ID)
     @commonInputText(maintainerDeputizeForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID, 'readonly -> true)
     @commonCheckbox(maintainerDeputizeForm, constants.FormField.ADD_MAINTAINER)

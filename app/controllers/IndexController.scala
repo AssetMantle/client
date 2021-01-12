@@ -17,7 +17,7 @@ import scala.util.Try
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                withLoginAction: WithLoginAction,
+                                withLoginActionAsync: WithLoginActionAsync,
                                 masterAccounts: Accounts,
                                 blockchainAssets: blockchain.Assets,
                                 blockchainSplits: blockchain.Splits,

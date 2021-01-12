@@ -19,7 +19,7 @@ class SplitController @Inject()(
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
                                  masterAccounts: master.Accounts,
-                                 withLoginAction: WithLoginAction,
+                                 withLoginActionAsync: WithLoginActionAsync,
                                  withUnknownLoginAction: WithUnknownLoginAction,
                                  transactionsSplitSend: transactions.blockchain.SplitSend,
                                  transactionsSplitWrap: transactions.blockchain.SplitWrap,
@@ -44,7 +44,7 @@ class SplitController @Inject()(
       Ok(blockchainForms.splitSend(ownableID = ownableID, fromID = fromID))
   }
 
-  def send: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def send: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.SplitSend.form.bindFromRequest().fold(
         formWithErrors => {
@@ -86,7 +86,7 @@ class SplitController @Inject()(
       Ok(blockchainForms.splitWrap())
   }
 
-  def wrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def wrap: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.SplitWrap.form.bindFromRequest().fold(
         formWithErrors => {
@@ -132,7 +132,7 @@ class SplitController @Inject()(
       Ok(blockchainForms.splitUnwrap(ownableID = ownableID, fromID = fromID))
   }
 
-  def unwrap: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def unwrap: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.SplitUnwrap.form.bindFromRequest().fold(
         formWithErrors => {

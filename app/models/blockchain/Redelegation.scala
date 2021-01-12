@@ -12,9 +12,9 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries._
-import queries.{GetValidatorDelegatorDelegation, GetValidatorDelegatorRedelegations}
-import queries.responses.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
-import queries.responses.ValidatorDelegatorRedelegationsResponse.{Response => ValidatorDelegatorRedelegationsResponse}
+import queries.blockchain.{GetValidatorDelegatorDelegation, GetValidatorDelegatorRedelegations}
+import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
+import queries.responses.blockchain.ValidatorDelegatorRedelegationsResponse.{Response => ValidatorDelegatorRedelegationsResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}

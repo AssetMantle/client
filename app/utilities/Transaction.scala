@@ -6,10 +6,9 @@ import models.blockchain
 import models.blockchain.{Transaction => bcTransaction}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import queries.GetResponse
-import queries.{GetResponse, GetTransaction}
+import queries.blockchain.{GetResponse, GetTransaction}
 import transactions.Abstract.BaseRequest
-import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
+import transactions.responses.blockchain.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

@@ -9,8 +9,8 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.GetAccount
-import queries.responses.AccountResponse.{Response => AccountResponse}
+import queries.blockchain.GetAccount
+import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp

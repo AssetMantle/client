@@ -23,7 +23,7 @@ class MaintainerController @Inject()(
                                       masterAccounts: master.Accounts,
                                       masterProperties: master.Properties,
                                       masterClassifications: master.Classifications,
-                                      withLoginAction: WithLoginAction,
+                                      withLoginActionAsync: WithLoginActionAsync,
                                       blockchainIdentities: blockchain.Identities,
                                       withUnknownLoginAction: WithUnknownLoginAction,
                                       transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
@@ -42,30 +42,29 @@ class MaintainerController @Inject()(
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
-  def deputizeForm(classificationID: String, entityType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def deputizeForm(classificationID: String, entityType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = entityType)
-      val maintainerID = masterClassifications.Service.tryGetMaintainerID(classificationID)
-
-      def getProvisionedAddresses(maintainerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainerID)
+      val maintainerIDs = masterClassifications.Service.getMaintainerIDs(classificationID)
+      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
       (for {
         properties <- properties
-        maintainerID <- maintainerID
-        provisionedAddresses <- getProvisionedAddresses(maintainerID)
+        maintainerIDs <- maintainerIDs
+        identityIDs <- identityIDs
       } yield {
-        if (properties.nonEmpty && provisionedAddresses.contains(loginState.address)) {
+        if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
           val mutables = Option(properties.filter(_.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
-          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerID, classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = maintainerID, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
+          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerIDs.intersect(identityIDs).head, classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = identityIDs.intersect(maintainerIDs).head, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
         } else {
-          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerID))
+          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerIDs.intersect(identityIDs).head))
         }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def deputize: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def deputize: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       blockchainCompanion.MaintainerDeputize.form.bindFromRequest().fold(
         formWithErrors => {

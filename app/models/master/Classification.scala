@@ -62,12 +62,7 @@ class Classifications @Inject()(
     }
   }
 
-  private def tryGetMaintainerByID(id: String): Future[String] = db.run(identityTable.filter(_.id === id).map(_.maintainerID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+  private def getMaintainerIDsByID(id: String): Future[Seq[String]] = db.run(identityTable.filter(_.id === id).map(_.maintainerID).result)
 
   private def tryGetEntityTypeByIDAndMaintainer(id: String, maintainerID: String): Future[String] = db.run(identityTable.filter(x => x.id === id && x.maintainerID === maintainerID).map(_.entityType).result.head.asTry).map {
     case Success(result) => result
@@ -141,7 +136,7 @@ class Classifications @Inject()(
 
     def getOrderDefinitionsByIdentityIDs(identities: Seq[String]): Future[Seq[Classification]] = getByEntityTypeAndMaintainers(entityType = constants.Blockchain.Entity.ORDER_DEFINITION, ids = identities)
 
-    def tryGetMaintainerID(id: String): Future[String] = tryGetMaintainerByID(id = id)
+    def getMaintainerIDs(id: String): Future[Seq[String]] = getMaintainerIDsByID(id)
 
     def tryGetEntityType(id: String, maintainerID: String): Future[String] = tryGetEntityTypeByIDAndMaintainer(id = id, maintainerID = maintainerID)
   }

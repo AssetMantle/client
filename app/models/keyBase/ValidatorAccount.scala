@@ -2,16 +2,16 @@ package models.keyBase
 
 import java.net.ConnectException
 import java.sql.Timestamp
-
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.GetValidatorKeyBaseAccount
-import queries.responses.ValidatorKeyBaseAccountResponse.{Response => ValidatorKeyBaseAccountResponse}
+import queries.keyBase.GetValidatorKeyBaseAccount
+import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.{Response => ValidatorKeyBaseAccountResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.DurationInt

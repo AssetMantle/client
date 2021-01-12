@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
 import exceptions.BaseException
 import models.masterTransaction
 import play.api.i18n.I18nSupport
@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 class NotificationController @Inject()(
                                         messagesControllerComponents: MessagesControllerComponents,
                                         masterTransactionNotifications: masterTransaction.Notifications,
-                                        withLoginAction: WithLoginAction,
+                                        withLoginActionAsync: WithLoginActionAsync,
                                         withoutLoginActionAsync: WithoutLoginActionAsync
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -39,7 +39,7 @@ class NotificationController @Inject()(
       }
   }
 
-  def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def unreadNotificationCount(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
       (for {
@@ -50,7 +50,7 @@ class NotificationController @Inject()(
       }
   }
 
-  def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val markAsRead = masterTransactionNotifications.Service.markAsRead(notificationID)
       val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
