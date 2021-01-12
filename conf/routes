@@ -167,6 +167,8 @@ POST        /order/blockchainBuyerExecute                                       
 GET         /order/blockchainSellerExecute                                                        controllers.OrderController.blockchainSellerExecuteForm
 POST        /order/blockchainSellerExecute                                                        controllers.OrderController.blockchainSellerExecute
 
+GET         /order/fiatProof                                                                      controllers.OrderController.uploadFiatProof(orderID: String)
+
 GET         /trader/organizationRejectRequest                                                     controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organizationRejectRequest                                                     controllers.TraderController.organizationRejectRequest
 

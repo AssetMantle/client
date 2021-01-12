@@ -33,7 +33,7 @@
                                         }
                                         case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
                                             @if(!asset.moderated) {
-                                                @commonFormButton(constants.Form.BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
+                                                @commonJavascriptButton(constants.Form.BUYER_EXECUTE_ORDER.button, JavaScript(s"""getForm(jsRoutes.controllers.OrderController.uploadFiatProof('${negotiation.id}'))"""))
                                             }
                                         }
                                         case constants.Status.Order.COMPLETED=>{

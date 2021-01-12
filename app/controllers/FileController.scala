@@ -7,16 +7,14 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
-import models.master.{AccountFile, AccountKYC, Negotiation, Organization, Trader}
 import models.common.Serializable._
-import models.docusign
+import models.master._
 import models.masterTransaction.{AssetFile, NegotiationFile}
-import models.{blockchain, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Lang, Messages}
+import models.{docusign, master, masterTransaction}
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.MicroNumber
 import views.companion.master.FileUpload
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -425,6 +423,7 @@ class FileController @Inject()(
               result <- getResult(documentContent, negotiation, traderList, organizationList)
             } yield result
           }
+          case constants.File.Negotiation.FIAT_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrder(orderID = negotiationID))
           case _ => {
             val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
             val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -456,7 +455,7 @@ class FileController @Inject()(
 
       (for {
         negotiationDocumentList <- negotiationDocumentList
-        result <- storeAndGetResult((negotiationDocumentList.negotiationDocuments ++ Seq(constants.File.Negotiation.CONTRACT)).contains(documentType))
+        result <- storeAndGetResult((negotiationDocumentList.negotiationDocuments ++ Seq(constants.File.Negotiation.CONTRACT, constants.File.Negotiation.FIAT_PROOF)).contains(documentType))
         _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiationID, tradeActivity = constants.TradeActivity.NEGOTIATION_DOCUMENT_UPLOADED, loginState.username, Messages(documentType))
       } yield {
         result
@@ -528,6 +527,7 @@ class FileController @Inject()(
               result <- getResult(documentContent, negotiation, traderList, organizationList)
             } yield result
           }
+          case constants.File.Negotiation.FIAT_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrder(orderID = negotiationID))
           case _ => {
             val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(negotiationID)
             val negotiation = masterNegotiations.Service.tryGet(negotiationID)
