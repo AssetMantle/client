@@ -3,16 +3,15 @@
 
 @(identityID: String, provisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@commonTextInfo(constants.View.IDENTITY_ID, identityID)
-@provisionedAddresses.map { address =>
-    @commonInfoBox() {
-        @address
-        @loginState match {
-            case Some(login) => {
-                @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identityID}', '${address}'")
+    @commonModalInfo(constants.View.PROVISIONED_ADDRESS_LIST) {
+        @commonTextInfo(constants.View.IDENTITY_ID, identityID)
+        @provisionedAddresses.map { address =>
+            @address
+            @loginState match {
+                case Some(login) => {
+                    @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identityID}', '${address}'")
+                }
+                case None => {}
             }
-            case None => {}
         }
     }
-    <br>
-}

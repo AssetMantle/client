@@ -14,10 +14,8 @@
             @commonVerticalTextInfo(constants.View.MAKER_OWNABLE_ID, order.makerOwnableID)
             @commonVerticalTextInfo(constants.View.TAKER_OWNABLE_ID, order.takerOwnableID)
             @commonVerticalBooleanInfo(constants.View.STATUS, order.status)
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            <div class="buttonsListChild">
             @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${order.id}', '${constants.Blockchain.Entity.ORDER}'")
-            </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.ORDER_CANCEL, 'parameters -> s"'${order.id}', '${order.makerID}'")
             </div>
         }

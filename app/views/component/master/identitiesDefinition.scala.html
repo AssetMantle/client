@@ -18,10 +18,8 @@
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
             </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            <div class="buttonsListChild">
                 @commonFormButton(constants.Form.IDENTITY_ISSUE, 'parameters -> s"'${classification.id}'")
-            </div>
-            <div class="listItemChild cmuk-flex cmuk-flex-middle">
             @commonFormButton(constants.Form.MAINTAINER_DEPUTIZE, 'parameters -> s"'${classification.id}', '${constants.Blockchain.Entity.IDENTITY_DEFINITION}'")
             </div>
         }

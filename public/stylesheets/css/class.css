@@ -199,6 +199,9 @@ body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk
   border-color: #31323A; }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
   color: #e50913; }
+body.darkMode .loginForm .formBody .forgotPassword {
+  background: none;
+  color: #D0D0D0; }
 body.darkMode .tableCard table tr {
   border-bottom: 1px solid #31323A; }
   body.darkMode .tableCard table tr th {
@@ -223,6 +226,20 @@ body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size])
   background: #282934;
   border-color: #31323A;
   color: #D0D0D0; }
+body.darkMode .cmuk-alert-success {
+  background-color: #338667; }
+body.darkMode .cmuk-alert-danger {
+  background: #7b4852; }
+body.darkMode .cmuk-alert-warning {
+  background: #63472f !important; }
+body.darkMode .cmuk-navbar-dropdown {
+  background: #282934; }
+body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
+  background: #282934; }
+body.darkMode .cmuk-navbar-dropdown-nav > li > a {
+  color: #D0D0D0; }
+body.darkMode .timeline-content:hover {
+  background: #383941; }
 
 body.lightMode .buttonPrimary {
   background: #191616; }
@@ -246,6 +263,17 @@ body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
 body.lightMode .commodityImage {
   background: #F2F2F2;
   border: 1.51312px solid #E3E3E3; }
+body.lightMode .cmuk-alert-success {
+  background-color: #32d296; }
+body.lightMode .cmuk-alert-danger {
+  background: #e2a1ae; }
+body.lightMode .cmuk-alert-warning {
+  background: #fff6ee; }
+body.lightMode .cmuk-navbar-dropdown {
+  background: #fff;
+  color: #666; }
+body.lightMode .timeline-content:hover {
+  background: #e7eaf3; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -761,7 +789,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-weight: bold;
   font-size: 0.875rem; }
 .comdex .cmuk-alert-success {
-  background-color: #32d296;
   color: #FFFFFF; }
   .comdex .cmuk-alert-success .successIcon .icon {
     fill: #FFFFFF; }
@@ -939,8 +966,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .profileDropdown {
   padding: 10px; }
-  .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
-    background: #f8f8f8; }
 
 .formNote {
   font-size: 1.15rem; }
@@ -1102,7 +1127,7 @@ form .formBody {
 
 .modalInfoBlock {
   width: 620px;
-  max-height: 600px;
+  max-height: calc(100vh - 350px);
   overflow: auto;
   padding: 20px 60px 60px 60px; }
   .modalInfoBlock .traderCommodity {
@@ -1928,7 +1953,7 @@ header:before,
       width: 40px;
       height: 40px;
       position: relative;
-      top: 5;
+      top: 5px;
       display: inline-block;
       left: 10px;
       overflow: hidden;
@@ -1948,8 +1973,6 @@ header:before,
       .timeline .timeline-item .timeline-content .activityContent {
         color: #000000;
         font-size: 0.875rem; }
-    .timeline .timeline-item .timeline-content:hover {
-      background: #e7eaf3; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
     .timeline .timeline-item .timeline-content.right:before {
@@ -2613,5 +2636,16 @@ figure.zoom {
   align-items: center;
   justify-content: center;
   flex-direction: column; }
+
+.buttonsListChild {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0; }
+  .buttonsListChild button {
+    line-height: 28px; }
+  .buttonsListChild button:first-child {
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: center; }
 
 /*# sourceMappingURL=class.css.map */
