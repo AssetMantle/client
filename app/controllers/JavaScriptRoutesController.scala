@@ -265,8 +265,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewNegotiation,
         routes.javascript.ComponentViewController.organizationViewNegotiation,
 
-        routes.javascript.ComponentViewController.tradeStatisticsGraph,
-
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,

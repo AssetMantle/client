@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 @import views.html.base._
-@import views.html.component.master.statistics
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -34,7 +33,9 @@
             <div class="tradeList switcherCard">
                 <div id="zoneViewAcceptedNegotiationList"></div>
             </div>
-
+            <div class="tradeList switcherCard graphCard">
+                <div id="zoneTradeStatistics"></div>
+            </div>
             <div>
                 <div id="zoneViewOrganizationAccountList" class="switcherCard"></div>
             </div>
@@ -44,16 +45,16 @@
             </div>
             <script>
                     componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
+                    componentResource('zoneTradeStatistics', jsRoutes.controllers.ComponentViewController.zoneTradeStatistics());
                     componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
-                    componentResource('zoneViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.zoneViewAcceptedNegotiationList());
             </script>
         }
         case constants.User.ORGANIZATION => {
             <div class="tradeList switcherCard">
                 <div id="organizationViewAcceptedNegotiationList"></div>
             </div>
-            <div>
-                <div id="organizationViewAcceptedNegotiationList" class="switcherCard"></div>
+            <div class="tradeList switcherCard graphCard">
+                <div id="organizationTradeStatistics"></div>
             </div>
             <div>
                 <div id="organizationViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
@@ -69,14 +70,14 @@
                 <div id="traderViewAcceptedNegotiationList"></div>
             </div>
             <div class="tradeList switcherCard graphCard">
-            <div id="tradeStatisticsGraph"></div>
+            <div id="traderTradeStatistics"></div>
             </div>
             <div class="salesQuoteList">
                 <div id="traderViewSentReceivedIncompleteRejectedFailedNegotiationList" class="switcherCard"></div>
             </div>
             <script>
                     componentResource('traderViewAcceptedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
-                    componentResource('tradeStatisticsGraph', jsRoutes.controllers.ComponentViewController.tradeStatisticsGraph());
+                    componentResource('traderTradeStatistics', jsRoutes.controllers.ComponentViewController.traderTradeStatistics());
                     componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
             </script>
         }

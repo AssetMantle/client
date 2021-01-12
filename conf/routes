@@ -309,7 +309,6 @@ GET         /component/zoneViewAcceptedNegotiationList                          
 GET         /component/zoneViewActiveNegotiationList                                              controllers.ComponentViewController.zoneViewActiveNegotiationList
 GET         /component/zoneViewCompletedNegotiationList                                           controllers.ComponentViewController.zoneViewCompletedNegotiationList
 GET         /component/zoneViewAcceptedNegotiation                                                controllers.ComponentViewController.zoneViewAcceptedNegotiation(negotiationID: String)
-GET         /component/zoneTradeStatistics                                                        controllers.ComponentViewController.zoneTradeStatistics
 GET         /component/zoneViewTradeRoomFinancialAndChecks                                        controllers.ComponentViewController.zoneViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/zoneViewTradeRoomFinancial                                                 controllers.ComponentViewController.zoneViewTradeRoomFinancial(negotiationID: String)
 GET         /component/zoneViewTradeRoomChecks                                                    controllers.ComponentViewController.zoneViewTradeRoomChecks(negotiationID: String)
@@ -372,12 +371,11 @@ GET         /component/zoneViewIssueFiatRequestList                             
 GET         /component/organizationSubscription                                                   controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                         controllers.ComponentViewController.traderSubscription
 
+GET         /component/zoneTradeStatistics                                                        controllers.ComponentViewController.zoneTradeStatistics
 GET         /component/organizationTradeStatistics                                                controllers.ComponentViewController.organizationTradeStatistics
 GET         /component/traderTradeStatistics                                                      controllers.ComponentViewController.traderTradeStatistics
 
 GET         /component/organizationDeclarations                                                   controllers.ComponentViewController.organizationDeclarations
-
-GET         /component/tradeStatisticsGraph                                                       controllers.ComponentViewController.tradeStatisticsGraph
 
 GET         /zone/inviteZone                                                                      controllers.AddZoneController.inviteZoneForm
 POST        /zone/inviteZone                                                                      controllers.AddZoneController.inviteZone
