@@ -10,11 +10,9 @@
     @commonInputInt(orderMakeForm, constants.FormField.EXPIRES_IN)
     @commonInputBigDecimal(orderMakeForm, constants.FormField.MAKER_OWNABLE_SPLIT)
     @commonInputMicroNumber(orderMakeForm, constants.FormField.GAS)
-    @defining((numImmutableMetaForms + numImmutableForms + numMutableMetaForms + numMutableForms) == 0) { addAndDeleteFields =>
-        @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-    }
+    @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderMakeForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
     @commonInputPassword(orderMakeForm, constants.FormField.PASSWORD, 'required -> false)
 }

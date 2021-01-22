@@ -55,9 +55,9 @@ class MaintainerController @Inject()(
       } yield {
         if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
           val mutables = Option(properties.filter(_.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
-          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerIDs.intersect(identityIDs).head, classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = identityIDs.intersect(maintainerIDs).head, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
+          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerIDs.intersect(identityIDs).headOption.getOrElse(""), classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = identityIDs.intersect(maintainerIDs).head, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
         } else {
-          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerIDs.intersect(identityIDs).head))
+          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerIDs.intersect(identityIDs).headOption.getOrElse("")))
         }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
