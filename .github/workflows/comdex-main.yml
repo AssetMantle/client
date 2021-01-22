@@ -1,0 +1,18 @@
+name: ComdexClient
+
+on:
+  push:
+    branches: [comdexClient]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: SBT action test
+        id: sbt
+        uses: lokkju/github-action-sbt@master
+        with:
+          commands: dist
+          sbt_project_directory: ./build
