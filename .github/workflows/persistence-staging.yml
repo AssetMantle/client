@@ -1,0 +1,27 @@
+name: Peristence
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: SBT action test
+        id: sbt
+        uses: lokkju/github-action-sbt@11-1.3.0-2.12.10
+        with:
+          commands: dist
+      - name: Operations
+        uses: alinz/ssh-scp-action@master
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          port: 22
+          user: ${{ secrets.USERNAME }}
+          # then run these commands
+          ssh_after: |
+            ${{ secrets.SCRIPT_PATH }}

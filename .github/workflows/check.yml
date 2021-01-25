@@ -1,17 +1,14 @@
-name: Peristence
+name: Check
 
 on:
-  push:
-    branches: [action-service]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: SBT action test
         id: sbt
-        uses: lokkju/github-action-sbt@11-1.3.0-2.12.10
+        uses: lokkju/github-action-sbt@master
         with:
           commands: dist

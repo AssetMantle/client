@@ -1,0 +1,23 @@
+name: Peristence
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Operations
+        uses: alinz/ssh-scp-action@master
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          port: 22
+          user: ${{ secrets.USERNAME }}
+          # then run these commands
+          ssh_after: |
+            ${{ secrets.SCRIPT_PATH }}
