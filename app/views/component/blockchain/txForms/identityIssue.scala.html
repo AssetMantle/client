@@ -8,11 +8,9 @@
     @commonInputText(identityIssueForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID, 'readonly -> true)
     @commonInputText(identityIssueForm, constants.FormField.TO)
     @commonInputMicroNumber(identityIssueForm, constants.FormField.GAS)
-    @defining((numImmutableMetaForms + numImmutableForms + numMutableMetaForms + numMutableForms) == 0) { addAndDeleteFields =>
-        @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-        @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = addAndDeleteFields, deleteFields = addAndDeleteFields)
-    }
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
     @commonInputPassword(identityIssueForm, constants.FormField.PASSWORD, 'required -> false)
 }

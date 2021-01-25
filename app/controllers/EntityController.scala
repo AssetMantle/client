@@ -59,7 +59,7 @@ class EntityController @Inject()(
               val maintainerIDs = masterClassifications.Service.getMaintainerIDs(upsertLabelData.entityID)
               val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-              def checkAndUpdate(maintainerIDs: Seq[String], identityIDs: Seq[String]) = if (identityIDs.intersect(maintainerIDs).nonEmpty) masterClassifications.Service.updateLabel(id = upsertLabelData.entityID, maintainerID = identityIDs.intersect(maintainerIDs).head, label = upsertLabelData.label)
+              def checkAndUpdate(maintainerIDs: Seq[String], identityIDs: Seq[String]) = if (identityIDs.intersect(maintainerIDs).nonEmpty) masterClassifications.Service.updateLabel(id = upsertLabelData.entityID, maintainerID = identityIDs.intersect(maintainerIDs).headOption.getOrElse(""), label = upsertLabelData.label)
               else throw new BaseException(constants.Response.UNAUTHORIZED)
 
               for {
