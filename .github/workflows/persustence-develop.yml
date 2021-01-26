@@ -1,23 +1,22 @@
-name: Peristence
+name: Peristence Development
 
 on:
   push:
     branches: [development]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-
       - name: Operations
         uses: alinz/ssh-scp-action@master
         with:
-          key: ${{ secrets.SSH_KEY }}
-          host: ${{ secrets.HOST }}
+          key: ${{ secrets.DEVELOP_SSH_KEY }}
+          host: ${{ secrets.DEVELOP_HOST }}
           port: 22
-          user: ${{ secrets.USERNAME }}
+          user: ${{ secrets.DEVELOP_USERNAME }}
           # then run these commands
           ssh_after: |
-            ${{ secrets.SCRIPT_PATH }}
+            ${{ secrets.DEVELOP_SCRIPT_PATH }}

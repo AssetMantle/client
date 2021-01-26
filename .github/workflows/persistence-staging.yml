@@ -2,10 +2,10 @@ name: Peristence
 
 on:
   push:
-    branches: [staging]
+    branches: [master]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,10 +18,10 @@ jobs:
       - name: Operations
         uses: alinz/ssh-scp-action@master
         with:
-          key: ${{ secrets.SSH_KEY }}
-          host: ${{ secrets.HOST }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          host: ${{ secrets.STAGING_HOST }}
           port: 22
-          user: ${{ secrets.USERNAME }}
+          user: ${{ secrets.STAGING_USERNAME }}
           # then run these commands
           ssh_after: |
-            ${{ secrets.SCRIPT_PATH }}
+            ${{ secrets.STAGING_SCRIPT_PATH }}
