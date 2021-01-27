@@ -1,6 +1,9 @@
 name: Check
 
 on:
+  pull-request:
+    branches:
+      - development
 
 jobs:
   build:
