@@ -25,11 +25,13 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
 
-  def blockchainSendAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainSendAssetForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.sendAsset())
   }
 
-  def blockchainSendAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainSendAsset: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sendAsset(formWithErrors)))

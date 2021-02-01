@@ -7,28 +7,40 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.Serializable.Coin
 import models.master.Account
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import transactions.responses.TransactionResponse.BlockResponse
 import utilities.MicroNumber
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: MicroNumber, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendCoin] with Logged {
-  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SendCoin(from: String, to: String, amount: Seq[Coin], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SendCoin] with Logged {
+  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
-class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoins @Inject()(actorSystem: ActorSystem,
+                          transaction: utilities.Transaction,
+                          protected val databaseConfigProvider: DatabaseConfigProvider,
+                          utilitiesNotification: utilities.Notification,
+                          masterAccounts: master.Accounts,
+                          blockchainAccounts: blockchain.Accounts
+                         )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+
+  case class SendCoinSerialized(from: String, to: String, amountSerialized: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: SendCoin = SendCoin(from = from, to = to, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amountSerialized), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(sendCoin: SendCoin): SendCoinSerialized = SendCoinSerialized(from = sendCoin.from, to = sendCoin.to, amountSerialized = Json.toJson(sendCoin.amount).toString, gas = sendCoin.gas.toMicroString, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code, createdBy = sendCoin.createdBy, createdOn = sendCoin.createdOn, createdOnTimeZone = sendCoin.createdOnTimeZone, updatedBy = sendCoin.updatedBy, updatedOn = sendCoin.updatedOn, updatedOnTimeZone = sendCoin.updatedOnTimeZone)
+
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -51,12 +63,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  case class SendCoinSerialized(from: String, to: String, amount: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: SendCoin = SendCoin(from = from, to = to, amount = new MicroNumber(BigInt(amount)), gas = new MicroNumber(BigInt(gas)), status = status, txHash = txHash, ticketID = ticketID, mode = mode, code = code, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedOn = updatedOn, updatedBy = updatedBy, updatedOnTimeZone = updatedOnTimeZone)
-  }
-
-  def serialize(sendCoin: SendCoin): SendCoinSerialized = SendCoinSerialized(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount.toMicroString, gas = sendCoin.gas.toMicroString, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code, createdBy = sendCoin.createdBy, createdOn = sendCoin.createdOn, createdOnTimeZone = sendCoin.createdOnTimeZone, updatedBy = sendCoin.updatedBy, updatedOn = sendCoin.updatedOn, updatedOnTimeZone = sendCoin.updatedOnTimeZone)
-
   private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += serialize(sendCoin)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -65,26 +71,32 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
   private def updateStatusByTicketID(ticketID: String, status: Option[Boolean]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.status.?).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -120,10 +132,12 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -166,8 +180,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def create(sendCoin: SendCoin): Future[String] = add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
 
-    def createAsync(sendCoin: SendCoin): Future[String] = add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
-
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
@@ -178,30 +190,18 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def getTransaction(ticketID: String): Future[SendCoin] = findByTicketID(ticketID).map(_.deserialize)
 
-    def getTransactionAsync(ticketID: String): Future[SendCoin] = findByTicketID(ticketID).map(_.deserialize)
-
     def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
     def getMode(ticketID: String): Future[String] = findModeByTicketID(ticketID)
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
-    def updateTransactionHashAsync(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val sendCoin = Service.getTransaction(ticketID)
-
-      def markDirty(sendCoin: SendCoin): Future[Unit] = {
-        val markDirtyTo = blockchainAccounts.Service.markDirty(sendCoin.to)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(sendCoin.from)
-        for {
-          _ <- markDirtyTo
-          _ <- markDirtyFrom
-        } yield {}
-      }
 
       def getAccountID(address: String) = blockchainAccounts.Service.tryGetUsername(address)
 
@@ -216,14 +216,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       (for {
         _ <- markTransactionSuccessful
         sendCoin <- sendCoin
-        _ <- markDirty(sendCoin)
         accountID <- getAccountID(sendCoin.to)
         toAccount <- toAccount(accountID)
         _ <- unknownUserTypeUpdate(toAccount)
         fromAccountID <- getAccountID(sendCoin.from)
-        _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
@@ -248,20 +247,18 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- markTransactionFailed
         sendCoin <- sendCoin
         fromAccountID <- getAccountID(sendCoin.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      } yield {}).recover {
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
+      } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-  val scheduledTask = new Runnable {
-    override def run(): Unit = {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
-    }
+  private val txRunnable = new Runnable {
+    def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

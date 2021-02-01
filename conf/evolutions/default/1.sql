@@ -4,6 +4,8 @@ CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN_TRANSACTION
     AUTHORIZATION "commit";
+CREATE SCHEMA IF NOT EXISTS KEY_BASE
+    AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS MASTER
     AUTHORIZATION "commit";
 CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION
@@ -51,7 +53,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
     "publicKey"         VARCHAR NOT NULL,
     "accountNumber"     VARCHAR NOT NULL,
     "sequence"          VARCHAR NOT NULL,
-    "dirtyBit"          BOOLEAN NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -59,6 +60,51 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("address")
+);
+
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "immutables"        VARCHAR NOT NULL,
+    "mutables"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."AverageBlockTime"
+(
+    "id"                VARCHAR NOT NULL,
+    "height"            INTEGER NOT NULL,
+    "value"             BIGINT  NOT NULL,
+    "time"              VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Block"
+(
+    "height"            INTEGER NOT NULL,
+    "time"              VARCHAR NOT NULL,
+    "proposerAddress"   VARCHAR NOT NULL,
+    "validators"        VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("height")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
@@ -180,6 +226,251 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
 );
+
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Classification_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "immutableTraits"   VARCHAR NOT NULL,
+    "mutableTraits"     VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Delegation"
+(
+    "delegatorAddress"  VARCHAR NOT NULL,
+    "validatorAddress"  VARCHAR NOT NULL,
+    "shares"            NUMERIC NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("delegatorAddress", "validatorAddress")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityProperties_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "immutables"        VARCHAR NOT NULL,
+    "mutables"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityProvisioned_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "address")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."IdentityUnprovisioned_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "address")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Maintainer_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "maintainedTraits"  VARCHAR NOT NULL,
+    "addMaintainer"     BOOLEAN NOT NULL,
+    "removeMaintainer"  BOOLEAN NOT NULL,
+    "mutateMaintainer"  BOOLEAN NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Meta_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "dataType"          VARCHAR NOT NULL,
+    "dataValue"         VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "dataType")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
+(
+    "id"                VARCHAR NOT NULL,
+    "immutables"        VARCHAR NOT NULL,
+    "mutables"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Parameter"
+(
+    "parameterType"     VARCHAR NOT NULL,
+    "value"             VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("parameterType")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"
+(
+    "delegatorAddress"            VARCHAR NOT NULL,
+    "validatorSourceAddress"      VARCHAR NOT NULL,
+    "validatorDestinationAddress" VARCHAR NOT NULL,
+    "entries"                     VARCHAR NOT NULL,
+    "createdBy"                   VARCHAR,
+    "createdOn"                   TIMESTAMP,
+    "createdOnTimeZone"           VARCHAR,
+    "updatedBy"                   VARCHAR,
+    "updatedOn"                   TIMESTAMP,
+    "updatedOnTimeZone"           VARCHAR,
+    PRIMARY KEY ("delegatorAddress", "validatorSourceAddress", "validatorDestinationAddress")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Split_BC"
+(
+    "ownerID"           VARCHAR NOT NULL,
+    "ownableID"         VARCHAR NOT NULL,
+    "split"             NUMERIC NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ownerID", "ownableID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
+(
+    "denom"             VARCHAR NOT NULL,
+    "totalSupply"       VARCHAR NOT NULL,
+    "bondedAmount"      VARCHAR NOT NULL,
+    "notBondedAmount"   VARCHAR NOT NULL,
+    "communityPool"     VARCHAR NOT NULL,
+    "inflation"         NUMERIC NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("denom")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Transaction"
+(
+    "hash"              VARCHAR NOT NULL,
+    "height"            INTEGER NOT NULL,
+    "code"              INTEGER,
+    "rawLog"            VARCHAR NOT NULL,
+    "status"            BOOLEAN NOT NULL,
+    "gasWanted"         VARCHAR NOT NULL,
+    "gasUsed"           VARCHAR NOT NULL,
+    "messages"          VARCHAR NOT NULL,
+    "fee"               VARCHAR NOT NULL,
+    "timestamp"         VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("hash")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Undelegation"
+(
+    "delegatorAddress"  VARCHAR NOT NULL,
+    "validatorAddress"  VARCHAR NOT NULL,
+    "entries"           VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("delegatorAddress", "validatorAddress")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Validator"
+(
+    "operatorAddress"       VARCHAR NOT NULL,
+    "hexAddress"            VARCHAR NOT NULL UNIQUE,
+    "consensusPublicKey"    VARCHAR NOT NULL UNIQUE,
+    "jailed"                BOOLEAN NOT NULL,
+    "status"                INTEGER NOT NULL,
+    "tokens"                VARCHAR NOT NULL,
+    "delegatorShares"       NUMERIC NOT NULL,
+    "description"           VARCHAR NOT NULL,
+    "unbondingHeight"       INTEGER,
+    "unbondingTime"         VARCHAR,
+    "commission"            VARCHAR NOT NULL,
+    "minimumSelfDelegation" VARCHAR NOT NULL,
+    "createdBy"             VARCHAR,
+    "createdOn"             TIMESTAMP,
+    "createdOnTimeZone"     VARCHAR,
+    "updatedBy"             VARCHAR,
+    "updatedOn"             TIMESTAMP,
+    "updatedOnTimeZone"     VARCHAR,
+    PRIMARY KEY ("operatorAddress")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."WithdrawAddress"
+(
+    "delegatorAddress"  VARCHAR NOT NULL,
+    "withdrawAddress"   VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("delegatorAddress")
+);
+
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
 (
@@ -639,6 +930,423 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
     PRIMARY KEY ("ticketID")
 );
 
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AssetDefine"
+(
+    "from"                VARCHAR NOT NULL,
+    "fromID"              VARCHAR NOT NULL,
+    "immutableMetaTraits" VARCHAR NOT NULL,
+    "immutableTraits"     VARCHAR NOT NULL,
+    "mutableMetaTraits"   VARCHAR NOT NULL,
+    "mutableTraits"       VARCHAR NOT NULL,
+    "gas"                 VARCHAR NOT NULL,
+    "status"              BOOLEAN,
+    "txHash"              VARCHAR,
+    "ticketID"            VARCHAR NOT NULL,
+    "mode"                VARCHAR NOT NULL,
+    "code"                VARCHAR,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AssetMint"
+(
+    "from"                    VARCHAR NOT NULL,
+    "fromID"                  VARCHAR NOT NULL,
+    "toID"                    VARCHAR NOT NULL,
+    "classificationID"        VARCHAR NOT NULL,
+    "immutableMetaProperties" VARCHAR NOT NULL,
+    "immutableProperties"     VARCHAR NOT NULL,
+    "mutableMetaProperties"   VARCHAR NOT NULL,
+    "mutableProperties"       VARCHAR NOT NULL,
+    "gas"                     VARCHAR NOT NULL,
+    "status"                  BOOLEAN,
+    "txHash"                  VARCHAR,
+    "ticketID"                VARCHAR NOT NULL,
+    "mode"                    VARCHAR NOT NULL,
+    "code"                    VARCHAR,
+    "createdBy"               VARCHAR,
+    "createdOn"               TIMESTAMP,
+    "createdOnTimeZone"       VARCHAR,
+    "updatedBy"               VARCHAR,
+    "updatedOn"               TIMESTAMP,
+    "updatedOnTimeZone"       VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AssetMutate"
+(
+    "from"                  VARCHAR NOT NULL,
+    "fromID"                VARCHAR NOT NULL,
+    "assetID"               VARCHAR NOT NULL,
+    "mutableMetaProperties" VARCHAR NOT NULL,
+    "mutableProperties"     VARCHAR NOT NULL,
+    "gas"                   VARCHAR NOT NULL,
+    "status"                BOOLEAN,
+    "txHash"                VARCHAR,
+    "ticketID"              VARCHAR NOT NULL,
+    "mode"                  VARCHAR NOT NULL,
+    "code"                  VARCHAR,
+    "createdBy"             VARCHAR,
+    "createdOn"             TIMESTAMP,
+    "createdOnTimeZone"     VARCHAR,
+    "updatedBy"             VARCHAR,
+    "updatedOn"             TIMESTAMP,
+    "updatedOnTimeZone"     VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AssetBurn"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "assetID"           VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IdentityDefine"
+(
+    "from"                VARCHAR NOT NULL,
+    "fromID"              VARCHAR NOT NULL,
+    "immutableMetaTraits" VARCHAR NOT NULL,
+    "immutableTraits"     VARCHAR NOT NULL,
+    "mutableMetaTraits"   VARCHAR NOT NULL,
+    "mutableTraits"       VARCHAR NOT NULL,
+    "gas"                 VARCHAR NOT NULL,
+    "status"              BOOLEAN,
+    "txHash"              VARCHAR,
+    "ticketID"            VARCHAR NOT NULL,
+    "mode"                VARCHAR NOT NULL,
+    "code"                VARCHAR,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IdentityIssue"
+(
+    "from"                    VARCHAR NOT NULL,
+    "to"                      VARCHAR NOT NULL,
+    "fromID"                  VARCHAR NOT NULL,
+    "classificationID"        VARCHAR NOT NULL,
+    "immutableMetaProperties" VARCHAR NOT NULL,
+    "immutableProperties"     VARCHAR NOT NULL,
+    "mutableMetaProperties"   VARCHAR NOT NULL,
+    "mutableProperties"       VARCHAR NOT NULL,
+    "gas"                     VARCHAR NOT NULL,
+    "status"                  BOOLEAN,
+    "txHash"                  VARCHAR,
+    "ticketID"                VARCHAR NOT NULL,
+    "mode"                    VARCHAR NOT NULL,
+    "code"                    VARCHAR,
+    "createdBy"               VARCHAR,
+    "createdOn"               TIMESTAMP,
+    "createdOnTimeZone"       VARCHAR,
+    "updatedBy"               VARCHAR,
+    "updatedOn"               TIMESTAMP,
+    "updatedOnTimeZone"       VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IdentityProvision"
+(
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "identityID"        VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IdentityUnprovision"
+(
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "identityID"        VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IdentityNub"
+(
+    "from"              VARCHAR NOT NULL,
+    "nubID"             VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MaintainerDeputize"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "toID"              VARCHAR NOT NULL,
+    "classificationID"  VARCHAR NOT NULL,
+    "maintainedTraits"  VARCHAR NOT NULL,
+    "addMaintainer"     BOOLEAN NOT NULL,
+    "removeMaintainer"  BOOLEAN NOT NULL,
+    "mutateMaintainer"  BOOLEAN NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."MetaReveal"
+(
+    "from"              VARCHAR NOT NULL,
+    "metaFact"          VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."OrderDefine"
+(
+    "from"                VARCHAR NOT NULL,
+    "fromID"              VARCHAR NOT NULL,
+    "immutableMetaTraits" VARCHAR NOT NULL,
+    "immutableTraits"     VARCHAR NOT NULL,
+    "mutableMetaTraits"   VARCHAR NOT NULL,
+    "mutableTraits"       VARCHAR NOT NULL,
+    "gas"                 VARCHAR NOT NULL,
+    "status"              BOOLEAN,
+    "txHash"              VARCHAR,
+    "ticketID"            VARCHAR NOT NULL,
+    "mode"                VARCHAR NOT NULL,
+    "code"                VARCHAR,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."OrderMake"
+(
+    "from"                    VARCHAR NOT NULL,
+    "fromID"                  VARCHAR NOT NULL,
+    "classificationID"        VARCHAR NOT NULL,
+    "makerOwnableID"          VARCHAR NOT NULL,
+    "takerOwnableID"          VARCHAR NOT NULL,
+    "expiresIn"               INTEGER NOT NULL,
+    "makerOwnableSplit"       NUMERIC NOT NULL,
+    "immutableMetaProperties" VARCHAR NOT NULL,
+    "immutableProperties"     VARCHAR NOT NULL,
+    "mutableMetaProperties"   VARCHAR NOT NULL,
+    "mutableProperties"       VARCHAR NOT NULL,
+    "gas"                     VARCHAR NOT NULL,
+    "status"                  BOOLEAN,
+    "txHash"                  VARCHAR,
+    "ticketID"                VARCHAR NOT NULL,
+    "mode"                    VARCHAR NOT NULL,
+    "code"                    VARCHAR,
+    "createdBy"               VARCHAR,
+    "createdOn"               TIMESTAMP,
+    "createdOnTimeZone"       VARCHAR,
+    "updatedBy"               VARCHAR,
+    "updatedOn"               TIMESTAMP,
+    "updatedOnTimeZone"       VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."OrderTake"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "takerOwnableSplit" NUMERIC NOT NULL,
+    "orderID"           VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."OrderCancel"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "orderID"           VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
+(
+    "from"              VARCHAR NOT NULL,
+    "to"                VARCHAR NOT NULL,
+    "amount"            VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitSend"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "toID"              VARCHAR NOT NULL,
+    "ownableID"         VARCHAR NOT NULL,
+    "split"             NUMERIC NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitWrap"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "coins"             VARCHAR NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SplitUnwrap"
+(
+    "from"              VARCHAR NOT NULL,
+    "fromID"            VARCHAR NOT NULL,
+    "ownableID"         VARCHAR NOT NULL,
+    "split"             NUMERIC NOT NULL,
+    "gas"               VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "txHash"            VARCHAR,
+    "ticketID"          VARCHAR NOT NULL,
+    "mode"              VARCHAR NOT NULL,
+    "code"              VARCHAR,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ticketID")
+);
+
 CREATE TABLE IF NOT EXISTS DOCUSIGN."Envelope"
 (
     "id"                VARCHAR NOT NULL,
@@ -687,13 +1395,28 @@ CREATE TABLE IF NOT EXISTS DOCUSIGN."OAuthToken"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS KEY_BASE."ValidatorAccount"
+(
+    "address"           VARCHAR NOT NULL,
+    "identity"          VARCHAR,
+    "username"          VARCHAR,
+    "picture"           BYTEA,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("address")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
     "id"                VARCHAR NOT NULL,
-    "secretHash"        VARCHAR NOT NULL,
-    "language"          VARCHAR NOT NULL,
+    "secretHash"        VARCHAR,
+    "language"          VARCHAR,
     "userType"          VARCHAR NOT NULL,
-    "partialMnemonic"   VARCHAR NOT NULL,
+    "partialMnemonic"   VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -785,6 +1508,22 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset_History"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Classification"
+(
+    "id"                VARCHAR NOT NULL,
+    "maintainerID"      VARCHAR NOT NULL,
+    "entityType"        VARCHAR NOT NULL,
+    "label"             VARCHAR,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id", "maintainerID")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Email"
 (
     "id"                VARCHAR NOT NULL,
@@ -833,6 +1572,20 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "updatedOn"          TIMESTAMP,
     "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("accountID")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Identity"
+(
+    "id"                VARCHAR NOT NULL,
+    "label"             VARCHAR,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Mobile"
@@ -924,7 +1677,10 @@ CREATE TABLE IF NOT EXISTS MASTER."Negotiation_History"
 CREATE TABLE IF NOT EXISTS MASTER."Order"
 (
     "id"                VARCHAR NOT NULL,
-    "orderID"           VARCHAR NOT NULL UNIQUE,
+    "label"             VARCHAR,
+    "makerID"           VARCHAR NOT NULL,
+    "makerOwnableID"    VARCHAR NOT NULL,
+    "takerOwnableID"    VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1048,6 +1804,25 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Property"
+(
+    "entityID"          VARCHAR NOT NULL,
+    "entityType"        VARCHAR NOT NULL,
+    "name"              VARCHAR NOT NULL,
+    "value"             VARCHAR,
+    "dataType"          VARCHAR NOT NULL,
+    "isMeta"            BOOLEAN NOT NULL,
+    "isMutable"         BOOLEAN NOT NULL,
+    "hashID"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("entityID", "entityType", "name")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."TraderRelation"
 (
     "id"                VARCHAR NOT NULL,
@@ -1079,6 +1854,21 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
     "updatedOn"          TIMESTAMP,
     "updatedOnTimeZone"  VARCHAR,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Split"
+(
+    "ownableID"         VARCHAR NOT NULL,
+    "ownerID"           VARCHAR NOT NULL,
+    "entityType"        VARCHAR NOT NULL,
+    "status"            BOOLEAN,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("ownableID", "ownerID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
@@ -1248,8 +2038,9 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile_History"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
     "id"                       VARCHAR NOT NULL,
-    "accountID"                VARCHAR NOT NULL,
+    "accountID"                VARCHAR,
     "notificationTemplateJson" VARCHAR NOT NULL,
+    "jsRoute"                  VARCHAR,
     "read"                     BOOLEAN NOT NULL,
     "createdBy"                VARCHAR,
     "createdOn"                TIMESTAMP,
@@ -1386,6 +2177,20 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
+(
+    "serial"            SERIAL  NOT NULL,
+    "denom"             VARCHAR NOT NULL,
+    "price"             NUMERIC NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("denom")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TradeActivity"
@@ -1621,157 +2426,6 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
     PRIMARY KEY ("id")
 );
 
-ALTER TABLE BLOCKCHAIN."Account_BC"
-    ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
-ALTER TABLE BLOCKCHAIN."Asset_BC"
-    ADD CONSTRAINT Asset_BC_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
-    ADD CONSTRAINT ACLAccount_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
-    ADD CONSTRAINT ACLAccount_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
-ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
-    ADD CONSTRAINT ACLAccount_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
-ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
-    ADD CONSTRAINT ACLAccount_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC"
-    ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC"
-    ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Organization_BC"
-    ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE BLOCKCHAIN."TransactionFeedBack_BC"
-    ADD CONSTRAINT TransactionFeedBack_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
-    ADD CONSTRAINT TraderFeedbackHistory_TransactionFeedBack_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."TransactionFeedBack_BC" ("address");
-ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
-    ADD CONSTRAINT TraderFeedbackHistory_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
-    ADD CONSTRAINT TraderFeedbackHistory_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
-    ADD CONSTRAINT TraderFeedbackHistory_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Zone_BC"
-    ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
-
-ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
-    ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
-
-ALTER TABLE DOCUSIGN."Envelope"
-    ADD CONSTRAINT Envelope_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
-
-ALTER TABLE MASTER."AccountFile"
-    ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."AccountKYC"
-    ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Asset"
-    ADD CONSTRAINT Asset_BCAsset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash") ON DELETE CASCADE;
-ALTER TABLE MASTER."Asset"
-    ADD CONSTRAINT Asset_Trader_TakerID FOREIGN KEY ("takerID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Email"
-    ADD CONSTRAINT Email_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Mobile"
-    ADD CONSTRAINT Mobile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Identification"
-    ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Negotiation"
-    ADD CONSTRAINT Negotiation_BCNegotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
-ALTER TABLE MASTER."Negotiation"
-    ADD CONSTRAINT Negotiation_MasterTrader_buyerTraderID FOREIGN KEY ("buyerTraderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Negotiation"
-    ADD CONSTRAINT Negotiation_MasterTrader_sellerTraderID FOREIGN KEY ("sellerTraderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Negotiation"
-    ADD CONSTRAINT Negotiation_MasterAsset_assetID FOREIGN KEY ("assetID") REFERENCES MASTER."Asset" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER."Order"
-    ADD CONSTRAINT Order_BCOrder_orderID FOREIGN KEY ("orderID") REFERENCES BLOCKCHAIN."Order_BC" ("id");
-ALTER TABLE MASTER."Organization"
-    ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Organization"
-    ADD CONSTRAINT Organization_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."OrganizationBankAccountDetail"
-    ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationKYC"
-    ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."OrganizationUBO"
-    ADD CONSTRAINT OrganizationUBO_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."Trader"
-    ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Trader"
-    ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."Trader"
-    ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."TraderRelation"
-    ADD CONSTRAINT TraderRelation_Trader_fromID FOREIGN KEY ("fromID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."TraderRelation"
-    ADD CONSTRAINT TraderRelation_Trader_toID FOREIGN KEY ("toID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."Zone"
-    ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."ZoneKYC"
-    ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
-
-ALTER TABLE MASTER_TRANSACTION."AssetFile"
-    ADD CONSTRAINT AssetFile_Asset_id FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER_TRANSACTION."Chat"
-    ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."Message"
-    ADD CONSTRAINT Message_Chat_accountIDChatWindowID FOREIGN KEY ("fromAccountID", "chatID") REFERENCES MASTER_TRANSACTION."Chat" ("accountID", "id");
-ALTER TABLE MASTER_TRANSACTION."Message"
-    ADD CONSTRAINT Message_Message_replyToID FOREIGN KEY ("replyToID") REFERENCES MASTER_TRANSACTION."Message" ("id");
-ALTER TABLE MASTER_TRANSACTION."MessageRead"
-    ADD CONSTRAINT MessageRead_Message_messageID FOREIGN KEY ("messageID") REFERENCES MASTER_TRANSACTION."Message" ("id");
-ALTER TABLE MASTER_TRANSACTION."EmailOTP"
-    ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
-    ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
-    ADD CONSTRAINT NegotiationFile_MasterNegotiation_id FOREIGN KEY ("id") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER_TRANSACTION."Notification"
-    ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
-    ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."ReceiveFiat"
-    ADD CONSTRAINT ReceiveFiat_Trader_id FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER_TRANSACTION."ReceiveFiat"
-    ADD CONSTRAINT ReceiveFiat_Order_id FOREIGN KEY ("orderID") REFERENCES MASTER."Order" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
-    ADD CONSTRAINT RedeemFiatRequest_RedeemFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."RedeemFiat" ("ticketID");
-ALTER TABLE MASTER_TRANSACTION."RedeemFiatRequest"
-    ADD CONSTRAINT RedeemFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
-    ADD CONSTRAINT SendFiatRequest_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
-    ADD CONSTRAINT SendFiatRequest_SendFiat_ticketID FOREIGN KEY ("ticketID") REFERENCES BLOCKCHAIN_TRANSACTION."SendFiat" ("ticketID");
-ALTER TABLE MASTER_TRANSACTION."SendFiatRequest"
-    ADD CONSTRAINT SendFiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER_TRANSACTION."SessionToken"
-    ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."SMSOTP"
-    ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."TradeActivity"
-    ADD CONSTRAINT TradeActivity_Negotiation_TradeRoomID FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id") ON DELETE CASCADE;
-ALTER TABLE MASTER_TRANSACTION."TraderInvitation"
-    ADD CONSTRAINT TraderInvitation_Organization_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER_TRANSACTION."ZoneInvitation"
-    ADD CONSTRAINT ZoneInvitation_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-
-ALTER TABLE MEMBER_CHECK."MemberScanDecision"
-    ADD CONSTRAINT MemberScanDecision_MemberScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."MemberScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."MemberScanDecision"
-    ADD CONSTRAINT MemberScanDecision_OrganizationUBO_uboID FOREIGN KEY ("id") REFERENCES MASTER."OrganizationUBO" ("id");
-ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
-    ADD CONSTRAINT CorporateScanDecision_CorporateScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."CorporateScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."CorporateScanDecision"
-    ADD CONSTRAINT CorporateScanDecision_Organization_organizationID FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MEMBER_CHECK."VesselScanDecision"
-    ADD CONSTRAINT VesselScanDecision_VesselScan_scanID FOREIGN KEY ("scanID") REFERENCES MEMBER_CHECK."VesselScan" ("scanID");
-ALTER TABLE MEMBER_CHECK."VesselScanDecision"
-    ADD CONSTRAINT VesselScanDecision_Asset_assetID FOREIGN KEY ("id") REFERENCES MASTER."Asset" ("id") ON DELETE CASCADE;
-
-ALTER TABLE WESTERN_UNION."FiatRequest"
-    ADD CONSTRAINT FiatRequest_Trader_traderID FOREIGN KEY ("traderID") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE WESTERN_UNION."RTCB"
-    ADD CONSTRAINT RTCB_FiatRequest_externalReference FOREIGN KEY ("externalReference") REFERENCES WESTERN_UNION."FiatRequest" ("id");
-
 /*Triggers*/
 
 CREATE OR REPLACE FUNCTION PUBLIC.INSERT_OR_UPDATE_LOG() RETURNS TRIGGER AS
@@ -1809,11 +2463,6 @@ CREATE TRIGGER ACL_HASH_BC_LOG
     ON BLOCKCHAIN."ACLHash_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ASSET_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."Asset_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER FIAT_BC_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Fiat_BC"
@@ -1847,6 +2496,96 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ZONE_BC_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Zone_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Asset_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER AVERAGE_BLOCK_TIME_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."AverageBlockTime"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER BLOCK_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Block"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CLASSIFICATION_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Classification_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER DELEGATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Delegation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_PROPERTIES_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."IdentityProperties_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_PROVISIONED_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."IdentityProvisioned_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_UNPROVISIONED_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."IdentityUnprovisioned_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MAINTAINER_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Maintainer_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER META_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Meta_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PARAMETER_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Parameter"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER REDELEGATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Redelegation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SPLIT_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Split_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TOKEN_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Token"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER TRANSACTION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Transaction"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER UNDELEGATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Undelegation"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER VALIDATOR_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Validator"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER WITHDRAW_ADDRESS_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."WithdrawAddress"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
@@ -1946,6 +2685,98 @@ CREATE TRIGGER SET_SELLER_FEEDBACK_LOG
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
+CREATE TRIGGER ASSET_BURN_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AssetBurn"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_DEFINE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AssetDefine"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_MINT_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AssetMint"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ASSET_MUTATE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."AssetMutate"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_DEFINE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IdentityDefine"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_ISSUE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IdentityIssue"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_NUB_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IdentityNub"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_PROVISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IdentityProvision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_UNPROVISION_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."IdentityUnprovision"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER MAINTAINER_DEPUTIZE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."MaintainerDeputize"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER META_REVEAL_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."MetaReveal"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_CANCEL_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."OrderCancel"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_DEFINE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."OrderDefine"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_MAKE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."OrderMake"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER ORDER_TAKE_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."OrderTake"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SPLIT_SEND_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SplitSend"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SPLIT_UNWRAP_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SplitUnwrap"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER SPLIT_WRAP_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN_TRANSACTION."SplitWrap"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+
 CREATE TRIGGER ENVELOPE_LOG
     BEFORE INSERT OR UPDATE
     ON DOCUSIGN."Envelope"
@@ -2005,6 +2836,16 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORDER_LOG
     BEFORE INSERT OR UPDATE
     ON MASTER."Order"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER CLASSIFICATION_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Classification"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER IDENTITY_LOG
+    BEFORE INSERT OR UPDATE
+    ON MASTER."Identity"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORGANIZATION_LOG
@@ -2359,15 +3200,13 @@ VALUES ('main',
         'en',
         'GENESIS');
 
-INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence",
-                                     "dirtyBit")
+INSERT INTO blockchain."Account_BC" ("address", "username", "coins", "publicKey", "accountNumber", "sequence")
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         'main',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
-        '0',
-        true);
+        '0');
 
 # --- !Downs
 
@@ -2376,44 +3215,58 @@ DROP TRIGGER IF EXISTS ACCOUNT_BC_LOG ON BLOCKCHAIN."Account_BC" CASCADE;
 DROP TRIGGER IF EXISTS ACL_ACCOUNT_BC_LOG ON BLOCKCHAIN."ACLAccount_BC" CASCADE;
 DROP TRIGGER IF EXISTS ACL_HASH_BC_LOG ON BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TRIGGER IF EXISTS ASSET_BC_LOG ON BLOCKCHAIN."Asset_BC" CASCADE;
-DROP TRIGGER IF EXISTS FIAT_BC_LOG ON BLOCKCHAIN."Fiat_BC" CASCADE;
-DROP TRIGGER IF EXISTS NEGOTIATION_BC_LOG ON BLOCKCHAIN."Negotiation_BC" CASCADE;
+DROP TRIGGER IF EXISTS AVERAGE_BLOCK_TIME_LOG ON BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TRIGGER IF EXISTS BLOCK_LOG ON BLOCKCHAIN."Block" CASCADE;
+DROP TRIGGER IF EXISTS CLASSIFICATION_BC_LOG ON BLOCKCHAIN."Classification_BC" CASCADE;
+DROP TRIGGER IF EXISTS DELEGATION_LOG ON BLOCKCHAIN."Delegation" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_PROPERTIES_BC_LOG ON BLOCKCHAIN."IdentityProperties_BC" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_PROVISIONED_BC_LOG ON BLOCKCHAIN."IdentityProvisioned_BC" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_UNPROVISIONED_BC_LOG ON BLOCKCHAIN."IdentityUnprovisioned_BC" CASCADE;
+DROP TRIGGER IF EXISTS MAINTAINER_BC_LOG ON BLOCKCHAIN."Maintainer_BC" CASCADE;
+DROP TRIGGER IF EXISTS META_BC_LOG ON BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
-DROP TRIGGER IF EXISTS ORGANIZATION_BC_LOG ON BLOCKCHAIN."Organization_BC" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_FEEDBACK_HISTORY_BC_LOG ON BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
-DROP TRIGGER IF EXISTS TRANSACTION_FEEDBACK_BC_LOG ON BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
-DROP TRIGGER IF EXISTS ZONE_BC_LOG ON BLOCKCHAIN."Zone_BC" CASCADE;
+DROP TRIGGER IF EXISTS PARAMETER_LOG ON BLOCKCHAIN."Parameter" CASCADE;
+DROP TRIGGER IF EXISTS REDELEGATION_LOG ON BLOCKCHAIN."Redelegation" CASCADE;
+DROP TRIGGER IF EXISTS SPLIT_BC_LOG ON BLOCKCHAIN."Split_BC" CASCADE;
+DROP TRIGGER IF EXISTS TOKEN_LOG ON BLOCKCHAIN."Token" CASCADE;
+DROP TRIGGER IF EXISTS TRANSACTION_LOG ON BLOCKCHAIN."Transaction" CASCADE;
+DROP TRIGGER IF EXISTS UNDELEGATION_LOG ON BLOCKCHAIN."Undelegation" CASCADE;
+DROP TRIGGER IF EXISTS VALIDATOR_LOG ON BLOCKCHAIN."Validator" CASCADE;
+DROP TRIGGER IF EXISTS WITHDRAW_ADDRESS_LOG ON BLOCKCHAIN."WithdrawAddress" CASCADE;
 
-DROP TRIGGER IF EXISTS ADD_ORGANIZATION_LOG ON BLOCKCHAIN_TRANSACTION."AddOrganization" CASCADE;
-DROP TRIGGER IF EXISTS ADD_ZONE_LOG ON BLOCKCHAIN_TRANSACTION."AddZone" CASCADE;
-DROP TRIGGER IF EXISTS BUYER_EXECUTE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder" CASCADE;
-DROP TRIGGER IF EXISTS CHANGE_BUYER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ChangeBuyerBid" CASCADE;
-DROP TRIGGER IF EXISTS CHANGE_SELLER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ChangeSellerBid" CASCADE;
-DROP TRIGGER IF EXISTS CONFIRM_BUYER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid" CASCADE;
-DROP TRIGGER IF EXISTS CONFIRM_SELLER_BID_LOG ON BLOCKCHAIN_TRANSACTION."ConfirmSellerBid" CASCADE;
-DROP TRIGGER IF EXISTS ISSUE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."IssueAsset" CASCADE;
-DROP TRIGGER IF EXISTS ISSUE_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."IssueFiat" CASCADE;
-DROP TRIGGER IF EXISTS REDEEM_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."RedeemAsset" CASCADE;
-DROP TRIGGER IF EXISTS REDEEM_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."RedeemFiat" CASCADE;
-DROP TRIGGER IF EXISTS RELEASE_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."ReleaseAsset" CASCADE;
-DROP TRIGGER IF EXISTS SELLER_EXECUTE_ORDER_LOG ON BLOCKCHAIN_TRANSACTION."SellerExecuteOrder" CASCADE;
-DROP TRIGGER IF EXISTS SEND_ASSET_LOG ON BLOCKCHAIN_TRANSACTION."SendAsset" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_BURN_LOG ON BLOCKCHAIN_TRANSACTION."AssetBurn" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_DEFINE_LOG ON BLOCKCHAIN_TRANSACTION."AssetDefine" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_MINT_LOG ON BLOCKCHAIN_TRANSACTION."AssetMint" CASCADE;
+DROP TRIGGER IF EXISTS ASSET_MUTATE_LOG ON BLOCKCHAIN_TRANSACTION."AssetMutate" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_DEFINE_LOG ON BLOCKCHAIN_TRANSACTION."IdentityDefine" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_ISSUE_LOG ON BLOCKCHAIN_TRANSACTION."IdentityIssue" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_NUB_LOG ON BLOCKCHAIN_TRANSACTION."IdentityNub" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_PROVISION_LOG ON BLOCKCHAIN_TRANSACTION."IdentityProvision" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_UNPROVISION_LOG ON BLOCKCHAIN_TRANSACTION."IdentityUnprovision" CASCADE;
+DROP TRIGGER IF EXISTS MAINTAINER_DEPUTIZE_LOG ON BLOCKCHAIN_TRANSACTION."MaintainerDeputize" CASCADE;
+DROP TRIGGER IF EXISTS META_REVEAL_LOG ON BLOCKCHAIN_TRANSACTION."MetaReveal" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_CANCEL_LOG ON BLOCKCHAIN_TRANSACTION."OrderCancel" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_DEFINE_LOG ON BLOCKCHAIN_TRANSACTION."OrderDefine" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_MAKE_LOG ON BLOCKCHAIN_TRANSACTION."OrderMake" CASCADE;
+DROP TRIGGER IF EXISTS ORDER_TAKE_LOG ON BLOCKCHAIN_TRANSACTION."OrderTake" CASCADE;
 DROP TRIGGER IF EXISTS SEND_COIN_LOG ON BLOCKCHAIN_TRANSACTION."SendCoin" CASCADE;
-DROP TRIGGER IF EXISTS SEND_FIAT_LOG ON BLOCKCHAIN_TRANSACTION."SendFiat" CASCADE;
-DROP TRIGGER IF EXISTS SET_ACL_LOG ON BLOCKCHAIN_TRANSACTION."SetACL" CASCADE;
-DROP TRIGGER IF EXISTS SET_BUYER_FEEDBACK_LOG ON BLOCKCHAIN_TRANSACTION."SetBuyerFeedback" CASCADE;
-DROP TRIGGER IF EXISTS SET_SELLER_FEEDBACK_LOG ON BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
+DROP TRIGGER IF EXISTS SPLIT_SEND_LOG ON BLOCKCHAIN_TRANSACTION."SplitSend" CASCADE;
+DROP TRIGGER IF EXISTS SPLIT_UNWRAP_LOG ON BLOCKCHAIN_TRANSACTION."SplitUnwrap" CASCADE;
+DROP TRIGGER IF EXISTS SPLIT_WRAP_LOG ON BLOCKCHAIN_TRANSACTION."SplitWrap" CASCADE;
 
 DROP TRIGGER IF EXISTS ENVELOPE_LOG ON DOCUSIGN."Envelope" CASCADE;
 DROP TRIGGER IF EXISTS OAUTH_TOKEN_LOG ON DOCUSIGN."OAuthToken" CASCADE;
+
+DROP TRIGGER IF EXISTS VALIDATOR_ACCOUNT_LOG ON KEY_BASE."ValidatorAccount" CASCADE;
 
 DROP TRIGGER IF EXISTS ACCOUNT_LOG ON MASTER."Account" CASCADE;
 DROP TRIGGER IF EXISTS ACCOUNT_FILE_LOG ON MASTER."AccountFile" CASCADE;
 DROP TRIGGER IF EXISTS ACCOUNT_KYC_LOG ON MASTER."AccountKYC" CASCADE;
 DROP TRIGGER IF EXISTS ASSET_LOG ON MASTER."Asset" CASCADE;
+DROP TRIGGER IF EXISTS CLASSIFICATION_LOG ON MASTER."Classification" CASCADE;
 DROP TRIGGER IF EXISTS EMAIL_LOG ON MASTER."Email" CASCADE;
-DROP TRIGGER IF EXISTS FIAT_LOG ON MASTER."Fiat" CASCADE;
 DROP TRIGGER IF EXISTS IDENTIFICATION_LOG ON MASTER."Identification" CASCADE;
+DROP TRIGGER IF EXISTS IDENTITY_LOG ON MASTER."Identity" CASCADE;
 DROP TRIGGER IF EXISTS MOBILE_LOG ON MASTER."Mobile" CASCADE;
 DROP TRIGGER IF EXISTS NEGOTIATION_LOG ON MASTER."Negotiation" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_LOG ON MASTER."Order" CASCADE;
@@ -2421,10 +3274,8 @@ DROP TRIGGER IF EXISTS ORGANIZATION_LOG ON MASTER."Organization" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_BANK_ACCOUNT_DETAIL_LOG ON MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_KYC_LOG ON MASTER."OrganizationKYC" CASCADE;
 DROP TRIGGER IF EXISTS ORGANIZATION_UBO_LOG ON MASTER."OrganizationUBO" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_LOG ON MASTER."Trader" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_RELATION_LOG ON MASTER."TraderRelation" CASCADE;
-DROP TRIGGER IF EXISTS ZONE_LOG ON MASTER."Zone" CASCADE;
-DROP TRIGGER IF EXISTS ZONE_KYC_LOG ON MASTER."ZoneKYC" CASCADE;
+DROP TRIGGER IF EXISTS PROPERTY_LOG ON MASTER."Property" CASCADE;
+DROP TRIGGER IF EXISTS SPLIT_LOG ON MASTER."Split" CASCADE;
 
 DROP TRIGGER IF EXISTS ASSET_FILE_LOG ON MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TRIGGER IF EXISTS CHAT_LOG ON MASTER_TRANSACTION."Chat" CASCADE;
@@ -2440,9 +3291,7 @@ DROP TRIGGER IF EXISTS REDEEM_FIAT_REQUEST_LOG ON MASTER_TRANSACTION."RedeemFiat
 DROP TRIGGER IF EXISTS SEND_FIAT_REQUEST_TOKEN_LOG ON MASTER_TRANSACTION."SendFiatRequest" CASCADE;
 DROP TRIGGER IF EXISTS SESSION_TOKEN_LOG ON MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TRIGGER IF EXISTS SMS_OTP_LOG ON MASTER_TRANSACTION."SMSOTP" CASCADE;
-DROP TRIGGER IF EXISTS TRADE_ACTIVITY_LOG ON MASTER_TRANSACTION."TradeActivity" CASCADE;
-DROP TRIGGER IF EXISTS TRADER_INVITATION_LOG ON MASTER_TRANSACTION."TraderInvitation" CASCADE;
-DROP TRIGGER IF EXISTS ZONE_INVITATION_LOG ON MASTER_TRANSACTION."ZoneInvitation" CASCADE;
+DROP TRIGGER IF EXISTS TOKEN_PRICE_LOG ON MASTER_TRANSACTION."TokenPrice" CASCADE;
 
 DROP TRIGGER IF EXISTS MEMBER_SCAN_LOG ON MEMBER_CHECK."MemberScan" CASCADE;
 DROP TRIGGER IF EXISTS MEMBER_SCAN_DECISION_LOG ON MEMBER_CHECK."MemberScanDecision" CASCADE;
@@ -2473,46 +3322,60 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLAccount_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Block" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Classification_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Delegation" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityProperties_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityProvisioned_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."IdentityUnprovisioned_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Maintainer_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Organization_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Zone_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Parameter" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Redelegation" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Split_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Token" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Transaction" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Undelegation" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Validator" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."WithdrawAddress" CASCADE;
 
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddZone" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SendAsset" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AssetBurn" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AssetDefine" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AssetMint" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AssetMutate" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IdentityDefine" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IdentityIssue" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IdentityNub" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IdentityProvision" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."IdentityUnprovision" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."MaintainerDeputize" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."MetaReveal" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."OrderCancel" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."OrderDefine" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."OrderMake" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."OrderTake" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SendCoin" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SendFiat" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetACL" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SplitSend" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SplitUnwrap" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SplitWrap" CASCADE;
 
 DROP TABLE IF EXISTS DOCUSIGN."Envelope" CASCADE;
 DROP TABLE IF EXISTS DOCUSIGN."Envelope_History" CASCADE;
 DROP TABLE IF EXISTS DOCUSIGN."OAuthToken" CASCADE;
 
+DROP TABLE IF EXISTS KEY_BASE."ValidatorAccount" CASCADE;
+
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Asset" CASCADE;
-DROP TABLE IF EXISTS MASTER."Asset_History" CASCADE;
+DROP TABLE IF EXISTS MASTER."Classification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Email" CASCADE;
 DROP TABLE IF EXISTS MASTER."Fiat" CASCADE;
 DROP TABLE IF EXISTS MASTER."Identification" CASCADE;
+DROP TABLE IF EXISTS MASTER."Identity" CASCADE;
 DROP TABLE IF EXISTS MASTER."Mobile" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation" CASCADE;
 DROP TABLE IF EXISTS MASTER."Negotiation_History" CASCADE;
@@ -2522,10 +3385,8 @@ DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationUBO" CASCADE;
-DROP TABLE IF EXISTS MASTER."Trader" CASCADE;
-DROP TABLE IF EXISTS MASTER."TraderRelation" CASCADE;
-DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
-DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."Property" CASCADE;
+DROP TABLE IF EXISTS MASTER."Split" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile_History" CASCADE;

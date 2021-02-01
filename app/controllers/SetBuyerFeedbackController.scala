@@ -20,11 +20,12 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
 
   private implicit val module: String = constants.Module.CONTROLLERS_SET_BUYER_FEEDBACK
 
-  def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
-  def setBuyerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def setBuyerFeedback(): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.SetBuyerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
@@ -51,7 +52,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       )
   }
 
-  def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val nullRatingsForBuyerFeedback = blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
       (for {
@@ -62,11 +63,13 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       }
   }
 
-  def blockchainSetBuyerFeedbackForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainSetBuyerFeedbackForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.setBuyerFeedback())
   }
 
-  def blockchainSetBuyerFeedback: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainSetBuyerFeedback: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.SetBuyerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors)))

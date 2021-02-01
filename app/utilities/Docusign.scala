@@ -1,6 +1,7 @@
 package utilities
 
 import java.util.Arrays
+
 import com.docusign.esign.api.EnvelopesApi
 import com.docusign.esign.client.ApiClient
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, Signer, Document => DocusignDocument, ReturnUrlRequest => CallBackURLRequest}
@@ -10,9 +11,11 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master.{Email, Trader}
 import models.master
+import models.blockchain.Account
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
 import java.io.{BufferedOutputStream, FileOutputStream}
+
 import models.docusign.{OAuthToken => DocusignOAuthToken}
 import com.docusign.esign.client.auth.OAuth.OAuthToken
 import com.sun.jersey.api.client.ClientHandlerException
@@ -20,6 +23,7 @@ import controllers.routes
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import models.docusign
+
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,7 +46,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
   private val basePath = configuration.get[String]("docusign.basePath")
   private val integrationKey = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_INTEGRATION_KEY)
   private val clientSecret = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_CLIENT_SECRET)
-  private val comdexURL = configuration.get[String]("comdex.url")
+  private val webAppURL = configuration.get[String]("webApp.url")
   private val apiClient = new ApiClient(basePath)
   private val envelopesApi = new EnvelopesApi(apiClient)
 
@@ -104,7 +108,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
       val viewRequest = new CallBackURLRequest
-      viewRequest.setReturnUrl(comdexURL + routes.DocusignController.callBack("", "").url.split("""\?""")(0))
+      viewRequest.setReturnUrl(webAppURL + routes.DocusignController.callBack("", "").url.split("""\?""")(0))
       envelopesApi.createSenderView(accountID, envelopeID, viewRequest).getUrl
     }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -123,7 +127,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     } yield {
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
       val viewRequest = new RecipientViewRequest()
-      viewRequest.setReturnUrl(comdexURL + routes.DocusignController.callBack(envelopeID, "").url.split("""&""")(0))
+      viewRequest.setReturnUrl(webAppURL + routes.DocusignController.callBack(envelopeID, "").url.split("""&""")(0))
       viewRequest.setAuthenticationMethod(authenticationMethod)
       viewRequest.setEmail(emailAddress)
       viewRequest.setUserName(trader.accountID)
@@ -213,7 +217,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   private def fetchAuthorizationURI: String = {
     try {
-      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), comdexURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
+      apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), webAppURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
     } catch {
       case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
         throw new BaseException(constants.Response.INVALID_INPUT)

@@ -9,8 +9,8 @@ object XMLRestResponse {
 
   //Failure
   val REQUEST_NOT_WELL_FORMED = new XmlResponse(400, "BAD_REQUEST", "Request is not well-formed and cannot be understood.")
-  val INVALID_REQUEST_SIGNATURE = new XmlResponse(403,"FORBIDDEN","Comdex validation failure – invalid request signature")
-  val COMDEX_VALIDATION_FAILURE = new XmlResponse(500, "INTERVAL_SERVER_ERROR", "Comdex validation failure")
+  val INVALID_REQUEST_SIGNATURE = new XmlResponse(403,"FORBIDDEN","Validation failure – invalid request signature")
+  val VALIDATION_FAILURE = new XmlResponse(500, "INTERVAL_SERVER_ERROR", "Validation failure")
 
 
   class XmlResponse(code: Int, status: String, message: String) {

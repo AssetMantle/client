@@ -214,8 +214,8 @@ class SendFiats @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val sendFiat = Service.getTransaction(ticketID)
       val markBlockchainSuccess = masterTransactionSendFiatRequests.Service.markBlockchainSuccess(ticketID)
 
@@ -280,11 +280,11 @@ class SendFiats @Inject()(
       def markDirty(sendFiat: SendFiat): Future[Unit] = {
         val markFiatsDirty = blockchainFiats.Service.markDirty(sendFiat.from)
         val markBuyerTransactionFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
-        val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(sendFiat.from)
+        //val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(sendFiat.from)
         for {
           _ <- markFiatsDirty
           _ <- markBuyerTransactionFeedbackDirty
-          _ <- markBuyerAccountDirty
+        //  _ <- markBuyerAccountDirty
         } yield ()
       }
 
@@ -304,11 +304,11 @@ class SendFiats @Inject()(
         _ <- markDirty(sendFiat)
         fromAccountID <- getAccountID(sendFiat.from)
         toAccountID <- getAccountID(sendFiat.to)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
         _ <- masterTransactionTradeActivities.Service.create(negotiationID = masterNegotiation.id, tradeActivity = constants.TradeActivity.SEND_FIAT_TO_ORDER_SUCCESSFUL)
       } yield {
-        actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
+        //actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
       }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -339,7 +339,7 @@ class SendFiats @Inject()(
         _ <- markDirty(sendFiat.from)
         fromAccountID <- getAccountID(sendFiat.from)
         _ <- markBlockchainFailure
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

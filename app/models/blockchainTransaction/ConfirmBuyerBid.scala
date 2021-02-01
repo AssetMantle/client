@@ -202,19 +202,19 @@ class ConfirmBuyerBids @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val confirmBuyerBid = Service.getTransaction(ticketID)
 
       def negotiationID(confirmBuyerBid: ConfirmBuyerBid): Future[String] = blockchainNegotiations.Service.tryGetID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
 
       def markDirty(negotiationID: String, confirmBuyerBid: ConfirmBuyerBid): Future[Unit] = {
         val markNegotiationDirty = blockchainNegotiations.Service.markDirty(negotiationID)
-        val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(confirmBuyerBid.from)
+       // val markBuyerAccountDirty = blockchainAccounts.Service.markDirty(confirmBuyerBid.from)
         val markBuyerTransactionFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(confirmBuyerBid.from)
         for {
           _ <- markNegotiationDirty
-          _ <- markBuyerAccountDirty
+         // _ <- markBuyerAccountDirty
           _ <- markBuyerTransactionFeedbackDirty
         } yield ()
       }
@@ -230,10 +230,10 @@ class ConfirmBuyerBids @Inject()(
         _ <- markDirty(negotiationID = negotiationID, confirmBuyerBid = confirmBuyerBid)
         buyerAccountID <- getAccountID(confirmBuyerBid.from)
         sellerAccountID <- getAccountID(confirmBuyerBid.to)
-        _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
-        _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
+        _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BUYER_BID_CONFIRMED, ticketID, txHash)()
+        _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_BID_CONFIRMED, ticketID, txHash)()
         masterNegotiationID <- masterNegotiationID(negotiationID)
-        _ <- masterTransactionTradeActivities.Service.create(masterNegotiationID, constants.TradeActivity.BUYER_BID_CONFIRMED, ticketID, blockResponse.txhash)
+        _ <- masterTransactionTradeActivities.Service.create(masterNegotiationID, constants.TradeActivity.BUYER_BID_CONFIRMED, ticketID, txHash)
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -262,7 +262,7 @@ class ConfirmBuyerBids @Inject()(
         confirmBuyerBid <- confirmBuyerBid
         _ <- markDirty(confirmBuyerBid)
         fromAccountID <- getID(confirmBuyerBid.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BUYER_BID_CONFIRMATION_FAILED, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BUYER_BID_CONFIRMATION_FAILED, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

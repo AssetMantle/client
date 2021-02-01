@@ -12,9 +12,9 @@ class Log @Inject()(messagesApi: MessagesApi)
                     configuration: Configuration
                    ) {
 
-  private implicit val lang = Lang(configuration.get[String]("play.log.lang"))
+  private implicit val lang: Lang = Lang(configuration.get[String]("play.log.lang"))
 
-  def infoLog(infoMessage: String, logParameters: Any*)(implicit logger: Logger) = {
+  def infoLog(infoMessage: String, logParameters: Any*)(implicit logger: Logger): Unit = {
     logger.info(messagesApi(infoMessage, logParameters: _*))
   }
 }

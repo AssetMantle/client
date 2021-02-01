@@ -188,8 +188,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val issueFiat = Service.getTransaction(ticketID)
 
       def getAccountResponse(issueFiat: IssueFiat): Future[AccountResponse.Response] = getAccount.Service.get(issueFiat.to)
@@ -202,7 +202,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         blockchainFiats.Service.create(pegHash = fiat.pegHash, ownerAddress = issueFiat.to, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)
       }
 
-      def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
+     // def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
 
       def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
@@ -218,10 +218,10 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         traderID <- traderID(toAccountID)
         _ <- create(accountResponse, issueFiat)
         _ <- markSuccess(traderID, issueFiat.transactionID)
-        _ <- markDirty(issueFiat)
+       // _ <- markDirty(issueFiat)
         fromAccountID <- getAccountID(issueFiat.from)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -254,8 +254,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         toAccountID <- getAccountID(issueFiat.to)
         traderID <- traderID(toAccountID)
         _ <- markFailure(traderID, issueFiat.transactionID)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -5,6 +5,8 @@ object SelectFieldOptions {
     "SOYBEAN", "STEEL", "OTHER")
   val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val CURRENCIES: Seq[String] = Seq("USD")
+  val DATA_TYPE: Seq[String] = Seq(constants.Blockchain.DataType.DEC_DATA, constants.Blockchain.DataType.ID_DATA, constants.Blockchain.DataType.STRING_DATA, constants.Blockchain.DataType.HEIGHT_DATA)
+  val ENTITY_TYPE: Seq[String] = Seq(constants.Blockchain.Entity.ORDER, constants.Blockchain.Entity.ORDER_DEFINITION, constants.Blockchain.Entity.ASSET, constants.Blockchain.Entity.ASSET_DEFINITION, constants.Blockchain.Entity.WRAPPED_COIN, constants.Blockchain.Entity.IDENTITY, constants.Blockchain.Entity.IDENTITY_DEFINITION)
   val COUNTRIES: Seq[String] = Seq("Afghanistan", "Albania", "Algeria",
     "Andorra",
     "Angola",
@@ -203,7 +205,6 @@ object SelectFieldOptions {
   val PAYMENT_TERMS: Seq[String] = Seq(constants.View.ONLY_SUPPLIER, constants.View.ONLY_BUYER, constants.View.BOTH_PARTIES)
   val MODE: Seq[String] = Seq("async", "sync", "block")
   val REFERENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")
-
 
   //memberCheck
   val MATCH_TYPE: Seq[String] = Seq("Exact", "Close")

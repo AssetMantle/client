@@ -1,0 +1,53 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="comdex" type="Play2FrameworkRunConfigurations" factoryName="Play 2 App" show_console_on_std_err="false" show_console_on_std_out="false">
+    <module name="commitCentral" />
+    <option name="allowRunningInParallel" value="false" />
+    <option name="enableSbtGlobalPlugins" value="false" />
+    <option name="play2EnvVariables">
+      <map>
+        <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
+        <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
+        <entry key="BLOCKCHAIN_HOST" value="13.126.196.140" />
+        <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
+        <entry key="COMDEX_URL" value="http://localhost:9000" />
+        <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
+        <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json" />
+        <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/comdexKeyStore" />
+        <entry key="KEY_STORE_PASSWORD" value="123123123" />
+        <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
+        <entry key="MAILGUN_USER" value="postmaster@dev.comdex.sg" />
+        <entry key="MEMBER_CHECK_URL" value="https://demo.membercheck.com" />
+        <entry key="PLAY_HTTP_SECRET" value="d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&gt;x" />
+        <entry key="POSTGRES_DB" value="commit" />
+        <entry key="POSTGRES_HOST" value="localhost" />
+        <entry key="POSTGRES_PASSWORD" value="commit" />
+        <entry key="POSTGRES_USER" value="commit" />
+        <entry key="ROOT_FILE_PATH" value="$USER_HOME$" />
+        <entry key="TRULIOO_URL" value="https://api.globalgateway.io" />
+        <entry key="WEB_APP_URL" value="http://localhost:9000" />
+      </map>
+    </option>
+    <option name="play2IsNonDefaultInstallDirUsed" value="false" />
+    <option name="play2JpdaPort" value="9999" />
+    <option name="play2JvmOptions">
+      <array>
+        <option value="-Xms512M" />
+        <option value="-Xmx1024M" />
+        <option value="-Xss1M" />
+        <option value="-XX:+CMSClassUnloadingEnabled" />
+        <option value="-XX:MaxPermSize=256M" />
+      </array>
+    </option>
+    <option name="play2NeedOpenInBrowser" value="true" />
+    <option name="play2NonDefaultInstallDir" value="" />
+    <option name="play2OpenUrl" value="http://localhost:9000" />
+    <option name="play2isAutoReloadEnabled" value="true" />
+    <option name="selectedOptions">
+      <set />
+    </option>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

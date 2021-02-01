@@ -1,0 +1,31 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.EditValidator
+@import views.html.base._
+
+@import utilities.MicroNumber
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[EditValidator]) { editValidator =>
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(editValidator.validatorAddress, routes.ViewController.validator(editValidator.validatorAddress)))
+    @if(editValidator.commissionRate.isDefined) {
+        @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, editValidator.commissionRate.getOrElse("")))
+    }
+    @if(editValidator.description.moniker.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_MONIKER, editValidator.description.moniker.getOrElse(""))
+    }
+    @if(editValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_IDENTITY, editValidator.description.identity.getOrElse(""))
+    }
+    @if(editValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_WEBSITE, editValidator.description.website.getOrElse(""))
+    }
+    @if(editValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, editValidator.description.securityContact.getOrElse(""))
+    }
+    @if(editValidator.description.identity.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, editValidator.description.details.getOrElse(""))
+    }
+    @if(editValidator.minSelfDelegation.isDefined) {
+        @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(editValidator.minSelfDelegation.getOrElse(MicroNumber.zero)))
+    }
+}

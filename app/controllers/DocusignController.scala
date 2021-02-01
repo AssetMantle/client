@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithGenesisLoginAction, WithLoginActionAsync, WithTraderLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{docusign, master, masterTransaction}
@@ -30,7 +30,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.CONTROLLERS_DOCUSIGN
 
-  def send(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def send(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
@@ -75,7 +75,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def callBack(envelopeId: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def callBack(envelopeId: String, event: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     val envelope = docusignEnvelopes.Service.tryGetByEnvelopeID(envelopeId)
 
     def getNegotiation(negotiationID: String): Future[Negotiation] = masterNegotiations.Service.tryGet(negotiationID)
@@ -109,8 +110,8 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
           _ <- markSigningComplete
           _ <- markContractSigned(docusignEnvelope.id)
           _ <- updateStatus(docusignEnvelope.id, docusignEnvelope.documentType)
-          _ <- utilitiesNotification.send(traders(0).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
-          _ <- utilitiesNotification.send(traders(1).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)
+          _ <- utilitiesNotification.send(traders(0).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
+          _ <- utilitiesNotification.send(traders(1).accountID, constants.Notification.CONTRACT_SIGNED, docusignEnvelope.id)()
           _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.CONTRACT_SIGNED, traders.find(_.id== negotiation.buyerTraderID).map(_.accountID).getOrElse(""))
         } yield 0
       }
@@ -123,15 +124,15 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       traders <- getTraders(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
       _ <- updateStatus(envelope, traders,negotiation)
     } yield {
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
-      actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
+      //actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(0).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
+     // actors.Service.cometActor ! actors.Message.makeCometMessage(username = traders(1).accountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(envelope.id))
       Ok(views.html.component.master.docusignCallBackView(event))
     }).recover {
       case baseException: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
     }
   }
 
-  def sign(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sign(negotiationID: String, documentType: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val emailAddress = masterEmails.Service.tryGetVerifiedEmailAddress(loginState.username)
       val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
@@ -154,14 +155,14 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def authorization: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorization: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }
   }
 
-  def authorizationCallBack(code: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def authorizationCallBack(code: String): Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {

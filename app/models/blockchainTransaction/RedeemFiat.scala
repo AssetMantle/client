@@ -189,17 +189,17 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val redeemFiat = Service.getTransaction(ticketID)
       val markBlockchainSuccess = masterTransactionRedeemFiats.Service.markBlockchainSuccess(ticketID)
 
       def markDirty(redeemFiat: RedeemFiat): Future[Unit] = {
         val markFiatsDirty = blockchainFiats.Service.markDirty(redeemFiat.from)
-        val markBlockchainAccountDirty = blockchainAccounts.Service.markDirty(redeemFiat.from)
+       // val markBlockchainAccountDirty = blockchainAccounts.Service.markDirty(redeemFiat.from)
         for {
           _ <- markFiatsDirty
-          _ <- markBlockchainAccountDirty
+         // _ <- markBlockchainAccountDirty
         } yield {}
       }
 
@@ -212,8 +212,8 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
         _ <- markDirty(redeemFiat)
         fromAccountID <- getAccountID(redeemFiat.from)
         toAccountID <- getAccountID(redeemFiat.to)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -241,7 +241,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem,
         redeemFiat <- redeemFiat
         fromAccountID <- getAccountID(redeemFiat.from)
         _ <- markBlockchainFailure
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

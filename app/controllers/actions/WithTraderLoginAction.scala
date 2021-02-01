@@ -16,7 +16,7 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_TRADER_LOGIN_ACTION
 
-  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
+  def apply(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
 
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
@@ -36,14 +36,16 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
       }
 
       def getLoginState(username: String, address: String): Future[LoginState] = {
-        val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
+       /* val aclHash = blockchainACLAccounts.Service.tryGetACLHash(address)
 
         def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
 
         for {
           aclHash <- aclHash
           acl <- acl(aclHash)
-        } yield LoginState(username, constants.User.TRADER, address, Option(acl))
+        } yield
+          */
+          Future(LoginState(username, constants.User.TRADER, address))
       }
 
       def result(loginState: LoginState): Future[Result] = f(loginState)(request)

@@ -55,7 +55,7 @@ class AddOrganizationController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def addOrganizationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addOrganizationForm(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
       val zones = masterZones.Service.getAllVerified
@@ -76,7 +76,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def addOrganization(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addOrganization(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AddOrganization.form.bindFromRequest().fold(
         formWithErrors => {
@@ -121,11 +121,12 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userAddUBOForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def userAddUBOForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.userAddUBO())
   }
 
-  def userAddUBO(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userAddUBO(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AddUBO.form.bindFromRequest().fold(
         formWithErrors => {
@@ -154,11 +155,12 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def addUBOForm(): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def addUBOForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.addUBO())
   }
 
-  def addUBO(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def addUBO(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AddUBO.form.bindFromRequest().fold(
         formWithErrors => {
@@ -187,11 +189,12 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userDeleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def userDeleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
-  def userDeleteUBO(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userDeleteUBO(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.DeleteUBO.form.bindFromRequest().fold(
         formWithErrors => {
@@ -214,11 +217,12 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def deleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def deleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
-  def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.DeleteUBO.form.bindFromRequest().fold(
         formWithErrors => {
@@ -241,7 +245,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def addOrUpdateOrganizationBankAccountForm(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateOrganizationBankAccountForm(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -257,7 +261,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def addOrUpdateOrganizationBankAccount(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def addOrUpdateOrganizationBankAccount(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AddOrUpdateOrganizationBankAccount.form.bindFromRequest().fold(
         formWithErrors => {
@@ -280,7 +284,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def userUploadOrUpdateOrganizationKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUploadOrUpdateOrganizationKYCView(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -295,7 +299,8 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
   }
 
@@ -319,7 +324,7 @@ class AddOrganizationController @Inject()(
     )
   }
 
-  def userStoreOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userStoreOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -343,11 +348,12 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
-  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -374,7 +380,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
 
@@ -397,7 +403,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def userReviewAddOrganizationRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddOrganizationRequest(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.UserReviewAddOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -453,7 +459,7 @@ class AddOrganizationController @Inject()(
           (for {
             id <- id
             allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_REQUESTED, loginState.username)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ORGANIZATION_REQUESTED, loginState.username)()
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
@@ -462,7 +468,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def acceptRequestForm(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def acceptRequestForm(organizationID: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.tryGet(organizationID)
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -479,7 +485,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def acceptRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def acceptRequest: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AcceptOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -518,7 +524,7 @@ class AddOrganizationController @Inject()(
                 def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
                 def sendCoinTransaction(organizationAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = constants.Blockchain.DefaultOrganizationFaucetAmount, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount =Seq(Coin(denom, constants.Blockchain.DefaultOrganizationFaucetAmount)) , gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
                   request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetAmount)), password = acceptRequestData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
@@ -542,8 +548,8 @@ class AddOrganizationController @Inject()(
                   organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
                   _ <- sendCoinTransaction(organizationAccountAddress)
                   ticketID <- sendAddOrganizationTransaction(organizationAccountAddress)
-                  _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
-                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)
+                  _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)()
+                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)()
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
                 } yield result
               } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
@@ -565,7 +571,7 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
       val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
@@ -590,7 +596,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def updateOrganizationKYCDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYCDocumentStatus(): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.UpdateOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
@@ -610,7 +616,7 @@ class AddOrganizationController @Inject()(
               for {
                 _ <- verifyOrganizationKYCs
                 organizationID <- organizationID
-                _ <- utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))()
               } yield {}
             } else {
               val rejectOrganizationKYCs = masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
@@ -618,7 +624,7 @@ class AddOrganizationController @Inject()(
               for {
                 _ <- rejectOrganizationKYCs
                 organizationID <- organizationID
-                _ <- utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                _ <- utilitiesNotification.send(organizationID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))()
               } yield {}
             }
           }
@@ -649,11 +655,12 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def rejectRequestForm(organizationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def rejectRequestForm(organizationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.rejectOrganizationRequest(organizationID = organizationID))
   }
 
-  def rejectRequest(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def rejectRequest(): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.RejectOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -666,7 +673,7 @@ class AddOrganizationController @Inject()(
           (for {
             _ <- rejectOrganization
             organizationAccountID <- organizationAccountID
-            _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_REJECTED, rejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))
+            _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_REJECTED, rejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))()
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_REJECTED)))
           } yield result
             ).recover {
@@ -676,11 +683,13 @@ class AddOrganizationController @Inject()(
       )
   }
 
-  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
   }
 
-  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
   }
 
@@ -704,7 +713,7 @@ class AddOrganizationController @Inject()(
     )
   }
 
-  def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -725,7 +734,7 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -749,11 +758,13 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def blockchainAddOrganizationForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainAddOrganizationForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.addOrganization())
   }
 
-  def blockchainAddOrganization: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainAddOrganization: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.AddOrganization.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.addOrganization(formWithErrors)))

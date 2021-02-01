@@ -1,0 +1,13 @@
+@import views.html.component.blockchain.immutables
+@import views.html.component.blockchain.mutables
+@import views.html.base._
+@import models.blockchain.AssetNew
+
+@(asset: AssetNew)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.ASSET) {
+} {
+    @commonTextInfo(constants.View.ASSET_ID, asset.id)
+    @immutables(asset.immutables)
+    @mutables(asset.mutables)
+}

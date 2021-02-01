@@ -1,7 +1,8 @@
 package utilities
 
-import java.util.concurrent.atomic.AtomicInteger
+import models.common.Serializable.{Immutables, Mutables}
 
+import java.util.concurrent.atomic.AtomicInteger
 import scala.util.Random
 
 object IDGenerator {
@@ -19,4 +20,14 @@ object IDGenerator {
   }
 
   def hexadecimal: String = (-Math.abs(Random.nextLong)).toHexString.toUpperCase
+
+  def getClassificationID(chainID: String, immutables: Immutables, mutables: Mutables): String = Seq(chainID, Hash.getHash(Hash.getHash(immutables.properties.propertyList.map(_.id): _*), Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
+
+  def getAssetID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+
+  def getIdentityID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+
+  def getOrderID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, immutables: Immutables): String = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, immutables.getHashID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
+
+  def getMaintainerID(classificationID: String, identityID: String): String = Seq(classificationID, identityID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 }

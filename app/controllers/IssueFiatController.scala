@@ -32,15 +32,17 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_FIAT
 
-  def issueFiatRequestForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def issueFiatRequestForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.issueFiatRequest())
   }
 
-  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Double): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Double): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = new MicroNumber(transactionAmount), gas = constants.FormField.GAS.maximumValue, password = ""))))
   }
 
-  def issueFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def issueFiat: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.IssueFiat.form.bindFromRequest().fold(
         formWithErrors => {
@@ -55,7 +57,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
               val traderID = masterTraders.Service.tryGetID(issueFiatData.accountID)
 
               def sendTransaction(toAddress: String): Future[String] = {
-                if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).issueFiat) {
+               // if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).issueFiat) {
                   transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                     entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
@@ -65,7 +67,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                     onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
                     updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
                   )
-                } else throw new BaseException(constants.Response.UNAUTHORIZED)
+                //} else throw new BaseException(constants.Response.UNAUTHORIZED)
               }
 
               def create(traderID: String) = masterFiats.Service.create(traderID, issueFiatData.transactionID, issueFiatData.transactionAmount, new MicroNumber(0))
@@ -94,11 +96,13 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       )
   }
 
-  def blockchainIssueFiatForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainIssueFiatForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.issueFiat())
   }
 
-  def blockchainIssueFiat: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainIssueFiat: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.issueFiat(formWithErrors)))

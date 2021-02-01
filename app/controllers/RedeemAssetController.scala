@@ -25,11 +25,13 @@ class RedeemAssetController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
 
-  def blockchainRedeemAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainRedeemAssetForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.redeemAsset())
   }
 
-  def blockchainRedeemAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainRedeemAsset: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.RedeemAsset
       .form.bindFromRequest().fold(
       formWithErrors => {

@@ -1,0 +1,22 @@
+@import controllers.actions.LoginState
+@import models.master.OrderNew
+@import views.html.base._
+
+@(publicOrders: Seq[OrderNew])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+    @publicOrders.map { order =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ORDER_ID, order.id)
+            @commonVerticalTextInfo(constants.View.LABEL, order.label.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.MAKER_ID, order.makerID)
+            @commonVerticalTextInfo(constants.View.MAKER_OWNABLE_ID, order.makerOwnableID)
+            @commonVerticalTextInfo(constants.View.TAKER_OWNABLE_ID, order.takerOwnableID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, order.status)
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${order.id}', '${constants.Blockchain.Entity.ORDER}'")
+            </div>
+            <div class="listItemChild cmuk-flex cmuk-flex-middle">
+            @commonFormButton(constants.Form.ORDER_TAKE, 'parameters -> s"'${order.id}'")
+            </div>
+        }
+    }

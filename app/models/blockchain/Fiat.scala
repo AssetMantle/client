@@ -283,7 +283,7 @@ class Fiats @Inject()(
             _ <- insertOrUpdateMasterFiat(accountResponse, oldFiatPegWallet)
             totalAmount <- updateAndDelete(accountResponse = accountResponse, oldFiatPegWallet = oldFiatPegWallet)
             accountID <- accountID
-          } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat(totalAmount))
+          } yield ()//actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.FIAT, messageContent = actors.Message.Fiat(totalAmount))
         })
       }
 

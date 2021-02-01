@@ -35,12 +35,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
-  def redeemFiatForm: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def redeemFiatForm: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.redeemFiat()))
   }
 
-  def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def redeemFiat: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
@@ -56,7 +56,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, toAddress: String, trader: Trader): Future[Result] = {
             if (validateUsernamePassword) {
-              if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
+             // if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
                 val ticketID = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
                   entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
@@ -71,7 +71,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
                   _ <- createRedeemFiatRequests(trader.id, ticketID)
                   result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
                 } yield result
-              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+              //} else throw new BaseException(constants.Response.UNAUTHORIZED)
             } else Future(BadRequest(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form.fill(redeemFiatData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
           }
 
@@ -91,12 +91,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-  def zoneRedeemFiatForm(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneRedeemFiatForm(id: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.zoneRedeemFiat(id = id)))
   }
 
-  def zoneRedeemFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneRedeemFiat: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.ZoneRedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
@@ -113,11 +113,13 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         })
   }
 
-  def blockchainRedeemFiatForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainRedeemFiatForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.redeemFiat())
   }
 
-  def blockchainRedeemFiat: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainRedeemFiat: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))

@@ -4,6 +4,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable.Coin
 import models.master._
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -47,14 +48,14 @@ class SetACLController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_SET_ACL
 
-  private val comdexURL: String = configuration.get[String]("comdex.url")
+  private val comdexURL: String = configuration.get[String]("webApp.url")
 
-  def inviteTraderForm(): Action[AnyContent] = withoutLoginAction {
+  def inviteTraderForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(views.html.component.master.inviteTrader())
   }
 
-  def inviteTrader(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def inviteTrader(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.InviteTrader.form.bindFromRequest().fold(
         formWithErrors => {
@@ -86,7 +87,7 @@ class SetACLController @Inject()(
                 organization <- organization
                 identification <- identification
                 _ <- createInvitation(organization)
-                _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
+                _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)()
                 result <- sendEmailAndGetResult(organization, identification)
               } yield result
             }
@@ -104,7 +105,7 @@ class SetACLController @Inject()(
       )
   }
 
-  def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addTraderForm(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.getByAccountID(loginState.username)
 
@@ -122,7 +123,7 @@ class SetACLController @Inject()(
       }
   }
 
-  def addTrader(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addTrader(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AddTrader.form.bindFromRequest().fold(
         formWithErrors => {
@@ -174,7 +175,7 @@ class SetACLController @Inject()(
       )
   }
 
-  def zoneVerifyTraderForm(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneVerifyTraderForm(traderID: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.tryGet(traderID)
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -191,7 +192,7 @@ class SetACLController @Inject()(
       }
   }
 
-  def zoneVerifyTrader: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneVerifyTrader: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyTrader.form.bindFromRequest().fold(
         formWithErrors => {
@@ -223,7 +224,7 @@ class SetACLController @Inject()(
                 val createACL = blockchainAclHashes.Service.create(acl)
 
                 def sendCoinTransaction(aclAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultTraderFaucetAmount, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount =Seq(Coin(denom, constants.Blockchain.DefaultTraderFaucetAmount)) , gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
                   request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultTraderFaucetAmount)), password = verifyTraderData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
@@ -269,7 +270,7 @@ class SetACLController @Inject()(
       )
   }
 
-  def organizationVerifyTraderForm(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationVerifyTraderForm(traderID: String): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.tryGet(traderID)
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
@@ -287,7 +288,7 @@ class SetACLController @Inject()(
       }
   }
 
-  def organizationVerifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationVerifyTrader: Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyTrader.form.bindFromRequest().fold(
         formWithErrors => {
@@ -319,7 +320,7 @@ class SetACLController @Inject()(
                 val createACL = blockchainAclHashes.Service.create(acl)
 
                 def sendCoinTransaction(aclAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = constants.Blockchain.DefaultTraderFaucetAmount, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount =Seq(Coin(denom, constants.Blockchain.DefaultTraderFaucetAmount)) , gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
                   request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultTraderFaucetAmount)), password = verifyTraderData.password, mode = transactionMode),
                   action = transactionsSendCoin.Service.post,
@@ -363,11 +364,13 @@ class SetACLController @Inject()(
       )
   }
 
-  def blockchainSetACLForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainSetACLForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.setACL())
   }
 
-  def blockchainSetACL: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainSetACL: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.SetACL.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.setACL(formWithErrors)))

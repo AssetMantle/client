@@ -7,6 +7,8 @@ import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
 import utilities.MicroNumber
+import utilities.NumericOperation.checkPrecision
+
 import scala.util.matching.Regex
 import utilities.NumericOperation._
 
@@ -33,7 +35,6 @@ object FormField {
   val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ID = new StringFormField("ID", 32, 32)
-  val ORDER_ID = new StringFormField("ORDER_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val BUYER_ACCOUNT_ID = new StringFormField("BUYER_ACCOUNT_ID", 3, 50)
   val SELLER_ACCOUNT_ID = new StringFormField("SELLER_ACCOUNT_ID", 3, 50)
@@ -118,6 +119,20 @@ object FormField {
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
   val NEGOTIATION_ID = new StringFormField("NEGOTIATION_ID", 1, 100)
+  val SEARCH = new StringFormField("SEARCH_TX_HASH_HEIGHT_BLOCK_HEIGHT_ADDRESS", 1, 1000)
+  val DATA_VALUE = new StringFormField("DATA_VALUE", 1, 100)
+  val DATA_NAME = new StringFormField("DATA_NAME", 1, 100)
+  val OWNABLE_ID = new StringFormField("OWNABLE_ID", 1, 200)
+  val NUB_ID = new StringFormField("NUB_ID", 1, 200)
+  val CLASSIFICATION_ID = new StringFormField("CLASSIFICATION_ID", 1, 200)
+  val IDENTITY_ID = new StringFormField("IDENTITY_ID", 1, 200)
+  val DENOM = new StringFormField("DENOM", 1, 100)
+  val MAKER_OWNABLE_ID = new StringFormField("MAKER_OWNABLE_ID", 1, 200)
+  val TAKER_OWNABLE_ID = new StringFormField("TAKER_OWNABLE_ID", 1, 200)
+  val ORDER_ID = new StringFormField("ORDER_ID", 1, 500)
+  val LABEL = new StringFormField("LABEL", 1, 200)
+  val ENTITY_ID = new StringFormField("ENTITY_ID", 1, 500)
+  val VALUE = new StringFormField("VALUE", 1, 1000)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -132,6 +147,9 @@ object FormField {
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
+  val TOKEN_DENOM = new SelectFormField("TOKEN_DENOM", Seq.empty)
+  val DATA_TYPE = new SelectFormField("DATA_TYPE", constants.SelectFieldOptions.DATA_TYPE)
+  val ENTITY_TYPE = new SelectFormField("ENTITY_TYPE", constants.SelectFieldOptions.ENTITY_TYPE)
 
   //IntFormField
   val BID = new IntFormField("BID", 0, Int.MaxValue)
@@ -142,6 +160,7 @@ object FormField {
   val RATING = new IntFormField("RATING", 0, 100)
   val SHIPPING_PERIOD = new IntFormField("SHIPPING_PERIOD", 0, 1000)
   val TENURE = new IntFormField("TENURE", 0, 500)
+  val EXPIRES_IN = new IntFormField("EXPIRES_IN", 1, Int.MaxValue)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
@@ -189,6 +208,15 @@ object FormField {
   val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
   val CONFIRM = new BooleanFormField("CONFIRM")
   val DOCUMENT_LIST_COMPLETED = new BooleanFormField("DOCUMENT_LIST_COMPLETED")
+  val ADD_IMMUTABLE_META_FIELD = new BooleanFormField("ADD_IMMUTABLE_META_FIELD")
+  val ADD_IMMUTABLE_FIELD = new BooleanFormField("ADD_IMMUTABLE_FIELD")
+  val ADD_MUTABLE_META_FIELD = new BooleanFormField("ADD_MUTABLE_META_FIELD")
+  val ADD_MUTABLE_FIELD = new BooleanFormField("ADD_MUTABLE_FIELD")
+  val ADD_MAINTAINED_TRAITS = new BooleanFormField("ADD_MAINTAINED_TRAITS")
+  val ADD_MAINTAINER = new BooleanFormField("ADD_MAINTAINER")
+  val REMOVE_MAINTAINER = new BooleanFormField("REMOVE_MAINTAINER")
+  val MUTATE_MAINTAINER = new BooleanFormField("MUTATE_MAINTAINER")
+  val ADD_FIELD = new BooleanFormField("ADD_FIELD")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
@@ -197,6 +225,22 @@ object FormField {
   val UBOS = new NestedFormField("UBOS")
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
+  val IMMUTABLE_META_TRAITS = new NestedFormField("IMMUTABLE_META_TRAITS")
+  val IMMUTABLE_TRAITS = new NestedFormField("IMMUTABLE_TRAITS")
+  val MUTABLE_META_TRAITS = new NestedFormField("MUTABLE_META_TRAITS")
+  val MUTABLE_TRAITS = new NestedFormField("MUTABLE_TRAITS")
+  val MAINTAINED_TRAITS = new NestedFormField("MAINTAINED_TRAITS")
+  val COINS = new NestedFormField("COINS")
+  val REVEAL_FACT = new NestedFormField("REVEAL_FACT")
+  val IMMUTABLE_META_PROPERTIES = new NestedFormField("IMMUTABLE_META_PROPERTIES")
+  val IMMUTABLE_PROPERTIES = new NestedFormField("IMMUTABLE_PROPERTIES")
+  val MUTABLE_META_PROPERTIES = new NestedFormField("MUTABLE_META_PROPERTIES")
+  val MUTABLE_PROPERTIES = new NestedFormField("MUTABLE_PROPERTIES")
+
+  //BigDecimalFormField
+  val SPLIT = new BigDecimalFormField("SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
+  val TAKER_OWNABLE_SPLIT = new BigDecimalFormField("TAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
+  val MAKER_OWNABLE_SPLIT = new BigDecimalFormField("MAKER_OWNABLE_SPLIT", constants.Blockchain.SmallestDec, BigDecimal(Double.MaxValue))
 
   //MicroNumberFormField
   val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
@@ -205,7 +249,7 @@ object FormField {
   val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
-  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10), RegularExpression.GAS)
+  val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10))
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
 
   //TODO: Error Response through Messages
@@ -239,6 +283,11 @@ object FormField {
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }
 
+  class BigDecimalFormField(fieldName: String, val minimumValue: BigDecimal, val maximumValue: BigDecimal) {
+    val name: String = fieldName
+    val field: Mapping[BigDecimal] = of(bigDecimalFormat).verifying(Constraints.max[BigDecimal](maximumValue), Constraints.min[BigDecimal](minimumValue))
+  }
+
   class BooleanFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
@@ -248,9 +297,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, regex: Regex = RegularExpression.FIAT) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = text.verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = constants.Response.INVALID_NUMBER.message)).verifying(constants.Response.NUMBER_OUT_OF_RANGE.message, x => new MicroNumber(x) >= minimumValue && new MicroNumber(x) <= maximumValue).transform[MicroNumber](x => new MicroNumber(x), y => y.toRoundedOffString())
+    val field: Mapping[MicroNumber] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue.toDouble), Constraints.min[Double](minimumValue.toDouble)).verifying(constants.Response.PRECISION_MORE_THAN_REQUIRED.message, x => checkPrecision(precision, x.toString)).transform[MicroNumber](x => new MicroNumber(x), y => y.toDouble)
   }
 
 }

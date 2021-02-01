@@ -1,0 +1,15 @@
+@import views.companion.blockchain.AssetMint
+@import views.html.base._
+
+@(assetMintForm: Form[AssetMint.Data] = AssetMint.form, classificationID: String, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ASSET_MINT, assetMintForm) {
+    @commonInputText(assetMintForm, constants.FormField.FROM_ID)
+    @commonInputText(assetMintForm, constants.FormField.TO_ID)
+    @commonInputText(assetMintForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID)
+    @commonInputMicroNumber(assetMintForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetMintForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
+    @commonInputPassword(assetMintForm, constants.FormField.PASSWORD, 'required -> false)
+}

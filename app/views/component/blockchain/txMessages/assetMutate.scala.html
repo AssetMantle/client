@@ -1,0 +1,15 @@
+@import models.Abstract.TransactionMessage
+@import views.html.base._
+@import views.html.component.blockchain.properties
+@import models.common.TransactionMessages.AssetMutate
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[AssetMutate]) { assetMutate =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(assetMutate.from, routes.ViewController.wallet(assetMutate.from)))
+    @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetMutate.assetID, routes.IndexController.search(assetMutate.assetID)))
+    @Messages(constants.View.MUTABLE_META_PROPERTIES):
+    @views.html.component.blockchain.metaProperties(assetMutate.mutableMetaProperties.metaPropertyList)
+    @Messages(constants.View.MUTABLE_PROPERTIES):
+    @views.html.component.blockchain.properties(assetMutate.mutableProperties.propertyList)
+}

@@ -1,0 +1,35 @@
+@import controllers.actions.LoginState
+@import models.blockchain.Split
+@import models.master.AssetNew
+@import views.html.base._
+
+@(splits: Seq[Split], allDenoms: Seq[String], assets: Seq[AssetNew])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ACCOUNT_SPLITS) {
+    @commonFormButton(constants.Form.SPLIT_WRAP)
+} {
+    @splits.map { split =>
+        @commonVerticalInfoBox() {
+            @defining(if (allDenoms.contains(split.ownableID)) constants.Blockchain.Entity.WRAPPED_COIN else constants.Blockchain.Entity.ASSET) {entityType =>
+                @commonVerticalTextInfo(constants.View.ID, split.ownableID)
+                @commonVerticalTextInfo(constants.View.ENTITY_TYPE, entityType)
+                @if(entityType == constants.Blockchain.Entity.ASSET) {
+                    @commonVerticalTextInfo(constants.View.LABEL, assets.find(_.id == split.ownableID).fold("")(_.label.getOrElse("")))
+                    <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${entityType}'")
+                    </div>
+                }
+                @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
+                @commonVerticalDoubleInfo(constants.View.AMOUNT, split.split.toDouble)
+                @if(entityType != constants.Blockchain.Entity.ASSET) {
+                    <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                    </div>
+                }
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
+            }
+        }
+    }
+}

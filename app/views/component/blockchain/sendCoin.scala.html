@@ -2,7 +2,7 @@
 @import views.html.base._
 
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@commonForm(constants.Form.BLOCKCHAIN_SEND_COIN, sendCoinForm) {
+@commonForm(constants.Form.SEND_COIN, sendCoinForm) {
     @commonInputText(sendCoinForm, constants.FormField.FROM)
     @commonInputText(sendCoinForm, constants.FormField.TO)
     @commonInputMicroNumber(sendCoinForm, constants.FormField.AMOUNT)

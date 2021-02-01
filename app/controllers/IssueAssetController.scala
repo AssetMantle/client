@@ -33,7 +33,7 @@ class IssueAssetController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
-  def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
@@ -51,7 +51,7 @@ class IssueAssetController @Inject()(
       }
   }
 
-  def issueAssetForm(assetID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def issueAssetForm(assetID: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val asset = masterAssets.Service.tryGet(assetID)
       (for {
@@ -62,7 +62,7 @@ class IssueAssetController @Inject()(
       }
   }
 
-  def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def issueAsset: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.IssueAssetOld.form.bindFromRequest().fold(
         formWithErrors => {
@@ -109,11 +109,13 @@ class IssueAssetController @Inject()(
       )
   }
 
-  def blockchainIssueAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainIssueAssetForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.issueAsset())
   }
 
-  def blockchainIssueAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainIssueAsset: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.issueAsset(formWithErrors)))

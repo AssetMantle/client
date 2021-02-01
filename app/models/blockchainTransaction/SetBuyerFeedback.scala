@@ -185,16 +185,16 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val setBuyerFeedback = Service.getTransaction(ticketID)
 
       def updateAndMarkDirty(setBuyerFeedback: SetBuyerFeedback): Future[Unit] = {
         val update = blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, setBuyerFeedback.from, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(setBuyerFeedback.from)
+        //val markDirtyFrom = blockchainAccounts.Service.markDirty(setBuyerFeedback.from)
         for {
           _ <- update
-          _ <- markDirtyFrom
+        //  _ <- markDirtyFrom
         } yield {}
       }
 
@@ -206,8 +206,8 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         _ <- updateAndMarkDirty(setBuyerFeedback)
         fromAccountID <- getAccountID(setBuyerFeedback.from)
         toAccountID <- getAccountID(setBuyerFeedback.to)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -233,7 +233,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         _ <- markTransactionFailed
         setBuyerFeedback <- setBuyerFeedback
         fromAccountID <- getAccountID(setBuyerFeedback.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -196,8 +196,8 @@ class SetACLs @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val setACL = Service.getTransaction(ticketID)
 
       def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
@@ -208,11 +208,11 @@ class SetACLs @Inject()(
 
       def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL): Future[Int] = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
 
-      def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
+      //def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
 
       def markAccepted(traderID: String): Future[Int] = masterTraders.Service.markAccepted(traderID)
 
-      def markDirty(fromAddress: String): Future[Int] = blockchainAccounts.Service.markDirty(fromAddress)
+     // def markDirty(fromAddress: String): Future[Int] = blockchainAccounts.Service.markDirty(fromAddress)
 
       def transactionFeedbacksInsertOrUpdate(setACL: SetACL): Future[Int] = blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
 
@@ -225,15 +225,15 @@ class SetACLs @Inject()(
         trader <- getTrader(traderAccountID)
         acl <- getAcl(setACL.aclHash)
         _ <- aclAccountInsertOrUpdate(setACL, acl)
-        _ <- markUserTypeTrader(traderAccountID)
+       // _ <- markUserTypeTrader(traderAccountID)
         _ <- markAccepted(trader.id)
-        _ <- markDirty(setACL.from)
+       // _ <- markDirty(setACL.from)
         _ <- transactionFeedbacksInsertOrUpdate(setACL)
         fromAccountID <- getAccountID(setACL.from)
         organization <- getTraderOrganization(trader.organizationID)
-        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, blockResponse.txhash, trader.accountID)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, blockResponse.txhash, trader.accountID, trader.accountID, organization.name)
+        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_SUCCESSFUL, txHash)()
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_SUCCESSFUL, txHash, trader.accountID)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_SUCCESSFUL, txHash, trader.accountID, trader.accountID, organization.name)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -266,9 +266,9 @@ class SetACLs @Inject()(
         zoneAccountID <- getAccountID(setACL.from)
         trader <- getTrader(traderAccountID)
         organization <- getTraderOrganization(trader.organizationID)
-        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_FAILED, message)
-        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_FAILED, message, trader.accountID)
-        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED, message, trader.accountID, trader.accountID, organization.name)
+        _ <- utilitiesNotification.send(traderAccountID, constants.Notification.TRADER_REGISTRATION_FAILED, message)()
+        _ <- utilitiesNotification.send(organization.accountID, constants.Notification.ORGANIZATION_TRADER_REGISTRATION_FAILED, message, trader.accountID)()
+        _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_ADD_TRADER_FAILED, message, trader.accountID, trader.accountID, organization.name)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -8,9 +8,9 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.{JsError, JsPath, JsSuccess, JsValue, Json, OWrites, Reads}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
-import queries.responses.MemberCheckCorporateScanResponse.{ScanEntity, ScanInputParam, ScanResult}
+import queries.responses.memberCheck.CorporateScanResponse.{ScanEntity, ScanInputParam, ScanResult}
 import transactions.responses.MemberCheckCorporateScanResponse._
-import queries.responses.MemberCheckCorporateScanResponse._
+import queries.responses.memberCheck.CorporateScanResponse._
 import transactions.responses.TransactionResponse._
 import utilities.JSON.convertJsonStringToObject
 
@@ -23,7 +23,7 @@ import utilities.MicroNumber
 @Singleton
 class LoopBackController @Inject()(
                                     messagesControllerComponents: MessagesControllerComponents,
-                                    transactionsAddKey: transactions.AddKey,
+                                    transactionsAddKey: transactions.blockchain.AddKey,
                                     transactionsIssueAsset: transactions.IssueAsset,
                                     transactionsIssueFiat: transactions.IssueFiat,
                                     transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
@@ -37,8 +37,8 @@ class LoopBackController @Inject()(
                                     transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
                                     transactionsRedeemAsset: transactions.RedeemAsset,
                                     transactionsRedeemFiat: transactions.RedeemFiat,
-                                    transactionsChangePassword: transactions.ChangePassword,
-                                    transactionsForgotPassword: transactions.ForgotPassword,
+                                    transactionsChangePassword: transactions.blockchain.ChangePassword,
+                                    transactionsForgotPassword: transactions.blockchain.ForgotPassword,
                                     transactionsSendCoin: transactions.SendCoin,
                                     blockchainAccounts: blockchain.Accounts,
                                     blockchainACLAccounts: blockchain.ACLAccounts,
@@ -86,7 +86,7 @@ class LoopBackController @Inject()(
   def memberCheckCorporateScanInfo(request: String): Action[AnyContent] = Action {
     val scanParam = ScanInputParam(Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, Random.alphanumeric.take(10).mkString, true)
     val scanResult = ScanResult(request.toInt, Random.alphanumeric.take(10).mkString, Random.alphanumeric.filter(_.isDigit).take(4).mkString.toInt, None)
-    Ok(Json.toJson(queries.responses.MemberCheckCorporateScanResponse.Response(scanParam, scanResult)).toString())
+    Ok(Json.toJson(queries.responses.memberCheck.CorporateScanResponse.Response(scanParam, scanResult)).toString())
   }
 
   def sendEmail(emailAddress: String): Action[AnyContent] = Action.async {
@@ -124,7 +124,7 @@ class LoopBackController @Inject()(
   def mnemonic: Action[AnyContent] = Action {
     Ok(Random.shuffle(mnemonicSampleElements).take(24).mkString(" "))
   }
-
+/*
   def addKey: Action[AnyContent] = Action { implicit request =>
     implicit val requestReads = transactionsAddKey.requestReads
     implicit val responseWrites = transactionsAddKey.responseWrites
@@ -133,7 +133,7 @@ class LoopBackController @Inject()(
       convertJsonStringToObject[transactionsAddKey.Request](requestBody.toString())
     }.getOrElse(throw new BaseException(constants.Response.FAILURE))
     Ok(Json.toJson(transactionsAddKey.Response(addKeyRequest.name, constants.Test.BLOCKCHAIN_ADDRESS_PREFIX + Random.alphanumeric.filter(c => c.isDigit || c.isLower).take(38).mkString, "commitpub1addwnpepq" + Random.alphanumeric.filter(c => c.isDigit || c.isLower).take(58).mkString, addKeyRequest.seed)))
-  }
+  }*/
 
   def sendCoin(to: String): Action[AnyContent] = Action { implicit request =>
     if (kafkaEnabled) {

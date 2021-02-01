@@ -96,11 +96,11 @@ class WesternUnionController @Inject()(
         } yield utilities.XMLRestResponse.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else Future(utilities.XMLRestResponse.INVALID_REQUEST_SIGNATURE.result)
         ).recover {
-        case _: Exception => utilities.XMLRestResponse.COMDEX_VALIDATION_FAILURE.result
+        case _: Exception => utilities.XMLRestResponse.VALIDATION_FAILURE.result
       }
   }
 
-  def westernUnionPortalRedirect(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def westernUnionPortalRedirect(): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.IssueFiatRequest.form.bindFromRequest().fold(
         formWithErrors => {

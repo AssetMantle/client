@@ -3,7 +3,7 @@ package utilities
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
-
+import play.api.libs.functional.syntax._
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 
@@ -17,7 +17,7 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def this(value: Double) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
-  def this(value: Float) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
+  def this(value: Float) = this((BigDecimal(value.toDouble) * MicroNumber.factor).toBigInt)
 
   def toMicroString: String = this.value.toString
 
@@ -176,6 +176,8 @@ object MicroNumber {
   private val module: String = constants.Module.UTILITIES_MICRO_NUMBER
 
   private val logger: Logger = Logger(this.getClass)
+
+  val zero = new MicroNumber(0)
 
   def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 

@@ -216,7 +216,7 @@ class Assets @Inject()(
               accountResponse <- accountResponse
               _ <- updateOrDelete(accountResponse)
               accountID <- accountID
-            } yield actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
+            } yield () //actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
           }
         }
       }

@@ -15,6 +15,7 @@ object Form {
   //AccountController
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp(), routes.javascript.AccountController.signUpForm)
   val CREATE_WALLET = new Form("CREATE_WALLET", routes.AccountController.createWallet(), routes.javascript.AccountController.createWalletForm)
+  val IMPORT_WALLET = new Form("IMPORT_WALLET", routes.AccountController.importWallet(), routes.javascript.AccountController.importWalletForm)
   val LOGIN = new Form("LOGIN", routes.AccountController.login(), routes.javascript.AccountController.loginForm)
   val LOGOUT = new Form("LOGOUT", routes.AccountController.logout(), routes.javascript.AccountController.logoutForm)
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword(), routes.javascript.AccountController.changePasswordForm)
@@ -22,9 +23,6 @@ object Form {
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword(), routes.javascript.AccountController.forgotPasswordForm)
   val ADD_IDENTIFICATION = new Form("ADD_IDENTIFICATION", routes.AccountController.addIdentification(), routes.javascript.AccountController.addIdentificationForm)
   val USER_REVIEW_IDENTIFICATION = new Form("USER_REVIEW_IDENTIFICATION", routes.AccountController.userReviewIdentification(), routes.javascript.AccountController.userReviewIdentificationForm)
-
-  //AddKeyController
-  val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey(), routes.javascript.AddKeyController.blockchainAddKeyForm)
 
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization(), routes.javascript.AddOrganizationController.addOrganizationForm)
@@ -56,6 +54,13 @@ object Form {
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
+
+  //AssetController
+  val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define(), routes.javascript.AssetController.defineForm)
+  val ASSET_MINT = new Form("ASSET_MINT", routes.AssetController.mint(), routes.javascript.AssetController.mintForm)
+  val ASSET_MUTATE = new Form("ASSET_MUTATE", routes.AssetController.mutate(), routes.javascript.AssetController.mutateForm)
+  val ASSET_BURN = new Form("ASSET_BURN", routes.AssetController.burn(), routes.javascript.AssetController.burnForm)
+
   //BackgroundCheckController
   val MEMBER_CHECK_MEMBER_SCAN = new Form("MEMBER_CHECK_MEMBER_SCAN", routes.BackgroundCheckController.memberScan(), routes.javascript.BackgroundCheckController.memberScanForm)
   val MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION", routes.BackgroundCheckController.memberScanResultDecision(), routes.javascript.BackgroundCheckController.memberScanResultDecisionForm)
@@ -66,6 +71,9 @@ object Form {
   val MEMBER_CHECK_VESSEL_SCAN = new Form("MEMBER_CHECK_VESSEL_SCAN", routes.BackgroundCheckController.vesselScan(), routes.javascript.BackgroundCheckController.vesselScanForm)
   val MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION", routes.BackgroundCheckController.vesselScanResultDecision(), routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm)
   val ADD_ASSET_MEMBER_CHECK = new Form("ADD_ASSET_MEMBER_CHECK", routes.BackgroundCheckController.addAssetMemberCheck(), routes.javascript.BackgroundCheckController.addAssetMemberCheckForm)
+
+  //ChatController
+  val SEND_MESSAGE = new Form("SEND_MESSAGE", routes.ChatController.sendMessage(), routes.javascript.ChatController.sendMessageForm)
 
 
   //ChangeBuyerBidController
@@ -80,8 +88,6 @@ object Form {
   //ConfirmSellerBidController
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid(), routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm)
 
-  //ChatController
-  val SEND_MESSAGE = new Form("SEND_MESSAGE", routes.ChatController.sendMessage(), routes.javascript.ChatController.sendMessageForm)
 
   //ContactController
   val ADD_OR_UPDATE_EMAIL_ADDRESS = new Form("ADD_OR_UPDATE_EMAIL_ADDRESS", routes.ContactController.addOrUpdateEmailAddress(), routes.javascript.ContactController.addOrUpdateEmailAddressForm)
@@ -89,7 +95,36 @@ object Form {
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.ContactController.verifyEmailAddress(), routes.javascript.ContactController.verifyEmailAddressForm)
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber(), routes.javascript.ContactController.verifyMobileNumberForm)
 
-  //IssueAssetController
+  //EntityController
+  val UPSERT_ENTITY_LABEL = new Form("UPSERT_ENTITY_LABEL", routes.EntityController.upsertLabel(), routes.javascript.EntityController.upsertLabelForm)
+
+  //IdentityController
+  val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub(), routes.javascript.IdentityController.nubForm)
+  val IDENTITY_DEFINE = new Form("IDENTITY_DEFINE", routes.IdentityController.define(), routes.javascript.IdentityController.defineForm)
+  val IDENTITY_ISSUE = new Form("IDENTITY_ISSUE", routes.IdentityController.issue(), routes.javascript.IdentityController.issueForm)
+  val IDENTITY_PROVISION = new Form("IDENTITY_PROVISION", routes.IdentityController.provision(), routes.javascript.IdentityController.provisionForm)
+  val IDENTITY_UNPROVISION = new Form("IDENTITY_UNPROVISION", routes.IdentityController.unprovision(), routes.javascript.IdentityController.unprovisionForm)
+
+  //MetaController
+  val META_REVEAL = new Form("META_REVEAL", routes.MetaController.reveal(), routes.javascript.MetaController.revealForm)
+
+  //MaintainerController
+  val MAINTAINER_DEPUTIZE = new Form("MAINTAINER_DEPUTIZE", routes.MaintainerController.deputize(), routes.javascript.MaintainerController.deputizeForm)
+
+  //OrderController
+  val ORDER_DEFINE = new Form("ORDER_DEFINE", routes.OrderController.define(), routes.javascript.OrderController.defineForm)
+  val ORDER_MAKE = new Form("ORDER_MAKE", routes.OrderController.make(), routes.javascript.OrderController.makeForm)
+  val ORDER_TAKE = new Form("ORDER_TAKE", routes.OrderController.take(), routes.javascript.OrderController.takeForm)
+  val ORDER_CANCEL = new Form("ORDER_CANCEL", routes.OrderController.cancel(), routes.javascript.OrderController.cancelForm)
+
+  //SendCoinController
+  //val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin(), routes.javascript.SendCoinController.sendCoinForm)
+
+  //SplitController
+  val SPLIT_SEND = new Form("SPLIT_SEND", routes.SplitController.send(), routes.javascript.SplitController.sendForm)
+  val SPLIT_WRAP = new Form("SPLIT_WRAP", routes.SplitController.wrap(), routes.javascript.SplitController.wrapForm)
+  val SPLIT_UNWRAP = new Form("SPLIT_UNWRAP", routes.SplitController.unwrap(), routes.javascript.SplitController.unwrapForm)
+
   val ZONE_ISSUE_ASSET = new Form("ZONE_ISSUE_ASSET", routes.IssueAssetController.issueAsset(), routes.javascript.IssueAssetController.issueAssetForm)
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset(), routes.javascript.IssueAssetController.blockchainIssueAssetForm)
 
@@ -144,7 +179,7 @@ object Form {
   val FAUCET_REQUEST = new Form("FAUCET_REQUEST", routes.SendCoinController.faucetRequest(), routes.javascript.SendCoinController.faucetRequestForm)
   val REJECT_FAUCET_REQUEST = new Form("REJECT_FAUCET_REQUEST", routes.SendCoinController.rejectFaucetRequest(), routes.javascript.SendCoinController.rejectFaucetRequestForm)
   val APPROVE_FAUCET_REQUEST = new Form("APPROVE_FAUCET_REQUEST", routes.SendCoinController.approveFaucetRequests(), routes.javascript.SendCoinController.approveFaucetRequestsForm)
-  val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin(), routes.javascript.SendCoinController.blockchainSendCoinForm)
+  //val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin(), routes.javascript.SendCoinController.blockchainSendCoinForm)
 
   //SendFiatController
   val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat(), routes.javascript.SendFiatController.sendFiatForm)
@@ -172,6 +207,7 @@ object Form {
   val TRADER_RELATION_REQUEST = new Form("TRADER_RELATION_REQUEST", routes.TraderController.traderRelationRequest(), routes.javascript.TraderController.traderRelationRequestForm)
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
   val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
+
 
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"

@@ -25,11 +25,13 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
-  def blockchainReleaseAssetForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainReleaseAssetForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.releaseAsset())
   }
 
-  def blockchainReleaseAsset: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainReleaseAsset: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors)))

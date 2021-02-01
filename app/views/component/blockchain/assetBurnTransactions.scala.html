@@ -1,0 +1,15 @@
+@import views.html.base._
+@import models.blockchainTransaction.AssetBurn
+
+@(assetBurnTransactions: Seq[AssetBurn])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="burnAsset">
+    @assetBurnTransactions.map { burnTransaction =>
+        @commonVerticalInfoBox(){
+            @commonVerticalTextInfo(constants.View.TX_HASH, burnTransaction.txHash.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.FROM_ID, burnTransaction.fromID)
+            @commonVerticalTextInfo(constants.View.ASSET_ID, burnTransaction.assetID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, burnTransaction.status)
+        }
+    }
+</div>

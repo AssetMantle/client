@@ -36,7 +36,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_FIAT
 
-  def sendFiatForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sendFiatForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
@@ -49,7 +49,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       }
   }
 
-  def sendFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sendFiat: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
@@ -69,8 +69,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           def createFiatRequest(traderID: String, ticketID: String, negotiationID: String): Future[String] = masterTransactionSendFiatRequests.Service.create(traderID, ticketID, negotiationID, sendFiatData.sendAmount)
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[Result] = {
-            if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
-            else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
+            /*if (!loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendFiat) throw new BaseException(constants.Response.UNAUTHORIZED)
+            else*/ if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
             else {
               if (validateUsernamePassword) {
                 val ticketID = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
@@ -118,12 +118,12 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def zoneSendFiatForm(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneSendFiatForm(id: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.zoneSendFiat(id = id)))
   }
 
-  def zoneSendFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneSendFiat: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.ZoneSendFiat.form.bindFromRequest().fold(
         formWithErrors => {
@@ -140,11 +140,13 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         })
   }
 
-  def blockchainSendFiatForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainSendFiatForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.sendFiat())
   }
 
-  def blockchainSendFiat: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainSendFiat: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.SendFiat.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))

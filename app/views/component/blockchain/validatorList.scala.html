@@ -1,0 +1,9 @@
+@import views.html.base._
+@import models.blockchain.Validator
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonHorizontalSwitcher(ListMap(
+    constants.View.ACTIVE_VALIDATORS -> routes.javascript.ComponentViewController.activeValidatorList,
+    constants.View.INACTIVE_VALIDATORS -> routes.javascript.ComponentViewController.inactiveValidatorList,
+))

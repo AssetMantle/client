@@ -1,20 +1,27 @@
 package controllers
 
 import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import play.api.libs.json.Json
+import play.api.mvc._
+import constants.Response.Success
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.blockchain.ACL
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Order}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
-import play.api.mvc._
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.MicroNumber
+import views.companion.{blockchain => blockchainCompanion}
+import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 
 @Singleton
 class OrderController @Inject()(
@@ -40,22 +47,39 @@ class OrderController @Inject()(
                                  utilitiesNotification: utilities.Notification,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withZoneLoginAction: WithZoneLoginAction,
+                                 withLoginActionAsync: WithLoginActionAsync,
+                                 withUnknownLoginAction: WithUnknownLoginAction,
+                                 blockchainOrders: blockchain.Orders,
+                                 blockchainClassifications: blockchain.Classifications,
+                                 masterClassifications: master.Classifications,
+                                 masterProperties: master.Properties,
+                                 transactionsOrderDefine: transactions.blockchain.OrderDefine,
+                                 blockchainTransactionOrderDefines: blockchainTransaction.OrderDefines,
+                                 transactionsOrderMake: transactions.blockchain.OrderMake,
+                                 blockchainTransactionOrderMakes: blockchainTransaction.OrderMakes,
+                                 transactionsOrderTake: transactions.blockchain.OrderTake,
+                                 blockchainTransactionOrderTakes: blockchainTransaction.OrderTakes,
+                                 transactionsOrderCancel: transactions.blockchain.OrderCancel,
+                                 blockchainTransactionOrderCancels: blockchainTransaction.OrderCancels,
+                                 withUserLoginAction: WithUserLoginAction,
+                                 blockchainIdentities: blockchain.Identities,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,
-                                 withoutLoginActionAsync: WithoutLoginActionAsync,
+                                 withoutLoginActionAsync: WithoutLoginActionAsync
                                )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
-
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ORDER
 
-  def moderatedBuyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  def moderatedBuyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.moderatedBuyerExecuteOrder(orderID = orderID))
   }
 
-  def moderatedBuyerExecute: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def moderatedBuyerExecute: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -104,9 +128,9 @@ class OrderController @Inject()(
                 }
                 for {
                   ticketID <- ticketID
-                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
-                  _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
-                  _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)
+                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
                   _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.MODERATED_BUY_ORDER_EXECUTED, ticketID)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = moderatedBuyerExecuteData.orderID, successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
                 } yield result
@@ -135,11 +159,12 @@ class OrderController @Inject()(
       )
   }
 
-  def moderatedSellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def moderatedSellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.moderatedSellerExecuteOrder(orderID = orderID))
   }
 
-  def moderatedSellerExecute: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def moderatedSellerExecute: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -180,9 +205,9 @@ class OrderController @Inject()(
                 }
                 for {
                   ticketID <- ticketID
-                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
-                  _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
-                  _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)
+                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_SELL_ORDER_EXECUTED, ticketID)()
                   _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.MODERATED_SELL_ORDER_EXECUTED, ticketID)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = moderatedSellerExecuteOrderData.orderID, successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
                 } yield result
@@ -213,11 +238,12 @@ class OrderController @Inject()(
       )
   }
 
-  def buyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def buyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(orderID = orderID))
   }
 
-  def buyerExecute: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def buyerExecute: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -234,7 +260,7 @@ class OrderController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
+            if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) /*&& loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder*/) {
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                   entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
@@ -257,8 +283,8 @@ class OrderController @Inject()(
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             sellerAddress <- getAddress(sellerAccountID)
             ticketID <- sendTransaction(buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
-            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)()
+            _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)()
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.BUYER_ORDER_EXECUTED, ticketID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = buyerExecuteData.orderID, successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
           } yield result
@@ -269,11 +295,12 @@ class OrderController @Inject()(
       )
   }
 
-  def sellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def sellerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.sellerExecuteOrder(orderID = orderID))
   }
 
-  def sellerExecute: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def sellerExecute: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -292,7 +319,7 @@ class OrderController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile): Future[String] = {
-            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sellerExecuteOrder) {
+            if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) /*&& loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sellerExecuteOrder*/) {
               val awbProofHash = utilities.String.sha256Sum(Json.toJson(billOfLading.documentContent.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))).toString)
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
@@ -318,8 +345,8 @@ class OrderController @Inject()(
             buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
             ticketID <- sendTransaction(buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, order = order, billOfLading = billOfLading)
-            _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)
-            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)
+            _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)()
+            _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SELLER_ORDER_EXECUTED, ticketID)()
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.SELLER_ORDER_EXECUTED, ticketID)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = sellerExecuteData.orderID, successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           } yield result
@@ -330,11 +357,13 @@ class OrderController @Inject()(
       )
   }
 
-  def blockchainBuyerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainBuyerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.buyerExecuteOrder())
   }
 
-  def blockchainBuyerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainBuyerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.BuyerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.buyerExecuteOrder(formWithErrors)))
@@ -351,17 +380,19 @@ class OrderController @Inject()(
     )
   }
 
-  def blockchainSellerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainSellerExecuteForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.sellerExecuteOrder())
   }
 
-  def blockchainSellerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainSellerExecute: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors)))
       },
       sellerExecuteOrderData => {
-        val post = transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
+        val post = transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas.toString), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
         (for {
           _ <- post
         } yield Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
@@ -371,4 +402,224 @@ class OrderController @Inject()(
       }
     )
   }
+
+
+  private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
+
+  def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(blockchainForms.orderDefine())
+  }
+
+  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.OrderDefine.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.orderDefine(formWithErrors)))
+        },
+        defineData => {
+          if (defineData.addImmutableMetaField || defineData.addImmutableField || defineData.addMutableMetaField || defineData.addMutableField) {
+            Future(PartialContent(blockchainForms.orderDefine(
+              orderDefineForm = blockchainCompanion.OrderDefine.form.fill(defineData.copy(addImmutableMetaField = false, addImmutableField = false, addMutableMetaField = false, addMutableField = false)),
+              numImmutableMetaForms = getNumberOfFields(defineData.addImmutableMetaField, defineData.immutableMetaTraits.fold(0)(_.flatten.length)),
+              numImmutableForms = getNumberOfFields(defineData.addImmutableField, defineData.immutableTraits.fold(0)(_.flatten.length)),
+              numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
+              numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
+          } else {
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
+            val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutables = defineData.mutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+
+            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+              val broadcastTx = transaction.process[blockchainTransaction.OrderDefine, transactionsOrderDefine.Request](
+                entity = blockchainTransaction.OrderDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionOrderDefines.Service.create,
+                request = transactionsOrderDefine.Request(transactionsOrderDefine.Message(transactionsOrderDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
+                action = transactionsOrderDefine.Service.post,
+                onSuccess = blockchainTransactionOrderDefines.Utility.onSuccess,
+                onFailure = blockchainTransactionOrderDefines.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionOrderDefines.Service.updateTransactionHash)
+
+              for {
+                ticketID <- broadcastTx
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+              } yield result
+            } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
+
+            (for {
+              verifyPassword <- verifyPassword
+              result <- broadcastTxAndGetResult(verifyPassword)
+            } yield result
+              ).recover {
+              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            }
+          }
+        }
+      )
+  }
+
+  def makeForm(classificationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val properties = masterProperties.Service.getAll(entityID = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION)
+      val maintainerIDs = masterClassifications.Service.getMaintainerIDs(classificationID)
+      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+
+      (for {
+        properties <- properties
+        maintainerIDs <- maintainerIDs
+        identityIDs <- identityIDs
+      } yield {
+        if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
+          val immutableMetaProperties = Option(properties.filter(x => x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val immutableProperties = Option(properties.filter(x => !x.isMeta && !x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          //Special Case need to remove expiry and makerOwnableSplit from Mutables Meta
+          val mutableMetaProperties = Option(properties.filter(x => x.isMeta && x.isMutable && x.name != constants.Blockchain.Properties.Expiry && x.name != constants.Blockchain.Properties.MakerOwnableSplit).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          val mutableProperties = Option(properties.filter(x => !x.isMeta && x.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
+          Ok(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(blockchainCompanion.OrderMake.Data(fromID = maintainerIDs.intersect(identityIDs).headOption.getOrElse(""), classificationID = classificationID, makerOwnableID = "", takerOwnableID = "", expiresIn = 0, makerOwnableSplit = 0.0, immutableMetaProperties = immutableMetaProperties, addImmutableMetaField = false, immutableProperties = immutableProperties, addImmutableField = false, mutableMetaProperties = mutableMetaProperties, addMutableMetaField = false, mutableProperties = mutableProperties, addMutableField = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, numImmutableMetaForms = immutableMetaProperties.fold(0)(_.length), numImmutableForms = immutableProperties.fold(0)(_.length), numMutableMetaForms = mutableMetaProperties.fold(0)(_.length), numMutableForms = mutableProperties.fold(0)(_.length)))
+        } else {
+          Ok(blockchainForms.orderMake(classificationID = classificationID))
+        }
+      }
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def make: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.OrderMake.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.orderMake(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.CLASSIFICATION_ID.name, ""))))
+        },
+        makeData => {
+          if (makeData.addImmutableMetaField || makeData.addImmutableField || makeData.addMutableMetaField || makeData.addMutableField) {
+            Future(PartialContent(blockchainForms.orderMake(
+              orderMakeForm = blockchainCompanion.OrderMake.form.fill(makeData.copy(addImmutableMetaField = false, addImmutableField = false, addMutableMetaField = false, addMutableField = false)),
+              numImmutableMetaForms = getNumberOfFields(makeData.addImmutableMetaField, makeData.immutableMetaProperties.fold(0)(_.flatten.length)),
+              classificationID = makeData.classificationID,
+              numImmutableForms = getNumberOfFields(makeData.addImmutableField, makeData.immutableProperties.fold(0)(_.flatten.length)),
+              numMutableMetaForms = getNumberOfFields(makeData.addMutableMetaField, makeData.mutableMetaProperties.fold(0)(_.flatten.length)),
+              numMutableForms = getNumberOfFields(makeData.addMutableField, makeData.mutableProperties.fold(0)(_.flatten.length)))))
+          } else {
+            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password.getOrElse(""))
+            val immutableMetas = makeData.immutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val immutables = makeData.immutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutableMetas = makeData.mutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+            val mutables = makeData.mutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
+
+            def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+              val broadcastTx = transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
+                entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, makerOwnableSplit = makeData.makerOwnableSplit, expiresIn = makeData.expiresIn, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = makeData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionOrderMakes.Service.create,
+                request = transactionsOrderMake.Request(transactionsOrderMake.Message(transactionsOrderMake.BaseReq(from = loginState.address, gas = makeData.gas), fromID = makeData.fromID, classificationID = makeData.classificationID, makerOwnableID = makeData.makerOwnableID, takerOwnableID = makeData.takerOwnableID, expiresIn = makeData.expiresIn, makerOwnableSplit = makeData.makerOwnableSplit, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                action = transactionsOrderMake.Service.post,
+                onSuccess = blockchainTransactionOrderMakes.Utility.onSuccess,
+                onFailure = blockchainTransactionOrderMakes.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionOrderMakes.Service.updateTransactionHash)
+
+              for {
+                ticketID <- broadcastTx
+                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+              } yield result
+            } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
+
+            (for {
+              verifyPassword <- verifyPassword
+              result <- broadcastTxAndGetResult(verifyPassword)
+            } yield result
+              ).recover {
+              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            }
+          }
+        }
+      )
+  }
+
+  def takeForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(blockchainForms.orderTake(orderID = orderID))
+  }
+
+  def take: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.OrderTake.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.orderTake(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""))))
+        },
+        takeData => {
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = takeData.password)
+
+          def broadcastTx = transaction.process[blockchainTransaction.OrderTake, transactionsOrderTake.Request](
+            entity = blockchainTransaction.OrderTake(from = loginState.address, fromID = takeData.fromID, orderID = takeData.orderID, takerOwnableSplit = takeData.takerOwnableSplit, gas = takeData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionOrderTakes.Service.create,
+            request = transactionsOrderTake.Request(transactionsOrderTake.Message(transactionsOrderTake.BaseReq(from = loginState.address, gas = takeData.gas), fromID = takeData.fromID, orderID = takeData.orderID, takerOwnableSplit = takeData.takerOwnableSplit)),
+            action = transactionsOrderTake.Service.post,
+            onSuccess = blockchainTransactionOrderTakes.Utility.onSuccess,
+            onFailure = blockchainTransactionOrderTakes.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionOrderTakes.Service.updateTransactionHash
+          )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.orderTake(blockchainCompanion.OrderTake.form.fill(takeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), takeData.orderID)))
+
+          (for {
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def cancelForm(orderID: String, makerID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(blockchainForms.orderCancel(orderID = orderID, makerID = makerID))
+  }
+
+  def cancel: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      blockchainCompanion.OrderCancel.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(blockchainForms.orderCancel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.FROM_ID.name, ""))))
+        },
+        cancelData => {
+          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = cancelData.password)
+
+          def broadcastTx = transaction.process[blockchainTransaction.OrderCancel, transactionsOrderCancel.Request](
+            entity = blockchainTransaction.OrderCancel(from = loginState.address, fromID = cancelData.fromID, orderID = cancelData.orderID, gas = cancelData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionOrderCancels.Service.create,
+            request = transactionsOrderCancel.Request(transactionsOrderCancel.Message(transactionsOrderCancel.BaseReq(from = loginState.address, gas = cancelData.gas), fromID = cancelData.fromID, orderID = cancelData.orderID)),
+            action = transactionsOrderCancel.Service.post,
+            onSuccess = blockchainTransactionOrderCancels.Utility.onSuccess,
+            onFailure = blockchainTransactionOrderCancels.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionOrderCancels.Service.updateTransactionHash
+          )
+
+          def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
+            for {
+              ticketID <- broadcastTx
+              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+            } yield result
+          } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID, cancelData.fromID)))
+
+          (for {
+            verifyPassword <- verifyPassword
+            result <- broadcastTxAndGetResult(verifyPassword)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+
 }

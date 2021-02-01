@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Notification(id: String, accountID: String, notificationTemplate: NotificationTemplate, read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Notification(id: String, accountID: Option[String], notificationTemplate: NotificationTemplate, jsRoute: Option[String], read: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedBy: Option[String] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
   val title: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.TITLE_SUFFIX).mkString(".")
 
   val template: String = Seq(constants.Notification.PUSH_NOTIFICATION_PREFIX, notificationTemplate.template, constants.Notification.MESSAGE_SUFFIX).mkString(".")
@@ -37,24 +37,24 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
-  case class NotificationSerializable(id: String, accountID: String, notificationTemplateJson: String, read: Boolean, createdOn: Option[Timestamp], createdBy: Option[String], createdOnTimeZone: Option[String], updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
-    def deserialize: Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class NotificationSerializable(id: String, accountID: Option[String], notificationTemplateJson: String, jsRoute: Option[String], read: Boolean, createdOn: Option[Timestamp], createdBy: Option[String], createdOnTimeZone: Option[String], updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson),jsRoute = jsRoute,  read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimeZone = notification.createdOnTimeZone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
+  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString,jsRoute = notification.jsRoute, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimeZone = notification.createdOnTimeZone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += serialize(notification)).asTry).map {
+  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.id) += serialize(notification)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
+  private def findNotificationsByAccountId(accountID: Option[String], offset: Int, limit: Int): Future[Seq[NotificationSerializable]] = db.run(notificationTable.filter(_.accountID.? === accountID).sortBy(_.createdOn.desc).drop(offset).take(limit).result)
 
-  private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === status).length.result.asTry).map {
+  private def findNumberOfReadOnStatusByAccountId(accountID: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(x => x.accountID === accountID && x.read === status).length.result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -62,10 +62,12 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   private def updateReadById(id: String, status: Boolean): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(status).asTry).map {
-    case Success(result) => result
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
@@ -79,13 +81,15 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class NotificationTable(tag: Tag) extends Table[NotificationSerializable](tag, "Notification") {
 
-    def * = (id, accountID, notificationTemplateJson, read, createdOn.?, createdBy.?, createdOnTimeZone.?, updatedOn.?, updatedBy.?, updatedOnTimeZone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
+    def * = (id, accountID.?, notificationTemplateJson, jsRoute.?, read, createdOn.?, createdBy.?, createdOnTimeZone.?, updatedOn.?, updatedBy.?, updatedOnTimeZone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
     def notificationTemplateJson = column[String]("notificationTemplateJson")
+
+    def jsRoute = column[String]("jsRoute")
 
     def read = column[Boolean]("read")
 
@@ -104,9 +108,15 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notification: constants.Notification, parameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters)))
+    def create(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = Option(accountID), notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters),  jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.String.getJsRouteString(x, routeParameters: _*)))))
 
-    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize))
+    def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = Option(accountID), offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+
+    def create(notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = None, notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters), jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.String.getJsRouteString(x, routeParameters: _*)))))
+
+    def getPublic(pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = null, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
+
+   // def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize))
 
     def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 

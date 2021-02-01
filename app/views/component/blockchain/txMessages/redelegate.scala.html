@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Redelegate
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Redelegate]) { redelegate =>
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(redelegate.delegatorAddress, routes.ViewController.wallet(redelegate.delegatorAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_SOURCE_ADDRESS, commonLink(redelegate.validatorSrcAddress, routes.ViewController.validator(redelegate.validatorSrcAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_DESTINATION_ADDRESS, commonLink(redelegate.validatorDstAddress, routes.ViewController.validator(redelegate.validatorDstAddress)))
+    @commonTextInfo(constants.View.AMOUNTS, s"${redelegate.amount.amount} ${redelegate.amount.denom}")
+}

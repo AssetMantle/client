@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.ABCIInfoResponse.Response
+import queries.responses.blockchain.ABCIInfoResponse.Response
 
 import scala.concurrent.{ExecutionContext, Future}
 

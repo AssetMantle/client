@@ -26,11 +26,13 @@ class ChangeSellerBidController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_CHANGE_SELLER_BID
 
-  def blockchainChangeSellerBidForm: Action[AnyContent] = withoutLoginAction { implicit request =>
+  def blockchainChangeSellerBidForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.blockchain.changeSellerBid())
   }
 
-  def blockchainChangeSellerBid: Action[AnyContent] = withoutLoginActionAsync { implicit request =>
+  def blockchainChangeSellerBid: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
     views.companion.blockchain.ChangeSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
         Future(BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors)))

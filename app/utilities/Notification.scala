@@ -5,7 +5,6 @@ import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
 import com.twilio.rest.api.v2010.account.Message
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
@@ -13,6 +12,7 @@ import play.api.libs.mailer._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -154,15 +154,15 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*): Future[String] = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(routeParameters: String*): Future[String] = {
     val language = masterAccounts.Service.tryGetLanguage(accountID)
-    val notificationID = masterTransactionNotifications.Service.create(accountID, notification = notification, messagesParameters: _*)
+    val notificationID = masterTransactionNotifications.Service.create(accountID = accountID, notification = notification, messagesParameters: _*)(routeParameters: _*)
 
-    def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.map(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
+    def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.fold(Future())(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*))
 
-    def email(implicit language: Lang): Future[String] = notification.email.map(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*)).getOrElse(Future(""))
+    def email(implicit language: Lang): Future[String] = notification.email.fold(Future(""))(emailNotification => sendEmailByAccountID(accountID = accountID, email = emailNotification, messagesParameters: _*))
 
-    def sms(implicit language: Lang): Future[Unit] = notification.sms.map(smsNotification => sendSMSByAccountID(accountID = accountID, sms = smsNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
+    def sms(implicit language: Lang): Future[Unit] = notification.sms.fold(Future())(smsNotification => sendSMSByAccountID(accountID = accountID, sms = smsNotification, messageParameters = messagesParameters: _*))
 
     (for {
       language <- language

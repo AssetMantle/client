@@ -182,8 +182,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val addZone = Service.getTransaction(ticketID)
 
       def createZoneAndSendNotification(addZone: AddZone): Future[Unit] = {
@@ -192,19 +192,19 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
         def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
 
-        def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
+       // def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
 
-        def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addZone.from)
+       // def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addZone.from)
 
         for {
           _ <- create
           _ <- verifyZone
           zoneAccountID <- getAccountID(addZone.to)
-          _ <- markUserTypeZone(zoneAccountID)
-          _ <- markDirty
+        //  _ <- markUserTypeZone(zoneAccountID)
+        //  _ <- markDirty
           fromAccountID <- getAccountID(addZone.from)
-          _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+          _ <- utilitiesNotification.send(zoneAccountID, constants.Notification.SUCCESS, txHash)()
+          _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, txHash)()
         } yield {}
       }
 
@@ -237,7 +237,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         _ <- markTransactionFailed
         addZone <- addZone
         fromAccountID <- getAccountID(addZone.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

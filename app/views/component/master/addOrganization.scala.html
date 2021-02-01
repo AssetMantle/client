@@ -5,34 +5,23 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
-        <p class="cmuk-margin-remove panelHeader infoText">@Messages(constants.View.REGISTER_AS_ORGANIZATION)<span class="infoIcon organizationInfoIcon" cmuk-tooltip="title:@Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE);pos:bottom"> @commonIcon("info")</span></p>
-        <br>
-        <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ZONE)</div>
-        <div class="cmuk-panel cmuk-panel-scrollable">
+    <p class="cmuk-margin-remove panelHeader infoText">@Messages(constants.View.REGISTER_AS_ORGANIZATION)<span class="infoIcon organizationInfoIcon" cmuk-tooltip="title:@Messages(constants.View.REGISTER_AS_ORGANIZATION_NOTE);pos:bottom"> @commonIcon("info")</span></p>
+    <br>
+    <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ZONE)</div>
+    <div class="cmuk-panel cmuk-panel-scrollable">
         <ul class="cmuk-list">
         @zones.map { zone =>
             <li onclick="fillZoneIDField('@zone.id')">@zone.name | @zone.currency</li>
         }
         </ul>
-        </div>
-        @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID, 'readonly -> true)
-        @commonInputText(addOrganizationForm, constants.FormField.NAME)
-        @commonInputText(addOrganizationForm, constants.FormField.ABBREVIATION)
-        @commonInputDate(addOrganizationForm, constants.FormField.ESTABLISHMENT_DATE)
-        @commonInputText(addOrganizationForm, constants.FormField.EMAIL_ADDRESS)
-        <div class="cmuk-text-left title">@Messages(constants.FormField.REGISTERED_ADDRESS.name):</div>
-        @defining(Option(constants.FormField.REGISTERED_ADDRESS)) { implicit nestedFormField =>
-            @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_1)
-        @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)
-        @commonInputText(addOrganizationForm, constants.FormField.LANDMARK, 'required -> false)
-        @commonInputText(addOrganizationForm, constants.FormField.CITY)
-        @commonSelect(addOrganizationForm, constants.FormField.COUNTRY)
-        @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
-        @commonInputText(addOrganizationForm, constants.FormField.PHONE)
-        }
-        <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name):</div>
-        @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
-        @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
+    </div>
+    @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID, 'readonly -> true)
+    @commonInputText(addOrganizationForm, constants.FormField.NAME)
+    @commonInputText(addOrganizationForm, constants.FormField.ABBREVIATION)
+    @commonInputDate(addOrganizationForm, constants.FormField.ESTABLISHMENT_DATE)
+    @commonInputText(addOrganizationForm, constants.FormField.EMAIL_ADDRESS)
+    <div class="cmuk-text-left title">@Messages(constants.FormField.REGISTERED_ADDRESS.name):</div>
+    @defining(Option(constants.FormField.REGISTERED_ADDRESS)) { implicit nestedFormField =>
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_1)
         @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)
         @commonInputText(addOrganizationForm, constants.FormField.LANDMARK, 'required -> false)
@@ -40,6 +29,17 @@
         @commonSelect(addOrganizationForm, constants.FormField.COUNTRY)
         @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
         @commonInputText(addOrganizationForm, constants.FormField.PHONE)
-        }
+    }
+    <div class="cmuk-text-left title">@Messages(constants.FormField.POSTAL_ADDRESS.name):</div>
+    @commonCheckbox(Form(constants.FormField.SAME_AS_REGISTERED_ADDRESS.field), constants.FormField.SAME_AS_REGISTERED_ADDRESS)
+    @defining(Option(constants.FormField.POSTAL_ADDRESS)) { implicit nestedFormField =>
+        @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_1)
+        @commonInputText(addOrganizationForm, constants.FormField.ADDRESS_LINE_2)
+        @commonInputText(addOrganizationForm, constants.FormField.LANDMARK, 'required -> false)
+        @commonInputText(addOrganizationForm, constants.FormField.CITY)
+        @commonSelect(addOrganizationForm, constants.FormField.COUNTRY)
+        @commonInputText(addOrganizationForm, constants.FormField.ZIP_CODE)
+        @commonInputText(addOrganizationForm, constants.FormField.PHONE)
+    }
 }
 <script src="@routes.Assets.versioned("javascripts/addOrganization.js")" type="text/javascript"></script>

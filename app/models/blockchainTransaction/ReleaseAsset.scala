@@ -184,16 +184,16 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val releaseAsset = Service.getTransaction(ticketID)
 
       def markDirty(releaseAsset: ReleaseAsset): Future[Unit] = {
         val markDirtyPegHash = blockchainAssets.Service.markDirty(releaseAsset.pegHash)
-        val markDirtyFrom = blockchainAccounts.Service.markDirty(releaseAsset.from)
+        //val markDirtyFrom = blockchainAccounts.Service.markDirty(releaseAsset.from)
         for {
           _ <- markDirtyPegHash
-          _ <- markDirtyFrom
+         // _ <- markDirtyFrom
         } yield {}
       }
 
@@ -217,8 +217,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         negotiationList <- getNegotiationListByAssetID(assetID)
         fromAccountID <- getAccountID(releaseAsset.from)
         toAccountID <- getAccountID(releaseAsset.to)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ZONE_RELEASED_ASSET, blockResponse.txhash)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_RELEASED_ASSET, blockResponse.txhash)
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.ZONE_RELEASED_ASSET, txHash)()
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.ZONE_RELEASED_ASSET, txHash)()
         _ <- createTradeActivity(negotiationList)
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -245,7 +245,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         _ <- markTransactionFailed
         releaseAsset <- releaseAsset
         fromAccountID <- getAccountID(releaseAsset.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)()
       } yield {}).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

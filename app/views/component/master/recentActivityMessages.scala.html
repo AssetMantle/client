@@ -1,8 +1,7 @@
-@import controllers.actions.LoginState
 @import models.masterTransaction.Notification
 @import views.html.base._
 
-@(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(notifications: Seq[Notification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="timeline recentActivityBox" cmuk-scrollspy="target: > div; cls: cmuk-animation-fade; delay: 100; repeat: true">
     @if(notifications.nonEmpty) {
@@ -11,7 +10,7 @@
                 <div class="timeline-icon">
                     @commonIcon("contract")
                 </div>
-                <div class="timeline-content right">
+                <div onclick="onNotificationClick(@notification.jsRoute.getOrElse(""), @notification.jsRoute.getOrElse("").split("\\.").contains("ViewController"))" class="timeline-content right">
                     <div>
                         <div class="textLineOverflow activityContent" title="@Messages(notification.template, notification.notificationTemplate.parameters: _*)">
                             <span class="cmuk-text-bolder">@Messages(notification.title)</span>
@@ -22,7 +21,6 @@
                 </div>
             </div>
         }
-
     } else {
         <div class="noActivity cmuk-position-center cmuk-margin-top">@Messages(constants.View.NO_ACTIVITIES)</div>
     }

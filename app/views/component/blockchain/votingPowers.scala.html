@@ -1,0 +1,11 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(votingPowerMap: ListMap[String, Double], totalActiveValidators: Int, totalValidators: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.VOTING_POWERS) {
+} {
+    @commonTextInfo(constants.View.TOTAL_ACTIVE_VALIDATORS, s"${totalActiveValidators.toString}/${totalValidators.toString}")
+    <br>
+    @commonPieChart("votingPowersChart", votingPowerMap, showLegend = false)
+}

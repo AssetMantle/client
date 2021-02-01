@@ -1,0 +1,32 @@
+@import views.html.base._
+
+@(blockHeight: Int, proposer: String, time: String, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
+} {
+    @commonTable(id = "latestBlockHeight", tableType = "cmuk-table-divider") {
+        @Messages(constants.View.LATEST_BLOCK_HEIGHT)
+    } {
+        <tr>
+            <th>@Messages(constants.View.HEIGHT)</th>
+            <td id="latestBlockHeight_height" class="cmuk-text-bold">@blockHeight</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.View.PROPOSER)</th>
+            <td id="latestBlockHeight_proposer">@proposer</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.View.TIME)</th>
+            <td id="latestBlockHeight_time">@utilities.Date.bcTimestampToString(time)</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.View.AVERAGE_BLOCK_TIME)</th>
+            <td id="latestBlockHeight_averageBlockTime">@averageBlockTime</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.View.CHAIN_ID)</th>
+            <td>@chainID</td>
+        </tr>
+    }
+}
+

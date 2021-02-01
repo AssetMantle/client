@@ -33,7 +33,7 @@ object AddOrganization {
         constants.FormField.PHONE.name -> constants.FormField.PHONE.field,
       )(AddressData.apply)(AddressData.unapply)
     )(Data.apply)(Data.unapply)
-  ) 
+  )
 
   case class AddressData(addressLine1: String, addressLine2: String, landmark: Option[String], city: String, country: String, zipCode: String, phone: String)
 

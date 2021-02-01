@@ -1,0 +1,15 @@
+@import models.common.Serializable.Mutables
+@import views.html.base._
+@import views.html.component.blockchain.properties
+
+@(mutables: Mutables)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonInfoBox() {
+    <div class="cmuk-text-left title"> @Messages(constants.View.MUTABLE_PROPERTIES):</div>
+    @if(mutables.properties.propertyList.isEmpty) {
+        @Messages(constants.View.MUTABLES_NOT_FOUND)
+    } else {
+        @properties(mutables.properties.propertyList)
+    }
+}
+

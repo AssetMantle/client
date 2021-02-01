@@ -1,0 +1,11 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(delegationsMap: ListMap[String, Double], selfDelegatedPercentage: Double, othersDelegatedPercentage: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.VALIDATOR_DELEGATIONS) {
+} {
+    @commonPieChart("validatorDelegationsChart", delegationsMap, showLegend = true)
+    @commonTextInfo(constants.View.SELF_DELEGATED, Seq(selfDelegatedPercentage.toString, "%").mkString(" "))
+    @commonTextInfo(constants.View.OTHERS_DELEGATED, Seq(othersDelegatedPercentage.toString, "%").mkString(" "))
+}

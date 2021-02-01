@@ -1,23 +1,21 @@
-GET         /                                                                                     controllers.IndexController.index
+GET         /                                                    controllers.IndexController.index
+GET         /search                                              controllers.IndexController.search(query: String)
 
-GET         /assets/*file                                                                         controllers.Assets.versioned(path="/public", file: Asset)
+GET         /websocket                                           controllers.WebSocketController.connect
 
-GET         /javascriptRoutes                                                                     controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /firebase-messaging-sw.js                                                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+GET         /javascriptRoutes                                    controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /docusign/send                                                                        controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                                                        controllers.DocusignController.sign(id:String, documentType: String)
-GET         /docusign/authorization                                                               controllers.DocusignController.authorization
+GET         /firebase-messaging-sw.js                            controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+
+GET         /docusign/send                                       controllers.DocusignController.send(id:String, documentType: String)
+GET         /docusign/sign                                       controllers.DocusignController.sign(id:String, documentType: String)
+GET         /docusign/authorization                              controllers.DocusignController.authorization
 
 #DO NOT CHANGE /Docusign CallBack ENDPOINT
-GET         /docusign/callBack                                                                    controllers.DocusignController.callBack(envelopeId:String, event:String)
-GET         /docusign/authorizationCallBack                                                       controllers.DocusignController.authorizationCallBack(code:String)
-
-GET         /blockExplorer/lastBlockHeight                                                        controllers.BlockExplorerController.lastBlockHeight
-GET         /blockExplorer/blockDetails                                                           controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
-GET         /blockExplorer/stakingValidators                                                      controllers.BlockExplorerController.stakingValidators
-GET         /blockExplorer/transactionHash                                                        controllers.BlockExplorerController.transactionHash(txHash: String)
+GET         /docusign/callBack                                   controllers.DocusignController.callBack(envelopeId:String, event:String)
+GET         /docusign/authorizationCallBack                      controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /genesisRequest                                                                       controllers.ViewController.genesisRequest
 GET         /zoneRequest                                                                          controllers.ViewController.zoneRequest
@@ -30,42 +28,106 @@ GET         /dashboard                                                          
 GET         /tradeRoom                                                                            controllers.ViewController.tradeRoom(id: String)
 GET         /tradeRoomCompleted                                                                   controllers.ViewController.tradeRoomCompleted(id: String)
 
-GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                                                       controllers.AccountController.signUpForm
-POST        /account/signUp                                                                       controllers.AccountController.signUp
+GET         /wallet                                              controllers.ViewController.wallet(address: String)
+GET         /blocks                                              controllers.ViewController.blocks
+GET         /transactions                                        controllers.ViewController.transactions
+GET         /validators                                          controllers.ViewController.validators
+GET         /block                                               controllers.ViewController.block(height: Int)
+GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
+GET         /validator                                           controllers.ViewController.validator(address: String)
+GET         /identity                                            controllers.ViewController.identity
+GET         /account                                             controllers.ViewController.account
+GET         /asset                                               controllers.ViewController.asset
+GET         /order                                               controllers.ViewController.order
 
-GET         /account/createWallet                                                                 controllers.AccountController.createWalletForm(username: String)
-POST        /account/createWallet                                                                 controllers.AccountController.createWallet
+GET         /profilePicture                                      controllers.ComponentViewController.profilePicture
+
+GET         /account/signUp                                      controllers.AccountController.signUpForm
+POST        /account/signUp                                      controllers.AccountController.signUp
+
+GET         /account/createWallet                                controllers.AccountController.createWalletForm(username: String)
+POST        /account/createWallet                                controllers.AccountController.createWallet
+
+GET         /account/checkMnemonics                              controllers.AccountController.checkMnemonics(mnemonics: String)
+GET         /account/importWallet                                controllers.AccountController.importWalletForm
+POST        /account/importWallet                                controllers.AccountController.importWallet
 
 GET         /account/login                                                                        controllers.AccountController.loginForm
 POST        /account/login                                                                        controllers.AccountController.login
 
-GET         /account/logout                                                                       controllers.AccountController.logoutForm
-POST        /account/logout                                                                       controllers.AccountController.logout
+GET         /account/logout                                      controllers.AccountController.logoutForm
+POST        /account/logout                                      controllers.AccountController.logout
 
-GET         /account/changePassword                                                               controllers.AccountController.changePasswordForm
-POST        /account/changePassword                                                               controllers.AccountController.changePassword
+GET         /account/changePassword                              controllers.AccountController.changePasswordForm
+POST        /account/changePassword                              controllers.AccountController.changePassword
 
-GET         /account/forgotPasswordUsername                                                       controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername                                                       controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPassword
 
-GET         /account/forgotPassword                                                               controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                                                               controllers.AccountController.forgotPassword
+GET         /account/forgotPassword                              controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                              controllers.AccountController.forgotPassword
 
-GET         /account/checkUsernameAvailable                                                       controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /account/checkUsernameAvailable                      controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /account/addIdentification                                                            controllers.AccountController.addIdentificationForm
-POST        /account/addIdentification                                                            controllers.AccountController.addIdentification
-GET         /account/userViewUploadOrUpdateIdentification                                         controllers.AccountController.userViewUploadOrUpdateIdentification
-GET         /account/userReviewIdentification                                                     controllers.AccountController.userReviewIdentificationForm
-POST        /account/userReviewIdentification                                                     controllers.AccountController.userReviewIdentification
+GET         /account/addIdentification                           controllers.AccountController.addIdentificationForm
+POST        /account/addIdentification                           controllers.AccountController.addIdentification
+GET         /account/userViewUploadOrUpdateIdentification        controllers.AccountController.userViewUploadOrUpdateIdentification
+GET         /account/userReviewIdentification                    controllers.AccountController.userReviewIdentificationForm
+POST        /account/userReviewIdentification                    controllers.AccountController.userReviewIdentification
+
+GET         /asset/define                                        controllers.AssetController.defineForm
+POST        /asset/define                                        controllers.AssetController.define
+GET         /asset/mint                                          controllers.AssetController.mintForm(classificationID: String)
+POST        /asset/mint                                          controllers.AssetController.mint
+GET         /asset/mutate                                        controllers.AssetController.mutateForm(assetID: String, fromID: String)
+POST        /asset/mutate                                        controllers.AssetController.mutate
+GET         /asset/burn                                          controllers.AssetController.burnForm(assetID: String, fromID: String)
+POST        /asset/burn                                          controllers.AssetController.burn
 
 GET         /asset/issue                                                                          controllers.AssetController.issueForm
 POST        /asset/issue                                                                          controllers.AssetController.issue
 
 GET         /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLadingForm(negotiationID: String)
 POST        /asset/addBillOfLading                                                                controllers.AssetController.addBillOfLading
+
+GET         /identity/nub                                        controllers.IdentityController.nubForm
+POST        /identity/nub                                        controllers.IdentityController.nub
+GET         /identity/issue                                      controllers.IdentityController.issueForm(classificationID: String)
+POST        /identity/issue                                      controllers.IdentityController.issue
+GET         /identity/define                                     controllers.IdentityController.defineForm
+POST        /identity/define                                     controllers.IdentityController.define
+GET         /identity/provision                                  controllers.IdentityController.provisionForm(identityID: String)
+POST        /identity/provision                                  controllers.IdentityController.provision
+GET         /identity/unprovision                                controllers.IdentityController.unprovisionForm(identityID: String, address: String)
+POST        /identity/unprovision                                controllers.IdentityController.unprovision
+
+
+GET         /meta/reveal                                         controllers.MetaController.revealForm
+POST        /meta/reveal                                         controllers.MetaController.reveal
+
+GET         /maintainer/deputize                                 controllers.MaintainerController.deputizeForm(classificationID: String, entityType: String)
+POST        /maintainer/deputize                                 controllers.MaintainerController.deputize
+
+GET         /order/define                                        controllers.OrderController.defineForm
+POST        /order/define                                        controllers.OrderController.define
+GET         /order/make                                          controllers.OrderController.makeForm(classificationID: String)
+POST        /order/make                                          controllers.OrderController.make
+GET         /order/take                                          controllers.OrderController.takeForm(orderID: String)
+POST        /order/take                                          controllers.OrderController.take
+GET         /order/cancel                                        controllers.OrderController.cancelForm(orderID: String, makerID: String)
+POST        /order/cancel                                        controllers.OrderController.cancel
+
+GET         /split/send                                          controllers.SplitController.sendForm(ownableID: String, fromID: String)
+POST        /split/send                                          controllers.SplitController.send
+GET         /split/wrap                                          controllers.SplitController.wrapForm
+POST        /split/wrap                                          controllers.SplitController.wrap
+GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String, fromID: String)
+POST        /split/unwrap                                        controllers.SplitController.unwrap
+
+GET         /entity/upsertLabel                                  controllers.EntityController.upsertLabelForm(entityID: String, entityType: String)
+POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
+GET         /component/entityProperties                          controllers.EntityController.properties(entityID: String, entityType: String)
 
 GET         /asset/send                                                                           controllers.AssetController.sendForm(negotiationID: String)
 POST        /asset/send                                                                           controllers.AssetController.send
@@ -79,19 +141,19 @@ POST        /asset/redeem                                                       
 GET         /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocumentForm(negotiationID: String, documentType: String)
 POST        /asset/acceptOrRejectAssetDocument                                                    controllers.AssetController.acceptOrRejectAssetDocument
 
-GET         /contact                                                                              controllers.ContactController.contact
+GET         /contact                                             controllers.ContactController.contact
 
-GET         /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddressForm
-POST        /contact/addOrUpdateEmailAddress                                                      controllers.ContactController.addOrUpdateEmailAddress
+GET         /contact/addOrUpdateEmailAddress                     controllers.ContactController.addOrUpdateEmailAddressForm
+POST        /contact/addOrUpdateEmailAddress                     controllers.ContactController.addOrUpdateEmailAddress
 
-GET         /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumberForm
-POST        /contact/addOrUpdateMobileNumber                                                      controllers.ContactController.addOrUpdateMobileNumber
+GET         /contact/addOrUpdateMobileNumber                     controllers.ContactController.addOrUpdateMobileNumberForm
+POST        /contact/addOrUpdateMobileNumber                     controllers.ContactController.addOrUpdateMobileNumber
 
-GET         /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddressForm
-POST        /contact/verifyEmailAddress                                                           controllers.ContactController.verifyEmailAddress
+GET         /contact/verifyEmailAddress                          controllers.ContactController.verifyEmailAddressForm
+POST        /contact/verifyEmailAddress                          controllers.ContactController.verifyEmailAddress
 
-GET         /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumberForm
-POST        /contact/verifyMobileNumber                                                           controllers.ContactController.verifyMobileNumber
+GET         /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumberForm
+POST        /contact/verifyMobileNumber                          controllers.ContactController.verifyMobileNumber
 
 GET         /negotiation/request                                                                  controllers.NegotiationController.requestForm
 POST        /negotiation/request                                                                  controllers.NegotiationController.request
@@ -305,6 +367,13 @@ GET         /component/zoneViewPendingOrganizationRequest                       
 GET         /component/zoneViewRejectedOrganizationRequestList                                    controllers.ComponentViewController.zoneViewRejectedOrganizationRequestList
 GET         /component/zoneViewRejectedOrganizationRequest                                        controllers.ComponentViewController.zoneViewRejectedOrganizationRequest(organizationID: String)
 
+GET         /component/latestBlockHeight                         controllers.ComponentViewController.latestBlockHeight
+GET         /component/tokensStatistics                          controllers.ComponentViewController.tokensStatistics
+GET         /component/votingPowers                              controllers.ComponentViewController.votingPowers
+
+GET         /component/tokensPrices                              controllers.ComponentViewController.tokensPrices
+
+
 GET         /component/zoneViewAcceptedNegotiationList                                            controllers.ComponentViewController.zoneViewAcceptedNegotiationList
 GET         /component/zoneViewActiveNegotiationList                                              controllers.ComponentViewController.zoneViewActiveNegotiationList
 GET         /component/zoneViewCompletedNegotiationList                                           controllers.ComponentViewController.zoneViewCompletedNegotiationList
@@ -316,6 +385,11 @@ GET         /component/zoneViewCompletedTradeRoomFinancialAndChecks             
 GET         /component/zoneViewCompletedTradeRoomFinancial                                        controllers.ComponentViewController.zoneViewCompletedTradeRoomFinancial(negotiationID: String)
 GET         /component/zoneViewCompletedTradeRoomChecks                                           controllers.ComponentViewController.zoneViewCompletedTradeRoomChecks(negotiationID: String)
 GET         /component/zoneOrderActions                                                           controllers.ComponentViewController.zoneOrderActions(negotiationID: String)
+GET         /component/accountWallet                             controllers.ComponentViewController.accountWallet(address: String)
+GET         /component/accountDelegations                        controllers.ComponentViewController.accountDelegations(address: String)
+GET         /component/accountTransactions                       controllers.ComponentViewController.accountTransactions(address: String)
+GET         /component/accountTransactionsPerPage                controllers.ComponentViewController.accountTransactionsPerPage(address: String, page: Int)
+GET         /component/accountSplits                             controllers.ComponentViewController.accountSplits()
 
 GET         /component/organizationViewTradeRoomFinancialAndChecks                                controllers.ComponentViewController.organizationViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/organizationViewTradeRoomFinancial                                         controllers.ComponentViewController.organizationViewTradeRoomFinancial(negotiationID: String)
@@ -349,9 +423,27 @@ GET         /component/traderViewCompleteRedeemFiatRequestList                  
 GET         /component/traderViewFailedRedeemFiatRequestList                                      controllers.ComponentViewController.traderViewFailedRedeemFiatRequestList()
 GET         /component/traderViewReceiveFiatList                                                  controllers.ComponentViewController.traderViewReceiveFiatList()
 
+GET         /component/blockList                                 controllers.ComponentViewController.blockList
+GET         /component/blockListPage                             controllers.ComponentViewController.blockListPage(pageNumber: Int)
+GET         /component/blockDetails                              controllers.ComponentViewController.blockDetails(height: Int)
+GET         /component/blockTransactions                         controllers.ComponentViewController.blockTransactions(height: Int)
+
+GET         /component/transactionList                           controllers.ComponentViewController.transactionList
+GET         /component/transactionListPage                       controllers.ComponentViewController.transactionListPage(pageNumber: Int)
+GET         /component/transactionDetails                        controllers.ComponentViewController.transactionDetails(txHash: String)
+GET         /component/transactionMessages                       controllers.ComponentViewController.transactionMessages(txHash: String)
+
 GET         /component/organizationViewCompletedTradeRoomFinancialAndChecks                       controllers.ComponentViewController.organizationViewCompletedTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/organizationViewCompletedTradeRoomFinancial                                controllers.ComponentViewController.organizationViewCompletedTradeRoomFinancial(negotiationID: String)
 GET         /component/organizationViewCompletedTradeRoomChecks                                   controllers.ComponentViewController.organizationViewCompletedTradeRoomChecks(negotiationID: String)
+GET         /component/validatorList                             controllers.ComponentViewController.validatorList
+GET         /component/activeValidatorList                       controllers.ComponentViewController.activeValidatorList
+GET         /component/inactiveValidatorList                     controllers.ComponentViewController.inactiveValidatorList
+GET         /component/validatorInfo                             controllers.ComponentViewController.validatorDetails(address: String)
+GET         /component/validatorUptime                           controllers.ComponentViewController.validatorUptime(address: String, n: Int)
+GET         /component/validatorDelegations                      controllers.ComponentViewController.validatorDelegations(address: String)
+GET         /component/validatorTransactions                     controllers.ComponentViewController.validatorTransactions(address: String)
+GET         /component/validatorTransactionsPerPage              controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
 
 GET         /component/traderViewTradeRoomFinancialAndChecks                                      controllers.ComponentViewController.traderViewTradeRoomFinancialAndChecks(negotiationID: String)
 GET         /component/traderViewTradeRoomFinancial                                               controllers.ComponentViewController.traderViewTradeRoomFinancial(negotiationID: String)
@@ -370,6 +462,26 @@ GET         /component/zoneViewIssueFiatRequestList                             
 
 GET         /component/organizationSubscription                                                   controllers.ComponentViewController.organizationSubscription
 GET         /component/traderSubscription                                                         controllers.ComponentViewController.traderSubscription
+
+
+GET         /component/provisionedAddresses                      controllers.ComponentViewController.provisionedAddresses(identityID: String)
+GET         /component/unprovisionedAddresses                    controllers.ComponentViewController.unprovisionedAddresses(identityID: String)
+
+GET         /component/identitiesDefinition                      controllers.ComponentViewController.identitiesDefinition
+GET         /component/identitiesProvisioned                     controllers.ComponentViewController.identitiesProvisioned
+GET         /component/identitiesUnprovisioned                   controllers.ComponentViewController.identitiesUnprovisioned
+
+GET         /component/assetsDefinition                          controllers.ComponentViewController.assetsDefinition
+GET         /component/assetsMinted                              controllers.ComponentViewController.assetsMinted
+
+GET         /component/ordersDefinition                          controllers.ComponentViewController.ordersDefinition
+GET         /component/ordersMade                                controllers.ComponentViewController.ordersMade
+GET         /component/ordersTake                                controllers.ComponentViewController.ordersTake
+GET         /component/ordersTakePublic                          controllers.ComponentViewController.ordersTakePublic
+GET         /component/ordersTakePrivate                         controllers.ComponentViewController.ordersTakePrivate
+
+GET         /component/moduleTransactions                        controllers.ComponentViewController.moduleTransactions(module: String)
+GET         /component/getTransaction                            controllers.ComponentViewController.getTransaction(transactionType: String)
 
 GET         /component/zoneTradeStatistics                                                        controllers.ComponentViewController.zoneTradeStatistics
 GET         /component/organizationTradeStatistics                                                controllers.ComponentViewController.organizationTradeStatistics
@@ -403,18 +515,20 @@ GET         /traderUpload/storeNegotiationDocument                              
 GET         /traderUpdate/negotiationForm                                                         controllers.FileController.updateNegotiationForm(documentType: String, negotiationRequestID :String)
 GET         /traderUpdate/negotiationDocument                                                     controllers.FileController.updateNegotiation(name: String, documentType: String, negotiationRequestID: String)
 
-GET         /accountUpload                                                                        controllers.FileController.uploadAccountFileForm(documentType: String)
-POST        /accountUpload/file                                                                   controllers.FileController.uploadAccountFile(documentType: String)
-GET         /accountUpload/storeFile                                                              controllers.FileController.storeAccountFile(name: String, documentType: String)
-GET         /accountUpdate                                                                        controllers.FileController.updateAccountFileForm(documentType: String)
-GET         /accountUpdate/updateFile                                                             controllers.FileController.updateAccountFile(name: String, documentType: String)
+GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
-GET         /userUpload                                                                           controllers.FileController.uploadAccountKYCForm(documentType: String)
-POST        /userUpload/file                                                                      controllers.FileController.uploadAccountKYC(documentType: String)
-GET         /userUpload/storeFile                                                                 controllers.FileController.storeAccountKYC(name: String, documentType: String)
-GET         /userUpdate                                                                           controllers.FileController.updateAccountKYCForm(documentType: String)
-GET         /userUpdate/updateFile                                                                controllers.FileController.updateAccountKYC(name: String, documentType: String)
-GET         /userUpload/getFile                                                                   controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
+GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)
+POST        /accountUpload/file                                  controllers.FileController.uploadAccountFile(documentType: String)
+GET         /accountUpload/storeFile                             controllers.FileController.storeAccountFile(name: String, documentType: String)
+GET         /accountUpdate                                       controllers.FileController.updateAccountFileForm(documentType: String)
+GET         /accountUpdate/updateFile                            controllers.FileController.updateAccountFile(name: String, documentType: String)
+
+GET         /userUpload                                          controllers.FileController.uploadAccountKYCForm(documentType: String)
+POST        /userUpload/file                                     controllers.FileController.uploadAccountKYC(documentType: String)
+GET         /userUpload/storeFile                                controllers.FileController.storeAccountKYC(name: String, documentType: String)
+GET         /userUpdate                                          controllers.FileController.updateAccountKYCForm(documentType: String)
+GET         /userUpdate/updateFile                               controllers.FileController.updateAccountKYC(name: String, documentType: String)
+GET         /userUpload/getFile                                  controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
 
 GET         /userUpload/zoneKYC                                                                   controllers.AddZoneController.userUploadZoneKYCForm(documentType: String)
 POST        /userUpload/userZoneKYCDocument                                                       controllers.AddZoneController.userUploadZoneKYC(documentType: String)
@@ -519,7 +633,7 @@ GET         /master/viewPendingIssueAssetRequests                               
 GET         /master/issueAsset                                                                    controllers.IssueAssetController.issueAssetForm(assetID: String)
 POST        /master/issueAsset                                                                    controllers.IssueAssetController.issueAsset
 
-GET         /component/comet                                                                      controllers.ComponentViewController.comet
+#GET         /component/comet                                                                      controllers.ComponentViewController.comet
 
 GET         /master/issueFiatRequest                                                              controllers.IssueFiatController.issueFiatRequestForm
 
@@ -564,11 +678,8 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 #DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB
-POST        /wu/portalRedirect                                                                    controllers.WesternUnionController.westernUnionPortalRedirect
-
-GET         /blockchain/addKey                                                                    controllers.AddKeyController.blockchainAddKeyForm
-POST        /blockchain/addKey                                                                    controllers.AddKeyController.blockchainAddKey
+POST        /wurtcb                                              controllers.WesternUnionController.westernUnionRTCB
+POST        /wu/portalRedirect                                   controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addOrganization                                                           controllers.AddOrganizationController.blockchainAddOrganizationForm
 POST        /blockchain/addOrganization                                                           controllers.AddOrganizationController.blockchainAddOrganization
@@ -606,8 +717,8 @@ POST        /blockchain/releaseAsset                                            
 GET         /blockchain/sendAsset                                                                 controllers.SendAssetController.blockchainSendAssetForm
 POST        /blockchain/sendAsset                                                                 controllers.SendAssetController.blockchainSendAsset
 
-GET         /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoinForm
-POST        /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoin
+#GET         /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoinForm
+#POST        /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoin
 
 GET         /blockchain/sendFiat                                                                  controllers.SendFiatController.blockchainSendFiatForm
 POST        /blockchain/sendFiat                                                                  controllers.SendFiatController.blockchainSendFiat
@@ -638,7 +749,7 @@ GET         /loopback/reputation/:address                                       
 GET         /loopback/acl/:address                                                                controllers.LoopBackController.acl(address: String)
 
 POST        /loopback/api/v1/corp-scans/single                                                    controllers.LoopBackController.memberCheckCorporateScan
-POST        /loopback/keys                                                                        controllers.LoopBackController.addKey
+#POST        /loopback/keys                                                                        controllers.LoopBackController.addKey
 POST        /loopback/bank/accounts/:to/transfers                                                 controllers.LoopBackController.sendCoin(to: String)
 POST        /loopback/defineZone                                                                  controllers.LoopBackController.addZone
 POST        /loopback/defineOrganization                                                          controllers.LoopBackController.addOrganization

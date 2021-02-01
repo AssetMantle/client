@@ -38,7 +38,6 @@ class FileController @Inject()(
                                 masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                 masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
-                                withLoginAction: WithLoginAction,
                                 withUserLoginAction: WithUserLoginAction,
                                 withTraderLoginAction: WithTraderLoginAction,
                                 withOrganizationLoginAction: WithOrganizationLoginAction,
@@ -46,6 +45,7 @@ class FileController @Inject()(
                                 withGenesisLoginAction: WithGenesisLoginAction,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
+                                withLoginActionAsync: WithLoginActionAsync,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -53,11 +53,13 @@ class FileController @Inject()(
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }
 
-  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
   }
 
@@ -82,7 +84,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val storeFile = fileResourceManager.storeFile[AccountKYC](
         name = name,
@@ -108,7 +110,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val oldDocument = masterAccountKYCs.Service.tryGet(id = loginState.username, documentType = documentType)
 
@@ -137,7 +139,7 @@ class FileController @Inject()(
       }
   }
 
-  def getAccountKYCFile(fileName: String, documentType: String) = withLoginAction.authenticated { implicit loginState =>
+  def getAccountKYCFile(fileName: String, documentType: String) = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkFileNameExists = masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
 
@@ -150,7 +152,7 @@ class FileController @Inject()(
   }
 
   //TODO Shall we verify for genesis
-  def genesisAccessedFile(fileName: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def genesisAccessedFile(fileName: String, documentType: String): Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       Future {
         Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName))
@@ -159,7 +161,7 @@ class FileController @Inject()(
       }
   }
 
-  def zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val organizationZoneID = masterOrganizations.Service.tryGetZoneID(organizationID)
       val userZoneID = masterZones.Service.tryGetID(loginState.username)
@@ -177,11 +179,13 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAsset), documentType, negotiationID))
   }
 
-  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateAssetForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAsset), documentType, negotiationID))
   }
 
@@ -205,7 +209,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeAsset(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeAsset(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -268,7 +272,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateAsset(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateAsset(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
@@ -334,11 +338,13 @@ class FileController @Inject()(
       }
   }
 
-  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeNegotiation), documentType, negotiationID))
   }
 
-  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateNegotiationForm(documentType: String, negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateNegotiation), documentType, negotiationID))
   }
 
@@ -362,7 +368,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeNegotiation(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeNegotiation(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val negotiationDocumentList = masterNegotiations.Service.tryGetDocumentList(negotiationID)
 
@@ -465,7 +471,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateNegotiation(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateNegotiation(name: String, documentType: String, negotiationID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val oldDocument = masterTransactionNegotiationFiles.Service.tryGet(id = negotiationID, documentType = documentType)
 
@@ -558,7 +564,7 @@ class FileController @Inject()(
   }
 
   //TODO Shall we check if exists?
-  def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val id = masterZones.Service.tryGetID(loginState.username)
 
@@ -574,7 +580,7 @@ class FileController @Inject()(
   }
 
   //TODO Shall we check if exists?
-  def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
     implicit request =>
       val id = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -590,7 +596,7 @@ class FileController @Inject()(
   }
 
 
-  def zoneAccessedNegotiationFile(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneAccessedNegotiationFile(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
@@ -614,11 +620,13 @@ class FileController @Inject()(
       }
   }
 
-  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
-  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 
@@ -642,7 +650,7 @@ class FileController @Inject()(
     )
   }
 
-  def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val storeFile = fileResourceManager.storeFile[AccountFile](
         name = name,
@@ -659,7 +667,7 @@ class FileController @Inject()(
       }
   }
 
-  def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val oldDocument = masterAccountFiles.Service.tryGet(id = loginState.username, documentType = documentType)
 
@@ -680,7 +688,7 @@ class FileController @Inject()(
       }
   }
 
-  def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def file(fileName: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val path: Future[String] = loginState.userType match {
         case constants.User.ZONE =>
@@ -720,7 +728,7 @@ class FileController @Inject()(
       }
   }
 
-  def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -762,7 +770,7 @@ class FileController @Inject()(
       }
   }
 
-  def organizationAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -811,7 +819,7 @@ class FileController @Inject()(
       }
   }
 
-  def zoneAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneAccessedTradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 

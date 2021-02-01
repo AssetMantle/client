@@ -192,18 +192,18 @@ class RedeemAssets @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val redeemAsset = Service.getTransaction(ticketID)
 
       def markRedeemed(pegHash: String): Future[Int] = masterAssets.Service.markRedeemedByPegHash(pegHash)
 
       def markDirty(redeemAsset: RedeemAsset): Future[Unit] = {
         val markAssetDirty = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
-        val markFromAccountDirty = blockchainAccounts.Service.markDirty(redeemAsset.from)
+        //val markFromAccountDirty = blockchainAccounts.Service.markDirty(redeemAsset.from)
         for {
           _ <- markAssetDirty
-          _ <- markFromAccountDirty
+       //   _ <- markFromAccountDirty
         } yield ()
       }
 
@@ -216,8 +216,8 @@ class RedeemAssets @Inject()(
         _ <- markDirty(redeemAsset)
         fromAccountID <- getAccountID(redeemAsset.from)
         toAccountID <- getAccountID(redeemAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, txHash)()
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, txHash)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -243,7 +243,7 @@ class RedeemAssets @Inject()(
         _ <- markTransactionFailed
         redeemAsset <- redeemAsset
         fromAccountID <- getID(redeemAsset.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SEND_ASSET_TO_ORDER_FAILED, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

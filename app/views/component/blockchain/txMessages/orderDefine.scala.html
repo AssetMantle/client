@@ -1,0 +1,18 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.OrderDefine
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[OrderDefine]) { orderDefine =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(orderDefine.from, routes.ViewController.wallet(orderDefine.from)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderDefine.fromID, routes.IndexController.search(orderDefine.fromID)))
+    @Messages(constants.View.IMMUTABLE_META_TRAITS):
+    @views.html.component.blockchain.metaProperties(orderDefine.immutableMetaTraits.metaPropertyList)
+    @Messages(constants.View.MUTABLE_META_TRAITS):
+    @views.html.component.blockchain.metaProperties(orderDefine.mutableMetaTraits.metaPropertyList)
+    @Messages(constants.View.IMMUTABLE_TRAITS):
+    @views.html.component.blockchain.properties(orderDefine.immutableTraits.propertyList)
+    @Messages(constants.View.MUTABLE_TRAITS):
+    @views.html.component.blockchain.properties(orderDefine.mutableTraits.propertyList)
+}

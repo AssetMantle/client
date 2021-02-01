@@ -1,0 +1,13 @@
+@import models.common.Serializable.Property
+@import views.html.base._
+
+@(properties: Seq[Property])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@properties.map { property =>
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.PROPERTY_ID, property.id)
+        <div class="cmuk-text-left title">@Messages(constants.View.FACT):</div>
+        @commonTextInfo(constants.View.FACT_TYPE, property.fact.factType)
+        @commonTextInfo(constants.View.FACT_HASH, property.fact.hash)
+    }
+}

@@ -246,8 +246,8 @@ class Orders @Inject()(actorSystem: ActorSystem,
               buyerAccountID <- getAccountID(negotiation.buyerAddress)
               sellerAccountID <- getAccountID(negotiation.sellerAddress)
             } yield {
-              actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
-              actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              //actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              //actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
             }
           }
         }

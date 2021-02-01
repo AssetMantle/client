@@ -1,0 +1,23 @@
+@import play.api.data.Field
+@import views.html.base._
+@import views.html.helper.select
+@import scala.collection.immutable.ListMap
+
+@(allTokenPrices: Map[String, ListMap[String, Double]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.TOKENS_PRICE) {
+    @if(allTokenPrices.nonEmpty) {
+        <div class="cardHeaderSelect">
+        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(allTokenPrices.keys.head)), for(denom <- allTokenPrices.keys.toList) yield (denom, denom), 'id -> "tokensPricesSymbolSelect", 'value -> s"'${allTokenPrices.keys.head}'", 'onClick -> s"showPrices('${allTokenPrices.keys}')", 'class -> "cmuk-select", 'label -> "")
+        </div>
+    }
+} {
+    @if(allTokenPrices.keys.nonEmpty) {
+        @for((denom, tokenPrices) <- allTokenPrices) {
+            <div id="@Seq("tokenPrices", denom).mkString("_")" class="hidden">
+            @commonLineChart(Seq("tokenPricesChart", denom).mkString("_"), tokenPrices, denom, showLegend = false)
+            </div>
+        }
+    }
+    <script src="@routes.Assets.versioned("javascripts/tokensPrices.js")" type="text/javascript"></script>
+}

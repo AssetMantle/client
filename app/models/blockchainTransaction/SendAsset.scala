@@ -204,8 +204,8 @@ class SendAssets @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val sendAsset = Service.getTransaction(ticketID)
 
       def getNegotiationID(sendAsset: SendAsset): Future[String] = blockchainNegotiations.Service.tryGetID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
@@ -248,10 +248,10 @@ class SendAssets @Inject()(
       }
 
       def markDirty(sendAsset: SendAsset): Future[Unit] = {
-        val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendAsset.from)
+        //val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendAsset.from)
         val markDirtyBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
         for {
-          _ <- markDirtyBlockchainAccounts
+         // _ <- markDirtyBlockchainAccounts
           _ <- markDirtyBlockchainTransactionFeedbacks
         } yield ()
       }
@@ -270,11 +270,11 @@ class SendAssets @Inject()(
         _ <- markDirty(sendAsset)
         fromAccountID <- getAccountID(sendAsset.from)
         toAccountID <- getAccountID(sendAsset.to)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, blockResponse.txhash)
-        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, blockResponse.txhash)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, txHash)()
+        _ <- utilitiesNotification.send(toAccountID, constants.Notification.SEND_ASSET_TO_ORDER_SUCCESSFUL, txHash)()
         _ <- masterTransactionTradeActivities.Service.create(negotiationID = masterNegotiation.id, tradeActivity = constants.TradeActivity.SEND_ASSET_TO_ORDER_SUCCESSFUL)
       } yield {
-        actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
+        //actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
       }
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -307,7 +307,7 @@ class SendAssets @Inject()(
         address <- address(sendAsset)
         _ <- markDirty(address)
         fromAccountID <- getAccountID(sendAsset.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_FAILED, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.SEND_ASSET_TO_ORDER_FAILED, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -1,17 +1,19 @@
 package controllers
 
-import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
-import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Logger}
+import controllers.actions.WithoutLoginAction
 import play.api.mvc._
 import play.api.routing._
+import play.api.{Configuration, Logger}
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
-class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents,withoutLoginAction: WithoutLoginAction)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
+class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents, withoutLoginAction: WithoutLoginAction)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def javascriptRoutes = withoutLoginAction { implicit request =>
+  def javascriptRoutes = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.Assets.versioned,
@@ -27,8 +29,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.addIdentificationForm,
         routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
         routes.javascript.AccountController.userReviewIdentificationForm,
+        routes.javascript.AccountController.checkMnemonics,
+        routes.javascript.AccountController.importWalletForm,
 
-        routes.javascript.AddKeyController.blockchainAddKeyForm,
+        //routes.javascript.AddKeyController.blockchainAddKeyForm,
 
         routes.javascript.AddOrganizationController.addOrganizationForm,
         routes.javascript.AddOrganizationController.userDeleteUBOForm,
@@ -80,10 +84,15 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AssetController.sendForm,
         routes.javascript.AssetController.redeemForm,
 
-        routes.javascript.BlockExplorerController.lastBlockHeight,
+        routes.javascript.AssetController.defineForm,
+        routes.javascript.AssetController.mintForm,
+        routes.javascript.AssetController.mutateForm,
+        routes.javascript.AssetController.burnForm,
+
+    /*    routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
         routes.javascript.BlockExplorerController.stakingValidators,
-        routes.javascript.BlockExplorerController.transactionHash,
+        routes.javascript.BlockExplorerController.transactionHash,*/
 
         routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm,
 
@@ -265,6 +274,60 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewNegotiation,
         routes.javascript.ComponentViewController.organizationViewNegotiation,
 
+
+        routes.javascript.ComponentViewController.commonHome,
+        routes.javascript.ComponentViewController.profilePicture,
+        routes.javascript.ComponentViewController.identification,
+        routes.javascript.ComponentViewController.recentActivities,
+
+        routes.javascript.ComponentViewController.latestBlockHeight,
+        routes.javascript.ComponentViewController.tokensStatistics,
+        routes.javascript.ComponentViewController.votingPowers,
+
+        routes.javascript.ComponentViewController.tokensPrices,
+
+        routes.javascript.ComponentViewController.accountWallet,
+        routes.javascript.ComponentViewController.accountDelegations,
+        routes.javascript.ComponentViewController.accountTransactions,
+        routes.javascript.ComponentViewController.accountTransactionsPerPage,
+        routes.javascript.ComponentViewController.accountSplits,
+
+        routes.javascript.ComponentViewController.blockList,
+        routes.javascript.ComponentViewController.blockListPage,
+        routes.javascript.ComponentViewController.blockDetails,
+        routes.javascript.ComponentViewController.blockTransactions,
+
+        routes.javascript.ComponentViewController.transactionList,
+        routes.javascript.ComponentViewController.transactionListPage,
+        routes.javascript.ComponentViewController.transactionDetails,
+        routes.javascript.ComponentViewController.transactionMessages,
+
+        routes.javascript.ComponentViewController.validatorList,
+        routes.javascript.ComponentViewController.activeValidatorList,
+        routes.javascript.ComponentViewController.inactiveValidatorList,
+        routes.javascript.ComponentViewController.validatorDetails,
+        routes.javascript.ComponentViewController.validatorUptime,
+        routes.javascript.ComponentViewController.validatorDelegations,
+        routes.javascript.ComponentViewController.validatorTransactions,
+        routes.javascript.ComponentViewController.validatorTransactionsPerPage,
+
+        routes.javascript.ComponentViewController.provisionedAddresses,
+        routes.javascript.ComponentViewController.unprovisionedAddresses,
+
+        routes.javascript.ComponentViewController.identitiesDefinition,
+        routes.javascript.ComponentViewController.identitiesProvisioned,
+        routes.javascript.ComponentViewController.identitiesUnprovisioned,
+        routes.javascript.ComponentViewController.assetsDefinition,
+        routes.javascript.ComponentViewController.assetsMinted,
+        routes.javascript.ComponentViewController.ordersDefinition,
+        routes.javascript.ComponentViewController.ordersMade,
+        routes.javascript.ComponentViewController.ordersTake,
+        routes.javascript.ComponentViewController.ordersTakePublic,
+        routes.javascript.ComponentViewController.ordersTakePrivate,
+
+        routes.javascript.ComponentViewController.moduleTransactions,
+        routes.javascript.ComponentViewController.getTransaction,
+
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,
@@ -276,6 +339,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.DocusignController.send,
         routes.javascript.DocusignController.sign,
         routes.javascript.DocusignController.authorization,
+
+        routes.javascript.EntityController.upsertLabelForm,
+        routes.javascript.EntityController.properties,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -301,6 +367,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateAccountKYCForm,
         routes.javascript.FileController.updateAccountKYC,
 
+        routes.javascript.IdentityController.nubForm,
+        routes.javascript.IdentityController.defineForm,
+        routes.javascript.IdentityController.issueForm,
+        routes.javascript.IdentityController.provisionForm,
+        routes.javascript.IdentityController.unprovisionForm,
 
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
         routes.javascript.IssueAssetController.issueAssetForm,
@@ -311,6 +382,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
+
+        routes.javascript.IndexController.search,
+
+        routes.javascript.MetaController.revealForm,
+        routes.javascript.MaintainerController.deputizeForm,
 
         routes.javascript.NegotiationController.requestForm,
         routes.javascript.NegotiationController.paymentTermsForm,
@@ -337,12 +413,28 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
 
+        routes.javascript.SendCoinController.sendCoinForm,
+
+        routes.javascript.ContactController.verifyEmailAddressForm,
+
+        routes.javascript.ContactController.verifyMobileNumberForm,
+
+
         routes.javascript.OrderController.moderatedBuyerExecuteForm,
         routes.javascript.OrderController.moderatedSellerExecuteForm,
         routes.javascript.OrderController.buyerExecuteForm,
         routes.javascript.OrderController.sellerExecuteForm,
         routes.javascript.OrderController.blockchainBuyerExecute,
         routes.javascript.OrderController.blockchainSellerExecute,
+
+        routes.javascript.OrderController.defineForm,
+        routes.javascript.OrderController.makeForm,
+        routes.javascript.OrderController.takeForm,
+        routes.javascript.OrderController.cancelForm,
+
+        routes.javascript.SplitController.sendForm,
+        routes.javascript.SplitController.wrapForm,
+        routes.javascript.SplitController.unwrapForm,
 
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 
@@ -354,12 +446,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.SendAssetController.blockchainSendAssetForm,
 
-        routes.javascript.SendCoinController.faucetRequestForm,
+       /* routes.javascript.SendCoinController.faucetRequestForm,
         routes.javascript.SendCoinController.approveFaucetRequestsForm,
         routes.javascript.SendCoinController.rejectFaucetRequestForm,
-        routes.javascript.SendCoinController.faucetRequestList,
+        routes.javascript.SendCoinController.faucetRequestList,*/
         routes.javascript.SendCoinController.sendCoinForm,
-        routes.javascript.SendCoinController.blockchainSendCoinForm,
+       // routes.javascript.SendCoinController.blockchainSendCoinForm,
 
         routes.javascript.SendFiatController.sendFiatForm,
         routes.javascript.SendFiatController.zoneSendFiatForm,

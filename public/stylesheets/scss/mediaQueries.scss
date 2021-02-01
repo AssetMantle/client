@@ -172,6 +172,9 @@
       }
     }
   }
+  .comdex .searchForm dl .cmuk-search-input{
+    width: 280px;
+  }
 }
 
 @media (min-width: 640px) {
@@ -222,7 +225,11 @@
     }
   }
 }
-
+@media (min-width: 1200px) and (max-width: 1470px) {
+  .comdex .searchForm dl .cmuk-search-input{
+    width: 200px;
+  }
+}
 @media (min-width:1200px) {
   .pageContainer {
     .leftSide {
@@ -247,13 +254,23 @@
       margin-bottom: 5px;
     }
   }
+  .searchContainer{
+    display: block;
+  }
 }
 
-@media (max-width:1200px ) {
+@media (max-width:1199px ) {
   .pageContainer {
     .middle{
       margin-bottom: 20px;
     }
+  }
+  .leftSide, .rightSide{
+    position: relative !important;
+    top: 0 !important;
+  }
+  .comdex .mobileSearch{
+    display: block;
   }
 }
 
@@ -280,6 +297,10 @@
         }
       }
     }
+  }
+  .tableViewCard .infoRow .infoRowLabel{
+    width: 125px;
+    vertical-align: inherit;
   }
 }
 @media (min-width: 992px) and (max-width:1400px) {

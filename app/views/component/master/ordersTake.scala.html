@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import models.master.Order
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ORDERS_TAKE) {
+} {
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.PUBLIC_ORDERS -> routes.javascript.ComponentViewController.ordersTakePublic,
+        constants.View.PRIVATE_ORDERS -> routes.javascript.ComponentViewController.ordersTakePrivate,
+    ))
+}

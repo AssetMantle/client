@@ -1,0 +1,15 @@
+@import views.html.component.blockchain.immutables
+@import views.html.component.blockchain.mutables
+@import views.html.base._
+@import models.blockchain.Identity
+
+@(identity: Identity)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.IDENTITY) {
+} {
+    @commonTextInfo(constants.View.IDENTITY_ID, identity.id)
+    @commonHtmlInfo(constants.View.PROVISIONED_ADDRESS_LIST, commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.provisionedAddresses,  'parameters -> s"'${identity.id}'"))
+    @commonHtmlInfo(constants.View.UNPROVISIONED_ADDRESS_LIST, commonModalButton(constants.View.VIEW, routes.javascript.ComponentViewController.unprovisionedAddresses,  'parameters -> s"'${identity.id}'"))
+    @immutables(identity.immutables)
+    @mutables(identity.mutables)
+}

@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import models.master.OrderNew
+@import views.html.base._
+
+@(orders: Seq[OrderNew])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ORDERS_MADE) {
+} {
+    @orders.map { order =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.ORDER_ID, order.id)
+            @commonVerticalTextInfo(constants.View.LABEL, order.label.getOrElse(""))
+            @commonVerticalTextInfo(constants.View.MAKER_ID, order.makerID)
+            @commonVerticalTextInfo(constants.View.MAKER_OWNABLE_ID, order.makerOwnableID)
+            @commonVerticalTextInfo(constants.View.TAKER_OWNABLE_ID, order.takerOwnableID)
+            @commonVerticalBooleanInfo(constants.View.STATUS, order.status)
+            <div class="buttonsListChild">
+            @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${order.id}', '${constants.Blockchain.Entity.ORDER}'")
+            @commonFormButton(constants.Form.ORDER_CANCEL, 'parameters -> s"'${order.id}', '${order.makerID}'")
+            </div>
+        }
+    }
+}

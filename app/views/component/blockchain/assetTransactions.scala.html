@@ -1,0 +1,23 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.TRANSACTIONS) {
+
+} {
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.DEFINE -> routes.javascript.ComponentViewController.getTransaction,
+        constants.View.MINT -> routes.javascript.ComponentViewController.getTransaction,
+        constants.View.MUTATE -> routes.javascript.ComponentViewController.getTransaction,
+        constants.View.BURN -> routes.javascript.ComponentViewController.getTransaction,
+    ),
+        'DEFINE_PARAMETERS -> s"'${constants.Blockchain.TransactionRequest.ASSET_DEFINE}'",
+        'MINT_PARAMETERS -> s"'${constants.Blockchain.TransactionRequest.ASSET_MINT}'",
+        'MUTATE_PARAMETERS -> s"'${constants.Blockchain.TransactionRequest.ASSET_MUTATE}'",
+        'BURN_PARAMETERS -> s"'${constants.Blockchain.TransactionRequest.ASSET_BURN}'"
+    )
+}
+
+
+

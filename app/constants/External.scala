@@ -2,6 +2,10 @@ package constants
 
 object External {
 
+  object KeyBase {
+    val VALIDATOR_KEY_BASE_ACCOUNT = "VALIDATOR_KEY_BASE_ACCOUNT"
+  }
+
   object Docusign {
     //Docusign Inputs
     val REFRESH_TOKEN = "refresh_token"

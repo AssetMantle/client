@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions.{WithLoginActionAsync, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -16,7 +16,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class TraderController @Inject()(
                                   utilitiesNotification: utilities.Notification,
-                                  withLoginAction: WithLoginAction,
                                   withUsernameToken: WithUsernameToken,
                                   masterOrganizations: master.Organizations,
                                   masterZones: master.Zones,
@@ -46,11 +45,12 @@ class TraderController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def organizationRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def organizationRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.organizationRejectTraderRequest(views.companion.master.RejectTraderRequest.form.fill(views.companion.master.RejectTraderRequest.Data(traderID = traderID))))
   }
 
-  def organizationRejectRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationRejectRequest: Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -68,7 +68,7 @@ class TraderController @Inject()(
             trader <- trader
             organizationID <- organizationID
             _ <- rejectTrader(organizationID = organizationID, trader = trader)
-            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ORGANIZATION_REJECTED_TRADER_REQUEST, organizationRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))
+            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ORGANIZATION_REJECTED_TRADER_REQUEST, organizationRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))()
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
@@ -78,11 +78,12 @@ class TraderController @Inject()(
       )
   }
 
-  def zoneRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+  def zoneRejectRequestForm(traderID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
     Ok(views.html.component.master.zoneRejectTraderRequest(views.companion.master.RejectTraderRequest.form, traderID))
   }
 
-  def zoneRejectRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneRejectRequest: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.RejectTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -100,7 +101,7 @@ class TraderController @Inject()(
             trader <- trader
             zoneID <- zoneID
             _ <- rejectTrader(zoneID = zoneID, trader = trader)
-            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ZONE_REJECTED_TRADER_REQUEST, zoneRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))
+            _ <- utilitiesNotification.send(trader.accountID, constants.Notification.ZONE_REJECTED_TRADER_REQUEST, zoneRejectRequestData.comment.getOrElse(constants.View.NO_COMMENTS))()
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_REJECT_TRADER_REQUEST_SUCCESSFUL)))
           } yield result
             ).recover {
@@ -110,12 +111,12 @@ class TraderController @Inject()(
       )
   }
 
-  def traderRelationRequestForm(): Action[AnyContent] = withoutLoginAction {
+  def traderRelationRequestForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(views.html.component.master.traderRelationRequest())
   }
 
-  def traderRelationRequest(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderRelationRequest(): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.TraderRelationRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -157,10 +158,10 @@ class TraderController @Inject()(
             _ <- create(fromTrader = fromTrader, toTrader)
             fromTraderOrganization <- getOrganization(fromTrader.organizationID)
             toTraderOrganization <- getOrganization(toTrader.organizationID)
-            _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.accountID, toTraderOrganization.name)
-            _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.accountID, toTraderOrganization.name)
-            _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.accountID, fromTraderOrganization.name)
-            _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.accountID, fromTraderOrganization.name)
+            _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_SENT, toTrader.accountID, toTraderOrganization.name)()
+            _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_SENT, toTrader.accountID, toTraderOrganization.name)()
+            _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RELATION_REQUEST_RECEIVED, fromTrader.accountID, fromTraderOrganization.name)()
+            _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RELATION_REQUEST_RECEIVED, fromTrader.accountID, fromTraderOrganization.name)()
             result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_RELATION_REQUEST_SEND_SUCCESSFUL)))
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -169,7 +170,7 @@ class TraderController @Inject()(
       )
   }
 
-  def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectTraderRelationForm(fromID: String, toID: String): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       val traderRelation = masterTraderRelations.Service.tryGet(fromID = fromID, toID = toID)
       (for {
@@ -179,7 +180,7 @@ class TraderController @Inject()(
       }
   }
 
-  def acceptOrRejectTraderRelation(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def acceptOrRejectTraderRelation(): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.AcceptOrRejectTraderRelation.form.bindFromRequest().fold(
         formWithErrors => {
@@ -207,17 +208,17 @@ class TraderController @Inject()(
           def sendNotificationsAndGetResult(fromTrader: Trader, fromTraderOrganization: Organization, toTrader: Trader, toTraderOrganization: Organization, traderRelation: TraderRelation): Future[Result] = {
             if (acceptOrRejectTraderRelationData.status) {
               for {
-                _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.accountID, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.accountID, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.accountID, fromTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.accountID, fromTraderOrganization.name)
+                _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.accountID, toTraderOrganization.name)()
+                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_ACCEPTED, toTrader.accountID, toTraderOrganization.name)()
+                _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.accountID, fromTraderOrganization.name)()
+                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_ACCEPTED, fromTrader.accountID, fromTraderOrganization.name)()
               } yield {}
             } else {
               for {
-                _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.accountID, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.accountID, toTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.accountID, fromTraderOrganization.name)
-                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.accountID, fromTraderOrganization.name)
+                _ <- utilitiesNotification.send(fromTrader.accountID, constants.Notification.TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.accountID, toTraderOrganization.name)()
+                _ <- utilitiesNotification.send(fromTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED, toTrader.accountID, toTraderOrganization.name)()
+                _ <- utilitiesNotification.send(toTrader.accountID, constants.Notification.TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.accountID, fromTraderOrganization.name)()
+                _ <- utilitiesNotification.send(toTraderOrganization.accountID, constants.Notification.ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED, fromTrader.accountID, fromTraderOrganization.name)()
               } yield {}
             }
             withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectTraderRelation(traderRelation = traderRelation))
@@ -238,7 +239,7 @@ class TraderController @Inject()(
       )
   }
 
-  def organizationModifyTraderForm(accountID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationModifyTraderForm(accountID: String): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       val trader = masterTraders.Service.tryGetByAccountID(accountID)
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
@@ -257,7 +258,7 @@ class TraderController @Inject()(
       }
   }
 
-  def organizationModifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationModifyTrader: Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
     implicit request =>
       views.companion.master.ModifyTrader.form.bindFromRequest().fold(
         formWithErrors => {

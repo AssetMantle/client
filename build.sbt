@@ -61,3 +61,7 @@ libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.5.0-RC1"
 libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19"
 
 libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.2"
+
+libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
+
+libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"

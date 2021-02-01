@@ -204,8 +204,8 @@ class ChangeSellerBids @Inject()(
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val changeSellerBid = Service.getTransaction(ticketID)
 
       def negotiation(changeSellerBid: ChangeSellerBid): Future[Option[Negotiation]] = blockchainNegotiations.Service.getNegotiation(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash)
@@ -230,10 +230,10 @@ class ChangeSellerBids @Inject()(
       }
 
       def markDirty(changeSellerBid: ChangeSellerBid): Future[Unit] = {
-        val markSellerAccountDirty = blockchainAccounts.Service.markDirty(changeSellerBid.from)
+        //val markSellerAccountDirty = blockchainAccounts.Service.markDirty(changeSellerBid.from)
         val markSellerFeedbackDirty = blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
         for {
-          _ <- markSellerAccountDirty
+        //  _ <- markSellerAccountDirty
           _ <- markSellerFeedbackDirty
         } yield ()
       }
@@ -258,17 +258,17 @@ class ChangeSellerBids @Inject()(
 
         if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
           for {
-            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
-            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)()
+            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)()
             buyerOrganization <- getOrganization(buyer.organizationID)
             sellerOrganization <- getOrganization(seller.organizationID)
-            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, sellerOrganization.name)
-            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, buyerOrganization.name)
+            _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, sellerOrganization.name)()
+            _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, seller.accountID, buyer.accountID, buyerOrganization.name)()
           } yield ()
         } else {
           for {
-            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
-            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, blockResponse.txhash, negotiation.id, negotiation.assetDescription)
+            _ <- utilitiesNotification.send(buyer.accountID, constants.Notification.NEGOTIATION_UPDATED, txHash, negotiation.id, negotiation.assetDescription)()
+            _ <- utilitiesNotification.send(seller.accountID, constants.Notification.NEGOTIATION_UPDATED, txHash, negotiation.id, negotiation.assetDescription)()
           } yield ()
         }
       }
@@ -316,7 +316,7 @@ class ChangeSellerBids @Inject()(
         changeSellerBid <- changeSellerBid
         _ <- markDirty(changeSellerBid)
         fromAccountID <- getAccountID(changeSellerBid.from)
-        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.NEGOTIATION_UPDATE_FAILED, message)
+        _ <- utilitiesNotification.send(fromAccountID, constants.Notification.NEGOTIATION_UPDATE_FAILED, message)()
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

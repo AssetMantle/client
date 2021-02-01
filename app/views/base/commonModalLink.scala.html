@@ -1,0 +1,9 @@
+@import play.api.routing.JavaScriptReverseRoute
+
+@(name: String, route: JavaScriptReverseRoute, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<a id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-link", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")' onclick="getForm(@utilities.String.getJsRouteString(route, arguments.toMap.get('parameters).map(_.toString).getOrElse("")))">
+@Messages(name)
+</a>
+
+@*Example Usage: @commonModalLink(constants.View.NAME, routes.javascript.AccountController.identificationForm, 'parameters -> "'Abhinav', 1996") *@

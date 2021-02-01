@@ -1,8 +1,10 @@
 package constants
 
 import constants.Notification.{Email, PushNotification, SMS}
+import controllers.routes
+import play.api.routing.JavaScriptReverseRoute
 
-class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
+class Notification(val notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean, val route: Option[JavaScriptReverseRoute] = None) {
 
   val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
 
@@ -51,14 +53,24 @@ object Notification {
   val EMAIL_ADDRESS_UPDATED = new Notification(notificationType = "EMAIL_ADDRESS_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
   val MOBILE_NUMBER_UPDATED = new Notification(notificationType = "MOBILE_NUMBER_UPDATED", sendEmail = false, sendPushNotification = false, sendSMS = false)
 
+  val VALIDATOR_CREATED = new Notification(notificationType = "VALIDATOR_CREATED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_EDITED = new Notification(notificationType = "VALIDATOR_EDITED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_UNJAILED = new Notification(notificationType = "VALIDATOR_UNJAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_MISSING_SIGNATURE_SLASHING = new Notification(notificationType = "VALIDATOR_MISSING_SIGNATURE_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_DOUBLE_SIGNING_SLASHING = new Notification(notificationType = "VALIDATOR_DOUBLE_SIGNING_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+  val VALIDATOR_MISSED_BLOCKS = new Notification(notificationType = "VALIDATOR_MISSED_BLOCKS", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ViewController.validator))
+
   //userReviewIdentification
   val USER_REVIEWED_IDENTIFICATION_DETAILS = new Notification(notificationType = "USER_REVIEWED_IDENTIFICATION_DETAILS", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val IDENTIFICATION_UPDATE = new Notification(notificationType = "IDENTIFICATION_UPDATE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //inviteTrader
   val ORGANIZATION_TRADER_INVITATION = new Notification(notificationType = "ORGANIZATION_TRADER_INVITATION", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //inviteZone
   val ZONE_INVITATION_SENT = new Notification(notificationType = "ZONE_INVITATION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  val CONTRACT_SIGNED = new Notification(notificationType = "CONTRACT_SIGNED", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //trader
   val ORGANIZATION_REJECTED_TRADER_REQUEST = new Notification(notificationType = "ORGANIZATION_REJECTED_TRADER_REQUEST", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -77,8 +89,6 @@ object Notification {
   val ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_TRADER_SENT_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "ORGANIZATION_TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
   val TRADER_RECEIVED_RELATION_REQUEST_REJECTED = new Notification(notificationType = "TRADER_RECEIVED_RELATION_REQUEST_REJECTED", sendEmail = true, sendPushNotification = true, sendSMS = false)
-
-  val IDENTIFICATION_UPDATE = new Notification(notificationType = "IDENTIFICATION_UPDATE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
   //addOrganization
   val ADD_ORGANIZATION_REQUESTED = new Notification(notificationType = "ADD_ORGANIZATION_REQUESTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
@@ -124,7 +134,6 @@ object Notification {
   val NEGOTIATION_PAYMENT_TERMS_UPDATED = new Notification(notificationType = "NEGOTIATION_PAYMENT_TERMS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED = new Notification(notificationType = "NEGOTIATION_DOCUMENT_CHECKLISTS_UPDATED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val ORGANIZATION_NOTIFY_NEGOTIATION_STARTED = new Notification(notificationType = "ORGANIZATION_NOTIFY_NEGOTIATION_STARTED", sendEmail = false, sendPushNotification = true, sendSMS = false)
-  val CONTRACT_SIGNED = new Notification(notificationType = "CONTRACT_SIGNED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT = new Notification(notificationType = "BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
@@ -156,6 +165,30 @@ object Notification {
   val INVOICE_CONTENT_ADDED = new Notification(notificationType = "INVOICE_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val CONTRACT_CONTENT_ADDED = new Notification(notificationType = "CONTRACT_CONTENT_ADDED", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS = new Notification(notificationType = "BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS", sendEmail = false, sendPushNotification = true, sendSMS = false)
+
+  //Assets
+  val ASSET_DEFINED = new Notification(notificationType = "ASSET_DEFINED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ASSET_MINTED = new Notification(notificationType = "ASSET_MINTED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ASSET_MUTATED = new Notification(notificationType = "ASSET_MUTATED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ASSET_BURNED = new Notification(notificationType = "ASSET_BURNED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+
+  val IDENTITY_NUB = new Notification(notificationType = "IDENTITY_NUB", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val IDENTITY_DEFINED = new Notification(notificationType = "IDENTITY_DEFINED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val IDENTITY_ISSUED = new Notification(notificationType = "IDENTITY_ISSUED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val IDENTITY_PROVISIONED = new Notification(notificationType = "IDENTITY_PROVISIONED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val IDENTITY_UNPROVISIONED = new Notification(notificationType = "IDENTITY_UNPROVISIONED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+
+  val ORDER_DEFINED = new Notification(notificationType = "ORDER_DEFINED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ORDER_MADE = new Notification(notificationType = "ORDER_MADE", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ORDER_TAKEN = new Notification(notificationType = "ORDER_TAKEN", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val ORDER_CANCELLED = new Notification(notificationType = "ORDER_CANCELLED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+
+  val SPLIT_SENT = new Notification(notificationType = "SPLIT_SENT", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val SPLIT_WRAPPED = new Notification(notificationType = "SPLIT_WRAPPED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val SPLIT_UNWRAPPED = new Notification(notificationType = "SPLIT_UNWRAPPED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+
+  val MAINTAINER_DEPUTIZED = new Notification(notificationType = "MAINTAINER_DEPUTIZED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
+  val META_REVEALED = new Notification(notificationType = "META_REVEALED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ViewController.transaction))
 
   //docusign
   val DOCUSIGN_AUTHORIZATION_PENDING = new Notification(notificationType = "DOCUSIGN_AUTHORIZATION_PENDING", sendEmail = false, sendPushNotification = true, sendSMS = false)

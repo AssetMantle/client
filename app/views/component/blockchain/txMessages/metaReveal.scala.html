@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.MetaReveal
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[MetaReveal]) { metaReveal =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(metaReveal.from, routes.ViewController.wallet(metaReveal.from)))
+    @Messages(constants.View.META_FACT):
+    @views.html.component.blockchain.data(metaReveal.metaFact.data)
+}
