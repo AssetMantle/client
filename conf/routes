@@ -630,8 +630,6 @@ GET         /master/asset/issue/pending/view                                    
 GET         /master/asset/issue                                                                      controllers.IssueAssetController.issueAssetForm(assetID: String)
 POST        /master/asset/issue                                                                      controllers.IssueAssetController.issueAsset
 
-GET         /component/comet                                                                         controllers.ComponentViewController.comet
-
 GET         /master/fiat/issue                                                                       controllers.IssueFiatController.issueFiatRequestForm
 
 GET         /master/fiat/issue                                                                       controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Double)
