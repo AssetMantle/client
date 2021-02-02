@@ -41,6 +41,9 @@ class AppWebSocketActor extends Actor {
     case blockchainConnectionLost: BlockchainConnectionLost => broadcastToAll(Message(constants.Actor.MessageType.BLOCKCHAIN_CONNECTION_LOST, blockchainConnectionLost))
     case chat: Chat => broadcastToUser(username = chat.toUser, privateMessageContent = chat, subject = constants.Actor.MessageType.CHAT)
     case asset: Asset => broadcastToUser(username = asset.toUser, privateMessageContent = asset, subject = constants.Actor.MessageType.ASSET)
+    case fiat: Fiat => broadcastToUser(username = fiat.toUser, privateMessageContent = fiat, subject = constants.Actor.MessageType.FIAT)
+    case negotiation: Negotiation => broadcastToUser(username = negotiation.toUser, privateMessageContent = negotiation, subject = constants.Actor.MessageType.NEGOTIATION)
+    case order: Order => broadcastToUser(username = order.toUser, privateMessageContent = order, subject = constants.Actor.MessageType.ORDER)
     case privateMessage: PrivateMessage => broadcastToUser(username = privateMessage.messageContent.toUser, privateMessageContent = privateMessage.messageContent, subject = privateMessage.subject)
     case addActor: AddActor => {
       publicRouter = publicRouter.addRoutee(addActor.actorRef)
