@@ -21,7 +21,7 @@
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/comet.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/webSocket.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/activitiesBox.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
@@ -239,7 +239,14 @@
                         <div>@Messages(constants.View.CONNECTION_ERROR)</div>
                     </div>
                 </div>
+            <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
+                <div class="connectionError">
+                    <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
+                    <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
+                </div>
             </div>
+
+        </div>
         @* Footer *@
         <div class="footer">
             <div class="cmuk-container">

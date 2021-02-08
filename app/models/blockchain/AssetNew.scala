@@ -1,4 +1,4 @@
-package models.blockchain
+ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged

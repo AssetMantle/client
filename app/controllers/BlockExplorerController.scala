@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class BlockExplorerController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                        queriesGetABCIInfo: queries.GetABCIInfo,
+                                        queriesGetABCIInfo: queries.blockchain.GetABCIInfo,
                                         queriesStakingValidators: queries.GetStakingValidators,
                                         queriesGetBlockDetails: queries.GetBlockDetails,
                                         queriesGetTransactionHash: queries.GetTransactionHashResponse,
