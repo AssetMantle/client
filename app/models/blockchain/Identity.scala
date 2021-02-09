@@ -1,20 +1,22 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.DataValue.IDDataValue
 import models.common.Serializable._
 import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub, IdentityProvision, IdentityUnprovision}
-import models.master
 import models.master.{Identity => masterIdentity}
+import models.{blockchain, blockchainTransaction, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
-import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -29,11 +31,19 @@ class Identities @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             configuration: Configuration,
                             blockchainMetas: Metas,
+                            masterZones: master.Zones,
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
+                            masterOrganizations: master.Organizations,
+                            masterAccounts: master.Accounts,
+                            blockchainAccounts: blockchain.Accounts,
                             masterClassifications: master.Classifications,
                             masterIdentities: master.Identities,
+                            masterTraders: master.Traders,
+                            transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
+                            blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
                             masterProperties: master.Properties,
+                            transaction: utilities.Transaction,
                             utilitiesOperations: utilities.Operations
                           )(implicit executionContext: ExecutionContext) {
 
@@ -42,6 +52,8 @@ class Identities @Inject()(
   val db = databaseConfig.db
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
 
@@ -335,8 +347,10 @@ class Identities @Inject()(
         } yield classificationID
       }
 
+      val userType = identityDefine.immutableMetaTraits.metaPropertyList.find(x => x.id == constants.User.USER_TYPE).map(x => x.metaFact.data.value.asString)
+
       def masterOperations(classificationID: String) = {
-        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, label = userType, status = Option(true))
         for {
           _ <- insert
         } yield ()
@@ -356,6 +370,99 @@ class Identities @Inject()(
     def onIssue(identityIssue: IdentityIssue): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.immutableMetaProperties.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.mutableMetaProperties.metaPropertyList)
+      val userType = identityIssue.immutableMetaProperties.metaPropertyList.find(x => x.id == constants.User.USER_TYPE).map(x => x.metaFact.data.value.asString)
+
+      def updateUser(identityID: String) = {
+        userType match {
+          case Some(userType)=>{
+            userType match {
+              case constants.User.ZONE => {
+                val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
+
+                val orgIdentityClassificationID: Future[String] = masterClassifications.Service.tryGetClassificationID(identityIssue.fromID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ORGANIZATION)
+
+                def verifyZone = masterZones.Service.verifyZone(identityID)
+
+                def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
+
+                def classificationProperties(classificationID: String) = masterProperties.Service.getAll(classificationID, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                def broadcastTx(classificationID: String, classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                  entity = blockchainTransaction.MaintainerDeputize(from = identityIssue.from, fromID = identityIssue.fromID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = MicroNumber(5), ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                  request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = identityIssue.from, gas = MicroNumber(5)), fromID = identityIssue.fromID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                  action = transactionsMaintainerDeputize.Service.post,
+                  onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                  onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                )
+
+                for {
+                  accountID <- accountID
+                  orgIdentityClassificationID <- orgIdentityClassificationID
+                  orgClassificationProperties <- classificationProperties(orgIdentityClassificationID)
+                  _ <- broadcastTx(orgIdentityClassificationID, orgClassificationProperties)
+                  _ <- verifyZone
+                  _ <- markUserTypeZone(accountID)
+                } yield ()
+              }
+              case constants.User.ORGANIZATION => {
+                val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
+
+                val adminMaintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
+
+                def markAccepted = masterOrganizations.Service.markAccepted(identityID)
+
+                def markUserTypeOrganization(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeOrganization(accountID)
+
+                def adminAddress(adminMaintainerID: String) = Service.getAllProvisionAddresses(adminMaintainerID).map(_.headOption.getOrElse(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)))
+
+                def traderIdentityClassificationID(maintainerID: String): Future[String] = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.TRADER)
+
+                def classificationProperties(classificationID: String) = masterProperties.Service.getAll(classificationID, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                def broadcastTx(adminMaintainerID: String, adminAddress: String, classificationID: String, classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                  entity = blockchainTransaction.MaintainerDeputize(from = adminAddress, fromID = adminMaintainerID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = MicroNumber(5), ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                  request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = adminAddress, gas = MicroNumber(5)), fromID = adminMaintainerID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                  action = transactionsMaintainerDeputize.Service.post,
+                  onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                  onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                )
+
+                for {
+                  adminMaintainerID <- adminMaintainerID
+                  adminAddress <- adminAddress(adminMaintainerID)
+                  accountID <- accountID
+                  traderIdentityClassificationID <- traderIdentityClassificationID(adminMaintainerID)
+                  classificationProperties <- classificationProperties(traderIdentityClassificationID)
+                  _ <- broadcastTx(adminMaintainerID, adminAddress, traderIdentityClassificationID, classificationProperties)
+                  _ <- markAccepted
+                  _ <- markUserTypeOrganization(accountID)
+                } yield ()
+              }
+              case constants.User.TRADER => {
+                def markAccepted: Future[Int] = masterTraders.Service.markAccepted(identityID)
+
+                val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
+
+                def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
+
+                for {
+                  accountID <- accountID
+                  _ <- markAccepted
+                  _ <- markUserTypeTrader(accountID)
+                } yield ()
+
+              }
+              case _ => throw new BaseException(constants.Response.USER_TYPE_DOES_NOT_EXIST)
+            }
+          }
+          case None=> throw new BaseException(constants.Response.USER_TYPE_DOES_NOT_EXIST)
+        }
+
+      }
 
       def insertOrUpdate(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
         val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityIssue.immutableProperties.propertyList))
@@ -368,7 +475,7 @@ class Identities @Inject()(
       }
 
       def masterOperations(identityID: String) = {
-        val insert = masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, status = Option(true)))
+        val insert = masterIdentities.Service.insertOrUpdate(masterIdentity(id = identityID, label = userType, status = Option(true)))
         for {
           _ <- insert
         } yield ()
@@ -378,6 +485,7 @@ class Identities @Inject()(
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
         identityID <- insertOrUpdate(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- updateUser(identityID)
         _ <- masterOperations(identityID)
       } yield ()
         ).recover {

@@ -9,6 +9,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.SendFiat
 import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,7 +23,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                                    masterTraders: master.Traders,
                                    masterNegotiations: master.Negotiations,
                                    masterTransactionSendFiatRequests: masterTransaction.SendFiatRequests,
-                                   transactionsSendFiat: transactions.SendFiat,
+                                   transactionsSendFiat: SendFiat,
                                    transaction: utilities.Transaction,
                                    withTraderLoginAction: WithTraderLoginAction,
                                    withZoneLoginAction: WithZoneLoginAction,

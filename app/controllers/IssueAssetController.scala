@@ -9,6 +9,8 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.IssueAsset
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -20,7 +22,7 @@ class IssueAssetController @Inject()(
                                       blockchainAccounts: blockchain.Accounts,
                                       masterAssets: master.Assets,
                                       withZoneLoginAction: WithZoneLoginAction,
-                                      transactionsIssueAsset: transactions.IssueAsset,
+                                      transactionsIssueAsset: IssueAsset,
                                       blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets,
                                       withUsernameToken: WithUsernameToken,
                                       withoutLoginAction: WithoutLoginAction,

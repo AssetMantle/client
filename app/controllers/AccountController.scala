@@ -306,7 +306,7 @@ class AccountController @Inject()(
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
           } yield Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

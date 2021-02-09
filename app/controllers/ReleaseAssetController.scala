@@ -9,12 +9,13 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.{Configuration, Logger}
+import transactions.blockchain.ReleaseAsset
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                       transactionsReleaseAsset: transactions.ReleaseAsset,
+                                       transactionsReleaseAsset: ReleaseAsset,
                                        withoutLoginAction: WithoutLoginAction,
                                        withoutLoginActionAsync: WithoutLoginActionAsync,
                                        withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {

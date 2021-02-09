@@ -8,13 +8,14 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import transactions.blockchain.RedeemAsset
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RedeemAssetController @Inject()(
                                        messagesControllerComponents: MessagesControllerComponents,
-                                       transactionsRedeemAsset: transactions.RedeemAsset,
+                                       transactionsRedeemAsset: RedeemAsset,
                                        withoutLoginAction: WithoutLoginAction,
                                        withoutLoginActionAsync: WithoutLoginActionAsync,
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {

@@ -12,7 +12,9 @@ import models.masterTransaction.{AssetFile, NegotiationFile, TradeActivity, Trad
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.{ChangeBuyerBid, ChangeSellerBid, ConfirmBuyerBid, ConfirmSellerBid}
 import utilities.MicroNumber
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,14 +39,14 @@ class NegotiationController @Inject()(
                                        masterTransactionTradeActivityHistories: masterTransaction.TradeActivityHistories,
                                        transaction: utilities.Transaction,
                                        utilitiesNotification: utilities.Notification,
-                                       transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
-                                       transactionsChangeSellerBid: transactions.ChangeSellerBid,
+                                       transactionsChangeBuyerBid: ChangeBuyerBid,
+                                       transactionsChangeSellerBid: ChangeSellerBid,
                                        withTraderLoginAction: WithTraderLoginAction,
                                        withUsernameToken: WithUsernameToken,
                                        withLoginActionAsync: WithLoginActionAsync,
                                        blockchainTransactionConfirmBuyerBids: blockchainTransaction.ConfirmBuyerBids,
-                                       transactionsConfirmBuyerBid: transactions.ConfirmBuyerBid,
-                                       transactionsConfirmSellerBid: transactions.ConfirmSellerBid,
+                                       transactionsConfirmBuyerBid: ConfirmBuyerBid,
+                                       transactionsConfirmSellerBid: ConfirmSellerBid,
                                        blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 

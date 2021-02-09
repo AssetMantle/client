@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -13,21 +13,21 @@ import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ChangeBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_CHANGE_BUYER_BID
+  private implicit val module: String = constants.Module.TRANSACTIONS_ISSUE_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "changeBuyerBid"
+  private val path = "issueAsset"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
@@ -41,14 +41,13 @@ class ChangeBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Confi
 
   }
 
-  case class Request(base_req: BaseReq, to: String, bid: MicroNumber, time: String, pegHash: String, mode: String, password: String) extends BaseRequest
+  case class Request(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: MicroNumber, quantityUnit: String, assetQuantity: MicroNumber, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequest
 
   object Request {
 
-    def apply(base_req: BaseReq, to: String, bid: String, time: String, pegHash: String, mode: String, password: String): Request = new Request(base_req, to, new MicroNumber(BigInt(bid)), time, pegHash, mode, password)
+    def apply(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean): Request = new Request(base_req, to, documentHash, assetType, new MicroNumber(BigInt(assetPrice)), quantityUnit, new MicroNumber(BigInt(assetQuantity)), takerAddress, mode, password, moderated)
 
-    def unapply(arg: Request): Option[(BaseReq, String, String, String, String, String, String)] = Option(arg.base_req, arg.to, arg.bid.toMicroString, arg.time, arg.pegHash, arg.mode, arg.password)
-
+    def unapply(arg: Request): Option[(BaseReq, String, String, String, String, String, String, String, String, String, Boolean)] = Option(arg.base_req, arg.to, arg.documentHash, arg.assetType, arg.assetPrice.toMicroString, arg.quantityUnit, arg.assetQuantity.toMicroString, arg.takerAddress, arg.mode, arg.password, arg.moderated)
   }
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
@@ -63,6 +62,7 @@ class ChangeBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Confi
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
+
   }
 
 }

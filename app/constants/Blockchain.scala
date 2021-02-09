@@ -247,5 +247,18 @@ object Blockchain {
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
   }
 
+  object Parameters {
+
+    val MAIN_NUB_ID = "MAIN_NUB_ID"
+    val USER_TYPE = "USER_TYPE"
+    val CURRENCY = "CURRENCY"
+    val ZONE_ID = "ZONE_ID"
+    val NAME = "NAME"
+    val ADDRESS = "ADDRESS"
+    val ORGANIZATION_ID = "ORGANIZATION_ID"
+    val EXTRA_INFO = "EXTRA_INFO"
+    val ACCOUNT_ID="ACCOUNT_ID"
+  }
+
 
 }

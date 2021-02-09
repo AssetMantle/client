@@ -1,32 +1,24 @@
 package controllers
 
-import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import constants.Response.Success
+import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync, _}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
-import models._
 import models.blockchain.ACL
 import models.common.Serializable._
 import models.master.{Asset, Negotiation, Trader, Zone}
 import models.masterTransaction.AssetFile
+import models.{blockchain, blockchainTransaction, master, _}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, _}
 import play.api.{Configuration, Logger}
-import utilities.KeyStore
-import constants.Response.Success
-import controllers.actions._
-import controllers.results.WithUsernameToken
-import exceptions.BaseException
-import models.{blockchain, blockchainTransaction, master}
-import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
-import utilities.MicroNumber
+import transactions.blockchain.{IssueAsset, RedeemAsset, ReleaseAsset, SendAsset}
+import utilities.{KeyStore, MicroNumber}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -50,7 +42,7 @@ class AssetController @Inject()(
                                  masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                  docusignEnvelopes: docusign.Envelopes,
                                  masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
-                                 masterTransactionTradeActivities:masterTransaction.TradeActivities,
+                                 masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withLoginActionAsync: WithLoginActionAsync,
                                  transactionsAssetDefine: transactions.blockchain.AssetDefine,
@@ -68,13 +60,14 @@ class AssetController @Inject()(
                                  withUserLoginAction: WithUserLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
-                                 transactionsIssueAsset: transactions.IssueAsset,
-                                 transactionsRedeemAsset: transactions.RedeemAsset,
-                                 transactionsReleaseAsset: transactions.ReleaseAsset,
-                                 transactionsSendAsset: transactions.SendAsset,
+                                 transactionsIssueAsset: IssueAsset,
+                                 transactionsRedeemAsset: RedeemAsset,
+                                 transactionsReleaseAsset: ReleaseAsset,
+                                 transactionsSendAsset: SendAsset,
                                  utilitiesNotification: utilities.Notification,
                                  utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,
+                                 withGenesisLoginAction: WithGenesisLoginAction,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync,
                                  keyStore: KeyStore
@@ -146,7 +139,7 @@ class AssetController @Inject()(
 
   def issueForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.issueAsset())
+      Ok(views.html.component.master.issueAsset())
   }
 
   def issue(): Action[AnyContent] = withTraderLoginAction { implicit loginState =>
@@ -156,81 +149,71 @@ class AssetController @Inject()(
           Future(BadRequest(views.html.component.master.issueAsset(formWithErrors)))
         },
         issueAssetData => {
-         /* (loginState.acl match {
-            case Some(acl) => {
-              if (acl.issueAsset) {*/
-                val traderID = masterTraders.Service.tryGetID(loginState.username)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-                def getResult(traderID: String): Future[Result] = {
+          def getResult(traderID: String): Future[Result] = {
 
-                  def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+            def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
 
-                  def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
+            def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
-                  def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
+            def getCounterPartyTraderList(traderIDs: Seq[String]): Future[Seq[Trader]] = masterTraders.Service.getTraders(traderIDs)
 
-                  def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
+            def getCounterPartyOrganizations(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-                  if (issueAssetData.moderated) {
-                    val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+            if (issueAssetData.moderated) {
+              val addModeratedAsset = masterAssets.Service.addModerated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
-                    for {
-                      assetID <- addModeratedAsset
-                      _ <- issueModeratedAsset(assetID)
-                      tradableAssetList <- getAllTradableAssetList(traderID)
-                      counterPartyList <- getCounterPartyList(traderID)
-                      counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
-                      counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-                      result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
-                    } yield result
-                  } else {
-                    val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
+              for {
+                assetID <- addModeratedAsset
+                _ <- issueModeratedAsset(assetID)
+                tradableAssetList <- getAllTradableAssetList(traderID)
+                counterPartyList <- getCounterPartyList(traderID)
+                counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
+              } yield result
+            } else {
+              val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
 
-                    def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
-                      val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
+              def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+                val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
-                      def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                        entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
-                        blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                        request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
-                        action = transactionsIssueAsset.Service.post,
-                        onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                        onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                        updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                      )
-
-                      for {
-                        documentHash <- addUnmoderatedAsset
-                        ticketID <- sendTransaction(documentHash)
-                        tradableAssetList <- getAllTradableAssetList(traderID)
-                        counterPartyList <- getCounterPartyList(traderID)
-                        counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
-                        counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-                        result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
-                      } yield result
-                    } else Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
-
-                    for {
-                      validateUsernamePassword <- validateUsernamePassword
-                      result <- issueAssetAndGetResult(validateUsernamePassword)
-                    } yield result
-                  }
-                }
+                def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
+                  action = transactionsIssueAsset.Service.post,
+                  onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+                )
 
                 for {
-                  traderID <- traderID
-                  result <- getResult(traderID)
+                  documentHash <- addUnmoderatedAsset
+                  ticketID <- sendTransaction(documentHash)
+                  tradableAssetList <- getAllTradableAssetList(traderID)
+                  counterPartyList <- getCounterPartyList(traderID)
+                  counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
+                  counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
+                  result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                 } yield result
-              /*} else {
-                throw new BaseException(constants.Response.UNAUTHORIZED)
-              }
+              } else Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
+
+              for {
+                validateUsernamePassword <- validateUsernamePassword
+                result <- issueAssetAndGetResult(validateUsernamePassword)
+              } yield result
             }
-            case None => {
-              throw new BaseException(constants.Response.UNAUTHORIZED)
-            }
-          }).recover {
+          }
+
+          (for {
+            traderID <- traderID
+            result <- getResult(traderID)
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
-          }*/
+          }
         }
       )
   }
@@ -312,7 +295,7 @@ class AssetController @Inject()(
 
   def releaseForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.releaseAsset(assetID = assetID))
+      Ok(views.html.component.master.releaseAsset(assetID = assetID))
   }
 
   def release: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
@@ -388,7 +371,7 @@ class AssetController @Inject()(
 
   def sendForm(negotiationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.sendAsset(negotiationID = negotiationID))
+      Ok(views.html.component.master.sendAsset(negotiationID = negotiationID))
   }
 
   def send: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
@@ -410,7 +393,7 @@ class AssetController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyer: Trader, buyerAddress: String, sellerAddress: String, asset: Asset, assetLocked: Boolean, sellerTraderID: String, negotiation: Negotiation): Future[Result] = {
-            if (asset.ownerID != sellerTraderID /*|| !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sendAsset*/) throw new BaseException(constants.Response.UNAUTHORIZED)
+            if (asset.ownerID != sellerTraderID ) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             else if (negotiation.status != constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED) throw new BaseException(constants.Response.CONFIRM_TRANSACTION_PENDING)
             else asset.pegHash match {
@@ -456,7 +439,7 @@ class AssetController @Inject()(
 
   def redeemForm(assetID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.redeemAsset(assetID = assetID))
+      Ok(views.html.component.master.redeemAsset(assetID = assetID))
   }
 
   def redeem: Action[AnyContent] = withTraderLoginAction { implicit loginState =>
@@ -477,7 +460,7 @@ class AssetController @Inject()(
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
           def sendTransactionAndGetResult(validateUsernamePassword: Boolean, zoneAccountID: String, ownerAddress: String, zoneAddress: String, asset: Asset, assetLocked: Boolean, trader: Trader): Future[Result] = {
-            if (asset.ownerID != trader.id /*|| !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemAsset*/) throw new BaseException(constants.Response.UNAUTHORIZED)
+            if (asset.ownerID != trader.id ) throw new BaseException(constants.Response.UNAUTHORIZED)
             else if (assetLocked) throw new BaseException(constants.Response.ASSET_LOCKED)
             else asset.pegHash match {
               case Some(pegHash) =>
@@ -560,7 +543,7 @@ class AssetController @Inject()(
               _ <- verify
               sellerAccountID <- sellerAccountID
               _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))()
-              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_ACCEPTED,loginState.username, Messages(updateAssetDocumentStatusData.documentType))
+              _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.ASSET_DOCUMENT_ACCEPTED, loginState.username, Messages(updateAssetDocumentStatusData.documentType))
             } yield {}
           } else {
             val reject = masterTransactionAssetFiles.Service.reject(id = negotiation.assetID, documentType = updateAssetDocumentStatusData.documentType)
@@ -596,7 +579,7 @@ class AssetController @Inject()(
       Ok(blockchainForms.assetDefine())
   }
 
-  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def define: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       blockchainCompanion.AssetDefine.form.bindFromRequest().fold(
         formWithErrors => {

@@ -149,16 +149,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(accountID: String, name: String, currency: String, address: Address): Future[String] = add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address)))
 
-    def insertOrUpdate(accountID: String, name: String, currency: String, address: Address): Future[String] = {
-      val id = tryGetIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
-
-      def upsertZone(id: String) = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
-
-      for {
-        id <- id
-        _ <- upsertZone(id)
-      } yield id
-    }
+    def insertOrUpdate(id:String, accountID: String, name: String, currency: String, address: Address): Future[Int] = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
 
     def tryGet(id: String): Future[Zone] = tryGetByID(id).map(_.deserialize)
 

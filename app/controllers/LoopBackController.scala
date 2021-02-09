@@ -18,28 +18,28 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 import queries.responses.AccountResponse.Value
 import queries.responses.TraderReputationResponse
+import transactions.blockchain.{BuyerExecuteOrder, ChangeBuyerBid, ChangeSellerBid, ConfirmBuyerBid, ConfirmSellerBid, IssueAsset, IssueFiat, RedeemAsset, RedeemFiat, ReleaseAsset, SellerExecuteOrder, SendAsset, SendFiat}
 import utilities.MicroNumber
 
 @Singleton
 class LoopBackController @Inject()(
                                     messagesControllerComponents: MessagesControllerComponents,
                                     transactionsAddKey: transactions.blockchain.AddKey,
-                                    transactionsIssueAsset: transactions.IssueAsset,
-                                    transactionsIssueFiat: transactions.IssueFiat,
-                                    transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
-                                    transactionsChangeSellerBid: transactions.ChangeSellerBid,
-                                    transactionsConfirmBuyerBid: transactions.ConfirmBuyerBid,
-                                    transactionsConfirmSellerBid: transactions.ConfirmSellerBid,
-                                    transactionsReleaseAsset: transactions.ReleaseAsset,
-                                    transactionsSendAsset: transactions.SendAsset,
-                                    transactionsSendFiat: transactions.SendFiat,
-                                    transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder,
-                                    transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
-                                    transactionsRedeemAsset: transactions.RedeemAsset,
-                                    transactionsRedeemFiat: transactions.RedeemFiat,
+                                    transactionsIssueAsset: IssueAsset,
+                                    transactionsIssueFiat: IssueFiat,
+                                    transactionsChangeBuyerBid: ChangeBuyerBid,
+                                    transactionsChangeSellerBid: ChangeSellerBid,
+                                    transactionsConfirmBuyerBid: ConfirmBuyerBid,
+                                    transactionsConfirmSellerBid: ConfirmSellerBid,
+                                    transactionsReleaseAsset: ReleaseAsset,
+                                    transactionsSendAsset: SendAsset,
+                                    transactionsSendFiat: SendFiat,
+                                    transactionsBuyerExecuteOrder: BuyerExecuteOrder,
+                                    transactionsSellerExecuteOrder: SellerExecuteOrder,
+                                    transactionsRedeemAsset: RedeemAsset,
+                                    transactionsRedeemFiat: RedeemFiat,
                                     transactionsChangePassword: transactions.blockchain.ChangePassword,
                                     transactionsForgotPassword: transactions.blockchain.ForgotPassword,
-                                    transactionsSendCoin: transactions.SendCoin,
                                     blockchainAccounts: blockchain.Accounts,
                                     blockchainACLAccounts: blockchain.ACLAccounts,
                                     blockchainACLHashes: blockchain.ACLHashes,

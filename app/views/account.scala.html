@@ -1,54 +1,106 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 
-@left = {
+@left={
     <div class="leftContainer">
-        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+        <div id="financials" class="financial"></div>
     </div>
     <script>
-            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
-            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+            case constants.User.ORGANIZATION => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+            }
+            case constants.User.ZONE => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
     </script>
 }
 
-@center = {
-@loginState match {
-    case null => {}
-    case default => {
-        <div class="cmuk-container cmuk-margin-bottom">
-            <div class="cmuk-grid-match" cmuk-grid>
+@center ={
+    <div class="cmuk-container cmuk-margin-bottom">
+    @loginState.userType match {
+        case constants.User.ZONE => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
                 <div class="cmuk-width-expand@@m">
-                    <div id="accountWallet" class="tableViewCard"></div>
+                    <div id="zoneViewOrganizationAccountList" class="switcherCard"></div>
                 </div>
+
             </div>
-            <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
                 <div class="cmuk-width-expand@@m">
-                    <div id="accountSplits"></div>
+                    <div id="zoneViewTraderAccountList" class="switcherCard"></div>
                 </div>
+
             </div>
-            <div class="cmuk-grid-match" cmuk-grid>
+            <script>
+                    componentResource('zoneViewOrganizationAccountList', jsRoutes.controllers.ComponentViewController.zoneViewOrganizationAccountList());
+                    componentResource('zoneViewTraderAccountList', jsRoutes.controllers.ComponentViewController.zoneViewTraderAccountList());
+            </script>
+        }
+        case constants.User.ORGANIZATION => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
                 <div class="cmuk-width-expand@@m">
-                    <div id="accountDelegations" class="switcherCard tableViewCard"></div>
+                    <div id="organizationViewTraderAccountList" class="switcherCard"></div>
                 </div>
+
             </div>
-            <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
                 <div class="cmuk-width-expand@@m">
-                    <div id="accountTransactions"></div>
+                    <div id="organizationSubscription"></div>
                 </div>
+
             </div>
-        </div>
-        <script>
-            componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@loginState.address'));
-            componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@loginState.address'));
-            componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@loginState.address'));
-            componentResource('accountSplits', jsRoutes.controllers.ComponentViewController.accountSplits());
-    </script>
+            <script>
+                    componentResource('organizationViewTraderAccountList', jsRoutes.controllers.ComponentViewController.organizationViewTraderAccountList());
+                    componentResource('organizationSubscription', jsRoutes.controllers.ComponentViewController.organizationSubscription());
+            </script>
+        }
+        case constants.User.TRADER => {
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderRelationList" class="traderRelationList switcherCard"></div>
+                </div>
+
+            </div>
+            <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+
+                <div class="cmuk-width-expand@@m">
+                    <div id="traderSubscription"></div>
+                </div>
+
+            </div>
+            <script>
+                    componentResource('traderRelationList', jsRoutes.controllers.ComponentViewController.traderRelationList());
+                    componentResource('traderSubscription', jsRoutes.controllers.ComponentViewController.traderSubscription());
+            </script>
+        }
+        case constants.User.GENESIS => {
+            @commonFormButton(constants.Form.IDENTITY_NUB)
+            @commonFormButton(constants.Form.IDENTITY_DEFINE)
+            @commonFormButton(constants.Form.ASSET_DEFINE)
+            @commonFormButton(constants.Form.ORDER_DEFINE)
+            @commonFormButton(constants.Form.INVITE_ZONE)
+            <a href="@routes.DocusignController.authorization()">@Messages(constants.View.AUTHORIZE_DOCUSIGN)</a>
+        }
+        case constants.User.USER => {
+        }
+        case _ => {}
     }
-}
+    </div>
 }
 
 @right = {
@@ -56,10 +108,8 @@
         <div class="recentActivityContainer">
             <div id="recentActivities"></div>
         </div>
-        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
     </script>
 }

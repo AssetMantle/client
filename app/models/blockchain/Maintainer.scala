@@ -1,6 +1,9 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.MaintainerDeputize
@@ -11,8 +14,6 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -140,13 +141,13 @@ class Maintainers @Inject()(
       val upsert = Service.insertOrUpdate(Maintainer(id = maintainerID, maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
       val masterOperations = {
-        val entityType = masterClassifications.Service.tryGetEntityType(id = maintainerDeputize.classificationID, maintainerID = maintainerDeputize.fromID)
+        val classification = masterClassifications.Service.get(maintainerDeputize.classificationID, maintainerDeputize.fromID)
 
-        def insertClassification(entityType: String) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = entityType, maintainerID = maintainerDeputize.toID, status = Option(true))
+        def insertClassification(classification: models.master.Classification) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = classification.entityType, maintainerID = maintainerDeputize.toID, label = classification.label, status = Option(true))
 
         for {
-          entityType <- entityType
-          _ <- insertClassification(entityType)
+          classification <- classification
+          _ <- insertClassification(classification.getOrElse(throw new BaseException(constants.Response.FAILURE)))
         } yield ()
       }
 

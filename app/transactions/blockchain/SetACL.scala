@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -13,23 +13,21 @@ import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_ADD_ZONE
+  private implicit val module: String = constants.Module.TRANSACTIONS_SET_ACL
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "defineZone"
+  private val path = "defineACL"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
-
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
 
@@ -41,11 +39,13 @@ class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   }
 
+  case class Request(base_req: BaseReq, aclAddress: String, organizationID: String, zoneID: String, mode: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String, password: String) extends BaseRequest
+
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(base_req: BaseReq, to: String, zoneID: String, password: String, mode: String) extends BaseRequest
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
   object Service {
     def post(request: Request): Future[WSResponse] = action(request).recover {

@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -9,25 +9,25 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 import utilities.MicroNumber
-import scala.concurrent.TimeoutException
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReleaseAsset @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class ChangeSellerBid @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_RELEASE_ASSET
+  private implicit val module: String = constants.Module.TRANSACTIONS_CHANGE_SELLER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "releaseAsset"
+  private val path = "changeSellerBid"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
@@ -37,11 +37,19 @@ class ReleaseAsset @Inject()(wsClient: WSClient)(implicit configuration: Configu
 
     def apply(from: String, chain_id: String, gas: String): BaseReq = new BaseReq(from, chain_id, new MicroNumber(BigInt(gas)))
 
-    def unapply(arg: BaseReq): Option[(String, String, String)] = Option(arg.from, arg.chain_id, arg.gas.toMicroString)
+    def unapply(arg: BaseReq): Option[(String, String, String)] = Option((arg.from, arg.chain_id, arg.gas.toMicroString))
 
   }
 
-  case class Request(base_req: BaseReq, to: String, pegHash: String, mode: String, password: String) extends BaseRequest
+  case class Request(base_req: BaseReq, to: String, bid: MicroNumber, time: String, pegHash: String, mode: String, password: String) extends BaseRequest
+
+  object Request {
+
+    def apply(base_req: BaseReq, to: String, bid: String, time: String, pegHash: String, mode: String, password: String): Request = new Request(base_req, to, new MicroNumber(BigInt(bid)), time, pegHash, mode, password)
+
+    def unapply(arg: Request): Option[(BaseReq, String, String, String, String, String, String)] = Option(arg.base_req, arg.to, arg.bid.toMicroString, arg.time, arg.pegHash, arg.mode, arg.password)
+
+  }
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
   implicit val baseRequestReads: Reads[BaseReq] = Json.reads[BaseReq]

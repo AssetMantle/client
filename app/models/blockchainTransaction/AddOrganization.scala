@@ -24,7 +24,7 @@ case class AddOrganization(from: String, to: String, organizationID: String, zon
 }
 
 @Singleton
-class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterOrganizationKYCs: master.OrganizationKYCs, transactionAddOrganization: transactions.AddOrganization, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterOrganizationKYCs: master.OrganizationKYCs, transactionAddOrganization: transactions.blockchain.AddOrganization, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 

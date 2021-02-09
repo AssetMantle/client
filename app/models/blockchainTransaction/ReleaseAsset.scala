@@ -26,7 +26,7 @@ case class ReleaseAsset(from: String, to: String, pegHash: String, gas: MicroNum
 }
 
 @Singleton
-class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets, masterNegotiations: master.Negotiations, masterTransactionTradeActivities: masterTransaction.TradeActivities)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.blockchain.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterAssets: master.Assets, masterNegotiations: master.Negotiations, masterTransactionTradeActivities: masterTransaction.TradeActivities)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_RELEASE_ASSET
 

@@ -127,21 +127,12 @@ class ComponentViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
-  private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
-
-  //private val keepAliveDuration = configuration.get[Int]("comet.keepAliveDuration").seconds
-
     private val bondedStatus = configuration.get[Int]("blockchain.validator.status.bonded")
 
   private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
-
-  /*def comet: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok.chunked(actors.Service.Comet.createSource(loginState.username, keepAliveDuration) via Comet.json("parent.cometMessage")).as(ContentTypes.HTML))
-  }*/
 
   def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

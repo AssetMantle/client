@@ -18,8 +18,9 @@ import play.api.{Configuration, Logger}
 import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
-
 import javax.inject.{Inject, Singleton}
+import transactions.blockchain.{BuyerExecuteOrder, SellerExecuteOrder}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -42,8 +43,8 @@ class OrderController @Inject()(
                                  masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
-                                 transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder,
-                                 transactionsSellerExecuteOrder: transactions.SellerExecuteOrder,
+                                 transactionsBuyerExecuteOrder: BuyerExecuteOrder,
+                                 transactionsSellerExecuteOrder: SellerExecuteOrder,
                                  utilitiesNotification: utilities.Notification,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withZoneLoginAction: WithZoneLoginAction,
@@ -64,6 +65,7 @@ class OrderController @Inject()(
                                  withUserLoginAction: WithUserLoginAction,
                                  blockchainIdentities: blockchain.Identities,
                                  withUsernameToken: WithUsernameToken,
+                                 withGenesisLoginAction: WithGenesisLoginAction,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync
                                )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -411,7 +413,7 @@ class OrderController @Inject()(
       Ok(blockchainForms.orderDefine())
   }
 
-  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def define: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       blockchainCompanion.OrderDefine.form.bindFromRequest().fold(
         formWithErrors => {

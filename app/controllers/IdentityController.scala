@@ -1,7 +1,7 @@
 package controllers
 
 import constants.Response.Success
-import controllers.actions._
+import controllers.actions.{WithGenesisLoginAction, _}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models.{blockchain, blockchainTransaction, master}
@@ -11,8 +11,8 @@ import play.api.{Configuration, Logger}
 import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -41,7 +41,8 @@ class IdentityController @Inject()(
                                     masterClassifications: master.Classifications,
                                     masterAccounts: master.Accounts,
                                     withoutLoginAction: WithoutLoginAction,
-                                    withoutLoginActionAsync: WithoutLoginActionAsync
+                                    withoutLoginActionAsync: WithoutLoginActionAsync,
+                                    withGenesisLoginAction: WithGenesisLoginAction
                                   )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -54,14 +55,14 @@ class IdentityController @Inject()(
 
   def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.identityNub())
+      Ok(blockchainForms.identityNub(nubID=constants.Blockchain.Parameters.MAIN_NUB_ID))
   }
 
-  def nub: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def nub: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityNub.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.identityNub(formWithErrors)))
+          Future(BadRequest(blockchainForms.identityNub(formWithErrors,constants.Blockchain.Parameters.MAIN_NUB_ID)))
         },
         nubData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = nubData.password)
@@ -79,7 +80,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
+          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message),constants.Blockchain.Parameters.MAIN_NUB_ID)))
 
           (for {
             verifyPassword <- verifyPassword
@@ -97,7 +98,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityDefine())
   }
 
-  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+  def define: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityDefine.form.bindFromRequest().fold(
         formWithErrors => {

@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -19,15 +19,15 @@ class SetBuyerFeedback @Inject()(wsClient: WSClient)(implicit configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
   private val path = "submitBuyerFeedback"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
 

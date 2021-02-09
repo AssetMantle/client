@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -19,15 +19,15 @@ class RedeemFiat @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
   private val path = "redeemFiat"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 

@@ -1,4 +1,4 @@
-package transactions
+package transactions.blockchain
 
 import java.net.ConnectException
 
@@ -13,21 +13,21 @@ import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_SEND_FIAT
+  private implicit val module: String = constants.Module.TRANSACTIONS_BUYER_EXECUTE_ORDER
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.main.ip")
+  private val ip = configuration.get[String]("blockchain.ip")
 
-  private val port = configuration.get[String]("blockchain.main.restPort")
+  private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "sendFiat"
+  private val path = "buyerExecuteOrder"
 
   private val url = ip + ":" + port + "/" + path
 
-  private val chainID = configuration.get[String]("blockchain.main.chainID")
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
@@ -41,14 +41,7 @@ class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   }
 
-  case class Request(base_req: BaseReq, to: String, amount: MicroNumber, pegHash: String, mode: String, password: String) extends BaseRequest
-
-  object Request {
-
-    def apply(base_req: BaseReq, to: String, amount: String, pegHash: String, mode: String, password: String): Request = new Request(base_req, to, new MicroNumber(BigInt(amount)), pegHash, mode, password)
-
-    def unapply(arg: Request): Option[(BaseReq, String, String, String, String, String)] = Option(arg.base_req, arg.to, arg.amount.toMicroString, arg.pegHash, arg.mode, arg.password)
-  }
+  case class Request(base_req: BaseReq, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String, password: String) extends BaseRequest
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
   implicit val baseRequestReads: Reads[BaseReq] = Json.reads[BaseReq]

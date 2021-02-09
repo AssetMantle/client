@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -13,6 +13,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.AddZone
 import utilities.KeyStore
 import views.companion.master.FileUpload
 
@@ -26,13 +27,13 @@ class AddZoneController @Inject()(
                                    transaction: utilities.Transaction,
                                    utilitiesNotification: utilities.Notification,
                                    masterZoneKYCs: master.ZoneKYCs,
-                                   transactionsAddZone: transactions.AddZone,
-                                   transactionsSendCoin: transactions.SendCoin,
-                                   blockchainTransactionAddZones: blockchainTransaction.AddZones,
-                                   blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
+                                   transactionsAddZone: AddZone,
                                    blockchainAccounts: blockchain.Accounts,
+                                   transactionsIdentityIssue: transactions.blockchain.IdentityIssue,
+                                   blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
                                    masterZones: master.Zones,
                                    masterEmails: master.Emails,
+                                   masterIdentities: master.Identities,
                                    masterMobiles: master.Mobiles,
                                    masterAccounts: master.Accounts,
                                    withUserLoginAction: WithUserLoginAction,
@@ -40,6 +41,7 @@ class AddZoneController @Inject()(
                                    withUsernameToken: WithUsernameToken,
                                    masterTransactionZoneInvitations: masterTransaction.ZoneInvitations,
                                    withoutLoginAction: WithoutLoginAction,
+                                   masterClassifications: master.Classifications,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    keyStore: KeyStore
                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -49,8 +51,6 @@ class AddZoneController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
-
-  private val denom = configuration.get[String]("blockchain.denom")
 
   private val comdexURL: String = configuration.get[String]("webApp.url")
 
@@ -125,22 +125,36 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.addZone(formWithErrors)))
         },
         addZoneData => {
+          val immutables = Seq(constants.Property.NAME.getBaseProperty(addZoneData.name))
+          val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ZONE))
+          val maintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
+
+          def getZoneClassificationID(maintainerID: String) = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ZONE)
+
           val invitationStatus = masterTransactionZoneInvitations.Service.getStatus(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
           val mobile = masterMobiles.Service.tryGet(loginState.username)
 
-          def insertOrUpdate(invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
+          def insertOrUpdate(zoneClassificationID: String, invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
             if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
-            else masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+            else {
+              val identityID = utilities.IDGenerator.getIdentityID(zoneClassificationID, Immutables(Properties(immutables.map(_.toProperty) ++ immutableMetas.map(_.toProperty))))
+              val upsert = masterZones.Service.insertOrUpdate(id = identityID, accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+              for (
+                _ <- upsert
+              ) yield identityID
+            }
           } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
+            maintainerID <- maintainerID
+            zoneClassificationID <- getZoneClassificationID(maintainerID)
             invitationStatus <- invitationStatus
             email <- email
             mobile <- mobile
-            id <- insertOrUpdate(invitationStatus, email, mobile)
+            id <- insertOrUpdate(zoneClassificationID, invitationStatus, email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
@@ -168,7 +182,7 @@ class AddZoneController @Inject()(
 
   def userUploadZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userStoreZoneKYC), documentType))
+      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userStoreZoneKYC), documentType))
   }
 
   def userUploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -218,7 +232,7 @@ class AddZoneController @Inject()(
 
   def userUpdateZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUpdateZoneKYC), documentType))
+      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUpdateZoneKYC), documentType))
   }
 
   def userUpdateZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
@@ -296,7 +310,9 @@ class AddZoneController @Inject()(
                 } catch {
                   case baseException: BaseException => throw baseException
                 }
+
                 def markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
+
                 for {
                   _ <- markZoneFormCompleted
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
@@ -325,7 +341,7 @@ class AddZoneController @Inject()(
 
   def verifyZoneForm(zoneID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.verifyZone(zoneID = zoneID))
+      Ok(views.html.component.master.verifyZone(zoneID = zoneID))
   }
 
   def verifyZone: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
@@ -339,37 +355,37 @@ class AddZoneController @Inject()(
 
           def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
-              val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
+              val zone = masterZones.Service.tryGet(verifyZoneData.zoneID)
+              val maintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
 
               def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-              def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount =Seq(Coin(denom, constants.Blockchain.DefaultZoneFaucetAmount)) , gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetAmount)), password = verifyZoneData.password, mode = transactionMode),
-                action = transactionsSendCoin.Service.post,
-                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-              )
+              def getZoneClassificationID(maintainerID: String) = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ZONE)
 
-              def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
-                entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
-                request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
-                action = transactionsAddZone.Service.post,
-                onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
-                onFailure = blockchainTransactionAddZones.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
-              )
+              def issueIdentityTransaction(zoneAccountAddress: String, maintainerID: String, zoneClassificationID: String, zone: Zone) = {
+                val immutables = Seq(constants.Property.NAME.getBaseProperty(zone.name))
+                val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ZONE))
+                val mutableMetas = Seq(constants.Property.CURRENCY.getBaseProperty(zone.currency))
+                val mutables = Seq(constants.Property.ADDRESS.getBaseProperty(zone.address.toString.filter(_.isLetter)))
+
+                transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+                  entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = maintainerID, classificationID = zoneClassificationID, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
+                  request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyZoneData.gas), fromID = maintainerID, classificationID = zoneClassificationID, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  action = transactionsIdentityIssue.Service.post,
+                  onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
+                  onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
+              }
 
               for {
-                accountID <- accountID
-                zoneAccountAddress <- zoneAccountAddress(accountID)
-                _ <- sendCoinTransaction(zoneAccountAddress)
-                _ <- addZoneTransaction(zoneAccountAddress)
+                maintainerID <- maintainerID
+                zone <- zone
+                zoneAccountAddress <- zoneAccountAddress(zone.accountID)
+                zoneClassificationID <- getZoneClassificationID(maintainerID)
+                _ <- issueIdentityTransaction(zoneAccountAddress, maintainerID, zoneClassificationID, zone)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
-                _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)()
+                _ <- utilitiesNotification.send(zone.accountID, constants.Notification.ADD_ZONE_CONFIRMED, zone.accountID)()
               } yield {
                 result
               }
@@ -469,7 +485,7 @@ class AddZoneController @Inject()(
 
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.rejectVerifyZoneRequest(zoneID = zoneID))
+      Ok(views.html.component.master.rejectVerifyZoneRequest(zoneID = zoneID))
   }
 
   def rejectVerifyZoneRequest: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
@@ -496,7 +512,7 @@ class AddZoneController @Inject()(
 
   def uploadZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
+      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
   }
 
   def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -542,7 +558,7 @@ class AddZoneController @Inject()(
 
   def updateZoneKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.updateZoneKYC), documentType))
+      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.updateZoneKYC), documentType))
   }
 
   def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
@@ -571,24 +587,24 @@ class AddZoneController @Inject()(
 
   def blockchainAddZoneForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.blockchain.addZone())
+      Ok(views.html.component.blockchain.addZone())
   }
 
   def blockchainAddZone: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-    views.companion.blockchain.AddZone.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.addZone(formWithErrors)))
-      },
-      addZoneData => {
-        val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
-        (for {
-          _ <- postRequest
-        } yield Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED)))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+      views.companion.blockchain.AddZone.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.blockchain.addZone(formWithErrors)))
+        },
+        addZoneData => {
+          val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
+          (for {
+            _ <- postRequest
+          } yield Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
         }
-      }
-    )
+      )
   }
 }

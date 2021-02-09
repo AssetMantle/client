@@ -203,7 +203,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[String] = add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
 
-    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[String] = {
+    def insertOrUpdate(id:String, zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[Int] =upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
+
+   /* {
       val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
 
       def upsertOrganization(id: String) = upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
@@ -212,7 +214,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
         id <- id
         _ <- upsertOrganization(id)
       } yield id
-    }
+    }*/
 
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
