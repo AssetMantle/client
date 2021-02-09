@@ -48,9 +48,24 @@ object Message {
 
     implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
+    case class Fiat(toUser: String, ping: String = constants.Actor.MessageType.PING) extends PrivateMessageContent
+
+    implicit val fiatWrites: OWrites[Fiat] = Json.writes[Fiat]
+
+    case class Order(toUser: String, ping: String = constants.Actor.MessageType.PING) extends PrivateMessageContent
+
+    implicit val orderWrites: OWrites[Order] = Json.writes[Order]
+
+    case class Negotiation(toUser: String, id: String) extends PrivateMessageContent
+
+    implicit val negotiationWrites: OWrites[Negotiation] = Json.writes[Negotiation]
+
     implicit val privateMessageContentWrites: Writes[PrivateMessageContent] = {
       case chat: Chat => Json.toJson(chat)
       case asset: Asset => Json.toJson(asset)
+      case fiat: Fiat => Json.toJson(fiat)
+      case negotiation: Negotiation => Json.toJson(negotiation)
+      case order: Order => Json.toJson(order)
     }
 
     case class PrivateMessage(subject: String, messageContent: PrivateMessageContent) extends MessageValue

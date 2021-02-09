@@ -54,7 +54,6 @@ object Form {
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
 
-
   //AssetController
   val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define(), routes.javascript.AssetController.defineForm)
   val ASSET_MINT = new Form("ASSET_MINT", routes.AssetController.mint(), routes.javascript.AssetController.mintForm)

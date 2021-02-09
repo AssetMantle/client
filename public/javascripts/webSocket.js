@@ -59,6 +59,15 @@ function onPrivateMessage(message) {
         case 'ASSET':
             onAsset(message.messageContent);
             break;
+        case 'FIAT':
+            onFiat(message.messageContent);
+            break;
+        case 'NEGOTIATION':
+            onNegotiation(message.messageContent);
+            break;
+        case 'ORDER':
+            onOrder(message.messageContent);
+            break;
         default :
             console.log("Unknown Private Message Subject Type");
             break;
@@ -72,6 +81,33 @@ function onChat(message) {
 }
 
 function onAsset(message) {
+    console.log(message);
+}
+
+function onFiat(message) {
+    if ($('#totalFiat').length) {
+        $('#totalFiat').html(message.ping);
+    }
+    if ($('#traderFinancials').length) {
+        refreshCard('traderFinancials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+    }
+}
+
+function onNegotiation(message) {
+    if ($('#' + message.id).length) {
+        if ($('#traderViewAcceptedNegotiation').length) {
+            refreshCard('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation(message.id));
+        }
+        if ($('#organizationViewAcceptedNegotiation').length) {
+            refreshCard('organizationViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.organizationViewAcceptedNegotiation(message.id));
+        }
+        if ($('#traderViewAcceptedNegotiationDocumentList').length) {
+            refreshCard('traderViewAcceptedNegotiationDocumentList', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationDocumentList(message.id));
+        }
+    }
+}
+
+function onOrder(message) {
     console.log(message);
 }
 

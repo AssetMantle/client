@@ -18,6 +18,9 @@ object Actor {
     val PING = "PING"
     val CHAT = "CHAT"
     val ASSET = "ASSET"
+    val FIAT = "FIAT"
+    val ORDER = "ORDER"
+    val NEGOTIATION = "NEGOTIATION"
     val TEST = "TEST"
   }
 
