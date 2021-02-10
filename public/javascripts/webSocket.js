@@ -75,7 +75,7 @@ function onPrivateMessage(message) {
 }
 
 function onChat(message) {
-    if ($('#chatMessages').length && $('#' + message.chatID).length) {
+    if ($('#chatMessages').length && $('#' + $.escapeSelector(message.chatID)).length) {
         refreshCard('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats(message.chatID, 0), 'CHAT_LOADING');
     }
 }
@@ -94,7 +94,7 @@ function onFiat(message) {
 }
 
 function onNegotiation(message) {
-    if ($('#' + message.id).length) {
+    if ($('#' + $.escapeSelector(message.id)).length) {
         if ($('#traderViewAcceptedNegotiation').length) {
             refreshCard('traderViewAcceptedNegotiation', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiation(message.id));
         }
@@ -221,8 +221,8 @@ function updateMissedBlocksCounter(message) {
 }
 
 function refreshCard(source, route, loadingSpinnerID = 'commonSpinner') {
-    const div = $('#' + source);
-    let loadingSpinner = $('#' + loadingSpinnerID);
+    const div = $('#' + $.escapeSelector(source));
+    let loadingSpinner = $('#' + $.escapeSelector(loadingSpinnerID));
     $.ajax({
         url: route.url,
         type: route.type,

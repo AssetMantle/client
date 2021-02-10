@@ -1,5 +1,5 @@
 function graph(title, chartID) {
-    let ctx = $('#' + chartID);
+    let ctx = $('#' + $.escapeSelector(chartID));
     let chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -23,7 +23,7 @@ function graph(title, chartID) {
 }
 
 function updateGraph(chartID, label, data, maxNumberOfPoints = 10) {
-    let chart = $('#' + chartID).data(chartID);
+    let chart = $('#' + $.escapeSelector(chartID)).data(chartID);
     if (chart.data.datasets[0].data.length > maxNumberOfPoints) {
         chart.data.labels.splice(0, 1);
         chart.data.datasets[0].data.splice(0, 1);
@@ -57,7 +57,7 @@ function lineChart(chartID, timePeriods, buyTradesMonthly, sellTradesMonthly) {
         ]
     };
 
-    let ctx = $('#' + chartID);
+    let ctx = $('#' + $.escapeSelector(chartID));
     let chart = new Chart(ctx, {
         type: 'bar',
         data: barChartData,
