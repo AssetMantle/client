@@ -341,7 +341,7 @@ class SetACLController @Inject()(
                   val immutables = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(verifyTraderData.organizationID.replace("|", "@")))
                   val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
                   val mutableMetas = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
-                  val mutables = Seq(constants.Property.EXTRA_INFO.getBaseProperty(constants.Blockchain.Parameters.EXTRA_INFO))
+                  val mutables = Seq(constants.Property.ZONE_ID.getBaseProperty(trader.zoneID.replace("|", "@")))
 
                   transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                     entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.zoneID, classificationID = traderClassificationID, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),

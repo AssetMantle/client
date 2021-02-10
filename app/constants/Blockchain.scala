@@ -256,7 +256,6 @@ object Blockchain {
     val NAME = "NAME"
     val ADDRESS = "ADDRESS"
     val ORGANIZATION_ID = "ORGANIZATION_ID"
-    val EXTRA_INFO = "EXTRA_INFO"
     val ACCOUNT_ID="ACCOUNT_ID"
   }
 
