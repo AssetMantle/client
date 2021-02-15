@@ -15,7 +15,7 @@ function lineChart(chartID, keys, values, label, showLegend) {
                 backgroundColor: 'rgba(220,220,220,0.2)'
             }]
     };
-    let ctx = $('#' + chartID);
+    let ctx = $('#' + $.escapeSelector(chartID));
     let chart = new Chart(ctx, {
         type: 'line',
         data: chartData,

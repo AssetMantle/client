@@ -23,5 +23,5 @@ function onDocumentSelect(source) {
 }
 
 function initializeCheckBox(value) {
-    $('#' + value).prop('checked', true);
+    $('#' + $.escapeSelector(value)).prop('checked', true);
 }

@@ -1,3 +1,3 @@
 function loadSwitcherContent(divID) {
-    $('#' + divID).click();
+    $('#' + $.escapeSelector(divID)).click();
 }
