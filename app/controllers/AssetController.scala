@@ -150,6 +150,15 @@ class AssetController @Inject()(
         },
         issueAssetData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
+          val issueClassificationID = ""
+          val mutables = Seq(constants.Property.ASSET_DESCRIPTION.getBaseProperty(issueAssetData.description))
+          val immutables = Seq(constants.Property.ASSET_TYPE.getBaseProperty(issueAssetData.assetType))
+          val immutableMetas = Seq(constants.Property.PORT_OF_DISCHARGE.getBaseProperty(issueAssetData.portOfDischarge),
+                                   constants.Property.PORT_OF_LOADING.getBaseProperty(issueAssetData.portOfLoading),
+                                   constants.Property.ASSET_QUANTITY.getBaseProperty(issueAssetData.quantity.toMicroString),
+                                   constants.Property.QUANTITY_UNIT.getBaseProperty(issueAssetData.quantityUnit),
+                                   constants.Property.ASSET_PRICE_PER_UNIT.getBaseProperty(issueAssetData.pricePerUnit.toMicroString))
+          val mutableMetas = Seq(constants.Property.SHIPPING_PERIOD.getBaseProperty(issueAssetData.shippingPeriod.toString))
 
           def getResult(traderID: String): Future[Result] = {
 
@@ -176,17 +185,17 @@ class AssetController @Inject()(
             } else {
               val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
 
-              def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
+              def issueAssetAndGetResult(validateUsernamePassword: Boolean, issueClassificationID : String): Future[Result] = if (validateUsernamePassword) {
                 val addUnmoderatedAsset = masterAssets.Service.addUnmoderated(ownerID = traderID, assetType = issueAssetData.assetType, description = issueAssetData.description, quantity = issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, price = issueAssetData.pricePerUnit * issueAssetData.quantity, shippingPeriod = issueAssetData.shippingPeriod, portOfLoading = issueAssetData.portOfLoading, portOfDischarge = issueAssetData.portOfDischarge)
 
-                def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = None, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.pricePerUnit * issueAssetData.quantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.quantity, moderated = false, takerAddress = "", mode = transactionMode),
-                  action = transactionsIssueAsset.Service.post,
-                  onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+                def sendTransaction(documentHash: String): Future[String] = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
+                  entity = blockchainTransaction.AssetMint(from = loginState.address, fromID=traderID, toID = loginState.address, classificationID = issueClassificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables,gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
+                  request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), toID = loginState.address,fromID=traderID, classificationID = issueClassificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  action = transactionsAssetMint.Service.post,
+                  onSuccess = blockchainTransactionAssetMints.Utility.onSuccess,
+                  onFailure = blockchainTransactionAssetMints.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionAssetMints.Service.updateTransactionHash
                 )
 
                 for {
@@ -202,7 +211,7 @@ class AssetController @Inject()(
 
               for {
                 validateUsernamePassword <- validateUsernamePassword
-                result <- issueAssetAndGetResult(validateUsernamePassword)
+                result <- issueAssetAndGetResult(validateUsernamePassword,issueClassificationID)
               } yield result
             }
           }
