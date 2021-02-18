@@ -16,7 +16,7 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Zone(id: String, accountID: String, name: String, currency: String, address: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Zone(id: String, accountID: String, name: String, currency: String, address: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, deputizeStatus: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -27,7 +27,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val zoneTable = TableQuery[ZoneTable]
 
-  private def serialize(zone: Zone): ZoneSerialized = ZoneSerialized(id = zone.id, accountID = zone.accountID, name = zone.name, currency = zone.currency, address = Json.toJson(zone.address).toString, completionStatus = zone.completionStatus, verificationStatus = zone.verificationStatus, createdBy = zone.createdBy, createdOn = zone.createdOn, createdOnTimeZone = zone.createdOnTimeZone, updatedBy = zone.updatedBy, updatedOn = zone.updatedOn, updatedOnTimeZone = zone.updatedOnTimeZone)
+  private def serialize(zone: Zone): ZoneSerialized = ZoneSerialized(id = zone.id, accountID = zone.accountID, name = zone.name, currency = zone.currency, address = Json.toJson(zone.address).toString, completionStatus = zone.completionStatus, verificationStatus = zone.verificationStatus, deputizeStatus = zone.deputizeStatus, createdBy = zone.createdBy, createdOn = zone.createdOn, createdOnTimeZone = zone.createdOnTimeZone, updatedBy = zone.updatedBy, updatedOn = zone.updatedOn, updatedOnTimeZone = zone.updatedOnTimeZone)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -107,15 +107,15 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  case class ZoneSerialized(id: String, accountID: String, name: String, currency: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class ZoneSerialized(id: String, accountID: String, name: String, currency: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean], deputizeStatus: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
 
-    def deserialize: Zone = Zone(id = id, accountID = accountID, name = name, currency = currency, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Zone = Zone(id = id, accountID = accountID, name = name, currency = currency, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus, deputizeStatus = deputizeStatus, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
   }
 
   private[models] class ZoneTable(tag: Tag) extends Table[ZoneSerialized](tag, "Zone") {
 
-    def * = (id, accountID, name, currency, address, completionStatus, verificationStatus.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ZoneSerialized.tupled, ZoneSerialized.unapply)
+    def * = (id, accountID, name, currency, address, completionStatus, verificationStatus.?, deputizeStatus, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ZoneSerialized.tupled, ZoneSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -130,6 +130,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def completionStatus = column[Boolean]("completionStatus")
 
     def verificationStatus = column[Boolean]("verificationStatus")
+
+    def deputizeStatus = column[Boolean]("deputizeStatus")
 
     def createdBy = column[String]("createdBy")
 
@@ -149,7 +151,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(accountID: String, name: String, currency: String, address: Address): Future[String] = add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address)))
 
-    def insertOrUpdate(id:String, accountID: String, name: String, currency: String, address: Address): Future[Int] = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
+    def insertOrUpdate(id: String, accountID: String, name: String, currency: String, address: Address): Future[Int] = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
 
     def tryGet(id: String): Future[Zone] = tryGetByID(id).map(_.deserialize)
 

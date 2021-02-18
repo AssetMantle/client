@@ -671,27 +671,6 @@ GET         /chat/replyToMessage                                                
 POST        /wurtcb                                                                                  controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                                       controllers.WesternUnionController.westernUnionPortalRedirect
 
-GET         /blockchain/addOrganization                                                              controllers.AddOrganizationController.blockchainAddOrganizationForm
-POST        /blockchain/addOrganization                                                              controllers.AddOrganizationController.blockchainAddOrganization
-
-GET         /blockchain/addZone                                                                      controllers.AddZoneController.blockchainAddZoneForm
-POST        /blockchain/addZone                                                                      controllers.AddZoneController.blockchainAddZone
-
-GET         /blockchain/changeBuyerBid                                                               controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
-POST        /blockchain/changeBuyerBid                                                               controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
-
-GET         /blockchain/changeSellerBid                                                              controllers.ChangeSellerBidController.blockchainChangeSellerBidForm
-POST        /blockchain/changeSellerBid                                                              controllers.ChangeSellerBidController.blockchainChangeSellerBid
-
-GET         /blockchain/confirmBuyerBid                                                              controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm
-POST        /blockchain/confirmBuyerBid                                                              controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBid
-
-GET         /blockchain/confirmSellerBid                                                             controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm
-POST        /blockchain/confirmSellerBid                                                             controllers.ConfirmSellerBidController.blockchainConfirmSellerBid
-
-GET         /blockchain/issueAsset                                                                   controllers.IssueAssetController.blockchainIssueAssetForm
-POST        /blockchain/issueAsset                                                                   controllers.IssueAssetController.blockchainIssueAsset
-
 GET         /blockchain/issueFiat                                                                    controllers.IssueFiatController.blockchainIssueFiatForm
 POST        /blockchain/issueFiat                                                                    controllers.IssueFiatController.blockchainIssueFiat
 
@@ -712,9 +691,6 @@ POST        /blockchain/sendAsset                                               
 
 GET         /blockchain/sendFiat                                                                     controllers.SendFiatController.blockchainSendFiatForm
 POST        /blockchain/sendFiat                                                                     controllers.SendFiatController.blockchainSendFiat
-
-GET         /blockchain/setACL                                                                       controllers.SetACLController.blockchainSetACLForm
-POST        /blockchain/setACL                                                                       controllers.SetACLController.blockchainSetACL
 
 GET         /blockchain/setBuyerFeedback                                                             controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm
 POST        /blockchain/setBuyerFeedback                                                             controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedback

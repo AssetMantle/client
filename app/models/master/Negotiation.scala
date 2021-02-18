@@ -483,7 +483,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def updateDocumentList(id: String, documentList: DocumentList, physicalDocumentsHandledVia: String): Future[Int] = updateDocumentListPhysicalDocumentsHandledViaAndBuyerAcceptedDocumentListByID(id = id, documentList = Json.toJson(documentList).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, buyerAcceptedDocumentList = false)
 
-    def updateAssetTerms(id: String, description: String, price: MicroNumber, quantity: MicroNumber, quantityUnit: String): Future[Int] = updateAssetTermsAndBuyerAcceptedTermsByID(id = id, description = description, price = price, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedAssetDescription = false, buyerAcceptedPrice = false, buyerAcceptedQuantity = false)
+    def updateAssetTerms(id: String, description: String, price: MicroNumber, quantity: MicroNumber, quantityUnit: String, buyerAcceptedAssetDescription: Boolean , buyerAcceptedPrice: Boolean, buyerAcceptedQuantity: Boolean): Future[Int] = updateAssetTermsAndBuyerAcceptedTermsByID(id = id, description = description, price = price, quantity = quantity, quantityUnit = quantityUnit, buyerAcceptedAssetDescription = buyerAcceptedAssetDescription, buyerAcceptedPrice = buyerAcceptedPrice, buyerAcceptedQuantity = buyerAcceptedQuantity)
 
     def updateAssetOtherDetails(id: String, assetOtherDetails: AssetOtherDetails): Future[Int] = updateAssetOtherDetailsByID(id = id, assetOtherDetails = Json.toJson(assetOtherDetails).toString(), buyerAcceptedAssetOtherDetails = false)
 
@@ -497,7 +497,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markRequestRejected(id: String, comment: Option[String]): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Negotiation.REJECTED, comment = comment)
 
-    def markAcceptedAndUpdateNegotiationID(id: String, negotiationID: String): Future[Int] = updateNegotiationIDAndStatusByID(id = id, negotiationID = negotiationID, status = constants.Status.Negotiation.STARTED)
+    def markAccepted(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.STARTED)
 
     def markBuyerAcceptedAllNegotiationTerms(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Negotiation.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS)
 

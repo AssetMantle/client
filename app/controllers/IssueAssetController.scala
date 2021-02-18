@@ -110,27 +110,4 @@ class IssueAssetController @Inject()(
         }
       )
   }
-
-  def blockchainIssueAssetForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-    Ok(views.html.component.blockchain.issueAsset())
-  }
-
-  def blockchainIssueAsset: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-    views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.issueAsset(formWithErrors)))
-      },
-      issueAssetData => {
-        val post = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = issueAssetData.from, gas = issueAssetData.gas), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPricePerUnit * issueAssetData.assetQuantity, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
-        (for {
-          _ <- post
-        } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
 }

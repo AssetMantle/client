@@ -624,4 +624,56 @@ class OrderController @Inject()(
   }
 
 
+  def moderatedMakeOrder: Action[AnyContent]= withZoneLoginAction { implicit loginState =>
+    implicit request =>
+      views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, orderID = formWithErrors.data(constants.FormField.ORDER_ID.name))))
+        },
+        moderatedMakeOrderData => {
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = moderatedMakeOrderData.password)
+          val negotiation = masterNegotiations.Service.tryGet(moderatedMakeOrderData.orderID)
+
+          def asset(assetID:String) = masterAssets.Service.tryGet(assetID)
+
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String, buyerACL: ACL, negotiation: Negotiation): Future[Result] = {
+            if (validateUsernamePassword) {
+              if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && buyerACL.buyerExecuteOrder) {
+                val ticketID = asset.pegHash match {
+                  case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
+                    entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = moderatedMakeOrderData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
+                    request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedMakeOrderData.gas), password = moderatedMakeOrderData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, mode = transactionMode),
+                    action = transactionsBuyerExecuteOrder.Service.post,
+                    onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
+                    onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
+                  )
+                  case None => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
+                }
+                for {
+                  ticketID <- ticketID
+                  _ <- utilitiesNotification.send(loginState.username, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
+                  _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.MODERATED_BUY_ORDER_EXECUTED, ticketID)()
+                  _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.MODERATED_BUY_ORDER_EXECUTED, ticketID)
+                  result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = moderatedMakeOrderData.orderID, successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
+                } yield result
+              } else throw new BaseException(constants.Response.UNAUTHORIZED)
+            } else Future(BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(moderatedMakeOrderData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), orderID = moderatedMakeOrderData.orderID)))
+          }
+
+
+
+
+
+
+
+        }
+
+  }
+
+
+
+
 }

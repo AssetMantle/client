@@ -27,6 +27,8 @@ object Blockchain {
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
   val HeightDataDefaultValue = -1
+  val mainIdentityID=""
+
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
@@ -45,6 +47,16 @@ object Blockchain {
     val MINTING = "MINTING"
     val DISTRIBUTION = "DISTRIBUTION"
     val GOVERNANCE = "GOVERNANCE"
+  }
+
+  object Classification{
+
+    val ZONE=""
+    val ORGANIZATION= ""
+    val TRADER = ""
+    val MODERATED_ASSET = ""
+    val UNMODERATED_ASSET = ""
+    val ORDER= ""
   }
 
   object Event {
@@ -259,5 +271,11 @@ object Blockchain {
     val ACCOUNT_ID="ACCOUNT_ID"
   }
 
+  object Acl{
+
+    val ZONE= Seq(Classification.ORGANIZATION,Classification.TRADER, Classification.ORDER,Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET)
+    val ORGANIZATION= Seq(Classification.TRADER, Classification.ORDER,Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET)
+    val TRADER= Seq( Classification.ORDER, Classification.UNMODERATED_ASSET)
+  }
 
 }

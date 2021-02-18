@@ -26,6 +26,7 @@ object Form {
 
   //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization(), routes.javascript.AddOrganizationController.addOrganizationForm)
+  val DEPUTIZE_ORGANIZATION = new Form("DEPUTIZE_ORGANIZATION",routes.AddOrganizationController.deputize(), routes.javascript.AddOrganizationController.deputizeForm)
   val DELETE_UBO = new Form("DELETE_UBO", routes.AddOrganizationController.deleteUBO(), routes.javascript.AddOrganizationController.deleteUBOForm)
   val USER_DELETE_UBO = new Form("USER_DELETE_UBO", routes.AddOrganizationController.userDeleteUBO(), routes.javascript.AddOrganizationController.userDeleteUBOForm)
   val ADD_UBO = new Form("ADD_UBO", routes.AddOrganizationController.addUBO(), routes.javascript.AddOrganizationController.addUBOForm)
@@ -48,11 +49,13 @@ object Form {
   //AddZoneController
   val INVITE_ZONE = new Form("INVITE_ZONE", routes.AddZoneController.inviteZone(), routes.javascript.AddZoneController.inviteZoneForm)
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone(), routes.javascript.AddZoneController.addZoneForm)
+  val DEPUTIZE_ZONE = new Form("DEPUTIZE_ZONE",routes.AddZoneController.deputize(), routes.javascript.AddZoneController.deputizeForm)
   val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest(), routes.javascript.AddZoneController.userReviewAddZoneRequestForm)
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone(), routes.javascript.AddZoneController.verifyZoneForm)
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest(), routes.javascript.AddZoneController.rejectVerifyZoneRequestForm)
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone(), routes.javascript.AddZoneController.blockchainAddZoneForm)
   val UPDATE_ZONE_KYC_DOCUMENT_STATUS = new Form("UPDATE_ZONE_KYC_DOCUMENT_STATUS", routes.AddZoneController.updateZoneKYCDocumentStatus(), routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm)
+
 
   //AssetController
   val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define(), routes.javascript.AssetController.defineForm)
@@ -187,6 +190,7 @@ object Form {
 
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader(), routes.javascript.SetACLController.inviteTraderForm)
+  val DEPUTIZE_TRADER = new Form("DEPUTIZE_TRADER",routes.AddOrganizationController.deputize(), routes.javascript.AddOrganizationController.deputizeForm)
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader(), routes.javascript.SetACLController.addTraderForm)
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader(), routes.javascript.SetACLController.zoneVerifyTraderForm)
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader(), routes.javascript.SetACLController.organizationVerifyTraderForm)

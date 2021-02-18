@@ -55,14 +55,14 @@ class IdentityController @Inject()(
 
   def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(blockchainForms.identityNub(nubID=constants.Blockchain.Parameters.MAIN_NUB_ID))
+      Ok(blockchainForms.identityNub())
   }
 
   def nub: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityNub.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(blockchainForms.identityNub(formWithErrors,constants.Blockchain.Parameters.MAIN_NUB_ID)))
+          Future(BadRequest(blockchainForms.identityNub(formWithErrors)))
         },
         nubData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = nubData.password)
@@ -80,7 +80,7 @@ class IdentityController @Inject()(
               ticketID <- broadcastTx
               result <- withUsernameToken.Ok(views.html.identity(successes = Seq(new Success(ticketID))))
             } yield result
-          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message),constants.Blockchain.Parameters.MAIN_NUB_ID)))
+          } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
             verifyPassword <- verifyPassword

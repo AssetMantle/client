@@ -130,7 +130,9 @@ class Properties @Inject()(
 
     def create(property: Property): Future[String] = add(property)
 
-    def getAll(entityID: String, entityType: String): Future[Seq[Property]] = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+    def getAll(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+
+    //def getAllInMapForm(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType).map(x=> x.map(a => a.name -> a.value).toMap)
 
     def insertMultiple(properties: Seq[Property]): Future[Seq[String]] = addMultiple(properties)
 

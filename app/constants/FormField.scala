@@ -174,6 +174,12 @@ object FormField {
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
 
   //BooleanFormField
+  val ADD_ORGANIZATION = new BooleanFormField("ADD_ORGANIZATION")
+  val ADD_TRADER = new BooleanFormField("ADD_TRADER")
+  val CREATE_ORDER = new BooleanFormField("CREATE_ORDER")
+  val CREATE_MODERATED_ASSET = new BooleanFormField("CREATE_MODERATED_ASSET")
+  val CREATE_UNMODERATED_ASSET= new BooleanFormField("CREATE_UNMODERATED_ASSET")
+
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
   val ISSUE_FIAT = new BooleanFormField("ISSUE_FIAT")
   val SEND_ASSET = new BooleanFormField("SEND_ASSET")

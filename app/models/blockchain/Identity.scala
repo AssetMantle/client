@@ -379,29 +379,12 @@ class Identities @Inject()(
               case constants.User.ZONE => {
                 val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
 
-                val orgIdentityClassificationID: Future[String] = masterClassifications.Service.tryGetClassificationID(identityIssue.fromID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ORGANIZATION)
-
                 def verifyZone = masterZones.Service.verifyZone(identityID)
 
                 def markUserTypeZone(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeZone(accountID)
 
-                def classificationProperties(classificationID: String) = masterProperties.Service.getAll(classificationID, constants.Blockchain.Entity.IDENTITY_DEFINITION)
-
-                def broadcastTx(classificationID: String, classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
-                  entity = blockchainTransaction.MaintainerDeputize(from = identityIssue.from, fromID = identityIssue.fromID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = MicroNumber(5), ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
-                  request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = identityIssue.from, gas = MicroNumber(5)), fromID = identityIssue.fromID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
-                  action = transactionsMaintainerDeputize.Service.post,
-                  onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
-                  onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
-                )
-
                 for {
                   accountID <- accountID
-                  orgIdentityClassificationID <- orgIdentityClassificationID
-                  orgClassificationProperties <- classificationProperties(orgIdentityClassificationID)
-                  _ <- broadcastTx(orgIdentityClassificationID, orgClassificationProperties)
                   _ <- verifyZone
                   _ <- markUserTypeZone(accountID)
                 } yield ()
@@ -409,35 +392,12 @@ class Identities @Inject()(
               case constants.User.ORGANIZATION => {
                 val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
 
-                val adminMaintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
-
                 def markAccepted = masterOrganizations.Service.markAccepted(identityID)
 
                 def markUserTypeOrganization(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeOrganization(accountID)
 
-                def adminAddress(adminMaintainerID: String) = Service.getAllProvisionAddresses(adminMaintainerID).map(_.headOption.getOrElse(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)))
-
-                def traderIdentityClassificationID(maintainerID: String): Future[String] = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.TRADER)
-
-                def classificationProperties(classificationID: String) = masterProperties.Service.getAll(classificationID, constants.Blockchain.Entity.IDENTITY_DEFINITION)
-
-                def broadcastTx(adminMaintainerID: String, adminAddress: String, classificationID: String, classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
-                  entity = blockchainTransaction.MaintainerDeputize(from = adminAddress, fromID = adminMaintainerID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = MicroNumber(5), ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
-                  request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = adminAddress, gas = MicroNumber(5)), fromID = adminMaintainerID, toID = identityID, classificationID = classificationID, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
-                  action = transactionsMaintainerDeputize.Service.post,
-                  onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
-                  onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
-                )
-
                 for {
-                  adminMaintainerID <- adminMaintainerID
-                  adminAddress <- adminAddress(adminMaintainerID)
                   accountID <- accountID
-                  traderIdentityClassificationID <- traderIdentityClassificationID(adminMaintainerID)
-                  classificationProperties <- classificationProperties(traderIdentityClassificationID)
-                  _ <- broadcastTx(adminMaintainerID, adminAddress, traderIdentityClassificationID, classificationProperties)
                   _ <- markAccepted
                   _ <- markUserTypeOrganization(accountID)
                 } yield ()

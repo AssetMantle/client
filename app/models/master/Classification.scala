@@ -148,6 +148,7 @@ class Classifications @Inject()(
     def tryGetEntityType(id: String, maintainerID: String): Future[String] = tryGetEntityTypeByIDAndMaintainer(id = id, maintainerID = maintainerID)
 
     def tryGetClassificationID(maintainerID:String, entityType:String, label:String) = tryGetClassificationIDByByEntityTypeLabelAndMaintainer(maintainerID,entityType,label)
+
   }
 
 }

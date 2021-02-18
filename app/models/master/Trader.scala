@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, status: Option[Boolean] = None, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, status: Option[Boolean] = None, deputizeStatus: Boolean = false, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -146,7 +146,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private[models] class TraderTable(tag: Tag) extends Table[Trader](tag, "Trader") {
 
-    def * = (id, zoneID, organizationID, accountID, status.?, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Trader.tupled, Trader.unapply)
+    def * = (id, zoneID, organizationID, accountID, status.?, deputizeStatus, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Trader.tupled, Trader.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -157,6 +157,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def accountID = column[String]("accountID")
 
     def status = column[Boolean]("status")
+
+    def deputizeStatus = column[Boolean]("deputizeStatus")
 
     def comment = column[String]("comment")
 

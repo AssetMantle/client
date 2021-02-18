@@ -7,11 +7,11 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable._
-import models.master.{Email, Mobile, Zone, ZoneKYC}
+import models.master.{Classification, Email, Mobile, Zone, ZoneKYC}
 import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 import play.api.{Configuration, Logger}
 import transactions.blockchain.AddZone
 import utilities.KeyStore
@@ -27,21 +27,23 @@ class AddZoneController @Inject()(
                                    transaction: utilities.Transaction,
                                    utilitiesNotification: utilities.Notification,
                                    masterZoneKYCs: master.ZoneKYCs,
-                                   transactionsAddZone: AddZone,
                                    blockchainAccounts: blockchain.Accounts,
                                    transactionsIdentityIssue: transactions.blockchain.IdentityIssue,
                                    blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
                                    masterZones: master.Zones,
                                    masterEmails: master.Emails,
                                    masterIdentities: master.Identities,
+                                   masterProperties: master.Properties,
+                                   masterClassifications: master.Classifications,
                                    masterMobiles: master.Mobiles,
                                    masterAccounts: master.Accounts,
                                    withUserLoginAction: WithUserLoginAction,
+                                   transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
+                                   blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
                                    withGenesisLoginAction: WithGenesisLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    masterTransactionZoneInvitations: masterTransaction.ZoneInvitations,
                                    withoutLoginAction: WithoutLoginAction,
-                                   masterClassifications: master.Classifications,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
                                    keyStore: KeyStore
                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -127,18 +129,14 @@ class AddZoneController @Inject()(
         addZoneData => {
           val immutables = Seq(constants.Property.NAME.getBaseProperty(addZoneData.name))
           val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ZONE))
-          val maintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
-
-          def getZoneClassificationID(maintainerID: String) = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ZONE)
-
           val invitationStatus = masterTransactionZoneInvitations.Service.getStatus(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
           val mobile = masterMobiles.Service.tryGet(loginState.username)
 
-          def insertOrUpdate(zoneClassificationID: String, invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
+          def insertOrUpdate(invitationStatus: Option[Boolean], email: Email, mobile: Mobile) = if (invitationStatus.contains(true)) {
             if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
             else {
-              val identityID = utilities.IDGenerator.getIdentityID(zoneClassificationID, Immutables(Properties(immutables.map(_.toProperty) ++ immutableMetas.map(_.toProperty))))
+              val identityID = utilities.IDGenerator.getIdentityID(constants.Blockchain.Classification.ZONE, Immutables(Properties(immutables.map(_.toProperty) ++ immutableMetas.map(_.toProperty))))
               val upsert = masterZones.Service.insertOrUpdate(id = identityID, accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
               for (
                 _ <- upsert
@@ -149,12 +147,10 @@ class AddZoneController @Inject()(
           def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
-            maintainerID <- maintainerID
-            zoneClassificationID <- getZoneClassificationID(maintainerID)
             invitationStatus <- invitationStatus
             email <- email
             mobile <- mobile
-            id <- insertOrUpdate(zoneClassificationID, invitationStatus, email, mobile)
+            id <- insertOrUpdate( invitationStatus, email, mobile)
             zoneKYCs <- zoneKYCs(id)
             result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(zoneKYCs))
           } yield result
@@ -356,22 +352,19 @@ class AddZoneController @Inject()(
           def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
               val zone = masterZones.Service.tryGet(verifyZoneData.zoneID)
-              val maintainerID = masterIdentities.Service.tryGetIDByLabel(constants.Blockchain.Parameters.MAIN_NUB_ID)
 
               def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-              def getZoneClassificationID(maintainerID: String) = masterClassifications.Service.tryGetClassificationID(maintainerID, constants.Blockchain.Entity.IDENTITY_DEFINITION, constants.User.ZONE)
-
-              def issueIdentityTransaction(zoneAccountAddress: String, maintainerID: String, zoneClassificationID: String, zone: Zone) = {
+              def issueIdentityTransaction(zoneAccountAddress: String, zone: Zone) = {
                 val immutables = Seq(constants.Property.NAME.getBaseProperty(zone.name))
                 val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ZONE))
                 val mutableMetas = Seq(constants.Property.CURRENCY.getBaseProperty(zone.currency))
                 val mutables = Seq(constants.Property.ADDRESS.getBaseProperty(zone.address.toString.filter(_.isLetter)))
 
                 transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
-                  entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = maintainerID, classificationID = zoneClassificationID, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
-                  request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyZoneData.gas), fromID = maintainerID, classificationID = zoneClassificationID, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyZoneData.gas), fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                   action = transactionsIdentityIssue.Service.post,
                   onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
                   onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
@@ -379,11 +372,9 @@ class AddZoneController @Inject()(
               }
 
               for {
-                maintainerID <- maintainerID
                 zone <- zone
                 zoneAccountAddress <- zoneAccountAddress(zone.accountID)
-                zoneClassificationID <- getZoneClassificationID(maintainerID)
-                _ <- issueIdentityTransaction(zoneAccountAddress, maintainerID, zoneClassificationID, zone)
+                _ <- issueIdentityTransaction(zoneAccountAddress, zone)
                 result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
                 _ <- utilitiesNotification.send(zone.accountID, constants.Notification.ADD_ZONE_CONFIRMED, zone.accountID)()
               } yield {
@@ -401,6 +392,165 @@ class AddZoneController @Inject()(
           }).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
           }
+        }
+      )
+  }
+
+  def deputizeForm(zoneID: String): Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.deputizeZone(zoneID = zoneID)))
+  }
+
+  def deputize: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
+    implicit request =>
+      views.companion.master.DeputizeZone.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.deputizeZone(formWithErrors, zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name))))
+        },
+        deputizeZoneData => {
+          val zone = masterZones.Service.tryGet(deputizeZoneData.zoneID)
+          val zoneClassifications = masterClassifications.Service.getByIdentityIDs(Seq(deputizeZoneData.zoneID))
+
+          def deputizeAndGetResult(zone: Zone, zoneClassification:Seq[Classification])={
+            if(zone.deputizeStatus){
+                def deputizeOrganizationClassification= {
+                  if(deputizeZoneData.addOrganization && !zoneClassification.map(_.id).contains(constants.Blockchain.Classification.ORGANIZATION)){
+                    val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORGANIZATION, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                    def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                      entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.ORGANIZATION, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeZoneData.gas, ticketID = "", mode = transactionMode),
+                      blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                      request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeZoneData.gas), fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.ORGANIZATION, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                      action = transactionsMaintainerDeputize.Service.post,
+                      onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                      onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                      updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                    )
+
+                    for{
+                      classificationProperties<-classificationProperties
+                      _<- broadcastTx(classificationProperties)
+                    }yield ()
+
+                  }else{
+                    Future()
+                  }
+                }
+
+                def deputizeTraderClassification={
+                  if(deputizeZoneData.addTrader && !zoneClassification.map(_.id).contains(constants.Blockchain.Classification.TRADER)){
+                    val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.TRADER, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                    def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                      entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.TRADER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeZoneData.gas, ticketID = "", mode = transactionMode),
+                      blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                      request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeZoneData.gas), fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.TRADER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                      action = transactionsMaintainerDeputize.Service.post,
+                      onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                      onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                      updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                    )
+
+                    for{
+                      classificationProperties<-classificationProperties
+                      _<- broadcastTx(classificationProperties)
+                    }yield ()
+                  }else{
+                    Future()
+                  }
+                }
+
+              def deputizeModeratedAssetClassification={
+                if(deputizeZoneData.createModeratedAsset && !zoneClassification.map(_.id).contains(constants.Blockchain.Classification.MODERATED_ASSET)){
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.MODERATED_ASSET, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                  def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.MODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeZoneData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeZoneData.gas), fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.MODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for{
+                    classificationProperties<-classificationProperties
+                    _<- broadcastTx(classificationProperties)
+                  }yield ()
+
+                }else{
+                  Future()
+                }
+              }
+
+              def deputizeUnmoderatedAssetClassification={
+                if(deputizeZoneData.createUnmoderatedAsset && !zoneClassification.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)){
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                  def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeZoneData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeZoneData.gas), fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for{
+                    classificationProperties<-classificationProperties
+                    _<- broadcastTx(classificationProperties)
+                  }yield ()
+
+                }else{
+                  Future()
+                }
+              }
+
+              def deputizeOrderClassification={
+                if(deputizeZoneData.createOrder && !zoneClassification.map(_.id).contains(constants.Blockchain.Classification.ORDER)){
+
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                  def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeZoneData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeZoneData.gas), fromID = constants.Blockchain.mainIdentityID, toID = deputizeZoneData.zoneID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for{
+                    classificationProperties<-classificationProperties
+                    _<- broadcastTx(classificationProperties)
+                  }yield ()
+                }else{
+                  Future()
+                }
+              }
+
+              for{
+                _<-deputizeOrganizationClassification
+                _<-deputizeTraderClassification
+                _<-deputizeModeratedAssetClassification
+                _<- deputizeUnmoderatedAssetClassification
+                _<- deputizeOrderClassification
+              }yield ()
+            }else{
+              throw new BaseException(constants.Response.FAILURE)
+            }
+          }
+
+
+          for{
+            zone<-zone
+            zoneClassifications<-zoneClassifications
+            _<- deputizeAndGetResult(zone, zoneClassifications)
+          }yield (Ok)
+
         }
       )
   }
@@ -585,26 +735,4 @@ class AddZoneController @Inject()(
       }
   }
 
-  def blockchainAddZoneForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.component.blockchain.addZone())
-  }
-
-  def blockchainAddZone: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      views.companion.blockchain.AddZone.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.blockchain.addZone(formWithErrors)))
-        },
-        addZoneData => {
-          val postRequest = transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
-          (for {
-            _ <- postRequest
-          } yield Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED)))
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
 }
