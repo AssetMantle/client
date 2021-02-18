@@ -3,7 +3,7 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);
-        let loadingSpinner = $('#' + loadingSpinnerID);
+        let loadingSpinner = $('#' + $.escapeSelector(loadingSpinnerID));
         $.ajax({
             type: 'POST',
             contentType: 'application/x-www-form-urlencoded',

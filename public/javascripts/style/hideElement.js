@@ -12,19 +12,19 @@ function showHide(element){
 }
 
 function showHideByID(source){
-    $('#' + source).toggle();
+    $('#' + $.escapeSelector(source)).toggle();
 }
 
 function hideElement(element) {
-    $('#' + element).hide();
+    $('#' + $.escapeSelector(element)).hide();
 }
 
 function showElement(element) {
-    $('#' + element).show();
+    $('#' + element$.escapeSelector(element)).show();
 }
 
 function fetchOrShowHide(source, route, e) {
-    const div = $('#' + source);
+    const div = $('#' + $.escapeSelector(source));
     if (!$.trim(div.html()).length) {
         componentResource(source, route);
         showHide($(e));

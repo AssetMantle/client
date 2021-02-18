@@ -18,7 +18,7 @@ function pieChart(chartID, keys, values, showLegend) {
                 backgroundColor: colors,
             }]
     };
-    let ctx = $('#' + chartID);
+    let ctx = $('#' + $.escapeSelector(chartID));
     let chart = new Chart(ctx, {
         type: 'pie',
         data: chartData,

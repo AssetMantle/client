@@ -1,5 +1,5 @@
 function getForm(route, modalContent = '#commonModalContent', modal = '#commonModal', loadingSpinnerID = 'commonSpinner') {
-    let loadingSpinner = $('#' + loadingSpinnerID);
+    let loadingSpinner = $('#' + $.escapeSelector(loadingSpinnerID));
     $.ajax({
         url: route.url,
         type: route.type,
