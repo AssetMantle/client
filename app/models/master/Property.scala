@@ -148,7 +148,7 @@ class Properties @Inject()(
 
     def getPropertyMap(assetID:String): Future[Map[String,Option[String]]] = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map(x=> x.map(a => a.name -> a.value).toMap)
 
-    def getPropertyListMap(assetIDs:Seq[String]): Future[Map[String, Map[String,Option[String]]]] = getAllByEntityIDsAndEntityType(assetIDs, constants.Blockchain.Entity.ASSET).map(x=> assetIDs.map(assetID=> assetID -> x.filter(_.entityID == assetID).map(x=> x.name-> x.value).toMap).toMap)
+    def getPropertyListMap(assetIDs:Seq[String]): Future[Map[String, Map[String,Option[String]]]] = getAllByEntityIDsAndEntityType(assetIDs, constants.Blockchain.Entity.ASSET).map(assetProperties=> assetIDs.map(assetID=> assetID -> assetProperties.filter(_.entityID == assetID).map(property=> property.name-> property.value).toMap).toMap)
 
   }
 

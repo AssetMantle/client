@@ -27,8 +27,8 @@ object Blockchain {
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
   val HeightDataDefaultValue = -1
-  val mainIdentityID="test.cGn3HMW8M3t5gMDv-wXa9sseHnA=|e4lo1Ovc23oHP-8t9IXwIudkE0w="
-  val genesisAddress="cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c"
+  val mainIdentityID = "test.cGn3HMW8M3t5gMDv-wXa9sseHnA=|e4lo1Ovc23oHP-8t9IXwIudkE0w="
+  val genesisAddress = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c"
   val expiresIn = 100000
 
   object PublicKey {
@@ -50,14 +50,14 @@ object Blockchain {
     val GOVERNANCE = "GOVERNANCE"
   }
 
-  object Classification{
+  object Classification {
 
-    val ZONE="test.E17cGd1x9uCXCJyVH_wJZE-vCis="
-    val ORGANIZATION= "test.OvSt7cLb1EgjmCk9pqooU2vsCnQ="
+    val ZONE = "test.E17cGd1x9uCXCJyVH_wJZE-vCis="
+    val ORGANIZATION = "test.OvSt7cLb1EgjmCk9pqooU2vsCnQ="
     val TRADER = "test.MXs3XqfLPAosgO-W_IOUM10oDKk="
     val MODERATED_ASSET = "test.HnMyc9-9BCCw2WaolT1qCTkO_UY="
     val UNMODERATED_ASSET = "test.mKTDAiKuC-DoE_aESt27Vp0Jytg="
-    val ORDER= "test.52nqxr5PD_cdZLZbd-wZZzbcSpk="
+    val ORDER = "test.52nqxr5PD_cdZLZbd-wZZzbcSpk="
   }
 
   object Event {
@@ -268,43 +268,43 @@ object Blockchain {
     val NAME = "NAME"
     val ADDRESS = "ADDRESS"
     val ORGANIZATION_ID = "ORGANIZATION_ID"
-    val ACCOUNT_ID="ACCOUNT_ID"
-    val BUYER_ACCOUNT_ID="BUYER_ACCOUNT_ID"
-    val SELLER_ACCOUNT_ID="SELLER_ACCOUNT_ID"
+    val ACCOUNT_ID = "ACCOUNT_ID"
+    val BUYER_ACCOUNT_ID = "BUYER_ACCOUNT_ID"
+    val SELLER_ACCOUNT_ID = "SELLER_ACCOUNT_ID"
 
     //ASSET
     val ASSET_TYPE = "ASSET_TYPE"
     val ASSET_DESCRIPTION = "ASSET_DESCRIPTION"
     val ASSET_QUANTITY = "ASSET_QUANTITY"
     val QUANTITY_UNIT = "QUANTITY_UNIT"
-    val ASSET_PRICE_PER_UNIT= "ASSET_PRICE_PER_UNIT"
-    val SHIPPING_PERIOD= "SHIPPING_PERIOD"
+    val ASSET_PRICE_PER_UNIT = "ASSET_PRICE_PER_UNIT"
+    val SHIPPING_PERIOD = "SHIPPING_PERIOD"
     val PORT_OF_LOADING = "PORT_OF_LOADING"
     val PORT_OF_DISCHARGE = "PORT_OF_DISCHARGE"
-    val LOCKED="LOCKED"
-    val MODERATED="MODERATED"
-    val ORDER_TYPE="ORDER_TYPE"
-    val FIAT_PROOF="FIAT_PROOF"
-    val PRICE="PRICE"
-    val QUANTITY="QUANTITY"
+    val LOCKED = "LOCKED"
+    val MODERATED = "MODERATED"
+    val ORDER_TYPE = "ORDER_TYPE"
+    val FIAT_PROOF = "FIAT_PROOF"
+    val PRICE = "PRICE"
+    val QUANTITY = "QUANTITY"
 
     //ORDER
-    val EXCHANGE_RATE="exchangeRate"
-    val EXPIRY= "expiry"
-    val TAKER_ID="takerID"
+    val EXCHANGE_RATE = "exchangeRate"
+    val EXPIRY = "expiry"
+    val TAKER_ID = "takerID"
   }
 
-  object parameterValues{
+  object parameterValues {
 
     val ORDER_TYPE = "COMDEX_ORDER"
 
-}
+  }
 
-  object Acl{
+  object Acl {
 
-    val ZONE= Seq(Classification.ORGANIZATION,Classification.TRADER, Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET)
-    val ORGANIZATION= Seq(Classification.TRADER, Classification.UNMODERATED_ASSET)
-    val TRADER= Seq( Classification.UNMODERATED_ASSET)
+    val ZONE = Seq(Classification.ORGANIZATION, Classification.TRADER, Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET, Classification.ORDER)
+    val ORGANIZATION = Seq(Classification.TRADER, Classification.UNMODERATED_ASSET, Classification.ORDER)
+    val TRADER = Seq(Classification.UNMODERATED_ASSET, Classification.ORDER)
   }
 
 }

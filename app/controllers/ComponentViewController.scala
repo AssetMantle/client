@@ -360,7 +360,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID

@@ -204,16 +204,16 @@ class MaintainerDeputizes @Inject()(
 
       def insertProperties(maintainerDeputize: MaintainerDeputize) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = maintainerDeputize.maintainedTraits)
 
-      //def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
+      def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      //def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.MAINTAINER_DEPUTIZED, classificationID, txHash)(s"'$txHash'")
+      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.MAINTAINER_DEPUTIZED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         maintainerDeputize <- maintainerDeputize
         _ <- insertProperties(maintainerDeputize)
-        //accountID <- getAccountID(maintainerDeputize.from)
-        //_ <- sendNotifications(accountID = accountID, classificationID = maintainerDeputize.classificationID)
+        accountID <- getAccountID(maintainerDeputize.from)
+        _ <- sendNotifications(accountID = accountID, classificationID = maintainerDeputize.classificationID)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
