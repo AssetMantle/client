@@ -23,7 +23,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AssetController @Inject()(
                                  blockchainAccounts: blockchain.Accounts,
-                                 blockchainAssets: blockchain.Assets,
                                  masterAccounts: master.Accounts,
                                  masterOrganizations: master.Organizations,
                                  masterTraders: master.Traders,
@@ -53,10 +52,6 @@ class AssetController @Inject()(
                                  withUserLoginAction: WithUserLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  transaction: utilities.Transaction,
-                                 transactionsIssueAsset: IssueAsset,
-                                 transactionsRedeemAsset: RedeemAsset,
-                                 transactionsReleaseAsset: ReleaseAsset,
-                                 transactionsSendAsset: SendAsset,
                                  utilitiesNotification: utilities.Notification,
                                  utilitiesTransaction: utilities.Transaction,
                                  withZoneLoginAction: WithZoneLoginAction,

@@ -259,7 +259,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -283,7 +283,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -336,7 +336,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -384,7 +384,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -412,7 +412,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -447,7 +447,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -477,7 +477,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -543,7 +543,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -573,7 +573,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -603,7 +603,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -637,7 +637,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -1294,7 +1294,7 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getAsset(assetID: String) = masterProperties.Service.getAsset(assetID)
+      def getAsset(assetID: String) = masterProperties.Service.getPropertyMap(assetID)
 
       def getOrder(negotiationID: String): Future[Option[Order]] = masterOrders.Service.get(negotiationID)
 
@@ -1392,7 +1392,7 @@ class ComponentViewController @Inject()(
 
       def getResult(traderList: Seq[Trader], negotiation: Negotiation, organizationID: String) = {
         if (traderList.map(_.organizationID) contains organizationID) {
-          val asset = masterProperties.Service.getAsset(negotiation.assetID)
+          val asset = masterProperties.Service.getPropertyMap(negotiation.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(traderList.find(_.organizationID != organizationID).map(_.organizationID).getOrElse(""))
           for {
             asset <- asset
@@ -2090,7 +2090,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getAllAssets(assetIDs)
+      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         zoneID <- zoneID
@@ -2144,7 +2144,7 @@ class ComponentViewController @Inject()(
       def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation) = if (traderList.map(_.zoneID) contains zoneID) {
-        val asset = masterProperties.Service.getAsset(negotiation.assetID)
+        val asset = masterProperties.Service.getPropertyMap(negotiation.assetID)
         val organizationList = masterOrganizations.Service.getOrganizations(traderList.map(_.organizationID))
         for {
           asset <- asset
@@ -2356,7 +2356,7 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
 
-      def getAsset(assetID: String) = masterProperties.Service.getAsset(assetID)
+      def getAsset(assetID: String) = masterProperties.Service.getPropertyMap(assetID)
 
       (for {
         traderID <- traderID
@@ -2417,7 +2417,7 @@ class ComponentViewController @Inject()(
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (traderList.map(_.zoneID) contains zoneID) {
-          val asset = masterProperties.Service.getAsset(negotiation.assetID)
+          val asset = masterProperties.Service.getPropertyMap(negotiation.assetID)
           val order = masterOrders.Service.get(negotiationID)
           for {
             asset <- asset
@@ -3087,7 +3087,7 @@ class ComponentViewController @Inject()(
 
       def getResult(trader: Trader, negotiation: Negotiation): Future[Result] = {
         if (trader.id == negotiation.buyerTraderID || trader.id == negotiation.sellerTraderID) {
-          val assetProperties = masterProperties.Service.getAsset(negotiation.assetID)
+          val assetProperties = masterProperties.Service.getPropertyMap(negotiation.assetID)
           val counterPartyTrader = masterTraders.Service.tryGet(if (trader.id == negotiation.sellerTraderID) negotiation.buyerTraderID else negotiation.sellerTraderID)
 
           def getCounterPartyOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
@@ -3121,7 +3121,7 @@ class ComponentViewController @Inject()(
 
       def getResult(organizationID: String, negotiationTraders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (negotiationTraders.map(_.organizationID) contains organizationID) {
-          val asset = masterProperties.Service.getAsset(negotiation.assetID)
+          val asset = masterProperties.Service.getPropertyMap(negotiation.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(negotiationTraders.map(_.organizationID).filterNot(_ == organizationID).headOption.getOrElse(""))
 
           for {

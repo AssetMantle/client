@@ -262,7 +262,6 @@ object Blockchain {
 
   object Parameters {
 
-    val MAIN_NUB_ID = "MAIN_NUB_ID"
     val USER_TYPE = "USER_TYPE"
     val CURRENCY = "CURRENCY"
     val ZONE_ID = "ZONE_ID"
