@@ -21,14 +21,14 @@ class Block @Inject()(
                        blockchainBlocks: blockchain.Blocks,
                        blockchainAccounts: blockchain.Accounts,
                        blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
-                       blockchainAssetsNew: blockchain.AssetsNew,
+                       blockchainAssets: blockchain.Assets,
                        blockchainClassifications: blockchain.Classifications,
                        blockchainDelegations: blockchain.Delegations,
                        blockchainIdentities: blockchain.Identities,
                        blockchainMetas: blockchain.Metas,
                        blockchainParameters: blockchain.Parameters,
                        blockchainMaintainers: blockchain.Maintainers,
-                       blockchainOrdersNew: blockchain.OrdersNew,
+                       blockchainOrders: blockchain.Orders,
                        blockchainRedelegations: blockchain.Redelegations,
                        blockchainSplits: blockchain.Splits,
                        blockchainTransactions: blockchain.Transactions,
@@ -40,6 +40,7 @@ class Block @Inject()(
                        getBlockCommit: GetBlockCommit,
                        getTransaction: GetTransaction,
                        getTransactionsByHeight: GetTransactionsByHeight,
+                       utilitiesOperations: utilities.Operations,
                        masterTransactionNotifications: masterTransaction.Notifications,
                      )(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -130,7 +131,7 @@ class Block @Inject()(
   }
 
   private def actionsOnTransactions(transactions: Seq[blockchainTransaction], height: Int): Future[Seq[Seq[Unit]]] = Future.traverse(transactions) { transaction =>
-    if (transaction.status) Future.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg, height = height))
+    if (transaction.status) utilitiesOperations.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg, height = height))
     else Future(Seq.empty)
   }
 
@@ -153,10 +154,10 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
         case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])
         //Asset
-        case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainAssetsNew.Utility.onDefine(stdMsg.message.asInstanceOf[AssetDefine])
-        case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssetsNew.Utility.onMint(stdMsg.message.asInstanceOf[AssetMint])
-        case constants.Blockchain.TransactionMessage.ASSET_MUTATE => blockchainAssetsNew.Utility.onMutate(stdMsg.message.asInstanceOf[AssetMutate])
-        case constants.Blockchain.TransactionMessage.ASSET_BURN => blockchainAssetsNew.Utility.onBurn(stdMsg.message.asInstanceOf[AssetBurn])
+        case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainAssets.Utility.onDefine(stdMsg.message.asInstanceOf[AssetDefine])
+        case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(stdMsg.message.asInstanceOf[AssetMint])
+        case constants.Blockchain.TransactionMessage.ASSET_MUTATE => blockchainAssets.Utility.onMutate(stdMsg.message.asInstanceOf[AssetMutate])
+        case constants.Blockchain.TransactionMessage.ASSET_BURN => blockchainAssets.Utility.onBurn(stdMsg.message.asInstanceOf[AssetBurn])
         //Identity
         case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => blockchainIdentities.Utility.onDefine(stdMsg.message.asInstanceOf[IdentityDefine])
         case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(stdMsg.message.asInstanceOf[IdentityIssue])
@@ -168,10 +169,10 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(stdMsg.message.asInstanceOf[SplitWrap])
         case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(stdMsg.message.asInstanceOf[SplitUnwrap])
         //Order
-        case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainOrdersNew.Utility.onDefine(stdMsg.message.asInstanceOf[OrderDefine])
-        case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrdersNew.Utility.onMake(stdMsg.message.asInstanceOf[OrderMake], height)
-        case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrdersNew.Utility.onTake(stdMsg.message.asInstanceOf[OrderTake])
-        case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrdersNew.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
+        case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainOrders.Utility.onDefine(stdMsg.message.asInstanceOf[OrderDefine])
+        case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(stdMsg.message.asInstanceOf[OrderMake], height)
+        case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(stdMsg.message.asInstanceOf[OrderTake])
+        case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
         //meta
         case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
         //maintainer

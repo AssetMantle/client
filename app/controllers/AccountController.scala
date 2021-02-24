@@ -27,8 +27,6 @@ class AccountController @Inject()(
                                    withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
-                                   blockchainAclHashes: blockchain.ACLHashes,
-                                   blockchainAclAccounts: blockchain.ACLAccounts,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
@@ -129,7 +127,7 @@ class AccountController @Inject()(
             result <- createAccountAndGetResult(validateUsernamePassword, masterAccount)
           } yield result)
             .recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
         }
       )

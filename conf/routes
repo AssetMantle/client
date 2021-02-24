@@ -127,9 +127,6 @@ GET         /entity/upsertLabel                                                 
 POST        /entity/upsertLabel                                                                      controllers.EntityController.upsertLabel
 GET         /component/entityProperties                                                              controllers.EntityController.properties(entityID: String, entityType: String)
 
-GET         /asset/send                                                                              controllers.AssetController.sendForm(negotiationID: String)
-POST        /asset/send                                                                              controllers.AssetController.send
-
 GET         /asset/release                                                                           controllers.AssetController.releaseForm(assetID: String)
 POST        /asset/release                                                                           controllers.AssetController.release
 
@@ -206,24 +203,6 @@ GET         /negotiation/tradeActivityMessages/completed                        
 
 GET         /negotiation/contractSigned/update                                                       controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
 POST        /negotiation/contractSigned/update                                                       controllers.NegotiationController.updateContractSigned
-
-GET         /order/moderated/buyer/execute                                                           controllers.OrderController.moderatedBuyerExecuteForm(orderID: String)
-POST        /order/moderated/buyer/execute                                                           controllers.OrderController.moderatedBuyerExecute
-
-GET         /order/moderated/seller/execute                                                          controllers.OrderController.moderatedSellerExecuteForm(orderID: String)
-POST        /order/moderated/seller/execute                                                          controllers.OrderController.moderatedSellerExecute
-
-GET         /order/buyer/execute                                                                     controllers.OrderController.buyerExecuteForm(orderID: String)
-POST        /order/buyer/execute                                                                     controllers.OrderController.buyerExecute
-
-GET         /order/seller/execute                                                                    controllers.OrderController.sellerExecuteForm(orderID: String)
-POST        /order/seller/execute                                                                    controllers.OrderController.sellerExecute
-
-GET         /order/blockchain/buyer/execute                                                          controllers.OrderController.blockchainBuyerExecuteForm
-POST        /order/blockchain/buyer/execute                                                          controllers.OrderController.blockchainBuyerExecute
-
-GET         /order/blockchain/seller/execute                                                         controllers.OrderController.blockchainSellerExecuteForm
-POST        /order/blockchain/seller/execute                                                         controllers.OrderController.blockchainSellerExecute
 
 GET         /trader/organization/rejectRequest                                                       controllers.TraderController.organizationRejectRequestForm(traderID: String)
 POST        /trader/organization/rejectRequest                                                       controllers.TraderController.organizationRejectRequest
@@ -486,6 +465,9 @@ GET         /zone/inviteZone                                                    
 POST        /zone/inviteZone                                                                         controllers.AddZoneController.inviteZone
 GET         /zone/acceptInvitation                                                                   controllers.AddZoneController.acceptInvitation(token: String)
 
+GET         /zone/deputize                                                                           controllers.AddZoneController.deputizeForm(zoneID: String)
+POST        /zone/deputize                                                                           controllers.AddZoneController.deputize
+
 GET         /master/component/buyer/feedbackList                                                     controllers.SetBuyerFeedbackController.buyerFeedbackList
 GET         /master/component/seller/feedbackList                                                    controllers.SetSellerFeedbackController.sellerFeedbackList
 
@@ -547,6 +529,9 @@ POST        /master/zone/verifyTrader                                           
 GET         /master/organization/verifyTrader                                                        controllers.SetACLController.organizationVerifyTraderForm(traderID: String)
 POST        /master/organization//verifyTrader                                                       controllers.SetACLController.organizationVerifyTrader
 
+GET         /trader/deputize                                                                         controllers.SetACLController.deputizeForm(traderID: String)
+POST        /trader/deputize                                                                         controllers.SetACLController.deputize
+
 GET         /background/memberScan                                                                   controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
 POST        /background/memberScan                                                                   controllers.BackgroundCheckController.memberScan
 GET         /background/memberScan/result                                                            controllers.BackgroundCheckController.memberScanResult(resultID: Int)
@@ -571,6 +556,9 @@ POST        /background/addAsset                                                
 
 GET         /master/addOrganization                                                                  controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                                                  controllers.AddOrganizationController.addOrganization
+
+GET         /organization/deputize                                                                   controllers.AddOrganizationController.deputizeForm(organizationID: String)
+POST        /organization/deputize                                                                   controllers.AddOrganizationController.deputize
 
 GET         /master/userAddUBO                                                                       controllers.AddOrganizationController.userAddUBOForm
 POST        /master/userAddUBO                                                                       controllers.AddOrganizationController.userAddUBO
@@ -620,11 +608,6 @@ GET         /master/zone/verify/view                                            
 GET         /master/Zone/verify/reject                                                               controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/zone/verify/reject                                                               controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/asset/issue/pending/view                                                         controllers.IssueAssetController.viewPendingIssueAssetRequests
-
-GET         /master/asset/issue                                                                      controllers.IssueAssetController.issueAssetForm(assetID: String)
-POST        /master/asset/issue                                                                      controllers.IssueAssetController.issueAsset
-
 GET         /master/fiat/issue                                                                       controllers.IssueFiatController.issueFiatRequestForm
 
 GET         /master/fiat/issueForm                                                                   controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Double)
@@ -648,8 +631,6 @@ POST        /master/faucet/requests/approve                                     
 GET         /master/faucet/request/reject                                                            controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/faucet/request/reject                                                            controllers.SendCoinController.rejectFaucetRequest
 
-GET         /master/fiat/send                                                                        controllers.SendFiatController.sendFiatForm(negotiationID: String)
-POST        /master/fiat/send                                                                        controllers.SendFiatController.sendFiat
 GET         /master/fiat/send/zone                                                                   controllers.SendFiatController.zoneSendFiatForm(id: String)
 POST        /master/fiat/send/zone                                                                   controllers.SendFiatController.zoneSendFiat
 
@@ -674,23 +655,12 @@ POST        /wu/portalRedirect                                                  
 GET         /blockchain/issueFiat                                                                    controllers.IssueFiatController.blockchainIssueFiatForm
 POST        /blockchain/issueFiat                                                                    controllers.IssueFiatController.blockchainIssueFiat
 
-GET         /blockchain/redeemAsset                                                                  controllers.RedeemAssetController.blockchainRedeemAssetForm
-POST        /blockchain/redeemAsset                                                                  controllers.RedeemAssetController.blockchainRedeemAsset
-
 GET         /blockchain/redeemFiat                                                                   controllers.RedeemFiatController.blockchainRedeemFiatForm
 POST        /blockchain/redeemFiat                                                                   controllers.RedeemFiatController.blockchainRedeemFiat
 
-GET         /blockchain/releaseAsset                                                                 controllers.ReleaseAssetController.blockchainReleaseAssetForm
-POST        /blockchain/releaseAsset                                                                 controllers.ReleaseAssetController.blockchainReleaseAsset
-
-GET         /blockchain/sendAsset                                                                    controllers.SendAssetController.blockchainSendAssetForm
-POST        /blockchain/sendAsset                                                                    controllers.SendAssetController.blockchainSendAsset
 
 #GET         /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoinForm
 #POST        /blockchain/sendCoin                                                                  controllers.SendCoinController.blockchainSendCoin
-
-GET         /blockchain/sendFiat                                                                     controllers.SendFiatController.blockchainSendFiatForm
-POST        /blockchain/sendFiat                                                                     controllers.SendFiatController.blockchainSendFiat
 
 GET         /blockchain/setBuyerFeedback                                                             controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm
 POST        /blockchain/setBuyerFeedback                                                             controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedback

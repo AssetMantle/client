@@ -84,6 +84,8 @@ class Properties @Inject()(
 
   private def getAllByEntityIDAndEntityType(entityID: String, entityType: String): Future[Seq[Property]] = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).result)
 
+  private def getAllByEntityIDsAndEntityType(entityIDs: Seq[String], entityType: String): Future[Seq[Property]] = db.run(propertyTable.filter(x => x.entityID.inSet(entityIDs) && x.entityType === entityType).result)
+
   private def deleteByEntityIDAndEntityType(entityID: String, entityType: String) = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -143,6 +145,10 @@ class Properties @Inject()(
     def insertOrUpdate(property: Property): Future[Int] = upsert(property)
 
     def deleteAll(entityID: String, entityType: String): Future[Int] = deleteByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+
+    def getAsset(assetID:String): Future[Map[String,Option[String]]] = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map(x=> x.map(a => a.name -> a.value).toMap)
+
+    def getAllAssets(assetIDs:Seq[String]): Future[Map[String, Map[String,Option[String]]]] = getAllByEntityIDsAndEntityType(assetIDs, constants.Blockchain.Entity.ASSET).map(x=> assetIDs.map(assetID=> assetID -> x.filter(_.entityID == assetID).map(x=> x.name-> x.value).toMap).toMap)
 
   }
 

@@ -17,34 +17,6 @@ CREATE SCHEMA IF NOT EXISTS DOCUSIGN
 CREATE SCHEMA IF NOT EXISTS MEMBER_CHECK
     AUTHORIZATION "commit";
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
-(
-    "id"                VARCHAR NOT NULL,
-    "address"           VARCHAR NOT NULL,
-    "dirtyBit"          BOOLEAN NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
-(
-    "id"                VARCHAR NOT NULL,
-    "address"           VARCHAR NOT NULL,
-    "dirtyBit"          BOOLEAN NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
     "address"           VARCHAR NOT NULL,
@@ -165,68 +137,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("pegHash", "ownerAddress")
 );
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
-(
-    "pegHash"           VARCHAR NOT NULL,
-    "documentHash"      VARCHAR NOT NULL,
-    "assetType"         VARCHAR NOT NULL,
-    "assetQuantity"     VARCHAR NOT NULL,
-    "assetPrice"        VARCHAR NOT NULL,
-    "quantityUnit"      VARCHAR NOT NULL,
-    "ownerAddress"      VARCHAR NOT NULL,
-    "locked"            BOOLEAN NOT NULL,
-    "moderated"         BOOLEAN NOT NULL,
-    "takerAddress"      VARCHAR,
-    "dirtyBit"          BOOLEAN NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("pegHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
-(
-    "id"                 VARCHAR NOT NULL,
-    "buyerAddress"       VARCHAR NOT NULL,
-    "sellerAddress"      VARCHAR NOT NULL,
-    "assetPegHash"       VARCHAR NOT NULL,
-    "bid"                VARCHAR NOT NULL,
-    "time"               VARCHAR NOT NULL,
-    "buyerSignature"     VARCHAR,
-    "sellerSignature"    VARCHAR,
-    "buyerBlockHeight"   VARCHAR,
-    "sellerBlockHeight"  VARCHAR,
-    "buyerContractHash"  VARCHAR,
-    "sellerContractHash" VARCHAR,
-    "dirtyBit"           BOOLEAN NOT NULL,
-    "createdBy"          VARCHAR,
-    "createdOn"          TIMESTAMP,
-    "createdOnTimeZone"  VARCHAR,
-    "updatedBy"          VARCHAR,
-    "updatedOn"          TIMESTAMP,
-    "updatedOnTimeZone"  VARCHAR,
-    PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
-(
-    "id"                VARCHAR NOT NULL,
-    "fiatProofHash"     VARCHAR,
-    "awbProofHash"      VARCHAR,
-    "dirtyBit"          BOOLEAN NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id")
-);
-
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Classification_BC"
 (
@@ -471,237 +381,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."WithdrawAddress"
     PRIMARY KEY ("delegatorAddress")
 );
 
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
-(
-    "address"                      VARCHAR NOT NULL,
-    "sendAssetsPositiveTx"         VARCHAR NOT NULL,
-    "sendAssetsNegativeTx"         VARCHAR NOT NULL,
-    "sendFiatsPositiveTx"          VARCHAR NOT NULL,
-    "sendFiatsNegativeTx"          VARCHAR NOT NULL,
-    "ibcIssueAssetsPositiveTx"     VARCHAR NOT NULL,
-    "ibcIssueAssetsNegativeTx"     VARCHAR NOT NULL,
-    "ibcIssueFiatsPositiveTx"      VARCHAR NOT NULL,
-    "ibcIssueFiatsNegativeTx"      VARCHAR NOT NULL,
-    "buyerExecuteOrderPositiveTx"  VARCHAR NOT NULL,
-    "buyerExecuteOrderNegativeTx"  VARCHAR NOT NULL,
-    "sellerExecuteOrderPositiveTx" VARCHAR NOT NULL,
-    "sellerExecuteOrderNegativeTx" VARCHAR NOT NULL,
-    "changeBuyerBidPositiveTx"     VARCHAR NOT NULL,
-    "changeBuyerBidNegativeTx"     VARCHAR NOT NULL,
-    "changeSellerBidPositiveTx"    VARCHAR NOT NULL,
-    "changeSellerBidNegativeTx"    VARCHAR NOT NULL,
-    "confirmBuyerBidPositiveTx"    VARCHAR NOT NULL,
-    "confirmBuyerBidNegativeTx"    VARCHAR NOT NULL,
-    "confirmSellerBidPositiveTx"   VARCHAR NOT NULL,
-    "confirmSellerBidNegativeTx"   VARCHAR NOT NULL,
-    "negotiationPositiveTx"        VARCHAR NOT NULL,
-    "negotiationNegativeTx"        VARCHAR NOT NULL,
-    "dirtyBit"                     BOOLEAN NOT NULL,
-    "createdBy"                    VARCHAR,
-    "createdOn"                    TIMESTAMP,
-    "createdOnTimeZone"            VARCHAR,
-    "updatedBy"                    VARCHAR,
-    "updatedOn"                    TIMESTAMP,
-    "updatedOnTimeZone"            VARCHAR,
-    PRIMARY KEY ("address")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC"
-(
-    "address"           VARCHAR NOT NULL,
-    "buyerAddress"      VARCHAR NOT NULL,
-    "sellerAddress"     VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "rating"            VARCHAR NOT NULL,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("address", "buyerAddress", "sellerAddress", "pegHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "organizationID"    VARCHAR NOT NULL,
-    "zoneID"            VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "zoneID"            VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
-(
-    "from"              VARCHAR NOT NULL,
-    "buyerAddress"      VARCHAR NOT NULL,
-    "sellerAddress"     VARCHAR NOT NULL,
-    "fiatProofHash"     VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "bid"               VARCHAR NOT NULL,
-    "time"              INT     NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "bid"               VARCHAR NOT NULL,
-    "time"              INT     NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "bid"               VARCHAR NOT NULL,
-    "time"              INT     NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "buyerContractHash" VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
-(
-    "from"               VARCHAR NOT NULL,
-    "to"                 VARCHAR NOT NULL,
-    "bid"                VARCHAR NOT NULL,
-    "time"               INT     NOT NULL,
-    "pegHash"            VARCHAR NOT NULL,
-    "sellerContractHash" VARCHAR NOT NULL,
-    "gas"                VARCHAR NOT NULL,
-    "status"             BOOLEAN,
-    "txHash"             VARCHAR,
-    "ticketID"           VARCHAR NOT NULL,
-    "mode"               VARCHAR NOT NULL,
-    "code"               VARCHAR,
-    "createdBy"          VARCHAR,
-    "createdOn"          TIMESTAMP,
-    "createdOnTimeZone"  VARCHAR,
-    "updatedBy"          VARCHAR,
-    "updatedOn"          TIMESTAMP,
-    "updatedOnTimeZone"  VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "documentHash"      VARCHAR NOT NULL,
-    "assetType"         VARCHAR NOT NULL,
-    "assetPrice"        VARCHAR NOT NULL,
-    "quantityUnit"      VARCHAR NOT NULL,
-    "assetQuantity"     VARCHAR NOT NULL,
-    "moderated"         BOOLEAN NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "takerAddress"      VARCHAR,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
 (
     "from"              VARCHAR NOT NULL,
@@ -723,93 +402,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
     PRIMARY KEY ("ticketID")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat"
 (
     "from"              VARCHAR NOT NULL,
     "to"                VARCHAR NOT NULL,
     "redeemAmount"      VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
-(
-    "from"              VARCHAR NOT NULL,
-    "buyerAddress"      VARCHAR NOT NULL,
-    "sellerAddress"     VARCHAR NOT NULL,
-    "awbProofHash"      VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
-    "gas"               VARCHAR NOT NULL,
-    "status"            BOOLEAN,
-    "txHash"            VARCHAR,
-    "ticketID"          VARCHAR NOT NULL,
-    "mode"              VARCHAR NOT NULL,
-    "code"              VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendAsset"
-(
-    "from"              VARCHAR NOT NULL,
-    "to"                VARCHAR NOT NULL,
-    "pegHash"           VARCHAR NOT NULL,
     "gas"               VARCHAR NOT NULL,
     "status"            BOOLEAN,
     "txHash"            VARCHAR,
@@ -1460,17 +1058,7 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 CREATE TABLE IF NOT EXISTS MASTER."Asset"
 (
     "id"                VARCHAR NOT NULL,
-    "ownerID"           VARCHAR NOT NULL,
-    "pegHash"           VARCHAR UNIQUE,
-    "assetType"         VARCHAR NOT NULL,
-    "description"       VARCHAR NOT NULL,
-    "documentHash"      VARCHAR NOT NULL UNIQUE,
-    "quantity"          VARCHAR NOT NULL,
-    "quantityUnit"      VARCHAR NOT NULL,
-    "price"             VARCHAR NOT NULL,
-    "moderated"         BOOLEAN NOT NULL,
-    "takerID"           VARCHAR,
-    "otherDetails"      VARCHAR NOT NULL,
+    "label"             VARCHAR,
     "status"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1481,21 +1069,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     PRIMARY KEY ("id")
 );
 
+
 CREATE TABLE IF NOT EXISTS MASTER."Asset_History"
 (
-    "id"                VARCHAR   NOT NULL,
-    "ownerID"           VARCHAR   NOT NULL,
-    "pegHash"           VARCHAR,
-    "assetType"         VARCHAR   NOT NULL,
-    "description"       VARCHAR   NOT NULL,
-    "documentHash"      VARCHAR   NOT NULL,
-    "quantity"          VARCHAR   NOT NULL,
-    "quantityUnit"      VARCHAR   NOT NULL,
-    "price"             VARCHAR   NOT NULL,
-    "moderated"         BOOLEAN   NOT NULL,
-    "takerID"           VARCHAR,
-    "otherDetails"      VARCHAR   NOT NULL,
-    "status"            VARCHAR   NOT NULL,
+    "id"                VARCHAR NOT NULL,
+    "label"             VARCHAR,
+    "status"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1605,7 +1184,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Mobile"
 CREATE TABLE IF NOT EXISTS MASTER."Negotiation"
 (
     "id"                             VARCHAR NOT NULL,
-    "negotiationID"                  VARCHAR UNIQUE,
+    "orderID"                        VARCHAR UNIQUE,
     "buyerTraderID"                  VARCHAR NOT NULL,
     "sellerTraderID"                 VARCHAR NOT NULL,
     "assetID"                        VARCHAR NOT NULL,
@@ -1721,6 +1300,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
     "postalAddress"      VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "deputizeStatus"     BOOLEAN NOT NULL,
     "comment"            VARCHAR,
     "createdBy"          VARCHAR,
     "createdOn"          TIMESTAMP,
@@ -1794,6 +1374,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     "organizationID"    VARCHAR NOT NULL,
     "accountID"         VARCHAR NOT NULL UNIQUE,
     "status"            BOOLEAN,
+    "deputizeStatus"    BOOLEAN NOT NULL,
     "comment"           VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -1847,6 +1428,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
     "address"            VARCHAR NOT NULL,
     "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
+    "deputizeStatus"     BOOLEAN NOT NULL,
     "createdBy"          VARCHAR,
     "createdOn"          TIMESTAMP,
     "createdOnTimeZone"  VARCHAR,
@@ -2468,34 +2050,9 @@ CREATE TRIGGER FIAT_BC_LOG
     ON BLOCKCHAIN."Fiat_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER NEGOTIATION_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."Negotiation_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ORDER_BC_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Order_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ORGANIZATION_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."Organization_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER TRADER_FEEDBACK_HISTORY_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."TraderFeedbackHistory_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER TRANSACTION_FEEDBACK_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."TransactionFeedBack_BC"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ZONE_BC_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."Zone_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ASSET_BC_LOG
@@ -2589,74 +2146,14 @@ CREATE TRIGGER WITHDRAW_ADDRESS_LOG
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER ADD_ORGANIZATION_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."AddOrganization"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ADD_ZONE_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."AddZone"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER BUYER_EXECUTE_ORDER_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER CHANGE_BUYER_BID_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER CHANGE_SELLER_BID_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER CONFIRM_BUYER_BID_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER CONFIRM_SELLER_BID_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER ISSUE_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."IssueAsset"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER ISSUE_FIAT_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."IssueFiat"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER REDEEM_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."RedeemAsset"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER REDEEM_FIAT_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."RedeemFiat"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER RELEASE_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."ReleaseAsset"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER SELLER_EXECUTE_ORDER_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER SEND_ASSET_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."SendAsset"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER SEND_COIN_LOG
@@ -2672,16 +2169,6 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER SET_ACL_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN_TRANSACTION."SetACL"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER SET_BUYER_FEEDBACK_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
-    FOR EACH ROW
-EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER SET_SELLER_FEEDBACK_LOG
-    BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 

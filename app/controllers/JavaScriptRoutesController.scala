@@ -50,12 +50,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.updateOrganizationKYCDocumentStatusForm,
         routes.javascript.AddOrganizationController.acceptRequestForm,
         routes.javascript.AddOrganizationController.rejectRequestForm,
-        routes.javascript.AddOrganizationController.blockchainAddOrganizationForm,
         routes.javascript.AddOrganizationController.uploadOrganizationKYCForm,
         routes.javascript.AddOrganizationController.uploadOrganizationKYC,
         routes.javascript.AddOrganizationController.storeOrganizationKYC,
         routes.javascript.AddOrganizationController.updateOrganizationKYCForm,
         routes.javascript.AddOrganizationController.updateOrganizationKYC,
+        routes.javascript.AddOrganizationController.deputizeForm,
 
         routes.javascript.AddZoneController.inviteZoneForm,
         routes.javascript.AddZoneController.viewPendingVerifyZoneRequests,
@@ -64,7 +64,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.userReviewAddZoneRequestForm,
         routes.javascript.AddZoneController.verifyZoneForm,
         routes.javascript.AddZoneController.rejectVerifyZoneRequestForm,
-        routes.javascript.AddZoneController.blockchainAddZoneForm,
         routes.javascript.AddZoneController.viewKYCDocuments,
         routes.javascript.AddZoneController.updateZoneKYCDocumentStatusForm,
         routes.javascript.AddZoneController.userUploadZoneKYCForm,
@@ -77,11 +76,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.storeZoneKYC,
         routes.javascript.AddZoneController.updateZoneKYCForm,
         routes.javascript.AddZoneController.updateZoneKYC,
+        routes.javascript.AddZoneController.deputizeForm,
 
         routes.javascript.AssetController.issueForm,
         routes.javascript.AssetController.addBillOfLadingForm,
         routes.javascript.AssetController.releaseForm,
-        routes.javascript.AssetController.sendForm,
         routes.javascript.AssetController.redeemForm,
 
         routes.javascript.AssetController.defineForm,
@@ -93,10 +92,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BlockExplorerController.blockDetails,
         routes.javascript.BlockExplorerController.stakingValidators,
         routes.javascript.BlockExplorerController.transactionHash,*/
-
-        routes.javascript.ChangeBuyerBidController.blockchainChangeBuyerBidForm,
-
-        routes.javascript.ChangeSellerBidController.blockchainChangeSellerBidForm,
 
         routes.javascript.ChatController.chatRoom,
         routes.javascript.ChatController.chatWindow,
@@ -328,10 +323,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.moduleTransactions,
         routes.javascript.ComponentViewController.getTransaction,
 
-        routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
-
-        routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,
-
         routes.javascript.ContactController.addOrUpdateEmailAddressForm,
         routes.javascript.ContactController.addOrUpdateMobileNumberForm,
         routes.javascript.ContactController.contact,
@@ -373,12 +364,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IdentityController.provisionForm,
         routes.javascript.IdentityController.unprovisionForm,
 
-        routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
-        routes.javascript.IssueAssetController.issueAssetForm,
-        routes.javascript.IssueAssetController.blockchainIssueAssetForm,
-        routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
-        routes.javascript.IssueAssetController.issueAssetForm,
-
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
@@ -419,14 +404,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ContactController.verifyMobileNumberForm,
 
-
-        routes.javascript.OrderController.moderatedBuyerExecuteForm,
-        routes.javascript.OrderController.moderatedSellerExecuteForm,
-        routes.javascript.OrderController.buyerExecuteForm,
-        routes.javascript.OrderController.sellerExecuteForm,
-        routes.javascript.OrderController.blockchainBuyerExecute,
-        routes.javascript.OrderController.blockchainSellerExecute,
-
         routes.javascript.OrderController.defineForm,
         routes.javascript.OrderController.makeForm,
         routes.javascript.OrderController.takeForm,
@@ -436,15 +413,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SplitController.wrapForm,
         routes.javascript.SplitController.unwrapForm,
 
-        routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
-
         routes.javascript.RedeemFiatController.redeemFiatForm,
         routes.javascript.RedeemFiatController.zoneRedeemFiatForm,
         routes.javascript.RedeemFiatController.blockchainRedeemFiatForm,
-
-        routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
-
-        routes.javascript.SendAssetController.blockchainSendAssetForm,
 
        /* routes.javascript.SendCoinController.faucetRequestForm,
         routes.javascript.SendCoinController.approveFaucetRequestsForm,
@@ -453,15 +424,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.sendCoinForm,
        // routes.javascript.SendCoinController.blockchainSendCoinForm,
 
-        routes.javascript.SendFiatController.sendFiatForm,
         routes.javascript.SendFiatController.zoneSendFiatForm,
-        routes.javascript.SendFiatController.blockchainSendFiatForm,
 
         routes.javascript.SetACLController.inviteTraderForm,
         routes.javascript.SetACLController.addTraderForm,
         routes.javascript.SetACLController.zoneVerifyTraderForm,
         routes.javascript.SetACLController.organizationVerifyTraderForm,
-        routes.javascript.SetACLController.blockchainSetACLForm,
+        routes.javascript.SetACLController.deputizeForm,
 
         routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm,
         routes.javascript.SetBuyerFeedbackController.buyerFeedbackList,

@@ -82,7 +82,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZonesByCompletionStatusVerificationStatus(completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[ZoneSerialized]] = db.run(zoneTable.filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
+  private def getZonesByCompletionStatusDeputizeStatus(completionStatus: Boolean, deputizeStatus:Boolean): Future[Seq[ZoneSerialized]] = db.run(zoneTable.filter(_.completionStatus === completionStatus).filter(_.deputizeStatus === deputizeStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(zoneTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
     case Success(result) => result
@@ -93,6 +93,14 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(zoneTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def updateDeputizeStatusOnID(id: String, deputizeStatus: Boolean) = db.run(zoneTable.filter(_.id === id).map(_.deputizeStatus).update(deputizeStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -161,7 +169,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getByAccountID(accountID: String): Future[Zone] = findByAccountID(accountID).map(_.deserialize)
 
-    def getAllVerified: Future[Seq[Zone]] = getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = Option(true)).map(_.map(_.deserialize))
+    def getAllVerified: Future[Seq[Zone]] = getZonesByCompletionStatusDeputizeStatus(completionStatus = true, deputizeStatus = true).map(_.map(_.deserialize))
 
     def verifyZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
@@ -171,10 +179,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def markZoneFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def getVerifyZoneRequests: Future[Seq[Zone]] = getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = null).map(_.map(_.deserialize))
+    def getVerifyZoneRequests: Future[Seq[Zone]] = getZonesByCompletionStatusDeputizeStatus(completionStatus = true, deputizeStatus = false ).map(_.map(_.deserialize))
 
     def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusByID(id).map { status => status.getOrElse(false) }
 
+    def markDeputized(id:String) = updateDeputizeStatusOnID(id,true)
   }
 
 }

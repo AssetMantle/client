@@ -351,8 +351,10 @@ class Identities @Inject()(
 
       def masterOperations(classificationID: String) = {
         val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, label = userType, status = Option(true))
+        def insertProperties = masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, entityID = classificationID, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits)
         for {
           _ <- insert
+          _<- insertProperties
         } yield ()
       }
 
@@ -403,9 +405,9 @@ class Identities @Inject()(
                 } yield ()
               }
               case constants.User.TRADER => {
-                def markAccepted: Future[Int] = masterTraders.Service.markAccepted(identityID)
-
                 val accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(identityIssue.to)
+
+                def markAccepted: Future[Int] = masterTraders.Service.markAccepted(identityID)
 
                 def markUserTypeTrader(accountID: String): Future[Int] = masterAccounts.Service.markUserTypeTrader(accountID)
 

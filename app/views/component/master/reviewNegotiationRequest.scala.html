@@ -5,20 +5,20 @@
 @import models.master.Trader
 @import views.companion.master.ReviewNegotiationRequest
 
-@(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderReviewNegotiationRequest: Form[ReviewNegotiationRequest.Data] = ReviewNegotiationRequest.form, assetProperties: Map[String,Option[String]], negotiation: Negotiation, counterPartyTrader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_NEGOTIATION_REQUEST, traderReviewNegotiationRequest) {
     <div class="cmuk-text-left title">@Messages(constants.View.COUNTER_PARTY_DETAILS)</div>
     @commonTextInfo(constants.View.ACCOUNT_ID, counterPartyTrader.accountID)
     <div class="cmuk-text-left title">@Messages(constants.View.ASSET)</div>
-    @commonTextInfo(constants.View.ASSET_TYPE, asset.assetType)
-    @commonTextInfo(constants.View.ASSET_DESCRIPTION, asset.description)
-    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(asset.quantity.toRoundedOffString(), asset.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.ASSET_PRICE_PER_UNIT, Seq((asset.price/asset.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" "))
-    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
-    @commonBooleanInfo(constants.View.MODERATED, Option(asset.moderated))
-    @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
-    @commonTextInfo(constants.View.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
-    @commonTextInfo(constants.View.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
+    @commonTextInfo(constants.View.ASSET_TYPE, assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))
+    @commonTextInfo(constants.View.ASSET_DESCRIPTION, assetProperties.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse(""))
+    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetProperties.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse(""), assetProperties.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" "))
+    @commonTextInfo(constants.View.ASSET_PRICE_PER_UNIT, Seq((assetProperties.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse("").toDouble/assetProperties.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse("").toDouble), Messages(constants.View.USD), Messages(constants.View.PER),assetProperties.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" "))
+    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetProperties.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse(""), Messages(constants.View.USD)).mkString(" "))
+    @commonTextInfo(constants.View.MODERATED, assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse(""))
+    @commonTextInfo(constants.View.SHIPPING_PERIOD, assetProperties.getOrElse(constants.Property.SHIPPING_PERIOD.dataName,Some("")).getOrElse(""))
+    @commonTextInfo(constants.View.PORT_OF_LOADING, assetProperties.getOrElse(constants.Property.PORT_OF_LOADING.dataName,Some("")).getOrElse(""))
+    @commonTextInfo(constants.View.PORT_OF_DISCHARGE, assetProperties.getOrElse(constants.Property.PORT_OF_DISCHARGE.dataName,Some("")).getOrElse(""))
             <div class="cmuk-text-left title">@Messages(constants.View.PAYMENT_TERMS)</div>
             @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
             @negotiation.paymentTerms.credit match {

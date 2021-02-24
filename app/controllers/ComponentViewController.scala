@@ -41,7 +41,6 @@ class ComponentViewController @Inject()(
                                          blockchainDelegations: blockchain.Delegations,
                                          blockchainIdentities: blockchain.Identities,
                                          blockchainOrders: blockchain.Orders,
-                                         blockchainOrdersNew: blockchain.OrdersNew,
                                          blockchainRedelegations: blockchain.Redelegations,
                                          blockchainSplits: blockchain.Splits,
                                          blockchainMetas: blockchain.Metas,
@@ -69,20 +68,11 @@ class ComponentViewController @Inject()(
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                          messagesControllerComponents: MessagesControllerComponents,
                                          blockchainFiats: blockchain.Fiats,
-                                         blockchainTransactionConfirmBuyerBids: blockchainTransaction.ConfirmBuyerBids,
-                                         blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
-                                         blockchainTransactionSendAssets: blockchainTransaction.SendAssets,
-                                         blockchainTransactionSendFiats: blockchainTransaction.SendFiats,
-                                         blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders,
-                                         blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders,
-                                         blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets,
                                          masterAssets: master.Assets,
-                                         masterAssetsNew: master.AssetsNew,
                                          masterAssetHistories: master.AssetHistories,
                                          masterAccountFiles: master.AccountFiles,
                                          masterAccountKYCs: master.AccountKYCs,
                                          masterOrders: master.Orders,
-                                         masterOrdersNew: master.OrdersNew,
                                          masterTransactionAssetFiles: masterTransaction.AssetFiles,
                                          masterTransactionAssetFileHistories: masterTransaction.AssetFileHistories,
                                          docusignEnvelopes: docusign.Envelopes,
@@ -127,7 +117,7 @@ class ComponentViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
-    private val bondedStatus = configuration.get[Int]("blockchain.validator.status.bonded")
+  private val bondedStatus = configuration.get[Int]("blockchain.validator.status.bonded")
 
   private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
@@ -158,7 +148,7 @@ class ComponentViewController @Inject()(
 
       def getNegotiationList(traderID: String): Future[Seq[Negotiation]] = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderID(traderID)
 
-      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.id) contains _.orderID.getOrElse(""))
 
       def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
@@ -174,7 +164,7 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         fiatPegWallet <- getFiatPegWallet(traderID)
         negotiationList <- getNegotiationList(traderID)
-        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.orderID.getOrElse("")))
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.traderFinancials(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderID, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderID)))
         ).recover {
@@ -192,7 +182,7 @@ class ComponentViewController @Inject()(
 
       def getNegotiationList(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
 
-      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.id) contains _.orderID.getOrElse(""))
 
       def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
@@ -210,7 +200,7 @@ class ComponentViewController @Inject()(
         traderIDList <- getTraderIDList(organizationID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
         negotiationList <- getNegotiationList(traderIDList)
-        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.orderID.getOrElse("")))
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.organizationFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
@@ -228,7 +218,7 @@ class ComponentViewController @Inject()(
 
       def getNegotiationList(traderIDs: Seq[String]) = masterNegotiations.Service.getAllConfirmedNegotiationListByTraderIDs(traderIDs)
 
-      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.orderID) contains _.negotiationID.getOrElse(""))
+      def getIncompleteNegotiationList(negotiations: Seq[Negotiation], completedOrders: Seq[Order]) = negotiations.filterNot(completedOrders.map(_.id) contains _.orderID.getOrElse(""))
 
       def getCompletedOrderList(orderIDs: Seq[String]) = masterOrders.Service.getCompletedOrdersByOrderIDs(orderIDs)
 
@@ -246,7 +236,7 @@ class ComponentViewController @Inject()(
         traderIDList <- getTraderIDList(zoneID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
         negotiationList <- getNegotiationList(traderIDList)
-        completedOrderList <- getCompletedOrderList(negotiationList.map(_.negotiationID.getOrElse("")))
+        completedOrderList <- getCompletedOrderList(negotiationList.map(_.orderID.getOrElse("")))
         fiatsInOrderList <- getFiatsInOrderList(getIncompleteNegotiationList(negotiationList, completedOrderList).map(_.id))
       } yield Ok(views.html.component.master.zoneFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, payable = getPayable(traderIDList, fiatsInOrderList, completedOrderList, negotiationList), receivable = getReceivable(getIncompleteNegotiationList(negotiationList, completedOrderList), traderIDList)))
         ).recover {
@@ -269,7 +259,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -293,7 +283,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -346,7 +336,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -370,7 +360,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -394,7 +384,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -422,7 +412,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         traderID <- traderID
@@ -457,7 +447,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -487,7 +477,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -553,7 +543,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -583,7 +573,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -613,7 +603,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -647,7 +637,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String])= masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -1304,7 +1294,7 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
+      def getAsset(assetID: String) = masterProperties.Service.getAsset(assetID)
 
       def getOrder(negotiationID: String): Future[Option[Order]] = masterOrders.Service.get(negotiationID)
 
@@ -1314,47 +1304,12 @@ class ComponentViewController @Inject()(
 
       def getSellerAddress(traderID: String, negotiation: Negotiation, counterPartyAccountID: String) = if (traderID == negotiation.sellerTraderID) Future(loginState.address) else blockchainAccounts.Service.tryGetAddress(counterPartyAccountID)
 
-      def getSuccessiveTransactionStatus(traderID: String, negotiation: Negotiation, order: Option[Order], buyerAddress: String, sellerAddress: String, asset: models.master.Asset) = {
-        val pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
-
-        if (traderID == negotiation.buyerTraderID) {
-          negotiation.status match {
-            case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING => blockchainTransactionConfirmBuyerBids.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
-            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => order match {
-              case Some(order) => order.status match {
-                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
-                case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionBuyerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
-                case _ => Future(Option(false))
-              }
-              case None => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
-            }
-            case _ => Future(Option(false))
-          }
-        } else if (traderID == negotiation.sellerTraderID) {
-          negotiation.status match {
-            case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING => blockchainTransactionConfirmSellerBids.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
-            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => order match {
-              case Some(order) => order.status match {
-                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
-                case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionSellerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
-                case _ => Future(Option(false))
-              }
-              case None => blockchainTransactionSendAssets.Service.getTransactionStatus(sellerAddress, buyerAddress, pegHash)
-            }
-            case _ => Future(Option(false))
-          }
-        } else {
-          throw new BaseException(constants.Response.UNAUTHORIZED)
-        }
-
-      }
-
-      def getResult(traderID: String, negotiation: Negotiation, order: Option[Order], asset: models.master.Asset, counterPartyTrader: Trader, successiveTransactionStatus: Option[Boolean]) = {
+      def getResult(traderID: String, negotiation: Negotiation, order: Option[Order], assetProperties: Map[String,Option[String]], counterPartyTrader: Trader) = {
         if (traderID == negotiation.buyerTraderID || traderID == negotiation.sellerTraderID) {
           val counterPartyOrganization = masterOrganizations.Service.tryGet(counterPartyTrader.organizationID)
           for {
             counterPartyOrganization <- counterPartyOrganization
-          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiation = negotiation, order = order, asset = asset, successiveTransactionStatus = successiveTransactionStatus))
+          } yield Ok(views.html.component.master.traderViewAcceptedNegotiationTerms(traderID = traderID, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization, negotiation = negotiation, order = order, assetProperties = assetProperties))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -1368,8 +1323,7 @@ class ComponentViewController @Inject()(
         counterPartyTrader <- getCounterPartyTrader(traderID, negotiation)
         buyerAddress <- getBuyerAddress(traderID, negotiation, counterPartyTrader.accountID)
         sellerAddress <- getSellerAddress(traderID, negotiation, counterPartyTrader.accountID)
-        successiveTransactionStatus <- getSuccessiveTransactionStatus(traderID, negotiation, order, buyerAddress, sellerAddress, asset)
-        result <- getResult(traderID, negotiation, order, asset, counterPartyTrader, successiveTransactionStatus)
+        result <- getResult(traderID, negotiation, order, asset, counterPartyTrader)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -1438,10 +1392,10 @@ class ComponentViewController @Inject()(
 
       def getResult(traderList: Seq[Trader], negotiation: Negotiation, organizationID: String) = {
         if (traderList.map(_.organizationID) contains organizationID) {
-          val getAsset = masterAssets.Service.tryGet(negotiation.assetID)
+          val asset = masterProperties.Service.getAsset(negotiation.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(traderList.find(_.organizationID != organizationID).map(_.organizationID).getOrElse(""))
           for {
-            asset <- getAsset
+            asset <- asset
             counterPartyOrganization <- counterPartyOrganization
           } yield Ok(views.html.component.master.organizationViewAcceptedNegotiationTerms(traderList = traderList, counterPartyOrganization = counterPartyOrganization, negotiation = negotiation, asset = asset))
         } else {
@@ -2136,14 +2090,14 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
-      def getAssetListList(assetIDs: Seq[String]): Future[Seq[models.master.Asset]] = masterAssets.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getAllAssets(assetIDs)
 
       (for {
         zoneID <- zoneID
         traderList <- getTraderList(zoneID)
         acceptedNegotiationList <- getAcceptedNegotiationList(traderList.map(_.id))
         counterPartyTraderList <- getCounterPartyTraderList(traderList.map(_.id))
-        assetList <- getAssetListList(acceptedNegotiationList.map(_.assetID))
+        assetList <- getAssetList(acceptedNegotiationList.map(_.assetID))
       } yield Ok(views.html.component.master.zoneViewActiveNegotiationList(acceptedNegotiationList, counterPartyTraderList, assetList))).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2190,7 +2144,7 @@ class ComponentViewController @Inject()(
       def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation) = if (traderList.map(_.zoneID) contains zoneID) {
-        val asset = masterAssets.Service.tryGet(negotiation.assetID)
+        val asset = masterProperties.Service.getAsset(negotiation.assetID)
         val organizationList = masterOrganizations.Service.getOrganizations(traderList.map(_.organizationID))
         for {
           asset <- asset
@@ -2402,7 +2356,7 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
 
-      def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
+      def getAsset(assetID: String) = masterProperties.Service.getAsset(assetID)
 
       (for {
         traderID <- traderID
@@ -2410,7 +2364,7 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = asset.moderated))
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = if(asset.getOrElse(constants.Property.MODERATED.dataName, throw new BaseException(constants.Response.FAILURE)).getOrElse("") == "true") true else false))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2463,7 +2417,7 @@ class ComponentViewController @Inject()(
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (traderList.map(_.zoneID) contains zoneID) {
-          val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val asset = masterProperties.Service.getAsset(negotiation.assetID)
           val order = masterOrders.Service.get(negotiationID)
           for {
             asset <- asset
@@ -3133,16 +3087,16 @@ class ComponentViewController @Inject()(
 
       def getResult(trader: Trader, negotiation: Negotiation): Future[Result] = {
         if (trader.id == negotiation.buyerTraderID || trader.id == negotiation.sellerTraderID) {
-          val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val assetProperties = masterProperties.Service.getAsset(negotiation.assetID)
           val counterPartyTrader = masterTraders.Service.tryGet(if (trader.id == negotiation.sellerTraderID) negotiation.buyerTraderID else negotiation.sellerTraderID)
 
           def getCounterPartyOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
           for {
-            asset <- asset
+            assetProperties <- assetProperties
             counterPartyTrader <- counterPartyTrader
             counterPartyOrganization <- getCounterPartyOrganization(counterPartyTrader.organizationID)
-          } yield Ok(views.html.component.master.traderViewNegotiation(negotiation = negotiation, asset = asset, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization))
+          } yield Ok(views.html.component.master.traderViewNegotiation(negotiation = negotiation, assetProperties = assetProperties, counterPartyTrader = counterPartyTrader, counterPartyOrganization = counterPartyOrganization))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -3167,7 +3121,7 @@ class ComponentViewController @Inject()(
 
       def getResult(organizationID: String, negotiationTraders: Seq[Trader], negotiation: Negotiation): Future[Result] = {
         if (negotiationTraders.map(_.organizationID) contains organizationID) {
-          val asset = masterAssets.Service.tryGet(negotiation.assetID)
+          val asset = masterProperties.Service.getAsset(negotiation.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(negotiationTraders.map(_.organizationID).filterNot(_ == organizationID).headOption.getOrElse(""))
 
           for {
@@ -3601,7 +3555,7 @@ class ComponentViewController @Inject()(
 
       def getAssetSplits(identityIDs: Seq[String]) = masterSplits.Service.getAllAssetsByOwnerIDs(identityIDs)
 
-      def getAssets(assetIDs: Seq[String]) = masterAssetsNew.Service.getAllByIDs(assetIDs)
+      def getAssets(assetIDs: Seq[String]) = masterAssets.Service.getAllByIDs(assetIDs)
 
       (for {
         identityIDs <- identityIDs
@@ -3632,7 +3586,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-      def getOrdersMade(identityIDs: Seq[String]) = masterOrdersNew.Service.getAllByMakerIDs(identityIDs)
+      def getOrdersMade(identityIDs: Seq[String]) = masterOrders.Service.getAllByMakerIDs(identityIDs)
 
       (for {
         identityIDs <- identityIDs
@@ -3650,9 +3604,9 @@ class ComponentViewController @Inject()(
 
   def ordersTakePublic(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val publicTakeOrderIDs = blockchainOrdersNew.Service.getAllPublicOrderIDs
+      val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDs
 
-      def getPublicOrders(publicOrderIDs: Seq[String]) = masterOrdersNew.Service.getAllByIDs(publicOrderIDs)
+      def getPublicOrders(publicOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(publicOrderIDs)
 
       (for {
         publicOrderIDs <- publicTakeOrderIDs
@@ -3667,9 +3621,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrdersNew.Service.getAllPrivateOrderIDs(identityIDs)
+      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs)
 
-      def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrdersNew.Service.getAllByIDs(privateOrderIDs)
+      def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
 
       (for {
         identityIDs <- identityIDs
@@ -3688,7 +3642,7 @@ class ComponentViewController @Inject()(
 
       def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getByOwnerIDs(identityIDs)
 
-      def getAssets(splitIDs: Seq[String]) = masterAssetsNew.Service.getAllByIDs(splitIDs)
+      def getAssets(splitIDs: Seq[String]) = masterAssets.Service.getAllByIDs(splitIDs)
 
       (for {
         identityIDs <- identityIDs

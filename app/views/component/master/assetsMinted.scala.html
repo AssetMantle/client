@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import models.master.{AssetNew, Split}
+@import models.master.{Asset, Split}
 @import views.html.base._
 
-@(assets: Seq[AssetNew], splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(assets: Seq[Asset], splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ASSETS_MINTED) {
 } {
@@ -14,7 +14,7 @@
                 <div class="listItemChild cmuk-flex cmuk-flex-middle">
                 @commonFormButton(constants.Form.UPSERT_ENTITY_LABEL, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
                 </div>
-                @commonVerticalBooleanInfo(constants.View.STATUS, asset.fold[Option[Boolean]](None)(_.status))
+                @commonVerticalTextInfo(constants.View.STATUS, asset.fold[String]("")(_.status))
                 <div class="buttonsListChild">
                     @commonModalButton(constants.View.PROPERTIES, routes.javascript.EntityController.properties, 'parameters -> s"'${split.ownableID}', '${constants.Blockchain.Entity.ASSET}'")
                     @commonFormButton(constants.Form.ASSET_MUTATE, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")

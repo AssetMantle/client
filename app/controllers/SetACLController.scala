@@ -41,9 +41,7 @@ class SetACLController @Inject()(
                                   transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
                                   blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
                                   blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
-                                  blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
                                   blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
-                                  blockchainAclHashes: blockchain.ACLHashes,
                                   utilitiesNotification: utilities.Notification,
                                   withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -149,7 +147,7 @@ class SetACLController @Inject()(
               def addTrader(zoneID: String, email: Email, mobile: Mobile) =
                 if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
                 else {
-                  val immutables = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(addTraderData.organizationID.replace("|", "@")))
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(loginState.username))
                   val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
 
                   def insertOrUpdate = masterTraders.Service.insertOrUpdate(utilities.IDGenerator.getIdentityID(constants.Blockchain.Classification.TRADER, Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty)))), zoneID, addTraderData.organizationID, loginState.username)
@@ -237,34 +235,27 @@ class SetACLController @Inject()(
             else if (organizationVerificationStatus) {
               if (validateUsernamePassword) {
                 val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
-                val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
-                val createACL = blockchainAclHashes.Service.create(acl)
+                def issueIdentityTransaction(aclAddress: String) = {
 
-                def sendCoinTransaction(aclAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = aclAddress, amount = Seq(Coin(denom, constants.Blockchain.DefaultTraderFaucetAmount)), gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyTraderData.gas), to = aclAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultTraderFaucetAmount)), password = verifyTraderData.password, mode = transactionMode),
-                  action = transactionsSendCoin.Service.post,
-                  onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-                  onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-                )
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
+                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(verifyTraderData.organizationID.replace("|", "@")))
+                  val mutables = Seq(constants.Property.ZONE_ID.getBaseProperty(trader.zoneID.replace("|", "@")))
 
-                def sendSetACLTransaction(aclAddress: String, zoneID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
-                  entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
-                  request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
-                  action = transactionsSetACL.Service.post,
-                  onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-                  onFailure = blockchainTransactionSetACLs.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
-                )
+                  transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+                    entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = trader.zoneID, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
+                    request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyTraderData.gas), fromID = trader.zoneID, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                    action = transactionsIdentityIssue.Service.post,
+                    onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
+                    onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
+                }
+
 
                 for {
                   aclAddress <- aclAddress
-                  _ <- createACL
-                  _ <- sendCoinTransaction(aclAddress)
-                  ticketID <- sendSetACLTransaction(aclAddress = aclAddress, zoneID = trader.zoneID)
+                  ticketID <- issueIdentityTransaction(aclAddress = aclAddress)
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
                 } yield result
               } else Future(BadRequest(views.html.component.master.zoneVerifyTrader(views.companion.master.VerifyTrader.form.fill(verifyTraderData), trader)))
@@ -333,18 +324,16 @@ class SetACLController @Inject()(
             else {
               if (validateUsernamePassword) {
                 val aclAddress = blockchainAccounts.Service.tryGetAddress(verifyTraderData.accountID)
-                val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
-                val createACL = blockchainAclHashes.Service.create(acl)
 
                 def issueIdentityTransaction(aclAddress: String) = {
 
-                  val immutables = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(verifyTraderData.organizationID.replace("|", "@")))
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
                   val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
-                  val mutableMetas = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
+                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(verifyTraderData.organizationID.replace("|", "@")))
                   val mutables = Seq(constants.Property.ZONE_ID.getBaseProperty(trader.zoneID.replace("|", "@")))
 
                   transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
-                    entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.zoneID, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                    entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.id, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
                     blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
                     request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyTraderData.gas), fromID = organization.zoneID, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                     action = transactionsIdentityIssue.Service.post,
@@ -355,7 +344,6 @@ class SetACLController @Inject()(
 
                 for {
                   aclAddress <- aclAddress
-                  _ <- createACL
                   _ <- issueIdentityTransaction(aclAddress)
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
                 } yield result
@@ -394,11 +382,11 @@ class SetACLController @Inject()(
           val traderClassifications = masterClassifications.Service.getByIdentityIDs(Seq(deputizeTraderData.traderID))
 
           def deputizeAndGetResult(trader: Trader, organizationClassifications:Seq[Classification])={
-            if(trader.deputizeStatus){
+            if(!trader.deputizeStatus){
 
               def deputizeUnmoderatedAssetClassification={
                 if(deputizeTraderData.createUnmoderatedAsset && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)){
-                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.ASSET_DEFINITION)
 
                   def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
                     entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID =trader.organizationID, toID = deputizeTraderData.traderID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeTraderData.gas, ticketID = "", mode = transactionMode),
@@ -452,13 +440,15 @@ class SetACLController @Inject()(
             }
           }
 
-
-          for{
+          (for{
             trader<-trader
             traderClassifications<-traderClassifications
             _<- deputizeAndGetResult(trader, traderClassifications)
-          }yield (Ok)
-
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.TRADER_DEPUTIZED)))
+          }yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
         }
       )
   }

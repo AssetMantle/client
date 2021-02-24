@@ -27,6 +27,10 @@ case class Maintainer(id: String, maintainedTraits: Mutables, addMaintainer: Boo
 class Maintainers @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
+                             masterIdentities: master.Identities,
+                             masterZones: master.Zones,
+                             masterOrganizations: master.Organizations,
+                             masterTraders: master.Traders,
                              masterClassifications: master.Classifications
                            )(implicit executionContext: ExecutionContext) {
 
@@ -145,9 +149,74 @@ class Maintainers @Inject()(
 
         def insertClassification(classification: models.master.Classification) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = classification.entityType, maintainerID = maintainerDeputize.toID, label = classification.label, status = Option(true))
 
+        def updateDeputizeStatus = {
+          val identity = masterIdentities.Service.get(maintainerDeputize.toID)
+
+          def updateUserDeputizeStatus(identity: models.master.Identity) = {
+            identity.label.getOrElse("") match {
+              case constants.User.ZONE => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  if (constants.Blockchain.Acl.ZONE.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.ZONE) {
+                    masterZones.Service.markDeputized(maintainerDeputize.toID)
+                  } else Future(0)
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case constants.User.ORGANIZATION => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  if (constants.Blockchain.Acl.ORGANIZATION.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.ORGANIZATION) {
+                    masterOrganizations.Service.markDeputized(maintainerDeputize.toID)
+                  } else Future(0)
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case constants.User.TRADER => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  println("updating deputize status")
+                  if (constants.Blockchain.Acl.TRADER.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.TRADER) {
+                    println("deputized Trader. YAy")
+                    masterTraders.Service.markDeputized(maintainerDeputize.toID)
+                  } else {
+                    println("all classification not deputized yet")
+                    Future(0)
+                  }
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case _ => throw new BaseException(constants.Response.USER_TYPE_DOES_NOT_EXIST)
+            }
+
+          }
+
+          for{
+            identity<-identity
+            updateUserDeputizeStatus<-updateUserDeputizeStatus(identity.getOrElse(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)))
+          }yield ()
+
+        }
+
         for {
           classification <- classification
           _ <- insertClassification(classification.getOrElse(throw new BaseException(constants.Response.FAILURE)))
+          _<- updateDeputizeStatus
         } yield ()
       }
 

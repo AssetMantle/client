@@ -5,32 +5,25 @@
 @import models.master.Trader
 
 @import models.master.Order
-@(negotiation: Negotiation, asset: Asset, order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiation: Negotiation, asset: Map[String,Option[String]], order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORDER_ACTIONS,  'cardIconPath -> "images/icons/icons.svg#orderActions"){
 }{
-    @if(asset.moderated){
+    @if(asset.getOrElse(constants.Property.MODERATED.dataName,"") == "true"){
         @negotiation.status match {
             case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED  => {
                 @order match {
                     case Some(order)=> {
                         <div class="cmuk-position-center">
-                        @order.status match {
-                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING=> {@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")}
-                        case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING=>{
-                            @commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                            @commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                        }
-                        case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING=> {@commonFormButton(constants.Form.MODERATED_SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")}
-                        case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING=> {@commonFormButton(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")}
-                        case _=>{}
-                        }
+                         @if(order.status.isEmpty)   {
+                             @commonFormButton(constants.Form.ORDER_TAKE, 'parameters -> s"'${negotiation.id}'")
+                         }
                         </div>
                     }
-                    case None=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")</div>}
+                    case None=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.ORDER_MAKE, 'parameters -> s"'${negotiation.assetID}'")</div>}
                 }
             }
-            case _=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${asset.id}'")</div>}
+            case _=>{<div class="cmuk-position-center">@commonFormButton(constants.Form.RELEASE_ASSET, 'parameters -> s"'${negotiation.assetID}'")</div>}
         }
     }
 

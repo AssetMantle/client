@@ -98,7 +98,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityDefine())
   }
 
-  def define: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
+  def define: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityDefine.form.bindFromRequest().fold(
         formWithErrors => {

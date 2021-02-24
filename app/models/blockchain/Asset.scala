@@ -1,46 +1,44 @@
 package models.blockchain
 
-import java.sql.Timestamp
-
-import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.blockchain
+import models.common.Serializable._
+import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
+import models.master
+import models.master.{Asset => masterAsset}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.GetAccount
-import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
-import utilities.MicroNumber
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroNumber, assetPrice: MicroNumber, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(id: String, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+  def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(0)
+
+  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(1)
+}
 
 @Singleton
 class Assets @Inject()(
-                        protected val databaseConfigProvider: DatabaseConfigProvider,
-                        actorSystem: ActorSystem,
-                        getAccount: GetAccount,
-                        blockchainAccounts: blockchain.Accounts,
-                        configuration: Configuration,
-                      )(implicit executionContext: ExecutionContext) {
-
-  def serialize(asset: Asset): AssetSerialized = AssetSerialized(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.toMicroString, assetPrice = asset.assetPrice.toMicroString, quantityUnit = asset.quantityUnit, ownerAddress = asset.ownerAddress, locked = asset.locked, moderated = asset.moderated, takerAddress = asset.takerAddress, dirtyBit = asset.dirtyBit, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
-
-  case class AssetSerialized(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Asset = Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = new MicroNumber(BigInt(assetQuantity)), assetPrice = new MicroNumber(BigInt(assetPrice)), quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderated = moderated, takerAddress = takerAddress, dirtyBit = dirtyBit, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
-  }
+                           protected val databaseConfigProvider: DatabaseConfigProvider,
+                           configuration: Configuration,
+                           blockchainClassifications: Classifications,
+                           blockchainSplits: Splits,
+                           blockchainMetas: Metas,
+                           blockchainMaintainers: Maintainers,
+                           masterClassifications: master.Classifications,
+                           masterAssets: master.Assets,
+                           masterProperties: master.Properties,
+                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -48,108 +46,65 @@ class Assets @Inject()(
 
   import databaseConfig.profile.api._
 
+  case class AssetSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Asset = Asset(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(asset: Asset): AssetSerialized = AssetSerialized(id = asset.id, immutables = Json.toJson(asset.immutables).toString, mutables = Json.toJson(asset.mutables).toString, createdBy = asset.createdBy, createdOn = asset.createdOn, createdOnTimeZone = asset.createdOnTimeZone, updatedBy = asset.updatedBy, updatedOn = asset.updatedOn, updatedOnTimeZone = asset.updatedOnTimeZone)
+
   private[models] val assetTable = TableQuery[AssetTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-
-  private def add(assetSerialized: AssetSerialized): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += assetSerialized).asTry).map {
+  private def add(asset: Asset): Future[String] = db.run((assetTable returning assetTable.map(_.id) += serialize(asset)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_INSERT_FAILED, psqlException)
     }
   }
 
-  private def updateByPegHash(assetSerialized: AssetSerialized): Future[Int] = db.run(assetTable.filter(_.pegHash === assetSerialized.pegHash).update(assetSerialized).asTry).map {
+  private def addMultiple(assets: Seq[Asset]): Future[Seq[String]] = db.run((assetTable returning assetTable.map(_.id) ++= assets.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_INSERT_FAILED, psqlException)
     }
   }
 
-  private def updateOwnerAddressByPegHash(pegHash: String, address: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerAddress).update(address).asTry).map {
+  private def upsert(asset: Asset): Future[Int] = db.run(assetTable.insertOrUpdate(serialize(asset)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_UPSERT_FAILED, psqlException)
     }
   }
 
-  private def findByPegHash(pegHash: String): Future[AssetSerialized] = db.run(assetTable.filter(_.pegHash === pegHash).result.head.asTry).map {
+  private def tryGetByID(id: String) = db.run(assetTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ASSET_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def getAssetPegWalletByAddress(address: String): Future[Seq[AssetSerialized]] = db.run(assetTable.filter(_.ownerAddress === address).result)
+  private def getByID(id: String) = db.run(assetTable.filter(_.id === id).result.headOption)
 
-  private def getAssetPegHashesByAddress(address: String): Future[Seq[String]] = db.run(assetTable.filter(_.ownerAddress === address).map(_.pegHash).result)
+  private def getAllAssets = db.run(assetTable.result)
 
-  private def updateDirtyBitByPegHash(pegHash: String, dirtyBit: Boolean): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.dirtyBit).update(dirtyBit).asTry).map {
+  private def deleteByID(id: String): Future[Int] = db.run(assetTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ASSET_DELETE_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ASSET_DELETE_FAILED, noSuchElementException)
     }
   }
 
-  private def getAssetsByDirtyBit(dirtyBit: Boolean): Future[Seq[AssetSerialized]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result)
+  private def checkExistsByID(id: String) = db.run(assetTable.filter(_.id === id).exists.result)
 
-  private def tryGetLockedStatusByPegHash(pegHash: String): Future[Boolean] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.locked).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+  private[models] class AssetTable(tag: Tag) extends Table[AssetSerialized](tag, "Asset_BC") {
 
-  private def deleteByPegHash(pegHash: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+    def * = (id, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
 
-  private def deleteAssetPegWalletByAddress(ownerAddress: String): Future[Int] = db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+    def id = column[String]("id", O.PrimaryKey)
 
-  private[models] class AssetTable(tag: Tag) extends Table[AssetSerialized](tag, _tableName = "Asset_BC") {
+    def immutables = column[String]("immutables")
 
-    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, takerAddress.?, dirtyBit, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AssetSerialized.tupled, AssetSerialized.unapply)
-
-    def pegHash = column[String]("pegHash", O.PrimaryKey)
-
-    def documentHash = column[String]("documentHash")
-
-    def assetType = column[String]("assetType")
-
-    def assetQuantity = column[String]("assetQuantity")
-
-    def assetPrice = column[String]("assetPrice")
-
-    def quantityUnit = column[String]("quantityUnit")
-
-    def ownerAddress = column[String]("ownerAddress")
-
-    def locked = column[Boolean]("locked")
-
-    def moderated = column[Boolean]("moderated")
-
-    def takerAddress = column[String]("takerAddress")
-
-    def dirtyBit = column[Boolean]("dirtyBit")
+    def mutables = column[String]("mutables")
 
     def createdBy = column[String]("createdBy")
 
@@ -162,79 +117,129 @@ class Assets @Inject()(
     def updatedOn = column[Timestamp]("updatedOn")
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
-
   }
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: MicroNumber, assetPrice: MicroNumber, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(serialize(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)))
+    def create(asset: Asset): Future[String] = add(asset)
 
-    def tryGet(pegHash: String): Future[Asset] = findByPegHash(pegHash).map(_.deserialize)
+    def tryGet(id: String): Future[Asset] = tryGetByID(id).map(_.deserialize)
 
-    def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address).map(_.map(_.deserialize))
+    def get(id: String): Future[Option[Asset]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAssetPegHashes(address: String): Future[Seq[String]] = getAssetPegHashesByAddress(address)
+    def getAll: Future[Seq[Asset]] = getAllAssets.map(_.map(_.deserialize))
 
-    def update(asset: Asset): Future[Int] = updateByPegHash(serialize(asset))
+    def insertMultiple(assets: Seq[Asset]): Future[Seq[String]] = addMultiple(assets)
 
-    def markAssetSentToOrder(pegHash: String, address: String): Future[Int] = updateOwnerAddressByPegHash(pegHash = pegHash, address = address)
+    def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
 
-    def deleteAsset(pegHash: String): Future[Int] = deleteByPegHash(pegHash)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def deleteAssetPegWallet(ownerAddress: String): Future[Int] = deleteAssetPegWalletByAddress(ownerAddress)
-
-    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true).map(_.map(_.deserialize))
-
-    def tryGetLockedStatus(pegHash: String): Future[Boolean] = tryGetLockedStatusByPegHash(pegHash)
-
-    def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
+    def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = {
-      val dirtyAssets = Service.getDirtyAssets
-      Thread.sleep(sleepTime)
 
-      def insertOrUpdateAndSendCometMessage(dirtyAssets: Seq[Asset]): Future[Seq[Unit]] = {
-        Future.sequence {
-          dirtyAssets.map { dirtyAsset =>
-            val accountResponse = getAccount.Service.get(dirtyAsset.ownerAddress)
+    def onDefine(assetDefine: AssetDefine): Future[Unit] = {
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.immutableMetaTraits.metaPropertyList)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.mutableMetaTraits.metaPropertyList)
 
-            def updateOrDelete(ownerAccount: Response): Future[Int] = {
-              ownerAccount.value.asset_peg_wallet match {
-                case Some(assetPegWallet) => assetPegWallet.find(_.pegHash == dirtyAsset.pegHash) match {
-                  case Some(assetPeg) => Service.update(Asset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false))
-                  case None => Service.deleteAsset(dirtyAsset.pegHash)
-                }
-                case None => Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
-              }
-            }
+      def defineAndSuperAuxiliary(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
+        val mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ assetDefine.mutableTraits.propertyList))
+        val defineAuxiliary = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ assetDefine.immutableTraits.propertyList)), mutables = mutables)
 
-            def accountID: Future[String] = blockchainAccounts.Service.tryGetUsername(dirtyAsset.ownerAddress)
+        def superAuxiliary(classificationID: String) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = assetDefine.fromID, mutableTraits = mutables)
 
-            for {
-              accountResponse <- accountResponse
-              _ <- updateOrDelete(accountResponse)
-              accountID <- accountID
-            } yield () //actors.Service.cometActor ! actors.Message.makeCometMessage(username = accountID, messageType = constants.Comet.ASSET, messageContent = actors.Message.Asset())
-          }
-        }
+        for {
+          classificationID <- defineAuxiliary
+          _ <- superAuxiliary(classificationID = classificationID)
+        } yield classificationID
+      }
+
+      def masterOperations(classificationID: String) = {
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.ASSET_DEFINITION, maintainerID = assetDefine.fromID, status = Option(true))
+        def insertProperties = masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ASSET_DEFINITION, entityID = classificationID, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits)
+        for {
+          _ <- insert
+          _<- insertProperties
+        } yield ()
       }
 
       (for {
-        dirtyAssets <- dirtyAssets
-        _ <- insertOrUpdateAndSendCometMessage(dirtyAssets)
-      } yield ()).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(classificationID)
+      } yield ()
+        ).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onMint(assetMint: AssetMint): Future[Unit] = {
+      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.immutableMetaProperties.metaPropertyList)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.mutableMetaProperties.metaPropertyList)
+
+      def upsert(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
+        val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ assetMint.immutableProperties.propertyList))
+        val assetID = utilities.IDGenerator.getAssetID(classificationID = assetMint.classificationID, immutables = immutables)
+        val mintAuxiliary = blockchainSplits.Utility.auxiliaryMint(ownerID = assetMint.toID, ownableID = assetID, splitValue = constants.Blockchain.SmallestDec)
+        val upsertAsset = Service.insertOrUpdate(Asset(id = assetID, immutables = immutables, mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ assetMint.mutableProperties.propertyList))))
+
+        for {
+          _ <- mintAuxiliary
+          _ <- upsertAsset
+        } yield assetID
+      }
+
+      def masterOperations(assetID: String) = {
+        val insert = masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, status = constants.Status.Asset.ISSUED))
+        for {
+          _ <- insert
+        } yield ()
+      }
+
+      (for {
+        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        assetID <- upsert(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(assetID)
+      } yield ()
+        ).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onMutate(assetMutate: AssetMutate): Future[Unit] = {
+      val oldAsset = Service.tryGet(assetMutate.assetID)
+      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMutate.mutableMetaProperties.metaPropertyList)
+
+      def upsertAsset(oldAsset: Asset, scrubbedMutableMetaProperties: Seq[Property]) = Service.insertOrUpdate(oldAsset.copy(mutables = oldAsset.mutables.mutate(scrubbedMutableMetaProperties ++ assetMutate.mutableProperties.propertyList)))
+
+      (for {
+        oldAsset <- oldAsset
+        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
+        _ <- upsertAsset(oldAsset, scrubbedMutableMetaProperties)
+      } yield ()
+        ).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+
+    def onBurn(assetBurn: AssetBurn): Future[Unit] = {
+      val burnAuxiliary = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.SmallestDec)
+      val deleteAsset = Service.delete(assetBurn.assetID)
+      val masterOperations = masterAssets.Service.delete(assetBurn.assetID)
+
+      (for {
+        _ <- burnAuxiliary
+        _ <- deleteAsset
+        _ <- masterOperations
+      } yield ()
+        ).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
   }
 
-  val scheduledTask = new Runnable {
-    override def run(): Unit = {
-      Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
-    }
-  }
-
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(scheduledTask)(schedulerExecutionContext)
 }

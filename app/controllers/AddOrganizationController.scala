@@ -588,7 +588,7 @@ class AddOrganizationController @Inject()(
           val organizationClassifications = masterClassifications.Service.getByIdentityIDs(Seq(deputizeOrganizationData.organizationID))
 
           def deputizeAndGetResult(organization: Organization, organizationClassifications:Seq[Classification])={
-            if(organization.deputizeStatus){
+            if(!organization.deputizeStatus){
 
               def deputizeTraderClassification={
                 if(deputizeOrganizationData.addTrader && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.TRADER)){
@@ -607,31 +607,7 @@ class AddOrganizationController @Inject()(
                   for{
                     classificationProperties<-classificationProperties
                     _<- broadcastTx(classificationProperties)
-                  }yield ()
-                }else{
-                  Future()
-                }
-              }
-
-              def deputizeModeratedAssetClassification={
-                if(deputizeOrganizationData.createModeratedAsset && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.MODERATED_ASSET)){
-                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.MODERATED_ASSET, constants.Blockchain.Entity.IDENTITY_DEFINITION)
-
-                  def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
-                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.MODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
-                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
-                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.MODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
-                    action = transactionsMaintainerDeputize.Service.post,
-                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
-                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
-                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
-                  )
-
-                  for{
-                    classificationProperties<-classificationProperties
-                    _<- broadcastTx(classificationProperties)
-                  }yield ()
-
+                  }yield Thread.sleep(2000)
                 }else{
                   Future()
                 }
@@ -639,7 +615,7 @@ class AddOrganizationController @Inject()(
 
               def deputizeUnmoderatedAssetClassification={
                 if(deputizeOrganizationData.createUnmoderatedAsset && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)){
-                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.ASSET_DEFINITION)
 
                   def broadcastTx(classificationProperties:Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
                     entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID =organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
@@ -654,7 +630,7 @@ class AddOrganizationController @Inject()(
                   for{
                     classificationProperties<-classificationProperties
                     _<- broadcastTx(classificationProperties)
-                  }yield ()
+                  }yield Thread.sleep(2000)
 
                 }else{
                   Future()
@@ -686,7 +662,6 @@ class AddOrganizationController @Inject()(
 
               for{
                 _<-deputizeTraderClassification
-                _<-deputizeModeratedAssetClassification
                 _<- deputizeUnmoderatedAssetClassification
                 _<- deputizeOrderClassification
               }yield ()
@@ -696,12 +671,15 @@ class AddOrganizationController @Inject()(
           }
 
 
-          for{
+          (for{
             organization<-organization
             organizationClassifications<-organizationClassifications
             _<- deputizeAndGetResult(organization, organizationClassifications)
-          }yield (Ok)
-
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_DEPUTIZED)))
+          }yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
         }
       )
   }

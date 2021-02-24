@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import models.master.OrderNew
+@import models.master.Order
 @import views.html.base._
 
-@(publicOrders: Seq[OrderNew])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(publicOrders: Seq[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
     @publicOrders.map { order =>
         @commonVerticalInfoBox() {

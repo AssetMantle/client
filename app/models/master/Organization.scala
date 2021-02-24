@@ -132,6 +132,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
+  private def getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID: String, completionStatus: Boolean, deputizeStatus: Boolean): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.deputizeStatus === deputizeStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
+
   private def getOrganizationsByIDs(organizationIDs: Seq[String]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.id inSet (organizationIDs)).result)
 
   private def updateVerificationStatusAndCommentOnID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(organizationTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
@@ -143,6 +145,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   private def updateCompletionStatusOnID(id: String, completionStatus: Boolean): Future[Int] = db.run(organizationTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def updateDeputizeStatusOnID(id: String, deputizeStatus: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.deputizeStatus).update(deputizeStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -235,9 +245,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryGetAccountID(id: String): Future[String] = getAccountIDByID(id)
 
-    def getZoneAcceptedOrganizationList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true)).map { organizations => organizations.map(_.deserialize) }
+    def getZoneAcceptedOrganizationList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID = zoneID, completionStatus = true, deputizeStatus = true).map { organizations => organizations.map(_.deserialize) }
 
-    def getZonePendingOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
+    def getZonePendingOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID = zoneID, completionStatus = true, deputizeStatus = false).map { organizations => organizations.map(_.deserialize) }
 
     def getZoneRejectedOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(false)).map { organizations => organizations.map(_.deserialize) }
 
@@ -261,6 +271,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def markOrganizationFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
     def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]] = getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
+
+    def markDeputized(id:String) = updateDeputizeStatusOnID(id,true)
   }
 
 }
