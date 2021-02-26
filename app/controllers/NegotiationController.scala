@@ -12,7 +12,6 @@ import models.masterTransaction.{AssetFile, NegotiationFile, TradeActivity, Trad
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import transactions.blockchain.{ChangeBuyerBid, ChangeSellerBid, ConfirmBuyerBid, ConfirmSellerBid}
 import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,7 +55,7 @@ class NegotiationController @Inject()(
 
       def getAllAssetSplits(traderID:String) = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
 
-      def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getAllAssets(assetIDs)
+      def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
       def getAllTradableAssetList(assetIDs: Seq[String])= masterAssets.Service.getAllByIDs(assetIDs)
 
@@ -88,7 +87,7 @@ class NegotiationController @Inject()(
 
           def getAllAssetSplits(traderID:String) = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
 
-          def getAllTradableAssetProperties(assetIDs: Seq[String]):Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getAllAssets(assetIDs)
+          def getAllTradableAssetProperties(assetIDs: Seq[String]):Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
           def getAllTradableAssetList(assetIDs: Seq[String])= masterAssets.Service.getAllByIDs(assetIDs)
 
@@ -115,7 +114,7 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val asset= masterAssets.Service.tryGet(requestData.assetID)
 
-          val assetProperties= masterProperties.Service.getAsset(requestData.assetID)
+          val assetProperties= masterProperties.Service.getPropertyMap(requestData.assetID)
 
           def getAssetSplit(traderID:String): Future[Split] = masterSplits.Service.tryGet(requestData.assetID,traderID)
 
@@ -249,7 +248,7 @@ class NegotiationController @Inject()(
             } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
-          def getAssetProperties(assetID: String):Future[Map[String,Option[String]]]= masterProperties.Service.getAsset(assetID)
+          def getAssetProperties(assetID: String):Future[Map[String,Option[String]]]= masterProperties.Service.getPropertyMap(assetID)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
@@ -281,7 +280,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getAssetProperties(traderID: String, negotiation: Negotiation): Future[Map[String,Option[String]]] = if (traderID == negotiation.sellerTraderID) {
-        masterProperties.Service.getAsset(negotiation.assetID)
+        masterProperties.Service.getPropertyMap(negotiation.assetID)
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -308,7 +307,7 @@ class NegotiationController @Inject()(
           val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.ID.name))
 
           def getAssetProperties(traderID: String, negotiation: Negotiation): Future[Map[String,Option[String]]] = if (traderID == negotiation.sellerTraderID) {
-            masterProperties.Service.getAsset(negotiation.assetID)
+            masterProperties.Service.getPropertyMap(negotiation.assetID)
           } else {
             throw new BaseException(constants.Response.UNAUTHORIZED)
           }

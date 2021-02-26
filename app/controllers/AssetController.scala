@@ -13,7 +13,6 @@ import models.{blockchain, blockchainTransaction, master, _}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, _}
 import play.api.{Configuration, Logger}
-import transactions.blockchain.{IssueAsset, RedeemAsset, ReleaseAsset, SendAsset}
 import utilities.{KeyStore, MicroNumber}
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
@@ -104,7 +103,7 @@ class AssetController @Inject()(
 
             val allAssetSplits = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
 
-            def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String, Option[String]]]] = masterProperties.Service.getAllAssets(assetIDs)
+            def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String, Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
             def getAllTradableAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllByIDs(assetIDs)
 

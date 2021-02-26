@@ -4,13 +4,13 @@
 @import models.master.Organization
 @import models.master.Trader
 
-@(counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, assetHistory: AssetHistory)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiationHistory: NegotiationHistory, assetHistory: Map[String,Option[String]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiationHistory.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity commodityTitleSection">
             <div class="cmuk-flex cmuk-flex-middle">
-            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetHistory.assetType + ".svg")"></span><span class="tradeName">@Messages(assetHistory.assetType) &nbsp;</span>
+            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" +assetHistory.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("") + ".svg")"></span><span class="tradeName">@Messages(assetHistory.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("")) &nbsp;</span>
             </div>
             <div>
                 <span>@Messages(negotiationHistory.status)</span>

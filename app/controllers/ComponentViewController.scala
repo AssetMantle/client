@@ -307,7 +307,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssetHistories.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         traderID <- traderID
@@ -507,7 +507,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getAssetList(assetIDs: Seq[String]) = masterAssetHistories.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         organizationID <- organizationID
@@ -1353,7 +1353,7 @@ class ComponentViewController @Inject()(
 
       def getResult(traderID: String, negotiationHistory: NegotiationHistory) = {
         if (traderID == negotiationHistory.buyerTraderID || traderID == negotiationHistory.sellerTraderID) {
-          val assetHistory = masterAssetHistories.Service.tryGet(negotiationHistory.assetID)
+          val assetHistory = masterProperties.Service.getPropertyMap(negotiationHistory.assetID)
           val counterPartyTrader = masterTraders.Service.tryGet(if (traderID == negotiationHistory.buyerTraderID) negotiationHistory.sellerTraderID else negotiationHistory.buyerTraderID)
 
           def getCounterPartyOrganization(organizationID: String) = masterOrganizations.Service.tryGet(organizationID)
@@ -1427,7 +1427,7 @@ class ComponentViewController @Inject()(
 
       def getResult(traderList: Seq[Trader], negotiationHistory: NegotiationHistory, organizationID: String) = {
         if (traderList.map(_.organizationID) contains organizationID) {
-          val assetHistory = masterAssetHistories.Service.tryGet(negotiationHistory.assetID)
+          val assetHistory = masterProperties.Service.getPropertyMap(negotiationHistory.assetID)
           val counterPartyOrganization = masterOrganizations.Service.tryGet(traderList.find(_.organizationID != organizationID).map(_.organizationID).getOrElse(""))
           for {
             assetHistory <- assetHistory
@@ -2118,7 +2118,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
-      def getAssetList(assetIDs: Seq[String]): Future[Seq[AssetHistory]] = masterAssetHistories.Service.getAllAssetsByID(assetIDs)
+      def getAssetList(assetIDs: Seq[String]): Future[Seq[AssetHistory]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         zoneID <- zoneID
@@ -2178,7 +2178,7 @@ class ComponentViewController @Inject()(
       def getTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
       def getResult(zoneID: String, traderList: Seq[Trader], negotiationHistory: NegotiationHistory): Future[Result] = if (traderList.map(_.zoneID) contains zoneID) {
-        val assetHistory = masterAssetHistories.Service.tryGet(negotiationHistory.assetID)
+        val assetHistory = masterProperties.Service.getPropertyMap(negotiationHistory.assetID)
         val organizationList = masterOrganizations.Service.getOrganizations(traderList.map(_.organizationID))
         for {
           assetHistory <- assetHistory
@@ -2383,7 +2383,7 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderID: String) = masterFiats.Service.getFiatPegWallet(traderID)
 
-      def getAsset(assetID: String) = masterAssetHistories.Service.tryGet(assetID)
+      def getAsset(assetID: String) = masterProperties.Service.getPropertyMap(assetID)
 
       (for {
         traderID <- traderID
@@ -2391,7 +2391,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderHistory <- fiatsInOrderHistory
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.moderated))
+      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.getOrElse(constants.Property.MODERATED.dataName,Some("").getOrElse("") == constants.Boolean.TRUE)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

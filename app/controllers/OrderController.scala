@@ -5,13 +5,11 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction, WithoutL
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.ACL
 import models.master.{Asset, Negotiation, Order}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, _}
 import play.api.{Configuration, Logger}
-import transactions.blockchain.{BuyerExecuteOrder, SellerExecuteOrder}
 import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
@@ -22,8 +20,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class OrderController @Inject()(
                                  blockchainAccounts: blockchain.Accounts,
-                                 blockchainACLAccounts: blockchain.ACLAccounts,
-                                 blockchainACLHashes: blockchain.ACLHashes,
                                  masterAssets: master.Assets,
                                  masterNegotiations: master.Negotiations,
                                  masterOrders: master.Orders,
@@ -35,8 +31,6 @@ class OrderController @Inject()(
                                  masterTransactionTradeActivities: masterTransaction.TradeActivities,
                                  messagesControllerComponents: MessagesControllerComponents,
                                  transaction: utilities.Transaction,
-                                 transactionsBuyerExecuteOrder: BuyerExecuteOrder,
-                                 transactionsSellerExecuteOrder: SellerExecuteOrder,
                                  utilitiesNotification: utilities.Notification,
                                  withTraderLoginAction: WithTraderLoginAction,
                                  withZoneLoginAction: WithZoneLoginAction,
@@ -268,7 +262,6 @@ class OrderController @Inject()(
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
 
   def blockchainMake: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
