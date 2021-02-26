@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     <div class="salesQuoteCardMiddle salesChild">
-                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                        @assetList.get(completedNegotiation.assetID) match {
                         case Some(asset) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>

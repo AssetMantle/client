@@ -2118,7 +2118,7 @@ class ComponentViewController @Inject()(
 
       def getCounterPartyTraderList(traderIDs: Seq[String]) = masterTraders.Service.getTraders(traderIDs)
 
-      def getAssetList(assetIDs: Seq[String]): Future[Seq[AssetHistory]] = masterProperties.Service.getPropertyListMap(assetIDs)
+      def getAssetList(assetIDs: Seq[String]) = masterProperties.Service.getPropertyListMap(assetIDs)
 
       (for {
         zoneID <- zoneID
@@ -2391,7 +2391,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderHistory <- fiatsInOrderHistory
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.getOrElse(constants.Property.MODERATED.dataName,Some("").getOrElse("") == constants.Boolean.TRUE)))
+      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, (asset.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.TRUE)))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
