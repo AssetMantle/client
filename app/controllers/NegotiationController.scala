@@ -35,6 +35,8 @@ class NegotiationController @Inject()(
                                        masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                        masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                       transactionsAssetMint: transactions.blockchain.AssetMint,
+                                       blockchainTransactionAssetMints: blockchainTransaction.AssetMints,
                                        masterTransactionTradeActivityHistories: masterTransaction.TradeActivityHistories,
                                        transaction: utilities.Transaction,
                                        utilitiesNotification: utilities.Notification,
@@ -120,10 +122,10 @@ class NegotiationController @Inject()(
 
           def checkRelationExists(traderID: String): Future[Boolean] = masterTraderRelations.Service.checkRelationExists(fromID = traderID, toID = requestData.counterParty)
 
-          def insert(traderID: String, assetSplit: Split,asset: Asset,assetProperties:Map[String,Option[String]], checkRelationExists: Boolean): Future[String] = {
+          def insert(traderID: String, assetSplit: Split, asset: Asset, assetProperties:Map[String,Option[String]], checkRelationExists: Boolean): Future[String] = {
             if (traderID != assetSplit.ownerID || !checkRelationExists) throw new BaseException(constants.Response.UNAUTHORIZED)
             asset.status match {
-              case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.create(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = assetProperties.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse(""), price = MicroNumber(assetProperties.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse("")), quantity = MicroNumber(assetProperties.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse("")), quantityUnit = assetProperties.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse(""), assetOtherDetails = AssetOtherDetails(ShippingDetails(assetProperties.getOrElse(constants.Property.SHIPPING_PERIOD.dataName,Some("")).getOrElse("").toInt,assetProperties.getOrElse(constants.Property.PORT_OF_LOADING.dataName,Some("")).getOrElse(""),assetProperties.getOrElse(constants.Property.PORT_OF_DISCHARGE.dataName,Some("")).getOrElse(""))))
+              case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.create(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = assetProperties.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse(""), price = new MicroNumber(BigInt(assetProperties.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse(""))), quantity = new MicroNumber(BigInt(assetProperties.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse(""))), quantityUnit = assetProperties.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse(""), assetOtherDetails = AssetOtherDetails(ShippingDetails(assetProperties.getOrElse(constants.Property.SHIPPING_PERIOD.dataName,Some("")).getOrElse("").toInt,assetProperties.getOrElse(constants.Property.PORT_OF_LOADING.dataName,Some("")).getOrElse(""),assetProperties.getOrElse(constants.Property.PORT_OF_DISCHARGE.dataName,Some("")).getOrElse(""))))
               case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
           }
@@ -1057,10 +1059,23 @@ class NegotiationController @Inject()(
                         case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
                       }
 
-                      val updateStatus = masterNegotiations.Service.update(negotiation.copy(status = if (negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED) constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING else constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
+                      val mutables = Seq(constants.Property.ACCOUNT_ID.withValue(loginState.username))
+                      val immutables = Seq(constants.Property.TYPE.withValue(constants.Blockchain.parameterValues.FIAT))
+                      val immutableMetas = Seq(constants.Property.NEGOTIATION_ID.withValue(negotiation.id))
+                      val mutableMetas = Seq(constants.Property.AMOUNT.withValue(negotiation.price.toString))
+
+                      val createFiatTx: Future[String] = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
+                        entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = buyerTraderID, toID = buyerTraderID, classificationID = constants.Blockchain.Classification.FIAT, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas =buyerConfirmData.gas, ticketID = "", mode = transactionMode),
+                        blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
+                        request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = buyerConfirmData.gas), toID = buyerTraderID, fromID = buyerTraderID, classificationID = constants.Blockchain.Classification.FIAT, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                        action = transactionsAssetMint.Service.post,
+                        onSuccess = blockchainTransactionAssetMints.Utility.onSuccess,
+                        onFailure = blockchainTransactionAssetMints.Utility.onFailure,
+                        updateTransactionHash = blockchainTransactionAssetMints.Service.updateTransactionHash
+                      )
 
                       for {
-                        _<-updateStatus
+                        _ <- createFiatTx
                         _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_BID_CONFIRMED)()
                         _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_BID_CONFIRMED)()
                         _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.BUYER_BID_CONFIRMED)

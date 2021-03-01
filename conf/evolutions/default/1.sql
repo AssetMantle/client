@@ -1260,7 +1260,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Order"
     "makerID"           VARCHAR NOT NULL,
     "makerOwnableID"    VARCHAR NOT NULL,
     "takerOwnableID"    VARCHAR NOT NULL,
-    "status"            VARCHAR NOT NULL,
+    "status"            BOOLEAN,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,

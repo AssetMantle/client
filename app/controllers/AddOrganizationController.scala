@@ -86,8 +86,8 @@ class AddOrganizationController @Inject()(
           } yield BadRequest(views.html.component.master.addOrganization(formWithErrors, zones = zones))
         },
         addOrganizationData => {
-          val immutables = Seq(constants.Property.NAME.getBaseProperty(addOrganizationData.name))
-          val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ORGANIZATION))
+          val immutables = Seq(constants.Property.NAME.withValue(addOrganizationData.name))
+          val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.ORGANIZATION))
           val verificationStatus = masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)
           val identification = masterIdentifications.Service.tryGet(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
@@ -528,10 +528,10 @@ class AddOrganizationController @Inject()(
                 def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
                 def issueIdentityTransaction(organizationAccountAddress: String) = {
-                  val immutables = Seq(constants.Property.NAME.getBaseProperty(organization.name))
-                  val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.ORGANIZATION))
-                  val mutableMetas = Seq(constants.Property.ZONE_ID.getBaseProperty(utilities.String.removeUnacceptableCharacterFromID(organization.zoneID)))
-                  val mutables = Seq(constants.Property.ADDRESS.getBaseProperty(organization.registeredAddress.toString.filter(_.isLetter)))
+                  val immutables = Seq(constants.Property.NAME.withValue(organization.name))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.ORGANIZATION))
+                  val mutableMetas = Seq(constants.Property.ZONE_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(organization.zoneID)))
+                  val mutables = Seq(constants.Property.ADDRESS.withValue(organization.registeredAddress.toString.filter(_.isLetter)))
 
                   transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                     entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.zoneID, classificationID = constants.Blockchain.Classification.ORGANIZATION, to = organizationAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
@@ -635,9 +635,34 @@ class AddOrganizationController @Inject()(
                 }
               }
 
+              def deputizeFiatClassification = {
+                if (deputizeOrganizationData.createFiat && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.FIAT)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.FIAT, constants.Blockchain.Entity.ASSET_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield Thread.sleep(3000)
+
+                } else {
+                  Future()
+                }
+              }
+
+
               def deputizeOrderClassification = {
                 if (deputizeOrganizationData.createOrder && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.ORDER)) {
-                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.ORDER_DEFINITION)
 
                   def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
                     entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
@@ -661,6 +686,7 @@ class AddOrganizationController @Inject()(
               for {
                 _ <- deputizeTraderClassification
                 _ <- deputizeUnmoderatedAssetClassification
+                _ <- deputizeFiatClassification
                 _ <- deputizeOrderClassification
               } yield ()
             } else {

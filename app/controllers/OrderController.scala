@@ -40,6 +40,7 @@ class OrderController @Inject()(
                                  blockchainClassifications: blockchain.Classifications,
                                  masterClassifications: master.Classifications,
                                  masterProperties: master.Properties,
+                                 masterSplits: master.Splits,
                                  transactionsOrderDefine: transactions.blockchain.OrderDefine,
                                  blockchainTransactionOrderDefines: blockchainTransaction.OrderDefines,
                                  transactionsOrderMake: transactions.blockchain.OrderMake,
@@ -85,22 +86,27 @@ class OrderController @Inject()(
             if (verifyPassword) {
               if (negotiation.status == constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED && traderID == negotiation.buyerTraderID) {
 
-                val immutableMetas = Seq(constants.Property.ORDER_TYPE.getBaseProperty(constants.Blockchain.parameterValues.ORDER_TYPE))
-                val immutables = Seq(constants.Property.FIAT_PROOF.getBaseProperty(makeData.fiatProof))
-                val mutables = Seq(constants.Property.TAKER_ID.getBaseProperty(""),constants.Property.EXCHANGE_RATE.getBaseProperty("1"))
-                val mutableMetas = Seq(constants.Property.BUYER_ACCOUNT_ID.getBaseProperty(loginState.username), constants.Property.SELLER_ACCOUNT_ID.getBaseProperty(counterPartyAccountID))
+                val immutableMetas = Seq(constants.Property.ORDER_TYPE.withValue(constants.Blockchain.parameterValues.ORDER_TYPE))
+                val immutables = Seq(constants.Property.FIAT_PROOF.withValue(makeData.fiatProof))
+                val mutableMetas = Seq(constants.Property.EXCHANGE_RATE.withValue("1"), constants.Property.TAKER_ID.withValue(""))
+                val mutables = Seq(constants.Property.BUYER_ACCOUNT_ID.withValue(loginState.username), constants.Property.EXTRA_INFO.withValue(counterPartyAccountID))
 
-                val broadcastTx = transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
-                  entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = negotiation.buyerTraderID, classificationID = constants.Blockchain.Classification.ORDER, makerOwnableID = stakingDenom, takerOwnableID = negotiation.assetID, makerOwnableSplit = negotiation.price.doubleValue, expiresIn = constants.Blockchain.expiresIn, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = makeData.gas, ticketID = "", mode = transactionMode),
+                val fiatSplits = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(negotiation.buyerTraderID))
+                def assetList(assetIDs:Seq[String]) = masterProperties.Service.getPropertyListMap(assetIDs)
+
+                def broadcastTx(fiatOwnableID:String) = transaction.process[blockchainTransaction.OrderMake, transactionsOrderMake.Request](
+                  entity = blockchainTransaction.OrderMake(from = loginState.address, fromID = negotiation.buyerTraderID, classificationID = constants.Blockchain.Classification.ORDER, makerOwnableID = fiatOwnableID, takerOwnableID = negotiation.assetID, makerOwnableSplit = constants.Blockchain.SmallestDec, expiresIn = constants.Blockchain.expiresIn, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = makeData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionOrderMakes.Service.create,
-                  request = transactionsOrderMake.Request(transactionsOrderMake.Message(transactionsOrderMake.BaseReq(from = loginState.address, gas = makeData.gas), fromID = negotiation.buyerTraderID, classificationID = constants.Blockchain.Classification.ORDER, makerOwnableID = stakingDenom, takerOwnableID = negotiation.assetID, expiresIn = constants.Blockchain.expiresIn, makerOwnableSplit = negotiation.price.doubleValue, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  request = transactionsOrderMake.Request(transactionsOrderMake.Message(transactionsOrderMake.BaseReq(from = loginState.address, gas = makeData.gas), fromID = negotiation.buyerTraderID, classificationID = constants.Blockchain.Classification.ORDER, makerOwnableID = fiatOwnableID, takerOwnableID = negotiation.assetID, expiresIn = constants.Blockchain.expiresIn, makerOwnableSplit = constants.Blockchain.SmallestDec, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                   action = transactionsOrderMake.Service.post,
                   onSuccess = blockchainTransactionOrderMakes.Utility.onSuccess,
                   onFailure = blockchainTransactionOrderMakes.Utility.onFailure,
                   updateTransactionHash = blockchainTransactionOrderMakes.Service.updateTransactionHash)
 
                 for {
-                  ticketID <- broadcastTx
+                  fiatSplits<-fiatSplits
+                  assetList<-assetList(fiatSplits.map(_.ownableID))
+                  ticketID <- broadcastTx(assetList.find(asset=> asset._2.getOrElse(constants.Property.NEGOTIATION_ID.dataName, Some("")).getOrElse("") == negotiation.id).getOrElse(throw new BaseException(constants.Response.FAILURE))._1)
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORDER_MADE, ticketID)()
                   _ <- utilitiesNotification.send(counterPartyAccountID, constants.Notification.ORDER_MADE, ticketID)()
                   _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.ORDER_MADE, ticketID)
@@ -140,13 +146,13 @@ class OrderController @Inject()(
         },
         takeData => {
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = takeData.password)
-          val negotiation = masterNegotiations.Service.tryGet(takeData.orderID)
+          val negotiation = masterNegotiations.Service.tryGetByOrderID(takeData.orderID)
           val order = masterOrders.Service.tryGet(takeData.orderID)
           val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def sendTransactionAndGetResult(verifyPassword: Boolean, order: Order, negotiation: Negotiation, traderID: String) = {
             if (verifyPassword) {
-              if (order.status.isEmpty && traderID == negotiation.buyerTraderID) {
+              if (order.status.isEmpty && traderID == negotiation.sellerTraderID) {
 
                 val sendTx = transaction.process[blockchainTransaction.OrderTake, transactionsOrderTake.Request](
                   entity = blockchainTransaction.OrderTake(from = loginState.address, fromID = traderID, orderID = takeData.orderID, takerOwnableSplit = constants.Blockchain.SmallestDec, gas = takeData.gas, ticketID = "", mode = transactionMode),

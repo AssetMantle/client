@@ -186,12 +186,9 @@ class Maintainers @Inject()(
                 val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
 
                 def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
-                  println("updating deputize status")
                   if (constants.Blockchain.Acl.TRADER.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.TRADER) {
-                    println("deputized Trader. YAy")
                     masterTraders.Service.markDeputized(maintainerDeputize.toID)
                   } else {
-                    println("all classification not deputized yet")
                     Future(0)
                   }
                 }

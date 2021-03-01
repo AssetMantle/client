@@ -57,7 +57,8 @@ object Blockchain {
     val TRADER = "test.MXs3XqfLPAosgO-W_IOUM10oDKk="
     val MODERATED_ASSET = "test.HnMyc9-9BCCw2WaolT1qCTkO_UY="
     val UNMODERATED_ASSET = "test.mKTDAiKuC-DoE_aESt27Vp0Jytg="
-    val ORDER = "test.52nqxr5PD_cdZLZbd-wZZzbcSpk="
+    val FIAT = "test.6T9EyLje2HjG6CL2i6Mc600oBZc="
+    val ORDER = "test.vZaNZY9lTO4XfL9gMrraNgBDwhE="
   }
 
   object Event {
@@ -292,19 +293,26 @@ object Blockchain {
     val EXCHANGE_RATE = "exchangeRate"
     val EXPIRY = "expiry"
     val TAKER_ID = "takerID"
+    val MAKER_OWNABLE_SPLIT = "makerOwnableSplit"
+
+    val TYPE="TYPE"
+    val AMOUNT="AMOUNT"
+    val NEGOTIATION_ID="NEGOTIATION_ID"
+    val EXTRA_INFO="EXTRA_INFO"
   }
 
   object parameterValues {
 
     val ORDER_TYPE = "COMDEX_ORDER"
+    val FIAT = "FIAT"
 
   }
 
   object Acl {
 
-    val ZONE = Seq(Classification.ORGANIZATION, Classification.TRADER, Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET, Classification.ORDER)
-    val ORGANIZATION = Seq(Classification.TRADER, Classification.UNMODERATED_ASSET, Classification.ORDER)
-    val TRADER = Seq(Classification.UNMODERATED_ASSET, Classification.ORDER)
+    val ZONE = Seq(Classification.ORGANIZATION, Classification.TRADER, Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
+    val ORGANIZATION = Seq(Classification.TRADER, Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
+    val TRADER = Seq(Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
   }
 
 }

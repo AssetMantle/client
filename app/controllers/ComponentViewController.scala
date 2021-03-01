@@ -1296,7 +1296,7 @@ class ComponentViewController @Inject()(
 
       def getAsset(assetID: String) = masterProperties.Service.getPropertyMap(assetID)
 
-      def getOrder(negotiationID: String): Future[Option[Order]] = masterOrders.Service.get(negotiationID)
+      def getOrder(orderID: String): Future[Option[Order]] = masterOrders.Service.get(orderID)
 
       def getCounterPartyTrader(traderID: String, negotiation: Negotiation) = masterTraders.Service.tryGet(if (traderID == negotiation.buyerTraderID) negotiation.sellerTraderID else negotiation.buyerTraderID)
 
@@ -1319,7 +1319,7 @@ class ComponentViewController @Inject()(
         traderID <- traderID
         negotiation <- negotiation
         asset <- getAsset(negotiation.assetID)
-        order <- getOrder(negotiation.id)
+        order <- getOrder(negotiation.orderID.getOrElse(""))
         counterPartyTrader <- getCounterPartyTrader(traderID, negotiation)
         buyerAddress <- getBuyerAddress(traderID, negotiation, counterPartyTrader.accountID)
         sellerAddress <- getSellerAddress(traderID, negotiation, counterPartyTrader.accountID)

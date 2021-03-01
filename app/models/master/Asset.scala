@@ -89,6 +89,14 @@ class Assets @Inject()(
     }
   }
 
+  private def updateStatusByID(id: String, status: String): Future[Int] = db.run(assetTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def findAllTradableAssetsByStatues(assetIDs: Seq[String], statuses: String*): Future[Seq[Asset]] = db.run(assetTable.filter(_.id.inSet(assetIDs)).filter(_.status.inSet(statuses)).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
   private def getAllByAssetIDs(ids: Seq[String]) = db.run(assetTable.filter(_.id.inSet(ids)).result)
@@ -142,6 +150,9 @@ class Assets @Inject()(
     def getPendingIssueAssetRequests(assetIDs: Seq[String]): Future[Seq[Asset]] = findAllByOwnerIDsAndStatus(assetIDs = assetIDs, status = constants.Status.Asset.REQUESTED_TO_ZONE)
 
     def getAllTradableAssets(assetIDs: Seq[String]): Future[Seq[Asset]] = findAllTradableAssetsByStatues(assetIDs = assetIDs, constants.Status.Asset.REQUESTED_TO_ZONE, constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE, constants.Status.Asset.ISSUED)
+
+    def markTraded(id: String): Future[Int] = updateStatusByID(id = id, status = constants.Status.Asset.TRADED)
+
   }
 
 }

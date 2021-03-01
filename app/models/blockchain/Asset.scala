@@ -5,13 +5,12 @@ import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import models.master
-import models.master.{Asset => masterAsset}
+import models.master.{Negotiation, Asset => masterAsset}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,6 +32,7 @@ class Assets @Inject()(
                            blockchainMaintainers: Maintainers,
                            masterClassifications: master.Classifications,
                            masterAssets: master.Assets,
+                           masterNegotiations: master.Negotiations,
                            masterProperties: master.Properties,
                          )(implicit executionContext: ExecutionContext) {
 
@@ -194,8 +194,29 @@ class Assets @Inject()(
 
       def masterOperations(assetID: String) = {
         val insert = masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, status = constants.Status.Asset.ISSUED))
+
+        def updateNegotiation=  {
+          if(assetMint.classificationID == constants.Blockchain.Classification.FIAT){
+            val negotiation = masterNegotiations.Service.tryGet(assetMint.immutableMetaProperties.metaPropertyList.find(x=>x.id == constants.Property.NEGOTIATION_ID.dataName).getOrElse(throw new BaseException(constants.Response.NEGOTIATION_ID_NOT_FOUND)).metaFact.data.value.asString)
+            def updateNegotiationStatus(negotiation: Negotiation) = {
+              negotiation.status match{
+                case constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING=> masterNegotiations.Service.update(negotiation.copy(status = constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
+                case constants.Status.Negotiation.CONTRACT_SIGNED=>  masterNegotiations.Service.update(negotiation.copy(status = constants.Status.Negotiation.BUYER_CONFIRMED_SELLER_PENDING))
+                case _=> throw new BaseException(constants.Response.UNAUTHORIZED)
+              }
+            }
+
+            for {
+              negotiation <- negotiation
+              _ <- updateNegotiationStatus(negotiation)
+            }yield ()
+          }else{
+            Future()
+          }
+        }
         for {
           _ <- insert
+          _ <- updateNegotiation
         } yield ()
       }
 

@@ -18,7 +18,6 @@ case class Order(id: String, label: Option[String] = None, makerID: String, make
 @Singleton
 class Orders @Inject()(
                            configuration: Configuration,
-                           blockchainClassifications: blockchain.Classifications,
                            protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_ORDER
@@ -73,6 +72,16 @@ class Orders @Inject()(
   }
 
   private def updateLabelByID(id: String, label: Option[String]): Future[Int] = db.run(orderTable.filter(x => x.id === id).map(_.label.?).update(label).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
+  private def updateStatusByID(id: String, status: Option[Boolean]): Future[Int] = db.run(orderTable.filter(x => x.id === id).map(_.status.?).update(status).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
@@ -147,6 +156,8 @@ class Orders @Inject()(
     def tryGetMakerID(id: String): Future[String] = tryGetMakerIDByID(id)
 
     def updateLabel(id: String, label: String): Future[Int] = updateLabelByID(id = id, label = Option(label))
+
+    def markCompleted(id:String) =  updateStatusByID(id, Some(true))
 
     def getCompletedOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatus(orderIDs,Option(true))
 

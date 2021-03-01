@@ -1,6 +1,9 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.DataValue._
 import models.common.Serializable._
@@ -12,8 +15,6 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -42,16 +43,18 @@ case class Order(id: String, immutables: Immutables, mutables: Mutables, created
 
 @Singleton
 class Orders @Inject()(
-                           protected val databaseConfigProvider: DatabaseConfigProvider,
-                           configuration: Configuration,
-                           blockchainSplits: Splits,
-                           blockchainMetas: Metas,
-                           blockchainClassifications: Classifications,
-                           blockchainMaintainers: Maintainers,
-                           masterClassifications: master.Classifications,
-                           masterProperties: master.Properties,
-                           masterOrders: master.Orders,
-                         )(implicit executionContext: ExecutionContext) {
+                        protected val databaseConfigProvider: DatabaseConfigProvider,
+                        configuration: Configuration,
+                        blockchainSplits: Splits,
+                        blockchainMetas: Metas,
+                        blockchainClassifications: Classifications,
+                        blockchainMaintainers: Maintainers,
+                        masterClassifications: master.Classifications,
+                        masterProperties: master.Properties,
+                        masterOrders: master.Orders,
+                        masterAssets: master.Assets,
+                        masterNegotiations: master.Negotiations,
+                      )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -185,8 +188,11 @@ class Orders @Inject()(
       def masterOperations(classificationID: String) = {
         val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, maintainerID = orderDefine.fromID, status = Option(true))
 
+        def insertProperties = masterProperties.Utilities.upsertProperties(entityType = constants.Blockchain.Entity.ORDER_DEFINITION, entityID = classificationID, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits)
+
         for {
           _ <- insert
+          _ <- insertProperties
         } yield ()
       }
 
@@ -238,9 +244,10 @@ class Orders @Inject()(
 
       def masterOperations(orderID: String) = {
         val insert = masterOrders.Service.insertOrUpdate(master.Order(id = orderID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, status = None))
-
+        val updateNegotiation = masterNegotiations.Service.updateOrderID(orderMake.immutableMetaProperties.metaPropertyList.find(x => x.id == constants.Property.NEGOTIATION_ID.dataName).getOrElse(throw new BaseException(constants.Response.NEGOTIATION_ID_NOT_FOUND)).metaFact.data.value.asString, orderID)
         for {
           _ <- insert
+          _ <- updateNegotiation
         } yield ()
       }
 
@@ -314,20 +321,18 @@ class Orders @Inject()(
       }
 
       def masterOperations(orderID: String, orderDeleted: Boolean, metaMutables: Seq[MetaProperty]): Future[Unit] = {
-        if (orderDeleted) {
-          val deleteOrder = masterOrders.Service.delete(orderID)
-          val deleteProperties = masterProperties.Service.deleteAll(entityID = orderID, entityType = constants.Blockchain.Entity.ORDER)
-          for {
-            _ <- deleteOrder
-            _ <- deleteProperties
-          } yield ()
-        } else {
-          val updateProperties = masterProperties.Utilities.updateProperties(entityType = constants.Blockchain.Entity.ORDER, entityID = orderID, mutableMetas = MetaProperties(metaMutables), mutables = Properties(Seq.empty))
+        val negotiation = masterNegotiations.Service.tryGetByOrderID(orderID)
+        val updateOrderStatus = masterOrders.Service.markCompleted(orderID)
+        def updateAssetStatus(assetID:String) = masterAssets.Service.markTraded(assetID)
 
-          for {
-            _ <- updateProperties
-          } yield ()
-        }
+        def updateNegotiationStatus(id: String) = masterNegotiations.Service.markCompleted(id)
+
+        for {
+          negotiation <- negotiation
+          _<-updateAssetStatus(negotiation.assetID)
+          _ <- updateNegotiationStatus(negotiation.id)
+          _ <- updateOrderStatus
+        } yield ()
       }
 
       (for {

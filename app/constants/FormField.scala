@@ -114,7 +114,7 @@ object FormField {
   val CHAT_WINDOW_ID = new StringFormField("CHAT_WINDOW_ID", 2, 100)
   val INVITATION_CODE = new StringFormField("INVITATION_CODE", 4, 50)
   val FROM_ID = new StringFormField("FROM_ID", 16, 100)
-  val TO_ID = new StringFormField("TO_ID", 16, 16)
+  val TO_ID = new StringFormField("TO_ID", 16, 100)
   val COUNTER_PARTY = new StringFormField("COUNTER_PARTY", 2, 100)
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
@@ -177,6 +177,7 @@ object FormField {
   val ADD_ORGANIZATION = new BooleanFormField("ADD_ORGANIZATION")
   val ADD_TRADER = new BooleanFormField("ADD_TRADER")
   val CREATE_ORDER = new BooleanFormField("CREATE_ORDER")
+  val CREATE_FIAT = new BooleanFormField("CREATE_FIAT")
   val CREATE_MODERATED_ASSET = new BooleanFormField("CREATE_MODERATED_ASSET")
   val CREATE_UNMODERATED_ASSET= new BooleanFormField("CREATE_UNMODERATED_ASSET")
 

@@ -147,8 +147,8 @@ class SetACLController @Inject()(
               def addTrader(zoneID: String, email: Email, mobile: Mobile) =
                 if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
                 else {
-                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(loginState.username))
-                  val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.withValue(loginState.username))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.TRADER))
 
                   def insertOrUpdate = masterTraders.Service.insertOrUpdate(utilities.IDGenerator.getIdentityID(constants.Blockchain.Classification.TRADER, Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty)))), zoneID, addTraderData.organizationID, loginState.username)
 
@@ -238,10 +238,10 @@ class SetACLController @Inject()(
 
                 def issueIdentityTransaction(aclAddress: String) = {
 
-                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
-                  val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
-                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(utilities.String.removeUnacceptableCharacterFromID(verifyTraderData.organizationID)))
-                  val mutables = Seq(constants.Property.ZONE_ID.getBaseProperty(utilities.String.removeUnacceptableCharacterFromID(trader.zoneID)))
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.withValue(trader.accountID))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.TRADER))
+                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(verifyTraderData.organizationID)))
+                  val mutables = Seq(constants.Property.ZONE_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(trader.zoneID)))
 
                   transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                     entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = trader.zoneID, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
@@ -328,10 +328,10 @@ class SetACLController @Inject()(
 
                 def issueIdentityTransaction(aclAddress: String) = {
 
-                  val immutables = Seq(constants.Property.ACCOUNT_ID.getBaseProperty(trader.accountID))
-                  val immutableMetas = Seq(constants.Property.USER_TYPE.getBaseProperty(constants.User.TRADER))
-                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.getBaseProperty(utilities.String.removeUnacceptableCharacterFromID(verifyTraderData.organizationID)))
-                  val mutables = Seq(constants.Property.ZONE_ID.getBaseProperty(utilities.String.removeUnacceptableCharacterFromID(trader.zoneID)))
+                  val immutables = Seq(constants.Property.ACCOUNT_ID.withValue(trader.accountID))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.TRADER))
+                  val mutableMetas = Seq(constants.Property.ORGANIZATION_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(verifyTraderData.organizationID)))
+                  val mutables = Seq(constants.Property.ZONE_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(trader.zoneID)))
 
                   transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
                     entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.id, classificationID = constants.Blockchain.Classification.TRADER, to = aclAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
@@ -382,11 +382,11 @@ class SetACLController @Inject()(
           val trader = masterTraders.Service.tryGet(deputizeTraderData.traderID)
           val traderClassifications = masterClassifications.Service.getByIdentityIDs(Seq(deputizeTraderData.traderID))
 
-          def deputizeAndGetResult(trader: Trader, organizationClassifications: Seq[Classification]) = {
+          def deputizeAndGetResult(trader: Trader, traderClassifications: Seq[Classification]) = {
             if (!trader.deputizeStatus) {
               //TODO Need to implement better solution than manual delays for deputize
               def deputizeUnmoderatedAssetClassification = {
-                if (deputizeTraderData.createUnmoderatedAsset && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)) {
+                if (deputizeTraderData.createUnmoderatedAsset && !traderClassifications.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)) {
                   val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.ASSET_DEFINITION)
 
                   def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
@@ -409,9 +409,33 @@ class SetACLController @Inject()(
                 }
               }
 
+              def deputizeFiatClassification = {
+                if (deputizeTraderData.createFiat && !traderClassifications.map(_.id).contains(constants.Blockchain.Classification.FIAT)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.FIAT, constants.Blockchain.Entity.ASSET_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = trader.organizationID, toID = deputizeTraderData.traderID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeTraderData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeTraderData.gas), fromID = trader.organizationID, toID = deputizeTraderData.traderID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield Thread.sleep(3000)
+
+                } else {
+                  Future()
+                }
+              }
+
               def deputizeOrderClassification = {
-                if (deputizeTraderData.createOrder && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.ORDER)) {
-                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+                if (deputizeTraderData.createOrder && !traderClassifications.map(_.id).contains(constants.Blockchain.Classification.ORDER)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.ORDER_DEFINITION)
 
                   def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
                     entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = trader.organizationID, toID = deputizeTraderData.traderID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeTraderData.gas, ticketID = "", mode = transactionMode),
@@ -434,6 +458,7 @@ class SetACLController @Inject()(
 
               for {
                 _ <- deputizeUnmoderatedAssetClassification
+                _ <- deputizeFiatClassification
                 _ <- deputizeOrderClassification
               } yield ()
             } else {

@@ -88,16 +88,16 @@ class AssetController @Inject()(
         },
         issueAssetData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val mutables = Seq(constants.Property.SHIPPING_PERIOD.getBaseProperty(issueAssetData.shippingPeriod.toString),
-            constants.Property.PORT_OF_DISCHARGE.getBaseProperty(issueAssetData.portOfDischarge),
-            constants.Property.PORT_OF_LOADING.getBaseProperty(issueAssetData.portOfLoading),
-            constants.Property.QUANTITY.getBaseProperty(issueAssetData.quantity.toMicroString),
-            constants.Property.QUANTITY_UNIT.getBaseProperty(issueAssetData.quantityUnit),
-            constants.Property.PRICE.getBaseProperty((issueAssetData.pricePerUnit * issueAssetData.quantity).toMicroString))
-          val immutables = Seq(constants.Property.ASSET_TYPE.getBaseProperty(issueAssetData.assetType))
-          val immutableMetas = Seq(constants.Property.ASSET_DESCRIPTION.getBaseProperty(issueAssetData.description),
-            constants.Property.MODERATED.getBaseProperty(if (issueAssetData.moderated) constants.Boolean.TRUE else constants.Boolean.FALSE))
-          val mutableMetas = Seq(constants.Property.LOCKED.getBaseProperty(if (issueAssetData.moderated) constants.Boolean.TRUE else constants.Boolean.FALSE))
+          val mutables = Seq(constants.Property.SHIPPING_PERIOD.withValue(issueAssetData.shippingPeriod.toString),
+            constants.Property.PORT_OF_DISCHARGE.withValue(issueAssetData.portOfDischarge),
+            constants.Property.PORT_OF_LOADING.withValue(issueAssetData.portOfLoading),
+            constants.Property.QUANTITY.withValue(issueAssetData.quantity.toMicroString),
+            constants.Property.QUANTITY_UNIT.withValue(issueAssetData.quantityUnit),
+            constants.Property.PRICE.withValue((issueAssetData.pricePerUnit * issueAssetData.quantity).toMicroString))
+          val immutables = Seq(constants.Property.ASSET_TYPE.withValue(issueAssetData.assetType))
+          val immutableMetas = Seq(constants.Property.ASSET_DESCRIPTION.withValue(issueAssetData.description),
+            constants.Property.MODERATED.withValue(if (issueAssetData.moderated) constants.Boolean.TRUE else constants.Boolean.FALSE))
+          val mutableMetas = Seq(constants.Property.LOCKED.withValue(if (issueAssetData.moderated) constants.Boolean.TRUE else constants.Boolean.FALSE))
 
           def getResult(traderID: String): Future[Result] = {
 
@@ -105,7 +105,7 @@ class AssetController @Inject()(
 
             def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String, Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
-            def getAllTradableAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllByIDs(assetIDs)
+            def getAllTradableAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllTradableAssets(assetIDs)
 
             def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTradeRelations.Service.getAllCounterParties(traderID)
 
@@ -130,9 +130,9 @@ class AssetController @Inject()(
               def issueAssetAndGetResult(validateUsernamePassword: Boolean): Future[Result] = if (validateUsernamePassword) {
 
                 val sendTransaction: Future[String] = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
-                  entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = traderID, toID = loginState.address, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = traderID, toID = traderID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
-                  request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), toID = loginState.address, fromID = traderID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = issueAssetData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), toID = traderID, fromID = traderID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                   action = transactionsAssetMint.Service.post,
                   onSuccess = blockchainTransactionAssetMints.Utility.onSuccess,
                   onFailure = blockchainTransactionAssetMints.Utility.onFailure,

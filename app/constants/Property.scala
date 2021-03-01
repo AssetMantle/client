@@ -2,41 +2,41 @@ package constants
 
 import models.common.Serializable.BaseProperty
 
-class Property(val dataName: String, val dataType: String) {
-
-  def getBaseProperty(value: String) = BaseProperty(dataType, dataName, Some(value))
-
-}
 
 object Property {
 
-  val USER_TYPE = new Property(Blockchain.Parameters.USER_TYPE, constants.Blockchain.DataType.STRING_DATA)
-  val ZONE_ID = new Property(Blockchain.Parameters.ZONE_ID, constants.Blockchain.DataType.STRING_DATA)
-  val ORGANIZATION_ID = new Property(Blockchain.Parameters.ORGANIZATION_ID, constants.Blockchain.DataType.STRING_DATA)
-  val CURRENCY = new Property(Blockchain.Parameters.CURRENCY, constants.Blockchain.DataType.STRING_DATA)
-  val NAME = new Property(Blockchain.Parameters.NAME, constants.Blockchain.DataType.STRING_DATA)
-  val ADDRESS = new Property(Blockchain.Parameters.ADDRESS, constants.Blockchain.DataType.STRING_DATA)
-  val ACCOUNT_ID = new Property(Blockchain.Parameters.ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA)
+  val USER_TYPE: BaseProperty = BaseProperty(Blockchain.Parameters.USER_TYPE, constants.Blockchain.DataType.STRING_DATA, None)
+  val ZONE_ID: BaseProperty = BaseProperty(Blockchain.Parameters.ZONE_ID, constants.Blockchain.DataType.STRING_DATA, None)
+  val ORGANIZATION_ID: BaseProperty = BaseProperty(Blockchain.Parameters.ORGANIZATION_ID, constants.Blockchain.DataType.STRING_DATA, None)
+  val CURRENCY: BaseProperty = BaseProperty(Blockchain.Parameters.CURRENCY, constants.Blockchain.DataType.STRING_DATA, None)
+  val NAME: BaseProperty = BaseProperty(Blockchain.Parameters.NAME, constants.Blockchain.DataType.STRING_DATA, None)
+  val ADDRESS: BaseProperty = BaseProperty(Blockchain.Parameters.ADDRESS, constants.Blockchain.DataType.STRING_DATA, None)
+  val ACCOUNT_ID: BaseProperty = BaseProperty(Blockchain.Parameters.ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA, None)
 
-  val ASSET_TYPE = new Property(Blockchain.Parameters.ASSET_TYPE,constants.Blockchain.DataType.STRING_DATA)
-  val ASSET_DESCRIPTION = new Property(Blockchain.Parameters.ASSET_DESCRIPTION,constants.Blockchain.DataType.STRING_DATA)
-  val ASSET_PRICE_PER_UNIT = new Property(Blockchain.Parameters.ASSET_PRICE_PER_UNIT,constants.Blockchain.DataType.STRING_DATA)
-  val ASSET_QUANTITY = new Property(Blockchain.Parameters.ASSET_QUANTITY,constants.Blockchain.DataType.STRING_DATA)
-  val SHIPPING_PERIOD = new Property(Blockchain.Parameters.SHIPPING_PERIOD,constants.Blockchain.DataType.STRING_DATA)
-  val PORT_OF_LOADING = new Property(Blockchain.Parameters.PORT_OF_LOADING,constants.Blockchain.DataType.STRING_DATA)
-  val PORT_OF_DISCHARGE = new Property(Blockchain.Parameters.PORT_OF_DISCHARGE,constants.Blockchain.DataType.STRING_DATA)
-  val LOCKED = new Property(Blockchain.Parameters.LOCKED,constants.Blockchain.DataType.STRING_DATA)
-  val MODERATED = new Property(Blockchain.Parameters.MODERATED,constants.Blockchain.DataType.STRING_DATA)
+  val ASSET_TYPE: BaseProperty = BaseProperty(Blockchain.Parameters.ASSET_TYPE, constants.Blockchain.DataType.STRING_DATA, None)
+  val ASSET_DESCRIPTION: BaseProperty = BaseProperty(Blockchain.Parameters.ASSET_DESCRIPTION, constants.Blockchain.DataType.STRING_DATA, None)
+  val ASSET_PRICE_PER_UNIT: BaseProperty = BaseProperty(Blockchain.Parameters.ASSET_PRICE_PER_UNIT, constants.Blockchain.DataType.STRING_DATA, None)
+  val ASSET_QUANTITY: BaseProperty = BaseProperty(Blockchain.Parameters.ASSET_QUANTITY, constants.Blockchain.DataType.STRING_DATA, None)
+  val SHIPPING_PERIOD: BaseProperty = BaseProperty(Blockchain.Parameters.SHIPPING_PERIOD, constants.Blockchain.DataType.STRING_DATA, None)
+  val PORT_OF_LOADING: BaseProperty = BaseProperty(Blockchain.Parameters.PORT_OF_LOADING, constants.Blockchain.DataType.STRING_DATA, None)
+  val PORT_OF_DISCHARGE: BaseProperty = BaseProperty(Blockchain.Parameters.PORT_OF_DISCHARGE, constants.Blockchain.DataType.STRING_DATA, None)
+  val LOCKED: BaseProperty = BaseProperty(Blockchain.Parameters.LOCKED, constants.Blockchain.DataType.STRING_DATA, None)
+  val MODERATED: BaseProperty = BaseProperty(Blockchain.Parameters.MODERATED, constants.Blockchain.DataType.STRING_DATA, None)
 
-  val QUANTITY_UNIT = new Property(Blockchain.Parameters.QUANTITY_UNIT,constants.Blockchain.DataType.STRING_DATA)
-  val ORDER_TYPE = new Property(Blockchain.Parameters.ORDER_TYPE,constants.Blockchain.DataType.STRING_DATA)
-  val FIAT_PROOF = new Property(Blockchain.Parameters.FIAT_PROOF,constants.Blockchain.DataType.STRING_DATA)
-  val BUYER_ACCOUNT_ID = new Property(Blockchain.Parameters.BUYER_ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA)
-  val SELLER_ACCOUNT_ID = new Property(Blockchain.Parameters.SELLER_ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA)
-  val EXCHANGE_RATE= new Property(Blockchain.Parameters.EXCHANGE_RATE, constants.Blockchain.DataType.DEC_DATA)
-  val EXPIRY= new Property(Blockchain.Parameters.EXPIRY, constants.Blockchain.DataType.HEIGHT_DATA)
+  val QUANTITY_UNIT: BaseProperty = BaseProperty(Blockchain.Parameters.QUANTITY_UNIT, constants.Blockchain.DataType.STRING_DATA, None)
+  val ORDER_TYPE: BaseProperty = BaseProperty(Blockchain.Parameters.ORDER_TYPE, constants.Blockchain.DataType.STRING_DATA, None)
+  val FIAT_PROOF: BaseProperty = BaseProperty(Blockchain.Parameters.FIAT_PROOF, constants.Blockchain.DataType.STRING_DATA, None)
+  val BUYER_ACCOUNT_ID: BaseProperty = BaseProperty(Blockchain.Parameters.BUYER_ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA, None)
+  val SELLER_ACCOUNT_ID: BaseProperty = BaseProperty(Blockchain.Parameters.SELLER_ACCOUNT_ID, constants.Blockchain.DataType.STRING_DATA, None)
+  val EXCHANGE_RATE: BaseProperty = BaseProperty(Blockchain.Parameters.EXCHANGE_RATE, constants.Blockchain.DataType.DEC_DATA, None)
+  val MAKER_OWNABLE_SPLIT: BaseProperty = BaseProperty(Blockchain.Parameters.MAKER_OWNABLE_SPLIT, constants.Blockchain.DataType.DEC_DATA, None)
 
-  val PRICE = new Property(Blockchain.Parameters.PRICE,constants.Blockchain.DataType.DEC_DATA)
-  val QUANTITY = new Property(Blockchain.Parameters.QUANTITY,constants.Blockchain.DataType.DEC_DATA)
-  val TAKER_ID = new Property(Blockchain.Parameters.TAKER_ID,constants.Blockchain.DataType.DEC_DATA)
+  val PRICE: BaseProperty = BaseProperty(Blockchain.Parameters.PRICE, constants.Blockchain.DataType.DEC_DATA, None)
+  val QUANTITY: BaseProperty = BaseProperty(Blockchain.Parameters.QUANTITY, constants.Blockchain.DataType.DEC_DATA, None)
+  val TAKER_ID: BaseProperty = BaseProperty(Blockchain.Parameters.TAKER_ID, constants.Blockchain.DataType.ID_DATA, None)
+
+  val TYPE: BaseProperty = BaseProperty(Blockchain.Parameters.TYPE, constants.Blockchain.DataType.STRING_DATA, None)
+  val AMOUNT: BaseProperty = BaseProperty(Blockchain.Parameters.AMOUNT, constants.Blockchain.DataType.DEC_DATA, None)
+  val NEGOTIATION_ID: BaseProperty = BaseProperty(Blockchain.Parameters.NEGOTIATION_ID, constants.Blockchain.DataType.STRING_DATA, None)
+  val EXTRA_INFO: BaseProperty = BaseProperty(Blockchain.Parameters.EXTRA_INFO, constants.Blockchain.DataType.STRING_DATA, None)
 }

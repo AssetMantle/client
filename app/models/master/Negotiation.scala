@@ -115,6 +115,13 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def tryGetNegotiationByOrderID(orderID: String) = db.run(negotiationTable.filter(_.orderID.? === orderID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def trGetIDByOrderID(orderID: String): Future[String] = db.run(negotiationTable.filter(_.orderID === orderID).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -355,6 +362,14 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def updateOrderIDByID(id: String, orderID: Option[String]): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.orderID.?).update(orderID).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def checkByIDAndTraderID(id: String, traderID: String): Future[Boolean] = db.run(negotiationTable.filter(_.id === id).filter(x => x.buyerTraderID === traderID || x.sellerTraderID === traderID).exists.result)
 
   private[models] class NegotiationTable(tag: Tag) extends Table[NegotiationSerializable](tag, "Negotiation") {
@@ -466,8 +481,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def tryGet(id: String): Future[Negotiation] = tryGetByID(id).map(_.deserialize)
 
     def get(id: String): Future[Option[Negotiation]] = getByID(id).map(_.map(_.deserialize))
-
-    def tryGetByBCNegotiationID(negotiationID: String): Future[Negotiation] = tryGetByOrderID(negotiationID).map(_.deserialize)
 
     def tryGetByBuyerSellerTraderIDAndAssetID(buyerTraderID: String, sellerTraderID: String, assetID: String): Future[Negotiation] = findByBuyerSellerTraderIDAndAssetID(buyerTraderID = buyerTraderID, sellerTraderID = sellerTraderID, assetID = assetID).map(_.deserialize)
 
@@ -591,7 +604,9 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def getAllIncompleteNegotiationListByTraderIDs(traderIDs: Seq[String]): Future[Seq[Negotiation]] = findAllNegotiationsBySellerTraderIDsAndStatuses(traderIDs = traderIDs, constants.Status.Negotiation.FORM_INCOMPLETE, constants.Status.Negotiation.ISSUE_ASSET_PENDING).map(_.map(_.deserialize))
 
+    def updateOrderID( id:String,orderID:String) = updateOrderIDByID(id,Some(orderID))
 
+    def tryGetByOrderID(orderID:String)= tryGetNegotiationByOrderID(orderID).map(_.deserialize)
   }
 
 }

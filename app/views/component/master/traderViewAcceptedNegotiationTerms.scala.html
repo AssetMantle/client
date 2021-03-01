@@ -25,13 +25,12 @@
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED | constants.Status.Negotiation.COMPLETED => {
                             @order match {
                                 case Some(order) => {
-
                                     @if(order.status== Some(true)){
                                         @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
                                     }
                                 }
                                 case None => {
-                                    @if(assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.TRUE) {
+                                    @if(assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.FALSE) {
                                         @commonFormButton(constants.Form.ORDER_MAKE, 'parameters -> s"'${negotiation.id}'")
                                     }
                                 }
@@ -48,7 +47,7 @@
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
                             @order match {
                                 case Some(order) => {
-                                    @if(order.status.isEmpty){
+                                    @if(order.status.isEmpty && assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.FALSE){
                                         @commonFormButton(constants.Form.ORDER_TAKE, 'parameters -> s"'${order.id}'")
                                     }
                                 }
