@@ -1275,3 +1275,7 @@ COURIER=Courier
 TRUST=Trust
 TEXT=Enter Text
 DOCUMENTS_NOT_FOUND = No Documents Found
+KYC= KYC
+KYC_ROOMS = KYC Rooms
+KYC_ONGOING_LIST= Ongoing
+KYC_RECEIVED_LIST= Received

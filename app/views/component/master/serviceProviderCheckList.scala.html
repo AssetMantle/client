@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="kycListRooms">
+    @commonCard(constants.View.SERVICE_PROVIDER_CHECK, 'cardIconPath -> "images/icons/icons.svg#tradeRoom") {
+      @commonFormButton(constants.Form.KYC_REQUEST)
+    } {
+        @commonHorizontalSwitcher(ListMap(
+           constants.View.KYC_ONGOING_LIST -> routes.javascript.ComponentViewController.kycOngoingList,
+           constants.View.KYC_RECEIVED_LIST -> routes.javascript.ComponentViewController.kycReceivedList,
+        ))
+        <button class="viewMore"></button>
+    }
+</div>

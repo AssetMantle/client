@@ -1,0 +1,16 @@
+@import views.html.base._
+
+@import views.companion.master.KycRequest
+
+@import controllers.actions.LoginState
+@(kycRequest: Form[KycRequest.Data] = KycRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonForm(constants.Form.KYC_REQUEST,kycRequest){
+    @commonInputText(kycRequest, constants.FormField.EMAIL_ADDRESS, 'id -> "kycRequestEmailAddress", 'containerDivClass -> "hidden", 'readonly -> false)
+    @commonInputText(kycRequest, constants.FormField.COUNTER_PARTY, 'id -> "kycRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> false)
+
+    @commonJavascriptButton(constants.View.BACK, JavaScript("showSelectAsset()"), 'id -> "showSelectAssetButton")
+    @commonJavascriptButton(constants.View.NEXT, JavaScript("showSelectCounterParty()"), 'id -> "showSelectCounterPartyButton")
+    <script src="@routes.Assets.versioned("javascripts/kycRequest.js")" type="text/javascript"></script>
+
+}

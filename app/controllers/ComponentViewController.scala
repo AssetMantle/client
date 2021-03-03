@@ -3138,4 +3138,17 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def kycList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.component.master.kycList())
+  }
+  def kycOngoingList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.component.master.kycOngoingList())
+  }
+
+  def kycReceivedList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.component.master.kycReceivedList())
+  }
 }

@@ -1,0 +1,61 @@
+@import controllers.actions.LoginState
+@import views.html.base.common
+
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+    @common(Messages(constants.View.KYC), failures, warnings, successes, infos)(left)(center)(right)
+
+    @left = {
+        <div class="leftContainer">
+            <div id="financials" class="financial"></div>
+        </div>
+    @loginState.userType match {
+        case constants.User.TRADER => {
+            <script type="text/javascript">
+        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+        </script>
+        }
+        case constants.User.ORGANIZATION => {
+            <script type="text/javascript">
+        componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+        </script>
+        }
+        case constants.User.ZONE => {
+            <script type="text/javascript">
+        componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+       </script>
+        }
+    }
+    }
+
+    @center = {
+        <div class="cmuk-container cmuk-margin-bottom">
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                <div class="switcherCard">
+                    <div id="kycList"></div>
+                </div>
+
+                <div class="kycListList">
+                    <div id="KycOngoingReceivedList" class="switcherCard"></div>
+                </div>
+
+                <script>
+                    componentResource('List', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
+                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
+            </script>
+            }
+        </div>
+    }
+    }
+
+    @right = {
+        <div class="rightContainer">
+            <div class="recentActivityContainer">
+                <div id="recentActivities"></div>
+            </div>
+        </div>
+        <script>
+                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities(), 'RECENT_ACTIVITY_LOADING');
+        </script>
+    }
