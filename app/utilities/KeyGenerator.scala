@@ -63,7 +63,7 @@ object KeyGenerator {
         case Failure(exception) => logger.error(exception.getLocalizedMessage)
           throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
       }
-    } else throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
+    } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
   }
 
 }
