@@ -51,9 +51,12 @@ object KeyGenerator {
   def getKey(mnemonics: Seq[String], hdPath: ImmutableList[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Key = {
     val words = mnemonics.mkString(" ")
     if (Bip39.validate(words)) {
-      val seeds = Bip39.toSeed(words, bip39Passphrase)
-      val deterministicSeed = new DeterministicSeed(words, seeds, "", System.currentTimeMillis())
-      val wallet = Wallet.fromSeed(MainNetParams.get(), deterministicSeed, Script.ScriptType.P2PKH, hdPath)
+      val wallet = Wallet.fromSeed(
+        MainNetParams.get(),
+        new DeterministicSeed(words, Bip39.toSeed(words, bip39Passphrase), "", System.currentTimeMillis()),
+        Script.ScriptType.P2PKH,
+        hdPath
+      )
 
       utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(wallet.getKeyByPath(hdPath).getPubKey)))) match {
         case Success(address) => Key(address = address, hdPath = hdPath.toString, publicKey = wallet.getKeyByPath(hdPath).getPubKey, privateKey = wallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
