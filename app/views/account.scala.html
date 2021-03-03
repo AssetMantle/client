@@ -89,10 +89,6 @@
             </script>
         }
         case constants.User.GENESIS => {
-            @commonFormButton(constants.Form.IDENTITY_NUB)
-            @commonFormButton(constants.Form.IDENTITY_DEFINE)
-            @commonFormButton(constants.Form.ASSET_DEFINE)
-            @commonFormButton(constants.Form.ORDER_DEFINE)
             @commonFormButton(constants.Form.INVITE_ZONE)
             <a href="@routes.DocusignController.authorization()">@Messages(constants.View.AUTHORIZE_DOCUSIGN)</a>
         }
@@ -105,11 +101,11 @@
 
 @right = {
     <div class="rightContainer">
-        <div class="recentActivityContainer">
-            <div id="recentActivities"></div>
-        </div>
+    <div class="recentActivityContainer">
+        <div id="recentActivities"></div>
+    </div>
     </div>
     <script>
-            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+        componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
     </script>
 }

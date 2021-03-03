@@ -58,7 +58,7 @@ class IdentityController @Inject()(
       Ok(blockchainForms.identityNub())
   }
 
-  def nub: Action[AnyContent] = withGenesisLoginAction { implicit loginState =>
+  def nub: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       views.companion.blockchain.IdentityNub.form.bindFromRequest().fold(
         formWithErrors => {
