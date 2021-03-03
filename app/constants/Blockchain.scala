@@ -28,7 +28,6 @@ object Blockchain {
   val MaxTraits = 22
   val HeightDataDefaultValue = -1
   val mainIdentityID = "test.cGn3HMW8M3t5gMDv-wXa9sseHnA=|e4lo1Ovc23oHP-8t9IXwIudkE0w="
-  val genesisAddress = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c"
   val expiresIn = 100000
 
   object PublicKey {
