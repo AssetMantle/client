@@ -1,0 +1,29 @@
+@import models.masterTransaction.NegotiationFile
+@import views.html.base._
+@import controllers.actions.LoginState
+
+@(negotiationID:String, fiatProofFile: Option[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@fiatProofFile match{
+    case Some(negotiationFile)=>{
+        @component.master.commonDocumentViewer(negotiationFile) {
+            @routes.FileController.tradingFile(negotiationFile.id, negotiationFile.fileName, negotiationFile.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(negotiationFile.id, negotiationFile.fileName, negotiationFile.documentType)" target="_blank">@Messages(negotiationFile.documentType)</a>
+        } {
+            @commonModalButton(Messages(constants.View.UPDATE), routes.javascript.FileController.updateNegotiationForm, 'parameters -> s"'${negotiationFile.documentType}','${negotiationFile.id}'")
+            @negotiationFile.documentType match {
+                case constants.File.Asset.BILL_OF_LADING => {
+                    @commonFormButton(constants.Form.ADD_BILL_OF_LADING, 'parameters -> s"'${negotiationFile.id}'")
+                }
+                case _ => {}
+            }
+        }
+        @commonJavascriptButton(constants.View.NEXT, JavaScript(s"""getForm(jsRoutes.controllers.OrderController.buyerExecuteForm('${negotiationID}'))"""))
+    }
+    case None=>{
+        <div id='@Seq("UPLOAD", constants.File.Negotiation.FIAT_PROOF).mkString("_")' class="cmuk-text-left documentContainer">
+            <p>@Messages(constants.File.Negotiation.FIAT_PROOF)</p>@commonModalButton("UPLOAD", routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${constants.File.Negotiation.FIAT_PROOF}','${negotiationID}'")
+        </div>
+    }
+}
