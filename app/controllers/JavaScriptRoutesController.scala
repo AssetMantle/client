@@ -343,6 +343,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.OrderController.sellerExecuteForm,
         routes.javascript.OrderController.blockchainBuyerExecute,
         routes.javascript.OrderController.blockchainSellerExecute,
+        routes.javascript.OrderController.uploadFiatProof,
 
         routes.javascript.RedeemAssetController.blockchainRedeemAssetForm,
 

@@ -213,6 +213,14 @@ class OrderController @Inject()(
       )
   }
 
+  def uploadFiatProof(orderID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val negotiationFile = masterTransactionNegotiationFiles.Service.get(orderID, constants.File.Negotiation.FIAT_PROOF)
+      for {
+        negotiationFile <- negotiationFile
+      } yield Ok(views.html.component.master.uploadFiatProof(orderID, negotiationFile))
+  }
+
   def buyerExecuteForm(orderID: String): Action[AnyContent] = withoutLoginAction { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(orderID = orderID))
   }
@@ -226,6 +234,7 @@ class OrderController @Inject()(
         buyerExecuteData => {
           val negotiation = masterNegotiations.Service.tryGet(buyerExecuteData.orderID)
           val order = masterOrders.Service.tryGet(buyerExecuteData.orderID)
+          val negotiationFile = masterTransactionNegotiationFiles.Service.tryGet(buyerExecuteData.orderID, constants.File.Negotiation.FIAT_PROOF)
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
@@ -233,13 +242,13 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order): Future[String] = {
+          def sendTransaction(buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String): Future[String] = {
             if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
               asset.pegHash match {
                 case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
-                  entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
+                  entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
-                  request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteData.gas), password = buyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteData.fiatProof, pegHash = pegHash, mode = transactionMode),
+                  request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteData.gas), password = buyerExecuteData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, mode = transactionMode),
                   action = transactionsBuyerExecuteOrder.Service.post,
                   onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
                   onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
@@ -253,10 +262,11 @@ class OrderController @Inject()(
           (for {
             negotiation <- negotiation
             order <- order
+            negotiationFile <- negotiationFile
             asset <- getAsset(negotiation.assetID)
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             sellerAddress <- getAddress(sellerAccountID)
-            ticketID <- sendTransaction(buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order)
+            ticketID <- sendTransaction(buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = utilities.FileOperations.getFileNameWithoutExtension(negotiationFile.fileName))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_ORDER_EXECUTED, ticketID)
             _ <- masterTransactionTradeActivities.Service.create(negotiation.id, constants.TradeActivity.BUYER_ORDER_EXECUTED, ticketID)

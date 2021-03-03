@@ -2,13 +2,12 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{boolean, date, number, of, text, longNumber}
+import play.api.data.Forms.{boolean, date, longNumber, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
 import utilities.MicroNumber
 import scala.util.matching.Regex
-import utilities.NumericOperation._
 
 object FormField {
   //StringFormField
@@ -203,7 +202,7 @@ object FormField {
   val TRANSACTION_AMOUNT = new MicroNumberFormField("TRANSACTION_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val SEND_AMOUNT = new MicroNumberFormField("SEND_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val REDEEM_AMOUNT = new MicroNumberFormField("REDEEM_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
-  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val ASSET_QUANTITY = new MicroNumberFormField("ASSET_QUANTITY", new MicroNumber(0.01), new MicroNumber(100000000000000.0), constants.RegularExpression.QUANTITY, 3)
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10), RegularExpression.GAS)
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
@@ -248,9 +247,9 @@ object FormField {
     val name: String = fieldName
   }
 
-  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, regex: Regex = RegularExpression.FIAT) {
+  class MicroNumberFormField(fieldName: String, val minimumValue: MicroNumber, val maximumValue: MicroNumber, regex: Regex = RegularExpression.FIAT, precision: Int = 2) {
     val name: String = fieldName
-    val field: Mapping[MicroNumber] = text.verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = constants.Response.INVALID_NUMBER.message)).verifying(constants.Response.NUMBER_OUT_OF_RANGE.message, x => new MicroNumber(x) >= minimumValue && new MicroNumber(x) <= maximumValue).transform[MicroNumber](x => new MicroNumber(x), y => y.toRoundedOffString())
+    val field: Mapping[MicroNumber] = text.verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = constants.Response.INVALID_NUMBER.message)).verifying(constants.Response.NUMBER_OUT_OF_RANGE.message, x => new MicroNumber(x) >= minimumValue && new MicroNumber(x) <= maximumValue).transform[MicroNumber](x => new MicroNumber(x), y => y.toRoundedOffString(precision))
   }
 
 }

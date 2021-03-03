@@ -39,6 +39,7 @@ object File {
     val INVOICE = "INVOICE"
     val INSURANCE = "INSURANCE"
     val CONTRACT = "CONTRACT"
+    val FIAT_PROOF = "FIAT_PROOF"
     val OTHERS = "OTHERS"
   }
 
