@@ -1,9 +1,8 @@
-name: Check Compilation 
-
+name:  Build Comdex
 on:
   pull_request:
     branches:
-      - development
+      - comdex/development
 
 jobs:
   build:
