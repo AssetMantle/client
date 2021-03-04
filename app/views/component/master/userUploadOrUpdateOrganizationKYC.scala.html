@@ -11,7 +11,7 @@
 <div class="modalInfoBlock centerText">
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            @commonModalButton(Messages(constants.View.UPLOAD),routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
+            @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "), routes.javascript.AddOrganizationController.userUploadOrganizationKYCForm,'parameters -> s"'${documentType}'")
         </div>
     }
     @for(organizationKYC <- organizationKYCs) {
@@ -20,7 +20,7 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)" target="_blank">@Messages(organizationKYC.documentType)</a>
         } {
-            @commonModalButton(Messages(constants.View.UPDATE),routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
+            @commonModalButton(eq(Messages(constants.View.UPDATE), Messages( organizationKYC.documentType)).mkString(" "), routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,'parameters -> s"'${organizationKYC.documentType}'")
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
