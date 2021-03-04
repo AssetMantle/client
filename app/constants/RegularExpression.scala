@@ -23,6 +23,7 @@ object RegularExpression {
   val TRANSACTION_HASH: Regex = """[A-F0-9]{64}""".r
   val ADDRESS_SUFFIX: Regex = """[a-z0-9]{39}""".r
   val VALIDATOR_HEX_ADDRESS: Regex = """[A-F0-9]{40}""".r
+  val ID : Regex = """test\.[A-Za-z0-9_ -]{27}=\|[A-Za-z0-9_ -]{27}=""".r
 
   val BLOCKCHAIN_ID_SEPARATOR = s"""\\${constants.Blockchain.IDSeparator}"""
   val BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR = s"""\\${constants.Blockchain.FirstOrderCompositeIDSeparator}"""

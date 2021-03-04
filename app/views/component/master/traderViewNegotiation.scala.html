@@ -5,7 +5,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(negotiation: Negotiation, asset: Asset, counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiation: Negotiation, assetProperties: Map[String,Option[String]], counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
     @Messages(constants.View.NEGOTIATION_ID): @negotiation.id
@@ -15,7 +15,7 @@
 
 <div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DETAILS):</div>
 <div class="traderCommodity cmuk-text-left">
-    <span class="commodityImage">@commonImage("icons/"+asset.assetType+".svg")</span><span class="tradeName">@Messages(asset.assetType)</span>
+    <span class="commodityImage">@commonImage("icons/"+assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("")+".svg")</span><span class="tradeName">@Messages(assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))</span>
 </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)

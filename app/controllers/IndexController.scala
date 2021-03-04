@@ -19,12 +19,12 @@ import scala.util.Try
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                 withLoginActionAsync: WithLoginActionAsync,
                                 masterAccounts: Accounts,
-                                blockchainAssetsNew: blockchain.AssetsNew,
+                                blockchainAssets: blockchain.Assets,
                                 blockchainSplits: blockchain.Splits,
                                 blockchainMetas: blockchain.Metas,
                                 blockchainIdentities: blockchain.Identities,
                                 blockchainMaintainers: blockchain.Maintainers,
-                                blockchainOrdersNew: blockchain.OrdersNew,
+                                blockchainOrders: blockchain.Orders,
                                 blockchainClassifications: blockchain.Classifications,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
@@ -69,15 +69,15 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ViewController.transaction(query)))
       else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ViewController.block(query.toInt)))
       else {
-        val asset = blockchainAssetsNew.Service.get(query)
+        val asset = blockchainAssets.Service.get(query)
         val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
         val identity = blockchainIdentities.Service.get(query)
-        val order = blockchainOrdersNew.Service.get(query)
+        val order = blockchainOrders.Service.get(query)
         val metaList = blockchainMetas.Service.get(Seq(query))
         val classification = blockchainClassifications.Service.get(query)
         val maintainer = blockchainMaintainers.Service.get(query)
 
-        def searchResult(asset: Option[models.blockchain.AssetNew], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.OrderNew], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
+        def searchResult(asset: Option[models.blockchain.Asset], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.Order], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
           if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
           else {
             loginState match {

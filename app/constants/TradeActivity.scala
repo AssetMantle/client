@@ -36,4 +36,5 @@ object TradeActivity {
   val SELLER_ORDER_EXECUTED = new constants.TradeActivity("SELLER_ORDER_EXECUTED")
   val BUYER_BID_CONFIRMED = new TradeActivity("BUYER_BID_CONFIRMED")
   val SELLER_BID_CONFIRMED = new TradeActivity("SELLER_BID_CONFIRMED")
+  val ORDER_MADE= new TradeActivity("ORDER_MADE")
 }

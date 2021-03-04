@@ -1,5 +1,5 @@
 function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 'commonSpinner') {
-    const target = '#'+targetID;
+    const target = '#'+ $.escapeSelector(targetID);
     const form = $(source).closest("form");
     if (validateForm(form)) {
         const result = $(target);

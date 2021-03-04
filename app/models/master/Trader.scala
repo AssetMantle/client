@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, status: Option[Boolean] = None, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, status: Option[Boolean] = None, deputizeStatus: Boolean = false, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -120,6 +120,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getTradersByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
+  private def getTradersByDeputizeStatusByOrganizationID(organizationID: String, deputizeStatus: Boolean): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.deputizeStatus === deputizeStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
+
   private def getTraderIDsByStatusByOrganizationID(organizationID: String, status: Option[Boolean]): Future[Seq[String]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.? === status).map(_.id).result)
 
   private def getTraderIDsByStatusByZoneID(zoneID: String, status: Option[Boolean]): Future[Seq[String]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.status.? === status).map(_.id).result)
@@ -144,9 +146,18 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def updateDeputizeStatusOnID(id: String, deputizeStatus: Boolean) = db.run(traderTable.filter(_.id === id).map(_.deputizeStatus).update(deputizeStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+
   private[models] class TraderTable(tag: Tag) extends Table[Trader](tag, "Trader") {
 
-    def * = (id, zoneID, organizationID, accountID, status.?, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Trader.tupled, Trader.unapply)
+    def * = (id, zoneID, organizationID, accountID, status.?, deputizeStatus, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Trader.tupled, Trader.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -157,6 +168,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def accountID = column[String]("accountID")
 
     def status = column[Boolean]("status")
+
+    def deputizeStatus = column[Boolean]("deputizeStatus")
 
     def comment = column[String]("comment")
 
@@ -178,16 +191,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def create(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID))
 
-    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String): Future[String] = {
-      val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
-
-      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID))
-
-      for {
-        id <- id
-        _ <- upsertTrader(id)
-      } yield id
-    }
+    def insertOrUpdate(id:String, zoneID: String, organizationID: String, accountID: String): Future[Int] =upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID))
 
     def tryGetID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
@@ -217,13 +221,13 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def tryGetStatus(id: String): Future[Boolean] = tryGetStatusById(id).map(_.getOrElse(false))
 
-    def getOrganizationAcceptedTraderList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = Option(true))
+    def getOrganizationAcceptedTraderList(organizationID: String): Future[Seq[Trader]] = getTradersByDeputizeStatusByOrganizationID(organizationID = organizationID, deputizeStatus = true)
 
     def getVerifiedTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = getTraderIDsByStatusByOrganizationID(organizationID = organizationID, status = Option(true))
 
     def getVerifiedTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = getTraderIDsByStatusByZoneID(zoneID = zoneID, status = Option(true))
 
-    def getOrganizationPendingTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = null)
+    def getOrganizationPendingTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByDeputizeStatusByOrganizationID(organizationID = organizationID, deputizeStatus = false)
 
     def getOrganizationRejectedTraderRequestList(organizationID: String): Future[Seq[Trader]] = getTradersByStatusByOrganizationID(organizationID = organizationID, status = Option(false))
 
@@ -244,6 +248,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getTraderIDsByZoneID(zoneID: String): Future[Seq[String]] = findTraderIDsByZoneID(zoneID)
 
     def getTraderIDsByOrganizationID(organizationID: String): Future[Seq[String]] = findTraderIDsByOrganizationID(organizationID)
+
+    def markDeputized(id:String) = updateDeputizeStatusOnID(id,true)
   }
 
 }

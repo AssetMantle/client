@@ -169,6 +169,12 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markUserTypeUser(id: String): Future[Int] = updateUserTypeById(id, constants.User.USER)
 
+    def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
+
+    def markUserTypeZone(id: String): Future[Int] = updateUserTypeById(id, constants.User.ZONE)
+
+    def markUserTypeOrganization(id: String): Future[Int] = updateUserTypeById(id, constants.User.ORGANIZATION)
+
     def getUserType(id: String): Future[String] = getUserTypeById(id)
 
     def tryVerifyingUserType(id: String, userType: String): Future[Boolean] = {

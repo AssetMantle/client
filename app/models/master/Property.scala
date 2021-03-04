@@ -84,6 +84,8 @@ class Properties @Inject()(
 
   private def getAllByEntityIDAndEntityType(entityID: String, entityType: String): Future[Seq[Property]] = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).result)
 
+  private def getAllByEntityIDsAndEntityType(entityIDs: Seq[String], entityType: String): Future[Seq[Property]] = db.run(propertyTable.filter(x => x.entityID.inSet(entityIDs) && x.entityType === entityType).result)
+
   private def deleteByEntityIDAndEntityType(entityID: String, entityType: String) = db.run(propertyTable.filter(x => x.entityID === entityID && x.entityType === entityType).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -130,7 +132,9 @@ class Properties @Inject()(
 
     def create(property: Property): Future[String] = add(property)
 
-    def getAll(entityID: String, entityType: String): Future[Seq[Property]] = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+    def getAll(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+
+    //def getAllInMapForm(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType).map(x=> x.map(a => a.name -> a.value).toMap)
 
     def insertMultiple(properties: Seq[Property]): Future[Seq[String]] = addMultiple(properties)
 
@@ -141,6 +145,10 @@ class Properties @Inject()(
     def insertOrUpdate(property: Property): Future[Int] = upsert(property)
 
     def deleteAll(entityID: String, entityType: String): Future[Int] = deleteByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
+
+    def getPropertyMap(assetID:String): Future[Map[String,Option[String]]] = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map(x=> x.map(a => a.name -> a.value).toMap)
+
+    def getPropertyListMap(assetIDs:Seq[String]): Future[Map[String, Map[String,Option[String]]]] = getAllByEntityIDsAndEntityType(assetIDs, constants.Blockchain.Entity.ASSET).map(assetProperties=> assetIDs.map(assetID=> assetID -> assetProperties.filter(_.entityID == assetID).map(property=> property.name-> property.value).toMap).toMap)
 
   }
 

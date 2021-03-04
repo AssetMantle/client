@@ -7,25 +7,26 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
 import models._
 import models.common.Serializable._
-import models.master.{Asset, Negotiation, Organization, Trader}
+import models.master.{Asset, Negotiation, Organization, Split, Trader}
 import models.masterTransaction.{AssetFile, NegotiationFile, TradeActivity, TradeActivityHistory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import utilities.MicroNumber
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NegotiationController @Inject()(
                                        blockchainAccounts: blockchain.Accounts,
                                        messagesControllerComponents: MessagesControllerComponents,
-                                       blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids,
-                                       blockchainTransactionChangeSellerBids: blockchainTransaction.ChangeSellerBids,
                                        masterAccounts: master.Accounts,
                                        masterAssets: master.Assets,
                                        masterOrganizations: master.Organizations,
                                        masterTraderRelations: master.TraderRelations,
                                        masterTraders: master.Traders,
+                                       masterProperties: master.Properties,
+                                       masterSplits: master.Splits,
                                        masterZones: master.Zones,
                                        masterNegotiations: master.Negotiations,
                                        masterNegotiationHistories: master.NegotiationHistories,
@@ -34,18 +35,14 @@ class NegotiationController @Inject()(
                                        masterTransactionDocusignEnvelopes: docusign.Envelopes,
                                        masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles,
                                        masterTransactionTradeActivities: masterTransaction.TradeActivities,
+                                       transactionsAssetMint: transactions.blockchain.AssetMint,
+                                       blockchainTransactionAssetMints: blockchainTransaction.AssetMints,
                                        masterTransactionTradeActivityHistories: masterTransaction.TradeActivityHistories,
                                        transaction: utilities.Transaction,
                                        utilitiesNotification: utilities.Notification,
-                                       transactionsChangeBuyerBid: transactions.ChangeBuyerBid,
-                                       transactionsChangeSellerBid: transactions.ChangeSellerBid,
                                        withTraderLoginAction: WithTraderLoginAction,
                                        withUsernameToken: WithUsernameToken,
                                        withLoginActionAsync: WithLoginActionAsync,
-                                       blockchainTransactionConfirmBuyerBids: blockchainTransaction.ConfirmBuyerBids,
-                                       transactionsConfirmBuyerBid: transactions.ConfirmBuyerBid,
-                                       transactionsConfirmSellerBid: transactions.ConfirmSellerBid,
-                                       blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids,
                                      )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -58,7 +55,11 @@ class NegotiationController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+      def getAllAssetSplits(traderID:String) = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
+
+      def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
+
+      def getAllTradableAssetList(assetIDs: Seq[String])= masterAssets.Service.getAllByIDs(assetIDs)
 
       def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTraderRelations.Service.getAllCounterParties(traderID)
 
@@ -68,11 +69,13 @@ class NegotiationController @Inject()(
 
       (for {
         traderID <- traderID
-        tradableAssetList <- getAllTradableAssetList(traderID)
+        allAssetSplits<-getAllAssetSplits(traderID)
+        tradableAssetProperties <- getAllTradableAssetProperties(allAssetSplits.map(_.ownableID))
+        tradableAssetList<-getAllTradableAssetList(allAssetSplits.map(_.ownableID))
         counterPartyList <- getCounterPartyList(traderID)
         counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
         counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-      } yield Ok(views.html.component.master.negotiationRequest(tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
+      } yield Ok(views.html.component.master.negotiationRequest(tradableAssetProperties = tradableAssetProperties,tradableAssetList= tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -84,7 +87,11 @@ class NegotiationController @Inject()(
         formWithErrors => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-          def getAllTradableAssetList(traderID: String): Future[Seq[Asset]] = masterAssets.Service.getAllTradableAssets(traderID)
+          def getAllAssetSplits(traderID:String) = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
+
+          def getAllTradableAssetProperties(assetIDs: Seq[String]):Future[Map[String, Map[String,Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
+
+          def getAllTradableAssetList(assetIDs: Seq[String])= masterAssets.Service.getAllByIDs(assetIDs)
 
           def getCounterPartyList(traderID: String): Future[Seq[String]] = masterTraderRelations.Service.getAllCounterParties(traderID)
 
@@ -94,34 +101,42 @@ class NegotiationController @Inject()(
 
           (for {
             traderID <- traderID
-            tradableAssetList <- getAllTradableAssetList(traderID)
+            allAssetSplits<-getAllAssetSplits(traderID)
+            tradableAssetProperties <- getAllTradableAssetProperties(allAssetSplits.map(_.ownableID))
+            tradableAssetList<-getAllTradableAssetList(allAssetSplits.map(_.ownableID))
             counterPartyList <- getCounterPartyList(traderID)
             counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
             counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-          } yield BadRequest(views.html.component.master.negotiationRequest(formWithErrors, tradableAssetList, counterPartyTraderList, counterPartyOrganizationList))
+          } yield BadRequest(views.html.component.master.negotiationRequest(formWithErrors, tradableAssetProperties,tradableAssetList, counterPartyTraderList, counterPartyOrganizationList))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
         },
         requestData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
-          val asset: Future[Asset] = masterAssets.Service.tryGet(id = requestData.assetID)
+          val asset= masterAssets.Service.tryGet(requestData.assetID)
+
+          val assetProperties= masterProperties.Service.getPropertyMap(requestData.assetID)
+
+          def getAssetSplit(traderID:String): Future[Split] = masterSplits.Service.tryGet(requestData.assetID,traderID)
 
           def checkRelationExists(traderID: String): Future[Boolean] = masterTraderRelations.Service.checkRelationExists(fromID = traderID, toID = requestData.counterParty)
 
-          def insert(traderID: String, asset: Asset, checkRelationExists: Boolean): Future[String] = {
-            if (traderID != asset.ownerID || !checkRelationExists) throw new BaseException(constants.Response.UNAUTHORIZED)
+          def insert(traderID: String, assetSplit: Split, asset: Asset, assetProperties:Map[String,Option[String]], checkRelationExists: Boolean): Future[String] = {
+            if (traderID != assetSplit.ownerID || !checkRelationExists) throw new BaseException(constants.Response.UNAUTHORIZED)
             asset.status match {
-              case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.create(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = asset.description, price = asset.price, quantity = asset.quantity, quantityUnit = asset.quantityUnit, assetOtherDetails = asset.otherDetails)
+              case constants.Status.Asset.REQUESTED_TO_ZONE | constants.Status.Asset.AWAITING_BLOCKCHAIN_RESPONSE | constants.Status.Asset.ISSUED => masterNegotiations.Service.create(buyerTraderID = requestData.counterParty, sellerTraderID = traderID, assetID = asset.id, description = assetProperties.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse(""), price = new MicroNumber(BigInt(assetProperties.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse(""))), quantity = new MicroNumber(BigInt(assetProperties.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse(""))), quantityUnit = assetProperties.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse(""), assetOtherDetails = AssetOtherDetails(ShippingDetails(assetProperties.getOrElse(constants.Property.SHIPPING_PERIOD.dataName,Some("")).getOrElse("").toInt,assetProperties.getOrElse(constants.Property.PORT_OF_LOADING.dataName,Some("")).getOrElse(""),assetProperties.getOrElse(constants.Property.PORT_OF_DISCHARGE.dataName,Some("")).getOrElse(""))))
               case _ => throw new BaseException(constants.Response.ASSET_NOT_FOUND)
             }
           }
 
           (for {
             traderID <- traderID
-            asset <- asset
+            asset<-asset
+            assetProperties<-assetProperties
+            assetSplit <- getAssetSplit(traderID)
             checkRelationExists <- checkRelationExists(traderID)
-            id <- insert(traderID = traderID, asset = asset, checkRelationExists = checkRelationExists)
+            id <- insert(traderID = traderID, assetSplit = assetSplit,asset = asset,assetProperties = assetProperties, checkRelationExists = checkRelationExists)
             result <- withUsernameToken.PartialContent(views.html.component.master.paymentTerms(id = id))
           } yield result
             ).recover {
@@ -235,12 +250,12 @@ class NegotiationController @Inject()(
             } else throw new BaseException(constants.Response.UNAUTHORIZED)
           }
 
-          def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
+          def getAssetProperties(assetID: String):Future[Map[String,Option[String]]]= masterProperties.Service.getPropertyMap(assetID)
 
           def getTrader(traderID: String): Future[Trader] = masterTraders.Service.tryGet(traderID)
 
-          def getResult(asset: Asset, negotiation: Negotiation, counterPartyTrader: Trader): Future[Result] = if (documentListData.documentListCompleted) {
-            withUsernameToken.PartialContent(views.html.component.master.reviewNegotiationRequest(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
+          def getResult(assetProperties: Map[String,Option[String]], negotiation: Negotiation, counterPartyTrader: Trader): Future[Result] = if (documentListData.documentListCompleted) {
+            withUsernameToken.PartialContent(views.html.component.master.reviewNegotiationRequest(assetProperties = assetProperties, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
           } else {
             withUsernameToken.PartialContent(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = documentListData.id, documentList = documentListData.documentList, documentListCompleted = true, physicalDocumentsHandledVia = documentListData.physicalDocumentsHandledVia)), id = negotiation.id))
           }
@@ -250,9 +265,9 @@ class NegotiationController @Inject()(
             negotiation <- negotiation
             assetStatus <- getAssetStatus(negotiation.assetID)
             _ <- updateDocumentList(traderID = traderID, assetStatus = assetStatus, negotiation)
-            asset <- getAsset(negotiation.assetID)
+            assetProperties <- getAssetProperties(negotiation.assetID)
             counterPartyTrader <- getTrader(negotiation.buyerTraderID)
-            result <- getResult(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader)
+            result <- getResult(assetProperties = assetProperties, negotiation = negotiation, counterPartyTrader = counterPartyTrader)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -266,8 +281,8 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getAsset(traderID: String, negotiation: Negotiation): Future[Asset] = if (traderID == negotiation.sellerTraderID) {
-        masterAssets.Service.tryGet(negotiation.assetID)
+      def getAssetProperties(traderID: String, negotiation: Negotiation): Future[Map[String,Option[String]]] = if (traderID == negotiation.sellerTraderID) {
+        masterProperties.Service.getPropertyMap(negotiation.assetID)
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -277,9 +292,9 @@ class NegotiationController @Inject()(
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        asset <- getAsset(traderID, negotiation)
+        assetProperties <- getAssetProperties(traderID, negotiation)
         counterPartyTrader <- getTrader(negotiation.buyerTraderID)
-        result <- withUsernameToken.Ok(views.html.component.master.reviewNegotiationRequest(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
+        result <- withUsernameToken.Ok(views.html.component.master.reviewNegotiationRequest(assetProperties = assetProperties, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
@@ -293,8 +308,8 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(formWithErrors.data(constants.FormField.ID.name))
 
-          def getAsset(traderID: String, negotiation: Negotiation): Future[Asset] = if (traderID == negotiation.sellerTraderID) {
-            masterAssets.Service.tryGet(negotiation.assetID)
+          def getAssetProperties(traderID: String, negotiation: Negotiation): Future[Map[String,Option[String]]] = if (traderID == negotiation.sellerTraderID) {
+            masterProperties.Service.getPropertyMap(negotiation.assetID)
           } else {
             throw new BaseException(constants.Response.UNAUTHORIZED)
           }
@@ -304,9 +319,9 @@ class NegotiationController @Inject()(
           (for {
             traderID <- traderID
             negotiation <- negotiation
-            asset <- getAsset(traderID, negotiation)
+            assetProperties <- getAssetProperties(traderID, negotiation)
             counterPartyTrader <- getTrader(negotiation.buyerTraderID)
-          } yield BadRequest(views.html.component.master.reviewNegotiationRequest(formWithErrors, asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
+          } yield BadRequest(views.html.component.master.reviewNegotiationRequest(formWithErrors, assetProperties = assetProperties, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
           }
@@ -396,69 +411,56 @@ class NegotiationController @Inject()(
           }
         },
         acceptRequestData => {
-          /*(loginState.acl match {
-            case Some(acl) =>
-              if (acl.changeBuyerBid) {*/
-                val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = acceptRequestData.password)
-                val negotiation = masterNegotiations.Service.tryGet(acceptRequestData.id)
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = acceptRequestData.password)
+          val negotiation = masterNegotiations.Service.tryGet(acceptRequestData.id)
 
-                def getAssetPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
+          def getTrader(traderID: String) = masterTraders.Service.tryGet(traderID)
 
-                def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+          def markNegotiationAccepted(id: String): Future[Int] = masterNegotiations.Service.markAccepted(id = id)
 
-                def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
+          def createChatIDAndChatRoom(sellerAccountID: String, negotiationID: String): Future[Unit] = {
+            val chatID = masterTransactionChats.Service.createGroupChat(loginState.username, sellerAccountID)
 
-                def sendTransaction(sellerAddress: String, pegHash: String, negotiation: Negotiation): Future[String] = {
-                  transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
-                    entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
-                    blockchainTransactionCreate = blockchainTransactionChangeBuyerBids.Service.create,
-                    request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = sellerAddress, password = acceptRequestData.password, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, mode = transactionMode),
-                    action = transactionsChangeBuyerBid.Service.post,
-                    onSuccess = blockchainTransactionChangeBuyerBids.Utility.onSuccess,
-                    onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
-                    updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
-                  )
-                }
+            def insertChatID(chatID: String): Future[Int] = masterNegotiations.Service.insertChatID(id = negotiationID, chatID = chatID)
 
-                def createChatIDAndChatRoom(sellerAccountID: String, negotiationID: String): Future[Unit] = {
-                  val chatID = masterTransactionChats.Service.createGroupChat(loginState.username, sellerAccountID)
+            for {
+              chatID <- chatID
+              _ <- insertChatID(chatID)
+            } yield ()
+          }
 
-                  def insertChatID(chatID: String): Future[Int] = masterNegotiations.Service.insertChatID(id = negotiationID, chatID = chatID)
+          def acceptNegotiationAndGetResult(validateUsernamePassword: Boolean, negotiation: Negotiation, sellerTrader:Trader): Future[Result] =
+            if (validateUsernamePassword) {
+              if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
 
-                  for {
-                    chatID <- chatID
-                    _ <- insertChatID(chatID)
-                  } yield ()
-
-                }
-
-                def acceptNegotiationAndGetResult(validateUsernamePassword: Boolean, negotiation: Negotiation, sellerAccountID: String): Future[Result] =
-                  if (validateUsernamePassword) {
-                    for {
-                      pegHash <- getAssetPegHash(negotiation.assetID)
-                      sellerAddress <- getAddress(sellerAccountID)
-                      ticketID <- sendTransaction(sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation)
-                      _ <- createChatIDAndChatRoom(sellerAccountID = sellerAccountID, negotiationID = negotiation.id)
-                      _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, ticketID)()
-                      _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING, ticketID)()
-                      result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_REQUEST_ACCEPTED_BLOCKCHAIN_TRANSACTION_PENDING)))
-                    } yield result
-                  }
-                  else {
-                    Future(BadRequest(views.html.component.master.acceptNegotiationRequest(views.companion.master.AcceptNegotiationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation, sellerAccountID = sellerAccountID)))
-                  }
+                def getOrganization(organizationID: String): Future[Organization] = masterOrganizations.Service.tryGet(organizationID)
 
                 for {
-                  validateUsernamePassword <- validateUsernamePassword
-                  negotiation <- negotiation
-                  sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
-                  result <- acceptNegotiationAndGetResult(validateUsernamePassword = validateUsernamePassword, negotiation = negotiation, sellerAccountID = sellerAccountID)
+                  _ <- markNegotiationAccepted(negotiation.id)
+                  buyerTrader <- getTrader(negotiation.buyerTraderID)
+                  sellerOrganization <- getOrganization(sellerTrader.organizationID)
+                  buyerOrganization <- getOrganization(buyerTrader.organizationID)
+                  _ <- createChatIDAndChatRoom(sellerAccountID = sellerTrader.accountID, negotiationID = negotiation.id)
+                  _ <- utilitiesNotification.send(sellerTrader.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)()
+                  _ <- utilitiesNotification.send(buyerTrader.accountID, constants.Notification.NEGOTIATION_ACCEPTED, negotiation.id, negotiation.assetDescription)()
+                  _ <- utilitiesNotification.send(buyerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, sellerTrader.accountID, buyerTrader.accountID, sellerOrganization.name)()
+                  _ <- utilitiesNotification.send(sellerOrganization.accountID, constants.Notification.ORGANIZATION_NOTIFY_NEGOTIATION_STARTED, negotiation.id, negotiation.assetDescription, sellerTrader.accountID, buyerTrader.accountID, buyerOrganization.name)()
+                  result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.NEGOTIATION_REQUEST_ACCEPTED)))
                 } yield result
-            /*  } else throw new BaseException(constants.Response.UNAUTHORIZED)
-            case None => throw new BaseException(constants.Response.UNAUTHORIZED)
-          }).recover {
-            case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
-          }*/
+              }
+              else {
+                throw new BaseException(constants.Response.UNAUTHORIZED)
+              }
+            } else {
+              Future(BadRequest(views.html.component.master.acceptNegotiationRequest(views.companion.master.AcceptNegotiationRequest.form.fill(acceptRequestData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation, sellerAccountID =  sellerTrader.accountID)))
+            }
+
+          for {
+            validateUsernamePassword <- validateUsernamePassword
+            negotiation <- negotiation
+            sellerTrader<- getTrader(negotiation.sellerTraderID)
+            result <- acceptNegotiationAndGetResult(validateUsernamePassword = validateUsernamePassword, negotiation = negotiation,sellerTrader=sellerTrader)
+          } yield result
         }
       )
   }
@@ -565,40 +567,15 @@ class NegotiationController @Inject()(
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(updateAssetTermsData.id)
 
-          def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
-
-          def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
-
           def getAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
-
-          def sendTransaction(buyerAddress: String, pegHash: String, price: MicroNumber): Future[String] = {
-            transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
-              entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = buyerAddress, bid = price, time = constants.Blockchain.NegotiationDefaultTime, pegHash = pegHash, gas = updateAssetTermsData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
-              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = updateAssetTermsData.gas), to = buyerAddress, password = updateAssetTermsData.password, bid = price, time = constants.Blockchain.NegotiationDefaultTime.toString, pegHash = pegHash, mode = transactionMode),
-              action = transactionsChangeSellerBid.Service.post,
-              onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
-              onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
-            )
-          }
 
           def updateAssetTermsAndGetResult(validateUsernamePassword: Boolean, traderID: String, buyerAccountID: String, negotiation: Negotiation): Future[Result] = {
             if (traderID == negotiation.sellerTraderID) {
               if (validateUsernamePassword) {
-                val updateDescription = if (updateAssetTermsData.description != negotiation.assetDescription) masterNegotiations.Service.updateAssetDescription(id = updateAssetTermsData.id, assetDescription = updateAssetTermsData.description, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedAssetDescription) else Future(0)
-                val updatePrice = if (updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity != negotiation.price) {
-                  for {
-                    pegHash <- getPegHash(negotiation.assetID)
-                    buyerAddress <- getAddress(buyerAccountID)
-                    ticketID <- sendTransaction(buyerAddress = buyerAddress, pegHash = pegHash, price = (updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity).roundedOff())
-                  } yield 0
-                } else Future(0)
-                val updateQuantity = if (updateAssetTermsData.quantity != negotiation.quantity || updateAssetTermsData.quantityUnit != negotiation.quantityUnit) masterNegotiations.Service.updateQuantity(id = updateAssetTermsData.id, quantity = updateAssetTermsData.quantity, quantityUnit = updateAssetTermsData.quantityUnit, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedQuantity) else Future(0)
+                val updateNegotiation = masterNegotiations.Service.updateAssetTerms(negotiation.id, updateAssetTermsData.description, updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity,  updateAssetTermsData.quantity, updateAssetTermsData.quantityUnit,  if (negotiation.status == constants.Status.Negotiation.STARTED && updateAssetTermsData.description != negotiation.assetDescription) false else negotiation.buyerAcceptedAssetDescription, if (negotiation.status == constants.Status.Negotiation.STARTED && updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity != negotiation.price) false else negotiation.buyerAcceptedPrice, if (negotiation.status == constants.Status.Negotiation.STARTED && updateAssetTermsData.quantity != negotiation.quantity) false else negotiation.buyerAcceptedQuantity)
+
                 for {
-                  _ <- updateDescription
-                  _ <- updatePrice
-                  _ <- updateQuantity
+                  _ <- updateNegotiation
                   _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)()
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.NEGOTIATION_ASSET_TERMS_UPDATED, negotiation.id)()
                   _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.ASSET_DETAILS_UPDATED, loginState.username)
@@ -671,7 +648,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.NEGOTIATION_OTHER_DETAILS_UPDATED, loginState.username)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updateAssetOtherDetailsData.id, successes = Seq(constants.Response.NEGOTIATION_ASSET_TERMS_UPDATED)))
           } yield {
-           // actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
+            actors.Service.appWebSocketActor ! actors.Message.WebSocket.Negotiation(buyerAccountID, negotiation.id)
             result
           }
             ).recover {
@@ -730,7 +707,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.PAYMENT_TERMS_UPDATED, loginState.username)
             result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = updatePaymentTermsData.id, successes = Seq(constants.Response.NEGOTIATION_PAYMENT_TERMS_UPDATED)))
           } yield {
-            //actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
+            actors.Service.appWebSocketActor ! actors.Message.WebSocket.Negotiation(buyerAccountID, negotiation.id)
             result
           }
             ).recover {
@@ -793,7 +770,7 @@ class NegotiationController @Inject()(
             _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.DOCUMENT_LIST_UPDATED, loginState.username)
             result <- getResult(negotiation)
           } yield {
-            //actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
+            actors.Service.appWebSocketActor ! actors.Message.WebSocket.Negotiation(buyerAccountID, negotiation.id)
             result
           }
             ).recover {
@@ -858,7 +835,7 @@ class NegotiationController @Inject()(
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             result <- withUsernameToken.PartialContent(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = acceptOrRejectNegotiationTermsData.termType, status = acceptOrRejectNegotiationTermsData.status))
           } yield {
-           // actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
+            actors.Service.appWebSocketActor ! actors.Message.WebSocket.Negotiation(sellerAccountID, negotiation.id)
             result
           }
             ).recover {
@@ -1064,56 +1041,60 @@ class NegotiationController @Inject()(
           def getResult(negotiation: Negotiation, negotiationDocumentList: Seq[NegotiationFile], assetDocumentList: Seq[AssetFile]): Future[Result] = {
             if (negotiationDocumentList.filterNot(_.documentType == constants.File.Negotiation.CONTRACT).map(_.documentType).diff(negotiation.documentList.negotiationDocuments).isEmpty && assetDocumentList.map(_.documentType).diff(negotiation.documentList.assetDocuments).isEmpty) {
               if (assetDocumentList.find(_.documentType == constants.File.Asset.BILL_OF_LADING).getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND)).status == Option(true)) {
-                val buyerTraderID = masterTraders.Service.tryGetID(loginState.username)
-                val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = buyerConfirmData.password)
-                val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
+                if(negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED || negotiation.status == constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING) {
+                  val buyerTraderID = masterTraders.Service.tryGetID(loginState.username)
+                  val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = buyerConfirmData.password)
+                  val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
 
-                def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
+                  def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-                def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
+                  def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-                def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
+                  def updateAndGetResult(validateUsernamePassword: Boolean, sellerAccountID: String, buyerTraderID: String, sellerAddress: String, negotiation: Negotiation, contract: NegotiationFile): Future[Result] = {
+                    if (validateUsernamePassword) {
+                      if (buyerTraderID != negotiation.buyerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
+                      else if (!(negotiation.buyerAcceptedPrice && negotiation.buyerAcceptedQuantity && negotiation.buyerAcceptedAssetDescription && negotiation.buyerAcceptedAssetOtherDetails && negotiation.buyerAcceptedPaymentTerms && negotiation.buyerAcceptedDocumentList)) throw new BaseException(constants.Response.NEGOTIATION_TERMS_NOT_ACCEPTED)
+                      else contract.status match {
+                        case Some(status) => if (!status) throw new BaseException(constants.Response.CONTRACT_REJECTED)
+                        case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
+                      }
 
-                def sendTransactionAndGetResult(validateUsernamePassword: Boolean, sellerAccountID: String, buyerTraderID: String, sellerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[Result] = {
-                  if (validateUsernamePassword) {
-                    if (buyerTraderID != negotiation.buyerTraderID /*|| !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).confirmBuyerBid*/) throw new BaseException(constants.Response.UNAUTHORIZED)
-                    else if (!(negotiation.buyerAcceptedPrice && negotiation.buyerAcceptedQuantity && negotiation.buyerAcceptedAssetDescription && negotiation.buyerAcceptedAssetOtherDetails && negotiation.buyerAcceptedPaymentTerms && negotiation.buyerAcceptedDocumentList)) throw new BaseException(constants.Response.NEGOTIATION_TERMS_NOT_ACCEPTED)
-                    else contract.status match {
-                      case Some(status) => if (!status) throw new BaseException(constants.Response.CONTRACT_REJECTED)
-                      case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
-                    }
+                      val mutables = Seq(constants.Property.ACCOUNT_ID.withValue(loginState.username))
+                      val immutables = Seq(constants.Property.TYPE.withValue(constants.Blockchain.parameterValues.FIAT))
+                      val immutableMetas = Seq(constants.Property.NEGOTIATION_ID.withValue(negotiation.id))
+                      val mutableMetas = Seq(constants.Property.AMOUNT.withValue(negotiation.price.toString))
 
-                    val contractHash = utilities.FileOperations.getDocumentsHash(contract)
+                      val createFiatTx: Future[String] = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
+                        entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = buyerTraderID, toID = buyerTraderID, classificationID = constants.Blockchain.Classification.FIAT, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas =buyerConfirmData.gas, ticketID = "", mode = transactionMode),
+                        blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
+                        request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = buyerConfirmData.gas), toID = buyerTraderID, fromID = buyerTraderID, classificationID = constants.Blockchain.Classification.FIAT, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                        action = transactionsAssetMint.Service.post,
+                        onSuccess = blockchainTransactionAssetMints.Utility.onSuccess,
+                        onFailure = blockchainTransactionAssetMints.Utility.onFailure,
+                        updateTransactionHash = blockchainTransactionAssetMints.Service.updateTransactionHash
+                      )
 
-                    val ticketID = transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
-                      entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, buyerContractHash = contractHash, gas = buyerConfirmData.gas, ticketID = "", mode = transactionMode),
-                      blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,
-                      request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = loginState.address, gas = buyerConfirmData.gas), to = sellerAddress, password = buyerConfirmData.password, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, buyerContractHash = contractHash, mode = transactionMode),
-                      action = transactionsConfirmBuyerBid.Service.post,
-                      onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
-                      onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
-                      updateTransactionHash = blockchainTransactionConfirmBuyerBids.Service.updateTransactionHash
-                    )
-                    for {
-                      ticketID <- ticketID
-                      _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)()
-                      _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)()
-                      _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)
-                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.BLOCKCHAIN_TRANSACTION_BUYER_CONFIRM_NEGOTIATION_TRANSACTION_SENT)))
-                    } yield result
-                  } else Future(BadRequest(views.html.component.master.buyerConfirmNegotiation(views.companion.master.ConfirmNegotiation.form.fill(buyerConfirmData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation)))
+                      for {
+                        _ <- createFiatTx
+                        _ <- utilitiesNotification.send(loginState.username, constants.Notification.BUYER_BID_CONFIRMED)()
+                        _ <- utilitiesNotification.send(sellerAccountID, constants.Notification.BUYER_BID_CONFIRMED)()
+                        _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.BUYER_BID_CONFIRMED)
+                        result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
+                      } yield result
+                    } else Future(BadRequest(views.html.component.master.buyerConfirmNegotiation(views.companion.master.ConfirmNegotiation.form.fill(buyerConfirmData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation)))
+                  }
+
+                  for {
+                    validateUsernamePassword <- validateUsernamePassword
+                    buyerTraderID <- buyerTraderID
+                    contract <- contract
+                    sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
+                    sellerAddress <- getAddress(sellerAccountID)
+                    result <- updateAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAccountID = sellerAccountID, buyerTraderID = buyerTraderID, sellerAddress = sellerAddress, negotiation = negotiation, contract = contract)
+                  } yield result
+                }else{
+                  throw new BaseException(constants.Response.UNAUTHORIZED)
                 }
-
-                for {
-                  validateUsernamePassword <- validateUsernamePassword
-                  buyerTraderID <- buyerTraderID
-                  contract <- contract
-                  pegHash <- getPegHash(negotiation.assetID)
-                  sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
-                  buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
-                  sellerAddress <- getAddress(sellerAccountID)
-                  result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, sellerAccountID = sellerAccountID, buyerTraderID = buyerTraderID, sellerAddress = sellerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
-                } yield result
               } else {
                 throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
               }
@@ -1174,38 +1155,25 @@ class NegotiationController @Inject()(
                 val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
                 val contract = masterTransactionNegotiationFiles.Service.tryGet(id = sellerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
 
-                def getPegHash(assetID: String): Future[String] = masterAssets.Service.tryGetPegHash(assetID)
-
                 def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-                def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
-
-                def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerTraderID: String, buyerAddress: String, pegHash: String, negotiation: Negotiation, contract: NegotiationFile): Future[Result] = {
+                def updateAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerTraderID: String, negotiation: Negotiation, contract: NegotiationFile): Future[Result] = {
                   if (validateUsernamePassword) {
-                    if (sellerTraderID != negotiation.sellerTraderID /* || !loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).confirmSellerBid*/) throw new BaseException(constants.Response.UNAUTHORIZED)
+                    if (sellerTraderID != negotiation.sellerTraderID) throw new BaseException(constants.Response.UNAUTHORIZED)
                     if (!(negotiation.buyerAcceptedPrice && negotiation.buyerAcceptedQuantity && negotiation.buyerAcceptedAssetDescription && negotiation.buyerAcceptedAssetOtherDetails && negotiation.buyerAcceptedPaymentTerms && negotiation.buyerAcceptedDocumentList)) throw new BaseException(constants.Response.NEGOTIATION_TERMS_NOT_ACCEPTED)
                     contract.status match {
                       case Some(status) => if (!status) throw new BaseException(constants.Response.CONTRACT_REJECTED)
                       case None => throw new BaseException(constants.Response.CONTRACT_NOT_VERIFIED)
                     }
 
-                    val contractHash = utilities.FileOperations.getDocumentsHash(contract)
+                    val updateStatus = masterNegotiations.Service.update(negotiation.copy(status = if (negotiation.status == constants.Status.Negotiation.CONTRACT_SIGNED) constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING else constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED))
 
-                    val ticketID = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
-                      entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime), pegHash = pegHash, sellerContractHash = contractHash, gas = sellerConfirmData.gas, ticketID = "", mode = transactionMode),
-                      blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-                      request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = sellerConfirmData.gas), to = buyerAddress, password = sellerConfirmData.password, bid = negotiation.price, time = negotiation.time.getOrElse(constants.Blockchain.NegotiationDefaultTime).toString, pegHash = pegHash, sellerContractHash = contractHash, mode = transactionMode),
-                      action = transactionsConfirmSellerBid.Service.post,
-                      onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
-                      onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,
-                      updateTransactionHash = blockchainTransactionConfirmSellerBids.Service.updateTransactionHash
-                    )
                     for {
-                      ticketID <- ticketID
-                      _ <- utilitiesNotification.send(loginState.username, constants.Notification.BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)()
-                      _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)()
-                      _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT, ticketID)
-                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.BLOCKCHAIN_TRANSACTION_SELLER_CONFIRM_NEGOTIATION_TRANSACTION_SENT)))
+                      _ <- updateStatus
+                      _ <- utilitiesNotification.send(loginState.username, constants.Notification.SELLER_BID_CONFIRMED)()
+                      _ <- utilitiesNotification.send(buyerAccountID, constants.Notification.SELLER_BID_CONFIRMED)()
+                      _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, constants.TradeActivity.SELLER_BID_CONFIRMED)
+                      result <- withUsernameToken.Ok(views.html.tradeRoom(negotiationID = negotiation.id, successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
                     } yield result
                   } else Future(BadRequest(views.html.component.master.sellerConfirmNegotiation(views.companion.master.ConfirmNegotiation.form.fill(sellerConfirmData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), negotiation = negotiation)))
                 }
@@ -1214,10 +1182,8 @@ class NegotiationController @Inject()(
                   validateUsernamePassword <- validateUsernamePassword
                   sellerTraderID <- sellerTraderID
                   contract <- contract
-                  pegHash <- getPegHash(negotiation.assetID)
                   buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
-                  buyerAddress <- getAddress(buyerAccountID)
-                  result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerTraderID = sellerTraderID, buyerAddress = buyerAddress, pegHash = pegHash, negotiation = negotiation, contract = contract)
+                  result <- updateAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerTraderID = sellerTraderID, negotiation = negotiation, contract = contract)
                 } yield result
               } else {
                 throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)
@@ -1351,7 +1317,7 @@ class NegotiationController @Inject()(
                   _ <- masterTransactionTradeActivities.Service.create(negotiationID = negotiation.id, tradeActivity = constants.TradeActivity.BUYER_ACCEPTED_ALL_NEGOTIATION_TERMS, loginState.username)
                   result <- withUsernameToken.Ok(views.html.tradeRoom(confirmAllNegotiationTermsData.negotiationID))
                 } yield {
-                  //actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))
+                  actors.Service.appWebSocketActor ! actors.Message.WebSocket.Negotiation(sellerAccountID, negotiation.id)
                   result
                 }
               } else {

@@ -211,6 +211,7 @@ object Serializable {
 
     def toProperty: Property = Property(id = dataName, fact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
 
+    def withValue(value:String)= this.copy(dataValue= Some(value))
   }
 
   implicit val basePropertyReads: Reads[BaseProperty] = Json.reads[BaseProperty]

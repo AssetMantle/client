@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import models.master.Trader
+@import views.companion.master.DeputizeOrganization
+@import views.html.base._
+
+@(deputizeOrganizationForm: Form[DeputizeOrganization.Data] = DeputizeOrganization.form, organizationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.DEPUTIZE_ORGANIZATION, deputizeOrganizationForm) {
+    @commonInputText(deputizeOrganizationForm, constants.FormField.ORGANIZATION_ID,'value -> organizationID)
+    @commonCheckbox(deputizeOrganizationForm, constants.FormField.ADD_TRADER, 'checked -> true)
+    @commonCheckbox(deputizeOrganizationForm, constants.FormField.CREATE_MODERATED_ASSET, 'checked -> true)
+    @commonCheckbox(deputizeOrganizationForm, constants.FormField.CREATE_UNMODERATED_ASSET, 'checked -> true)
+    @commonCheckbox(deputizeOrganizationForm, constants.FormField.CREATE_FIAT, 'checked -> true)
+    @commonCheckbox(deputizeOrganizationForm, constants.FormField.CREATE_ORDER, 'checked -> true)
+    @commonInputMicroNumber(deputizeOrganizationForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputPassword(deputizeOrganizationForm, constants.FormField.PASSWORD)
+}

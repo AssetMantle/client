@@ -10,6 +10,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.SetACL
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +29,7 @@ class TraderController @Inject()(
                                   masterTraders: master.Traders,
                                   transaction: utilities.Transaction,
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
-                                  transactionsSetACL: transactions.SetACL,
+                                  transactionsSetACL: SetACL,
                                   blockchainAclHashes: blockchain.ACLHashes,
                                   withZoneLoginAction: WithZoneLoginAction,
                                   withoutLoginAction: WithoutLoginAction,

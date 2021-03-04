@@ -16,7 +16,7 @@ import slick.lifted.TableQuery
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None, deputizeStatus: Boolean = false, comment: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -27,7 +27,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] val organizationTable = TableQuery[OrganizationTable]
 
-  private def serialize(organization: Organization): OrganizationSerialized = OrganizationSerialized(id = organization.id, zoneID = organization.zoneID, accountID = organization.accountID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = organization.establishmentDate, email = organization.email, registeredAddress = Json.toJson(organization.registeredAddress).toString, postalAddress = Json.toJson(organization.postalAddress).toString, completionStatus = organization.completionStatus, verificationStatus = organization.verificationStatus, comment = organization.comment, createdBy = organization.createdBy, createdOn = organization.createdOn, createdOnTimeZone = organization.createdOnTimeZone, updatedBy = organization.updatedBy, updatedOn = organization.updatedOn, updatedOnTimeZone = organization.updatedOnTimeZone)
+  private def serialize(organization: Organization): OrganizationSerialized = OrganizationSerialized(id = organization.id, zoneID = organization.zoneID, accountID = organization.accountID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = organization.establishmentDate, email = organization.email, registeredAddress = Json.toJson(organization.registeredAddress).toString, postalAddress = Json.toJson(organization.postalAddress).toString, completionStatus = organization.completionStatus, verificationStatus = organization.verificationStatus, deputizeStatus = organization.deputizeStatus, comment = organization.comment, createdBy = organization.createdBy, createdOn = organization.createdOn, createdOnTimeZone = organization.createdOnTimeZone, updatedBy = organization.updatedBy, updatedOn = organization.updatedOn, updatedOnTimeZone = organization.updatedOnTimeZone)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -132,6 +132,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
 
+  private def getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID: String, completionStatus: Boolean, deputizeStatus: Boolean): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.deputizeStatus === deputizeStatus).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result)
+
   private def getOrganizationsByIDs(organizationIDs: Seq[String]): Future[Seq[OrganizationSerialized]] = db.run(organizationTable.filter(_.id inSet (organizationIDs)).result)
 
   private def updateVerificationStatusAndCommentOnID(id: String, verificationStatus: Option[Boolean], comment: Option[String]): Future[Int] = db.run(organizationTable.filter(_.id === id).map(x => (x.verificationStatus.?, x.comment.?)).update((verificationStatus, comment)).asTry).map {
@@ -150,16 +152,24 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def updateDeputizeStatusOnID(id: String, deputizeStatus: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.deputizeStatus).update(deputizeStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
 
-  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, completionStatus: Boolean, verificationStatus: Option[Boolean], comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
 
-    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), completionStatus = completionStatus, verificationStatus = verificationStatus, comment = comment, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, completionStatus: Boolean, verificationStatus: Option[Boolean], deputizeStatus: Boolean, comment: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+
+    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), completionStatus = completionStatus, verificationStatus = verificationStatus, deputizeStatus = deputizeStatus, comment = comment, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
 
   }
 
   private[models] class OrganizationTable(tag: Tag) extends Table[OrganizationSerialized](tag, "Organization") {
 
-    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, email, registeredAddress, postalAddress, completionStatus, verificationStatus.?, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrganizationSerialized.tupled, OrganizationSerialized.unapply)
+    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, email, registeredAddress, postalAddress, completionStatus, verificationStatus.?, deputizeStatus, comment.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (OrganizationSerialized.tupled, OrganizationSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -183,6 +193,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def verificationStatus = column[Boolean]("verificationStatus")
 
+    def deputizeStatus = column[Boolean]("deputizeStatus")
+
     def comment = column[String]("comment")
 
     def createdBy = column[String]("createdBy")
@@ -203,16 +215,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[String] = add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
 
-    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[String] = {
-      val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
-
-      def upsertOrganization(id: String) = upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
-
-      for {
-        id <- id
-        _ <- upsertOrganization(id)
-      } yield id
-    }
+    def insertOrUpdate(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[Int] = upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email)))
 
     def getID(accountID: String): Future[Option[String]] = getIDByAccountID(accountID)
 
@@ -242,9 +245,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryGetAccountID(id: String): Future[String] = getAccountIDByID(id)
 
-    def getZoneAcceptedOrganizationList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(true)).map { organizations => organizations.map(_.deserialize) }
+    def getZoneAcceptedOrganizationList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID = zoneID, completionStatus = true, deputizeStatus = true).map { organizations => organizations.map(_.deserialize) }
 
-    def getZonePendingOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map { organizations => organizations.map(_.deserialize) }
+    def getZonePendingOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusDeputizeStatusAndZoneID(zoneID = zoneID, completionStatus = true, deputizeStatus = false).map { organizations => organizations.map(_.deserialize) }
 
     def getZoneRejectedOrganizationRequestList(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = Option(false)).map { organizations => organizations.map(_.deserialize) }
 
@@ -268,6 +271,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def markOrganizationFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
     def getOrganizations(organizationIDs: Seq[String]): Future[Seq[Organization]] = getOrganizationsByIDs(organizationIDs).map(_.map(_.deserialize))
+
+    def markDeputized(id:String) = updateDeputizeStatusOnID(id,true)
   }
 
 }

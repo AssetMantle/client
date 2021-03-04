@@ -5,7 +5,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(completedNegotiationList: Seq[NegotiationHistory], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[AssetHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(completedNegotiationList: Seq[NegotiationHistory], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Map[String, Map[String,Option[String]]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="salesQuoteCard">
     @completedNegotiationList.map { completedNegotiation =>
         @traderList.find(trader => trader.id == completedNegotiation.sellerTraderID || trader.id == completedNegotiation.buyerTraderID) match {
@@ -17,13 +17,13 @@
                             <div class="salesQuoteCategory buy">
                             </div>
                             <div class="content">
-                            @assetList.find(_.id == completedNegotiation.assetID) match {
+                            @assetList.get(completedNegotiation.assetID) match {
                                 case Some(asset) => {
                                     <div class="assetIcon">
-                                        <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                                        <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("") + ".svg")"></span>
                                     </div>
                                     <div class="assetInitialData">
-                                        <p class="assetTitle">@Messages(asset.assetType)</p>
+                                        <p class="assetTitle">@Messages(asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))</p>
                                         <p class="assetQuantity">@Seq(completedNegotiation.quantity.toRoundedOffString(), completedNegotiation.quantityUnit).mkString(" ")</p>
                                     </div>
                                 }
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     <div class="salesQuoteCardMiddle salesChild">
-                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                        @assetList.get(completedNegotiation.assetID) match {
                         case Some(asset) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
@@ -59,13 +59,13 @@
                         <div class="salesQuoteCategory sell">
                         </div>
                         <div class="content">
-                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                        @assetList.get(completedNegotiation.assetID) match {
                             case Some(asset) => {
                                 <div class="assetIcon">
-                                    <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                                    <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("") + ".svg")"></span>
                                 </div>
                                 <div class="assetInitialData">
-                                    <p class="assetTitle">@Messages(asset.assetType)</p>
+                                    <p class="assetTitle">@Messages(asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))</p>
                                     <p class="assetQuantity">@Seq(completedNegotiation.quantity.toRoundedOffString(), completedNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <div class="salesQuoteCardMiddle salesChild">
-                        @assetList.find(_.id == completedNegotiation.assetID) match {
+                        @assetList.get(completedNegotiation.assetID) match {
                             case Some(asset) => {
                                 <div class="assetInitialData">
                                     <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
