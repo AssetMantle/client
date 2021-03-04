@@ -118,6 +118,9 @@ object FormField {
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
   val NEGOTIATION_ID = new StringFormField("NEGOTIATION_ID", 1, 100)
+  val REFERENCE_ID = new StringFormField("REFERENCE_ID", 0, 100)
+  val SANCTIONED_COUNTRIES = new StringFormField("SANCTIONED_COUNTRIES", 1, 100)
+  val ORGANIZATION_NAME = new StringFormField("ORGANIZATION_NAME", 1, 100)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -132,6 +135,9 @@ object FormField {
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
+  val CHECK_TYPE = new SelectFormField("CHECK_TYPE", constants.SelectFieldOptions.CHECK_TYPE)
+  val ORGANIZATION_TYPE = new SelectFormField("ORGANIZATION_TYPE", constants.SelectFieldOptions.ORGANIZATION_TYPE)
+
 
   //IntFormField
   val BID = new IntFormField("BID", 0, Int.MaxValue)
@@ -149,6 +155,8 @@ object FormField {
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
   val DATE_OF_BIRTH = new DateFormField("DATE_OF_BIRTH")
   val TENTATIVE_DATE = new DateFormField("TENTATIVE_DATE")
+  val VESSEL_CHECK_FROM_DATE = new DateFormField("VESSEL_CHECK_FROM_DATE")
+  val VESSEL_CHECK_TO_DATE = new DateFormField("VESSEL_CHECK_TO_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)

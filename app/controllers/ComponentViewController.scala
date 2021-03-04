@@ -1,14 +1,10 @@
 package controllers
 
-import java.text.DecimalFormat
-import java.time.Year
-import java.util.Calendar
-
 import controllers.actions._
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models._
 import models.common.Serializable._
+import models.kycCheck.worldcheck.WorldCheckKYCs
 import models.master._
 import models.masterTransaction.{SendFiatRequest, _}
 import play.api.http.ContentTypes
@@ -20,6 +16,10 @@ import play.twirl.api.Html
 import utilities.MicroNumber
 import utilities.MicroNumber._
 
+import java.text.DecimalFormat
+import java.time.Year
+import java.util.Calendar
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,6 +73,7 @@ class ComponentViewController @Inject()(
                                          withZoneLoginAction: WithZoneLoginAction,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
+                                         worldCheckKycs: WorldCheckKYCs
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -3138,17 +3139,36 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def kycList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.component.master.kycList())
-  }
-  def kycOngoingList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.component.master.kycOngoingList())
+  def kycList: Action[AnyContent] = withoutLoginAction {
+    implicit request => Ok(views.html.component.master.kycList())
   }
 
-  def kycReceivedList: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def kycOngoingList: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.kycReceivedList())
+      val identification = masterIdentifications.Service.get(loginState.username)
+      val kycList = worldCheckKycs.Service.get(loginState.username)
+
+      (for {
+        identification <- identification
+        kycList <- kycList
+      }yield Ok(views.html.component.master.kycOngoingList(kycList = kycList, identification = identification))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def kycReceivedList: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val identification = masterIdentifications.Service.get(loginState.username)
+      val kycList = worldCheckKycs.Service.get(loginState.username)
+
+      (for {
+        identification <- identification
+        kycList <- kycList
+      }yield  Ok(views.html.component.master.kycReceivedList(kycList = kycList, identification = identification))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+
   }
 }

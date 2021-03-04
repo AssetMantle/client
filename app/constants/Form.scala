@@ -175,6 +175,8 @@ object Form {
 
   //KYC Controller
   val KYC_REQUEST = new Form("KYC_REQUEST", routes.KycController.request(), routes.javascript.KycController.requestForm)
+  val ADD_DOCUMENT = new Form("ADD_DOCUMENT", routes.KycController.request(), routes.javascript.KycController.requestForm)
+  val SVC_CHECK_REQUEST = new Form("SVC_CHECK_REQUEST", routes.KycController.requestServiceCheck(), routes.javascript.KycController.requestServiceCheckForm)
 
 
   //Western Union - Please Do not change.

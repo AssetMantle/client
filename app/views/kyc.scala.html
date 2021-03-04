@@ -6,47 +6,43 @@
     @common(Messages(constants.View.KYC), failures, warnings, successes, infos)(left)(center)(right)
 
     @left = {
-        <div class="leftContainer">
+        <div class="leftContainer" xmlns="">
             <div id="financials" class="financial"></div>
         </div>
-    @loginState.userType match {
-        case constants.User.TRADER => {
-            <script type="text/javascript">
-        componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-        </script>
-        }
-        case constants.User.ORGANIZATION => {
-            <script type="text/javascript">
-        componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
-        </script>
-        }
-        case constants.User.ZONE => {
-            <script type="text/javascript">
-        componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
-       </script>
-        }
-    }
+                @loginState.userType match {
+                case constants.User.TRADER => {
+                <script>
+                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+                </script>
+                }
+                case constants.User.ORGANIZATION => {
+                  <script>
+                  componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+                  </script>
+                }
+                case constants.User.ZONE => {
+                  <script>
+                componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+                  </script>
+                }
+                case constants.User.GENESIS => {}
+                case _ => {}
+                }
+
+        <div class="leftContainer" xmlns="">
+            <div id="iMBCheckLists" class="iMBCheckList">
+
+            </div>
+        </div>
     }
 
     @center = {
         <div class="cmuk-container cmuk-margin-bottom">
-        @loginState.userType match {
-            case constants.User.TRADER => {
-                <div class="switcherCard">
-                    <div id="kycList"></div>
-                </div>
-
-                <div class="kycListList">
-                    <div id="KycOngoingReceivedList" class="switcherCard"></div>
-                </div>
-
-                <script>
-                    componentResource('List', jsRoutes.controllers.ComponentViewController.traderViewAcceptedNegotiationList());
-                    componentResource('traderViewSentReceivedIncompleteRejectedFailedNegotiationList', jsRoutes.controllers.ComponentViewController.traderViewSentReceivedIncompleteRejectedFailedNegotiationList());
-            </script>
-            }
+        <script>
+            componentResource('kycRooms', jsRoutes.controllers.ViewController.kycRooms());
+        </script>
         </div>
-    }
+
     }
 
     @right = {
@@ -57,5 +53,13 @@
         </div>
         <script>
                 componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities(), 'RECENT_ACTIVITY_LOADING');
+        </script>
+
+        <div class="rightContainer">
+            <div class="contactsContainer">
+                <div id="contacts"></div>
+            </div>
+        </div>
+        <script>
         </script>
     }

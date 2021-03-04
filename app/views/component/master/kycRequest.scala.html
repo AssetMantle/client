@@ -6,10 +6,22 @@
 @(kycRequest: Form[KycRequest.Data] = KycRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonForm(constants.Form.KYC_REQUEST,kycRequest){
-    @commonInputText(kycRequest, constants.FormField.EMAIL_ADDRESS, 'id -> "kycRequestEmailAddress", 'containerDivClass -> "hidden", 'readonly -> false)
-    @commonInputText(kycRequest, constants.FormField.COUNTER_PARTY, 'id -> "kycRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> false)
 
-    @commonJavascriptButton(constants.View.BACK, JavaScript("showSelectAsset()"), 'id -> "showSelectAssetButton")
+
+    <div id="requestingKyc">
+        <div class="cmuk-text-left panelHeader">@Messages(constants.View.KYC_REQUESTING)</div>
+        @commonInputText(kycRequest, constants.FormField.EMAIL_ADDRESS, 'id -> "kycRequestEmailAddress", 'containerDivClass -> "hidden", 'readonly -> false)
+        @commonInputText(kycRequest, constants.FormField.COUNTER_PARTY, 'id -> "kycRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> false)
+    </div>
+    <div id="requiredDocs">
+        <div class="cmuk-text-left panelHeader">@Messages(constants.View.REQUIRED_DOCUMENTS)</div>
+        @commonFormButton(constants.Form.ADD_DOCUMENT)
+    </div>
+    <div id="screeningChecks">
+        <div class="cmuk-text-left panelHeader">@Messages(constants.View.SCREENING_CHECKS)</div>
+    </div>
+
+    @commonJavascriptButton(constants.View.BACK, JavaScript("showSelectCounterParty()"), 'id -> "showSelectCounterPartyButton")
     @commonJavascriptButton(constants.View.NEXT, JavaScript("showSelectCounterParty()"), 'id -> "showSelectCounterPartyButton")
     <script src="@routes.Assets.versioned("javascripts/kycRequest.js")" type="text/javascript"></script>
 

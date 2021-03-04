@@ -5,7 +5,7 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="kycListRooms">
     @commonCard(constants.View.SERVICE_PROVIDER_CHECK, 'cardIconPath -> "images/icons/icons.svg#tradeRoom") {
-      @commonFormButton(constants.Form.KYC_REQUEST)
+      @commonFormButton(constants.Form.SVC_CHECK_REQUEST)
     } {
         @commonHorizontalSwitcher(ListMap(
            constants.View.KYC_ONGOING_LIST -> routes.javascript.ComponentViewController.kycOngoingList,

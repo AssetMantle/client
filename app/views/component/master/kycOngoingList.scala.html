@@ -1,0 +1,42 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@import models.kycCheck.worldcheck.WorldCheckKyc
+@import models.master.Identification
+
+@(kycList: Option[WorldCheckKyc], identification: Option[Identification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div class="ongoingKycListCard">
+    @kycList.map { kyc =>
+        @commonVerticalInfoBox() {
+            <div class="ongoingLeft child">
+                <div class="content">
+                @identification.find(_.accountID == kyc.requester) match {
+                    case Some(account) => {
+                        <div class="accountIcon">
+                            <span class="accountIcon"><img src="@routes.Assets.versioned("images/icons/" + account + ".svg")"></span>
+                        </div>
+                        <div class="accountData">
+                            <p class="accountName">@Messages(account.accountID)</p>
+                            <p class="accountAddress">@Seq(account.address).mkString(" ")</p>
+
+                        </div>
+                    }
+                }
+                </div>
+            </div>
+            <div class="ongoingMiddle child">
+                <div class="content">
+                @identification.find(_.accountID == kyc.requester) match {
+                    case Some(account) => {
+                        <div class="accountData">
+                            <p class="accountName">@Seq(account.firstName, account.lastName).mkString(" ")</p>
+                        </div>
+                        @commonLink(constants.View.GO_TO_KYC_ROOM, routes.ViewController.kycRooms(), 'class -> "cmuk-button buttonPrimary")
+                    }
+                }
+                </div>
+            </div>
+        }
+    }
+</div>

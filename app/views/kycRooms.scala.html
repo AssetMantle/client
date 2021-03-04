@@ -34,27 +34,9 @@
   <div class="mainTabs switcherCardSecond">
     <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
       <div class="cmuk-card-body">
-      @loginState.userType match {
-        case constants.User.TRADER => {
-          <div id="traderViewAcceptedNegotiation">
-                </div>
-          <script type="text/javascript">
-                </script>
-        }
-        case constants.User.ORGANIZATION => {
-          <div id="organizationViewAcceptedNegotiation">
-                </div>
-          <script type="text/javascript">
-                </script>
-        }
-        case constants.User.ZONE => {
-          <div id="zoneViewAcceptedNegotiation">
-                </div>
-          <script type="text/javascript">
-                </script>
-        }
-        case _ => {}
-      }
+      <script type="text/javascript">
+       // componentResource('kycRooms', jsRoutes.controllers.ViewController.kycRooms());
+      </script>
       </div>
     </div>
   </div>

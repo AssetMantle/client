@@ -660,12 +660,14 @@ POST        /loopback/redeemAsset                                               
 POST        /loopback/redeemFiat                                                                  controllers.LoopBackController.redeemFiat
 POST        /loopback/updatePassword/:username                                                    controllers.LoopBackController.updatePassword(username: String)
 POST        /loopback/forgotPassword/:username                                                    controllers.LoopBackController.forgotPassword(username: String)
-GET         /kyc                                                                                     controllers.ViewController.kyc
-GET         /kycRooms                                                                                controllers.ViewController.kycRooms
-GET         /component/kyc/kycList                                                                   controllers.ComponentViewController.kycList
-GET         /component/kyc/ongoing/kycList                                                           controllers.ComponentViewController.kycOngoingList
-GET         /component/kyc/received/kycList                                                          controllers.ComponentViewController.kycReceivedList
-GET         /kyc/request                                                                             controllers.KycController.requestForm
-POST        /kyc/request                                                                             controllers.KycController.request
+GET         /kyc                                                                                  controllers.ViewController.kyc
+GET         /kycRooms                                                                             controllers.ViewController.kycRooms
+GET         /component/kyc/kycList                                                                controllers.ComponentViewController.kycList
+GET         /component/kyc/ongoing/kycList                                                        controllers.ComponentViewController.kycOngoingList
+GET         /component/kyc/received/kycList                                                       controllers.ComponentViewController.kycReceivedList
+GET         /kyc/request                                                                          controllers.KycController.requestForm
+POST        /kyc/request                                                                          controllers.KycController.request
+GET         /kyc/serviceCheck/request                                                             controllers.KycController.requestServiceCheckForm
+POST        /kyc/serviceCheck/request                                                             controllers.KycController.requestServiceCheck
 + nocsrf
 POST        /loopback/pushNotification                                                            controllers.LoopBackController.pushNotification

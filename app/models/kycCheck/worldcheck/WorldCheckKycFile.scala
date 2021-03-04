@@ -1,16 +1,307 @@
 package models.kycCheck.worldcheck
 
+import exceptions.BaseException
 import models.Trait.{Document, Logged}
-import models.master.AccountKYC
+import org.postgresql.util.PSQLException
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
+import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-case class WorldCheckKycFiles ((id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountKYC] with Logged {
+case class WorldCheckKycFile(
+    id: String,
+    documentType: String,
+    fileName: String,
+    file: Option[Array[Byte]],
+    status: Option[Boolean] = None,
+    createdBy: Option[String] = None,
+    createdOn: Option[Timestamp] = None,
+    createdOnTimeZone: Option[String] = None,
+    updatedBy: Option[String] = None,
+    updatedOn: Option[Timestamp] = None,
+    updatedOnTimeZone: Option[String] = None
+) extends Document[WorldCheckKycFile]
+    with Logged {
 
-  def updateFileName(newFileName: String): AccountKYC = copy(fileName = newFileName)
+  def updateFileName(newFileName: String): WorldCheckKycFile =
+    copy(fileName = newFileName)
 
-  def updateFile(newFile: Option[Array[Byte]]): AccountKYC = copy(file = newFile)
+  def updateFile(newFile: Option[Array[Byte]]): WorldCheckKycFile =
+    copy(file = newFile)
 
-  def updateStatus(status: Option[Boolean]): AccountKYC = copy(status = status)
+  def updateStatus(status: Option[Boolean]): WorldCheckKycFile =
+    copy(status = status)
+}
 
+@Singleton
+class WorldCheckKycFiles @Inject() (
+    protected val databaseConfigProvider: DatabaseConfigProvider,
+    configuration: Configuration
+)(implicit executionContext: ExecutionContext) {
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.WORLD_CHECK_KYC_FILE
+
+  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
+  val db = databaseConfig.db
+
+  import databaseConfig.profile.api._
+
+  private[models] val worldCheckKycFileTable = TableQuery[WorldCheckKycFileTable]
+
+  private def add(worldCheckKycFile: WorldCheckKycFile): Future[String] =
+    db.run(
+        (worldCheckKycFileTable returning worldCheckKycFileTable
+          .map(_.id) += worldCheckKycFile).asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+          }
+      }
+
+  private def update(worldCheckKycFile: WorldCheckKycFile): Future[Int] =
+    db.run(
+        worldCheckKycFileTable
+          .filter(_.id === worldCheckKycFile.id)
+          .filter(_.documentType === worldCheckKycFile.documentType)
+          .update(worldCheckKycFile)
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
+  private def tryGetIDAndDocumentType(
+      id: String,
+      documentType: String
+  ): Future[WorldCheckKycFile] =
+    db.run(
+        worldCheckKycFileTable
+          .filter(_.id === id)
+          .filter(_.documentType === documentType)
+          .result
+          .head
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
+  private def getByIDAndDocumentType(
+      id: String,
+      documentType: String
+  ): Future[Option[WorldCheckKycFile]] =
+    db.run(
+      worldCheckKycFileTable
+        .filter(_.id === id)
+        .filter(_.documentType === documentType)
+        .result
+        .headOption
+    )
+
+  private def tryGetFileNameByIdDocumentType(
+      id: String,
+      documentType: String
+  ): Future[String] =
+    db.run(
+        worldCheckKycFileTable
+          .filter(_.id === id)
+          .filter(_.documentType === documentType)
+          .map(_.fileName)
+          .result
+          .head
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
+  private def updateStatusByIdAndDocumentType(
+      id: String,
+      documentType: String,
+      status: Option[Boolean]
+  ): Future[Int] =
+    db.run(
+        worldCheckKycFileTable
+          .filter(_.id === id)
+          .filter(_.documentType === documentType)
+          .map(_.status.?)
+          .update(status)
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
+  private def getAllDocumentsById(id: String): Future[Seq[WorldCheckKycFile]] =
+    db.run(worldCheckKycFileTable.filter(_.id === id).result)
+
+  private def deleteById(id: String) =
+    db.run(worldCheckKycFileTable.filter(_.id === id).delete.asTry).map {
+      case Success(result) => result
+      case Failure(exception) =>
+        exception match {
+          case noSuchElementException: NoSuchElementException =>
+            throw new BaseException(
+              constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+              noSuchElementException
+            )
+          case psqlException: PSQLException =>
+            throw new BaseException(
+              constants.Response.PSQL_EXCEPTION,
+              psqlException
+            )
+        }
+    }
+
+  private def checkFileExistsByIdAndDocumentType(
+      id: String,
+      documentType: String
+  ): Future[Boolean] =
+    db.run(
+      worldCheckKycFileTable
+        .filter(_.id === id)
+        .filter(_.documentType === documentType)
+        .exists
+        .result
+    )
+
+  private def checkByIdAndFileName(
+      id: String,
+      fileName: String
+  ): Future[Boolean] =
+    db.run(
+      worldCheckKycFileTable
+        .filter(_.id === id)
+        .filter(_.fileName === fileName)
+        .exists
+        .result
+    )
+
+  private[models] class WorldCheckKycFileTable(tag: Tag)
+      extends Table[WorldCheckKycFile](tag, "WorldCheckKycFile") {
+
+    def * =
+      (
+        id,
+        documentType,
+        fileName,
+        file.?,
+        status.?,
+        createdBy.?,
+        createdOn.?,
+        createdOnTimeZone.?,
+        updatedBy.?,
+        updatedOn.?,
+        updatedOnTimeZone.?
+      ) <> (WorldCheckKycFile.tupled, WorldCheckKycFile.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def documentType = column[String]("documentType", O.PrimaryKey)
+
+    def status = column[Boolean]("status")
+
+    def fileName = column[String]("fileName", O.Unique)
+
+    def file = column[Array[Byte]]("file")
+
+    def createdBy = column[String]("createdBy")
+
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
+
+    def updatedBy = column[String]("updatedBy")
+
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+
+  }
+
+  object Service {
+
+    def create(worldCheckKyc: WorldCheckKycFile): Future[String] = add(worldCheckKyc)
+
+    def updateOldDocument(worldCheckKyc: WorldCheckKycFile): Future[Int] =
+      update(worldCheckKyc)
+
+    def get(id: String, documentType: String): Future[Option[WorldCheckKycFile]] =
+      getByIDAndDocumentType(id = id, documentType = documentType)
+
+    def tryGet(id: String, documentType: String): Future[WorldCheckKycFile] =
+      tryGetIDAndDocumentType(id = id, documentType = documentType)
+
+    def tryGetFileName(id: String, documentType: String): Future[String] =
+      tryGetFileNameByIdDocumentType(id = id, documentType = documentType)
+
+    def getAllDocuments(id: String): Future[Seq[WorldCheckKycFile]] =
+      getAllDocumentsById(id = id)
+
+    def verify(id: String, documentType: String): Future[Int] =
+      updateStatusByIdAndDocumentType(
+        id = id,
+        documentType = documentType,
+        status = Option(true)
+      )
+
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
+
+    def checkFileExists(id: String, documentType: String): Future[Boolean] =
+      checkFileExistsByIdAndDocumentType(id = id, documentType = documentType)
+
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] =
+      checkByIdAndFileName(id = id, fileName = fileName)
+  }
 }
