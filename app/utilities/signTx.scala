@@ -1,6 +1,6 @@
 package utilities
 
-import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
+import java.security.spec.{ECPrivateKeySpec, ECPublicKeySpec, PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.security.{KeyPair, Signature, _}
 import java.util.Base64
 
@@ -13,8 +13,20 @@ import org.bitcoinj.signers.TransactionSigner
 import org.bitcoinj.crypto.TransactionSignature
 import transactions.common.sign
 import org.bitcoinj.signers.LocalTransactionSigner
+import org.bitcoinj.signers.LocalTransactionSigner
+
+import org.bitcoinj.
+
+import org.bouncycastle.crypto.signers
+
+import org.bouncycastle.crypto.signers.ECDSASigner
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo
+import org.bitcoinj.
+
 //import  org.bouncycastle.crypto.signers.
+import org.bouncycastle.crypto.signers.ECDSASigner
 import transactions.common.sign.{SignMeta, Signature2, StdSignMsg, StdTx, Tx}
+import org.bitcoinj.core.TransactionBroadcast
 import java.io._
 import java.security._
 
@@ -25,12 +37,10 @@ object signTx{
     val signedMsg=createSignMsg(tx, meta)
     //val signature=Signature.getInstance("SHA1withDSA", "SUN")
     createSignature(signedMsg, key)
-
+      val ecsaSigner= new ECDSASigner()
+    ecsaSigner.init()
+    ecsaSigner.generateSignature()
     //val x=KeyPair
-
-
-
-
 
   }
 
@@ -71,6 +81,7 @@ object signTx{
 
     //val privateKey = key.privateKey.to
 
+    val ECPRIVATEkey = new ECPrivateKeySpec("","")
     val fromateddPriavteKey= new PKCS8EncodedKeySpec(key.privateKey)
     val formattedPubKey = new X509EncodedKeySpec(key.publicKey)
     val kf= KeyFactory.getInstance("EC")
