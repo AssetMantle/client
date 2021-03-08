@@ -6,11 +6,11 @@ import queries.responses.common.Account.SinglePublicKey
 
 object sign{
 
-  case class Value(from_address:String,to_address:String, amount:Seq[Coin])
+  case class Value(amount:Seq[Coin], from_address:String, to_address:String )
   implicit val valueWrites: OWrites[Value] = Json.writes[Value]
 
   case class Signature2( signature:String, pub_key: SinglePublicKey)
-  case class Message(`type`:String,value:Value)
+  case class Message(`type`:String, value:Value)
   implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 
   case class Tx(msg:Seq[Message], fee:Fee, memo:String="")

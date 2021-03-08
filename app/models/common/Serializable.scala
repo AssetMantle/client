@@ -82,8 +82,8 @@ object Serializable {
     ) (coinApply _)
 
   implicit val coinWrites: Writes[Coin] = (coin: Coin) => Json.obj(
-    "denom" -> coin.denom,
-    "amount" -> coin.amount.toMicroString
+    "amount" -> coin.amount.toMicroString,
+  "denom" -> coin.denom
   )
 
   case class Fee(amount: Seq[Coin], gas: String)

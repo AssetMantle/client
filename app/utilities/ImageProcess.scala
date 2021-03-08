@@ -6,6 +6,7 @@ import com.sksamuel.scrimage.nio.JpegWriter
 import exceptions.BaseException
 import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64
+import org.bouncycastle.its.asn1.Signature
 import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +19,9 @@ object ImageProcess {
 
   def convertToThumbnail(name: String, uploadPath: String)(implicit executionContext: ExecutionContext): (String, Option[Array[Byte]]) = {
     try {
+
+     // val sgin = Signature.getInstance("SHA256withRSA", "BC")
+
       val imageRes = ImageIO.read(FileOperations.newFile(uploadPath, name))
       implicit val writer: JpegWriter = JpegWriter().withCompression(100)
       val bytes = FileOperations.convertToByteArray(scrimage.Image.fromFile(FileOperations.newFile(uploadPath, name)).fit(180, (180 * imageRes.getHeight) / imageRes.getWidth).output(FileOperations.newFile(uploadPath, '~' + name)))

@@ -99,11 +99,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
       val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
 
-      val sendCoinMessage= Message("cosmos-sdk/MsgSend",Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "", amount = Seq(Coin("stake", MicroNumber(20000)))))
+      val sendCoinMessage= Message("cosmos-sdk/MsgSend",Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos15yfq4crqefet0phh8qc5x6deprdt6ckynnd6ta", amount = Seq(Coin("stake", MicroNumber(2)))))
       val fee= Fee(Seq(), gas="1000000")
 
       val tx= Tx(Seq(sendCoinMessage), fee, "")
-      val signMeta= SignMeta("123123","123","123")
+      val signMeta= SignMeta("0","test","2")
       utilities.signTx.signTransaction(tx, signMeta, wallet)
       }catch {
         case exception: Exception=> logger.error(exception.getMessage,exception)
@@ -174,5 +174,5 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
- // startup.start()
+ startup.start()
 }
