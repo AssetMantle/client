@@ -13,11 +13,13 @@ import services.Startup
 import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Coin
 import play.api.libs.json.{Json, OWrites, Reads}
-import queries.responses.blockchain.TransactionResponse.Fee
+import models.common.Serializable.Fee
 import queries.responses.common.Account.SinglePublicKey
 import transactions.responses.MemberCheckCorporateScanResponse.ScanEntity
 import utilities.MicroNumber
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import transactions.common.sign.{Message, SignMeta, Tx, Value}
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -84,7 +86,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def testSendCoin: Action[AnyContent] =withoutLoginActionAsync{implicit loginState =>
     implicit request =>
 
-      println(Json.toJson(Temp("someType","someValue")))
+   /*   println(Json.toJson(Temp("someType","someValue")))
 
       val x=Json.toJson(Temp("someType","someValue"))
      // val z=JsonPropertyOrder()
@@ -92,26 +94,35 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
       println(y)
       println(y.`type`)
-      println(y.value)
-     /* val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
+      println(y.value)*/
+      try{
+      val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
       val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
 
-      val sendCoinMessage= transactionBroadcast.SendCoinMessage("cosmos-sdk/MsgSend",transactionBroadcast.Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "", amount = Seq(Coin("stake", MicroNumber(20000)))))
+      val sendCoinMessage= Message("cosmos-sdk/MsgSend",Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "", amount = Seq(Coin("stake", MicroNumber(20000)))))
       val fee= Fee(Seq(), gas="1000000")
-      val signature= transactionBroadcast.Signature(SinglePublicKey("tendermint/PubKeySecp256k1",wallet.publicKey.toString))
 
-      val request = transactionBroadcast.Request(transactionBroadcast.Tx(Seq(sendCoinMessage),fee,),transactionMode)
-      val sendBroadcast = transactionBroadcast.Service.post()
-*/
-      val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
+      val tx= Tx(Seq(sendCoinMessage), fee, "")
+      val signMeta= SignMeta("123123","123","123")
+      utilities.signTx.signTransaction(tx, signMeta, wallet)
+      }catch {
+        case exception: Exception=> logger.error(exception.getMessage,exception)
+      }
+
+      //val signature= transactionBroadcast.Signature(SinglePublicKey("tendermint/PubKeySecp256k1",wallet.publicKey.toString), )
+
+    //  val request = transactionBroadcast.Request(transactionBroadcast.Tx(Seq(sendCoinMessage),fee,),transactionMode)
+      //val sendBroadcast = transactionBroadcast.Service.post()
+
+      /*val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
 
       val key=utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
 
       println(key.address)
       println(key.publicKey.map(x=> x.toChar).toList.toString)
       println(key.mnemonics)
-      println(key.privateKey.toList.toString)
-    Future(Ok)
+      println(key.privateKey.toList.toString)*/
+    Future(Ok("Done"))
   }
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>

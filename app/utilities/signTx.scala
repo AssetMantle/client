@@ -1,10 +1,12 @@
 package utilities
 
+import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.security.{KeyPair, Signature, _}
 import java.util.Base64
 
 import play.api.libs.json.Json
 import queries.responses.common.Account.SinglePublicKey
+import org.bitcoinj
 import scorex.crypto.hash.Sha256
 import scorex.crypto.signatures.PublicKey
 import org.bitcoinj.signers.TransactionSigner
@@ -12,19 +14,19 @@ import org.bitcoinj.crypto.TransactionSignature
 import transactions.common.sign
 import org.bitcoinj.signers.LocalTransactionSigner
 //import  org.bouncycastle.crypto.signers.
-import transactions.common.sign.{SignMeta, Signature, StdSignMsg, StdTx, Tx}
+import transactions.common.sign.{SignMeta, Signature2, StdSignMsg, StdTx, Tx}
 import java.io._
-import java.security.
+import java.security._
 
 object signTx{
 
   def signTransaction(tx:Tx, meta: SignMeta, key: Key)={
 
     val signedMsg=createSignMsg(tx, meta)
-    val signature=Signature.getInstance("SHA1withDSA", "SUN")
+    //val signature=Signature.getInstance("SHA1withDSA", "SUN")
+    createSignature(signedMsg, key)
 
-
-    val x=KeyPair
+    //val x=KeyPair
 
 
 
@@ -39,7 +41,7 @@ object signTx{
   def createSignature(signMsg: StdSignMsg, key: Key)={
     val signatureBytes= createSignatureBytes(signMsg, key)
 
-    Signature(
+    Signature2(
       Base64.getUrlEncoder.encodeToString(signatureBytes),
       SinglePublicKey("tendermint/PubKeySecp256k1",Base64.getUrlEncoder.encodeToString(key.publicKey))
     )
@@ -54,22 +56,42 @@ object signTx{
 
   def sign(bytes:Array[Byte], key: Key)={
 
-    val hash = Sha256.hash(bytes)
+   /* val hash = Sha256.hash(bytes)
     val keygen = KeyPairGenerator.getInstance("DSA", "SUN")
 
     val random = SecureRandom.getInstance("SHA1PRNG", "SUN")
-    keygen.initialize(1024, random)
+    keygen.initialize(1024, random)*/
 
     //val pair =
 
     val ecdsa =Signature.getInstance("SHA256withECDSA")
 
     val pv= scorex.crypto.signatures.PrivateKey
-    val pubKey:java.security.PublicKey = key.publicKey
-    val zxc= PrivateKey.get
-    ecdsa.initSign(PublicKey)
+    //val pubKey:java.security.PublicKey = key.publicKey
+
+    //val privateKey = key.privateKey.to
+
+    val fromateddPriavteKey= new PKCS8EncodedKeySpec(key.privateKey)
+    val formattedPubKey = new X509EncodedKeySpec(key.publicKey)
+    val kf= KeyFactory.getInstance("EC")
+    val priv= kf.generatePrivate(fromateddPriavteKey)
+    val pubKey = kf.generatePublic(formattedPubKey)
+
+    ecdsa.initSign(priv)
+    ecdsa.update(bytes)
+    val signature=ecdsa.sign()
+
+    ecdsa.initVerify(pubKey)
+    ecdsa.update(bytes)
+    val bool= ecdsa.verify(signature)
+
+    println("verified---"+bool)
+    signature
+
+    //val zxc= PrivateKey.get
+    /*ecdsa.initSign(PublicKey)
     ecdsa.initSign(key.privateKey)
-    ecdsa.initSign(key.privateKey)
+    ecdsa.initSign(key.privateKey)*/
    // ecdsa.si
 
   }
