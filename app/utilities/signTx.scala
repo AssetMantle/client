@@ -7,10 +7,13 @@ import java.security.{KeyPair, Signature, _}
 import java.util
 import java.util.Base64
 
+import com.sun.tools.javac.util.Convert
+import javax.xml.bind.DatatypeConverter
 import play.api.libs.json.Json
 import queries.responses.common.Account.SinglePublicKey
 import org.bitcoinj
-import org.bitcoinj.core.ECKey
+import org.bitcoinj.core.ECKey.ECDSASignature
+import org.bitcoinj.core.{ECKey, Sha256Hash}
 import scorex.crypto.hash.Sha256
 import scorex.crypto.signatures.PublicKey
 import org.bitcoinj.signers.TransactionSigner
@@ -32,6 +35,7 @@ import org.bitcoinj.crypto.TransactionSignature
 
 import org.bouncycastle.crypto.signers.ECDSASigner
 
+import java.security.{MessageDigest, Security}
 import org.bouncycastle.crypto.signers.ECDSASigner
 import transactions.common.sign.{SignMeta, Signature2, StdSignMsg, StdTx, Tx}
 
@@ -75,13 +79,59 @@ object signTx{
   def createSignatureBytes(signMsg: StdSignMsg, key: ECKey)={
       val jsonString = toCanonicalJSONBytes(signMsg)
     println(jsonString)
+    println(jsonString.getBytes("UTF-8").toList)
+
+    //println(sonString.getBytes())
+
+    //val hash = Sha256.hash(jsonString.getBytes()).
+
+     val hash=  MessageDigest.getInstance("SHA-256").digest(jsonString.getBytes("UTF-8"))
+
+
+
+    println("hash--"+hash)
+
+    val byteArrayHash= MessageDigest
+      .getInstance("SHA-256")
+      .digest(jsonString.getBytes("UTF-8"))
+
+    println("byteArrayHash--"+byteArrayHash.toList)
+
+    //val sha256Hash= Sha256Hash.wrap(byteArrayHash)
+
+    val sha256Hash= Sha256Hash.of(hash)
+
+    val hash2= DatatypeConverter.printHexBinary(
+      MessageDigest
+        .getInstance("SHA-256")
+        .digest(jsonString.getBytes("UTF-8")))
+
+    println(hash2)
+
+   // key.sign()
     val xsignature=key.signMessage(jsonString)
 
-    println(key.getPubKey.mkString)
-    println(key.getPubKeyPoint.toString)
-    println(key.getPubKeyHash.mkString)
+
+    val byteArray = jsonString.getBytes()
+
+
+
+
+
+
+    val anotherSignature = key.sign(sha256Hash)
+    println("anotherSignature.r--"+anotherSignature.r)
+    println("anotherSignature.s---"+anotherSignature.s)
+
+    println("anotherSignature.r---ByteArray--"+anotherSignature.r.toByteArray)
+    println("anotherSignature.s----ByteArray---"+anotherSignature.s.toByteArray)
+
+    println("anotherSignature.r---Base64--"+Base64.getEncoder.encodeToString(anotherSignature.r.toByteArray))
+    println("anotherSignature.s----Base64-"+Base64.getEncoder.encodeToString(anotherSignature.s.toByteArray))
+
     println(key.getPublicKeyAsHex)
     println(Base64.getEncoder.encodeToString(key.getPubKey))
+    println(Base64.getEncoder.encodeToString(key.getPrivKeyBytes))
 
     println("signature--"+xsignature)
    val bool= try {
@@ -93,11 +143,11 @@ object signTx{
     }
 
     println("asdasdBoolBitcoinj--"+bool)
-      //sign(bytes,key)
+      sign(jsonString.getBytes("UTF-8"),key)
 
   }
 
-  def sign(bytes:Array[Byte], key: Key)={
+  def sign(bytes:Array[Byte], key: ECKey)={
 
    /* val hash = Sha256.hash(bytes)
     val keygen = KeyPairGenerator.getInstance("DSA", "SUN")
@@ -130,29 +180,30 @@ object signTx{
     parameters.init(new ECGenParameterSpec("secp256k1"))
     val ecParameterSpec= parameters.getParameterSpec(classOf[ECParameterSpec])
 
-    val ecPoint = new ECPoint(new BigInteger(1, util.Arrays.copyOfRange(key.publicKey, 0, 24)),new BigInteger(1, util.Arrays.copyOfRange(key.publicKey, 24, 48)))
+    val ecPoint = key.getPubKeyPoint
     //val w= getDecoded()
      //val ecParams= NISTNamedCurves.getByName("secp256k1")
     // val ecCurveSpec= new ECNamedCurveSpec("secp256k1", ecParams.getCurve, ecParams.getG, ecParams.getN)
-    val fromateddPriavteKey= new ECPrivateKeySpec(new BigInteger(key.privateKey), ecParameterSpec)
-    val formattedPubKey = new ECPublicKeySpec(ecPoint , ecParameterSpec)
+    val fromateddPriavteKey= new ECPrivateKeySpec(key.getPrivKey, ecParameterSpec)
+   // val formattedPubKey = new ECPublicKeySpec(ecPoint , ecParameterSpec)
 
     val kf= KeyFactory.getInstance("EC")
 
     val priv= kf.generatePrivate(fromateddPriavteKey)
-    val pubKey = kf.generatePublic(formattedPubKey)
+    //val pubKey = kf.generatePublic(formattedPubKey)
 
     ecdsa.initSign(priv)
     ecdsa.update(bytes)
     val signature=ecdsa.sign()
 
-    ecdsa.initVerify(pubKey)
-    ecdsa.update(bytes)
-    val bool= ecdsa.verify(signature)
+    //ecdsa.initVerify(pubKey)
+    //ecdsa.update(bytes)
+    //val bool= ecdsa.verify(signature)
 
-    println("verified---"+bool)
+  //  println("verified---"+bool)
+   // Base64.
+  //  println("signature222---"+ new String(Base64.getDecoder.decode(signature)))
     signature
-
 
     val ecSpec= new ECGenParameterSpec("secp256k1")
     val generator = KeyPairGenerator.getInstance("EC")
@@ -181,10 +232,7 @@ object signTx{
 
 
   def toCanonicalJSONBytes(signMsg: StdSignMsg): String={
-
     val z=Json.toJson(signMsg)
-
-
     Json.toJson(signMsg).toString()
 
   }
@@ -199,6 +247,73 @@ object signTx{
 
     val keys = signMsg.getClass.getDeclaredFields.map(_.getName)
     val values = signMsg.productIterator.to
+  }
+
+
+  def javaSecuritySigning(tx:Tx, meta: SignMeta, key: ECKey)={
+    val signedMsg=createSignMsg(tx, meta)
+    val jsonString = toCanonicalJSONBytes(signedMsg)
+   // val jsonString = toCanonicalJSONBytes(tx)
+    val bytes = jsonString.getBytes(StandardCharsets.UTF_8)
+
+    val parameters = AlgorithmParameters.getInstance("EC")
+    parameters.init(new ECGenParameterSpec("secp256k1"))
+    val ecParameterSpec= parameters.getParameterSpec(classOf[ECParameterSpec])
+    val ecPoint = key.getPubKeyPoint
+
+    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
+
+    val ecNamedCurveParameterSpec= ECNamedCurveTable.getParameterSpec("secp256k1")
+    val ecPrivateKeySpec= new ECPrivateKeySpec(key.getPrivKey, ecNamedCurveParameterSpec)
+
+
+    //val ecParams= NISTNamedCurves.getByName("secp256k1")
+    // val ecCurveSpec= new ECNamedCurveSpec("secp256k1", ecParams.getCurve, ecParams.getG, ecParams.getN)
+    val fromateddPriavteKey= new ECPrivateKeySpec(key.getPrivKey, ecParameterSpec)
+    // val formattedPubKey = new ECPublicKeySpec(ecPoint , ecParameterSpec)
+
+    val kf= KeyFactory.getInstance("EC")
+
+    val priv= kf.generatePrivate(fromateddPriavteKey)
+    //val pubKey = kf.generatePublic(formattedPubKey)
+    val ecdsa =Signature.getInstance("SHA256withECDSA")
+
+    val bool = key.getPrivKeyBytes ==     priv.getEncoded
+    println("same privateKey------"+ bool)
+
+
+
+    ecdsa.initSign(priv)
+    ecdsa.update(bytes)
+    val signature=ecdsa.sign()
+
+    //ecdsa.initVerify(pubKey)
+    //ecdsa.update(bytes)
+    //val bool= ecdsa.verify(signature)
+
+    //  println("verified---"+bool)
+
+  }
+
+
+  def bitcoinjSigning(tx:Tx, meta: SignMeta, key: ECKey)={
+    val signedMsg=createSignMsg(tx, meta)
+    val jsonString = toCanonicalJSONBytes(signedMsg)
+
+    val xsignature=key.signMessage(jsonString)
+
+
+
+
+
+
+  }
+
+  def bouncyCastleSigning()={
+
+
+
+
   }
 
 }
