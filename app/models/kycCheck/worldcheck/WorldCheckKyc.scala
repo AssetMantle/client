@@ -44,51 +44,7 @@ class WorldCheckKYCs @Inject() (
 
   private[models] val worldCheckKYCTable = TableQuery[WorldCheckTable]
 
-  def serialize(worldCheckKyc: WorldCheckKyc): WorldCheckKycSerialized =
-    WorldCheckKycSerialized(
-      id = worldCheckKyc.id,
-      email = worldCheckKyc.email,
-      counterParty = worldCheckKyc.counterParty,
-      requester = worldCheckKyc.requester,
-      status = worldCheckKyc.status,
-      createdBy = worldCheckKyc.createdBy,
-      createdOn = worldCheckKyc.createdOn,
-      createdOnTimeZone = worldCheckKyc.createdOnTimeZone,
-      updatedBy = worldCheckKyc.updatedBy,
-      updatedOn = worldCheckKyc.updatedOn,
-      updatedOnTimeZone = worldCheckKyc.updatedOnTimeZone
-    )
-  case class WorldCheckKycSerialized(
-      id: String,
-      email: String,
-      counterParty: String,
-      requester: String,
-      status: Option[Boolean],
-      createdBy: Option[String],
-      createdOn: Option[Timestamp],
-      createdOnTimeZone: Option[String],
-      updatedBy: Option[String],
-      updatedOn: Option[Timestamp],
-      updatedOnTimeZone: Option[String]
-  ) {
-
-    def deserialize: WorldCheckKyc =
-      WorldCheckKyc(
-        id = id,
-        email = email,
-        counterParty = counterParty,
-        requester = requester,
-        status = status,
-        createdBy = createdBy,
-        createdOn = createdOn,
-        createdOnTimeZone = createdOnTimeZone,
-        updatedBy = updatedBy,
-        updatedOn = updatedOn,
-        updatedOnTimeZone = updatedOnTimeZone
-      )
-
-  }
-  private def add(worldCheck: WorldCheckKycSerialized): Future[String] =
+  private def add(worldCheck: WorldCheckKyc): Future[String] =
     db.run(
         (worldCheckKYCTable returning worldCheckKYCTable
           .map(_.id) += worldCheck).asTry
@@ -107,14 +63,25 @@ class WorldCheckKYCs @Inject() (
 
   private def getByRequesterId(
       requester: String
-  ): Future[Option[WorldCheckKycSerialized]] =
+  ): Future[Seq[WorldCheckKyc]] =
     db.run(
-      worldCheckKYCTable.filter(_.requester === requester).result.headOption
+      worldCheckKYCTable.filter(_.requester === requester).result
+    )
+
+  private def getByIdRequesterId(
+      id: String,
+      requester: String
+  ): Future[WorldCheckKyc] =
+    db.run(
+      worldCheckKYCTable
+        .filter(_.id === id)
+        .filter(_.requester === requester)
+        .result
+        .head
     )
 
   private[models] class WorldCheckTable(tag: Tag)
-      extends Table[WorldCheckKycSerialized](tag, "WorldCheckKyc") {
-
+      extends Table[WorldCheckKyc](tag, "WorldCheckKyc") {
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -138,19 +105,20 @@ class WorldCheckKYCs @Inject() (
 
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
 
-    override def * =  (
-      id,
-      email,
-      counterParty,
-      requester,
-      status.?,
-      createdBy.?,
-      createdOn.?,
-      createdOnTimeZone.?,
-      updatedBy.?,
-      updatedOn.?,
-      updatedOnTimeZone.?
-    ) <> (WorldCheckKycSerialized.tupled, WorldCheckKycSerialized.unapply)
+    override def * =
+      (
+        id,
+        email,
+        counterParty,
+        requester,
+        status.?,
+        createdBy.?,
+        createdOn.?,
+        createdOnTimeZone.?,
+        updatedBy.?,
+        updatedOn.?,
+        updatedOnTimeZone.?
+      ) <> (WorldCheckKyc.tupled, WorldCheckKyc.unapply)
   }
 
   object Service {
@@ -161,17 +129,22 @@ class WorldCheckKYCs @Inject() (
         requester: String
     ): Future[String] =
       add(
-        serialize(
-          WorldCheckKyc(
-            utilities.IDGenerator.requestID(),
-            email = email,
-            counterParty = counterParty,
-            requester = requester
-          )
+        WorldCheckKyc(
+          utilities.IDGenerator.requestID(),
+          email = email,
+          counterParty = counterParty,
+          requester = requester
         )
       )
 
-    def get(requester: String): Future[Option[WorldCheckKyc]] =
-      getByRequesterId(requester).map(_.map(_.deserialize))
+    def get(requester: String): Future[Seq[WorldCheckKyc]] =
+      getByRequesterId(requester)
+
+    def getByIdAndRequester(
+        id: String,
+        requester: String
+    ): Future[WorldCheckKyc] =
+      getByIdRequesterId(id, requester)
   }
+
 }

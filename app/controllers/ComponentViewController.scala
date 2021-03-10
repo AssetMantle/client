@@ -4,7 +4,7 @@ import controllers.actions._
 import exceptions.BaseException
 import models._
 import models.common.Serializable._
-import models.kycCheck.worldcheck.WorldCheckKYCs
+import models.kycCheck.worldcheck.{WorldCheckKYCs, WorldCheckKycFiles, WorldCheckScreeningChecks}
 import models.master._
 import models.masterTransaction.{SendFiatRequest, _}
 import play.api.http.ContentTypes
@@ -73,7 +73,9 @@ class ComponentViewController @Inject()(
                                          withZoneLoginAction: WithZoneLoginAction,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
-                                         worldCheckKycs: WorldCheckKYCs
+                                         worldCheckKycs: WorldCheckKYCs,
+                                         worldCheckScreeningChecks: WorldCheckScreeningChecks,
+                                         worldCheckKycFiles : WorldCheckKycFiles
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -3139,8 +3141,8 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def kycList: Action[AnyContent] = withoutLoginAction {
-    implicit request => Ok(views.html.component.master.kycList())
+  def kycList: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request => Future(Ok(views.html.component.master.kycList()))
   }
 
   def kycOngoingList: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -3151,7 +3153,7 @@ class ComponentViewController @Inject()(
       (for {
         identification <- identification
         kycList <- kycList
-      }yield Ok(views.html.component.master.kycOngoingList(kycList = kycList, identification = identification))
+      } yield Ok(views.html.component.master.kycOngoingList(kycList = kycList, identification = identification))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -3165,10 +3167,43 @@ class ComponentViewController @Inject()(
       (for {
         identification <- identification
         kycList <- kycList
-      }yield  Ok(views.html.component.master.kycReceivedList(kycList = kycList, identification = identification))
+      } yield Ok(views.html.component.master.kycReceivedList(kycList = kycList, identification = identification))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
 
   }
+
+  def kycRoomChecks(kycID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val kycCheckList = worldCheckScreeningChecks.Service.getScreeningCheck(kycID)
+      val kycList = worldCheckKycs.Service.getByIdAndRequester(loginState.username,kycID)
+      (for {
+        kycCheckList <- kycCheckList
+        kycList <- kycList
+      }yield Ok(views.html.component.master.kycRoomChecks(kycID, kycCheckList, kycList))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def kycRoomDocuments(kycID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val kycDocuments = worldCheckKycFiles.Service.getAllDocuments(kycID)
+      val kycList = worldCheckKycs.Service.getByIdAndRequester(loginState.username,kycID)
+      (for {
+        kycDocuments <- kycDocuments
+        kycList <- kycList
+      } yield Ok(views.html.component.master.kycRoomDocuments(kycID, kycDocuments, kycList))
+
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def worldCheckKycDocuments(kycID : String) : Action[AnyContent] = withLoginAction.authenticated { implicit  loginState =>
+    implicit request => Future(Ok(views.html.component.master.kycList())) //TODO
+
+  }
+
 }

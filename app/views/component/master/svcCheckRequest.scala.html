@@ -3,31 +3,70 @@
 
 @import views.companion.master.ServiceCheckRequest
 @(serviceCheckRequest: Form[ServiceCheckRequest.Data] = ServiceCheckRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@commonForm(constants.Form.SVC_CHECK_REQUEST, serviceCheckRequest) {
-    <div id="requestingCheck">
-        <p class="cmuk-margin-remove panelHeader infoText">@Messages(constants.View.REQUESTING_FOR_CHECK)</p>
-        <br>
-        @commonSelect(serviceCheckRequest, constants.FormField.CHECK_TYPE)
-        <div id="vesselCheckForm">
-            @commonInputText(serviceCheckRequest, constants.FormField.VESSEL_NAME)
-            @commonInputText(serviceCheckRequest, constants.FormField.SANCTIONED_COUNTRIES)
-            @commonInputText(serviceCheckRequest, constants.FormField.REFERENCE_ID)
-            @commonInputDate(serviceCheckRequest, constants.FormField.VESSEL_CHECK_FROM_DATE)
-            @commonInputDate(serviceCheckRequest, constants.FormField.VESSEL_CHECK_TO_DATE)
+    @commonForm(constants.Form.SVC_CHECK_REQUEST, serviceCheckRequest) {
+        <div id="requestingCheck">
+            <p class="cmuk-margin-remove panelHeader infoText">@Messages(constants.View.REQUESTING_FOR_CHECK)</p>
+            <br>
+            @commonSelect(serviceCheckRequest, constants.FormField.CHECK_TYPE)
+            <div id="vesselCheckForm">
+                @commonInputText(serviceCheckRequest, constants.FormField.VESSEL_NAME)
+                @commonInputText(serviceCheckRequest, constants.FormField.SANCTIONED_COUNTRIES)
+                @commonInputText(serviceCheckRequest, constants.FormField.REFERENCE_ID)
+                @commonInputDate(serviceCheckRequest, constants.FormField.VESSEL_CHECK_FROM_DATE)
+                @commonInputDate(serviceCheckRequest, constants.FormField.VESSEL_CHECK_TO_DATE)
+            </div>
+            <div id="organizationCheck">
+                @commonInputText(serviceCheckRequest, constants.FormField.ORGANIZATION_NAME)
+                @commonSelect(serviceCheckRequest, constants.FormField.COUNTRY)
+                @commonSelect(serviceCheckRequest, constants.FormField.ORGANIZATION_TYPE)
+            </div>
         </div>
-        <div id="organizationCheck">
-            @commonInputText(serviceCheckRequest, constants.FormField.ORGANIZATION_NAME)
-            @commonSelect(serviceCheckRequest, constants.FormField.COUNTRY)
-            @commonSelect(serviceCheckRequest, constants.FormField.ORGANIZATION_TYPE)
+        <div id="comparisonData">
+            <div id ="keyData">
+                <div id="searchButton" class="searchButton">
+                @commonFormButton(constants.Form.SVC_CHECK_REQUEST)
+                </div>
+            </div>
+            <div id ="furtherInfo">
+
+            </div>
+            <div id ="aliases">
+
+            </div>
+            <div id ="keywords">
+
+            </div>
+            <div id="connectionsRelationships">
+
+            </div>
+            <div id="sources">
+
+            </div>
+        </div>
+
+        <div id="completeCheckData">
+            @commonSelect(serviceCheckRequest, constants.FormField.MATCH_DECISION)
+            @commonSelect(serviceCheckRequest, constants.FormField.ASSESSED_RISK)
+            @commonInputText(serviceCheckRequest, constants.FormField.COMMENT)
+
         </div>
 
         <div id="searchButton" class="searchButton">
-        @commonFormButton(constants.Form.SVC_CHECK_REQUEST)
+        @commonJavascriptButton(constants.View.SEARCH, JavaScript("showSearchResult()"), 'id -> "showSearchResult")
+        </div>
+        <div id="searchResult" clasd="searchResult">
+
+        </div>
+        <div id="exportButton" class="exportButton">
+            @commonFormButton(constants.Form.SVC_CHECK_REQUEST)
+            @commonJavascriptButton(constants.View.NEXT, JavaScript("showCompleteData()"), 'id -> "showCompleteData")
         </div>
         <div id ="nextButton" class="nextButton">
         @commonJavascriptButton(constants.View.NEXT, JavaScript("showComparisonData()"), 'id -> "showComparisonData")
         </div>
-    </div>
+        <div id="submitButton" class="completeCheckButton">
+        @commonFormButton(constants.Form.SVC_CHECK_REQUEST)
+        </div>
 
-}
-<script src="@routes.Assets.versioned("javascripts/serviceCheckRequest.js")" type="text/javascript"></script>
+    }
+    <script src="@routes.Assets.versioned("javascripts/serviceCheckRequest.js")" type="text/javascript"></script>

@@ -18,6 +18,9 @@ object ServiceCheckRequest {
       constants.FormField.ORGANIZATION_NAME.name -> constants.FormField.ORGANIZATION_NAME.field,
       constants.FormField.COUNTRY.name -> constants.FormField.COUNTRY.field,
       constants.FormField.ORGANIZATION_TYPE.name -> constants.FormField.ORGANIZATION_TYPE.field,
+      constants.FormField.MATCH_DECISION.name -> constants.FormField.MATCH_DECISION.field,
+      constants.FormField.ASSESSED_RISK.name -> constants.FormField.ASSESSED_RISK.field,
+      constants.FormField.COMMENT.name -> constants.FormField.COMMENT.field,
 
     )(Data.apply)(Data.unapply)
   )
@@ -31,6 +34,9 @@ object ServiceCheckRequest {
       toDate: Date,
       organizationName : String,
       country : String,
-      organizationType : String
+      organizationType : String,
+      matchDecision : String,
+      assessesRisk : String,
+      comment : String
   )
 }

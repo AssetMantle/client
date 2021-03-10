@@ -669,5 +669,9 @@ GET         /kyc/request                                                        
 POST        /kyc/request                                                                          controllers.KycController.request
 GET         /kyc/serviceCheck/request                                                             controllers.KycController.requestServiceCheckForm
 POST        /kyc/serviceCheck/request                                                             controllers.KycController.requestServiceCheck
+GET         /component/kyc/kycRoom/checks/:kycID                                                  controllers.ComponentViewController.kycRoomChecks(kycID : String)
+GET         /component/kyc/kycRoom/documents/:kycID                                               controllers.ComponentViewController.kycRoomDocuments(kycID : String)
+GET         /component/kyc/kycRoom/worldCheckKycDocuments/:kycID                                  controllers.ComponentViewController.worldCheckKycDocuments(kycID : String)
+
 + nocsrf
 POST        /loopback/pushNotification                                                            controllers.LoopBackController.pushNotification

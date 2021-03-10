@@ -1,0 +1,59 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.kycCheck.worldcheck.WorldCheckKycFile
+@import models.kycCheck.worldcheck.WorldCheckKyc
+
+@(kycID: String, kycFiles: Seq[WorldCheckKycFile], kycList: WorldCheckKyc)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+
+@if(loginState.username == kycList.requester) {
+
+    <ul class="documentList scroller">
+        <li>
+            <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
+                <tbody>
+                    <tr><td colspan="4">@Messages(constants.View.DOCUMENT_LIST):</td></tr>
+                    @kycFiles.map { kycFile =>
+                        <tr>
+                            <td colspan="4">@Messages(kycFile.documentType):</td>
+                            <td class="cmuk-text-center">
+                            @kycFile.status match {
+                                case Some(true) => {
+                                    <span class="cmuk-badge verified">@constants.View.APPROVED</span>
+                                }
+                                case Some(false) => {
+                                    <span class="cmuk-badge rejected">@constants.View.REJECTED</span>
+                                }
+                                </td>
+                            case None => {
+                                <td colspan="2"></td>
+                            }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </li>
+    </ul>
+} else {
+    @if(loginState.username == kycList.counterParty) {
+        <ul class="documentList scroller">
+            <li>
+                <table class="table-scroll small-first-col cmuk-table cmuk-table-divider">
+                    <tbody>
+                        <tr><td colspan="4">@Messages(constants.View.DOCUMENT_LIST):</td></tr>
+                        @kycFiles.map { kycFile =>
+                            <tr>
+                                <td colspan="4">@Messages(kycFile.documentType):</td>
+                                <td class="cmuk-text-center">
+                                    <div class="uploadDoc">
+                                    @commonModalButton(constants.View.UPLOAD, routes.javascript.ComponentViewController.worldCheckKycDocuments, 'parameters -> s"'${kycID}'")
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    }
+}

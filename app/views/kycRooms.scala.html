@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(kycId : String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.View.KYC_ROOMS), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -10,9 +10,11 @@
     <div id="financial" class="financial"></div>
     @loginState.userType match {
       case constants.User.TRADER => {
-        <div id="traderViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
+        <div id="viewKycDocumentList" class="cmuk-margin-bottom"></div>
         <script type="text/javascript">
-                </script>
+          componentResource('kycChecks', jsRoutes.controllers.ComponentViewController.kycRoomChecks('@kycId'));
+          componentResource('kycDocumentList', jsRoutes.controllers.ComponentViewController.kycRoomDocuments('@kycId'));
+        </script>
       }
       case constants.User.ORGANIZATION => {
         <div id="organizationViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>

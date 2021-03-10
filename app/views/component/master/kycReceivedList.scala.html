@@ -4,7 +4,7 @@
 @import models.kycCheck.worldcheck.WorldCheckKyc
 @import models.master.Identification
 
-@(kycList: Option[WorldCheckKyc], identification: Option[Identification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(kycList: Seq[WorldCheckKyc], identification: Option[Identification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div class="receivedKycListCard">
     @kycList.map { kyc =>

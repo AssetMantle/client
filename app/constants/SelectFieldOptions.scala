@@ -445,5 +445,5 @@ object SelectFieldOptions {
     "+998"
   )
   val CHECK_TYPE: Seq[String] = Seq("Vessel","Individual","Organization")
-  val ORGANIZATION_TYPE: Seq[String] = Seq("TYPE1","TYPE1","TYPE1")
+  val ORGANIZATION_TYPE: Seq[String] = Seq("Public","Private")
 }
