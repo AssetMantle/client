@@ -13,21 +13,26 @@
                     @kycChecks.map { kycCheck =>
                         <tr>
                             <td colspan="4">@Messages(kycCheck.checkType):</td>
-                            <td class="cmuk-text-center">
+
                             @kycCheck.status match {
-                                case "APPROVED" => {
-                                    <span class="cmuk-badge approve">@constants.View.APPROVED</span>
+                                case (status) => {
+                                    <td class="cmuk-text-center">
+                                    @if(status == constants.View.APPROVED) {
+                                        <span class="cmuk-badge approve">@constants.View.APPROVED</span>
+                                    } else {
+                                        @if(status == "INITIATE") {
+                                            <span class="cmuk-badge approve">@constants.View.INITIATE</span>
+                                        } else {
+                                            @if(status == "IN_PROGRESS") {
+                                                <span class="cmuk-badge cmuk-progress">@constants.View.IN_PROGRESS</span>
+                                            }
+                                        }
+                                    }
+                                    </td>
                                 }
-                                case "INITIATE" => {
-                                    <span class="cmuk-badge approve">@constants.View.INITIATE</span>
+                                case _=> {
+                                    <td colspan="2"></td>
                                 }
-                                case "IN_PROGRESS" => {
-                                    <span class="cmuk-badge cmuk-progress">@constants.View.IN_PROGRESS</span>
-                                }
-                                </td>
-                            case _ => {
-                                <td colspan="2"></td>
-                            }
 
                             }
                         </tr>
@@ -46,21 +51,27 @@
                         @kycChecks.map { kycCheck =>
                             <tr>
                                 <td colspan="4">@Messages(kycCheck.checkType):</td>
-                                <td class="cmuk-text-center">
+
                                 @kycCheck.status match {
-                                    case "APPROVED" => {
-                                        <span class="cmuk-badge approve">@constants.View.APPROVED</span>
+                                    case (status) => {
+                                        <td class="cmuk-text-center">
+                                        @if(status == constants.View.APPROVED) {
+                                            <span class="cmuk-badge approve">@constants.View.APPROVED</span>
+                                        } else {
+                                            @if(status == "PENDING") {
+                                                <span class="cmuk-badge approve">@constants.View.PENDING</span>
+                                            } else {
+                                                @if(status == "IN_PROGRESS") {
+                                                    <span class="cmuk-badge cmuk-progress">@constants.View.IN_PROGRESS</span>
+                                                }
+                                            }
+                                        }
+                                        </td>
                                     }
-                                    case "PENDING" => {
-                                        <span class="cmuk-badge verified">@constants.View.PENDING</span>
+                                    case _=> {
+                                        <td colspan="2"></td>
                                     }
-                                    case "IN_PROGRESS" => {
-                                        <span class="cmuk-badge verified">@constants.View.IN_PROGRESS</span>
-                                    }
-                                    </td>
-                                case _ => {
-                                    <td colspan="2"></td>
-                                }
+
                                 }
                             </tr>
                         }

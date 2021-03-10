@@ -32,7 +32,7 @@
                         <div class="accountData">
                             <p class="accountName">@Seq(account.firstName, account.lastName).mkString(" ")</p>
                         </div>
-                        @commonLink(constants.View.GO_TO_KYC_ROOM, routes.ViewController.kycRooms(), 'class -> "cmuk-button buttonPrimary")
+                        @commonLink(constants.View.GO_TO_KYC_ROOM, routes.ViewController.kycRooms(kyc.id), 'class -> "cmuk-button buttonPrimary")
                     }
                 }
                 </div>

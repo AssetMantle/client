@@ -29,9 +29,6 @@ GET         /transactions                                                       
 GET         /dashboard                                                                            controllers.ViewController.dashboard
 GET         /tradeRoom                                                                            controllers.ViewController.tradeRoom(id: String)
 GET         /tradeRoomCompleted                                                                   controllers.ViewController.tradeRoomCompleted(id: String)
-GET         /kyc                                                                                  controllers.ViewController.kyc
-GET         /kycRooms                                                                             controllers.ViewController.kycRooms
-
 GET         /profilePicture                                                                       controllers.ComponentViewController.profilePicture
 
 GET         /account/signUp                                                                       controllers.AccountController.signUpForm
@@ -661,7 +658,7 @@ POST        /loopback/redeemFiat                                                
 POST        /loopback/updatePassword/:username                                                    controllers.LoopBackController.updatePassword(username: String)
 POST        /loopback/forgotPassword/:username                                                    controllers.LoopBackController.forgotPassword(username: String)
 GET         /kyc                                                                                  controllers.ViewController.kyc
-GET         /kycRooms                                                                             controllers.ViewController.kycRooms
+GET         /kycRooms/:kycId                                                                      controllers.ViewController.kycRooms(kycId : String)
 GET         /component/kyc/kycList                                                                controllers.ComponentViewController.kycList
 GET         /component/kyc/ongoing/kycList                                                        controllers.ComponentViewController.kycOngoingList
 GET         /component/kyc/received/kycList                                                       controllers.ComponentViewController.kycReceivedList

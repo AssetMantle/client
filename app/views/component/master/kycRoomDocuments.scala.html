@@ -15,18 +15,20 @@
                     @kycFiles.map { kycFile =>
                         <tr>
                             <td colspan="4">@Messages(kycFile.documentType):</td>
-                            <td class="cmuk-text-center">
+
                             @kycFile.status match {
-                                case Some(true) => {
-                                    <span class="cmuk-badge verified">@constants.View.APPROVED</span>
+                                case Some(status) => {
+                                    <td class="cmuk-text-center">
+                                    @if(status) {
+                                        <span class="cmuk-badge verified">@constants.View.APPROVED</span>
+                                    } else {
+                                        <span class="cmuk-badge rejected">@constants.View.REJECTED</span>
+                                    }
+                                    </td>
                                 }
-                                case Some(false) => {
-                                    <span class="cmuk-badge rejected">@constants.View.REJECTED</span>
+                                case None => {
+                                    <td colspan="2"></td>
                                 }
-                                </td>
-                            case None => {
-                                <td colspan="2"></td>
-                            }
                             }
                         </tr>
                     }

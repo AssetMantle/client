@@ -1,67 +1,51 @@
 @import controllers.actions.LoginState
 @import views.html.base.common
 
-@(kycId : String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(kycId: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.View.KYC_ROOMS), failures, warnings, successes, infos)(left)(center)(right)
+    @common(Messages(constants.View.KYC_ROOMS), failures, warnings, successes, infos)(left)(center)(right)
 
-@left = {
-  <div class="leftContainer">
-    <div id="financial" class="financial"></div>
-    @loginState.userType match {
-      case constants.User.TRADER => {
-        <div id="viewKycDocumentList" class="cmuk-margin-bottom"></div>
-        <script type="text/javascript">
-          componentResource('kycChecks', jsRoutes.controllers.ComponentViewController.kycRoomChecks('@kycId'));
-          componentResource('kycDocumentList', jsRoutes.controllers.ComponentViewController.kycRoomDocuments('@kycId'));
-        </script>
-      }
-      case constants.User.ORGANIZATION => {
-        <div id="organizationViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
-        <script type="text/javascript">
-                </script>
-      }
-      case constants.User.ZONE => {
-        <div id="zoneViewAcceptedNegotiationDocumentList" class="cmuk-margin-bottom"></div>
-        <script type="text/javascript">
-                </script>
+    @left = {
+        <div class="leftContainer">
+            <div id="financial" class="financial"></div>
 
-      }
-      case _ => {}
+            <div id="viewKycDocumentList" class="cmuk-margin-bottom"></div>
+            <script type="text/javascript">
+                    componentResource('kycChecks', jsRoutes.controllers.ComponentViewController.kycRoomChecks('@kycId'));
+                    componentResource('kycDocumentList', jsRoutes.controllers.ComponentViewController.kycRoomDocuments('@kycId'));
+            </script>
+        </div>
     }
-  </div>
-}
 
-@center = {
-  <div class="mainTabs switcherCardSecond">
-    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
-      <div class="cmuk-card-body">
-      <script type="text/javascript">
-       // componentResource('kycRooms', jsRoutes.controllers.ViewController.kycRooms());
-      </script>
-      </div>
-    </div>
-  </div>
-}
+    @center = {
+        <div class="mainTabs switcherCardSecond">
+            <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+                <div class="cmuk-card-body">
+                    <script type="text/javascript">
+                    </script>
+                </div>
+            </div>
+        </div>
+    }
 
-@right = {
+    @right = {
 
-  <div>
-    <div class="rightContainer">
-      <div class="recentActivityContainer">
-        <div id="tradeActivities"></div>
-      </div>
-      <div id="chatRoom" class="chatRoom"></div>
-      <div id="orderActions" class="orderInfoCard cmuk-margin-bottom"></div>
-    </div>
-  </div>
-  <script>
-          @loginState.userType match {
-          case constants.User.TRADER => {
-          }
-          case constants.User.ZONE => {
-          }
-          case _ => {}
-          }
-  </script>
-}
+        <div>
+            <div class="rightContainer">
+                <div class="recentActivityContainer">
+                    <div id="tradeActivities"></div>
+                </div>
+                <div id="chatRoom" class="chatRoom"></div>
+                <div id="orderActions" class="orderInfoCard cmuk-margin-bottom"></div>
+            </div>
+        </div>
+        <script>
+        @loginState.userType match {
+            case constants.User.TRADER => {
+            }
+            case constants.User.ZONE => {
+            }
+            case _ => {}
+        }
+        </script>
+    }

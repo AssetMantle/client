@@ -8,8 +8,8 @@
         <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
         <entry key="BLOCKCHAIN_HOST" value="uat.webapp.comdex.sg" />
-        <entry key="BLOCKCHAIN_REST_PORT" value="1318" />
-        <entry key="COMDEX_URL" value="http://localhost:9000" />
+        <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
+        <entry key="COMDEX_URL" value="http://localhost:9001" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
         <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json" />
@@ -25,7 +25,7 @@
         <entry key="POSTGRES_USER" value="commit" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$" />
         <entry key="TRULIOO_URL" value="https://api.globalgateway.io" />
-        <entry key="WEB_APP_URL" value="http://localhost:9000" />
+        <entry key="WEB_APP_URL" value="uat.webapp.comdex.sg" />
       </map>
     </option>
     <option name="play2IsNonDefaultInstallDirUsed" value="false" />
@@ -40,7 +40,7 @@
     </option>
     <option name="play2NeedOpenInBrowser" value="true" />
     <option name="play2NonDefaultInstallDir" value="" />
-    <option name="play2OpenUrl" value="http://localhost:9000" />
+    <option name="play2OpenUrl" value="http://localhost:9001" />
     <option name="play2isAutoReloadEnabled" value="true" />
     <option name="projectPathOnTarget" />
     <option name="selectedOptions">
