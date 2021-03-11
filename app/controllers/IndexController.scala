@@ -103,9 +103,10 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       val fee= Fee(Seq(), gas="200000")
 
       val tx= Tx(Seq(sendCoinMessage), fee, "")
-      val signMeta= SignMeta("0","test","6")
+      val signMeta= SignMeta("0","test","8")
       utilities.signTx.signTransaction(tx, signMeta, wallet)
         utilities.signTx.javaSecuritySigning(tx,signMeta,wallet)
+        utilities.signTx.signweb3j(tx,signMeta,wallet)
       }catch {
         case exception: Exception=> logger.error(exception.getMessage,exception)
       }

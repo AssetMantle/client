@@ -67,3 +67,6 @@ libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
 libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
 
 libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
+
+// https://mvnrepository.com/artifact/org.web3j/crypto
+libraryDependencies += "org.web3j" % "crypto" % "5.0.0"

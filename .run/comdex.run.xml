@@ -43,6 +43,9 @@
     <option name="play2NonDefaultInstallDir" value="" />
     <option name="play2OpenUrl" value="http://localhost:9000" />
     <option name="play2isAutoReloadEnabled" value="true" />
+    <option name="selectedOptions">
+      <set />
+    </option>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
