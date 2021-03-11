@@ -2,6 +2,7 @@ GET         /                                                                   
 GET         /search                                                                                  controllers.IndexController.search(query: String)
 
 GET         /testSendCoin                                                                            controllers.IndexController.testSendCoin
+GET         /testBroadcast                                                                           controllers.IndexController.sendCoinBroadcast
 
 GET         /websocket                                                                               controllers.WebSocketController.connect
 

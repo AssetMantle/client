@@ -8,8 +8,10 @@ import java.security.{KeyPair, Signature, _}
 import java.util
 import java.util.Base64
 
-import org.bouncycastle.util.encoders.{ Hex, Base64 => BouncyCastleBAse64}
+import com.starkbank.ellipticcurve.Curve
+import org.bouncycastle.util.encoders.{Hex, Base64 => BouncyCastleBAse64}
 import javax.xml.bind.DatatypeConverter
+import org.bitcoin.{NativeSecp256k1, Secp256k1Context}
 import play.api.libs.json.Json
 import queries.responses.common.Account.SinglePublicKey
 import org.bitcoinj
@@ -29,6 +31,7 @@ import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.spec.ECNamedCurveSpec
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo
+import org.web3j.abi.datatypes.generated.Uint8
 //import org.bitcoinj.
 //import  org.bouncycastle.crypto.signers.
 
@@ -38,7 +41,7 @@ import org.bouncycastle.crypto.signers.ECDSASigner
 
 import java.security.{MessageDigest, Security}
 import org.bouncycastle.crypto.signers.ECDSASigner
-import transactions.common.sign.{SignMeta, Signature2, StdSignMsg, StdTx, Tx}
+import transactions.common.sign.{SignMeta, StdSignMsg, StdTx, Tx}
 
 import org.bitcoinj.core.TransactionBroadcast
 import java.io._
@@ -47,6 +50,10 @@ import java.io._
 import org.web3j.crypto._
 import org.web3j.crypto.{Hash => Web3jHash}
 
+import com.starkbank.ellipticcurve.{PrivateKey => SBPrivateKey}
+import com.starkbank.ellipticcurve.Ecdsa
+//import com.starbank
+import net.consensys.cava.crypto.SECP256K1
 
 object signTx{
 
@@ -83,9 +90,6 @@ object signTx{
 
   def createSignatureBytes(signMsg: StdSignMsg, key: ECKey)={
       val jsonString = toCanonicalJSONBytes(signMsg)
-    println(jsonString)
-    println(jsonString.getBytes().length)
-    println(jsonString.getBytes().toList)
 
     //println(sonString.getBytes())
 
@@ -105,7 +109,7 @@ object signTx{
 
     //val sha256Hash= Sha256Hash.wrap(byteArrayHash)
 
-    val sha256Hash= Sha256Hash.of(hash)
+    val sha256Hash= Sha256Hash.wrap(hash)
 
     val hash2= DatatypeConverter.printHexBinary(
       MessageDigest
@@ -239,11 +243,9 @@ object signTx{
     signature
   }
 
-
   def toCanonicalJSONBytes(signMsg: StdSignMsg): String={
-    val z=Json.toJson(signMsg)
+    println("signing MSg-"+ Json.toJson(signMsg).toString())
     Json.toJson(signMsg).toString()
-
   }
 
   def toCanonicalJSONString(signMsg: StdSignMsg)={
@@ -310,6 +312,7 @@ object signTx{
     val kf= KeyFactory.getInstance("EC")
 
     val priv= kf.generatePrivate(fromateddPriavteKey)
+    println("comparing BigINts of PrivKeys --"+ (priv.asInstanceOf[ECPrivateKey].getS == key.getPrivKey))
     //val pubKey = kf.generatePublic(formattedPubKey)
     val ecdsa =Signature.getInstance("SHA256withECDSA")
 
@@ -327,7 +330,7 @@ object signTx{
     //val signatureString = new String(BouncyCastleBAse64.decode(signature), StandardCharsets.UTF_8)
     //println(signatureString)
     println("Signature :--"+new BigInteger(1,signature).toString(16))
-    println("Signature22 :--"+Base64.getEncoder.encodeToString(new BigInteger(1,signature).toString(16).getBytes()))
+    println("Signature22 :--"+Base64.getEncoder.encodeToString(new BigInteger(1,signature).toString(16).getBytes(StandardCharsets.UTF_8)))
     println(Base64.getEncoder.encodeToString(signature))
     println(Base64.getUrlEncoder.encodeToString(signature))
 
@@ -337,7 +340,7 @@ object signTx{
     //ecdsa.initVerify(pubKey)
     //ecdsa.update(bytes)
     //val bool= ecdsa.verify(signature)
-
+    println("is kEy encrypted"+key.isEncrypted)
     //  println("verified---"+bool)
 
   }
@@ -348,16 +351,30 @@ object signTx{
     val jsonString = toCanonicalJSONBytes(signedMsg)
 
     val xsignature=key.signMessage(jsonString)
-   // xsi
 
 
 
+    val hash=Sha256Hash.wrap(Sha256Hash.hash(jsonString.getBytes(StandardCharsets.UTF_8)))
+    val ecdsSign=key.sign(hash)
+    println("bitcoinj signing--R--"+ecdsSign.r)
+    println("bitcoinj signing--R--"+ecdsSign.s)
+    val signBytes=ecdsSign.encodeToDER()
+    println(ecdsSign.encodeToDER())
 
+    println(jsonString.getBytes().length)
+    println(key.getPrivKeyBytes.length)
+    println(Sha256Hash.hash(jsonString.getBytes()).length)
+    //Secp256k1Context.secp256k1_init_context()
+   // val sign= NativeSecp256k1.sign(Sha256Hash.hash(jsonString.getBytes()), key.getPrivKeyBytes)
+   // println("Direct SIgn---"+ Base64.getEncoder.encodeToString(sign))
+
+    println(Base64.getEncoder.encodeToString(signBytes))
+    println("bitcoinj Singing---"+ BouncyCastleBAse64.toBase64String(signBytes))
+    println("bitcoinj-----"+BouncyCastleBAse64.encode(signBytes))
 
   }
 
   def bouncyCastleSigning()={
-
 
 
 
@@ -383,17 +400,47 @@ object signTx{
     println("hash ---"+msgHash.toList.toString())
 
     val signature = Sign.signMessage(msgHash,keyPair,false)
-    println("R value --"+signature.getR.mkString(""))
-    println("S value --"+signature.getS.mkString(""))
-   println("Signature R--"+Hex.toHexString(signature.getR))
+    println("R value --"+new BigInteger(1,signature.getR).toString(16))
+    println("S value --"+new BigInteger(1,signature.getS).toString(16))
+    println("Signature R--"+Hex.toHexString(signature.getR))
     println("Signature V--"+Hex.toHexString(signature.getV))
    // Sign.SignatureData.
   val completeByte = signature.getV ++ signature.getR ++ signature.getS
+
   val finalSig= new String(BouncyCastleBAse64.encode(completeByte), StandardCharsets.UTF_8)
 
+   // val mutableBytes = MutableBytes.create(65)
     println(finalSig)
     println(Base64.getEncoder.encodeToString(completeByte))
     println(Base64.getUrlEncoder.encodeToString(completeByte))
+    //Base64.getEncoder.encode(A)
+  }
+
+  def starkbank(tx:Tx, meta: SignMeta, key: ECKey)={
+    val signedMsg = createSignMsg(tx, meta)
+    val jsonString = toCanonicalJSONBytes(signedMsg)
+
+    val privateKey=  new SBPrivateKey(Curve.secp256k1, key.getPrivKey)
+    val signature = Ecdsa.sign(jsonString,privateKey)
+    println("StarBankSignaTURE-----"+signature.toBase64)
+    signature.toBase64
+  }
+
+  def consensysSigning(tx:Tx, meta: SignMeta, key: ECKey)={
+    val signedMsg = createSignMsg(tx, meta)
+    val jsonString = toCanonicalJSONBytes(signedMsg)
+
+    val privateKey= SECP256K1.SecretKey.fromInteger(key.getPrivKey)
+    val keyPair = SECP256K1.KeyPair.fromSecretKey(privateKey)
+
+    val signature = SECP256K1.sign(jsonString.getBytes, keyPair)
+    val sigBYtes=signature.bytes()
+    println(sigBYtes.toArray.toList.toString)
+    println("consensysSign---R---"+signature.r())
+    println("consensysSign---V---"+signature.s())
+    println("consensysSign----"+Base64.getEncoder.encodeToString(sigBYtes.toArray))
+
+    Base64.getEncoder.encodeToString(sigBYtes.toArray)
   }
 
 }

@@ -2,7 +2,7 @@ package transactions.blockchain
 
 import exceptions.BaseException
 import models.common.Serializable._
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OWrites, Writes}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
@@ -11,6 +11,7 @@ import java.net.ConnectException
 
 import javax.inject.{Inject, Singleton}
 import queries.responses.common.Account.SinglePublicKey
+import transactions.common.sign.{SendCoinMessage, Signature, StdSignMsg}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,21 +32,23 @@ class Broadcast @Inject()(wsClient: WSClient)(implicit configuration: Configurat
 
   private val url = ip + ":" + port + "/" + path
 
+  case class BroadcastTx(msg:Seq[SendCoinMessage], fee:Fee, signatures: Seq[Signature], memo:String="")
+  implicit val broadcastTxWrites: OWrites[BroadcastTx] = Json.writes[BroadcastTx]
 
-  case class Value(from_address:String,to_address:String, amount:Seq[Coin])
-  case class Signature(pub_key: SinglePublicKey, signature:String)
-  case class SendCoinMessage(messageType:String,value:Value)
-  case class Tx(msg:Seq[SendCoinMessage], fee:Fee, signatures: Seq[Signature], memo:String="")
-  case class Request(tx:Tx, mode:String)
+  case class Request(tx:BroadcastTx, mode:String)
+  implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  //private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+  private def action(request: Request): Future[WSResponse] = {
+    println("broadcastRequest--"+Json.toJson(request).toString())
+    wsClient.url(url).post(Json.toJson(request))
+  }
 
   object Service {
 
-  /*  def post(request: Request): Future[WSResponse] = action(request).recover {
+    def post(request: Request): Future[WSResponse] = action(request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-    }*/
+    }
 
   }
 

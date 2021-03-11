@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.Base64
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -18,7 +20,8 @@ import queries.responses.common.Account.SinglePublicKey
 import transactions.responses.MemberCheckCorporateScanResponse.ScanEntity
 import utilities.MicroNumber
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import transactions.common.sign.{Message, SignMeta, Tx, Value}
+import org.bitcoinj.core.ECKey
+import transactions.common.sign.{SendCoinMessage, SignMeta, Signature, Tx, Value}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -37,6 +40,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 transactionBroadcast: transactions.blockchain.Broadcast,
+                                queryAccount: queries.blockchain.GetAccount,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -76,7 +80,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         }
         case None=> Future(Ok(views.html.index()))
       }
-
   }
 
   case class Temp(`type`:String, value:String)
@@ -99,14 +102,17 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
       val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
 
-      val sendCoinMessage= Message("cosmos-sdk/MsgSend", Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", amount = Seq(Coin("stake", MicroNumber(1)))))
+      val sendCoinMessage= SendCoinMessage("cosmos-sdk/MsgSend", Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", amount = Seq(Coin("stake", MicroNumber(1)))))
       val fee= Fee(Seq(), gas="200000")
 
       val tx= Tx(Seq(sendCoinMessage), fee, "")
-      val signMeta= SignMeta("0","test","8")
+      val signMeta= SignMeta("0","test","14")
       utilities.signTx.signTransaction(tx, signMeta, wallet)
         utilities.signTx.javaSecuritySigning(tx,signMeta,wallet)
+        utilities.signTx.bitcoinjSigning(tx,signMeta,wallet)
         utilities.signTx.signweb3j(tx,signMeta,wallet)
+        utilities.signTx.starkbank(tx,signMeta,wallet)
+        utilities.signTx.consensysSigning(tx,signMeta,wallet)
       }catch {
         case exception: Exception=> logger.error(exception.getMessage,exception)
       }
@@ -126,6 +132,45 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       println(key.privateKey.toList.toString)*/
     Future(Ok("Done"))
   }
+
+  def sendCoinBroadcast=Action.async{
+
+    val account = queryAccount.Service.get("cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c")
+
+    def getTxFeeAndSignMeta(accountResponse:queries.responses.blockchain.AccountResponse.Response)= Future{
+      val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
+      val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
+
+      val sendCoinMessage= SendCoinMessage("cosmos-sdk/MsgSend", Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", amount = Seq(Coin("stake", MicroNumber(1)))))
+      val fee= Fee(Seq(), gas="200000")
+
+      val tx= Tx(Seq(sendCoinMessage), fee, "")
+      val accountMeta = accountResponse.result.value
+      val signMeta= SignMeta(accountMeta.accountNumber,"test",accountMeta.sequence)
+
+      (tx,fee,signMeta,wallet)
+    }
+
+    def sendBroadcast(tx:Tx,fee: Fee, meta: SignMeta, key: ECKey) = {
+
+      val signature = utilities.signTx.starkbank(tx, meta, key)
+
+      val signatureObject = Signature(signature, SinglePublicKey("tendermint/PubKeySecp256k1",Base64.getEncoder.encodeToString(key.getPubKey)))
+
+      val request = transactionBroadcast.Service.post(transactionBroadcast.Request(transactionBroadcast.BroadcastTx(tx.msg,fee,Seq(signatureObject)),transactionMode))
+      request.map { x =>
+        println("broadcastResponse--"+x.body)
+        x.body
+      }
+    }
+
+    for{
+      account<-account
+      (tx,fee,signMeta,wallet)<-getTxFeeAndSignMeta(account)
+      response<- sendBroadcast(tx,fee,signMeta, wallet)
+    }yield (Ok(response))
+  }
+
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>

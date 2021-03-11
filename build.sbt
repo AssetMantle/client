@@ -70,3 +70,9 @@ libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
 
 // https://mvnrepository.com/artifact/org.web3j/crypto
 libraryDependencies += "org.web3j" % "crypto" % "5.0.0"
+
+// https://mvnrepository.com/artifact/com.starkbank.ellipticcurve/starkbank-ecdsa
+libraryDependencies += "com.starkbank.ellipticcurve" % "starkbank-ecdsa" % "1.0.0"
+
+// https://mvnrepository.com/artifact/net.consensys.cava/cava-crypto
+libraryDependencies += "net.consensys.cava" % "cava-crypto" % "0.5.0"
