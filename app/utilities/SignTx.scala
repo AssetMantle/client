@@ -6,7 +6,7 @@ import java.util.Base64
 import org.bitcoinj.core.{ECKey, Sha256Hash, Utils}
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import queries.responses.common.Account.SinglePublicKey
-import models.common.Serializable.{SignMeta, Signature, StdSignMsg, StdTx, Tx}
+import transactions.request.Serializable.{SignMeta, Signature, StdSignMsg, StdTx, Tx}
 
 object SignTx {
 
