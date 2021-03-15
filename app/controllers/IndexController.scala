@@ -13,15 +13,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import services.Startup
 import javax.inject.{Inject, Singleton}
-import models.common.Serializable.Coin
-import play.api.libs.json.{Json, OWrites, Reads}
-import models.common.Serializable.Fee
-import queries.responses.common.Account.SinglePublicKey
-import transactions.responses.MemberCheckCorporateScanResponse.ScanEntity
-import utilities.MicroNumber
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import org.bitcoinj.core.ECKey
-import transactions.common.sign.{SendCoinMessage, SignMeta, Signature, Tx, Value}
+import play.api.libs.json.{Json, OWrites}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -48,21 +40,9 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-
-    /*  val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
-
-      val key=utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
-
-      println(key.address)
-      println(key.publicKey)
-      println(key.mnemonics)
-      println(key.privateKey)*/
-
       loginState match {
         case Some(loginState)=>
           implicit val loginStateImplicit: LoginState = loginState
@@ -81,96 +61,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case None=> Future(Ok(views.html.index()))
       }
   }
-
-  case class Temp(`type`:String, value:String)
-  implicit val tempReads: Reads[Temp] = Json.reads[Temp]
-  implicit val tempWrites: OWrites[Temp] = Json.writes[Temp]
-
-  def testSendCoin: Action[AnyContent] =withoutLoginActionAsync{implicit loginState =>
-    implicit request =>
-
-   /*   println(Json.toJson(Temp("someType","someValue")))
-
-      val x=Json.toJson(Temp("someType","someValue"))
-     // val z=JsonPropertyOrder()
-      val y= utilities.JSON.convertJsonStringToObject(x.toString())
-
-      println(y)
-      println(y.`type`)
-      println(y.value)*/
-      try{
-      val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
-      val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
-
-      val sendCoinMessage= SendCoinMessage("cosmos-sdk/MsgSend", Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", amount = Seq(Coin("stake", MicroNumber(1)))))
-      val fee= Fee(Seq(), gas="200000")
-
-      val tx= Tx(Seq(sendCoinMessage), fee, "")
-      val signMeta= SignMeta("0","test","14")
-      utilities.signTx.signTransaction(tx, signMeta, wallet)
-        utilities.signTx.javaSecuritySigning(tx,signMeta,wallet)
-        utilities.signTx.bitcoinjSigning(tx,signMeta,wallet)
-        utilities.signTx.signweb3j(tx,signMeta,wallet)
-        utilities.signTx.starkbank(tx,signMeta,wallet)
-        utilities.signTx.consensysSigning(tx,signMeta,wallet)
-      }catch {
-        case exception: Exception=> logger.error(exception.getMessage,exception)
-      }
-
-      //val signature= transactionBroadcast.Signature(SinglePublicKey("tendermint/PubKeySecp256k1",wallet.publicKey.toString), )
-
-    //  val request = transactionBroadcast.Request(transactionBroadcast.Tx(Seq(sendCoinMessage),fee,),transactionMode)
-      //val sendBroadcast = transactionBroadcast.Service.post()
-
-      /*val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
-
-      val key=utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
-
-      println(key.address)
-      println(key.publicKey.map(x=> x.toChar).toList.toString)
-      println(key.mnemonics)
-      println(key.privateKey.toList.toString)*/
-    Future(Ok("Done"))
-  }
-
-  def sendCoinBroadcast=Action.async{
-
-    val account = queryAccount.Service.get("cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c")
-
-    def getTxFeeAndSignMeta(accountResponse:queries.responses.blockchain.AccountResponse.Response)= Future{
-      val mnemonic="wage thunder live sense resemble foil apple course spin horse glass mansion midnight laundry acoustic rhythm loan scale talent push green direct brick please"
-      val wallet= utilities.KeyGenerator.getKey(mnemonic.split(" ").toSeq)
-
-      val sendCoinMessage= SendCoinMessage("cosmos-sdk/MsgSend", Value(from_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", to_address = "cosmos1pkkayn066msg6kn33wnl5srhdt3tnu2vzasz9c", amount = Seq(Coin("stake", MicroNumber(1)))))
-      val fee= Fee(Seq(), gas="200000")
-
-      val tx= Tx(Seq(sendCoinMessage), fee, "")
-      val accountMeta = accountResponse.result.value
-      val signMeta= SignMeta(accountMeta.accountNumber,"test",accountMeta.sequence)
-
-      (tx,fee,signMeta,wallet)
-    }
-
-    def sendBroadcast(tx:Tx,fee: Fee, meta: SignMeta, key: ECKey) = {
-
-      val signature = utilities.signTx.starkbank(tx, meta, key)
-
-      val signatureObject = Signature(signature, SinglePublicKey("tendermint/PubKeySecp256k1",Base64.getEncoder.encodeToString(key.getPubKey)))
-
-      val request = transactionBroadcast.Service.post(transactionBroadcast.Request(transactionBroadcast.BroadcastTx(tx.msg,fee,Seq(signatureObject)),transactionMode))
-      request.map { x =>
-        println("broadcastResponse--"+x.body)
-        x.body
-      }
-    }
-
-    for{
-      account<-account
-      (tx,fee,signMeta,wallet)<-getTxFeeAndSignMeta(account)
-      response<- sendBroadcast(tx,fee,signMeta, wallet)
-    }yield (Ok(response))
-  }
-
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>

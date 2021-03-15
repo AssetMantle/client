@@ -1,7 +1,7 @@
 package models.common
 
 import exceptions.BaseException
-import models.Abstract.{AssetDocumentContent, DataValue, NegotiationDocumentContent, TransactionMessage}
+import models.Abstract.{AssetDocumentContent, DataValue, NegotiationDocumentContent, TransactionMessage, TransactionValue}
 import models.common.DataValue._
 import models.common.TransactionMessages._
 import play.api.Logger
@@ -12,9 +12,11 @@ import play.api.libs.json._
 import utilities.MicroNumber
 import java.sql.Date
 
+import queries.responses.common.Account.SinglePublicKey
+
 object Serializable {
 
-  private implicit val module: String = constants.Module.SERIALIZABLE
+  private implicit val module: String = constants.Module.MODELS_COMMON_SERIALIZABLE
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -83,7 +85,7 @@ object Serializable {
 
   implicit val coinWrites: Writes[Coin] = (coin: Coin) => Json.obj(
     "amount" -> coin.amount.toMicroString,
-  "denom" -> coin.denom
+    "denom" -> coin.denom
   )
 
   case class Fee(amount: Seq[Coin], gas: String)
@@ -211,7 +213,7 @@ object Serializable {
 
     def toProperty: Property = Property(id = dataName, fact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
 
-    def withValue(value:String)= this.copy(dataValue= Some(value))
+    def withValue(value: String) = this.copy(dataValue = Some(value))
   }
 
   implicit val basePropertyReads: Reads[BaseProperty] = Json.reads[BaseProperty]
@@ -250,4 +252,6 @@ object Serializable {
     Json.format[Invoice].map(x => x: NegotiationDocumentContent) or
       Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
+
+
 }

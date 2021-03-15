@@ -59,11 +59,8 @@ object KeyGenerator {
         hdPath
       )
 
-
       utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(wallet.getKeyByPath(hdPath).getPubKey)))) match {
-        case Success(address) => {
-          Key(address = address, hdPath = hdPath.toString, publicKey = wallet.getKeyByPath(hdPath).getPubKey, privateKey = wallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)}
-          wallet.getKeyByPath(hdPath)
+        case Success(address) => Key(address = address, hdPath = hdPath.toString, publicKey = wallet.getKeyByPath(hdPath).getPubKey, privateKey = wallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
         case Failure(exception) => logger.error(exception.getLocalizedMessage)
           throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
       }
