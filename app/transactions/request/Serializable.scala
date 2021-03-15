@@ -17,10 +17,10 @@ object Serializable{
 
   implicit val signatureWrites: OWrites[Signature] = Json.writes[Signature]
 
-  case class SendCoinTransactionValue(amount: Seq[Coin], from_address: String, to_address: String) extends TransactionValue
+  case class SendCoin(amount: Seq[Coin], from_address: String, to_address: String) extends TransactionValue
 
   implicit val transactionValueWrites: Writes[TransactionValue] = {
-    case sendCoinTransactionValue: SendCoinTransactionValue => Json.toJson(sendCoinTransactionValue)(Json.writes[SendCoinTransactionValue])
+    case sendCoin: SendCoin => Json.toJson(sendCoin)(Json.writes[SendCoin])
     case _ => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
   }
 
