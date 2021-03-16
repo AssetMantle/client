@@ -1335,8 +1335,6 @@ ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
-ALTER TABLE MASTER."Classification"
-    ADD CONSTRAINT Classification_Identity_Maintainer FOREIGN KEY ("maintainerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
