@@ -37,7 +37,10 @@
                                             }
                                         }
                                         case constants.Status.Order.COMPLETED=>{
-                                            @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
+                                            @if(asset.status == constants.Status.Asset.TRADED){
+                                                @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
+                                            }
+
                                         }
                                         case _=> {}
                                     }

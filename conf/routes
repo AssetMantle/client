@@ -147,8 +147,6 @@ GET         /negotiation/completedTradeActivityMessages                         
 GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
 POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
 
-GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
-
 GET         /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecuteForm(orderID: String)
 POST        /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecute
 

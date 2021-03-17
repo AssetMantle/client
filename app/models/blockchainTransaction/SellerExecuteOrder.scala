@@ -80,7 +80,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sellerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByBuyerSellerAddressesAndPegHash(buyerAddress: String, sellerAddress: String, pegHash: String) = db.run(sellerExecuteOrderTable.filter(x => x.buyerAddress === buyerAddress && x.sellerAddress === sellerAddress && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByBuyerSellerAddressesAndPegHash(buyerAddress: String, sellerAddress: String, pegHash: String) = db.run(sellerExecuteOrderTable.filter(x => x.buyerAddress === buyerAddress && x.sellerAddress === sellerAddress && x.pegHash === pegHash).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -267,7 +267,11 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   val scheduledTask = new Runnable {
     override def run(): Unit = {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      try {
+       Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getMessage, exception)
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 package models.docusign
 
-import java.net.ConnectException
+import java.net.{ConnectException, UnknownHostException}
 import java.sql.Timestamp
 
 import akka.actor.ActorSystem
@@ -140,8 +140,6 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
             case constants.Response.NO_SUCH_ELEMENT_EXCEPTION => utilitiesNotification.send(constants.User.MAIN_ACCOUNT, constants.Notification.DOCUSIGN_AUTHORIZATION_PENDING)
             case _ => throw baseException
           }
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
       }
     }
   }

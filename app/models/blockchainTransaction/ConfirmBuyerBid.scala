@@ -111,7 +111,7 @@ class ConfirmBuyerBids @Inject()(
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(confirmBuyerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String) = db.run(confirmBuyerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).result.headOption)
+  private def getTransactionByFromToAndPegHash(from: String, to: String, pegHash: String) = db.run(confirmBuyerBidTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -271,7 +271,11 @@ class ConfirmBuyerBids @Inject()(
 
   val scheduledTask = new Runnable {
     override def run(): Unit = {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      try {
+       Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getMessage, exception)
+      }
     }
   }
 

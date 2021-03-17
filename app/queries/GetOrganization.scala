@@ -1,6 +1,6 @@
 package queries
 
-import java.net.ConnectException
+import java.net.{ConnectException, UnknownHostException}
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -30,8 +30,8 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
   object Service {
 
     def get(organizationID: String): Future[Response] = action(organizationID).recover {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case unknownHostException: UnknownHostException => throw new BaseException(constants.Response.UNKNOWN_HOST_EXCEPTION, unknownHostException)
     }
 
   }

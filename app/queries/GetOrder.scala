@@ -1,6 +1,6 @@
 package queries
 
-import java.net.ConnectException
+import java.net.{ConnectException, UnknownHostException}
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}

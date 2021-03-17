@@ -8,7 +8,8 @@ object TruliooConsentsResponse {
 
   class Response(response: WSResponse) extends BaseResponse {
     val body: Seq[String] = response.body.replaceAll(""""""", "")
-      .replaceAll("[\\[\\]]","")
+      .replaceAll("[\\[\\]]", "")
       .split(",").map(_.trim)
   }
+
 }
