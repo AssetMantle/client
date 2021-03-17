@@ -21,10 +21,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
     "address"           VARCHAR NOT NULL,
     "username"          VARCHAR NOT NULL UNIQUE,
-    "coins"             VARCHAR NOT NULL,
-    "publicKey"         VARCHAR NOT NULL,
+    "accountType"       VARCHAR NOT NULL,
+    "publicKey"         VARCHAR,
     "accountNumber"     VARCHAR NOT NULL,
     "sequence"          VARCHAR NOT NULL,
+    "vestingParameters" VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -61,6 +62,19 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."AverageBlockTime"
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Balance_BC"
+(
+    "address"           VARCHAR NOT NULL,
+    "coins"             VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Block"
@@ -254,13 +268,14 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Transaction"
 (
     "hash"              VARCHAR NOT NULL,
     "height"            INTEGER NOT NULL,
-    "code"              INTEGER,
+    "code"              INTEGER NOT NULL,
     "rawLog"            VARCHAR NOT NULL,
     "status"            BOOLEAN NOT NULL,
     "gasWanted"         VARCHAR NOT NULL,
     "gasUsed"           VARCHAR NOT NULL,
     "messages"          VARCHAR NOT NULL,
     "fee"               VARCHAR NOT NULL,
+    "memo"              VARCHAR NOT NULL,
     "timestamp"         VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -291,12 +306,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Validator"
     "hexAddress"            VARCHAR NOT NULL UNIQUE,
     "consensusPublicKey"    VARCHAR NOT NULL UNIQUE,
     "jailed"                BOOLEAN NOT NULL,
-    "status"                INTEGER NOT NULL,
+    "status"                VARCHAR NOT NULL,
     "tokens"                VARCHAR NOT NULL,
     "delegatorShares"       NUMERIC NOT NULL,
     "description"           VARCHAR NOT NULL,
-    "unbondingHeight"       INTEGER,
-    "unbondingTime"         VARCHAR,
+    "unbondingHeight"       VARCHAR NOT NULL,
+    "unbondingTime"         VARCHAR NOT NULL,
     "commission"            VARCHAR NOT NULL,
     "minimumSelfDelegation" VARCHAR NOT NULL,
     "createdBy"             VARCHAR,
@@ -1404,6 +1419,11 @@ CREATE TRIGGER AVERAGE_BLOCK_TIME_LOG
     ON BLOCKCHAIN."AverageBlockTime"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER BALANCE_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Balance_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER BLOCK_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Block"
@@ -1803,6 +1823,7 @@ EXECUTE PROCEDURE MEMBER_CHECK.VESSEL_SCAN_DECISION_HISTORY();
 DROP TRIGGER IF EXISTS ACCOUNT_BC_LOG ON BLOCKCHAIN."Account_BC" CASCADE;
 DROP TRIGGER IF EXISTS ASSET_BC_LOG ON BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TRIGGER IF EXISTS AVERAGE_BLOCK_TIME_LOG ON BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TRIGGER IF EXISTS BALANCE_BC_LOG ON BLOCKCHAIN."Balance_BC" CASCADE;
 DROP TRIGGER IF EXISTS BLOCK_LOG ON BLOCKCHAIN."Block" CASCADE;
 DROP TRIGGER IF EXISTS CLASSIFICATION_BC_LOG ON BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TRIGGER IF EXISTS DELEGATION_LOG ON BLOCKCHAIN."Delegation" CASCADE;
@@ -1889,6 +1910,7 @@ DROP TRIGGER IF EXISTS DELETE_VESSEL_SCAN_DECISION ON MEMBER_CHECK."VesselScanDe
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Balance_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Block" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Delegation" CASCADE;

@@ -6,11 +6,13 @@ import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction
 import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
+import queries.Abstract.Account
 import queries.blockchain.{GetABCIInfo, GetBlockResults, GetBondedValidators, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
+import queries.responses.blockchain.GenesisResponse.Bank.BankBalance
 import queries.responses.blockchain.GenesisResponse._
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
@@ -28,6 +30,7 @@ import scala.io.{Source => ScalaSource}
 class Startup @Inject()(
                          blockchainAccounts: blockchain.Accounts,
                          blockchainBlocks: blockchain.Blocks,
+                         blockchainBalances: blockchain.Balances,
                          blockchainParameters: blockchain.Parameters,
                          blockchainDelegations: blockchain.Delegations,
                          blockchainValidators: blockchain.Validators,
@@ -39,9 +42,6 @@ class Startup @Inject()(
                          keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                          getABCIInfo: GetABCIInfo,
                          getBlockResults: GetBlockResults,
-                         getBondedValidators: GetBondedValidators,
-                         getUnbondedValidators: GetUnbondedValidators,
-                         getUnbondingValidators: GetUnbondingValidators,
                          getTotalSupply: GetTotalSupply,
                          getStakingPool: GetStakingPool,
                          getMintingInflation: GetMintingInflation,
@@ -74,6 +74,7 @@ class Startup @Inject()(
     (for {
       genesis <- genesis
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
+      _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
       _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gentxs.getOrElse(Seq.empty))
       _ <- updateDistributionOnStart(genesis.app_state.distribution)
@@ -85,42 +86,11 @@ class Startup @Inject()(
     }
   }
 
-  //  private def insertBlocksOnStart(latestBlockHeight: Int): Future[Unit] = Future {
-  //    try {
-  //      var blockHeight = latestBlockHeight + 1
-  //      while (true) {
-  //        val blockCommitResponse = blocksServices.insertOnBlock(blockHeight)
-  //
-  //        def transactions: Future[Seq[Transaction]] = blocksServices.insertTransactionsOnBlock(blockHeight)
-  //
-  //        def avgBlockTime(blockCommitResponse: BlockCommitResponse.Response): Future[Double] = blocksServices.setAverageBlockTime(blockCommitResponse.result.signed_header.header)
-  //
-  //        def checksAndUpdatesOnBlock(blockCommitResponse: BlockCommitResponse.Response): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockCommitResponse.result.signed_header.header)
-  //
-  //        def sendWebSocketMessage(blockCommitResponse: BlockCommitResponse.Response, transactions: Seq[Transaction], avgBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = avgBlockTime)
-  //
-  //        val forComplete = for {
-  //          blockCommitResponse <- blockCommitResponse
-  //          transactions <- transactions
-  //          avgBlockTime <- avgBlockTime(blockCommitResponse)
-  //          _ <- checksAndUpdatesOnBlock(blockCommitResponse)
-  //          _ <- sendWebSocketMessage(blockCommitResponse, transactions, avgBlockTime)
-  //        } yield ()
-  //        Await.result(forComplete, Duration.Inf)
-  //        blockHeight = blockHeight + 1
-  //      }
-  //    } catch {
-  //      case baseException: BaseException => if (baseException.failure != constants.Response.BLOCK_QUERY_FAILED) {
-  //        throw baseException
-  //      } else ()
-  //    }
-  //  }
-
-  private def insertAccountsOnStart(accounts: Seq[Account.Result]): Future[Seq[Unit]] = {
+  private def insertAccountsOnStart(accounts: Seq[Account]): Future[Seq[Unit]] = {
     utilitiesOperations.traverse(accounts) { account =>
-      val upsert = blockchainAccounts.Utility.insertOrUpdateAccountBalance(address = account.value.address)
+      val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccount(account.address)
       (for {
-        _ <- upsert
+        _ <- upsertAccount
       } yield ()
         ).recover {
         case baseException: BaseException => throw baseException
@@ -128,15 +98,27 @@ class Startup @Inject()(
     }
   }
 
-  private def updateStakingOnStart(staking: Staking): Future[Unit] = {
-    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.getOrElse(Seq.empty).map(_.toValidator))
-    val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = BigInt(staking.params.unbonding_time), maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
-    //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
+  private def insertBalancesOnStart(balances: Seq[BankBalance]): Future[Seq[Unit]] = {
+    utilitiesOperations.traverse(balances) { balance =>
+      val upsertAccount = blockchainBalances.Utility.addCoinsToAccount(balance.address, balance.coins.map(_.toCoin))
+      (for {
+        _ <- upsertAccount
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+  }
 
+  private def updateStakingOnStart(staking: Staking.Module): Future[Unit] = {
+    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
+    val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = staking.params.unbonding_time, maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
+
+    //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
     def updateDelegations(): Future[Unit] = {
-      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.getOrElse(Seq.empty).map(_.toDelegation))
-      val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.getOrElse(Seq.empty).map(_.toRedelegation))
-      val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.getOrElse(Seq.empty).map(_.toUndelegation))
+      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
+      val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.map(_.toRedelegation))
+      val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.map(_.toUndelegation))
 
       for {
         _ <- insertAllDelegations
@@ -155,8 +137,8 @@ class Startup @Inject()(
     }
   }
 
-  private def updateDistributionOnStart(distribution: Distribution): Future[Unit] = {
-    val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.getOrElse(Seq.empty).map(_.toWithdrawAddress))
+  private def updateDistributionOnStart(distribution: Distribution.Module): Future[Unit] = {
+    val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.map(_.toWithdrawAddress))
     val insertDistributionParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.DISTRIBUTION, value = DistributionParameter(communityTax = distribution.params.community_tax, baseProposerReward = distribution.params.base_proposer_reward, bonusProposerReward = distribution.params.bonus_proposer_reward, withdrawAddrEnabled = distribution.params.withdraw_addr_enabled)))
     (for {
       _ <- insertAllWithdrawAddresses
@@ -166,8 +148,8 @@ class Startup @Inject()(
     }
   }
 
-  private def updateSlashingOnStart(slashing: Slashing): Future[Unit] = {
-    val insertSlashingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.SLASHING, value = SlashingParameter(signedBlocksWindow = slashing.params.signed_blocks_window.toInt, minSignedPerWindow = slashing.params.min_signed_per_window, downtimeJailDuration = BigInt(slashing.params.downtime_jail_duration), slashFractionDoubleSign = slashing.params.slash_fraction_double_sign, slashFractionDowntime = slashing.params.slash_fraction_downtime)))
+  private def updateSlashingOnStart(slashing: Slashing.Module): Future[Unit] = {
+    val insertSlashingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.SLASHING, value = SlashingParameter(signedBlocksWindow = slashing.params.signed_blocks_window, minSignedPerWindow = slashing.params.min_signed_per_window, downtimeJailDuration = slashing.params.downtime_jail_duration, slashFractionDoubleSign = slashing.params.slash_fraction_double_sign, slashFractionDowntime = slashing.params.slash_fraction_downtime)))
     (for {
       _ <- insertSlashingParameters
     } yield ()).recover {
@@ -197,11 +179,11 @@ class Startup @Inject()(
     val communityPoolResponse = getCommunityPool.Service.get
 
     def insert(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = {
-      blockchainTokens.Service.insertMultiple(totalSupplyResponse.result.map(x => Token(denom = x.denom, totalSupply = x.amount,
-        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
-        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
-        communityPool = communityPoolResponse.result.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
-        inflation = if (x.denom == stakingDenom) mintingInflationResponse.result else BigDecimal(0.0)
+      blockchainTokens.Service.insertMultiple(totalSupplyResponse.supply.map(x => Token(denom = x.denom, totalSupply = x.amount,
+        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
+        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
+        communityPool = communityPoolResponse.pool.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
+        inflation = if (x.denom == stakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
       )))
     }
 
@@ -218,6 +200,7 @@ class Startup @Inject()(
   }
 
   private def insertBlock(height: Int): Future[Unit] = {
+    println(height)
     val blockCommitResponse = blocksServices.insertOnBlock(height)
     val blockResultResponse = getBlockResults.Service.get(height)
 
@@ -262,7 +245,7 @@ class Startup @Inject()(
       //TODO (also may be akka.dispatch.TaskInvocation)
       //TODO ILLEGAL_STATE_EXCEPTION comes only once at start if the GET request is done Await.result(getABCIInfo.Service.get(), Duration, Inf)
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
-      val abciInfo = getABCIInfo.Service.get()
+      val abciInfo = Await.result(getABCIInfo.Service.get(), Duration.Inf)
 
       def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
 
@@ -278,7 +261,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-        abciInfo <- abciInfo
+//        abciInfo <- abciInfo
         latestExplorerHeight <- latestExplorerHeight
         _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
       } yield ()

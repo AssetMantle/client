@@ -16,11 +16,11 @@
     @validators.map { validator =>
         <tr>
             <td class="blockHeightItem">
-                @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker.getOrElse(validator.operatorAddress), routes.ViewController.validator(validator.operatorAddress)))
+                @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))
             </td>
             <td>@validator.tokens</td>
             <td>@validator.commission.commissionRates.rate%</td>
-            <td>@validator.status.toString</td>
+            <td>@validator.status</td>
             <td>@validator.jailed.toString</td>
         </tr>
     }

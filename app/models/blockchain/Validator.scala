@@ -1,6 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
+import models.Abstract.PublicKey
 import models.Trait.Logged
 import models.common.Serializable.{Commission, ValidatorDescription}
 import models.common.TransactionMessages._
@@ -9,7 +10,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries._
+import models.common.PublicKeys._
 import queries.blockchain.{GetBondedValidators, GetValidator}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
@@ -19,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: Int, tokens: MicroNumber, delegatorShares: BigDecimal, description: ValidatorDescription, unbondingHeight: Option[Int], unbondingTime: Option[String], commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: ValidatorDescription, unbondingHeight: String, unbondingTime: String, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Validators @Inject()(
@@ -29,7 +30,7 @@ class Validators @Inject()(
                             getBondedValidators: GetBondedValidators,
                             masterTransactionNotifications: masterTransaction.Notifications,
                             blockchainDelegations: Delegations,
-                            blockchainAccounts: Accounts,
+                            blockchainBalances: Balances,
                             utilitiesOperations: utilities.Operations,
                             keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                             blockchainWithdrawAddresses: WithdrawAddresses,
@@ -43,21 +44,15 @@ class Validators @Inject()(
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_VALIDATOR
 
-  private val bondedStatus = configuration.get[Int]("blockchain.validator.status.bonded")
-
-  private val unbondedStatus = configuration.get[Int]("blockchain.validator.status.unbonded")
-
-  private val unbondingStatus = configuration.get[Int]("blockchain.validator.status.unbonding")
-
   import databaseConfig.profile.api._
 
   private[models] val validatorTable = TableQuery[ValidatorTable]
 
-  case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: Int, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: Option[Int], unbondingTime: Option[String], commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = consensusPublicKey, status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[ValidatorDescription](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: String, unbondingTime: String, commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = utilities.JSON.convertJsonStringToObject[PublicKey](consensusPublicKey), status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[ValidatorDescription](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(validator: Validator): ValidatorSerialized = ValidatorSerialized(operatorAddress = validator.operatorAddress, hexAddress = validator.hexAddress, consensusPublicKey = validator.consensusPublicKey, status = validator.status, jailed = validator.jailed, tokens = validator.tokens.toString, delegatorShares = validator.delegatorShares, description = Json.toJson(validator.description).toString, unbondingHeight = validator.unbondingHeight, unbondingTime = validator.unbondingTime, commission = Json.toJson(validator.commission).toString, minimumSelfDelegation = validator.minimumSelfDelegation.toString, createdBy = validator.createdBy, createdOn = validator.createdOn, createdOnTimeZone = validator.createdOnTimeZone, updatedBy = validator.updatedBy, updatedOn = validator.updatedOn, updatedOnTimeZone = validator.updatedOnTimeZone)
+  def serialize(validator: Validator): ValidatorSerialized = ValidatorSerialized(operatorAddress = validator.operatorAddress, hexAddress = validator.hexAddress, consensusPublicKey = Json.toJson(validator.consensusPublicKey).toString, status = validator.status, jailed = validator.jailed, tokens = validator.tokens.toString, delegatorShares = validator.delegatorShares, description = Json.toJson(validator.description).toString, unbondingHeight = validator.unbondingHeight, unbondingTime = validator.unbondingTime, commission = Json.toJson(validator.commission).toString, minimumSelfDelegation = validator.minimumSelfDelegation.toString, createdBy = validator.createdBy, createdOn = validator.createdOn, createdOnTimeZone = validator.createdOnTimeZone, updatedBy = validator.updatedBy, updatedOn = validator.updatedOn, updatedOnTimeZone = validator.updatedOnTimeZone)
 
   private def add(validator: Validator): Future[String] = db.run((validatorTable returning validatorTable.map(_.operatorAddress) += serialize(validator)).asTry).map {
     case Success(result) => result
@@ -119,9 +114,9 @@ class Validators @Inject()(
 
   private def getAllValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.result)
 
-  private def getAllActiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === bondedStatus).result)
+  private def getAllActiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
 
-  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === bondedStatus).result)
+  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
 
   private def getValidatorsByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.operatorAddress.inSet(operatorAddresses)).result)
 
@@ -129,7 +124,7 @@ class Validators @Inject()(
 
   private[models] class ValidatorTable(tag: Tag) extends Table[ValidatorSerialized](tag, "Validator") {
 
-    def * = (operatorAddress, hexAddress, consensusPublicKey, jailed, status, tokens, delegatorShares, description, unbondingHeight.?, unbondingTime.?, commission, minimumSelfDelegation, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorSerialized.tupled, ValidatorSerialized.unapply)
+    def * = (operatorAddress, hexAddress, consensusPublicKey, jailed, status, tokens, delegatorShares, description, unbondingHeight, unbondingTime, commission, minimumSelfDelegation, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorSerialized.tupled, ValidatorSerialized.unapply)
 
     def operatorAddress = column[String]("operatorAddress", O.PrimaryKey)
 
@@ -139,7 +134,7 @@ class Validators @Inject()(
 
     def jailed = column[Boolean]("jailed")
 
-    def status = column[Int]("status")
+    def status = column[String]("status")
 
     def tokens = column[String]("tokens")
 
@@ -147,7 +142,7 @@ class Validators @Inject()(
 
     def description = column[String]("description")
 
-    def unbondingHeight = column[Int]("unbondingHeight")
+    def unbondingHeight = column[String]("unbondingHeight")
 
     def unbondingTime = column[String]("unbondingTime")
 
@@ -190,7 +185,7 @@ class Validators @Inject()(
 
     def tryGetProposerName(hexAddress: String): Future[String] = tryGetValidatorByHexAddress(hexAddress).map { x =>
       val validator = x.deserialize
-      validator.description.moniker.getOrElse(validator.operatorAddress)
+      validator.description.moniker
     }
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
@@ -212,7 +207,7 @@ class Validators @Inject()(
 
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(Delegate(delegatorAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.validatorAddress), validatorAddress = createValidator.validatorAddress, amount = createValidator.value))
-        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker.getOrElse(createValidator.validatorAddress))(s"'${createValidator.validatorAddress}'")
+        val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.description.moniker)(s"'${createValidator.validatorAddress}'")
         //        val insertKeyBaseAccount = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(createValidator.validatorAddress, createValidator.description.identity)
 
         for {
@@ -234,7 +229,7 @@ class Validators @Inject()(
     def onEditValidator(editValidator: EditValidator): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(editValidator.validatorAddress)
 
-      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
+      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker)(s"'${validator.operatorAddress}'")
 
       //        def insertKeyBaseAccount(validator: Validator) = keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity)
 
@@ -249,7 +244,7 @@ class Validators @Inject()(
     def onUnjail(unjail: Unjail): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(unjail.address)
 
-      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker.getOrElse(validator.operatorAddress))(s"'${validator.operatorAddress}'")
+      def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker)(s"'${validator.operatorAddress}'")
 
       (for {
         validator <- upsertValidator
@@ -262,7 +257,7 @@ class Validators @Inject()(
 
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
-      val accountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(delegate.delegatorAddress)
+      val accountBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 
@@ -291,7 +286,7 @@ class Validators @Inject()(
       val accountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.validatorAddress)
       //TODO
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(accountAddress)
-      val updateAccountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(accountAddress)
+      val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(accountAddress)
 
       (for {
         _ <- withdrawBalance

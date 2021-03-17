@@ -20,7 +20,7 @@ object Serializable {
 
   implicit val addressReads: Reads[Address] = Json.reads[Address]
 
-  case class ValidatorDescription(moniker: Option[String], identity: Option[String], website: Option[String], securityContact: Option[String], details: Option[String])
+  case class ValidatorDescription(moniker: String, identity: String, website: String, securityContact: String, details: String)
 
   implicit val validatorDescriptionWrites: OWrites[ValidatorDescription] = Json.writes[ValidatorDescription]
 
@@ -52,7 +52,7 @@ object Serializable {
     "amount" -> coin.amount.toMicroString
   )
 
-  case class Fee(amount: Seq[Coin], gas: String)
+  case class Fee(amount: Seq[Coin], gasLimit: String, payer: String, granter: String)
 
   implicit val feeReads: Reads[Fee] = Json.reads[Fee]
 

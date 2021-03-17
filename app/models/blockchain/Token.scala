@@ -177,7 +177,7 @@ class Tokens @Inject()(
     def onSlashing: Future[Unit] = {
       val stakingPoolResponse = getStakingPool.Service.get
 
-      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = stakingDenom, bondedAmount = stakingPoolResponse.result.bonded_tokens, notBondedAmount = stakingPoolResponse.result.not_bonded_tokens)
+      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = stakingDenom, bondedAmount = stakingPoolResponse.pool.bonded_tokens, notBondedAmount = stakingPoolResponse.pool.not_bonded_tokens)
 
       (for {
         stakingPoolResponse <- stakingPoolResponse
@@ -194,12 +194,12 @@ class Tokens @Inject()(
       val stakingPoolResponse = getStakingPool.Service.get
       val communityPoolResponse = getCommunityPool.Service.get
 
-      def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.result) { token =>
+      def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.supply) { token =>
         Service.insertOrUpdate(Token(denom = token.denom, totalSupply = token.amount,
-          bondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
-          notBondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
-          communityPool = communityPoolResponse.result.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
-          inflation = if (token.denom == stakingDenom) mintingInflationResponse.result else BigDecimal(0.0)
+          bondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
+          notBondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
+          communityPool = communityPoolResponse.pool.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
+          inflation = if (token.denom == stakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
         ))
       }
 

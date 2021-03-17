@@ -7,18 +7,18 @@ import utilities.MicroNumber
 
 object CommunityPoolResponse {
 
-  case class Result(denom: String, amount: MicroNumber)
+  case class Pool(denom: String, amount: MicroNumber)
 
-  object Result {
-    def apply(denom: String, amount: String): Result = new Result(denom, new MicroNumber(BigDecimal(amount).toBigInt()))
+  object Pool {
+    def apply(denom: String, amount: String): Pool = new Pool(denom, new MicroNumber(BigDecimal(amount).toBigInt()))
   }
 
-  implicit val resultReads: Reads[Result] = (
+  implicit val poolReads: Reads[Pool] = (
     (JsPath \ "denom").read[String] and
       (JsPath \ "amount").read[String]
-    ) (Result.apply _)
+    ) (Pool.apply _)
 
-  case class Response(height: String, result: Seq[Result]) extends BaseResponse
+  case class Response(pool: Seq[Pool]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

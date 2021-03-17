@@ -111,14 +111,14 @@ object TransactionMessageResponses {
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
 
   //staking
-  case class Description(moniker: Option[String], identity: Option[String], website: Option[String], security_contact: Option[String], details: Option[String]) {
+  case class Description(moniker: String, identity: String, website: String, security_contact: String, details: String) {
     def toDescription: TransactionMessages.Description = TransactionMessages.Description(moniker = moniker, identity = identity, website = website, securityContact = security_contact, details = details)
   }
 
   implicit val descriptionReads: Reads[Description] = Json.reads[Description]
 
-  case class Commission(rate: Option[String], max_rate: Option[String], max_change_rate: Option[String]) {
-    def toCommission: TransactionMessages.Commission = TransactionMessages.Commission(rate = rate.getOrElse("0.0"), maxRate = max_rate.getOrElse("0.0"), maxChangeRate = max_change_rate.getOrElse("0.0"))
+  case class Commission(rate: String, max_rate: String, max_change_rate: String) {
+    def toCommission: TransactionMessages.Commission = TransactionMessages.Commission(rate = rate, maxRate = max_rate, maxChangeRate = max_change_rate)
   }
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
@@ -129,7 +129,7 @@ object TransactionMessageResponses {
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
-  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Description, min_self_delegation: Option[MicroNumber]) extends TransactionMessageResponse {
+  case class EditValidator(validator_address: String, commission_rate: String, description: Description, min_self_delegation: Option[MicroNumber]) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 

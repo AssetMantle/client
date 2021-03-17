@@ -20,7 +20,7 @@ class GetValidator @Inject()()(implicit wsClient: WSClient, configuration: Confi
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "staking/validators"
+  private val path = "cosmos/staking/v1beta1/validators"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

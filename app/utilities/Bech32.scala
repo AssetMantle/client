@@ -1,6 +1,7 @@
 package utilities
 
 import java.security.MessageDigest
+import java.util.Base64
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success, Try}
 
@@ -21,7 +22,16 @@ object Bech32 {
     MessageDigest.getInstance("SHA-256").digest(pubKeyBytes).slice(0, 20).map("%02x".format(_)).mkString.toUpperCase
   }
 
-  def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = "cosmosvaloper"): String = {
+  def convertValidatorPublicKeyToHexAddress(pubkey: String): String = {
+    MessageDigest
+      .getInstance("SHA-256")
+      .digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))
+      .slice(0, 20)
+      .map("%02x".format(_))
+      .mkString.toUpperCase
+  }
+
+  def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = constants.Blockchain.ValidatorPrefix): String = {
     val byteSeq = decode(accountAddress) match {
       case Success(value: (String, Seq[Int5])) => value._2
       case Failure(exception) => throw exception

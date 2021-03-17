@@ -9,10 +9,12 @@ import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import queries.blockchain.GetAccount
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -29,7 +31,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
-                                startup: Startup
+                                startup: Startup,
+                                getAccount: GetAccount
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -39,10 +42,9 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
-        case Some(loginState) => {
+        case Some(loginState) =>
           implicit val loginStateImplicit: LoginState = loginState
           withUsernameToken.Ok(views.html.index())
-        }
         case None => Future(Ok(views.html.index()))
       }
   }
@@ -67,12 +69,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
           else {
             loginState match {
-              case Some(loginState) => {
+              case Some(loginState) =>
                 implicit val loginStateImplicit: LoginState = loginState
                 if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
                   withUsernameToken.Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
                 } else withUsernameToken.Ok(views.html.search(asset, identity, splits, order, metaList, classification, maintainer))
-              }
               case None =>
                 if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
                   Future(Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))

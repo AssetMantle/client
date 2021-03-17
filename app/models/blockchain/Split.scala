@@ -21,7 +21,7 @@ case class Split(ownerID: String, ownableID: String, split: BigDecimal, createdB
 class Splits @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration,
-                        blockchainAccounts: Accounts,
+                        blockchainBalances: Balances,
                         masterSplits: master.Splits
                       )(implicit executionContext: ExecutionContext) {
 
@@ -178,7 +178,7 @@ class Splits @Inject()(
     }
 
     def onWrap(splitWrap: SplitWrap): Future[Unit] = {
-      val updateAccountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(splitWrap.from)
+      val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(splitWrap.from)
       val updateSplits = Future.traverse(splitWrap.coins) { coin =>
         val oldSplit = Service.get(ownerID = splitWrap.fromID, ownableID = coin.denom)
 
@@ -212,7 +212,7 @@ class Splits @Inject()(
 
     def onUnwrap(splitUnwrap: SplitUnwrap): Future[Unit] = {
       val oldFromSplit = Service.tryGet(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID)
-      val updateAccountBalance = blockchainAccounts.Utility.insertOrUpdateAccountBalance(splitUnwrap.from)
+      val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(splitUnwrap.from)
 
       def updateSplits(oldFromSplit: Split) = if ((oldFromSplit.split - splitUnwrap.split) == 0) Service.delete(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID) else Service.insertOrUpdate(oldFromSplit.copy(split = oldFromSplit.split - splitUnwrap.split))
 

@@ -20,7 +20,7 @@ case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String, cr
 class WithdrawAddresses @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    configuration: Configuration,
-                                   blockchainAccounts: Accounts
+                                   blockchainBalances: Balances
                                  )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -116,7 +116,7 @@ class WithdrawAddresses @Inject()(
     def withdrawRewards(address: String): Future[Unit] = {
       val withdrawAddress = Service.get(address)
 
-      def updateBalance(withdrawAddress: String) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(withdrawAddress)
+      def updateBalance(withdrawAddress: String) = blockchainBalances.Utility.insertOrUpdateBalance(withdrawAddress)
 
       (for {
         withdrawAddress <- withdrawAddress

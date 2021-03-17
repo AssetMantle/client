@@ -15,7 +15,7 @@
             @validators.map { validator =>
                 <tr>
                     <td class="blockHeightItem">
-                        @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker.getOrElse(validator.operatorAddress), routes.ViewController.validator(validator.operatorAddress)))
+                        @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))
                     </td>
                     <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
                     <td>@validator.commission.commissionRates.rate.toString %</td>

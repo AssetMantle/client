@@ -111,7 +111,7 @@ object TransactionMessages {
   implicit val unjailWrites: OWrites[Unjail] = Json.writes[Unjail]
 
   //staking
-  case class Description(moniker: Option[String], identity: Option[String], website: Option[String], securityContact: Option[String], details: Option[String]) {
+  case class Description(moniker: String, identity: String, website: String, securityContact: String, details: String) {
     def toSerializableDescription: ValidatorDescription = ValidatorDescription(moniker = moniker, identity = identity, website = website, securityContact = securityContact, details = details)
   }
 
@@ -133,7 +133,7 @@ object TransactionMessages {
 
   implicit val createValidatorWrites: OWrites[CreateValidator] = Json.writes[CreateValidator]
 
-  case class EditValidator(validatorAddress: String, commissionRate: Option[String], description: Description, minSelfDelegation: Option[MicroNumber]) extends TransactionMessage
+  case class EditValidator(validatorAddress: String, commissionRate: String, description: Description, minSelfDelegation: Option[MicroNumber]) extends TransactionMessage
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]
 

@@ -7,8 +7,8 @@ import org.bitcoinj.crypto.ChildNumber
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = "cosmos"
-  val ValidatorPrefix = "cosmosvaloper"
+  val AccountPrefix = "persistence"
+  val ValidatorPrefix = "persistencevaloper"
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
@@ -23,7 +23,7 @@ object Blockchain {
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
   val HeightDataDefaultValue: Int = -1
-  val CoinType = 118
+  val CoinType = 750
   val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
@@ -32,16 +32,30 @@ object Blockchain {
     new ChildNumber(0, false)
   )
 
-
   object PublicKey {
-    val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
-    val SINGLE = "tendermint/PubKeySecp256k1"
+    val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
+    val SINGLE = "/cosmos.crypto.secp256k1.PubKey"
+    val VALIDATOR = "/cosmos.crypto.ed25519.PubKey"
+  }
+
+  object Proposal {
+    val PARAMETER_CHANGE = "/cosmos.params.v1beta1.ParameterChangeProposal"
+    val TEXT = "/cosmos.gov.v1beta1.TextProposal"
+    val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
   }
 
   object Account {
-    val DELAYED_VESTING = "cosmos-sdk/DelayedVestingAccount"
-    val BASE = "cosmos-sdk/Account"
-    val MODULE = "cosmos-sdk/ModuleAccount"
+    val BASE = "/cosmos.auth.v1beta1.BaseAccount"
+    val CONTINUOUS_VESTING = "/cosmos.vesting.v1beta1.ContinuousVestingAccount"
+    val DELAYED_VESTING = "/cosmos.vesting.v1beta1.DelayedVestingAccount"
+    val MODULE = "/cosmos.auth.v1beta1.ModuleAccount"
+    val PERIODIC_VESTING = "/cosmos.vesting.v1beta1.PeriodicVestingAccount"
+  }
+
+  object ValidatorStatus {
+    val BONED = "BOND_STATUS_BONDED"
+    val UNBONDED = "BOND_STATUS_UNBONDED"
+    val UNBONDING = "BOND_STATUS_UNBONDING"
   }
 
   object ParameterType {
@@ -173,7 +187,6 @@ object Blockchain {
     val MAINTAINER = "MAINTAINER"
   }
 
-
   object TransactionRequest {
     //identity
     val IDENTITY_NUB = "/xprt/identities/nub/request"
@@ -203,29 +216,29 @@ object Blockchain {
 
   object TransactionMessage {
     //bank
-    val SEND_COIN = "cosmos-sdk/MsgSend"
-    val MULTI_SEND = "cosmos-sdk/MsgMultiSend"
+    val SEND_COIN = "/cosmos.staking.v1beta1.MsgSend"
+    val MULTI_SEND = "/cosmos.staking.v1beta1.MsgMultiSend"
     //crisis
-    val VERIFY_INVARIANT = "cosmos-sdk/MsgVerifyInvariant"
+    val VERIFY_INVARIANT = "/cosmos.staking.v1beta1.MsgVerifyInvariant"
     //distribution
-    val SET_WITHDRAW_ADDRESS = "cosmos-sdk/MsgModifyWithdrawAddress"
-    val WITHDRAW_DELEGATOR_REWARD = "cosmos-sdk/MsgWithdrawDelegationReward"
-    val WITHDRAW_VALIDATOR_COMMISSION = "cosmos-sdk/MsgWithdrawValidatorCommission"
-    val FUND_COMMUNITY_POOL = "cosmos-sdk/MsgFundCommunityPool"
+    val SET_WITHDRAW_ADDRESS = "/cosmos.staking.v1beta1.MsgModifyWithdrawAddress"
+    val WITHDRAW_DELEGATOR_REWARD = "/cosmos.staking.v1beta1.MsgWithdrawDelegationReward"
+    val WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.staking.v1beta1.MsgWithdrawValidatorCommission"
+    val FUND_COMMUNITY_POOL = "/cosmos.staking.v1beta1.MsgFundCommunityPool"
     //evidence
-    val SUBMIT_EVIDENCE = "cosmos-sdk/MsgSubmitEvidence"
+    val SUBMIT_EVIDENCE = "/cosmos.staking.v1beta1.MsgSubmitEvidence"
     //gov
-    val DEPOSIT = "cosmos-sdk/MsgDeposit"
-    val SUBMIT_PROPOSAL = "cosmos-sdk/MsgSubmitProposal"
-    val VOTE = "cosmos-sdk/MsgVote"
+    val DEPOSIT = "/cosmos.staking.v1beta1.MsgDeposit"
+    val SUBMIT_PROPOSAL = "/cosmos.staking.v1beta1.MsgSubmitProposal"
+    val VOTE = "/cosmos.staking.v1beta1.MsgVote"
     //slashing
-    val UNJAIL = "cosmos-sdk/MsgUnjail"
+    val UNJAIL = "/cosmos.staking.v1beta1.MsgUnjail"
     //staking
-    val CREATE_VALIDATOR = "cosmos-sdk/MsgCreateValidator"
-    val EDIT_VALIDATOR = "cosmos-sdk/MsgEditValidator"
-    val DELEGATE = "cosmos-sdk/MsgDelegate"
-    val REDELEGATE = "cosmos-sdk/MsgBeginRedelegate"
-    val UNDELEGATE = "cosmos-sdk/MsgUndelegate"
+    val CREATE_VALIDATOR = "/cosmos.staking.v1beta1.MsgCreateValidator"
+    val EDIT_VALIDATOR = "/cosmos.staking.v1beta1.MsgEditValidator"
+    val DELEGATE = "/cosmos.staking.v1beta1.MsgDelegate"
+    val REDELEGATE = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
+    val UNDELEGATE = "/cosmos.staking.v1beta1.MsgUndelegate"
     //asset
     val ASSET_DEFINE = "/xprt/assets/define/message"
     val ASSET_MINT = "/xprt/assets/mint/message"

@@ -22,6 +22,7 @@ class Block @Inject()(
                        blockchainAccounts: blockchain.Accounts,
                        blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                        blockchainAssets: blockchain.Assets,
+                       blockchainBalances: blockchain.Balances,
                        blockchainClassifications: blockchain.Classifications,
                        blockchainDelegations: blockchain.Delegations,
                        blockchainIdentities: blockchain.Identities,
@@ -67,7 +68,7 @@ class Block @Inject()(
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactionResponses = Future.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash))
 
-      def getTransactions(transactionResponses: Seq[TransactionResponse]): Future[Seq[blockchainTransaction]] = Future(transactionResponses.map(_.toTransaction))
+      def getTransactions(transactionResponses: Seq[TransactionResponse]): Future[Seq[blockchainTransaction]] = Future(transactionResponses.map(_.txResponse.toTransaction))
 
       def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
@@ -132,14 +133,15 @@ class Block @Inject()(
   private def actionsOnTransactions(transactions: Seq[blockchainTransaction], height: Int): Future[Seq[Seq[Unit]]] = Future.traverse(transactions) { transaction =>
     if (transaction.status) Future.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg, height = height))
     else Future(Seq.empty)
+    //TODO blockchainAccounts.Utility.insertOrUpdateAccount(fromAddress)
   }
 
   def actionOnTxMessages(stdMsg: StdMsg, height: Int): Future[Unit] = {
     try {
       stdMsg.messageType match {
         //bank
-        case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainAccounts.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
-        case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainAccounts.Utility.onMultiSend(stdMsg.message.asInstanceOf[MultiSend])
+        case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
+        case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainBalances.Utility.onMultiSend(stdMsg.message.asInstanceOf[MultiSend])
         //slashing
         case constants.Blockchain.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(stdMsg.message.asInstanceOf[Unjail])
         //staking
@@ -206,8 +208,8 @@ class Block @Inject()(
       val hexAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address && x.value.isDefined).fold("")(x => utilities.Bech32.convertConsensusAddressToHexAddress(x.value.get))
       val insertNotification = validators.find(x => x.hexAddress == hexAddress).fold(Future(""))(validator =>
         utilities.Validator.getSlashingReason(event.attributes.find(x => constants.Blockchain.Event.Attribute.Reason == x.key).fold("")(_.value.getOrElse(""))) match {
-          case constants.View.MISSING_SIGNATURE => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSING_SIGNATURE_SLASHING, validator.description.moniker.getOrElse(validator.operatorAddress), height.toString)(s"'${validator.operatorAddress}'")
-          case constants.View.DOUBLE_SIGNING => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_DOUBLE_SIGNING_SLASHING, validator.description.moniker.getOrElse(validator.operatorAddress), height.toString)(s"'${validator.operatorAddress}'")
+          case constants.View.MISSING_SIGNATURE => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSING_SIGNATURE_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
+          case constants.View.DOUBLE_SIGNING => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_DOUBLE_SIGNING_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
           case _ => Future("")
         })
 
@@ -237,15 +239,16 @@ class Block @Inject()(
     def addEvent(validator: Validator, missedBlockCounter: Int, height: Int, slashingParameter: SlashingParameter): Future[String] = {
       //TODO criteria needs to be set to send notification
       //TODO In future if private notifications is asked for missing blocks then it needs to be done from here.
-      val slashingOnMissingBlocks = slashingParameter.minSignedPerWindow * BigDecimal(slashingParameter.signedBlocksWindow)
+      val slashingOnMissingBlocks = BigDecimal(slashingParameter.minSignedPerWindow) * BigDecimal(slashingParameter.signedBlocksWindow)
       if ((missedBlockCounter % (slashingOnMissingBlocks / 10) == 0) && missedBlockCounter != slashingOnMissingBlocks) {
-        masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker.getOrElse(validator.operatorAddress), missedBlockCounter.toString, height.toString)(validator.operatorAddress)
+        masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker, missedBlockCounter.toString, height.toString)(validator.operatorAddress)
       } else Future("")
     }
 
     def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
       val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
       val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.fold(0)(_.toInt))
+      println(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
       val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
 
       (for {
