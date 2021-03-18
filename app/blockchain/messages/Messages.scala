@@ -1,6 +1,6 @@
 package blockchain.messages
 
-import blockchain.Abstract.Transaction
+import blockchain.Abstract.BlockchainStdMessage
 import blockchain.common.{Coin, Height, ID, MetaFact, MetaProperties, Properties}
 import exceptions.BaseException
 import models.Abstract.TransactionMessage
@@ -30,53 +30,53 @@ object Messages {
   implicit val outputReads: Reads[Output] = Json.reads[Output]
   implicit val outputWrites: OWrites[Output] = Json.writes[Output]
 
-  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends Transaction {
+  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.MultiSend(inputs = inputs.map(_.toInput), outputs = outputs.map(_.toOutput))
   }
 
   implicit val multiSendReads: Reads[MultiSend] = Json.reads[MultiSend]
 
   //  bank
-  case class SendCoin(from_address: String, to_address: String, amount: Seq[Coin]) extends Transaction {
+  case class SendCoin(from_address: String, to_address: String, amount: Seq[Coin]) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SendCoin(fromAddress = from_address, toAddress = to_address, amounts = amount.map(x => Serializable.Coin(denom = x.denom, amount = x.amount)))
   }
 
   implicit val sendCoinReads: Reads[SendCoin] = Json.reads[SendCoin]
 
   //crisis
-  case class VerifyInvariant(sender: String, invariant_module_name: String, invariant_route: String) extends Transaction {
+  case class VerifyInvariant(sender: String, invariant_module_name: String, invariant_route: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.VerifyInvariant(sender = sender, invariantModuleName = invariant_module_name, invariantRoute = invariant_route)
   }
 
   implicit val verifyInvariantReads: Reads[VerifyInvariant] = Json.reads[VerifyInvariant]
 
   //distribution
-  case class SetWithdrawAddress(delegator_address: String, withdraw_address: String) extends Transaction {
+  case class SetWithdrawAddress(delegator_address: String, withdraw_address: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SetWithdrawAddress(delegatorAddress = delegator_address, withdrawAddress = withdraw_address)
   }
 
   implicit val setWithdrawAddressReads: Reads[SetWithdrawAddress] = Json.reads[SetWithdrawAddress]
 
-  case class WithdrawDelegatorReward(delegator_address: String, validator_address: String) extends Transaction {
+  case class WithdrawDelegatorReward(delegator_address: String, validator_address: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.WithdrawDelegatorReward(delegatorAddress = delegator_address, validatorAddress = validator_address)
   }
 
   implicit val withdrawDelegatorRewardReads: Reads[WithdrawDelegatorReward] = Json.reads[WithdrawDelegatorReward]
 
-  case class WithdrawValidatorCommission(validator_address: String) extends Transaction {
+  case class WithdrawValidatorCommission(validator_address: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.WithdrawValidatorCommission(validatorAddress = validator_address)
   }
 
   implicit val withdrawValidatorCommissionReads: Reads[WithdrawValidatorCommission] = Json.reads[WithdrawValidatorCommission]
 
-  case class FundCommunityPool(amount: Seq[Coin], depositor: String) extends Transaction {
+  case class FundCommunityPool(amount: Seq[Coin], depositor: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.FundCommunityPool(amount = amount.map(_.toCoin), depositor = depositor)
   }
 
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
 
   //gov
-  case class Deposit(proposal_id: String, depositor: String, amount: Seq[Coin]) extends Transaction {
+  case class Deposit(proposal_id: String, depositor: String, amount: Seq[Coin]) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Deposit(proposalID = proposal_id, depositor = depositor, amount = amount.map(_.toCoin))
   }
 
@@ -96,20 +96,20 @@ object Messages {
   implicit val contentReads: Reads[Content] = Json.reads[Content]
   implicit val contentWrites: OWrites[Content] = Json.writes[Content]
 
-  case class SubmitProposal(content: Content, initial_deposit: Seq[Coin], proposer: String) extends Transaction {
+  case class SubmitProposal(content: Content, initial_deposit: Seq[Coin], proposer: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SubmitProposal(content = content.toContent, initialDeposit = initial_deposit.map(_.toCoin), proposer = proposer)
   }
 
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
-  case class Vote(proposal_id: String, voter: String, option: Int) extends Transaction {
+  case class Vote(proposal_id: String, voter: String, option: Int) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Vote(proposalID = proposal_id, voter = voter, option = option)
   }
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
   //slashing
-  case class Unjail(address: String) extends Transaction {
+  case class Unjail(address: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Unjail(address = address)
   }
 
@@ -130,152 +130,152 @@ object Messages {
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
   implicit val commissionWrites: OWrites[Commission] = Json.writes[Commission]
 
-  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: Commission, description: Description, min_self_delegation: MicroNumber) extends Transaction {
+  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: Commission, description: Description, min_self_delegation: MicroNumber) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey, value = Serializable.Coin(denom = value.denom, amount = value.amount), commission = commission.toCommission, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
-  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Description, min_self_delegation: Option[MicroNumber]) extends Transaction {
+  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Description, min_self_delegation: Option[MicroNumber]) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]
 
-  case class Delegate(delegator_address: String, validator_address: String, amount: Coin) extends Transaction {
+  case class Delegate(delegator_address: String, validator_address: String, amount: Coin) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Delegate(delegatorAddress = delegator_address, validatorAddress = validator_address, amount = amount.toCoin)
   }
 
   implicit val delegateReads: Reads[Delegate] = Json.reads[Delegate]
 
-  case class Redelegate(delegator_address: String, validator_src_address: String, validator_dst_address: String, amount: Coin) extends Transaction {
+  case class Redelegate(delegator_address: String, validator_src_address: String, validator_dst_address: String, amount: Coin) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Redelegate(delegatorAddress = delegator_address, validatorSrcAddress = validator_src_address, validatorDstAddress = validator_dst_address, amount = amount.toCoin)
   }
 
   implicit val redelegateReads: Reads[Redelegate] = Json.reads[Redelegate]
 
-  case class Undelegate(delegator_address: String, validator_address: String, amount: Coin) extends Transaction {
+  case class Undelegate(delegator_address: String, validator_address: String, amount: Coin) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Undelegate(delegatorAddress = delegator_address, validatorAddress = validator_address, amount = amount.toCoin)
   }
 
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
   //Asset
-  case class AssetDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends Transaction {
+  case class AssetDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.AssetDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
   }
 
   implicit val assetDefineReads: Reads[AssetDefine] = Json.reads[AssetDefine]
 
-  case class AssetMint(from: String, fromID: ID, toID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends Transaction {
+  case class AssetMint(from: String, fromID: ID, toID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.AssetMint(from = from, fromID = fromID.value.idString, toID = toID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
 
   implicit val assetMintReads: Reads[AssetMint] = Json.reads[AssetMint]
 
-  case class AssetMutate(from: String, fromID: ID, assetID: ID, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends Transaction {
+  case class AssetMutate(from: String, fromID: ID, assetID: ID, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.AssetMutate(from = from, fromID = fromID.value.idString, assetID = assetID.value.idString, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
 
   implicit val assetMutateReads: Reads[AssetMutate] = Json.reads[AssetMutate]
 
-  case class AssetBurn(from: String, fromID: ID, assetID: ID) extends Transaction {
+  case class AssetBurn(from: String, fromID: ID, assetID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.AssetBurn(from = from, assetID = assetID.value.idString, fromID = fromID.value.idString)
   }
 
   implicit val assetBurnReads: Reads[AssetBurn] = Json.reads[AssetBurn]
 
   //Identity
-  case class IdentityDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends Transaction {
+  case class IdentityDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
   }
 
   implicit val identityDefineReads: Reads[IdentityDefine] = Json.reads[IdentityDefine]
 
-  case class IdentityIssue(from: String, to: String, fromID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends Transaction {
+  case class IdentityIssue(from: String, to: String, fromID: ID, classificationID: ID, immutableMetaProperties: MetaProperties, mutableMetaProperties: MetaProperties, mutableProperties: Properties, immutableProperties: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityIssue(from = from, to = to, fromID = fromID.value.idString, classificationID = classificationID.value.idString, immutableMetaProperties = immutableMetaProperties.toMetaProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties, immutableProperties = immutableProperties.toProperties)
   }
 
   implicit val identityIssueReads: Reads[IdentityIssue] = Json.reads[IdentityIssue]
 
-  case class IdentityProvision(from: String, to: String, identityID: ID) extends Transaction {
+  case class IdentityProvision(from: String, to: String, identityID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityProvision(from = from, to = to, identityID = identityID.value.idString)
   }
 
   implicit val identityProvisionReads: Reads[IdentityProvision] = Json.reads[IdentityProvision]
 
-  case class IdentityUnprovision(from: String, to: String, identityID: ID) extends Transaction {
+  case class IdentityUnprovision(from: String, to: String, identityID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityUnprovision(from = from, to = to, identityID = identityID.value.idString)
   }
 
   implicit val identityUnprovisionReads: Reads[IdentityUnprovision] = Json.reads[IdentityUnprovision]
 
-  case class IdentityNub(from: String, nubID: ID) extends Transaction {
+  case class IdentityNub(from: String, nubID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.IdentityNub(from = from, nubID = nubID.value.idString)
   }
 
   implicit val identityNubReads: Reads[IdentityNub] = Json.reads[IdentityNub]
 
   //Split
-  case class SplitSend(from: String, fromID: ID, toID: ID, ownableID: ID, split: BigDecimal) extends Transaction {
+  case class SplitSend(from: String, fromID: ID, toID: ID, ownableID: ID, split: BigDecimal) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SplitSend(from = from, fromID = fromID.value.idString, toID = toID.value.idString, ownableID = ownableID.value.idString, split = split)
   }
 
   implicit val splitSendReads: Reads[SplitSend] = Json.reads[SplitSend]
 
-  case class SplitWrap(from: String, fromID: ID, coins: Seq[Coin]) extends Transaction {
+  case class SplitWrap(from: String, fromID: ID, coins: Seq[Coin]) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SplitWrap(from = from, fromID = fromID.value.idString, coins = coins.map(_.toCoin))
   }
 
   implicit val splitWrapReads: Reads[SplitWrap] = Json.reads[SplitWrap]
 
-  case class SplitUnwrap(from: String, fromID: ID, ownableID: ID, split: BigDecimal) extends Transaction {
+  case class SplitUnwrap(from: String, fromID: ID, ownableID: ID, split: BigDecimal) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.SplitUnwrap(from = from, fromID = fromID.value.idString, ownableID = ownableID.value.idString, split = split)
   }
 
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
   //Order
-  case class OrderDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends Transaction {
+  case class OrderDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.OrderDefine(from = from, fromID = fromID.value.idString, immutableMetaTraits = immutableMetaTraits.toMetaProperties, immutableTraits = immutableTraits.toProperties, mutableMetaTraits = mutableMetaTraits.toMetaProperties, mutableTraits = mutableTraits.toProperties)
   }
 
   implicit val orderDefineReads: Reads[OrderDefine] = Json.reads[OrderDefine]
 
-  case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends Transaction {
+  case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, fromID = fromID.value.idString, classificationID = classificationID.value.idString, makerOwnableID = makerOwnableID.value.idString, takerOwnableID = takerOwnableID.value.idString, expiresIn = expiresIn.toInt, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties.toMetaProperties, immutableProperties = immutableProperties.toProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
 
-  case class OrderTake(from: String, fromID: ID, takerOwnableSplit: BigDecimal, orderID: ID) extends Transaction {
+  case class OrderTake(from: String, fromID: ID, takerOwnableSplit: BigDecimal, orderID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.OrderTake(from = from, fromID = fromID.value.idString, takerOwnableSplit = takerOwnableSplit, orderID = orderID.value.idString)
   }
 
   implicit val orderTakeReads: Reads[OrderTake] = Json.reads[OrderTake]
 
-  case class OrderCancel(from: String, fromID: ID, orderID: ID) extends Transaction {
+  case class OrderCancel(from: String, fromID: ID, orderID: ID) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.OrderCancel(from = from, fromID = fromID.value.idString, orderID = orderID.value.idString)
   }
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
   //meta
-  case class MetaReveal(from: String, metaFact: MetaFact) extends Transaction {
+  case class MetaReveal(from: String, metaFact: MetaFact) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.MetaReveal(from = from, metaFact = metaFact.toMetaFact)
   }
 
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
 
   //maintainer
-  case class MaintainerDeputize(from: String, fromID: ID, toID: ID, classificationID: ID, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends Transaction {
+  case class MaintainerDeputize(from: String, fromID: ID, toID: ID, classificationID: ID, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.MaintainerDeputize(from = from, fromID = fromID.value.idString, toID = toID.value.idString, classificationID = classificationID.value.idString, maintainedTraits = maintainedTraits.toProperties, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer)
   }
 
   implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]
 
   //unknown
-  case class Unknown(value: String) extends Transaction {
+  case class Unknown(value: String) extends BlockchainStdMessage {
     def toTxMsg: TransactionMessage = TransactionMessages.Unknown(value)
   }
 
@@ -340,7 +340,7 @@ object Messages {
       throw new BaseException(constants.Response.TRANSACTION_STRUCTURE_CHANGED)
   }
 
-  implicit val transactionWrites: Writes[Transaction] = {
+  implicit val transactionWrites: Writes[BlockchainStdMessage] = {
     case multiSend: MultiSend => Json.toJson(multiSend)(Json.writes[MultiSend])
     case sendCoin: SendCoin => Json.toJson(sendCoin)(Json.writes[SendCoin])
     case verifyInvariant: VerifyInvariant => Json.toJson(verifyInvariant)(Json.writes[VerifyInvariant])

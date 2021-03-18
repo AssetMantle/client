@@ -7,7 +7,7 @@ import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.TransactionMessageResponse
 import blockchain.messages.Messages.msgApply
 import transactions.Abstract.BaseResponse
-import blockchain.Abstract.{Transaction => BCTransaction}
+import blockchain.Abstract.{BlockchainStdMessage => BCTransaction}
 import blockchain.common.Coin
 
 object TransactionResponse {

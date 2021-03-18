@@ -1,6 +1,6 @@
 package transactions.request
 
-import blockchain.Abstract.Transaction
+import blockchain.Abstract.BlockchainStdMessage
 import models.common.Serializable.{Coin, Fee}
 import play.api.Logger
 import play.api.libs.json.{Json, OWrites}
@@ -17,7 +17,7 @@ object Serializable{
 
   implicit val signatureWrites: OWrites[Signature] = Json.writes[Signature]
 
-  case class Message(`type`: String, value: Transaction)
+  case class Message(`type`: String, value: BlockchainStdMessage)
 
   implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 
