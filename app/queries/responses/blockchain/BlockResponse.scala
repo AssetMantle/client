@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchain.common.Header
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
 
 object BlockResponse {

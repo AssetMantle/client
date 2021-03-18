@@ -1,11 +1,11 @@
 package transactions.request
 
-import exceptions.BaseException
-import models.Abstract.TransactionValue
+import blockchain.Abstract.Transaction
 import models.common.Serializable.{Coin, Fee}
 import play.api.Logger
-import play.api.libs.json.{Json, OWrites, Writes}
-import queries.responses.common.Account.SinglePublicKey
+import play.api.libs.json.{Json, OWrites}
+import blockchain.common.Account.SinglePublicKey
+import blockchain.messages.Messages.transactionWrites
 
 object Serializable{
 
@@ -17,14 +17,7 @@ object Serializable{
 
   implicit val signatureWrites: OWrites[Signature] = Json.writes[Signature]
 
-  case class SendCoin(amount: Seq[Coin], from_address: String, to_address: String) extends TransactionValue
-
-  implicit val transactionValueWrites: Writes[TransactionValue] = {
-    case sendCoin: SendCoin => Json.toJson(sendCoin)(Json.writes[SendCoin])
-    case _ => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-  }
-
-  case class Message(`type`: String, value: TransactionValue)
+  case class Message(`type`: String, value: Transaction)
 
   implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 

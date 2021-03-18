@@ -1,8 +1,8 @@
-package queries.responses.common
+package blockchain.common
 
 import models.common.Serializable
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json._
 
 case class Fact(value: Fact.Value) {
   def toFact: Serializable.Fact = Serializable.Fact(value.factType, value.hash)
@@ -17,6 +17,12 @@ object Fact {
       (JsPath \ "hash").read[String]
     ) (Value.apply _)
 
+  implicit val valueWrites: Writes[Value] = (value: Value) => Json.obj(
+    "type" -> value.factType,
+    "hash" -> value.hash
+  )
+
   implicit val factReads: Reads[Fact] = Json.reads[Fact]
+  implicit val factWrites: OWrites[Fact] = Json.writes[Fact]
 
 }

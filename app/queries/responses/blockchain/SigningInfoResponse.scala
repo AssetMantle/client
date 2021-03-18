@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchain.common.SigningInfo
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.SigningInfo
 import transactions.Abstract.BaseResponse
 
 object SigningInfoResponse {

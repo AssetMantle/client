@@ -1,10 +1,9 @@
-package queries.responses.common
+package blockchain.common
 
-import models.common.Serializable.Coin
 import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import queries.Abstract.{Account, PublicKey}
+import play.api.libs.functional.syntax._
 
 object Account {
 

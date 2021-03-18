@@ -1,5 +1,6 @@
 package services
 
+import blockchain.common.{Event, Header => BlockHeader}
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
 import models.blockchain.{Validator, Transaction => blockchainTransaction}
@@ -10,10 +11,9 @@ import models.{blockchain, keyBase, masterTransaction}
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.TransactionResponse.{Response => TransactionResponse}
-import queries.responses.common.{Event, Header => BlockHeader}
 import queries.blockchain.{GetBlockCommit, GetTransaction, GetTransactionsByHeight}
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

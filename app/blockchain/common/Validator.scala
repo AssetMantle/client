@@ -1,10 +1,10 @@
-package queries.responses.common
+package blockchain.common
 
-import models.blockchain.{Validator => BlockchainValidator}
 import models.common.Serializable
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import utilities.MicroNumber
+import play.api.libs.functional.syntax._
+import models.blockchain.{Validator => BlockchainValidator}
 
 object Validator {
 

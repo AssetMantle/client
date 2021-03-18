@@ -5,9 +5,10 @@ import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.TransactionMessageResponse
-import queries.responses.common.Coin
-import queries.responses.common.TransactionMessageResponses.msgApply
+import blockchain.messages.Messages.msgApply
 import transactions.Abstract.BaseResponse
+import blockchain.Abstract.{Transaction => BCTransaction}
+import blockchain.common.Coin
 
 object TransactionResponse {
 
@@ -21,7 +22,7 @@ object TransactionResponse {
 
   implicit val feeReads: Reads[Fee] = Json.reads[Fee]
 
-  case class Msg(msgType: String, value: TransactionMessageResponse) {
+  case class Msg(msgType: String, value: BCTransaction) {
     def toStdMsg: Serializable.StdMsg = Serializable.StdMsg(msgType, value.toTxMsg)
   }
 
