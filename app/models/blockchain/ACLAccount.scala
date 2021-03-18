@@ -172,7 +172,11 @@ class ACLAccounts @Inject()(
 
   val scheduledTask = new Runnable {
     override def run(): Unit = {
-      Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+      try {
+        Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getMessage, exception)
+      }
     }
   }
 

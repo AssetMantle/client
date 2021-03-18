@@ -1,5 +1,7 @@
 package utilities
 
+import java.net.UnknownHostException
+
 import com.twilio.Twilio
 import com.twilio.`type`.PhoneNumber
 import com.twilio.exception.{ApiConnectionException, ApiException}
@@ -7,6 +9,7 @@ import com.twilio.rest.api.v2010.account.Message
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
+import org.apache.commons.mail.EmailException
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.mailer._
@@ -88,21 +91,25 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future())
     } yield ()
       ).recover {
-      case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-        throw baseException
+      case unknownHostException: UnknownHostException => throw new BaseException(constants.Response.UNKNOWN_HOST_EXCEPTION, unknownHostException)
+      case baseException: BaseException => throw baseException
     }
   }
 
   private def sendEmail(emailAddress: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
-    mailerClient.send(Email(
-      subject = messagesApi(email.subject),
-      from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
-      to = Seq(emailAddress),
-      bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-      charset = Option(emailCharset),
-      replyTo = Seq(emailReplyTo),
-      bounceAddress = Option(emailBounceAddress),
-    ))
+    try {
+      mailerClient.send(Email(
+        subject = messagesApi(email.subject),
+        from = messagesApi(constants.Notification.FROM_EMAIL_ADDRESS, emailReplyTo),
+        to = Seq(emailAddress),
+        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+        charset = Option(emailCharset),
+        replyTo = Seq(emailReplyTo),
+        bounceAddress = Option(emailBounceAddress),
+      ))
+    }catch {
+      case emailException: EmailException=> throw new BaseException(constants.Response.EMAIL_SEND_FAILED, emailException)
+    }
   }
 
   def sendEmailToEmailAddress(fromAccountID: String, emailAddress: String, email: constants.Notification.Email, messageParameters: String*): Future[String] = {
@@ -154,9 +161,9 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*): Future[String] = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*): Future[Unit] = {
     val language = masterAccounts.Service.tryGetLanguage(accountID)
-    val notificationID = masterTransactionNotifications.Service.create(accountID, notification = notification, messagesParameters: _*)
+    val createNotification = masterTransactionNotifications.Service.create(accountID, notification = notification, messagesParameters: _*)
 
     def pushNotification(implicit language: Lang): Future[Unit] = notification.pushNotification.map(pushNotification => sendPushNotification(accountID = accountID, pushNotification = pushNotification, messageParameters = messagesParameters: _*)).getOrElse(Future())
 
@@ -166,13 +173,12 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
 
     (for {
       language <- language
-      notificationID <- notificationID
+      _ <- createNotification
       _ <- pushNotification(Lang(language))
       _ <- email(Lang(language))
       _ <- sms(Lang(language))
-    } yield notificationID).recover {
+    } yield ()).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
     }
   }
 

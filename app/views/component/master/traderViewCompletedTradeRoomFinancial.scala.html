@@ -2,7 +2,7 @@
 @import views.html.base._
 @import utilities.MicroNumber
 
-@(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <ul class="financialCardSection">
     <li class="cmuk-flex">
         <div class="cmuk-flex wallet">
@@ -32,7 +32,11 @@
             <span class="payableIcon">@commonIcon("payable")</span>
             <div>
                 <p class="cmuk-margin-remove ctitle">@Messages(constants.View.AMOUNT_PENDING)</p>
-                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @amountPending.toRoundedOffString()</p>
+                <p class="cmuk-comment-meta cmuk-margin-remove primaryFont">$ @if(moderated) {
+                    @amountPending.toRoundedOffString()
+                } else {
+                    0
+                }</p>
             </div>
         </div>
 

@@ -1,6 +1,6 @@
 package transactions
 
-import java.net.ConnectException
+import java.net.{ConnectException, UnknownHostException}
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -31,7 +31,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
   implicit val requestReads: Reads[Request] = Json.reads[Request]
 
-  case class Request(name: String, password: String, seed:String)
+  case class Request(name: String, password: String, seed: String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
   implicit val responseWrites: OWrites[Response] = Json.writes[Response]
@@ -44,7 +44,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      case e:Exception=>
+      case e: Exception =>
         logger.error(e.getMessage)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }

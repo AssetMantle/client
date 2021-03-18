@@ -1236,7 +1236,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      for {
+      (for {
         traderID <- traderID
         negotiation <- negotiation
       } yield {
@@ -1245,12 +1245,14 @@ class ComponentViewController @Inject()(
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
+      }).recover{
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
   def traderViewAcceptedNegotiationTerms(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val traderID = masterTraders.Service.tryGetID(loginState.username)
+      val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
       def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
@@ -1263,17 +1265,29 @@ class ComponentViewController @Inject()(
 
       def getSellerAddress(traderID: String, negotiation: Negotiation, counterPartyAccountID: String) = if (traderID == negotiation.sellerTraderID) Future(loginState.address) else blockchainAccounts.Service.tryGetAddress(counterPartyAccountID)
 
-      def getSuccessiveTransactionStatus(traderID: String, negotiation: Negotiation, order: Option[Order], buyerAddress: String, sellerAddress: String, asset: Asset) = {
+      def getZoneAccountID(zoneID:String) =  masterZones.Service.tryGetAccountID(zoneID)
+
+      def getZoneAddress(zoneAccountID:String) = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
+
+      def getSuccessiveTransactionStatus(traderID: String, negotiation: Negotiation, order: Option[Order], buyerAddress: String, sellerAddress: String, zoneAddress:String, asset: Asset) = {
         val pegHash = asset.pegHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
 
         if (traderID == negotiation.buyerTraderID) {
           negotiation.status match {
             case constants.Status.Negotiation.CONTRACT_SIGNED | constants.Status.Negotiation.SELLER_CONFIRMED_BUYER_PENDING => blockchainTransactionConfirmBuyerBids.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
-            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => order match {
-              case Some(order) => order.status match {
-                case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
-                case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionBuyerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
-                case _ => Future(Option(false))
+            case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED | constants.Status.Negotiation.COMPLETED => order match {
+              case Some(order) => {
+                order.status match {
+                  case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
+                  case constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING => if (!asset.moderated) blockchainTransactionBuyerExecuteOrders.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash) else Future(Option(false))
+                  case constants.Status.Order.COMPLETED => {
+                    asset.status match {
+                      case constants.Status.Asset.TRADED => blockchainTransactionRedeemAssets.Service.getTransactionStatus(buyerAddress, zoneAddress, pegHash)
+                      case _=>  Future(Option(false))
+                    }
+                  }
+                  case _ => Future(Option(false))
+                }
               }
               case None => blockchainTransactionSendFiats.Service.getTransactionStatus(buyerAddress, sellerAddress, pegHash)
             }
@@ -1310,15 +1324,17 @@ class ComponentViewController @Inject()(
       }
 
       (for {
-        traderID <- traderID
+        trader <- trader
         negotiation <- negotiation
         asset <- getAsset(negotiation.assetID)
         order <- getOrder(negotiation.id)
-        counterPartyTrader <- getCounterPartyTrader(traderID, negotiation)
-        buyerAddress <- getBuyerAddress(traderID, negotiation, counterPartyTrader.accountID)
-        sellerAddress <- getSellerAddress(traderID, negotiation, counterPartyTrader.accountID)
-        successiveTransactionStatus <- getSuccessiveTransactionStatus(traderID, negotiation, order, buyerAddress, sellerAddress, asset)
-        result <- getResult(traderID, negotiation, order, asset, counterPartyTrader, successiveTransactionStatus)
+        counterPartyTrader <- getCounterPartyTrader(trader.id, negotiation)
+        buyerAddress <- getBuyerAddress(trader.id, negotiation, counterPartyTrader.accountID)
+        sellerAddress <- getSellerAddress(trader.id, negotiation, counterPartyTrader.accountID)
+        zoneAccountID <- getZoneAccountID(if(trader.id == negotiation.buyerTraderID) trader.zoneID else counterPartyTrader.zoneID)
+        zoneAddress<- getZoneAddress(zoneAccountID)
+        successiveTransactionStatus <- getSuccessiveTransactionStatus(trader.id, negotiation, order, buyerAddress, sellerAddress, zoneAddress, asset)
+        result <- getResult(trader.id, negotiation, order, asset, counterPartyTrader, successiveTransactionStatus)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -1845,10 +1861,13 @@ class ComponentViewController @Inject()(
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
-      for {
+      (for {
         traderID <- traderID
         negotiation <- negotiation
       } yield Ok(views.html.component.master.traderViewAcceptedNegotiationDocumentList(negotiationID, traderID, negotiation))
+      ).recover{
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def traderViewCompletedNegotiationDocumentList(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -2204,10 +2223,13 @@ class ComponentViewController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
       val fiatsInOrder = masterTransactionSendFiatRequests.Service.getFiatsInOrder(negotiationID)
 
+      def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
+
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
-      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatsInOrder, 0, negotiation.price - fiatsInOrder))
+        asset <- getAsset(negotiation.assetID)
+      } yield Ok(views.html.component.master.zoneViewTradeRoomFinancial(fiatsInOrder, 0, negotiation.price - fiatsInOrder, asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2228,13 +2250,16 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
 
+      def getAssetHistory(assetID: String) = masterAssetHistories.Service.tryGet(assetID)
+
       (for {
         negotiationHistory <- negotiationHistory
         fiatsInOrderHistory <- fiatsInOrderHistory
         zoneID <- zoneID
         traderIDList <- getTraderIDList(zoneID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
+        assetHistory <- getAssetHistory(negotiationHistory.assetID)
+      } yield Ok(views.html.component.master.zoneViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory, assetHistory.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2290,13 +2315,16 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
 
+      def getAsset(assetID: String) = masterAssets.Service.tryGet(assetID)
+
       (for {
         negotiation <- negotiation
         fiatsInOrder <- fiatsInOrder
         organizationID <- organizationID
         traderIDList <- getTraderIDList(organizationID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder))
+        asset <- getAsset(negotiation.assetID)
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrder, asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2312,13 +2340,16 @@ class ComponentViewController @Inject()(
 
       def getFiatPegWallet(traderIDs: Seq[String]) = masterFiats.Service.getFiatPegWallet(traderIDs)
 
+      def getAssetHistory(assetID: String) = masterAssetHistories.Service.tryGet(assetID)
+
       (for {
         negotiationHistory <- negotiationHistory
         fiatsInOrderHistory <- fiatsInOrderHistory
         organizationID <- organizationID
         traderIDList <- getTraderIDList(organizationID)
         fiatPegWallet <- getFiatPegWallet(traderIDList)
-      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory))
+        assetHistory <- getAssetHistory(negotiationHistory.assetID)
+      } yield Ok(views.html.component.master.organizationViewTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiationHistory.price - fiatsInOrderHistory, assetHistory.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2358,7 +2389,7 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), traderID = traderID, moderated = asset.moderated))
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), moderated = asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2385,7 +2416,7 @@ class ComponentViewController @Inject()(
         fiatsInOrderHistory <- fiatsInOrderHistory
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, traderID, asset.moderated))
+      } yield Ok(views.html.component.master.traderViewCompletedTradeRoomFinancial(fiatPegWallet.map(_.transactionAmount).sum, 0, negotiation.price - fiatsInOrderHistory, asset.moderated))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
