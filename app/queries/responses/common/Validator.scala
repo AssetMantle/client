@@ -11,19 +11,19 @@ import utilities.MicroNumber
 object Validator {
 
   case class CommissionRates(rate: String, max_rate: String, max_change_rate: String) {
-    def toCommissionRates: Serializable.CommissionRates = Serializable.CommissionRates(rate = BigDecimal(rate) * 100, maxRate = BigDecimal(max_rate) * 100, maxChangeRate = BigDecimal(max_change_rate) * 100)
+    def toCommissionRates: Serializable.Validator.CommissionRates = Serializable.Validator.CommissionRates(rate = BigDecimal(rate), maxRate = BigDecimal(max_rate), maxChangeRate = BigDecimal(max_change_rate))
   }
 
   implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
 
   case class Commission(commission_rates: CommissionRates, update_time: String) {
-    def toCommission: Serializable.Commission = Serializable.Commission(commissionRates = commission_rates.toCommissionRates, updateTime = update_time)
+    def toCommission: Serializable.Validator.Commission = Serializable.Validator.Commission(commissionRates = commission_rates.toCommissionRates, updateTime = update_time)
   }
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
 
   case class Description(moniker: String, identity: String, website: String, security_contact: String, details: String) {
-    def toValidatorDescription: Serializable.ValidatorDescription = Serializable.ValidatorDescription(moniker = moniker, identity = identity, website = website, securityContact = security_contact, details = details)
+    def toValidatorDescription: Serializable.Validator.Description = Serializable.Validator.Description(moniker = moniker, identity = identity, website = website, securityContact = security_contact, details = details)
   }
 
   implicit val descriptionReads: Reads[Description] = Json.reads[Description]

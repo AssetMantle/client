@@ -20,7 +20,7 @@ class GetDelegatorRewards @Inject()()(implicit wsClient: WSClient, configuration
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "distribution/delegators"
+  private val path1 = "cosmos/distribution/v1beta1/delegators"
 
   private val path2 = "/rewards"
 

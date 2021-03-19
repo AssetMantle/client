@@ -6,9 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object ValidatorDelegatorDelegationResponse {
 
-  case class DelegationResponse()
-
-  case class Response(height: String, result: Delegation.Result) extends BaseResponse
+  case class Response(delegation_response: Delegation.Result) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

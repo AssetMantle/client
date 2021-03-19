@@ -3,16 +3,15 @@ package queries.blockchain
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.blockchain.AllValidatorDelegationsResponse.Response
-
+import queries.responses.blockchain.ValidatorCommission.Response
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetAllValidatorDelegations @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetValidatorCommission @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_ALL_VALIDATOR_DELEGATIONS
+  private implicit val module: String = constants.Module.QUERIES_GET_VALIDATOR_COMMISSION
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -20,9 +19,9 @@ class GetAllValidatorDelegations @Inject()()(implicit wsClient: WSClient, config
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "cosmos/staking/v1beta1/validators"
+  private val path1 = "cosmos/distribution/v1beta1/validators"
 
-  private val path2 = "/delegations"
+  private val path2 = "/commission"
 
   private val url = ip + ":" + port + "/" + path1 + "/"
 

@@ -8,9 +8,10 @@ import queries.responses.blockchain.TransactionResponse.Msg
 import queries.responses.common.{Coin, Delegation, Validator}
 import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
-import queries.responses.common.Account._
 
 object GenesisResponse {
+
+  import queries.responses.common.Accounts.accountReads
 
   case class GenTxValue(msg: Seq[Msg])
 

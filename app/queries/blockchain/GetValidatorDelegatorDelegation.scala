@@ -20,13 +20,13 @@ class GetValidatorDelegatorDelegation @Inject()()(implicit wsClient: WSClient, c
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "staking/delegators"
+  private val path1 = "cosmos/staking/v1beta1/validators"
 
   private val path2 = "/delegations/"
 
   private val url = ip + ":" + port + "/" + path1 + "/"
 
-  private def action(delegatorAddress: String, validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + delegatorAddress + path2 + validatorAddress).get)
+  private def action(delegatorAddress: String, validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + validatorAddress + path2 + delegatorAddress).get)
 
   object Service {
 

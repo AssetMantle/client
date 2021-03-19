@@ -13,5 +13,5 @@
     @commonTextInfo(constants.View.VALIDATOR_WEBSITE, editValidator.description.website)
     @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, editValidator.description.securityContact)
     @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, editValidator.description.details)
-    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(editValidator.minSelfDelegation.getOrElse(MicroNumber.zero)))
+    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, editValidator.minSelfDelegation)
 }

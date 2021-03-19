@@ -12,9 +12,9 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries._
-import queries.blockchain.{GetValidatorDelegatorDelegation, GetValidatorDelegatorRedelegations}
+import queries.blockchain.{GetValidatorDelegatorDelegation, GetDelegatorRedelegations}
 import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
-import queries.responses.blockchain.ValidatorDelegatorRedelegationsResponse.{Response => ValidatorDelegatorRedelegationsResponse}
+import queries.responses.blockchain.DelegatorRedelegationsResponse.{Response => DelegatorRedelegationsResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +27,7 @@ class Redelegations @Inject()(
                                blockchainDelegations: Delegations,
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                configuration: Configuration,
-                               getValidatorDelegatorRedelegations: GetValidatorDelegatorRedelegations,
+                               getDelegatorRedelegations: GetDelegatorRedelegations,
                                getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
                                blockchainValidators: Validators,
                                blockchainWithdrawAddresses: WithdrawAddresses,
@@ -128,7 +128,7 @@ class Redelegations @Inject()(
   object Utility {
 
     def onRedelegation(redelegate: Redelegate): Future[Unit] = {
-      val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
+      val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = redelegate.delegatorAddress, sourceValidatorAddress = redelegate.validatorSrcAddress, destinationValidatorAddress = redelegate.validatorDstAddress)
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorSrcAddress)
       val updateDstValidatorDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorDstAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(redelegate.delegatorAddress)
@@ -141,13 +141,13 @@ class Redelegations @Inject()(
         } yield ()
       }
 
-      def upsertRedelegation(redelegationsResponse: ValidatorDelegatorRedelegationsResponse) = Service.insertOrUpdate(redelegationsResponse.result.find(x => x.delegator_address == redelegate.delegatorAddress && x.validator_src_address == redelegate.validatorSrcAddress && x.validator_dst_address == redelegate.validatorDstAddress).getOrElse(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)).toRedelegation)
+      def upsertRedelegation(redelegationResponse: DelegatorRedelegationsResponse) = redelegationResponse.redelegation_responses.headOption.map(x => Service.insertOrUpdate(x.toRedelegation)).getOrElse(Future(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)))
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
       (for {
-        redelegationsResponse <- redelegationsResponse
-        _ <- upsertRedelegation(redelegationsResponse)
+        redelegationResponse <- redelegationResponse
+        _ <- upsertRedelegation(redelegationResponse)
         _ <- updateSrcValidatorDelegation
         _ <- updateDstValidatorDelegation
         _ <- withdrawAddressBalanceUpdate
@@ -158,37 +158,40 @@ class Redelegations @Inject()(
       }
     }
 
+    // TODO
     def onSlashingEvent(validatorAddress: String): Future[Unit] = {
-      val redelegations = Service.getAllBySourceValidator(validatorAddress)
-
-      def updateDelegations(redelegations: Seq[Redelegation]) = if (redelegations.nonEmpty) {
-        val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
-
-        def update(redelegationsResponse: ValidatorDelegatorRedelegationsResponse) = Future.traverse(redelegationsResponse.result.map(_.toRedelegation)) { redelegation =>
-          val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = redelegation.delegatorAddress, validatorAddress = redelegation.validatorDestinationAddress)
-
-          def updateDelegation(delegationResponse: ValidatorDelegatorDelegationResponse) = blockchainDelegations.Service.insertOrUpdate(delegationResponse.result.toDelegation)
-
-          for {
-            delegationResponse <- delegationResponse
-            _ <- updateDelegation(delegationResponse)
-          } yield ()
-        }
-
-        for {
-          redelegationsResponse <- redelegationsResponse
-          _ <- update(redelegationsResponse)
-        } yield ()
-      } else {
-        Future()
-      }
-
-      (for {
-        redelegations <- redelegations
-        _ <- updateDelegations(redelegations)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+//      val redelegations = Service.getAllBySourceValidator(validatorAddress)
+//
+//      def updateDelegations(redelegations: Seq[Redelegation]) = if (redelegations.nonEmpty) {
+//        //TODO Need to get all redelegation for particular SrcValidator
+//        val redelegationsResponse = getDelegatorRedelegations.Service.getWithSourceValidator(delegatorAddress = rede)
+//
+//        def update(redelegationsResponse: DelegatorRedelegationsResponse) = Future.traverse(redelegationsResponse.redelegation_responses.map(_.toRedelegation)) { redelegation =>
+//          val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = redelegation.delegatorAddress, validatorAddress = redelegation.validatorDestinationAddress)
+//
+//          def updateDelegation(delegationResponse: ValidatorDelegatorDelegationResponse) = blockchainDelegations.Service.insertOrUpdate(delegationResponse.delegation_response.toDelegation)
+//
+//          for {
+//            delegationResponse <- delegationResponse
+//            _ <- updateDelegation(delegationResponse)
+//          } yield ()
+//        }
+//
+//        for {
+//          redelegationsResponse <- redelegationsResponse
+//          _ <- update(redelegationsResponse)
+//        } yield ()
+//      } else {
+//        Future()
+//      }
+//
+//      (for {
+//        redelegations <- redelegations
+//        _ <- updateDelegations(redelegations)
+//      } yield ()).recover {
+//        case baseException: BaseException => throw baseException
+//      }
+      Future()
     }
 
     def onNewBlock(blockTime: String): Future[Unit] = {

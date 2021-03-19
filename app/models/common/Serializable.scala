@@ -1,6 +1,6 @@
 package models.common
 
-import models.Abstract.{DataValue, TransactionMessage}
+import models.Abstract.{DataValue, ProposalContent, TransactionMessage}
 import models.common.DataValue._
 import models.common.TransactionMessages._
 import play.api.Logger
@@ -20,23 +20,26 @@ object Serializable {
 
   implicit val addressReads: Reads[Address] = Json.reads[Address]
 
-  case class ValidatorDescription(moniker: String, identity: String, website: String, securityContact: String, details: String)
+  object Validator {
 
-  implicit val validatorDescriptionWrites: OWrites[ValidatorDescription] = Json.writes[ValidatorDescription]
+    case class Description(moniker: String, identity: String, website: String, securityContact: String, details: String)
 
-  implicit val validatorDescriptionReads: Reads[ValidatorDescription] = Json.reads[ValidatorDescription]
+    implicit val descriptionWrites: OWrites[Description] = Json.writes[Description]
 
-  case class CommissionRates(rate: BigDecimal, maxRate: BigDecimal, maxChangeRate: BigDecimal)
+    implicit val descriptionReads: Reads[Description] = Json.reads[Description]
 
-  implicit val commissionRatesWrites: OWrites[CommissionRates] = Json.writes[CommissionRates]
+    case class CommissionRates(rate: BigDecimal, maxRate: BigDecimal, maxChangeRate: BigDecimal)
 
-  implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
+    implicit val commissionRatesWrites: OWrites[CommissionRates] = Json.writes[CommissionRates]
 
-  case class Commission(commissionRates: CommissionRates, updateTime: String)
+    implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
 
-  implicit val commissionWrites: OWrites[Commission] = Json.writes[Commission]
+    case class Commission(commissionRates: CommissionRates, updateTime: String)
 
-  implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
+    implicit val commissionWrites: OWrites[Commission] = Json.writes[Commission]
+
+    implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
+  }
 
   case class Coin(denom: String, amount: MicroNumber)
 
@@ -181,4 +184,27 @@ object Serializable {
   implicit val basePropertyReads: Reads[BaseProperty] = Json.reads[BaseProperty]
 
   implicit val basePropertyWrites: OWrites[BaseProperty] = Json.writes[BaseProperty]
+
+  case class FinalTallyResult(yes: String, abstain: String, no: String, noWithVeto: String)
+
+  implicit val finalTallyResultReads: Reads[FinalTallyResult] = Json.reads[FinalTallyResult]
+
+  implicit val finalTallyResultWrites: OWrites[FinalTallyResult] = Json.writes[FinalTallyResult]
+
+  object Vesting {
+
+    case class VestingPeriod(length: String, amount: Seq[Coin])
+
+    implicit val vestingPeriodReads: Reads[VestingPeriod] = Json.reads[VestingPeriod]
+
+    implicit val vestingPeriodWrites: OWrites[VestingPeriod] = Json.writes[VestingPeriod]
+
+    case class VestingParameters(originalVesting: Seq[Coin], delegatedFree: Seq[Coin], delegatedVesting: Seq[Coin], endTime: String, startTime: Option[String], vestingPeriods: Seq[VestingPeriod])
+
+    implicit val vestingParametersReads: Reads[VestingParameters] = Json.reads[VestingParameters]
+
+    implicit val vestingParametersWrites: OWrites[VestingParameters] = Json.writes[VestingParameters]
+
+  }
+
 }

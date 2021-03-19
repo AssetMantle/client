@@ -8,7 +8,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.blockchain.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
+import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -47,7 +47,7 @@ class ComponentViewController @Inject()(
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainValidators: blockchain.Validators,
                                          getDelegatorRewards: GetDelegatorRewards,
-                                         getValidatorSelfBondAndCommissionRewards: GetValidatorSelfBondAndCommissionRewards,
+                                         getValidatorCommission: GetValidatorCommission,
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
@@ -167,17 +167,19 @@ class ComponentViewController @Inject()(
 
   def accountWallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val operatorAddress = utilities.Bech32.convertAccountAddressToOperatorAddress(address)
-      val isValidator = blockchainValidators.Service.exists(operatorAddress)
-      val account = blockchainAccounts.Service.tryGet(address)
+      val operatorAddress = Future(utilities.Bech32.convertAccountAddressToOperatorAddress(address))
       val balances = blockchainBalances.Service.tryGet(address)
       val delegations = blockchainDelegations.Service.getAllForDelegator(address)
       val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
       val allDenoms = blockchainTokens.Service.getAllDenoms
 
-      def getRewards(isValidator: Boolean): Future[(MicroNumber, MicroNumber)] = if (isValidator) {
-        getValidatorSelfBondAndCommissionRewards.Service.get(operatorAddress).map(x => (x.result.self_bond_rewards.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount)), x.result.val_commission.fold(MicroNumber.zero)(x => x.headOption.fold(MicroNumber.zero)(_.amount))))
-      } else getDelegatorRewards.Service.get(address).map(x => (x.result.total.fold(MicroNumber.zero)(_.headOption.fold(MicroNumber.zero)(_.amount)), MicroNumber.zero))
+      def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
+
+      def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[MicroNumber] = if (isValidator) {
+        getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount))
+      } else Future(MicroNumber.zero)
+
+      def getDelegationRewards(delegatorAddress: String) = getDelegatorRewards.Service.get(delegatorAddress).map(_.total.headOption.fold(MicroNumber.zero)(_.amount))
 
       def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 
@@ -186,10 +188,11 @@ class ComponentViewController @Inject()(
       def getUndelegatingAmount(undelegations: Seq[Undelegation]): MicroNumber = undelegations.map(_.entries.map(_.balance).sum).sum
 
       (for {
-        isValidator <- isValidator
-        account <- account
+        operatorAddress <- operatorAddress
+        isValidator <- isValidator(operatorAddress)
         balances <- balances
-        (delegationRewards, commissionRewards) <- getRewards(isValidator)
+        delegationRewards <- getDelegationRewards(address)
+        commissionRewards <- getValidatorCommissionRewards(operatorAddress, isValidator)
         delegations <- delegations
         undelegations <- undelegations
         validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))

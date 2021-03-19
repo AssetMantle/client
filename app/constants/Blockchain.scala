@@ -9,6 +9,7 @@ object Blockchain {
   val FullFundraiserPath = "44'/118'/0'/0/0"
   val AccountPrefix = "persistence"
   val ValidatorPrefix = "persistencevaloper"
+  val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
@@ -42,6 +43,8 @@ object Blockchain {
     val PARAMETER_CHANGE = "/cosmos.params.v1beta1.ParameterChangeProposal"
     val TEXT = "/cosmos.gov.v1beta1.TextProposal"
     val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
+    val SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"
+    val CANCEL_SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"
   }
 
   object Account {
@@ -215,30 +218,55 @@ object Blockchain {
   }
 
   object TransactionMessage {
+    //auth
+    val CREATE_VESTING_ACCOUNT = "/cosmos.vesting.v1beta1.MsgCreateVestingAccount"
     //bank
-    val SEND_COIN = "/cosmos.staking.v1beta1.MsgSend"
-    val MULTI_SEND = "/cosmos.staking.v1beta1.MsgMultiSend"
+    val SEND_COIN = "/cosmos.bank.v1beta1.MsgSend"
+    val MULTI_SEND = "/cosmos.bank.v1beta1.MsgMultiSend"
     //crisis
-    val VERIFY_INVARIANT = "/cosmos.staking.v1beta1.MsgVerifyInvariant"
+    val VERIFY_INVARIANT = "/cosmos.crisis.v1beta1.MsgVerifyInvariant"
     //distribution
-    val SET_WITHDRAW_ADDRESS = "/cosmos.staking.v1beta1.MsgModifyWithdrawAddress"
-    val WITHDRAW_DELEGATOR_REWARD = "/cosmos.staking.v1beta1.MsgWithdrawDelegationReward"
-    val WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.staking.v1beta1.MsgWithdrawValidatorCommission"
-    val FUND_COMMUNITY_POOL = "/cosmos.staking.v1beta1.MsgFundCommunityPool"
+    val SET_WITHDRAW_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress"
+    val WITHDRAW_DELEGATOR_REWARD = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
+    val WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
+    val FUND_COMMUNITY_POOL = "/cosmos.distribution.v1beta1.MsgFundCommunityPool"
     //evidence
-    val SUBMIT_EVIDENCE = "/cosmos.staking.v1beta1.MsgSubmitEvidence"
+    val SUBMIT_EVIDENCE = "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
     //gov
-    val DEPOSIT = "/cosmos.staking.v1beta1.MsgDeposit"
-    val SUBMIT_PROPOSAL = "/cosmos.staking.v1beta1.MsgSubmitProposal"
-    val VOTE = "/cosmos.staking.v1beta1.MsgVote"
+    val DEPOSIT = "/cosmos.gov.v1beta1.MsgDeposit"
+    val SUBMIT_PROPOSAL = "/cosmos.gov.v1beta1.MsgSubmitProposal"
+    val VOTE = "/cosmos.gov.v1beta1.MsgVote"
     //slashing
-    val UNJAIL = "/cosmos.staking.v1beta1.MsgUnjail"
+    val UNJAIL = "/cosmos.slashing.v1beta1.MsgUnjail"
     //staking
     val CREATE_VALIDATOR = "/cosmos.staking.v1beta1.MsgCreateValidator"
     val EDIT_VALIDATOR = "/cosmos.staking.v1beta1.MsgEditValidator"
     val DELEGATE = "/cosmos.staking.v1beta1.MsgDelegate"
     val REDELEGATE = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
     val UNDELEGATE = "/cosmos.staking.v1beta1.MsgUndelegate"
+    //ibc-client
+    val CREATE_CLIENT = "/ibc.core.client.v1.MsgCreateClient"
+    val UPDATE_CLIENT = "/ibc.core.client.v1.MsgUpdateClient"
+    val UPGRADE_CLIENT = "/ibc.core.client.v1.MsgUpgradeClient"
+    val SUBMIT_MISBEHAVIOUR = "/ibc.core.client.v1.MsgSubmitMisbehaviour"
+    //ibc-connection
+    val CONNECTION_OPEN_INIT = "/ibc.core.connection.v1.MsgConnectionOpenInit"
+    val CONNECTION_OPEN_TRY = "/ibc.core.connection.v1.MsgConnectionOpenTry"
+    val CONNECTION_OPEN_ACKK = "/ibc.core.connection.v1.MsgConnectionOpenAck"
+    val CONNECTION_OPEN_CONFIRM = "/ibc.core.connection.v1.MsgConnectionOpenConfirm"
+    //ibc-channel
+    val CHANNEL_OPEN_INIT = "/ibc.core.channel.v1.MsgChannelOpenInit"
+    val CHANNEL_OPEN_TRY = "/ibc.core.channel.v1.MsgChannelOpenTry"
+    val CHANNEL_OPEN_ACK = "/ibc.core.channel.v1.MsgChannelOpenAck"
+    val CHANNEL_OPEN_CONFIRM = "/ibc.core.channel.v1.MsgChannelOpenConfirm"
+    val CHANNEL_CLOSE_INIT = "/ibc.core.channel.v1.MsgChannelCloseInit"
+    val CHANNEL_CLOSE_CONFIRM = "/ibc.core.channel.v1.MsgChannelCloseConfirm"
+    val RECV_PACKET = "/ibc.core.channel.v1.MsgRecvPacket"
+    val TIMEOUT = "/ibc.core.channel.v1.MsgTimeout"
+    val TIMEOUT_ON_CLOSE = "/ibc.core.channel.v1.MsgTimeoutOnClose"
+    val ACKNOWLEDGEMENT = "/ibc.core.channel.v1.MsgAcknowledgement"
+    //ibc-transfer
+    val TRANSFER = "./ibc.applications.transfer.v1.MsgTransfer"
     //asset
     val ASSET_DEFINE = "/xprt/assets/define/message"
     val ASSET_MINT = "/xprt/assets/mint/message"

@@ -3,9 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
-import models.common.Vesting.VestingParameters
-import models.common.Serializable.Coin
-import models.common.TransactionMessages.{MultiSend, SendCoin}
+import models.common.Serializable.Vesting.VestingParameters
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

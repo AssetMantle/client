@@ -121,7 +121,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.result.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
@@ -134,7 +134,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.result.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => if (baseException.failure.message.matches(responseErrorDelegationNotFound)) {
           val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)

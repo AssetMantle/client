@@ -60,7 +60,7 @@ object TransactionResponse {
 
   implicit val txResponseReads: Reads[TxResponse] = Json.reads[TxResponse]
 
-  case class Response(txResponse: TxResponse) extends BaseResponse
+  case class Response(tx_response: TxResponse) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

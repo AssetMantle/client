@@ -15,7 +15,7 @@
     @commonTextInfo(constants.View.VALIDATOR_WEBSITE, createValidator.description.website)
     @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, createValidator.description.securityContact)
     @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, createValidator.description.details)
-    @commonTextInfo(constants.View.COMMISSION_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.rate) * 100).toDouble)} %")
-    @commonTextInfo(constants.View.MAXIMUM_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.maxRate) * 100).toDouble)} %")
-    @commonTextInfo(constants.View.MAXIMUM_CHANGE_RATE, s"${utilities.NumericOperation.formatNumber((BigDecimal(createValidator.commission.maxChangeRate) * 100).toDouble)} %")
+    @commonTextInfo(constants.View.COMMISSION_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.rate * 100)} %")
+    @commonTextInfo(constants.View.MAXIMUM_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.maxRate * 100)} %")
+    @commonTextInfo(constants.View.MAXIMUM_CHANGE_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.maxChangeRate * 100)} %")
 }

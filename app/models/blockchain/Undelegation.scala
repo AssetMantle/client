@@ -12,9 +12,9 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegations}
+import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegation}
 import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
-import queries.responses.blockchain.ValidatorDelegatorUndelegationsResponse.{Response => ValidatorDelegatorUndelegationsResponse}
+import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +27,7 @@ class Undelegations @Inject()(
                                actorSystem: ActorSystem,
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                configuration: Configuration,
-                               getValidatorDelegatorUndelegations: GetValidatorDelegatorUndelegations,
+                               getValidatorDelegatorUndelegation: GetValidatorDelegatorUndelegation,
                                getAllValidatorUndelegations: GetAllValidatorUndelegations,
                                blockchainValidators: Validators,
                                blockchainDelegations: Delegations,
@@ -131,12 +131,12 @@ class Undelegations @Inject()(
   object Utility {
 
     def onUndelegation(undelegate: Undelegate): Future[Unit] = {
-      val undelegationsResponse = getValidatorDelegatorUndelegations.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
+      val undelegationsResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.validatorAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(undelegate.delegatorAddress)
 
-      def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationsResponse) = Service.insertOrUpdate(undelegationsResponse.result.toUndelegation)
+      def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationResponse) = Service.insertOrUpdate(undelegationsResponse.unbond.toUndelegation)
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
@@ -158,7 +158,10 @@ class Undelegations @Inject()(
       def updateUndelegations(undelegations: Seq[Undelegation]): Future[Unit] = if (undelegations.nonEmpty) {
         val allValidatorUndelegations = getAllValidatorUndelegations.Service.get(validatorAddress)
 
-        def update(allValidatorUndelegations: AllValidatorUndelegationsResponse) = Future.traverse(undelegations)(undelegation => allValidatorUndelegations.result.find(_.delegator_address == undelegation.delegatorAddress).fold(Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress))(undelegationResponse => Service.insertOrUpdate(undelegationResponse.toUndelegation)))
+        def update(allValidatorUndelegations: AllValidatorUndelegationsResponse) = Future.traverse(undelegations)(undelegation => allValidatorUndelegations.unbonding_responses
+          .find(_.delegator_address == undelegation.delegatorAddress)
+          .fold(Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress))
+          (undelegationResponse => Service.insertOrUpdate(undelegationResponse.toUndelegation)))
 
         for {
           allValidatorUndelegations <- allValidatorUndelegations

@@ -18,7 +18,7 @@ import queries.responses.blockchain.MintingInflationResponse.{Response => Mintin
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.common.Validator.{Result => ValidatorResult}
-import queries.responses.common.{Account, Header}
+import queries.responses.common.Header
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -200,7 +200,6 @@ class Startup @Inject()(
   }
 
   private def insertBlock(height: Int): Future[Unit] = {
-    println(height)
     val blockCommitResponse = blocksServices.insertOnBlock(height)
     val blockResultResponse = getBlockResults.Service.get(height)
 

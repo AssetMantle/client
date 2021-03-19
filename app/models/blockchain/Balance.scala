@@ -110,8 +110,8 @@ class Balances @Inject()(
   object Utility {
 
     def onSendCoin(sendCoin: SendCoin): Future[Unit] = {
-      val fromAccount = subtractCoinsFromAccount(sendCoin.fromAddress, sendCoin.amounts)
-      val toAccount = addCoinsToAccount(sendCoin.toAddress, sendCoin.amounts)
+      val fromAccount = subtractCoinsFromAccount(sendCoin.fromAddress, sendCoin.amount)
+      val toAccount = addCoinsToAccount(sendCoin.toAddress, sendCoin.amount)
 
       (for {
         _ <- fromAccount

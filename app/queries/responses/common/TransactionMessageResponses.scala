@@ -5,16 +5,25 @@ import models.Abstract.TransactionMessage
 import models.common.{Serializable, TransactionMessages}
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
-import queries.Abstract.TransactionMessageResponse
+import queries.Abstract.{ProposalContent, TransactionMessageResponse}
 import queries.responses.blockchain.TransactionResponse.Msg
-import utilities.MicroNumber
 
 object TransactionMessageResponses {
+
+  import queries.responses.common.ProposalContent.proposalContentReads
 
   implicit val module: String = constants.Module.TRANSACTION_MESSAGE_RESPONSES
 
   implicit val logger: Logger = Logger(this.getClass)
 
+  //auth
+  case class CreateVestingAccount(from_address: String, to_address: String, amount: Seq[Coin], end_time: String, delayed: Boolean) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.CreateVestingAccount(fromAddress = from_address, toAddress = to_address, amount = amount.map(_.toCoin), endTime = end_time, delayed = delayed)
+  }
+
+  implicit val createVestingAccountReads: Reads[CreateVestingAccount] = Json.reads[CreateVestingAccount]
+
+  //  bank
   case class Input(address: String, coins: Seq[Coin]) {
     def toInput: TransactionMessages.Input = TransactionMessages.Input(address = address, coins = coins.map(_.toCoin))
   }
@@ -33,9 +42,8 @@ object TransactionMessageResponses {
 
   implicit val multiSendReads: Reads[MultiSend] = Json.reads[MultiSend]
 
-  //  bank
   case class SendCoin(from_address: String, to_address: String, amount: Seq[Coin]) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.SendCoin(fromAddress = from_address, toAddress = to_address, amounts = amount.map(x => Serializable.Coin(denom = x.denom, amount = x.amount)))
+    def toTxMsg: TransactionMessage = TransactionMessages.SendCoin(fromAddress = from_address, toAddress = to_address, amount = amount.map(_.toCoin))
   }
 
   implicit val sendCoinReads: Reads[SendCoin] = Json.reads[SendCoin]
@@ -72,6 +80,19 @@ object TransactionMessageResponses {
 
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
 
+  //evidence - TODO As evidence interface
+  case class Equivocation(height: String, time: String, power: String, consensus_address: String) {
+    def toEvidence: TransactionMessages.Equivocation = TransactionMessages.Equivocation(height = height, time = time, power = power, consensusAddress = consensus_address)
+  }
+
+  implicit val equivocationReads: Reads[Equivocation] = Json.reads[Equivocation]
+
+  case class SubmitEvidence(submitter: String, evidence: Equivocation) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.SubmitEvidence(submitter = submitter, evidence = evidence.toEvidence)
+  }
+
+  implicit val submitEvidenceReads: Reads[SubmitEvidence] = Json.reads[SubmitEvidence]
+
   //gov
   case class Deposit(proposal_id: String, depositor: String, amount: Seq[Coin]) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Deposit(proposalID = proposal_id, depositor = depositor, amount = amount.map(_.toCoin))
@@ -79,57 +100,51 @@ object TransactionMessageResponses {
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
-  case class ContentValue(title: String, description: String) {
-    def toContentValue: TransactionMessages.ContentValue = TransactionMessages.ContentValue(title = title, description = description)
-  }
-
-  implicit val contentValueReads: Reads[ContentValue] = Json.reads[ContentValue]
-
-  case class Content(value: ContentValue) {
-    def toContent: TransactionMessages.Content = TransactionMessages.Content(value = value.toContentValue)
-  }
-
-  implicit val contentReads: Reads[Content] = Json.reads[Content]
-
-  case class SubmitProposal(content: Content, initial_deposit: Seq[Coin], proposer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.SubmitProposal(content = content.toContent, initialDeposit = initial_deposit.map(_.toCoin), proposer = proposer)
+  case class SubmitProposal(content: ProposalContent, initial_deposit: Seq[Coin], proposer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.SubmitProposal(content = content.toSerializableProposalContent, initialDeposit = initial_deposit.map(_.toCoin), proposer = proposer)
   }
 
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
-  case class Vote(proposal_id: String, voter: String, option: Int) extends TransactionMessageResponse {
+  case class Vote(proposal_id: String, voter: String, option: String) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Vote(proposalID = proposal_id, voter = voter, option = option)
   }
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
   //slashing
-  case class Unjail(address: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Unjail(address = address)
+  case class Unjail(validator_addr: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Unjail(validatorAddress = validator_addr)
   }
 
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
 
   //staking
   case class Description(moniker: String, identity: String, website: String, security_contact: String, details: String) {
-    def toDescription: TransactionMessages.Description = TransactionMessages.Description(moniker = moniker, identity = identity, website = website, securityContact = security_contact, details = details)
+    def toDescription: Serializable.Validator.Description = Serializable.Validator.Description(moniker = moniker, identity = identity, website = website, securityContact = security_contact, details = details)
   }
 
   implicit val descriptionReads: Reads[Description] = Json.reads[Description]
 
-  case class Commission(rate: String, max_rate: String, max_change_rate: String) {
-    def toCommission: TransactionMessages.Commission = TransactionMessages.Commission(rate = rate, maxRate = max_rate, maxChangeRate = max_change_rate)
+  case class CommissionRates(rate: String, max_rate: String, max_change_rate: String) {
+    def toCommissionRates: Serializable.Validator.CommissionRates = Serializable.Validator.CommissionRates(rate = BigDecimal(rate), maxRate = BigDecimal(max_rate), maxChangeRate = BigDecimal(max_change_rate))
+  }
+
+  implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
+
+  case class Commission(commission_rates: CommissionRates, update_time: String) {
+    def toCommission: Serializable.Validator.Commission = Serializable.Validator.Commission(commissionRates = commission_rates.toCommissionRates, updateTime = update_time)
   }
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
 
-  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: Commission, description: Description, min_self_delegation: MicroNumber) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey, value = Serializable.Coin(denom = value.denom, amount = value.amount), commission = commission.toCommission, description = description.toDescription, minSelfDelegation = min_self_delegation)
+  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: CommissionRates, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey, value = value.toCoin, commissionRates = commission.toCommissionRates, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
-  case class EditValidator(validator_address: String, commission_rate: String, description: Description, min_self_delegation: Option[MicroNumber]) extends TransactionMessageResponse {
+  case class EditValidator(validator_address: String, commission_rate: String, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 
@@ -286,8 +301,8 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => Msg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawDelegatorReward](value.toString))
       case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => Msg(msgType, utilities.JSON.convertJsonStringToObject[WithdrawValidatorCommission](value.toString))
       case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => Msg(msgType, utilities.JSON.convertJsonStringToObject[FundCommunityPool](value.toString))
-      //TODO evidence Pending in cosmos-sdk
-      //case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Msg(msgType, utilities.JSON.convertJsonStringToObject[SubmitEvidence](value.toString))
+      //evidence
+      case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Msg(msgType, utilities.JSON.convertJsonStringToObject[SubmitEvidence](value.toString))
       //gov
       case constants.Blockchain.TransactionMessage.DEPOSIT => Msg(msgType, utilities.JSON.convertJsonStringToObject[Deposit](value.toString))
       case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => Msg(msgType, utilities.JSON.convertJsonStringToObject[SubmitProposal](value.toString))

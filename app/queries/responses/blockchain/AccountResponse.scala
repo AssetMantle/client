@@ -1,11 +1,12 @@
 package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
-import queries.Abstract.Account
 import transactions.Abstract.BaseResponse
-import queries.responses.common.Account._
+import queries.Abstract.Account
 
 object AccountResponse {
+
+  import queries.responses.common.Accounts.accountReads
 
   case class Response(account: Account) extends BaseResponse
 

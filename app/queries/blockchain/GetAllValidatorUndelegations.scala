@@ -20,7 +20,7 @@ class GetAllValidatorUndelegations @Inject()()(implicit wsClient: WSClient, conf
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "staking/validators"
+  private val path1 = "cosmos/staking/v1beta1/validators"
 
   private val path2 = "/unbonding_delegations"
 
