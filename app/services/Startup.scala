@@ -114,7 +114,7 @@ class Startup @Inject()(
     val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
     val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = staking.params.unbonding_time, maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
 
-    //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
+    val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
     def updateDelegations(): Future[Unit] = {
       val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
       val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.map(_.toRedelegation))
@@ -131,7 +131,7 @@ class Startup @Inject()(
       _ <- insertAllValidators
       _ <- updateDelegations()
       _ <- insertStakingParameters
-      //          _ <- insertKeyBaseAccount
+      _ <- insertKeyBaseAccount
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }

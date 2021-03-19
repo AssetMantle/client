@@ -854,7 +854,7 @@ CREATE TABLE IF NOT EXISTS KEY_BASE."ValidatorAccount"
     "address"           VARCHAR NOT NULL,
     "identity"          VARCHAR,
     "username"          VARCHAR,
-    "picture"           BYTEA,
+    "pictureURL"        VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,

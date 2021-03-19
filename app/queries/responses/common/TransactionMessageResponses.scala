@@ -5,12 +5,14 @@ import models.Abstract.TransactionMessage
 import models.common.{Serializable, TransactionMessages}
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
-import queries.Abstract.{ProposalContent, TransactionMessageResponse}
+import queries.Abstract.{ProposalContent, PublicKey, TransactionMessageResponse}
 import queries.responses.blockchain.TransactionResponse.Msg
 
 object TransactionMessageResponses {
 
   import queries.responses.common.ProposalContent.proposalContentReads
+  import queries.responses.common.PublicKey.publicKeyReads
+  import queries.responses.common.PublicKey.publicKeyReads
 
   implicit val module: String = constants.Module.TRANSACTION_MESSAGE_RESPONSES
 
@@ -138,8 +140,8 @@ object TransactionMessageResponses {
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
 
-  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: CommissionRates, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey, value = value.toCoin, commissionRates = commission.toCommissionRates, description = description.toDescription, minSelfDelegation = min_self_delegation)
+  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: PublicKey, value: Coin, commission: CommissionRates, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey.toSerializablePublicKey, value = value.toCoin, commissionRates = commission.toCommissionRates, description = description.toDescription, minSelfDelegation = min_self_delegation)
   }
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
