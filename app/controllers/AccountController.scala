@@ -3,8 +3,6 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
@@ -18,6 +16,7 @@ import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -134,7 +133,7 @@ class AccountController @Inject()(
 
   def checkMnemonics(mnemonics: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      if (utilities.Bip39.check(mnemonics)) Ok else NoContent
+      if (utilities.Bip39.validate(mnemonics)) Ok else NoContent
   }
 
   def importWalletForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
@@ -149,7 +148,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.importWallet(formWithErrors)))
         },
         importWalletData => {
-          val validMnemonics = utilities.Bip39.check(importWalletData.mnemonics)
+          val validMnemonics = utilities.Bip39.validate(importWalletData.mnemonics)
 
           val createAccountAndGetResult: Future[Result] = if (validMnemonics && importWalletData.password == importWalletData.confirmPassword) {
             //TODO Stop creating a key on BC node

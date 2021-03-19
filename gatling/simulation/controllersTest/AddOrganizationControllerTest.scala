@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -188,4 +189,4 @@ object addOrganizationControllerTest {
       s"""SELECT COALESCE((SELECT "id" FROM master."Organization" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
-}
+}*/

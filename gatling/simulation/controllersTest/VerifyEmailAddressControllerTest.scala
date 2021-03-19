@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -27,3 +28,4 @@ object verifyEmailAddressControllerTest {
         Form.OTP -> "${%s}".format(Test.TEST_OTP),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 }
+*/

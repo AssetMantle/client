@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -32,3 +33,4 @@ object updateContactControllerTest {
         Form.COUNTRY_CODE -> "${%s}".format(Test.TEST_COUNTRY_CODE),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -42,3 +43,4 @@ object blockchainTest {
     .feed(UsernameFeeder.usernameFeed)
     .exec(controllersTest.sendCoinControllerTest.blockchainSendCoinMainScenario)
 }
+*/

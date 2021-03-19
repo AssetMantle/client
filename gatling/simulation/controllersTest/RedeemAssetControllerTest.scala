@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -61,3 +62,4 @@ object redeemAssetControllerTest {
       .check(substring("SUCCESS ASSET_REDEEMED").exists)
     )
 }
+*/

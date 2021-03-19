@@ -1,3 +1,4 @@
+/*
 package feeders
 
 import java.awt.image.BufferedImage
@@ -44,3 +45,4 @@ object ImageFeeder {
   }
 
 }
+*/

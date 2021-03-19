@@ -1,5 +1,9 @@
 package constants
 
+import com.google.common.collect
+import com.google.common.collect.ImmutableList
+import org.bitcoinj.crypto.ChildNumber
+
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
@@ -18,7 +22,16 @@ object Blockchain {
   val DataNameAndTypeSeparator = ":"
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
-  val HeightDataDefaultValue = -1
+  val HeightDataDefaultValue: Int = -1
+  val CoinType = 118
+  val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
+    new ChildNumber(44, true),
+    new ChildNumber(CoinType, true),
+    new ChildNumber(0, true),
+    new ChildNumber(0, false),
+    new ChildNumber(0, false)
+  )
+
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"

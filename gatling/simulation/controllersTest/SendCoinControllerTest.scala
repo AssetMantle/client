@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -217,3 +218,4 @@ object sendCoinControllerTest {
     sqlQueryFeeder.apply().next()("id").toString
   }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -188,4 +189,4 @@ object addZoneControllerTest {
     )
     sqlQueryFeeder.apply().next().toSeq
   }
-}
+}*/

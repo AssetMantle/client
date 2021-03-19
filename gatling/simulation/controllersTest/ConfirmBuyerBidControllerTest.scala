@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -119,4 +120,4 @@ object confirmBuyerBidControllerTest {
       s"""SELECT COALESCE((SELECT "negotiationID" FROM master_transaction."NegotiationRequest" WHERE "sellerAccountID" = '$sellerUsername'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
-}
+}*/

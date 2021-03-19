@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -470,3 +471,4 @@ object issueAssetControllerTest {
     sqlQueryFeeder.apply().next()("pegHash").toString
   }
 }
+*/

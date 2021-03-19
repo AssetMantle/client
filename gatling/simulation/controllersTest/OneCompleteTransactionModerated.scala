@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.Test
@@ -329,3 +330,4 @@ object RedeemFiat {
 }
 
 
+*/

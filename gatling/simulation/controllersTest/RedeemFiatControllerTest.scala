@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -61,3 +62,4 @@ object redeemFiatControllerTest {
       .check(substring("SUCCESS FIAT_REDEEMED").exists)
     )
 }
+*/

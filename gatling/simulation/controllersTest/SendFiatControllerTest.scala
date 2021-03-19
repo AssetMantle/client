@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -62,4 +63,4 @@ object sendFiatControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS FIAT_SENT").exists)
     )
-}
+}*/

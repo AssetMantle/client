@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -41,4 +42,4 @@ object signUpControllerTest {
       .check(substring("Signed Up").exists)
     )
     .pause(5)
-}
+}*/

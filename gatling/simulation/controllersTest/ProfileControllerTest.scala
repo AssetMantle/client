@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -93,3 +94,4 @@ object profileControllerTest {
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }
 }
+*/

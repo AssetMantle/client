@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -152,4 +153,4 @@ object sellerExecuteOrderControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS SELLER_ORDER_EXECUTED").exists)
     )
-}
+}*/

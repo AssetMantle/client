@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -116,4 +117,4 @@ object issueFiatControllerTest {
     sqlQueryFeeder.apply().next()("id").toString
   }
 
-}
+}*/

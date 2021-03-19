@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -74,3 +75,4 @@ object SellerExecuteOrderUnmoderated{
     .exec(sellerExecuteOrderControllerTest.unmoderatedSellerExecuteOrder)
     .exec(logoutControllerTest.logoutScenario)
 }
+*/

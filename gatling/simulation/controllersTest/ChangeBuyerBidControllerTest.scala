@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -78,3 +79,4 @@ object changeBuyerBidControllerTest {
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }
 }
+*/

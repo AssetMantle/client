@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -150,3 +151,4 @@ object buyerExecuteOrderControllerTest {
       check(substring("SUCCESS BUYER_ORDER_EXECUTED").exists)
     )
 }
+*/

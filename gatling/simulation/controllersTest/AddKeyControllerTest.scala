@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -32,4 +33,4 @@ object addKeyControllerTest {
       .check(substring("SUCCESS KEY_ADDED").exists)
     )
 
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -21,3 +22,4 @@ object indexControllerTest {
     .pause(2)
 
 }
+*/
