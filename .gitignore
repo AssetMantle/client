@@ -1,7 +1,6 @@
 logs
 project/project
 project/target
-/conf/application.conf
 target
 tmp
 .history
