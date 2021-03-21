@@ -193,7 +193,7 @@
   .modal .modalContent{
     .modalBody {
       .infoBlock {
-       flex-direction: column;
+        flex-direction: column;
         max-width: 500px;
         max-height: 410px;
         .infoBlockItem{
@@ -247,7 +247,7 @@
       .cmuk-switcher{
         ul li {
           padding: 10px 0;
-      }
+        }
       }
     }
     .addBalanceButton{
@@ -278,7 +278,7 @@
       .cmuk-card-body {
         height: auto;
         .cmuk-switcher{
-        height: 210px;
+          height: 210px;
         }
       }
     }
@@ -444,7 +444,7 @@
     .commonCheckBox dt{
       width: auto;
       margin-right: 40px;
-  }
+    }
   }
   .showPassword, .checkIcon{
     top:37px;
