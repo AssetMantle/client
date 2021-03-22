@@ -43,13 +43,13 @@ body .cmuk-table td {
 }
 #validatorDetails {
   height: 250px;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 #validatorUptime {
   height: 100%;
   .scroller {
-    margin-left: 5px;
-    margin-top: 15px;
+    margin-left: 14px;
+    margin-top: 0;
   }
 }
 .cmuk-first-column {
@@ -1302,13 +1302,13 @@ body.lightMode {
     border-radius: 50%;
     background: #49A948;
     padding: 2px;
-    width: 12px;
+    width: 14px;
   }
   .close svg{
     border-radius: 50%;
     padding: 2px;
     background: #FE4350;
-    width: 12px;
+    width: 14px;
   }
   .close svg >*{
     stroke-width:2 !important;
@@ -1385,7 +1385,6 @@ body.lightMode {
       }
     }
     .cmuk-search-icon{
-      background: #585858;
       color: #ffffff;
     }
 
@@ -3384,8 +3383,7 @@ header:before,
 
 .cmuk-card-body.validatorList {
   padding:0px;
-  height: calc(100vh - 250px);
-  overflow: scroll;
+
 
 }
 #validatorList .cmuk-subnav {
