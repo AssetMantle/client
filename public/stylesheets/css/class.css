@@ -39,13 +39,13 @@ body .cmuk-table td {
 
 #validatorDetails {
   height: 250px;
-  overflow-x: hidden; }
+  overflow: hidden; }
 
 #validatorUptime {
   height: 100%; }
   #validatorUptime .scroller {
-    margin-left: 5px;
-    margin-top: 15px; }
+    margin-left: 14px;
+    margin-top: 0; }
 
 .cmuk-first-column {
   height: 100%; }
