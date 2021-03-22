@@ -388,10 +388,12 @@ class ComponentViewController @Inject()(
     implicit request =>
       val validator = blockchainValidators.Service.tryGet(address)
       val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
+      def keyBaseValidator(address: String): Future[ValidatorAccount] = keyBaseValidatorAccounts.Service.tryGet(address)
       (for {
         validator <- validator
         totalBondedAmount <- totalBondedAmount
-      } yield Ok(views.html.component.blockchain.validatorDetails(validator, utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONED))
+        keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
+      } yield Ok(views.html.component.blockchain.validatorDetails(validator, utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONED, keyBaseValidator))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
