@@ -1,6 +1,6 @@
 package models.common
 
-import models.Abstract.{ProposalContent, TransactionMessage}
+import models.Abstract.{ProposalContent, PublicKey, TransactionMessage}
 import models.common.Serializable._
 import play.api.Logger
 import play.api.libs.json._
@@ -8,6 +8,7 @@ import play.api.libs.json._
 object TransactionMessages {
 
   import models.common.ProposalContents._
+  import models.common.PublicKeys._
 
   private implicit val module: String = constants.Module.TRANSACTION_MESSAGE
 
@@ -117,7 +118,7 @@ object TransactionMessages {
   implicit val unjailWrites: OWrites[Unjail] = Json.writes[Unjail]
 
   //staking
-  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: String, value: Coin, minSelfDelegation: String, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage
+  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: PublicKey, value: Coin, minSelfDelegation: String, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 

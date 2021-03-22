@@ -12,7 +12,7 @@ import queries.Abstract.{Account, PublicKey}
 
 object Accounts {
 
-  import queries.responses.common.PublicKey.publicKeyReads
+  import queries.responses.common.PublicKeys.publicKeyReads
 
   private implicit val module: String = constants.Module.ACCOUNT_RESPONSE
 

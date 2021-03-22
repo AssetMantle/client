@@ -9,7 +9,7 @@ import transactions.Abstract.BaseResponse
 
 object ProposalResponse {
 
-  import queries.responses.common.ProposalContent._
+  import queries.responses.common.ProposalContents._
 
   case class FinalTallyResult(yes: String, abstain: String, no: String, no_with_veto: String) {
     def toSerializableFinalTallyResult: Serializable.FinalTallyResult = Serializable.FinalTallyResult(yes = yes, abstain = abstain, no = no, noWithVeto = no_with_veto)

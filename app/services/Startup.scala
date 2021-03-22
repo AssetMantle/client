@@ -225,8 +225,8 @@ class Startup @Inject()(
   }
 
   private def actionsOnEvents(blockResultResponse: BlockResultResponse): Future[Unit] = {
-    val slashing = blocksServices.onSlashingEvent(blockResultResponse.result.begin_block_events.filter(_.eventType == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
-    val missedBlock = blocksServices.onMissedBlockEvent(blockResultResponse.result.begin_block_events.filter(_.eventType == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
+    val slashing = blocksServices.onSlashingEvent(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
+    val missedBlock = blocksServices.onMissedBlockEvent(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
     (for {
       _ <- slashing
       _ <- missedBlock
@@ -260,7 +260,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-//        abciInfo <- abciInfo
+        //        abciInfo <- abciInfo
         latestExplorerHeight <- latestExplorerHeight
         _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
       } yield ()

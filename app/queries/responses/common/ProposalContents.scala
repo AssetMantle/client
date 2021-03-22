@@ -7,7 +7,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads}
 import queries.Abstract.ProposalContent
 
-object ProposalContent {
+object ProposalContents {
   private implicit val module: String = constants.Module.PROPOSAL_CONTENT_RESPONSE
 
   private implicit val logger: Logger = Logger(this.getClass)

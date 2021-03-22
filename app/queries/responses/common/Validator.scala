@@ -5,7 +5,7 @@ import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import queries.Abstract.PublicKey
-import queries.responses.common.PublicKey.publicKeyReads
+import queries.responses.common.PublicKeys.publicKeyReads
 import utilities.MicroNumber
 
 object Validator {
@@ -31,7 +31,7 @@ object Validator {
   case class Result(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String) {
     def toValidator: BlockchainValidator = BlockchainValidator(
       operatorAddress = operator_address,
-      hexAddress = utilities.Bech32.convertValidatorPublicKeyToHexAddress(consensus_pubkey.toSerializablePublicKey.publicKeyValue),
+      hexAddress = utilities.Bech32.convertValidatorPublicKeyToHexAddress(consensus_pubkey.toSerializablePublicKey.value),
       consensusPublicKey = consensus_pubkey.toSerializablePublicKey,
       jailed = jailed,
       status = status,
@@ -41,7 +41,7 @@ object Validator {
       unbondingHeight = unbonding_height,
       unbondingTime = unbonding_time,
       commission = commission.toCommission,
-      minimumSelfDelegation = min_self_delegation)
+      minimumSelfDelegation = MicroNumber(min_self_delegation))
   }
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]

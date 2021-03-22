@@ -145,7 +145,11 @@ object Blockchain {
       val Delegator = "delegator"
       val CompletionTime = "completion_time"
     }
+  }
 
+  object Tendermint {
+    val DuplicateVoteEvidence = "tendermint/DuplicateVoteEvidence"
+    val LightClientAttackEvidence = "tendermint/LightClientAttackEvidence"
   }
 
   object Properties {

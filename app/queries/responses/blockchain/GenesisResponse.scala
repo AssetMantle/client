@@ -144,7 +144,7 @@ object GenesisResponse {
 
     implicit val stakingParamsReads: Reads[StakingParams] = Json.reads[StakingParams]
 
-    case class Module(params: StakingParams, delegations: Seq[Delegation.Result], redelegations: Seq[Redelegation], unbonding_delegations: Seq[Undelegation], validators: Seq[Validator.Result])
+    case class Module(params: StakingParams, delegations: Seq[Delegation], redelegations: Seq[Redelegation], unbonding_delegations: Seq[Undelegation], validators: Seq[Validator.Result])
 
     implicit val stakingReads: Reads[Module] = Json.reads[Module]
 

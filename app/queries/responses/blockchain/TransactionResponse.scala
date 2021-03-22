@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.{PublicKey, TransactionMessageResponse}
 import queries.responses.common.Coin
-import queries.responses.common.PublicKey._
+import queries.responses.common.PublicKeys._
 import queries.responses.common.TransactionMessageResponses.msgApply
 import transactions.Abstract.BaseResponse
 
