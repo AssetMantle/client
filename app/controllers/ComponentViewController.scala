@@ -3,6 +3,8 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.blockchain._
+import models.keyBase
+import models.keyBase.ValidatorAccount
 import models.masterTransaction.TokenPrice
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -49,6 +51,7 @@ class ComponentViewController @Inject()(
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
+                                         keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
                                          messagesControllerComponents: MessagesControllerComponents,
@@ -358,9 +361,11 @@ class ComponentViewController @Inject()(
   def activeValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val validators = blockchainValidators.Service.getAllActiveValidatorList
+      def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
       (for {
         validators <- validators
-      } yield Ok(views.html.component.blockchain.activeValidatorList(validators, validators.map(_.tokens).sum))
+        keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
+      } yield Ok(views.html.component.blockchain.activeValidatorList(validators, validators.map(_.tokens).sum, keyBaseValidators))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -369,9 +374,11 @@ class ComponentViewController @Inject()(
   def inactiveValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val validators = blockchainValidators.Service.getAllInactiveValidatorList
+      def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
       (for {
         validators <- validators
-      } yield Ok(views.html.component.blockchain.inactiveValidatorList(validators))
+        keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
+      } yield Ok(views.html.component.blockchain.inactiveValidatorList(validators, keyBaseValidators))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

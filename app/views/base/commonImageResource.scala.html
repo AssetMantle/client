@@ -1,0 +1,4 @@
+@(uri: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+<img src="@uri" class='@Seq(arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")'>
+
+@*Exmaple Useage- @commonImage("http://exmaple.com/imageLocation.png",  'class -> "navigationBarLogo")*@
