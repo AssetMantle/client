@@ -2,7 +2,7 @@
 @import models.blockchain.Validator
 @import utilities.MicroNumber
 
-@(validators: Seq[Validator], totalBondedAmount: MicroNumber)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(validators: Seq[Validator], totalBondedAmount: MicroNumber, keyBaseValidators : Seq[keyBase.ValidatorAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <table class="cmuk-table cmuk-table-striped tableSort">
     <thead>
         <tr>
@@ -15,7 +15,11 @@
             @validators.map { validator =>
                 <tr>
                     <td class="blockHeightItem">
-                        @commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))
+                        @keyBaseValidators.find(x=>x.address == validator.operatorAddress && x.pictureURL.isDefined).flatMap(_.pictureURL) match {
+                            case Some(pictureURL)=>{@commonImageResource(pictureURL)}
+                            case None=>{@commonImage("note.svg")}
+                        }
+                        <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
                     </td>
                     <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
                     <td>@validator.commission.commissionRates.rate.toString %</td>

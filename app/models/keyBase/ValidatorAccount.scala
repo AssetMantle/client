@@ -75,6 +75,8 @@ class ValidatorAccounts @Inject()(
     }
   }
 
+  private def getListByAddress(address: Seq[String]): Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address.inSet(address)).result)
+
   private def findAll: Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.result)
 
   private[models] class ValidatorAccountTable(tag: Tag) extends Table[ValidatorAccount](tag, "ValidatorAccount") {
@@ -111,6 +113,8 @@ class ValidatorAccounts @Inject()(
 
     def tryGet(address: String): Future[ValidatorAccount] = tryGetByAddress(address)
 
+    def get(address: Seq[String]): Future[Seq[ValidatorAccount]] = getListByAddress(address)
+
     def getAll: Future[Seq[ValidatorAccount]] = findAll
   }
 
@@ -127,6 +131,7 @@ class ValidatorAccounts @Inject()(
           }
 
         }
+
         (for {
           keyBaseResponse <- keyBaseResponse
         } yield ValidatorAccount(address = validatorAddress, identity = identity, username = keyBaseResponse.them.headOption.fold[Option[String]](None)(x => Option(x.basics.username)), pictureURL = getImageURL(keyBaseResponse))
