@@ -7,8 +7,10 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
 class ExplorerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder =  explorerTest.testScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
+  val scenarioBuilder: ScenarioBuilder =  scenario("Explorer")
+      .exec(explorerTest.testScenario)
+    .exec(explorerTest.testScenario)
+  setUp(scenarioBuilder.inject(rampUsers(250) during(10))).protocols(http.baseUrl(Test.BASE_URL).inferHtmlResources())
 }
 
 object explorerTest {
@@ -29,7 +31,6 @@ object explorerTest {
           ),
           http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
         )
-        .notSilent
     )
     .pause(pauseBetweenRequests)
     .exec(http("Blocks_GET")
@@ -48,7 +49,6 @@ object explorerTest {
           ),
         http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
       )
-      .notSilent
     )
     .pause(pauseBetweenRequests)
     .exec(http("Transactions_GET")
@@ -67,7 +67,6 @@ object explorerTest {
           ),
         http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
       )
-      .notSilent
     )
     .pause(pauseBetweenRequests)
     .exec(http("Validators_GET")
@@ -87,7 +86,6 @@ object explorerTest {
           ),
         http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
       )
-      .notSilent
     )
     .pause(pauseBetweenRequests)
     .exec(http("Dashboard_GET")
@@ -103,6 +101,6 @@ object explorerTest {
           ),
         http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
       )
-      .notSilent
     )
+    .pause(pauseBetweenRequests)
 }

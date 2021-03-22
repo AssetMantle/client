@@ -57,17 +57,12 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetLatestBlockHeight: Future[Int] = db.run(blockTable.map(_.height).sortBy(_.desc).result.head.asTry).map {
-    case Success(result) => result
+  private def tryGetLatestBlockHeight =  db.run(blockTable.map(_.height).max.result.asTry).map {
+    case Success(result) => {
+      result.getOrElse(0)
+    }
     case Failure(exception) => exception match {
       case _: NoSuchElementException => 0
-    }
-  }
-
-  private def tryGetLatestBlock: Future[BlockSerialized] = db.run(blockTable.sortBy(_.height.desc).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BLOCK_NOT_FOUND, noSuchElementException)
     }
   }
 
@@ -127,8 +122,6 @@ class Blocks @Inject()(
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
-
-    def getLatestBlock: Future[Block] = tryGetLatestBlock.map(_.deserialize)
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = getBlocksForPageNumber(offset = (pageNumber - 1) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
 

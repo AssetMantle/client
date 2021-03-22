@@ -7,7 +7,7 @@
       <map>
         <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
-        <entry key="BLOCKCHAIN_HOST" value="13.126.196.140" />
+        <entry key="BLOCKCHAIN_HOST" value="143.110.183.203" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
@@ -39,13 +39,10 @@
         <option value="-XX:MaxPermSize=256M" />
       </array>
     </option>
-    <option name="play2NeedOpenInBrowser" value="true" />
+    <option name="play2NeedOpenInBrowser" value="false" />
     <option name="play2NonDefaultInstallDir" value="" />
     <option name="play2OpenUrl" value="http://localhost:9000" />
     <option name="play2isAutoReloadEnabled" value="true" />
-    <option name="selectedOptions">
-      <list />
-    </option>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

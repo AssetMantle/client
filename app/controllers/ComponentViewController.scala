@@ -10,8 +10,9 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
-
 import javax.inject.{Inject, Singleton}
+import queries.responses.common.Height
+
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -109,13 +110,16 @@ class ComponentViewController @Inject()(
 
   def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val latestBlock = blockchainBlocks.Service.getLatestBlock
+      val latestBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
       val averageBlockTime = blockchainAverageBlockTimes.Service.get
+
+      def getBlock(height: Int)= blockchainBlocks.Service.tryGet(height)
 
       def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
 
       (for {
-        latestBlock <- latestBlock
+        latestBlockHeight <- latestBlockHeight
+        latestBlock <- getBlock(latestBlockHeight)
         averageBlockTime <- averageBlockTime
         proposer <- getProposer(latestBlock.proposerAddress)
       } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
