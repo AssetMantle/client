@@ -17,7 +17,7 @@
     padding: 30px; }
 
   .mobile .cmuk-button {
-    background-color: #191616; }
+    background-color: #E50913; }
 
   .switcherCard .cmuk-subnav {
     flex-wrap: nowrap;
@@ -211,7 +211,10 @@
     padding: 11px; }
 
   .comdex .cmuk-height-medium {
-    height: 210px; }
+    height: 210px;
+    padding-top: 20px; }
+  .comdex #accountDelegations .cmuk-height-medium {
+    padding-top: 0; }
   .comdex .cmuk-card-header .cmuk-button {
     line-height: 26px; }
   .comdex .updateDocumentField button {
