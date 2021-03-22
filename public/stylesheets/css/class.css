@@ -921,12 +921,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   border-radius: 50%;
   background: #49A948;
   padding: 2px;
-  width: 12px; }
+  width: 14px; }
 .comdex .close svg {
   border-radius: 50%;
   padding: 2px;
   background: #FE4350;
-  width: 12px; }
+  width: 14px; }
 .comdex .close svg > * {
   stroke-width: 2 !important;
   stroke: #ffffff !important; }
@@ -981,7 +981,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       color: #5F646C;
       font-weight: 500; }
   .comdex .searchForm .cmuk-search-icon {
-    background: #585858;
     color: #ffffff; }
 .comdex .dataTables_wrapper .dataTables_filter {
   width: auto;
@@ -2419,9 +2418,7 @@ header:before,
       background-color: #FFFFFF; }
 
 .cmuk-card-body.validatorList {
-  padding: 0px;
-  height: calc(100vh - 250px);
-  overflow: scroll; }
+  padding: 0px; }
 
 #validatorList .cmuk-subnav {
   padding: 15px; }

@@ -5,7 +5,7 @@ function pieChart(chartID, keys, values, showLegend) {
     let colors = [];
     for (let i = 0; i < valueList.length; i++) {
         totalValue = totalValue + parseFloat(valueList[i]);
-        colors.push('#' + ((i + 1) * 16777215) / (valueList.length + 1).toString(16));
+        colors.push('#f' + ((i + 100) * 884).toString());
     }
 
     Chart.defaults.global.legend.display = showLegend;
