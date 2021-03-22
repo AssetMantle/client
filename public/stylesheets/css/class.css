@@ -24,10 +24,14 @@ body .block {
     background-color: #E50913; }
 
 body .cmuk-card-body {
-  padding: 0px; }
+  padding: 0px;
+  padding-top: 20px; }
 
 body .cmuk-table td {
-  font-size: 12px; }
+  font-size: .875rem;
+  font-family: 'Poppins';
+  font-weight: 400;
+  color: #272931; }
 
 #blockList_NEXT, #transactionList_NEXT, #transactionList_BACK, #blockList_BACK, #validatorTransactions_NEXT, #validatorTransactions_BACK {
   margin-bottom: 10px;
@@ -253,6 +257,11 @@ body.darkMode table.dataTable.no-footer {
   border-bottom: 1px solid transparent; }
 body.darkMode table.dataTable tbody tr {
   background: none; }
+body.darkMode body .cmuk-card-body .cmuk-height-medium {
+  height: 210px;
+  padding-top: 20px; }
+body.darkMode body #accountDelegations .cmuk-height-medium {
+  padding-top: 0; }
 body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]) {
   background: #282934;
   border-color: #31323A;
@@ -677,10 +686,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1.25rem; }
 
 .blockHeightItem {
-  font-family: "Poppins", sans-serif; }
+  font-family: "Poppins"; }
   .blockHeightItem a {
     color: #1A73B4;
-    font-size: 14px;
     font-weight: 400; }
   .blockHeightItem .listItemChild .listItemChildTitle {
     display: none; }
@@ -692,7 +700,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-family: "Poppins", sans-serif; }
+    font-size: .875rem;
+    font-family: "Poppins"; }
 
 .chartContainer {
   height: 260px; }
@@ -711,9 +720,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     font-weight: 500;
     color: #8D9CB5;
     width: auto;
-    font-family: "Poppins", sans-serif; }
+    font-family: "Poppins"; }
   .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue {
-    padding: 3px 12px;
+    padding: 7px 20px;
     display: table-cell;
     vertical-align: baseline;
     font-size: 0.875rem; }
@@ -838,6 +847,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-card-header {
   color: #313238;
   font-weight: 600;
+  font-family: "Poppins";
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
     margin-left: 15px;
@@ -876,8 +886,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   text-transform: capitalize; }
 .comdex .cmuk-table th {
   color: #8D9CB5;
-  font-width: 500;
-  font-family: "Poppins", sans-serif;
+  font-family: "Poppins";
   font-weight: 500; }
 .comdex .modalBody .cmuk-button {
   margin-bottom: 5px; }
@@ -994,7 +1003,8 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   padding-left: 10px; }
 .comdex table.dataTable tbody th, .comdex table.dataTable tbody td {
   padding: 16px 12px;
-  font-size: 12px; }
+  font-weight: 400;
+  color: #272931; }
 .comdex table.dataTable {
   border-collapse: collapse; }
 .comdex table.dataTable.no-footer {
@@ -1002,9 +1012,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex table.dataTable thead th {
   border-bottom: 0;
   color: #8D9CB5;
-  font-size: 14px;
   font-weight: 500;
-  font-family: "Poppins", sans-serif; }
+  font-family: "Poppins";
+  font-size: .875rem; }
 .comdex table.dataTable tfoot th {
   border-top: 0; }
 .comdex .dataTables_wrapper .dataTables_paginate .paginate_button.current, .comdex .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
@@ -1082,7 +1092,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding: 0 25px;
     font-weight: 600;
     font-size: 0.875rem;
-    font-family: "Poppins", sans-serif;
+    font-family: "Poppins";
     letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
     width: 20px;
@@ -1743,7 +1753,7 @@ form .formBody {
   font-size: 0.875rem;
   vertical-align: middle;
   color: #2E3239;
-  font-family: "Poppins", sans-serif;
+  font-family: "Poppins";
   font-weight: 600; }
 .leftContainer .financial {
   margin-bottom: 20px; }
@@ -2036,7 +2046,10 @@ header:before,
       -moz-transition: all 0.3s ease;
       transition: all 0.3s ease; }
       .timeline .timeline-item .timeline-content .activityContent {
-        color: #000000;
+        color: #2E3239;
+        font-size: 0.875rem;
+        font-width: 400;
+        font-family: "Poppins";
         font-size: 0.875rem; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
@@ -2159,7 +2172,7 @@ header:before,
     color: #2E3239;
     font-weight: 600;
     height: min-content;
-    font-family: "Poppins", sans-serif; }
+    font-family: "Poppins"; }
 
 .chat {
   padding: 0 10px 0 0; }
@@ -2458,7 +2471,9 @@ header:before,
   .notification .read {
     background-color: #fff2e8; }
   .notification .notificationTime {
-    font-size: 10px; }
+    font-weight: 600;
+    font-size: 10px;
+    color: #2E3239; }
 
 .notification > div, .NotificationButton {
   padding: 15px 25px; }
