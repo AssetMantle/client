@@ -47,6 +47,7 @@ class ComponentViewController @Inject()(
                                          blockchainTransactionsOrderTakes: blockchainTransaction.OrderTakes,
                                          blockchainTransactionsOrderCancels: blockchainTransaction.OrderCancels,
                                          blockchainTokens: blockchain.Tokens,
+                                         blockchainProposals: blockchain.Proposals,
                                          blockchainValidators: blockchain.Validators,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
@@ -353,6 +354,17 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def proposalList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val proposals = blockchainProposals.Service.get()
+      (for {
+        proposals <- proposals
+      } yield Ok(views.html.component.blockchain.proposalList(proposals))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
   def validatorList(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(views.html.component.blockchain.validatorList())
@@ -361,7 +373,9 @@ class ComponentViewController @Inject()(
   def activeValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val validators = blockchainValidators.Service.getAllActiveValidatorList
+
       def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
+
       (for {
         validators <- validators
         keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
@@ -374,7 +388,9 @@ class ComponentViewController @Inject()(
   def inactiveValidatorList(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val validators = blockchainValidators.Service.getAllInactiveValidatorList
+
       def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
+
       (for {
         validators <- validators
         keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
@@ -388,7 +404,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val validator = blockchainValidators.Service.tryGet(address)
       val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
-      def keyBaseValidator(address: String): Future[ValidatorAccount] = keyBaseValidatorAccounts.Service.tryGet(address)
+
+      def keyBaseValidator(address: String): Future[Option[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(address)
+
       (for {
         validator <- validator
         totalBondedAmount <- totalBondedAmount

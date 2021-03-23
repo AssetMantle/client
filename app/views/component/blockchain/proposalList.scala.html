@@ -1,0 +1,46 @@
+@import views.html.base._
+@import models.blockchain.Proposal
+@import scala.collection.immutable.ListMap
+
+@(proposalList: Seq[Proposal])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<table class="cmuk-table cmuk-table-striped tableSort">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.ID)</th>
+            <th>@Messages(constants.View.TITLE)</th>
+            <th>@Messages(constants.View.STATUS)</th>
+            <th>@Messages(constants.View.VOTING_START)</th>
+            <th>@Messages(constants.View.SUBMIT_TIME)</th>
+            <th>@Messages(constants.View.TOTAL_DEPOSIT)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @proposalList.map { proposal =>
+            <tr>
+                <td>@proposal.id</td>
+                <td>@proposal.content.proposalContentType</td>
+                <td>STATUS</td>
+                <td>@proposal.votingStartTime</td>
+                <td>@proposal.submitTime</td>
+                <td>@proposal.totalDeposit</td>
+            </tr>
+        }
+
+        @*
+    @validators.map { validator =>
+        <tr>
+            <td class="blockHeightItem">
+                @keyBaseValidators.find(x=>x.address == validator.operatorAddress && x.pictureURL.isDefined).flatMap(_.pictureURL) match {
+                    case Some(pictureURL)=>{@commonImageResource(pictureURL)}
+                    case None=>{@commonImage("note.svg")}
+                }
+            <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
+            </td>
+            <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
+            <td>@validator.commission.commissionRates.rate.toString %</td>
+        </tr>
+    }
+        *@
+    </tbody>
+</table>
+@*<script src="@routes.Assets.versioned("javascripts/dataTables/dataTable.js")" type="text/javascript"></script>*@

@@ -69,6 +69,8 @@ class Proposals @Inject()(
 
   private def getByID(id: String): Future[Option[ProposalSerialized]] = db.run(proposalTable.filter(_.id === id).result.headOption)
 
+  private def getAllProposals(): Future[Seq[ProposalSerialized]] = db.run(proposalTable.result)
+
   private[models] class ProposalTable(tag: Tag) extends Table[ProposalSerialized](tag, "Proposal_BC") {
 
     def * = (id, content, proposalType, status, finalTallyResult, submitTime, depositEndTime, totalDeposit, votingStartTime, votingEndTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalSerialized.tupled, ProposalSerialized.unapply)
@@ -113,6 +115,8 @@ class Proposals @Inject()(
     def insertOrUpdate(proposal: Proposal): Future[Int] = upsert(proposal)
 
     def get(id: String): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
+
+    def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 
   }
 

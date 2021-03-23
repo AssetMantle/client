@@ -48,14 +48,14 @@ class ValidatorAccounts @Inject()(
   private def add(validatorKeyBase: ValidatorAccount): Future[String] = db.run((validatorAccountTable returning validatorAccountTable.map(_.address) += validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPLOAD_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_INSERT_FAILED, psqlException)
     }
   }
 
   private def update(validatorKeyBase: ValidatorAccount): Future[Int] = db.run(validatorAccountTable.filter(_.address === validatorKeyBase.address).update(validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPDATE_FAILED, psqlException)
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, noSuchElementException)
     }
   }
@@ -63,19 +63,21 @@ class ValidatorAccounts @Inject()(
   private def upsert(validatorKeyBase: ValidatorAccount): Future[Int] = db.run(validatorAccountTable.insertOrUpdate(validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPSERT_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPSERT_FAILED, noSuchElementException)
     }
   }
 
   private def tryGetByAddress(address: String): Future[ValidatorAccount] = db.run(validatorAccountTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def getListByAddress(address: Seq[String]): Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address.inSet(address)).result)
+  private def getListByAddress(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address.inSet(addresses)).result)
+
+  private def getByAddress(address: String): Future[Option[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address === address).result.headOption)
 
   private def findAll: Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.result)
 
@@ -113,7 +115,9 @@ class ValidatorAccounts @Inject()(
 
     def tryGet(address: String): Future[ValidatorAccount] = tryGetByAddress(address)
 
-    def get(address: Seq[String]): Future[Seq[ValidatorAccount]] = getListByAddress(address)
+    def get(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = getListByAddress(addresses)
+
+    def get(address: String): Future[Option[ValidatorAccount]] = getByAddress(address)
 
     def getAll: Future[Seq[ValidatorAccount]] = findAll
   }

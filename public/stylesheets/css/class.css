@@ -1097,7 +1097,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: 20px;
     height: 20px;
     margin-bottom: -2px; }
-  .header .dashboardIcon, .header .blocksIcon, .header .traderIcon, .header .accountIcon, .header .transactionsIcon, .header .validatorsIcon, .header .singUpIcon, .header .loginIcon {
+  .header .dashboardIcon, .header .blocksIcon, .header .traderIcon, .header .accountIcon, .header .transactionsIcon, .header .validatorsIcon, .proposalsIcon, .header .singUpIcon, .header .loginIcon {
     margin-right: 5px;
     width: 20px;
     height: 20px; }
@@ -2417,7 +2417,7 @@ header:before,
       border-radius: 5px;
       background-color: #FFFFFF; }
 
-.cmuk-card-body.validatorList {
+.cmuk-card-body.validatorList .proposalList {
   padding: 0px; }
 
 #validatorList .cmuk-subnav {

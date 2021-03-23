@@ -1,35 +1,36 @@
 @import views.html.base._
 @import models.blockchain.Validator
 
-@(validator: Validator, selfDelegationAddress: String, votingPower: String, bondedStatus: String, keyBaseValidatorAccount: keyBase.ValidatorAccount)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(validator: Validator, selfDelegationAddress: String, votingPower: String, bondedStatus: String, keyBaseValidatorAccount: Option[keyBase.ValidatorAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-    @commonCard(validator.description.moniker) {
-        <div>
-            @if(validator.status == bondedStatus) {
-                <span class="cmuk-badge verified">@Messages(constants.View.ACTIVE)</span>
+@commonCard(validator.description.moniker) {
+    <div>
+        @if(validator.status == bondedStatus) {
+            <span class="cmuk-badge verified">@Messages(constants.View.ACTIVE)</span>
 
-            } else {
-                <span class="cmuk-badge pending">@Messages(constants.View.INACTIVE)</span>
-            }
-            @if(validator.jailed) {
-                <span class="cmuk-badge rejected">@Messages(constants.View.JAILED)</span>
-            }
-        </div>
-    } {
-        @keyBaseValidatorAccount.pictureURL match {
-            case Some(url) => {
-                @commonImageResource(url)
-            }
-            case None => {
-                @commonImage("note.svg")
-            }
+        } else {
+            <span class="cmuk-badge pending">@Messages(constants.View.INACTIVE)</span>
         }
-        @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
-        @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.wallet(selfDelegationAddress)))
-        @commonTextInfo(constants.View.COMMISSION_RATE, validator.commission.commissionRates.rate.toString + "%")
-        @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
-        @commonTextInfo(constants.View.VALIDATOR_IDENTITY, validator.description.identity)
-        @commonTextInfo(constants.View.VALIDATOR_WEBSITE, validator.description.website)
-        @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, validator.description.securityContact)
-        @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, validator.description.details)
+        @if(validator.jailed) {
+            <span class="cmuk-badge rejected">@Messages(constants.View.JAILED)</span>
+        }
+    </div>
+} {
+    @keyBaseValidatorAccount.flatMap(_.pictureURL) match {
+        case Some(url) => {
+            @commonImageResource(url)
+        }
+        case None => {
+            @commonImage("note.svg")
+        }
     }
+
+    @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
+    @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.wallet(selfDelegationAddress)))
+    @commonTextInfo(constants.View.COMMISSION_RATE, validator.commission.commissionRates.rate.toString + "%")
+    @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
+    @commonTextInfo(constants.View.VALIDATOR_IDENTITY, validator.description.identity)
+    @commonTextInfo(constants.View.VALIDATOR_WEBSITE, validator.description.website)
+    @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, validator.description.securityContact)
+    @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, validator.description.details)
+}
