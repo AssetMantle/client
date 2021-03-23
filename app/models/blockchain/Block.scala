@@ -132,7 +132,7 @@ class Blocks @Inject()(
 
       for {
         latestBlockHeight <- latestBlockHeight
-        blockList <- getBlocksByHeightRange(latestBlockHeight - pageNumber * blocksPerPage + 1 to latestBlockHeight - pageNumber * blocksPerPage + blocksPerPage).map(_.map(_.deserialize)) //getBlocksForPageNumber(offset = latestBlockHeight- (pageNumber) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
+        blockList <- getBlocksByHeightRange(latestBlockHeight - pageNumber * blocksPerPage + 1 to latestBlockHeight - (pageNumber - 1) * blocksPerPage).map(_.map(_.deserialize)) //getBlocksForPageNumber(offset = latestBlockHeight- (pageNumber) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
       } yield blockList
     }
 
@@ -141,7 +141,7 @@ class Blocks @Inject()(
 
       for {
         latestBlockHeight <- latestBlockHeight
-        blockList <- getBlocksByHeightRange((latestBlockHeight - n + 1 to latestBlockHeight)).map(_.map(_.deserialize))
+        blockList <- getBlocksByHeightRange(latestBlockHeight - n + 1 to latestBlockHeight).map(_.map(_.deserialize))
       } yield blockList
     }
   }
