@@ -6,7 +6,11 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import utilities.MicroNumber
 
+case class Redelegation(delegator_address: String, validator_src_address: String, validator_dst_address: String)
+
 object Redelegation {
+
+  implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
   case class Entry(creation_height: Int, completion_time: String, initial_balance: MicroNumber, shares_dst: String, balance: MicroNumber) {
     def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = initial_balance, sharesDestination = BigDecimal(shares_dst))
@@ -21,10 +25,6 @@ object Redelegation {
       (JsPath \ "shares_dst").read[String] and
       (JsPath \ "balance").read[String]
     ) (entryApply _)
-
-  case class Redelegation(delegator_address: String, validator_src_address: String, validator_dst_address: String)
-
-  implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
   case class Result(redelegation: Redelegation, entries: Seq[Entry]) {
     def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = redelegation.delegator_address, validatorSourceAddress = redelegation.validator_src_address, validatorDestinationAddress = redelegation.validator_dst_address, entries = entries.map(_.toRedelegationEntry))

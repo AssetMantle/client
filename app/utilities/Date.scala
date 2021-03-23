@@ -2,8 +2,7 @@ package utilities
 
 import java.sql.Timestamp
 import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{LocalDateTime, ZonedDateTime}
-
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime, Instant}
 import exceptions.BaseException
 import play.api.Logger
 
@@ -52,6 +51,15 @@ object Date {
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
         throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+  }
+
+  def addTime(timestamp: String, addEpochTime: Long): String = {
+    try {
+      ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(timestamp).toEpochSecond + addEpochTime), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+    } catch {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_DATA_TYPE)
     }
   }
 

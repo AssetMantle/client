@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Parameter"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Proposal_BC"
 (
-    "id"                VARCHAR NOT NULL,
+    "id"                INTEGER NOT NULL,
     "content"           VARCHAR NOT NULL,
     "proposalType"      VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Proposal_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalDeposit_BC"
 (
-    "proposalID"        VARCHAR NOT NULL,
+    "proposalID"        INTEGER NOT NULL,
     "depositor"         VARCHAR NOT NULL,
     "amount"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
@@ -250,12 +250,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalDeposit_BC"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("proposalID")
+    PRIMARY KEY ("proposalID", "depositor")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalVote_BC"
 (
-    "proposalID"        VARCHAR NOT NULL,
+    "proposalID"        INTEGER NOT NULL,
     "voter"             VARCHAR NOT NULL,
     "option"            VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalVote_BC"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("proposalID")
+    PRIMARY KEY ("proposalID", "voter")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"

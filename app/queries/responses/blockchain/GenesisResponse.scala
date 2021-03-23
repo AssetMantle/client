@@ -1,10 +1,14 @@
 package queries.responses.blockchain
 
+import models.Abstract.Parameter
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
+import models.common.Parameters.GovernanceParameter
 import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
-import queries.responses.blockchain.TransactionResponse.Msg
+import queries.responses.blockchain.TransactionResponse._
+import queries.responses.blockchain.params.{AuthResponse, BankResponse, DistributionResponse, HalvingResponse, MintResponse, SlashingResponse, StakingResponse}
+import queries.responses.blockchain.params.StakingResponse._
 import queries.responses.common.{Coin, Delegation, Validator}
 import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
@@ -13,27 +17,26 @@ object GenesisResponse {
 
   import queries.responses.common.Accounts.accountReads
 
-  case class GenTxValue(msg: Seq[Msg])
+  case class GenTxBody(messages: Seq[Msg], memo: String)
 
-  implicit val genTxValueReads: Reads[GenTxValue] = Json.reads[GenTxValue]
+  implicit val genTxBodyReads: Reads[GenTxBody] = Json.reads[GenTxBody]
 
-  case class GenTx(value: GenTxValue)
+  case class GenTx(body: GenTxBody, auth_info: AuthInfo)
 
   implicit val genTxReads: Reads[GenTx] = Json.reads[GenTx]
 
-  case class Genutil(gentxs: Option[Seq[GenTx]])
+  case class GenUtil(gen_txs: Seq[GenTx])
 
-  implicit val genUtilReads: Reads[Genutil] = Json.reads[Genutil]
+  implicit val genUtilReads: Reads[GenUtil] = Json.reads[GenUtil]
+
+  object Auth {
+
+    case class Module(accounts: Seq[Account], params: AuthResponse.Params)
+
+    implicit val authModuleReads: Reads[Module] = Json.reads[Module]
+  }
 
   object Bank {
-
-    case class SendEnabled(denom: String, enabled: Boolean)
-
-    implicit val sendEnabledReads: Reads[SendEnabled] = Json.reads[SendEnabled]
-
-    case class BankParams(default_send_enabled: Boolean, send_enabled: Seq[SendEnabled])
-
-    implicit val bankParamsReads: Reads[BankParams] = Json.reads[BankParams]
 
     case class BankBalance(address: String, coins: Seq[Coin])
 
@@ -43,20 +46,9 @@ object GenesisResponse {
 
     implicit val denomUnitsReads: Reads[DenomUnits] = Json.reads[DenomUnits]
 
-    case class Module(params: BankParams, balances: Seq[BankBalance], supply: Seq[Coin])
+    case class Module(params: BankResponse.Params, balances: Seq[BankBalance], supply: Seq[Coin])
 
     implicit val bankModuleReads: Reads[Module] = Json.reads[Module]
-  }
-
-  object Auth {
-
-    case class Params(max_memo_characters: String, sig_verify_cost_ed25519: String, sig_verify_cost_secp256k1: String, tx_sig_limit: String, tx_size_cost_per_byte: String)
-
-    implicit val authParamsReads: Reads[Params] = Json.reads[Params]
-
-    case class Module(accounts: Seq[Account], params: Params)
-
-    implicit val authModuleReads: Reads[Module] = Json.reads[Module]
   }
 
   object Distribution {
@@ -67,22 +59,14 @@ object GenesisResponse {
 
     implicit val withdrawAddressReads: Reads[WithdrawAddress] = Json.reads[WithdrawAddress]
 
-    case class Params(community_tax: String, base_proposer_reward: String, bonus_proposer_reward: String, withdraw_addr_enabled: Boolean)
-
-    implicit val distributionParamsReads: Reads[Params] = Json.reads[Params]
-
-    case class Module(params: Params, delegator_withdraw_infos: Seq[WithdrawAddress])
+    case class Module(params: DistributionResponse.Params, delegator_withdraw_infos: Seq[WithdrawAddress])
 
     implicit val distributionReads: Reads[Module] = Json.reads[Module]
   }
 
   object Halving {
 
-    case class Params(blockHeight: String)
-
-    implicit val halvingParamsReads: Reads[Params] = Json.reads[Params]
-
-    case class Module(params: Params)
+    case class Module(params: HalvingResponse.Result)
 
     implicit val moduleReads: Reads[Module] = Json.reads[Module]
   }
@@ -93,22 +77,14 @@ object GenesisResponse {
 
     implicit val minterReads: Reads[Minter] = Json.reads[Minter]
 
-    case class MintParams(mint_denom: String, inflation_rate_change: String, inflation_min: String, inflation_max: String, goal_bonded: String, blocks_per_year: String)
-
-    implicit val mintParamsReads: Reads[MintParams] = Json.reads[MintParams]
-
-    case class Module(minter: Minter, params: MintParams)
+    case class Module(minter: Minter, params: MintResponse.Params)
 
     implicit val mintReads: Reads[Module] = Json.reads[Module]
   }
 
   object Slashing {
 
-    case class SlashingParams(signed_blocks_window: String, min_signed_per_window: String, downtime_jail_duration: String, slash_fraction_double_sign: String, slash_fraction_downtime: String)
-
-    implicit val slashingParamsReads: Reads[SlashingParams] = Json.reads[SlashingParams]
-
-    case class Module(params: SlashingParams)
+    case class Module(params: SlashingResponse.Params)
 
     implicit val slashingReads: Reads[Module] = Json.reads[Module]
 
@@ -140,11 +116,7 @@ object GenesisResponse {
 
     implicit val undelegationReads: Reads[Undelegation] = Json.reads[Undelegation]
 
-    case class StakingParams(bond_denom: String, historical_entries: Int, max_entries: Int, max_validators: Int, unbonding_time: String)
-
-    implicit val stakingParamsReads: Reads[StakingParams] = Json.reads[StakingParams]
-
-    case class Module(params: StakingParams, delegations: Seq[Delegation.Result], redelegations: Seq[Redelegation], unbonding_delegations: Seq[Undelegation], validators: Seq[Validator.Result])
+    case class Module(params: StakingResponse.Params, delegations: Seq[Delegation], redelegations: Seq[Redelegation], unbonding_delegations: Seq[Undelegation], validators: Seq[Validator.Result])
 
     implicit val stakingReads: Reads[Module] = Json.reads[Module]
 
@@ -164,16 +136,18 @@ object GenesisResponse {
 
     implicit val tallyParamsReads: Reads[TallyParams] = Json.reads[TallyParams]
 
-    case class Module(deposit_params: DepositParams, voting_params: VotingParams, tally_params: TallyParams)
+    case class Module(deposit_params: DepositParams, voting_params: VotingParams, tally_params: TallyParams, proposals: Seq[ProposalResponse.Proposal], deposits: Seq[ProposalDepositResponse.Deposit], votes: Seq[ProposalVoteResponse.Vote]) {
+      def toParameter: Parameter = GovernanceParameter(minDeposit = deposit_params.min_deposit.map(_.toCoin), maxDepositPeriod = deposit_params.max_deposit_period.split("s")(0).toLong, votingPeriod = voting_params.voting_period.split("s")(0).toLong, quorum = BigDecimal(tally_params.quorum), threshold = BigDecimal(tally_params.threshold), vetoThreshold = BigDecimal(tally_params.veto_threshold))
+    }
 
     implicit val govReads: Reads[Module] = Json.reads[Module]
   }
 
-  case class AppState(auth: Auth.Module, bank: Bank.Module, distribution: Distribution.Module, genutil: Genutil, gov: Gov.Module, halving: Halving.Module, mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
+  case class AppState(auth: Auth.Module, bank: Bank.Module, distribution: Distribution.Module, genutil: GenUtil, gov: Gov.Module, halving: Halving.Module, mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 
-  case class Genesis(app_state: AppState)
+  case class Genesis(app_state: AppState, genesis_time: String, chain_id: String, initial_height: String)
 
   implicit val genesisReads: Reads[Genesis] = Json.reads[Genesis]
 

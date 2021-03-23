@@ -7,7 +7,7 @@ import models.blockchain.{ProposalVote => BlockchainProposalVote}
 object ProposalVoteResponse {
 
   case class Vote(proposal_id: String, voter: String, option: String) {
-    def toSerializableProposalVote: BlockchainProposalVote = BlockchainProposalVote(proposalID = proposal_id, voter = voter, option = option)
+    def toSerializableProposalVote: BlockchainProposalVote = BlockchainProposalVote(proposalID = proposal_id.toInt, voter = voter, option = option)
   }
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]

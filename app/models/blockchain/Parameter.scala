@@ -1,19 +1,25 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Abstract.{Parameter => abstractParameter}
 import models.Trait.Logged
 import models.common.Parameters._
+import models.common.ProposalContents.ParameterChange
+import models.common.Serializable.Coin
 import models.common.TransactionMessages._
 import models.masterTransaction
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
+import queries.blockchain.params._
+import queries.responses.blockchain.params._
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -25,6 +31,15 @@ class Parameters @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             configuration: Configuration,
                             masterTransactionNotifications: masterTransaction.Notifications,
+                            utilitiesOperations: utilities.Operations,
+                            getAuthParams: GetAuth,
+                            getBankParams: GetBank,
+                            getGovParams: GetGov,
+                            getDistributionParams: GetDistribution,
+                            getHalvingParams: GetHalving,
+                            getMintParams: GetMint,
+                            getSlashingParams: GetSlashing,
+                            getStakingParams: GetStaking
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -97,9 +112,113 @@ class Parameters @Inject()(
 
     def tryGet(parameterType: String): Future[Parameter] = tryGetByType(parameterType).map(_.deserialize)
 
+    def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(constants.Blockchain.ParameterType.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
+
+    def tryGetBankParameter: Future[BankParameter] = tryGetByType(constants.Blockchain.ParameterType.BANK).map(_.deserialize).map(_.value.asBankParameter)
+
+    def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(constants.Blockchain.ParameterType.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
+
+    def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(constants.Blockchain.ParameterType.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
+
+    def tryGetHalvingParameter: Future[HalvingParameter] = tryGetByType(constants.Blockchain.ParameterType.HALVING).map(_.deserialize).map(_.value.asHalvingParameter)
+
+    def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(constants.Blockchain.ParameterType.MINT).map(_.deserialize).map(_.value.asMintingParameter)
+
     def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(constants.Blockchain.ParameterType.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
+
+    def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 
   }
+
+  object Utility {
+
+    def onNewBlock(header: Header): Future[Unit] = {
+      val halvingParameter = Service.tryGetHalvingParameter
+
+      def checkAndUpdate(halvingParameter: HalvingParameter) = if ((header.height % halvingParameter.blockHeight) == 0) {
+        val mintingParameter = Service.tryGetMintingParameter
+
+        def updateMintingParameter(mintingParameter: MintingParameter) = Service.insertOrUpdate(Parameter(parameterType = mintingParameter.`type`, value = mintingParameter.copy(inflationMax = mintingParameter.inflationMax / 2, inflationMin = mintingParameter.inflationMin / 2, inflationRateChange = (mintingParameter.inflationMax / 2) - (mintingParameter.inflationMin / 2))))
+
+        for {
+          mintingParameter <- mintingParameter
+          _ <- updateMintingParameter(mintingParameter)
+        } yield ()
+      } else Future()
+
+      (for {
+        halvingParameter <- halvingParameter
+        _ <- checkAndUpdate(halvingParameter)
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def onParameterChange(parameterChange: ParameterChange): Future[Unit] = {
+      val update = utilitiesOperations.traverse(parameterChange.changes)(change => {
+        val parameter: Future[abstractParameter] = change.subspace match {
+          case constants.Blockchain.ParameterType.AUTH =>
+            val authResponse = getAuthParams.Service.get()
+            for {
+              authResponse <- authResponse
+            } yield authResponse.params.toParameter
+          case constants.Blockchain.ParameterType.BANK =>
+            val bankResponse = getBankParams.Service.get()
+            for {
+              bankResponse <- bankResponse
+            } yield bankResponse.params.toParameter
+          case constants.Blockchain.ParameterType.DISTRIBUTION =>
+            val distributionResponse = getDistributionParams.Service.get()
+            for {
+              distributionResponse <- distributionResponse
+            } yield distributionResponse.params.toParameter
+          case constants.Blockchain.ParameterType.GOVERNANCE =>
+            val govResponse = getGovParams.Service.get()
+            for {
+              govResponse <- govResponse
+            } yield govResponse.toParameter
+          case constants.Blockchain.ParameterType.HALVING =>
+            val halvingResponse = getHalvingParams.Service.get()
+            for {
+              halvingResponse <- halvingResponse
+            } yield halvingResponse.result.toParameter
+          case constants.Blockchain.ParameterType.MINT =>
+            val mintResponse = getMintParams.Service.get()
+            for {
+              mintResponse <- mintResponse
+            } yield mintResponse.params.toParameter
+          case constants.Blockchain.ParameterType.SLASHING =>
+            val slashingResponse = getSlashingParams.Service.get()
+            for {
+              slashingResponse <- slashingResponse
+            } yield slashingResponse.params.toParameter
+          case constants.Blockchain.ParameterType.STAKING =>
+            val stakingResponse = getStakingParams.Service.get()
+            for {
+              stakingResponse <- stakingResponse
+            } yield stakingResponse.params.toParameter
+          case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
+          case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
+          case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
+        }
+
+        def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.`type` != constants.Blockchain.ParameterType.CRISIS || parameterValue.`type` != constants.Blockchain.ParameterType.IBC || parameterValue.`type` != constants.Blockchain.ParameterType.TRANSFER)
+          Service.insertOrUpdate(Parameter(parameterType = parameterValue.`type`, value = parameterValue)) else Future(0)
+
+        for {
+          parameter <- parameter
+          _ <- upsertParameter(parameter)
+        } yield ()
+      })
+
+      (for {
+        _ <- update
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+  }
+
 }

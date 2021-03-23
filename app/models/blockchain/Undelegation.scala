@@ -16,6 +16,7 @@ import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUn
 import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -32,6 +33,7 @@ class Undelegations @Inject()(
                                blockchainValidators: Validators,
                                blockchainDelegations: Delegations,
                                blockchainWithdrawAddresses: WithdrawAddresses,
+                               utilitiesOperations: utilities.Operations,
                              )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -152,31 +154,6 @@ class Undelegations @Inject()(
       }
     }
 
-    def onSlashingEvent(validatorAddress: String): Future[Unit] = {
-      val undelegations = Service.getAllByValidator(validatorAddress)
-
-      def updateUndelegations(undelegations: Seq[Undelegation]): Future[Unit] = if (undelegations.nonEmpty) {
-        val allValidatorUndelegations = getAllValidatorUndelegations.Service.get(validatorAddress)
-
-        def update(allValidatorUndelegations: AllValidatorUndelegationsResponse) = Future.traverse(undelegations)(undelegation => allValidatorUndelegations.unbonding_responses
-          .find(_.delegator_address == undelegation.delegatorAddress)
-          .fold(Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress))
-          (undelegationResponse => Service.insertOrUpdate(undelegationResponse.toUndelegation)))
-
-        for {
-          allValidatorUndelegations <- allValidatorUndelegations
-          _ <- update(allValidatorUndelegations)
-        } yield ()
-      } else Future()
-
-      (for {
-        undelegations <- undelegations
-        _ <- updateUndelegations(undelegations)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
     def onNewBlock(blockTime: String): Future[Unit] = {
       val allUndelegations = Service.getAll
 
@@ -194,6 +171,50 @@ class Undelegations @Inject()(
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
+    }
+
+    def slashUndelegation(undelegation: Undelegation, currentBlockTime: String, infractionHeight: Int, slashingFraction: BigDecimal): Future[Unit] = {
+      val updatedEntries = undelegation.entries.map(entry => {
+        val slashAmount = MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
+        val unbondingSlashAmount = if (slashAmount < entry.balance) slashAmount else entry.balance
+        if (!(entry.creationHeight < infractionHeight) && !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTime) && unbondingSlashAmount != MicroNumber.zero) {
+          entry.copy(balance = entry.balance - unbondingSlashAmount)
+        } else entry
+      })
+      val updateUndelegation = Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
+
+      (for {
+        _ <- updateUndelegation
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    def unbond(delegation: Delegation, validator: Validator, shares: BigDecimal): Future[MicroNumber] = {
+      if (delegation.validatorAddress == validator.operatorAddress && delegation.shares >= shares) {
+        val isDelegatorValidator = utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress) == delegation.delegatorAddress
+
+        val jailValidator = if (isDelegatorValidator && !validator.jailed && validator.getTokensFromShares(delegation.shares) < validator.minimumSelfDelegation) {
+          blockchainValidators.Service.jailValidator(validator.operatorAddress)
+        } else Future(0)
+
+        val updateOrDeleteDelegation = if (delegation.shares == 0) blockchainDelegations.Service.delete(delegatorAddress = delegation.delegatorAddress, validatorAddress = delegation.validatorAddress)
+        else blockchainDelegations.Service.insertOrUpdate(delegation.copy(shares = delegation.shares - shares))
+
+        val (updatedValidator, removedTokens) = validator.removeDelegatorShares(shares)
+
+        val deleteOrUpdateValidator = if (updatedValidator.delegatorShares == 0 && validator.isUnbonded) blockchainValidators.Service.delete(validator.operatorAddress)
+        else blockchainValidators.Service.insertOrUpdate(updatedValidator)
+
+        (for {
+          _ <- jailValidator
+          _ <- updateOrDeleteDelegation
+          _ <- deleteOrUpdateValidator
+        } yield removedTokens).recover {
+          case baseException: BaseException => throw baseException
+        }
+
+      } else Future(throw new BaseException(constants.Response.INVALID_VALIDATOR_OR_DELEGATION_OR_SHARES))
     }
 
   }

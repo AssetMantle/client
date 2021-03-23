@@ -185,7 +185,7 @@ object Serializable {
 
   implicit val basePropertyWrites: OWrites[BaseProperty] = Json.writes[BaseProperty]
 
-  case class FinalTallyResult(yes: String, abstain: String, no: String, noWithVeto: String)
+  case class FinalTallyResult(yes: BigDecimal, abstain: BigDecimal, no: BigDecimal, noWithVeto: BigDecimal)
 
   implicit val finalTallyResultReads: Reads[FinalTallyResult] = Json.reads[FinalTallyResult]
 

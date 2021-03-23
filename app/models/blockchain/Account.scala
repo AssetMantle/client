@@ -13,6 +13,9 @@ import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
 import models.common.PublicKeys._
+import models.common.TransactionMessages.CreateVestingAccount
+import queries.responses.common.Header
+
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +29,8 @@ class Accounts @Inject()(
                           getAccount: GetAccount,
                           configuration: Configuration,
                           masterAccounts: master.Accounts,
-                          utilitiesOperations: utilities.Operations
+                          utilitiesOperations: utilities.Operations,
+                          blockchainBalances: Balances,
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -162,6 +166,19 @@ class Accounts @Inject()(
 
   object Utility {
 
+    def onCreateVestingAccount(createVestingAccount: CreateVestingAccount)(implicit header: Header): Future[Unit] = {
+      val insert = insertOrUpdateAccount(createVestingAccount.toAddress)
+      val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.toAddress)
+
+      (for {
+        _ <- insert
+        _ <- insertBalance
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+
+    }
+
     def insertOrUpdateAccount(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
       val bcAccount = Service.get(address)
@@ -173,7 +190,7 @@ class Accounts @Inject()(
         bcAccount <- bcAccount
         _ <- upsert(accountResponse, bcAccount)
       } yield ()).recover {
-        case _: BaseException => Future()
+        case baseException: BaseException => throw baseException
       }
     }
   }
