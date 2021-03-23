@@ -80,7 +80,7 @@ class Blocks @Inject()(
     }
   }
 
-  private def getBlocksByHeightRange(heightRange:Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet(heightRange)).sortBy(_.time.desc).result)
+  private def getBlocksByHeightRange(heightRange: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet (heightRange)).sortBy(_.time.desc).result)
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") {
 
@@ -130,19 +130,19 @@ class Blocks @Inject()(
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
 
-      for{
-        latestBlockHeight<-latestBlockHeight
-        blockList <- getBlocksByHeightRange(latestBlockHeight- pageNumber*blocksPerPage+1 to latestBlockHeight - pageNumber*blocksPerPage + blocksPerPage) .map(_.map(_.deserialize))//getBlocksForPageNumber(offset = latestBlockHeight- (pageNumber) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
-      }yield blockList
+      for {
+        latestBlockHeight <- latestBlockHeight
+        blockList <- getBlocksByHeightRange(latestBlockHeight - pageNumber * blocksPerPage + 1 to latestBlockHeight - pageNumber * blocksPerPage + blocksPerPage).map(_.map(_.deserialize)) //getBlocksForPageNumber(offset = latestBlockHeight- (pageNumber) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
+      } yield blockList
     }
 
     def getLastNBlocks(n: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
 
-      for{
-        latestBlockHeight<-latestBlockHeight
-        blockList<- getBlocksByHeightRange((latestBlockHeight-n+1 to latestBlockHeight)).map(_.map(_.deserialize))
-      }yield blockList
+      for {
+        latestBlockHeight <- latestBlockHeight
+        blockList <- getBlocksByHeightRange((latestBlockHeight - n + 1 to latestBlockHeight)).map(_.map(_.deserialize))
+      } yield blockList
     }
   }
 
