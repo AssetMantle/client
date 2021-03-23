@@ -2,12 +2,13 @@ package services
 
 import akka.actor.Cancellable
 import exceptions.BaseException
-import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
+import models.Abstract.Parameter
+import models.blockchain.{Token, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
-import queries.blockchain.{GetABCIInfo, GetBlockResults, GetBondedValidators, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
+import queries.blockchain.{GetABCIInfo, GetBlockResults, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
@@ -17,7 +18,6 @@ import queries.responses.blockchain.GenesisResponse._
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
-import queries.responses.common.Validator.{Result => ValidatorResult}
 import queries.responses.common.Header
 import utilities.MicroNumber
 
@@ -73,12 +73,12 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
+      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.halving.params.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
-      _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gentxs.getOrElse(Seq.empty))
+      _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gen_txs, chainID = genesis.chain_id, initialHeight = genesis.initial_height.toInt, genesisTime = genesis.genesis_time)
       _ <- updateDistributionOnStart(genesis.app_state.distribution)
-      _ <- updateSlashingOnStart(genesis.app_state.slashing)
       _ <- insertAllTokensOnStart()
     } yield ()
       ).recover {
@@ -112,9 +112,7 @@ class Startup @Inject()(
 
   private def updateStakingOnStart(staking: Staking.Module): Future[Unit] = {
     val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
-    val insertStakingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.STAKING, value = StakingParameter(unbondingTime = staking.params.unbonding_time, maxValidators = staking.params.max_validators, maxEntries = staking.params.max_entries, historicalEntries = staking.params.historical_entries, bondDenom = staking.params.bond_denom)))
 
-    //      val insertKeyBaseAccount = Future.traverse(staking.validators.map(_.toValidator))(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
     def updateDelegations(): Future[Unit] = {
       val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
       val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.map(_.toRedelegation))
@@ -130,8 +128,6 @@ class Startup @Inject()(
     (for {
       _ <- insertAllValidators
       _ <- updateDelegations()
-      _ <- insertStakingParameters
-      //          _ <- insertKeyBaseAccount
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
@@ -139,27 +135,16 @@ class Startup @Inject()(
 
   private def updateDistributionOnStart(distribution: Distribution.Module): Future[Unit] = {
     val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.map(_.toWithdrawAddress))
-    val insertDistributionParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.DISTRIBUTION, value = DistributionParameter(communityTax = distribution.params.community_tax, baseProposerReward = distribution.params.base_proposer_reward, bonusProposerReward = distribution.params.bonus_proposer_reward, withdrawAddrEnabled = distribution.params.withdraw_addr_enabled)))
     (for {
       _ <- insertAllWithdrawAddresses
-      _ <- insertDistributionParameters
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
   }
 
-  private def updateSlashingOnStart(slashing: Slashing.Module): Future[Unit] = {
-    val insertSlashingParameters = blockchainParameters.Service.insertOrUpdate(Parameter(parameterType = constants.Blockchain.ParameterType.SLASHING, value = SlashingParameter(signedBlocksWindow = slashing.params.signed_blocks_window, minSignedPerWindow = slashing.params.min_signed_per_window, downtimeJailDuration = slashing.params.downtime_jail_duration, slashFractionDoubleSign = slashing.params.slash_fraction_double_sign, slashFractionDowntime = slashing.params.slash_fraction_downtime)))
-    (for {
-      _ <- insertSlashingParameters
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
-  }
-
-  private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx]): Future[Unit] = {
-    val updateTxs = Future.traverse(genTxs) { genTx =>
-      val updateTx = Future.traverse(genTx.value.msg)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg, 0))
+  private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: String): Future[Unit] = {
+    val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
+      val updateTx = utilitiesOperations.traverse(genTx.body.messages)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
       for {
         _ <- updateTx
       } yield ()
@@ -199,21 +184,32 @@ class Startup @Inject()(
     }
   }
 
+  private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
+    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.`type`, value = parameter))
+
+    (for {
+      _ <- insert
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  })
+
   private def insertBlock(height: Int): Future[Unit] = {
     val blockCommitResponse = blocksServices.insertOnBlock(height)
     val blockResultResponse = getBlockResults.Service.get(height)
 
-    def insertTransactions(): Future[Seq[blockchainTransaction]] = blocksServices.insertTransactionsOnBlock(height)
+    def insertTransactions(blockHeader: Header): Future[Seq[blockchainTransaction]] = blocksServices.insertTransactionsOnBlock(blockHeader)
 
     def averageBlockTime(blockHeader: Header): Future[Double] = blocksServices.setAverageBlockTime(blockHeader)
 
-    def checksAndUpdatesOnNewBlock(blockHeader: Header): Future[Unit] = blocksServices.checksAndUpdatesOnBlock(blockHeader)
+    def checksAndUpdatesOnNewBlock(blockHeader: Header): Future[Unit] = blocksServices.checksAndUpdatesOnNewBlock(blockHeader)
 
     def sendNewBlockWebSocketMessage(blockCommitResponse: BlockCommitResponse, transactions: Seq[blockchainTransaction], averageBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
 
     (for {
       blockCommitResponse <- blockCommitResponse
-      transactions <- insertTransactions()
+      transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- averageBlockTime(blockCommitResponse.result.signed_header.header)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       blockResultResponse <- blockResultResponse

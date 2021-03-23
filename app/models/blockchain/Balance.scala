@@ -3,7 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.Coin
-import models.common.TransactionMessages.{MultiSend, SendCoin}
+import models.common.TransactionMessages.{MultiSend, SendCoin, Transfer}
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -25,7 +25,6 @@ class Balances @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getBalance: GetBalance,
                           configuration: Configuration,
-                          masterAccounts: master.Accounts,
                           utilitiesOperations: utilities.Operations
                         )(implicit executionContext: ExecutionContext) {
 
@@ -133,6 +132,22 @@ class Balances @Inject()(
       }
     }
 
+    def onIBCTransfer(transfer: Transfer): Future[Unit] = {
+      val isSenderOnChain = transfer.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = transfer.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(transfer.sender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(transfer.receiver) else Future()
+
+      (for {
+        _ <- updateSender
+        _ <- updateReceiver
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.IBC_TRANSFER_FAILED.logMessage) // TODO Can fail if a duplicate chain transacts
+          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+
+    }
+
     def subtractCoinsFromAccount(fromAddress: String, subtractCoins: Seq[Coin]): Future[Unit] = {
       val fromBalance = Service.tryGet(fromAddress)
 
@@ -148,18 +163,14 @@ class Balances @Inject()(
       val oldBalance = Service.get(toAddress)
 
       def upsert(oldBalance: Option[Balance]) = oldBalance.fold(Service.insertOrUpdate(Balance(address = toAddress, coins = addCoins)))(old => {
-        val updatedCoins = if (old.coins.nonEmpty) {
-          val newCoins = old.coins.map(oldCoin => addCoins.find(_.denom == oldCoin.denom).fold(oldCoin)(addCoin => Coin(denom = addCoin.denom, amount = oldCoin.amount + addCoin.amount)))
-          newCoins ++ addCoins.filter(x => !newCoins.map(_.denom).contains(x.denom))
-        } else addCoins
-        Service.insertOrUpdate(Balance(address = toAddress, coins = updatedCoins))
+        Service.insertOrUpdate(Balance(address = toAddress, coins = utilities.Blockchain.addCoins(old.coins, addCoins)))
       })
 
       (for {
         oldBalance <- oldBalance
         _ <- upsert(oldBalance)
       } yield ()).recover {
-        case _: BaseException => Future()
+        case baseException: BaseException => throw baseException
       }
     }
 
@@ -172,7 +183,7 @@ class Balances @Inject()(
         balanceResponse <- balanceResponse
         _ <- upsert(balanceResponse)
       } yield ()).recover {
-        case _: BaseException => Future()
+        case baseException: BaseException => throw baseException
       }
     }
   }

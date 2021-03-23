@@ -4,7 +4,7 @@ import exceptions.BaseException
 import models.Abstract.TransactionMessage
 import models.common.{Serializable, TransactionMessages}
 import play.api.Logger
-import play.api.libs.json.{JsObject, Json, Reads}
+import play.api.libs.json.{JsObject, Json, OWrites, Reads}
 import queries.Abstract.{ProposalContent, PublicKey, TransactionMessageResponse}
 import queries.responses.blockchain.TransactionResponse.Msg
 
@@ -96,7 +96,7 @@ object TransactionMessageResponses {
 
   //gov
   case class Deposit(proposal_id: String, depositor: String, amount: Seq[Coin]) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Deposit(proposalID = proposal_id, depositor = depositor, amount = amount.map(_.toCoin))
+    def toTxMsg: TransactionMessage = TransactionMessages.Deposit(proposalID = proposal_id.toInt, depositor = depositor, amount = amount.map(_.toCoin))
   }
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
@@ -108,7 +108,7 @@ object TransactionMessageResponses {
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
   case class Vote(proposal_id: String, voter: String, option: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Vote(proposalID = proposal_id, voter = voter, option = option)
+    def toTxMsg: TransactionMessage = TransactionMessages.Vote(proposalID = proposal_id.toInt, voter = voter, option = option)
   }
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
@@ -168,6 +168,19 @@ object TransactionMessageResponses {
   }
 
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
+
+  //ibc-transfer
+  case class IBCClientHeight(revision_number: String, revision_height: String) {
+    def toSerializableIBCClientHeight: TransactionMessages.IBCClientHeight = TransactionMessages.IBCClientHeight(revisionNumber = revision_number.toInt, revisionHeight = revision_height.toInt)
+  }
+
+  implicit val ibcClientHeightReads: Reads[IBCClientHeight] = Json.reads[IBCClientHeight]
+
+  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: IBCClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
+  }
+
+  implicit val transferReads: Reads[Transfer] = Json.reads[Transfer]
 
   //Asset
   case class AssetDefine(from: String, fromID: ID, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessageResponse {
@@ -292,6 +305,8 @@ object TransactionMessageResponses {
 
   def msgApply(msgType: String, value: JsObject): Msg = try {
     msgType match {
+      //auth
+      case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => Msg(msgType, utilities.JSON.convertJsonStringToObject[CreateVestingAccount](value.toString))
       //bank
       case constants.Blockchain.TransactionMessage.SEND_COIN => Msg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
       case constants.Blockchain.TransactionMessage.MULTI_SEND => Msg(msgType, utilities.JSON.convertJsonStringToObject[MultiSend](value.toString))
@@ -316,6 +331,8 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.DELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Delegate](value.toString))
       case constants.Blockchain.TransactionMessage.REDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
       case constants.Blockchain.TransactionMessage.UNDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
+      //ibc-transfer
+      case constants.Blockchain.TransactionMessage.TRANSFER => Msg(msgType, utilities.JSON.convertJsonStringToObject[Transfer](value.toString))
       //asset
       case constants.Blockchain.TransactionMessage.ASSET_DEFINE => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MINT => Msg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))

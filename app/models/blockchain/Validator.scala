@@ -158,6 +158,8 @@ class Validators @Inject()(
     }
   }
 
+  private def getAllVotingPowers: Future[Seq[String]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONED).map(_.tokens).result)
+
   private[models] class ValidatorTable(tag: Tag) extends Table[ValidatorSerialized](tag, "Validator") {
 
     def * = (operatorAddress, hexAddress, consensusPublicKey, jailed, status, tokens, delegatorShares, description, unbondingHeight, unbondingTime, commission, minimumSelfDelegation, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorSerialized.tupled, ValidatorSerialized.unapply)
@@ -237,6 +239,8 @@ class Validators @Inject()(
     def jailValidator(operatorAddress: String): Future[Int] = updateJailedStatus(operatorAddress = operatorAddress, jailed = true)
 
     def delete(operatorAddress: String): Future[Int] = deleteByOperatorAddress(operatorAddress)
+
+    def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
   }
 
   object Utility {

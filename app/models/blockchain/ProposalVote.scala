@@ -2,11 +2,13 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
+import models.common.TransactionMessages.Vote
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.blockchain.GetProposalVote
 import queries.responses.blockchain.ProposalVoteResponse.{Response => ProposalVoteResponse}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -14,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ProposalVote(proposalID: String, voter: String, option: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ProposalVote(proposalID: Int, voter: String, option: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class ProposalVotes @Inject()(
@@ -36,7 +38,7 @@ class ProposalVotes @Inject()(
 
   private[models] val proposalVoteTable = TableQuery[ProposalVoteTable]
 
-  private def add(proposalVote: ProposalVote): Future[String] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
+  private def add(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -50,22 +52,22 @@ class ProposalVotes @Inject()(
     }
   }
 
-  private def tryGetByID(proposalID: String): Future[ProposalVote] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.head.asTry).map {
+  private def tryGetByID(proposalID: Int): Future[ProposalVote] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def getByID(proposalID: String): Future[Option[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.headOption)
+  private def getByID(proposalID: Int): Future[Option[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.headOption)
 
   private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote_BC") {
 
     def * = (proposalID, voter, option, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalVote.tupled, ProposalVote.unapply)
 
-    def proposalID = column[String]("proposalID", O.PrimaryKey)
+    def proposalID = column[Int]("proposalID", O.PrimaryKey)
 
-    def voter = column[String]("voter")
+    def voter = column[String]("voter", O.PrimaryKey)
 
     def option = column[String]("option")
 
@@ -84,14 +86,24 @@ class ProposalVotes @Inject()(
 
   object Service {
 
-    def tryGet(proposalID: String): Future[ProposalVote] = tryGetByID(proposalID)
+    def tryGet(proposalID: Int): Future[ProposalVote] = tryGetByID(proposalID)
 
     def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
 
-    def get(proposalID: String): Future[Option[ProposalVote]] = getByID(proposalID)
+    def get(proposalID: Int): Future[Option[ProposalVote]] = getByID(proposalID)
   }
 
   object Utility {
+
+    def onVote(vote: Vote)(implicit blockHeader: Header): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(ProposalVote(proposalID = vote.proposalID, voter = vote.voter, option = vote.option))
+
+      (for {
+        _ <- upsert
+      } yield ()).recover {
+        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
 
     def insertOrUpdateProposal(proposalID: String, address: String): Future[Unit] = {
       val proposalVoteResponse = getProposalVote.Service.get(id = proposalID, address = address)
@@ -102,7 +114,7 @@ class ProposalVotes @Inject()(
         proposalVoteResponse <- proposalVoteResponse
         _ <- upsert(proposalVoteResponse)
       } yield ()).recover {
-        case _: BaseException => Future()
+        case baseException: BaseException => throw baseException
       }
     }
   }

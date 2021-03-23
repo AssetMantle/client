@@ -21,6 +21,7 @@ object TransactionMessages {
 
   implicit val createVestingAccountWrites: OWrites[CreateVestingAccount] = Json.writes[CreateVestingAccount]
 
+  //bank
   case class Input(address: String, coins: Seq[Coin])
 
   implicit val inputReads: Reads[Input] = Json.reads[Input]
@@ -39,7 +40,6 @@ object TransactionMessages {
 
   implicit val multiSendWrites: OWrites[MultiSend] = Json.writes[MultiSend]
 
-  //bank
   case class SendCoin(fromAddress: String, toAddress: String, amount: Seq[Coin]) extends TransactionMessage
 
   implicit val sendCoinReads: Reads[SendCoin] = Json.reads[SendCoin]
@@ -92,7 +92,7 @@ object TransactionMessages {
   implicit val submitEvidenceWrites: OWrites[SubmitEvidence] = Json.writes[SubmitEvidence]
 
   //gov
-  case class Deposit(proposalID: String, depositor: String, amount: Seq[Coin]) extends TransactionMessage
+  case class Deposit(proposalID: Int, depositor: String, amount: Seq[Coin]) extends TransactionMessage
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
@@ -104,7 +104,7 @@ object TransactionMessages {
 
   implicit val submitProposalWrites: OWrites[SubmitProposal] = Json.writes[SubmitProposal]
 
-  case class Vote(proposalID: String, voter: String, option: String) extends TransactionMessage
+  case class Vote(proposalID: Int, voter: String, option: String) extends TransactionMessage
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
@@ -147,6 +147,20 @@ object TransactionMessages {
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
   implicit val undelegateWrites: OWrites[Undelegate] = Json.writes[Undelegate]
+
+  //ibc-transfer
+
+  case class IBCClientHeight(revisionNumber: Int, revisionHeight: Int)
+
+  implicit val ibcClientHeightReads: Reads[IBCClientHeight] = Json.reads[IBCClientHeight]
+
+  implicit val ibcClientHeightWrites: OWrites[IBCClientHeight] = Json.writes[IBCClientHeight]
+
+  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: IBCClientHeight, timeoutTimestamp: String) extends TransactionMessage
+
+  implicit val transferReads: Reads[Transfer] = Json.reads[Transfer]
+
+  implicit val transferWrites: OWrites[Transfer] = Json.writes[Transfer]
 
   //Asset
   case class AssetDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
@@ -296,6 +310,8 @@ object TransactionMessages {
     case vote: Vote => Json.toJson(vote)
     //slashing
     case unjail: Unjail => Json.toJson(unjail)
+    //ibc-transfer
+    case transfer: Transfer => Json.toJson(transfer)
     //asset
     case assetDefine: AssetDefine => Json.toJson(assetDefine)
     case assetMint: AssetMint => Json.toJson(assetMint)
@@ -351,6 +367,8 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.DELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Delegate](value.toString))
       case constants.Blockchain.TransactionMessage.REDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
       case constants.Blockchain.TransactionMessage.UNDELEGATE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
+      //ibc-transfer
+      case constants.Blockchain.TransactionMessage.TRANSFER => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Transfer](value.toString))
       //asset
       case constants.Blockchain.TransactionMessage.ASSET_DEFINE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetDefine](value.toString))
       case constants.Blockchain.TransactionMessage.ASSET_MINT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[AssetMint](value.toString))
