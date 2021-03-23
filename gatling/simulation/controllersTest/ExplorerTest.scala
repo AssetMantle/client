@@ -10,7 +10,7 @@ class ExplorerTest extends Simulation {
   val scenarioBuilder: ScenarioBuilder =  scenario("Explorer")
       .exec(explorerTest.testScenario)
     .exec(explorerTest.testScenario)
-  setUp(scenarioBuilder.inject(rampUsers(250) during(10))).protocols(http.baseUrl(Test.BASE_URL).inferHtmlResources())
+  setUp(scenarioBuilder.inject(atOnceUsers(250))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object explorerTest {
@@ -25,11 +25,9 @@ object explorerTest {
           http("Latest Block Height").get(routes.ComponentViewController.latestBlockHeight().url),
           http("Token Statistics").get(routes.ComponentViewController.tokensStatistics().url),
           http("Token Prices").get(routes.ComponentViewController.tokensPrices().url),
-          http("Recent Activities").get(routes.ComponentViewController.recentActivities().url)
-          .resources(
-            http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
-          ),
-          http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
+          http("Recent Activities").get(routes.ComponentViewController.recentActivities().url),
+          http("Voting Powers").get(routes.ComponentViewController.votingPowers().url),
+          http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
         )
     )
     .pause(pauseBetweenRequests)
@@ -39,15 +37,11 @@ object explorerTest {
         http("Get Javascript Routes").get(routes.JavaScriptRoutesController.javascriptRoutes().url),
         http("Latest Block Height").get(routes.ComponentViewController.latestBlockHeight().url),
         http("Token Statistics").get(routes.ComponentViewController.tokensStatistics().url),
-        http("Block List").get(routes.ComponentViewController.blockList().url)
-        .resources(
-          http("Block List Page 1").get(routes.ComponentViewController.blockListPage(1).url)
-        ),
-        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url)
-          .resources(
-            http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
-          ),
-        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
+        http("Block List").get(routes.ComponentViewController.blockList().url),
+        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url),
+        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url),
+        http("Block List Page 1").get(routes.ComponentViewController.blockListPage(1).url),
+        http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
       )
     )
     .pause(pauseBetweenRequests)
@@ -57,15 +51,11 @@ object explorerTest {
         http("Get Javascript Routes").get(routes.JavaScriptRoutesController.javascriptRoutes().url),
         http("Latest Block Height").get(routes.ComponentViewController.latestBlockHeight().url),
         http("Token Statistics").get(routes.ComponentViewController.tokensStatistics().url),
-        http("Transaction List").get(routes.ComponentViewController.transactionList().url)
-          .resources(
-            http("Transaction List Page 1").get(routes.ComponentViewController.transactionListPage(1).url)
-          ),
-        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url)
-          .resources(
-            http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
-          ),
-        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
+        http("Transaction List").get(routes.ComponentViewController.transactionList().url),
+        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url),
+        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url),
+        http("Transaction List Page 1").get(routes.ComponentViewController.transactionListPage(1).url),
+        http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
       )
     )
     .pause(pauseBetweenRequests)
@@ -75,16 +65,12 @@ object explorerTest {
         http("Get Javascript Routes").get(routes.JavaScriptRoutesController.javascriptRoutes().url),
         http("Latest Block Height").get(routes.ComponentViewController.latestBlockHeight().url),
         http("Token Statistics").get(routes.ComponentViewController.tokensStatistics().url),
-        http("Validator List").get(routes.ComponentViewController.validatorList().url)
-          .resources(
-            http("Active Validators List").get(routes.ComponentViewController.activeValidatorList().url),
-            http("Inactive Validators List").get(routes.ComponentViewController.inactiveValidatorList().url)
-          ),
-        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url)
-          .resources(
-            http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
-          ),
-        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
+        http("Validator List").get(routes.ComponentViewController.validatorList().url),
+        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url),
+        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url),
+        http("Active Validators List").get(routes.ComponentViewController.activeValidatorList().url),
+        http("Inactive Validators List").get(routes.ComponentViewController.inactiveValidatorList().url),
+        http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
       )
     )
     .pause(pauseBetweenRequests)
@@ -95,11 +81,9 @@ object explorerTest {
         http("Latest Block Height").get(routes.ComponentViewController.latestBlockHeight().url),
         http("Token Statistics").get(routes.ComponentViewController.tokensStatistics().url),
         http("Token Prices").get(routes.ComponentViewController.tokensPrices().url),
-        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url)
-          .resources(
-            http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
-          ),
-        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url)
+        http("Recent Activities").get(routes.ComponentViewController.recentActivities().url),
+        http("Voting Powers").get(routes.ComponentViewController.votingPowers().url),
+        http("Recent Activities Messages").get(routes.NotificationController.recentActivityMessages(1).url)
       )
     )
     .pause(pauseBetweenRequests)
