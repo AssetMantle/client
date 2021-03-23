@@ -80,12 +80,6 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetHeights(range: Seq[Int]): Future[Seq[Int]] = db.run(blockTable.map(_.height).filter(_.inSet(range)).result)
-
-  private def getBlocksForPageNumber(offset: Int, limit: Int): Future[Seq[BlockSerialized]] = db.run(blockTable.drop(offset).take(limit).sortBy(_.time.desc).result)
-
-  private def getBlocksByLastN(offset: Int): Future[Seq[BlockSerialized]] = db.run(blockTable.drop(offset).result)
-
   private def getBlocksByHeightRange(heightRange:Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet(heightRange)).sortBy(_.time.desc).result)
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") {
