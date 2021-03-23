@@ -63,6 +63,8 @@ class Delegations @Inject()(
 
   private def getAllByValidatorAddress(validatorAddress: String): Future[Seq[Delegation]] = db.run(delegationTable.filter(_.validatorAddress === validatorAddress).result)
 
+  private def getByDelegatorAndValidatorAddress(delegatorAddress: String, validatorAddress: String): Future[Option[Delegation]] = db.run(delegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).result.headOption)
+
   private def deleteByAddress(delegatorAddress: String, validatorAddress: String): Future[Int] = db.run(delegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -106,6 +108,8 @@ class Delegations @Inject()(
 
     def getAllForValidator(operatorAddress: String): Future[Seq[Delegation]] = getAllByValidatorAddress(operatorAddress)
 
+    def get(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = getByDelegatorAndValidatorAddress(delegatorAddress = delegatorAddress, validatorAddress = operatorAddress)
+
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
   }
@@ -121,7 +125,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
@@ -134,7 +138,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => if (baseException.failure.message.matches(responseErrorDelegationNotFound)) {
           val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)

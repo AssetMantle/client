@@ -10,6 +10,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -201,7 +202,7 @@ class Orders @Inject()(
       }
     }
 
-    def onMake(orderMake: OrderMake, blockHeight: Int): Future[Unit] = {
+    def onMake(orderMake: OrderMake)(implicit header: Header): Future[Unit] = {
       val transferAuxiliary = blockchainSplits.Utility.auxiliaryTransfer(fromID = orderMake.fromID, toID = constants.Blockchain.Modules.Orders, ownableID = orderMake.makerOwnableID, splitValue = orderMake.makerOwnableSplit)
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderMake.immutableMetaProperties.metaPropertyList)
 
@@ -221,7 +222,7 @@ class Orders @Inject()(
 
       def scrubMutableMetaProperties(makerOwnableSplit: BigDecimal) = {
         val mutableMetaProperties = orderMake.mutableMetaProperties.metaPropertyList ++ Seq(
-          MetaProperty(constants.Blockchain.Properties.Expiry, MetaFact(Data(constants.Blockchain.DataType.HEIGHT_DATA, HeightDataValue(orderMake.expiresIn + blockHeight)))),
+          MetaProperty(constants.Blockchain.Properties.Expiry, MetaFact(Data(constants.Blockchain.DataType.HEIGHT_DATA, HeightDataValue(orderMake.expiresIn + header.height)))),
           MetaProperty(constants.Blockchain.Properties.MakerOwnableSplit, MetaFact(Data(constants.Blockchain.DataType.DEC_DATA, DecDataValue(makerOwnableSplit)))))
 
         val scrub = blockchainMetas.Utility.auxiliaryScrub(mutableMetaProperties)

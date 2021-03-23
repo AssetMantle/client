@@ -397,6 +397,7 @@ DELEGATOR_SHARES=Delegator Shares
 SEND_COIN=Send Coin
 NUMBER_OF_TRANSACTIONS=Num. of Txs.
 TOKENS_PRICE=Tokens Price
+BOND_STATUS_UNBONDING = UnBonding
 NO_BLOCK_TRANSACTIONS=No Transaction in the Block {0}.
 NEXT=Next
 BACK=Back

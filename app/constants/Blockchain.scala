@@ -45,6 +45,30 @@ object Blockchain {
     val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
     val SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"
     val CANCEL_SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"
+
+    object Status {
+      val UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED"
+      val DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
+      val VOTING_PERIOD = "PROPOSAL_STATUS_VOTING_PERIOD"
+      val PASSED = "PROPOSAL_STATUS_PASSED"
+      val REJECTED = "PROPOSAL_STATUS_REJECTED"
+      val FAILED = "PROPOSAL_STATUS_FAILED"
+    }
+
+  }
+
+  object ParameterType {
+    val AUTH = "auth"
+    val BANK = "bank"
+    val CRISIS = "crisis"
+    val DISTRIBUTION = "distribution"
+    val GOVERNANCE = "gov"
+    val HALVING = "halving"
+    val IBC = "ibc"
+    val MINT = "mint"
+    val SLASHING = "slashing"
+    val STAKING = "staking"
+    val TRANSFER = "transfer"
   }
 
   object Account {
@@ -59,14 +83,6 @@ object Blockchain {
     val BONED = "BOND_STATUS_BONDED"
     val UNBONDED = "BOND_STATUS_UNBONDED"
     val UNBONDING = "BOND_STATUS_UNBONDING"
-  }
-
-  object ParameterType {
-    val STAKING = "STAKING"
-    val SLASHING = "SLASHING"
-    val MINTING = "MINTING"
-    val DISTRIBUTION = "DISTRIBUTION"
-    val GOVERNANCE = "GOVERNANCE"
   }
 
   object Event {
@@ -146,6 +162,11 @@ object Blockchain {
       val CompletionTime = "completion_time"
     }
 
+  }
+
+  object Tendermint {
+    val DuplicateVoteEvidence = "tendermint/DuplicateVoteEvidence"
+    val LightClientAttackEvidence = "tendermint/LightClientAttackEvidence"
   }
 
   object Properties {

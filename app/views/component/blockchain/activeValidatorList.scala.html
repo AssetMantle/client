@@ -22,7 +22,7 @@
                         <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
                     </td>
                     <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
-                    <td>@validator.commission.commissionRates.rate.toString %</td>
+                    <td>@((validator.commission.commissionRates.rate*100).toString()) %</td>
                 </tr>
             }
         </tbody>

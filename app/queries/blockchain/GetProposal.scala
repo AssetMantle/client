@@ -28,7 +28,7 @@ class GetProposal @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   object Service {
 
-    def get(id: String): Future[Response] = action(id).recover {
+    def get(id: Int): Future[Response] = action(id.toString).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
   }
