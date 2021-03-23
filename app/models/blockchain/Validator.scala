@@ -12,6 +12,7 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import models.common.PublicKeys._
 import queries.blockchain.{GetBondedValidators, GetValidator}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
@@ -20,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: Description, unbondingHeight: String, unbondingTime: String, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: Description, unbondingHeight: Int, unbondingTime: String, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
   def getTokensFromShares(shares: BigDecimal): MicroNumber = MicroNumber(((shares * BigDecimal(tokens.value)) / delegatorShares).toBigInt())
 
@@ -68,7 +69,7 @@ class Validators @Inject()(
 
   private[models] val validatorTable = TableQuery[ValidatorTable]
 
-  case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: String, unbondingTime: String, commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: Int, unbondingTime: String, commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = utilities.JSON.convertJsonStringToObject[PublicKey](consensusPublicKey), status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[Description](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -142,7 +143,7 @@ class Validators @Inject()(
 
   private def getAllValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.result)
 
-  private def getAllActiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
+  private def getValidatorsByStatus(status: String): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === status).result)
 
   private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
 
@@ -180,7 +181,7 @@ class Validators @Inject()(
 
     def description = column[String]("description")
 
-    def unbondingHeight = column[String]("unbondingHeight")
+    def unbondingHeight = column[Int]("unbondingHeight")
 
     def unbondingTime = column[String]("unbondingTime")
 
@@ -228,9 +229,13 @@ class Validators @Inject()(
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
 
-    def getAllActiveValidatorList: Future[Seq[Validator]] = getAllActiveValidators.map(_.map(_.deserialize))
+    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONED).map(_.map(_.deserialize))
 
     def getAllInactiveValidatorList: Future[Seq[Validator]] = getAllInactiveValidators.map(_.map(_.deserialize))
+
+    def getAllUnbondingValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDING).map(_.map(_.deserialize))
+
+    def getAllUnbondedValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDED).map(_.map(_.deserialize))
 
     def getByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[Validator]] = getValidatorsByOperatorAddresses(operatorAddresses).map(_.map(_.deserialize))
 
@@ -301,15 +306,15 @@ class Validators @Inject()(
 
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
-      val accountBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegate.delegatorAddress)
+      val accountBalance = blockchainBalances.Utility.subtractCoinsFromAccount(delegate.delegatorAddress, Seq(delegate.amount))
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
-      val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
+      val withdrawRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 
       (for {
         _ <- updateValidator
         _ <- accountBalance
         _ <- insertDelegation
-        _ <- withdrawAddressBalanceUpdate
+        _ <- withdrawRewards
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
@@ -328,13 +333,10 @@ class Validators @Inject()(
 
     def onWithdrawValidatorCommission(withdrawValidatorCommission: WithdrawValidatorCommission): Future[Unit] = {
       val accountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.validatorAddress)
-      //TODO
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(accountAddress)
-      val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(accountAddress)
 
       (for {
         _ <- withdrawBalance
-        _ <- updateAccountBalance
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
@@ -354,7 +356,34 @@ class Validators @Inject()(
       }
     }
 
-    //TODO Can be optimized whenever called
+    def onNewBlock(header: Header): Future[Unit] = {
+      val unbondingValidators = Service.getAllUnbondingValidatorList
+
+      def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
+        if (header.height >= unbondingValidator.unbondingHeight && utilities.Date.isMature(header.time, unbondingValidator.unbondingTime)) {
+          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
+          val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Bech32.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
+
+          for {
+            _ <- updateOrDeleteValidator
+            _ <- withdrawValidatorRewards
+          } yield ()
+
+        } else Future()
+      })
+
+      // Unbonding delegations updated in separate onNewBlock of Undelegations table
+
+      (for {
+        unbondingValidators <- unbondingValidators
+        _ <- checkAndUpdateUnbondingValidators(unbondingValidators)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
+    //TODO Can be optimized whenever called?
     def updateActiveValidatorSet(): Future[Unit] = {
       val explorerAllActiveValidators = Service.getAllActiveValidatorList.map(_.map(_.operatorAddress))
       val bcAllActiveValidators = getBondedValidators.Service.get().map(_.validators.map(_.operator_address))

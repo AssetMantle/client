@@ -359,7 +359,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Validator"
     "tokens"                VARCHAR NOT NULL,
     "delegatorShares"       NUMERIC NOT NULL,
     "description"           VARCHAR NOT NULL,
-    "unbondingHeight"       VARCHAR NOT NULL,
+    "unbondingHeight"       INTEGER NOT NULL,
     "unbondingTime"         VARCHAR NOT NULL,
     "commission"            VARCHAR NOT NULL,
     "minimumSelfDelegation" VARCHAR NOT NULL,

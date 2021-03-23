@@ -20,7 +20,7 @@ class GetHalving @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "halving/parameters"
+  private val path = "persistence/halving/v1beta1/params"
 
   private val url = ip + ":" + port + "/" + path
 

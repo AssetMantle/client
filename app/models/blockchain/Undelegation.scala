@@ -154,20 +154,15 @@ class Undelegations @Inject()(
       }
     }
 
-    def onNewBlock(blockTime: String): Future[Unit] = {
-      val allUndelegations = Service.getAll
+    def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
+      val unbondingResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
-      def checkAndDelete(allUndelegations: Seq[Undelegation]) = Future.traverse(allUndelegations) { undelegation =>
-        val updatedUndelegation = undelegation.copy(entries = undelegation.entries.filterNot(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
-        val update = if (updatedUndelegation.entries.nonEmpty) Service.insertOrUpdate(updatedUndelegation) else Service.delete(delegatorAddress = updatedUndelegation.delegatorAddress, validatorAddress = updatedUndelegation.validatorAddress)
-        for {
-          _ <- update
-        } yield ()
-      }
+      def checkAndDelete(unbondingResponse: ValidatorDelegatorUndelegationResponse) = if (unbondingResponse.unbond.entries.nonEmpty) Service.insertOrUpdate(unbondingResponse.unbond.toUndelegation)
+      else Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
       (for {
-        allUndelegations <- allUndelegations
-        _ <- checkAndDelete(allUndelegations)
+        unbondingResponse <- unbondingResponse
+        _ <- checkAndDelete(unbondingResponse)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
@@ -194,6 +189,8 @@ class Undelegations @Inject()(
       if (delegation.validatorAddress == validator.operatorAddress && delegation.shares >= shares) {
         val isDelegatorValidator = utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress) == delegation.delegatorAddress
 
+        val withdrawDelegatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(delegation.delegatorAddress)
+
         val jailValidator = if (isDelegatorValidator && !validator.jailed && validator.getTokensFromShares(delegation.shares) < validator.minimumSelfDelegation) {
           blockchainValidators.Service.jailValidator(validator.operatorAddress)
         } else Future(0)
@@ -202,14 +199,19 @@ class Undelegations @Inject()(
         else blockchainDelegations.Service.insertOrUpdate(delegation.copy(shares = delegation.shares - shares))
 
         val (updatedValidator, removedTokens) = validator.removeDelegatorShares(shares)
+        val deleteValidator = updatedValidator.delegatorShares == 0 && validator.isUnbonded
 
-        val deleteOrUpdateValidator = if (updatedValidator.delegatorShares == 0 && validator.isUnbonded) blockchainValidators.Service.delete(validator.operatorAddress)
+        val deleteOrUpdateValidator = if (deleteValidator) blockchainValidators.Service.delete(validator.operatorAddress)
         else blockchainValidators.Service.insertOrUpdate(updatedValidator)
 
+        val withdrawValidatorRewards = if (deleteValidator) blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Bech32.convertOperatorAddressToAccountAddress(delegation.validatorAddress)) else Future()
+
         (for {
+          _ <- withdrawDelegatorRewards
           _ <- jailValidator
           _ <- updateOrDeleteDelegation
           _ <- deleteOrUpdateValidator
+          _ <- withdrawValidatorRewards
         } yield removedTokens).recover {
           case baseException: BaseException => throw baseException
         }

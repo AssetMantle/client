@@ -183,7 +183,7 @@ class Parameters @Inject()(
             val halvingResponse = getHalvingParams.Service.get()
             for {
               halvingResponse <- halvingResponse
-            } yield halvingResponse.result.toParameter
+            } yield halvingResponse.params.toParameter
           case constants.Blockchain.ParameterType.MINT =>
             val mintResponse = getMintParams.Service.get()
             for {

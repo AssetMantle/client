@@ -7,13 +7,13 @@ import transactions.Abstract.BaseResponse
 
 object HalvingResponse {
 
-  case class Result(blockHeight: String) {
+  case class Params(blockHeight: String) {
     def toParameter: Parameter = HalvingParameter(blockHeight = blockHeight.toInt)
   }
 
-  implicit val resultReads: Reads[Result] = Json.reads[Result]
+  implicit val paramsReads: Reads[Params] = Json.reads[Params]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(params: Params) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

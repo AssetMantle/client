@@ -38,29 +38,27 @@ object Validator {
       tokens = tokens,
       delegatorShares = delegator_shares,
       description = description.toValidatorDescription,
-      unbondingHeight = unbonding_height,
+      unbondingHeight = unbonding_height.toInt,
       unbondingTime = unbonding_time,
       commission = commission.toCommission,
       minimumSelfDelegation = MicroNumber(min_self_delegation))
   }
 
-  implicit val resultReads: Reads[Result] = Json.reads[Result]
+  def resultApply(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: String, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String): Result = Result(
+    operator_address = operator_address, consensus_pubkey = consensus_pubkey, jailed = jailed, status = status, tokens = new MicroNumber(BigInt(tokens)), delegator_shares = delegator_shares, description = description, unbonding_height = unbonding_height, unbonding_time = unbonding_time, commission = commission, min_self_delegation = min_self_delegation)
 
-  //  def resultApply(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: String, delegator_shares: BigDecimal, description: Description, unbonding_height: Option[String], unbonding_time: Option[String], commission: Commission, min_self_delegation: String): Result = Result(
-  //    operator_address = operator_address, consensus_pubkey, jailed, status, new MicroNumber(BigInt(tokens)), delegator_shares, description, unbonding_height.flatMap(x => Option(x.toInt)), unbonding_time, commission, min_self_delegation)
-  //
-  //  implicit val resultReads: Reads[Result] = (
-  //    (JsPath \ "operator_address").read[String] and
-  //      (JsPath \ "consensus_pubkey").read[PublicKey] and
-  //      (JsPath \ "jailed").read[Boolean] and
-  //      (JsPath \ "status").read[String] and
-  //      (JsPath \ "tokens").read[String] and
-  //      (JsPath \ "delegator_shares").read[BigDecimal] and
-  //      (JsPath \ "description").read[Description] and
-  //      (JsPath \ "unbonding_height").readNullable[String] and
-  //      (JsPath \ "unbonding_time").readNullable[String] and
-  //      (JsPath \ "commission").read[Commission] and
-  //      (JsPath \ "min_self_delegation").read[String]
-  //    ) (resultApply _)
+  implicit val resultReads: Reads[Result] = (
+    (JsPath \ "operator_address").read[String] and
+      (JsPath \ "consensus_pubkey").read[PublicKey] and
+      (JsPath \ "jailed").read[Boolean] and
+      (JsPath \ "status").read[String] and
+      (JsPath \ "tokens").read[String] and
+      (JsPath \ "delegator_shares").read[BigDecimal] and
+      (JsPath \ "description").read[Description] and
+      (JsPath \ "unbonding_height").read[String] and
+      (JsPath \ "unbonding_time").read[String] and
+      (JsPath \ "commission").read[Commission] and
+      (JsPath \ "min_self_delegation").read[String]
+    ) (resultApply _)
 
 }

@@ -29,7 +29,6 @@ class Redelegations @Inject()(
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                configuration: Configuration,
                                getDelegatorRedelegations: GetDelegatorRedelegations,
-                               getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
                                blockchainValidators: Validators,
                                blockchainWithdrawAddresses: WithdrawAddresses,
                                blockchainParameters: Parameters,
@@ -162,20 +161,15 @@ class Redelegations @Inject()(
       }
     }
 
-    def onNewBlock(blockTime: String): Future[Unit] = {
-      val allRedelegations = Service.getAll
+    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String): Future[Unit] = {
+      val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = delegator, sourceValidatorAddress = srcValidator, destinationValidatorAddress = dstValidator)
 
-      def checkAndDelete(allRedelegations: Seq[Redelegation]) = Future.traverse(allRedelegations) { redelegation =>
-        val updatedRedelegation = redelegation.copy(entries = redelegation.entries.filterNot(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
-        val update = if (updatedRedelegation.entries.nonEmpty) Service.insertOrUpdate(updatedRedelegation) else Service.delete(delegatorAddress = updatedRedelegation.delegatorAddress, validatorSourceAddress = updatedRedelegation.validatorSourceAddress, validatorDestinationAddress = updatedRedelegation.validatorDestinationAddress)
-        for {
-          _ <- update
-        } yield ()
-      }
+      def checkAndDelete(redelegationResponse: DelegatorRedelegationsResponse) = if (redelegationResponse.redelegation_responses.nonEmpty) Service.insertOrUpdate(redelegationResponse.redelegation_responses.head.toRedelegation)
+      else Service.delete(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
 
       (for {
-        allRedelegations <- allRedelegations
-        _ <- checkAndDelete(allRedelegations)
+        redelegationResponse <- redelegationResponse
+        _ <- checkAndDelete(redelegationResponse)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

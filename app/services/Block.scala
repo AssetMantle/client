@@ -110,14 +110,16 @@ class Block @Inject()(
 
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnNewBlock(header: Header): Future[Unit] = {
-    val undelegations = blockchainUndelegations.Utility.onNewBlock(header.time)
-    val redelegations = blockchainRedelegations.Utility.onNewBlock(header.time)
+    val validators = blockchainValidators.Utility.onNewBlock(header)
     val halving = blockchainParameters.Utility.onNewBlock(header)
     val tokens = blockchainTokens.Utility.updateAll()
+    // Evidence BeginBlocker is handled via Events
+    // Gov EndBlocker is handled via Events
+    // Slashing BeginBlocker is handled via Events
+    // Staking Unbonding and Redelegation Completion EndBlocker is handled via Events
 
     (for {
-      _ <- undelegations
-      _ <- redelegations
+      _ <- validators
       _ <- halving
       _ <- tokens
     } yield ()
@@ -164,7 +166,7 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
         case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
         case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])
-        case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => Future() // No need to process this as already updating community on every newBlock in checksAndUpdatesOnNewBlock
+        case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => blockchainBalances.Utility.subtractCoinsFromAccount(stdMsg.message.asInstanceOf[FundCommunityPool].depositor, stdMsg.message.asInstanceOf[FundCommunityPool].amount)
         //evidence
         case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Future()
         //gov
@@ -212,7 +214,7 @@ class Block @Inject()(
     }
   }
 
-  def onSlashingEvent(slashingEvents: Seq[Event], height: Int): Future[Unit] = {
+  def onSlashingEvents(slashingEvents: Seq[Event], height: Int): Future[Unit] = {
     val blockResponse = getBlock.Service.get(height)
     val slashingParameter = blockchainParameters.Service.tryGetSlashingParameter
     val slashing = blockchainTokens.Utility.onSlashing
@@ -225,14 +227,22 @@ class Block @Inject()(
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
           val slashingFraction = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
 
-          def evidence = Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)))
+          val slashingInfractionHeight = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
+          else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
-          def slashing(operatorAddress: String, evidence: TendermintEvidence) = slash(validatorAddress = operatorAddress, infractionHeight = evidence.height, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
+          def slashing(operatorAddress: String, slashingInfractionHeight: Int) = {
+            //TODO Check if correct when double signing
+            if (reasonAttribute.value == constants.Blockchain.Event.Attribute.DoubleSign) {
+              println("/////////////////// When double signing slashingInfractionHeight: ")
+              println(slashingInfractionHeight)
+            }
+            slash(validatorAddress = operatorAddress, infractionHeight = slashingInfractionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
+          }
 
           for {
             operatorAddress <- operatorAddress
-            evidence <- evidence
-            _ <- slashing(operatorAddress, evidence)
+            slashingInfractionHeight <- slashingInfractionHeight
+            _ <- slashing(operatorAddress, slashingInfractionHeight)
           } yield (operatorAddress, reasonAttribute.value)
         })
       }
@@ -273,7 +283,7 @@ class Block @Inject()(
     }
   }
 
-  def onMissedBlockEvent(livenessEvents: Seq[Event], height: Int): Future[Unit] = if (livenessEvents.nonEmpty) {
+  def onMissedBlockEvents(livenessEvents: Seq[Event], height: Int): Future[Unit] = if (livenessEvents.nonEmpty) {
 
     val slashingParameter = blockchainParameters.Service.tryGetSlashingParameter
 
@@ -310,7 +320,7 @@ class Block @Inject()(
     }
   } else Future()
 
-  def onProposalEvent(proposalEvents: Seq[Event], height: Int): Future[Seq[Unit]] = utilitiesOperations.traverse(proposalEvents)(event => {
+  def onProposalEvents(proposalEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(proposalEvents)(event => {
     val processInactiveProposal = if (event.`type` == constants.Blockchain.Event.InactiveProposal) {
       val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.toInt)
       val deleteDeposits = blockchainProposalDeposits.Service.deleteByProposalID(proposalID)
@@ -372,6 +382,32 @@ class Block @Inject()(
     }
   })
 
+  def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
+    val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value)
+    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value)
+    val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator) else Future(throw new BaseException(constants.Response.INVALID_UNBONDING_COMPLETION_EVENT))
+    (for {
+      _ <- process
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  })
+
+
+  def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
+    val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value)
+    val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value)
+    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value)
+    val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator) else Future(throw new BaseException(constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT))
+    (for {
+      _ <- process
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  })
+
   private def slash(validatorAddress: String, infractionHeight: Int, currentBlockHeight: Int, currentBlockTIme: String, slashingFraction: BigDecimal) = {
     val validator = blockchainValidators.Service.tryGet(validatorAddress)
 
@@ -383,11 +419,14 @@ class Block @Inject()(
 
       def slashedRedelegation(redelegations: Seq[Redelegation]) = utilitiesOperations.traverse(redelegations)(redelegation => blockchainRedelegations.Utility.slashRedelegation(redelegation, infractionHeight, currentBlockTIme, slashingFraction))
 
+      def updateValidator() = blockchainValidators.Utility.insertOrUpdateValidator(validator.operatorAddress)
+
       for {
         redelegations <- redelegations
         undelegations <- undelegations
-        slashedRedelegationAmount <- slashedRedelegation(redelegations)
-        slashedUndelegationAMount <- slashUndelegations(undelegations)
+        _ <- slashedRedelegation(redelegations)
+        _ <- slashUndelegations(undelegations)
+        _ <- updateValidator()
       } yield ()
     } else Future(MicroNumber.zero)
 

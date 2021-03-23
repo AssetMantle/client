@@ -66,7 +66,7 @@ object GenesisResponse {
 
   object Halving {
 
-    case class Module(params: HalvingResponse.Result)
+    case class Module(params: HalvingResponse.Params)
 
     implicit val moduleReads: Reads[Module] = Json.reads[Module]
   }
