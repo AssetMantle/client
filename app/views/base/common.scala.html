@@ -36,14 +36,15 @@
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/dataTables/dataTables.min.js")" type="text/javascript"></script>
         <style>
-                html{
+                html {
                     background: #20212A !important;
                 }
+
                 body.darkMode, .darkMode .bodyContainer {
                     background-color: #20212A !important;
                 }
 
-                body.lightMode, .lightMode .bodyContainer{
+                body.lightMode, .lightMode .bodyContainer {
                     background-color: #F0F0F0 !important;
                 }
         </style>
@@ -68,30 +69,36 @@
                         </a>
                         <ul class="cmuk-navbar-nav">
 
-                                <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
-                                @commonIcon("dashBoard")
-                                </span>
-                                    @Messages(constants.View.DASHBOARD)
-                                </a>
-                                </li>
-                                <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
-                                @commonIcon("blocks")
-                                </span>
-                                    @Messages(constants.View.BLOCKS)
-                                </a>
-                                </li>
-                                <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
-                                @commonIcon("transactions")
-                                </span>
-                                    @Messages(constants.View.TRANSACTIONS)
-                                </a>
-                                </li>
-                                <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
-                                @commonIcon("validators")
-                                </span>
-                                    @Messages(constants.View.VALIDATORS)
-                                </a>
-                                </li>
+                            <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                            @commonIcon("dashBoard")
+                            </span>
+                                @Messages(constants.View.DASHBOARD)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
+                            @commonIcon("blocks")
+                            </span>
+                                @Messages(constants.View.BLOCKS)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
+                            @commonIcon("transactions")
+                            </span>
+                                @Messages(constants.View.TRANSACTIONS)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
+                            @commonIcon("validators")
+                            </span>
+                                @Messages(constants.View.VALIDATORS)
+                            </a>
+                            </li>
+                            <li><a href="@controllers.routes.ViewController.proposals()" class="navItemRippleEffect"><span class="proposalsIcon">
+                            @commonIcon("proposals")
+                            </span>
+                                @Messages(constants.View.PROPOSALS)
+                            </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="cmuk-navbar-right">
@@ -100,60 +107,61 @@
                         </div>
                         <ul class="cmuk-navbar-nav">
 
-                            @loginState match {
-                                case null => {
-                                    <li>
-                                        <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
-                                            <span class="singUpIcon">@commonIcon("signUp")</span> @Messages(constants.Form.SIGN_UP.legend)
-                                        </a>
+                        @loginState match {
+                            case null => {
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
+                                        <span class="singUpIcon">@commonIcon("signUp")</span>
+                                        @Messages(constants.Form.SIGN_UP.legend)
+                                    </a>
 
-                                    </li>
-                                    <li>
-                                        <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
-                                            <span class="loginIcon">@commonIcon("login")</span>
-                                            @Messages(constants.Form.LOGIN.legend)
-                                        </a>
-                                    </li>
-                                }
-                                case default => {
-                                    <li>
-                                        <a class="navItemRippleEffect">
-                                            @loginState.username
-                                        <span cmuk-icon="user" class="loginIcon"></span>
-                                        </a>
-                                        <div class="cmuk-navbar-dropdown profileDropdown">
-                                            <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                                <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect">
-                                                    @Messages(constants.View.IDENTITY)
-                                                </a>
-                                                </li>
-                                                <li><a href="@controllers.routes.ViewController.asset()" class="navItemRippleEffect">
-                                                    @Messages(constants.View.ASSET)
-                                                </a>
-                                                </li>
-                                                <li><a href="@controllers.routes.ViewController.order()" class="navItemRippleEffect">
-                                                    @Messages(constants.View.ORDER)
-                                                </a>
-                                                </li>
-                                                <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect">
-                                                    @Messages(constants.View.ACCOUNT)
-                                                </a>
-                                                </li>
-                                                <li><a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
-                                                    @Messages(constants.View.PROFILE)
-                                                </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
-                                            <span class="logoutIcon">@commonIcon("logout")</span>
-                                        </a>
-                                    </li>
-
-                                }
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
+                                        <span class="loginIcon">@commonIcon("login")</span>
+                                        @Messages(constants.Form.LOGIN.legend)
+                                    </a>
+                                </li>
                             }
+                            case default => {
+                                <li>
+                                    <a class="navItemRippleEffect">
+                                        @loginState.username
+                                    <span cmuk-icon="user" class="loginIcon"></span>
+                                    </a>
+                                    <div class="cmuk-navbar-dropdown profileDropdown">
+                                        <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
+                                            <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect">
+                                            @Messages(constants.View.IDENTITY)
+                                            </a>
+                                            </li>
+                                            <li><a href="@controllers.routes.ViewController.asset()" class="navItemRippleEffect">
+                                            @Messages(constants.View.ASSET)
+                                            </a>
+                                            </li>
+                                            <li><a href="@controllers.routes.ViewController.order()" class="navItemRippleEffect">
+                                            @Messages(constants.View.ORDER)
+                                            </a>
+                                            </li>
+                                            <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect">
+                                            @Messages(constants.View.ACCOUNT)
+                                            </a>
+                                            </li>
+                                            <li><a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
+                                            @Messages(constants.View.PROFILE)
+                                            </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li>
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
+                                        <span class="logoutIcon">@commonIcon("logout")</span>
+                                    </a>
+                                </li>
+
+                            }
+                        }
                         </ul>
                     </div>
                 </div>
@@ -257,12 +265,12 @@
                 <div>@Messages(constants.View.CONNECTION_ERROR)</div>
             </div>
         </div>
-            <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
-                <div class="connectionError">
-                    <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
-                    <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
-                </div>
+        <div class = "modal centerScreen hidden" id="blockchainConnectionLost">
+            <div class="connectionError">
+                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)"/>
+                <div>@Messages(constants.View.BLOCKCHAIN_CONNECTION_LOST)</div>
             </div>
+        </div>
         </div>
             @* Footer *@
         <div class="footer">
@@ -270,7 +278,7 @@
                 <div>
                     <div class="footerLogo">
                         <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
-                        <button type="button" name="dark_light"  class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
+                        <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
                             <span class="dayMode">
                             @commonIcon("dayMode")
                             </span>

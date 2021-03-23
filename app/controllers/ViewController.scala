@@ -120,6 +120,17 @@ class ViewController @Inject()(
       }
   }
 
+  def proposals(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      loginState match {
+        case Some(loginState) => {
+          implicit val loginStateImplicit: LoginState = loginState
+          withUsernameToken.Ok(views.html.proposals())
+        }
+        case None => Future(Ok(views.html.proposals()))
+      }
+  }
+
   def dashboard: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
