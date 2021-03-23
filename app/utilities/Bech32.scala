@@ -2,6 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import play.api.Logger
+import utilities.KeyGenerator.BouncyHash
 
 import java.security.MessageDigest
 import java.util.Base64
@@ -36,6 +37,14 @@ object Bech32 {
       .slice(0, 20)
       .map("%02x".format(_))
       .mkString.toUpperCase
+  }
+
+  def convertAccountPublicKeyToBech32(pubkey: String): String = {
+    encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))))) match {
+      case Success(address) => address
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
+    }
   }
 
   def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = constants.Blockchain.ValidatorPrefix): String = {
