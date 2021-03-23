@@ -33,13 +33,27 @@ body .cmuk-table td {
   font-weight: 400;
   color: #272931; }
 
-#blockList_NEXT, #transactionList_NEXT, #transactionList_BACK, #blockList_BACK, #validatorTransactions_NEXT, #validatorTransactions_BACK {
+#blockList_NEXT,
+#transactionList_NEXT,
+#transactionList_BACK,
+#blockList_BACK,
+#validatorTransactions_NEXT,
+#validatorTransactions_BACK,
+#accountTransactions_NEXT, #accountTransactions_BACK {
   margin-bottom: 10px;
   margin-left: 10px; }
 
 #validatorDetails {
   height: 250px;
   overflow: hidden; }
+  #validatorDetails .cmuk-height-medium {
+    height: 210px;
+    padding-top: 20px;
+    padding-bottom: 20px; }
+  #validatorDetails img {
+    width: 25px;
+    height: auto;
+    margin-left: 15px; }
 
 #validatorUptime {
   height: 100%; }
@@ -1000,6 +1014,15 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   margin-right: 15px;
   border-radius: 4px;
   padding-left: 10px; }
+.comdex table.dataTable tbody td.blockHeightItem {
+  display: flex; }
+  .comdex table.dataTable tbody td.blockHeightItem img {
+    width: 25px;
+    height: auto;
+    float: left;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px; }
 .comdex table.dataTable tbody th, .comdex table.dataTable tbody td {
   padding: 16px 12px;
   font-weight: 400;
@@ -2422,6 +2445,9 @@ header:before,
 
 #validatorList .cmuk-subnav {
   padding: 15px; }
+
+#validatorList .cmuk-switcher {
+  overflow-x: scroll; }
 
 .recentActivityContainer {
   height: 50%; }
