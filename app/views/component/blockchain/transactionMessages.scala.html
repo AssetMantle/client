@@ -43,6 +43,15 @@
                 case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => {
                     @views.html.component.blockchain.txMessages.withdrawValidatorCommission(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.DEPOSIT => {
+                    @views.html.component.blockchain.txMessages.deposit(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.VOTE => {
+                    @views.html.component.blockchain.txMessages.vote(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => {
+                    @views.html.component.blockchain.txMessages.submitProposal(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.ASSET_DEFINE => {
                     @views.html.component.blockchain.txMessages.assetDefine(msg.message)
                 }

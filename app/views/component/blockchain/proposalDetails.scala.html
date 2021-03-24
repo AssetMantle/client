@@ -1,0 +1,22 @@
+@import views.html.base._
+
+@import models.blockchain.Proposal
+@(proposal: Proposal)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.PROPOSAL) {
+} {
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.ID, proposal.id.toString)
+        @commonTextInfo(constants.View.TITLE, proposal.content.title)
+        @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
+        @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
+        @commonTextInfo(constants.View.STATUS, proposal.status)
+        @commonTextInfo(constants.View.ID, proposal.finalTallyResult.toString)
+        @commonTextInfo(constants.View.ID, proposal.submitTime)
+        @commonTextInfo(constants.View.ID, proposal.depositEndTime)
+        @commonTextInfo(constants.View.ID, proposal.totalDeposit.toString)
+        @commonTextInfo(constants.View.ID, proposal.votingStartTime)
+        @commonTextInfo(constants.View.ID, proposal.votingEndTime)
+    }
+
+}
