@@ -2659,7 +2659,7 @@ header:before,
     }
     .docIcon {
       background: #FFFFFF;
-      border: 0.411524px solid #EAEAEA;
+      width:20px;
       box-sizing: border-box;
       padding: 2px 0 5px 5px;
       border-radius: 1.6461px;
@@ -2694,9 +2694,15 @@ header:before,
         td:first-child{
           padding-left: 15px;
           color: #636363;
+          display: flex;
+          align-items: center;
           font-size: $paragraphFontSizeMedium;
           a{
             color: #262525;
+            white-space: nowrap;
+            width: 185px;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
         td:last-child{
@@ -2704,6 +2710,7 @@ header:before,
         }
       }
     }
+
     .contractBox{
       padding: 10px;
       display: flex;
@@ -3575,4 +3582,7 @@ figure.zoom {
       }
     }
   }
+}
+.fiat-proof p{
+  width: auto!important;
 }

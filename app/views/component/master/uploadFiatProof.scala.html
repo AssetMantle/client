@@ -2,10 +2,10 @@
 @import views.html.base._
 @import controllers.actions.LoginState
 
-@(negotiationID:String, fiatProofFile: Option[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(negotiationID: String, fiatProofFile: Option[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@fiatProofFile match{
-    case Some(negotiationFile)=>{
+@fiatProofFile match {
+    case Some(negotiationFile) => {
         @component.master.commonDocumentViewer(negotiationFile) {
             @routes.FileController.tradingFile(negotiationFile.id, negotiationFile.fileName, negotiationFile.documentType)
         } {
@@ -21,9 +21,17 @@
         }
         @commonJavascriptButton(constants.View.NEXT, JavaScript(s"""getForm(jsRoutes.controllers.OrderController.buyerExecuteForm('${negotiationID}'))"""))
     }
-    case None=>{
+    case None => {
         <div id='@Seq("UPLOAD", constants.File.Negotiation.FIAT_PROOF).mkString("_")' class="cmuk-text-left documentContainer">
-            <p>@Messages(constants.File.Negotiation.FIAT_PROOF)</p>@commonModalButton("UPLOAD", routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${constants.File.Negotiation.FIAT_PROOF}','${negotiationID}'")
+            <div class="modalInfoBlock">
+                <div class="cmuk-text-center fiat-proof">
+                <p>@Messages(constants.File.Negotiation.FIAT_PROOF)</p>
+
+
+                @commonModalButton("UPLOAD", routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${constants.File.Negotiation.FIAT_PROOF}','${negotiationID}'")
+                </div>
+
+                </div>
         </div>
     }
 }
