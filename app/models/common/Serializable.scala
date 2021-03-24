@@ -209,4 +209,44 @@ object Serializable {
 
   }
 
+  object IBC {
+
+    case class Counterparty(clientID: String, connectionID: String)
+
+    implicit val counterpartyReads: Reads[Counterparty] = Json.reads[Counterparty]
+
+    implicit val counterpartyWrites: OWrites[Counterparty] = Json.writes[Counterparty]
+
+    case class Version(identifier: String, features: Seq[String])
+
+    implicit val versionReads: Reads[Version] = Json.reads[Version]
+
+    implicit val versionWrites: OWrites[Version] = Json.writes[Version]
+
+    case class ClientHeight(revisionNumber: Int, revisionHeight: Int)
+
+    implicit val clientHeightReads: Reads[ClientHeight] = Json.reads[ClientHeight]
+
+    implicit val clientHeightWrites: OWrites[ClientHeight] = Json.writes[ClientHeight]
+
+    case class Channel(state: String, ordering: String, counterparty: Counterparty, connectionHops: Seq[String], version: String)
+
+    implicit val channelReads: Reads[Channel] = Json.reads[Channel]
+
+    implicit val channelWrites: OWrites[Channel] = Json.writes[Channel]
+
+    case class FungibleTokenPacketData(denom: String, amount: MicroNumber, sender: String, receiver: String)
+
+    implicit val fungibleTokenPacketDataReads: Reads[FungibleTokenPacketData] = Json.reads[FungibleTokenPacketData]
+
+    implicit val fungibleTokenPacketDataWrites: OWrites[FungibleTokenPacketData] = Json.writes[FungibleTokenPacketData]
+
+    case class Packet(sequence: Int, sourcePort: String, sourceChannel: String, destinationPort: String, destinationChannel: String, data: FungibleTokenPacketData, timeoutHeight: ClientHeight, timeoutTimestamp: Int)
+
+    implicit val packetReads: Reads[Packet] = Json.reads[Packet]
+
+    implicit val packetWrites: OWrites[Packet] = Json.writes[Packet]
+
+  }
+
 }

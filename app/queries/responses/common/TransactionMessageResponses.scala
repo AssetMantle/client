@@ -169,15 +169,123 @@ object TransactionMessageResponses {
 
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
-  //ibc-transfer
-  case class IBCClientHeight(revision_number: String, revision_height: String) {
-    def toSerializableIBCClientHeight: TransactionMessages.IBCClientHeight = TransactionMessages.IBCClientHeight(revisionNumber = revision_number.toInt, revisionHeight = revision_height.toInt)
+  import IBC._
+
+  //ibc-client
+  case class CreateClient(signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.CreateClient(signer = signer)
   }
 
-  implicit val ibcClientHeightReads: Reads[IBCClientHeight] = Json.reads[IBCClientHeight]
+  implicit val createClientReads: Reads[CreateClient] = Json.reads[CreateClient]
 
-  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: IBCClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
+  case class UpdateClient(client_id: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.UpdateClient(clientID = client_id, signer = signer)
+  }
+
+  implicit val updateClientReads: Reads[UpdateClient] = Json.reads[UpdateClient]
+
+  case class SubmitMisbehaviour(client_id: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.SubmitMisbehaviour(clientID = client_id, signer = signer)
+  }
+
+  implicit val submitMisbehaviourReads: Reads[SubmitMisbehaviour] = Json.reads[SubmitMisbehaviour]
+
+  case class UpgradeClient(client_id: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.UpgradeClient(clientID = client_id, signer = signer)
+  }
+
+  implicit val upgradeClientReads: Reads[UpgradeClient] = Json.reads[UpgradeClient]
+
+  //ibc-connection
+  case class ConnectionOpenInit(client_id: String, counterparty: Counterparty, version: Version, delay_period: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenInit(clientID = client_id, counterparty = counterparty.toSerializableIBCCounterparty, version = version.toSerializableIBCVersion, delayPeriod = delay_period.toInt, signer = signer)
+  }
+
+  implicit val connectionOpenInitReads: Reads[ConnectionOpenInit] = Json.reads[ConnectionOpenInit]
+
+  case class ConnectionOpenConfirm(connection_id: String, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenConfirm(connectionID = connection_id, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val connectionOpenConfirmReads: Reads[ConnectionOpenConfirm] = Json.reads[ConnectionOpenConfirm]
+
+  case class ConnectionOpenAck(connection_id: String, counterparty_connection_id: String, version: Version, proof_height: ClientHeight, consensus_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenAck(connectionID = connection_id, counterpartyConnectionID = counterparty_connection_id, version = version.toSerializableIBCVersion, proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val connectionOpenAckReads: Reads[ConnectionOpenAck] = Json.reads[ConnectionOpenAck]
+
+  case class ConnectionOpenTry(client_id: String, previous_connection_id: String, counterparty: Counterparty, delay_period: String, counterparty_versions: Seq[Version], proof_height: ClientHeight, consensus_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenTry(clientID = client_id, previousConnectionID = previous_connection_id, counterparty = counterparty.toSerializableIBCCounterparty, delayPeriod = delay_period.toInt, counterpartyVersions = counterparty_versions.map(_.toSerializableIBCVersion), proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val connectionOpenTryReads: Reads[ConnectionOpenTry] = Json.reads[ConnectionOpenTry]
+
+  //ibc-channel
+  case class ChannelOpenInit(port_id: String, channel: Channel, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelOpenInit(portID = port_id, channel = channel.toSerializableIBCChannel, signer = signer)
+  }
+
+  implicit val channelOpenInitReads: Reads[ChannelOpenInit] = Json.reads[ChannelOpenInit]
+
+  case class ChannelOpenTry(port_id: String, previous_channel_id: String, channel: Channel, counterparty_version: String, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelOpenTry(portID = port_id, previousChannelID = previous_channel_id, channel = channel.toSerializableIBCChannel, counterpartyVersion = counterparty_version, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val channelOpenTryReads: Reads[ChannelOpenTry] = Json.reads[ChannelOpenTry]
+
+  case class ChannelOpenAck(port_id: String, channel_id: String, counterparty_channel_id: String, counterparty_version: String, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelOpenAck(portID = port_id, channelID = channel_id, counterpartyChannelID = counterparty_channel_id, counterpartyVersion = counterparty_version, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val channelOpenAckReads: Reads[ChannelOpenAck] = Json.reads[ChannelOpenAck]
+
+  case class ChannelOpenConfirm(port_id: String, channel_id: String, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelOpenConfirm(portID = port_id, channelID = channel_id, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val channelOpenConfirmReads: Reads[ChannelOpenConfirm] = Json.reads[ChannelOpenConfirm]
+
+  case class ChannelCloseInit(port_id: String, channel_id: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelCloseInit(portID = port_id, channelID = channel_id, signer = signer)
+  }
+
+  implicit val channelCloseInitReads: Reads[ChannelCloseInit] = Json.reads[ChannelCloseInit]
+
+
+  case class ChannelCloseConfirm(port_id: String, channel_id: String, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ChannelCloseConfirm(portID = port_id, channelID = channel_id, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val channelCloseConfirmReads: Reads[ChannelCloseConfirm] = Json.reads[ChannelCloseConfirm]
+
+  case class RecvPacket(packet: Packet, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.RecvPacket(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val recvPacketReads: Reads[RecvPacket] = Json.reads[RecvPacket]
+
+  case class Timeout(packet: Packet, proof_height: ClientHeight, next_sequence_recv: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Timeout(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv.toInt, signer = signer)
+  }
+
+  implicit val timeoutReads: Reads[Timeout] = Json.reads[Timeout]
+
+  case class TimeoutOnClose(packet: Packet, proof_height: ClientHeight, next_sequence_recv: Int, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.TimeoutOnClose(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv.toInt, signer = signer)
+  }
+
+  implicit val timeoutOnCloseReads: Reads[TimeoutOnClose] = Json.reads[TimeoutOnClose]
+
+  case class Acknowledgement(packet: Packet, proof_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Acknowledgement(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, signer = signer)
+  }
+
+  implicit val acknowledgementReads: Reads[Acknowledgement] = Json.reads[Acknowledgement]
+
+  //ibc-transfer
+  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp.toInt)
   }
 
   implicit val transferReads: Reads[Transfer] = Json.reads[Transfer]
@@ -331,6 +439,27 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.DELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Delegate](value.toString))
       case constants.Blockchain.TransactionMessage.REDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Redelegate](value.toString))
       case constants.Blockchain.TransactionMessage.UNDELEGATE => Msg(msgType, utilities.JSON.convertJsonStringToObject[Undelegate](value.toString))
+      //ibc-client
+      case constants.Blockchain.TransactionMessage.CREATE_CLIENT => Msg(msgType, utilities.JSON.convertJsonStringToObject[CreateClient](value.toString))
+      case constants.Blockchain.TransactionMessage.UPDATE_CLIENT => Msg(msgType, utilities.JSON.convertJsonStringToObject[UpdateClient](value.toString))
+      case constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR => Msg(msgType, utilities.JSON.convertJsonStringToObject[SubmitMisbehaviour](value.toString))
+      case constants.Blockchain.TransactionMessage.UPGRADE_CLIENT => Msg(msgType, utilities.JSON.convertJsonStringToObject[UpgradeClient](value.toString))
+      //ibc-connection
+      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT => Msg(msgType, utilities.JSON.convertJsonStringToObject[ConnectionOpenInit](value.toString))
+      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM => Msg(msgType, utilities.JSON.convertJsonStringToObject[ConnectionOpenConfirm](value.toString))
+      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK => Msg(msgType, utilities.JSON.convertJsonStringToObject[ConnectionOpenAck](value.toString))
+      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY => Msg(msgType, utilities.JSON.convertJsonStringToObject[ConnectionOpenTry](value.toString))
+      //ibc-channel
+      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelOpenInit](value.toString))
+      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelOpenTry](value.toString))
+      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelOpenAck](value.toString))
+      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelOpenConfirm](value.toString))
+      case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelCloseInit](value.toString))
+      case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => Msg(msgType, utilities.JSON.convertJsonStringToObject[ChannelCloseConfirm](value.toString))
+      case constants.Blockchain.TransactionMessage.RECV_PACKET => Msg(msgType, utilities.JSON.convertJsonStringToObject[RecvPacket](value.toString))
+      case constants.Blockchain.TransactionMessage.TIMEOUT => Msg(msgType, utilities.JSON.convertJsonStringToObject[Timeout](value.toString))
+      case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => Msg(msgType, utilities.JSON.convertJsonStringToObject[TimeoutOnClose](value.toString))
+      case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => Msg(msgType, utilities.JSON.convertJsonStringToObject[Acknowledgement](value.toString))
       //ibc-transfer
       case constants.Blockchain.TransactionMessage.TRANSFER => Msg(msgType, utilities.JSON.convertJsonStringToObject[Transfer](value.toString))
       //asset

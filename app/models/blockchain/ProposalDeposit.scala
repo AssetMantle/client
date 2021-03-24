@@ -121,7 +121,7 @@ class ProposalDeposits @Inject()(
       val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
       val proposalDeposit = Service.get(deposit.proposalID, deposit.depositor)
 
-      def updateAccountBalance() = blockchainBalances.Utility.subtractCoinsFromAccount(deposit.depositor, deposit.amount)
+      def updateAccountBalance() = blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor)
 
       def updateProposal(proposal: Proposal, governanceParameters: GovernanceParameter) = {
         if (proposal.status == constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD && proposal.isTotalDepositGTEMinimum(governanceParameters.minDeposit)) {
@@ -146,7 +146,7 @@ class ProposalDeposits @Inject()(
     def refundDeposits(proposalID: Int): Future[Unit] = {
       val deposits = Service.getByProposalID(proposalID)
 
-      def refundAll(deposits: Seq[ProposalDeposit]) = utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.addCoinsToAccount(deposit.depositor, deposit.amount))
+      def refundAll(deposits: Seq[ProposalDeposit]) = utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor))
 
       (for {
         deposits <- deposits

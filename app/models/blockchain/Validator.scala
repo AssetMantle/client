@@ -306,7 +306,7 @@ class Validators @Inject()(
 
     def onDelegation(delegate: Delegate): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
-      val accountBalance = blockchainBalances.Utility.subtractCoinsFromAccount(delegate.delegatorAddress, Seq(delegate.amount))
+      val accountBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
       val withdrawRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.delegatorAddress)
 

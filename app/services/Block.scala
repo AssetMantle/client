@@ -153,7 +153,7 @@ class Block @Inject()(
     val updateAccount = utilitiesOperations.traverse(transaction.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
     // Should always be called after messages are processed, otherwise can create conflict
-    def updateBalance() = blockchainBalances.Utility.subtractCoinsFromAccount(transaction.getFeePayer, transaction.fee.amount)
+    def updateBalance() = blockchainBalances.Utility.insertOrUpdateBalance(transaction.getFeePayer)
 
     (for {
       _ <- messages
@@ -178,7 +178,7 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
         case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
         case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])
-        case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => blockchainBalances.Utility.subtractCoinsFromAccount(stdMsg.message.asInstanceOf[FundCommunityPool].depositor, stdMsg.message.asInstanceOf[FundCommunityPool].amount)
+        case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => blockchainBalances.Utility.insertOrUpdateBalance(stdMsg.message.asInstanceOf[FundCommunityPool].depositor)
         //evidence
         case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Future()
         //gov
@@ -193,6 +193,27 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.DELEGATE => blockchainValidators.Utility.onDelegation(stdMsg.message.asInstanceOf[Delegate])
         case constants.Blockchain.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stdMsg.message.asInstanceOf[Redelegate])
         case constants.Blockchain.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stdMsg.message.asInstanceOf[Undelegate])
+        //ibc-client
+        case constants.Blockchain.TransactionMessage.CREATE_CLIENT => Future()
+        case constants.Blockchain.TransactionMessage.UPDATE_CLIENT => Future()
+        case constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR => Future()
+        case constants.Blockchain.TransactionMessage.UPGRADE_CLIENT => Future()
+        //ibc-connection
+        case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT => Future()
+        case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM => Future()
+        case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK => Future()
+        case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY => Future()
+        //ibc-channel
+        case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT => Future()
+        case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY => Future()
+        case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK => Future()
+        case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM => Future()
+        case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => Future()
+        case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => Future()
+        case constants.Blockchain.TransactionMessage.RECV_PACKET => blockchainBalances.Utility.onRecvPacket(stdMsg.message.asInstanceOf[RecvPacket])
+        case constants.Blockchain.TransactionMessage.TIMEOUT => blockchainBalances.Utility.onTimeout(stdMsg.message.asInstanceOf[Timeout])
+        case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => blockchainBalances.Utility.onTimeoutOnClose(stdMsg.message.asInstanceOf[TimeoutOnClose])
+        case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(stdMsg.message.asInstanceOf[Acknowledgement])
         //ibc-transfer
         case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(stdMsg.message.asInstanceOf[Transfer])
         //Asset

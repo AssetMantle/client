@@ -273,7 +273,7 @@ object Blockchain {
     //ibc-connection
     val CONNECTION_OPEN_INIT = "/ibc.core.connection.v1.MsgConnectionOpenInit"
     val CONNECTION_OPEN_TRY = "/ibc.core.connection.v1.MsgConnectionOpenTry"
-    val CONNECTION_OPEN_ACKK = "/ibc.core.connection.v1.MsgConnectionOpenAck"
+    val CONNECTION_OPEN_ACK = "/ibc.core.connection.v1.MsgConnectionOpenAck"
     val CONNECTION_OPEN_CONFIRM = "/ibc.core.connection.v1.MsgConnectionOpenConfirm"
     //ibc-channel
     val CHANNEL_OPEN_INIT = "/ibc.core.channel.v1.MsgChannelOpenInit"

@@ -100,7 +100,7 @@ class Startup @Inject()(
 
   private def insertBalancesOnStart(balances: Seq[BankBalance]): Future[Seq[Unit]] = {
     utilitiesOperations.traverse(balances) { balance =>
-      val upsertAccount = blockchainBalances.Utility.addCoinsToAccount(balance.address, balance.coins.map(_.toCoin))
+      val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(balance.address)
       (for {
         _ <- upsertAccount
       } yield ()
@@ -149,7 +149,7 @@ class Startup @Inject()(
       val updateAccount = utilitiesOperations.traverse(genTx.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
       // Should always be called after messages are processed, otherwise can create conflict
-      def updateBalance() = blockchainBalances.Utility.subtractCoinsFromAccount(genTx.getFeePayer, genTx.auth_info.fee.amount.map(_.toCoin))
+      def updateBalance() = blockchainBalances.Utility.insertOrUpdateBalance(genTx.getFeePayer)
 
       for {
         _ <- updateTx
