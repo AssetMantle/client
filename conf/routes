@@ -27,6 +27,7 @@ GET         /proposals                                           controllers.Vie
 GET         /block                                               controllers.ViewController.block(height: Int)
 GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
 GET         /validator                                           controllers.ViewController.validator(address: String)
+GET         /proposal                                            controllers.ViewController.proposal(id: Int)
 GET         /identity                                            controllers.ViewController.identity
 GET         /account                                             controllers.ViewController.account
 GET         /asset                                               controllers.ViewController.asset
@@ -153,6 +154,7 @@ GET         /component/blockDetails                              controllers.Com
 GET         /component/blockTransactions                         controllers.ComponentViewController.blockTransactions(height: Int)
 
 GET         /component/proposalList                              controllers.ComponentViewController.proposalList
+GET         /component/proposalInfo                              controllers.ComponentViewController.proposalDetails(id: Int)
 
 GET         /component/transactionList                           controllers.ComponentViewController.transactionList
 GET         /component/transactionListPage                       controllers.ComponentViewController.transactionListPage(pageNumber: Int)
