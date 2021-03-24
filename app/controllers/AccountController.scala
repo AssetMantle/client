@@ -160,13 +160,13 @@ class AccountController @Inject()(
             def checkAccountExists(oldUsername: Option[String]) = oldUsername.fold(Future(false))(username => masterAccounts.Service.checkAccountExists(username))
 
             def checkAndUpdate(addKeyResponse: KeyResponse.Response, accountExists: Boolean) = if (!accountExists) {
-              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = None, accountType = constants.Blockchain.Account.BASE, accountNumber = "", sequence = "", vestingParameters = None))
+              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = None, accountType = constants.Blockchain.Account.BASE, accountNumber = -1, sequence = 0, vestingParameters = None))
               val createMasterAccount = {
                 val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
                 masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
               }
 
-              def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccount(addKeyResponse.result.keyOutput.address)
+              def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(addKeyResponse.result.keyOutput.address)
 
               for {
                 _ <- createBCAccount

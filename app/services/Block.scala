@@ -2,6 +2,7 @@ package services
 
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
+import models.Abstract.PublicKey
 import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.{GovernanceParameter, SlashingParameter}
 import models.common.ProposalContents.ParameterChange
@@ -13,7 +14,7 @@ import queries.Abstract.TendermintEvidence
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.ProposalResponse.{Response => ProposalResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
-import queries.responses.blockchain.TransactionResponse.{Response => TransactionResponse}
+import queries.responses.blockchain.TransactionResponse.{AuthInfo, Response => TransactionResponse}
 import queries.responses.common.{Event, Header}
 import queries.blockchain.{GetBlock, GetBlockCommit, GetProposal, GetTransaction, GetTransactionsByHeight}
 import queries.responses.common.ProposalContents.CommunityPoolSpend
@@ -146,10 +147,21 @@ class Block @Inject()(
     }
   }
 
-  private def actionsOnTransactions(transactions: Seq[blockchainTransaction])(implicit header: Header): Future[Seq[Seq[Unit]]] = Future.traverse(transactions) { transaction =>
-    if (transaction.status) Future.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg))
+  def actionsOnTransactions(transactions: Seq[blockchainTransaction])(implicit header: Header): Future[Seq[Unit]] = utilitiesOperations.traverse(transactions) { transaction =>
+    val messages = if (transaction.status) utilitiesOperations.traverse(transaction.messages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg))
     else Future(Seq.empty)
-    //TODO blockchainAccounts.Utility.insertOrUpdateAccount(fromAddress)
+    val updateAccount = utilitiesOperations.traverse(transaction.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
+
+    // Should always be called after messages are processed, otherwise can create conflict
+    def updateBalance() = blockchainBalances.Utility.subtractCoinsFromAccount(transaction.getFeePayer, transaction.fee.amount)
+
+    (for {
+      _ <- messages
+      _ <- updateAccount
+      _ <- updateBalance()
+    } yield ()).recover {
+      case baseException: BaseException => throw baseException
+    }
   }
 
   def actionOnTxMessages(stdMsg: StdMsg)(implicit header: Header): Future[Unit] = {
@@ -227,22 +239,15 @@ class Block @Inject()(
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
           val slashingFraction = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
 
-          val slashingInfractionHeight = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
+          val distributionHeight = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
           else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
-          def slashing(operatorAddress: String, slashingInfractionHeight: Int) = {
-            //TODO Check if correct when double signing
-            if (reasonAttribute.value == constants.Blockchain.Event.Attribute.DoubleSign) {
-              println("/////////////////// When double signing slashingInfractionHeight: ")
-              println(slashingInfractionHeight)
-            }
-            slash(validatorAddress = operatorAddress, infractionHeight = slashingInfractionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
-          }
+          def slashing(operatorAddress: String, distributionHeight: Int) = slash(validatorAddress = operatorAddress, infractionHeight = distributionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
 
           for {
             operatorAddress <- operatorAddress
-            slashingInfractionHeight <- slashingInfractionHeight
-            _ <- slashing(operatorAddress, slashingInfractionHeight)
+            distributionHeight <- distributionHeight
+            _ <- slashing(operatorAddress, distributionHeight)
           } yield (operatorAddress, reasonAttribute.value)
         })
       }

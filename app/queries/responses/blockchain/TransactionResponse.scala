@@ -55,7 +55,8 @@ object TransactionResponse {
       messages = tx.body.messages.map(_.toStdMsg),
       fee = tx.auth_info.fee.toFee,
       memo = tx.body.memo,
-      timestamp = timestamp)
+      timestamp = timestamp
+    )
   }
 
   implicit val txResponseReads: Reads[TxResponse] = Json.reads[TxResponse]

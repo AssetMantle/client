@@ -21,7 +21,7 @@ object PublicKeys {
   implicit val singlePublicKeyWrites: OWrites[SinglePublicKey] = Json.writes[SinglePublicKey]
 
   case class MultiSigPublicKey(publicKeyType: String, threshold: Int, publicKeys: Seq[SinglePublicKey]) extends PublicKey {
-    val value: String = publicKeys.map(_.key).mkString("") //TODO
+    val value: String = publicKeys.map(_.key).mkString("")
   }
 
   implicit val multiSigPublicKeyReads: Reads[MultiSigPublicKey] = Json.reads[MultiSigPublicKey]

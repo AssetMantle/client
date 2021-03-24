@@ -39,7 +39,7 @@ object Bech32 {
       .mkString.toUpperCase
   }
 
-  def convertAccountPublicKeyToBech32(pubkey: String): String = {
+  def convertAccountPublicKeyToAccountAddress(pubkey: String): String = {
     encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))))) match {
       case Success(address) => address
       case Failure(exception) => logger.error(exception.getLocalizedMessage)

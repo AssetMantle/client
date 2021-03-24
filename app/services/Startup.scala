@@ -88,7 +88,7 @@ class Startup @Inject()(
 
   private def insertAccountsOnStart(accounts: Seq[Account]): Future[Seq[Unit]] = {
     utilitiesOperations.traverse(accounts) { account =>
-      val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccount(account.address)
+      val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(account.address)
       (for {
         _ <- upsertAccount
       } yield ()
@@ -142,11 +142,19 @@ class Startup @Inject()(
     }
   }
 
+  // IMPORTANT: Assuming all GenTxs are valid txs and successfully goes through
   private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: String): Future[Unit] = {
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
       val updateTx = utilitiesOperations.traverse(genTx.body.messages)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
+      val updateAccount = utilitiesOperations.traverse(genTx.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
+
+      // Should always be called after messages are processed, otherwise can create conflict
+      def updateBalance() = blockchainBalances.Utility.subtractCoinsFromAccount(genTx.getFeePayer, genTx.auth_info.fee.amount.map(_.toCoin))
+
       for {
         _ <- updateTx
+        _ <- updateAccount
+        _ <- updateBalance()
       } yield ()
     }
 

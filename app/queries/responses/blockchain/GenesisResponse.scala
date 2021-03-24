@@ -21,7 +21,24 @@ object GenesisResponse {
 
   implicit val genTxBodyReads: Reads[GenTxBody] = Json.reads[GenTxBody]
 
-  case class GenTx(body: GenTxBody, auth_info: AuthInfo)
+  case class GenTx(body: GenTxBody, auth_info: AuthInfo) {
+    def getSigners: Seq[String] = {
+      var seen: Map[String, Boolean] = Map()
+      var signers: Seq[String] = Seq()
+      body.messages.foreach(message => message.toStdMsg.getSigners.foreach(signer => {
+        if (!seen.getOrElse(signer, false)) {
+          signers = signers :+ signer
+          seen = seen + (signer -> true)
+        }
+      }))
+      signers
+    }
+
+    def getFeePayer: String = {
+      val signers = getSigners
+      if (signers.nonEmpty) signers.head else ""
+    }
+  }
 
   implicit val genTxReads: Reads[GenTx] = Json.reads[GenTx]
 

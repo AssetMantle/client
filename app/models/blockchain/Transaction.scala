@@ -14,7 +14,26 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Transaction(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Transaction(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+
+  def getSigners: Seq[String] = {
+    var seen: Map[String, Boolean] = Map()
+    var signers: Seq[String] = Seq()
+    messages.foreach(message => message.getSigners.foreach(signer => {
+      if (!seen.getOrElse(signer, false)) {
+        signers = signers :+ signer
+        seen = seen + (signer -> true)
+      }
+    }))
+    signers
+  }
+
+  def getFeePayer: String = {
+    val signers = getSigners
+    if (signers.nonEmpty) signers.head else ""
+  }
+
+}
 
 @Singleton
 class Transactions @Inject()(

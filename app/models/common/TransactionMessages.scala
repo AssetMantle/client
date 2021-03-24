@@ -15,7 +15,9 @@ object TransactionMessages {
   private implicit val logger: Logger = Logger(this.getClass)
 
   //auth
-  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: String, delayed: Boolean) extends TransactionMessage
+  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: String, delayed: Boolean) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(fromAddress)
+  }
 
   implicit val createVestingAccountReads: Reads[CreateVestingAccount] = Json.reads[CreateVestingAccount]
 
@@ -34,45 +36,59 @@ object TransactionMessages {
 
   implicit val outputWrites: OWrites[Output] = Json.writes[Output]
 
-  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends TransactionMessage
+  case class MultiSend(inputs: Seq[Input], outputs: Seq[Output]) extends TransactionMessage {
+    def getSigners: Seq[String] = inputs.map(_.address)
+  }
 
   implicit val multiSendReads: Reads[MultiSend] = Json.reads[MultiSend]
 
   implicit val multiSendWrites: OWrites[MultiSend] = Json.writes[MultiSend]
 
-  case class SendCoin(fromAddress: String, toAddress: String, amount: Seq[Coin]) extends TransactionMessage
+  case class SendCoin(fromAddress: String, toAddress: String, amount: Seq[Coin]) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(fromAddress)
+  }
 
   implicit val sendCoinReads: Reads[SendCoin] = Json.reads[SendCoin]
 
   implicit val sendCoinWrites: OWrites[SendCoin] = Json.writes[SendCoin]
 
   //crisis
-  case class VerifyInvariant(sender: String, invariantModuleName: String, invariantRoute: String) extends TransactionMessage
+  case class VerifyInvariant(sender: String, invariantModuleName: String, invariantRoute: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(sender)
+  }
 
   implicit val verifyInvariantReads: Reads[VerifyInvariant] = Json.reads[VerifyInvariant]
 
   implicit val verifyInvariantWrites: OWrites[VerifyInvariant] = Json.writes[VerifyInvariant]
 
   //distribution
-  case class SetWithdrawAddress(delegatorAddress: String, withdrawAddress: String) extends TransactionMessage
+  case class SetWithdrawAddress(delegatorAddress: String, withdrawAddress: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(delegatorAddress)
+  }
 
   implicit val setWithdrawAddressReads: Reads[SetWithdrawAddress] = Json.reads[SetWithdrawAddress]
 
   implicit val setWithdrawAddressWrites: OWrites[SetWithdrawAddress] = Json.writes[SetWithdrawAddress]
 
-  case class WithdrawDelegatorReward(delegatorAddress: String, validatorAddress: String) extends TransactionMessage
+  case class WithdrawDelegatorReward(delegatorAddress: String, validatorAddress: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(delegatorAddress)
+  }
 
   implicit val withdrawDelegatorRewardReads: Reads[WithdrawDelegatorReward] = Json.reads[WithdrawDelegatorReward]
 
   implicit val withdrawDelegatorRewardWrites: OWrites[WithdrawDelegatorReward] = Json.writes[WithdrawDelegatorReward]
 
-  case class WithdrawValidatorCommission(validatorAddress: String) extends TransactionMessage
+  case class WithdrawValidatorCommission(validatorAddress: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+  }
 
   implicit val withdrawValidatorCommissionReads: Reads[WithdrawValidatorCommission] = Json.reads[WithdrawValidatorCommission]
 
   implicit val withdrawValidatorCommissionWrites: OWrites[WithdrawValidatorCommission] = Json.writes[WithdrawValidatorCommission]
 
-  case class FundCommunityPool(amount: Seq[Coin], depositor: String) extends TransactionMessage
+  case class FundCommunityPool(amount: Seq[Coin], depositor: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(depositor)
+  }
 
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
 
@@ -85,64 +101,87 @@ object TransactionMessages {
 
   implicit val equivocationWrites: OWrites[Equivocation] = Json.writes[Equivocation]
 
-  case class SubmitEvidence(submitter: String, evidence: Equivocation) extends TransactionMessage
+  case class SubmitEvidence(submitter: String, evidence: Equivocation) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(submitter)
+  }
 
   implicit val submitEvidenceReads: Reads[SubmitEvidence] = Json.reads[SubmitEvidence]
 
   implicit val submitEvidenceWrites: OWrites[SubmitEvidence] = Json.writes[SubmitEvidence]
 
   //gov
-  case class Deposit(proposalID: Int, depositor: String, amount: Seq[Coin]) extends TransactionMessage
+  case class Deposit(proposalID: Int, depositor: String, amount: Seq[Coin]) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(depositor)
+  }
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
   implicit val depositWrites: OWrites[Deposit] = Json.writes[Deposit]
 
-  case class SubmitProposal(content: ProposalContent, initialDeposit: Seq[Coin], proposer: String) extends TransactionMessage
+  case class SubmitProposal(content: ProposalContent, initialDeposit: Seq[Coin], proposer: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(proposer)
+  }
 
   implicit val submitProposalReads: Reads[SubmitProposal] = Json.reads[SubmitProposal]
 
   implicit val submitProposalWrites: OWrites[SubmitProposal] = Json.writes[SubmitProposal]
 
-  case class Vote(proposalID: Int, voter: String, option: String) extends TransactionMessage
+  case class Vote(proposalID: Int, voter: String, option: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(voter)
+  }
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
   implicit val voteWrites: OWrites[Vote] = Json.writes[Vote]
 
   //slashing
-  case class Unjail(validatorAddress: String) extends TransactionMessage
+  case class Unjail(validatorAddress: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+  }
 
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
 
   implicit val unjailWrites: OWrites[Unjail] = Json.writes[Unjail]
 
   //staking
-  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: PublicKey, value: Coin, minSelfDelegation: String, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage
+  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: PublicKey, value: Coin, minSelfDelegation: String, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage {
+    def getSigners: Seq[String] = {
+      val validatorAccountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress)
+      if (validatorAddress == delegatorAddress) Seq(delegatorAddress) else Seq(delegatorAddress, validatorAccountAddress)
+    }
+  }
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
   implicit val createValidatorWrites: OWrites[CreateValidator] = Json.writes[CreateValidator]
 
-  case class EditValidator(validatorAddress: String, commissionRate: String, description: Serializable.Validator.Description, minSelfDelegation: String) extends TransactionMessage
+  case class EditValidator(validatorAddress: String, commissionRate: String, description: Serializable.Validator.Description, minSelfDelegation: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
+  }
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]
 
   implicit val editValidatorWrites: OWrites[EditValidator] = Json.writes[EditValidator]
 
-  case class Delegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage
+  case class Delegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(delegatorAddress)
+  }
 
   implicit val delegateReads: Reads[Delegate] = Json.reads[Delegate]
 
   implicit val delegateWrites: OWrites[Delegate] = Json.writes[Delegate]
 
-  case class Redelegate(delegatorAddress: String, validatorSrcAddress: String, validatorDstAddress: String, amount: Coin) extends TransactionMessage
+  case class Redelegate(delegatorAddress: String, validatorSrcAddress: String, validatorDstAddress: String, amount: Coin) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(delegatorAddress)
+  }
 
   implicit val redelegateReads: Reads[Redelegate] = Json.reads[Redelegate]
 
   implicit val redelegateWrites: OWrites[Redelegate] = Json.writes[Redelegate]
 
-  case class Undelegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage
+  case class Undelegate(delegatorAddress: String, validatorAddress: String, amount: Coin) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(delegatorAddress)
+  }
 
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
@@ -156,128 +195,168 @@ object TransactionMessages {
 
   implicit val ibcClientHeightWrites: OWrites[IBCClientHeight] = Json.writes[IBCClientHeight]
 
-  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: IBCClientHeight, timeoutTimestamp: String) extends TransactionMessage
+  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: IBCClientHeight, timeoutTimestamp: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(sender)
+  }
 
   implicit val transferReads: Reads[Transfer] = Json.reads[Transfer]
 
   implicit val transferWrites: OWrites[Transfer] = Json.writes[Transfer]
 
   //Asset
-  case class AssetDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+  case class AssetDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val assetDefineReads: Reads[AssetDefine] = Json.reads[AssetDefine]
 
   implicit val assetDefineWrites: OWrites[AssetDefine] = Json.writes[AssetDefine]
 
-  case class AssetMint(from: String, fromID: String, toID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
+  case class AssetMint(from: String, fromID: String, toID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val assetMintReads: Reads[AssetMint] = Json.reads[AssetMint]
 
   implicit val assetMintWrites: OWrites[AssetMint] = Json.writes[AssetMint]
 
-  case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
+  case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val assetMutateReads: Reads[AssetMutate] = Json.reads[AssetMutate]
 
   implicit val assetMutateWrites: OWrites[AssetMutate] = Json.writes[AssetMutate]
 
-  case class AssetBurn(from: String, fromID: String, assetID: String) extends TransactionMessage
+  case class AssetBurn(from: String, fromID: String, assetID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val assetBurnReads: Reads[AssetBurn] = Json.reads[AssetBurn]
 
   implicit val assetBurnWrites: OWrites[AssetBurn] = Json.writes[AssetBurn]
 
   //Identity
-  case class IdentityDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+  case class IdentityDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val identityDefineReads: Reads[IdentityDefine] = Json.reads[IdentityDefine]
 
   implicit val identityDefineWrites: OWrites[IdentityDefine] = Json.writes[IdentityDefine]
 
-  case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
+  case class IdentityIssue(from: String, to: String, fromID: String, classificationID: String, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val identityIssueReads: Reads[IdentityIssue] = Json.reads[IdentityIssue]
 
   implicit val identityIssueWrites: OWrites[IdentityIssue] = Json.writes[IdentityIssue]
 
-  case class IdentityProvision(from: String, to: String, identityID: String) extends TransactionMessage
+  case class IdentityProvision(from: String, to: String, identityID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val identityProvisionReads: Reads[IdentityProvision] = Json.reads[IdentityProvision]
 
   implicit val identityProvisionWrites: OWrites[IdentityProvision] = Json.writes[IdentityProvision]
 
-  case class IdentityUnprovision(from: String, to: String, identityID: String) extends TransactionMessage
+  case class IdentityUnprovision(from: String, to: String, identityID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val identityUnprovisionReads: Reads[IdentityUnprovision] = Json.reads[IdentityUnprovision]
 
   implicit val identityUnprovisionWrites: OWrites[IdentityUnprovision] = Json.writes[IdentityUnprovision]
 
-  case class IdentityNub(from: String, nubID: String) extends TransactionMessage
+  case class IdentityNub(from: String, nubID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val identityNubReads: Reads[IdentityNub] = Json.reads[IdentityNub]
 
   implicit val identityNubWrites: OWrites[IdentityNub] = Json.writes[IdentityNub]
 
   //Split
-  case class SplitSend(from: String, fromID: String, toID: String, ownableID: String, split: BigDecimal) extends TransactionMessage
+  case class SplitSend(from: String, fromID: String, toID: String, ownableID: String, split: BigDecimal) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val splitSendReads: Reads[SplitSend] = Json.reads[SplitSend]
 
   implicit val splitSendWrites: OWrites[SplitSend] = Json.writes[SplitSend]
 
-  case class SplitWrap(from: String, fromID: String, coins: Seq[Coin]) extends TransactionMessage
+  case class SplitWrap(from: String, fromID: String, coins: Seq[Coin]) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val splitWrapReads: Reads[SplitWrap] = Json.reads[SplitWrap]
 
   implicit val splitWrapWrites: OWrites[SplitWrap] = Json.writes[SplitWrap]
 
-  case class SplitUnwrap(from: String, fromID: String, ownableID: String, split: BigDecimal) extends TransactionMessage
+  case class SplitUnwrap(from: String, fromID: String, ownableID: String, split: BigDecimal) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val splitUnwrapReads: Reads[SplitUnwrap] = Json.reads[SplitUnwrap]
 
   implicit val splitUnwrapWrites: OWrites[SplitUnwrap] = Json.writes[SplitUnwrap]
 
   //Order
-  case class OrderDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage
+  case class OrderDefine(from: String, fromID: String, immutableMetaTraits: MetaProperties, immutableTraits: Properties, mutableMetaTraits: MetaProperties, mutableTraits: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val orderDefineReads: Reads[OrderDefine] = Json.reads[OrderDefine]
 
   implicit val orderDefineWrites: OWrites[OrderDefine] = Json.writes[OrderDefine]
 
-  case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage
+  case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
 
   implicit val orderMakeWrites: OWrites[OrderMake] = Json.writes[OrderMake]
 
-  case class OrderTake(from: String, fromID: String, takerOwnableSplit: BigDecimal, orderID: String) extends TransactionMessage
+  case class OrderTake(from: String, fromID: String, takerOwnableSplit: BigDecimal, orderID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val orderTakeReads: Reads[OrderTake] = Json.reads[OrderTake]
 
   implicit val orderTakeWrites: OWrites[OrderTake] = Json.writes[OrderTake]
 
-  case class OrderCancel(from: String, fromID: String, orderID: String) extends TransactionMessage
+  case class OrderCancel(from: String, fromID: String, orderID: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
   implicit val orderCancelWrites: OWrites[OrderCancel] = Json.writes[OrderCancel]
 
   //meta
-  case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage
+  case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val metaRevealReads: Reads[MetaReveal] = Json.reads[MetaReveal]
 
   implicit val metaRevealWrites: OWrites[MetaReveal] = Json.writes[MetaReveal]
 
   //maintainer
-  case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessage
+  case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Properties, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(from)
+  }
 
   implicit val maintainerDeputizeReads: Reads[MaintainerDeputize] = Json.reads[MaintainerDeputize]
 
   implicit val maintainerDeputizeWrites: OWrites[MaintainerDeputize] = Json.writes[MaintainerDeputize]
 
   //unknown
-  case class Unknown(value: String) extends TransactionMessage
+  case class Unknown(value: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq("")
+  }
 
   implicit val unknownReads: Reads[Unknown] = Json.reads[Unknown]
 
