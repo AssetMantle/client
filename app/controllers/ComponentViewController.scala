@@ -364,12 +364,13 @@ class ComponentViewController @Inject()(
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
+
   def proposalDetails(id: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val proposal = blockchainProposals.Service.tryGet(id)
       (for {
         proposal <- proposal
-      } yield Ok(views.html.component.blockchain.proposal(proposal))
+      } yield Ok(views.html.component.blockchain.proposalDetails(proposal))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
