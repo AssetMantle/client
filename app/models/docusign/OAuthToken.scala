@@ -34,6 +34,7 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private val accountID = keyStore.getPassphrase(constants.KeyStore.DOCUSIGN_ACCOUNT_ID)
 
+  private val enableActor = configuration.get[Boolean]("docusign.scheduler.enable")
   private val docusignOAuthTokenInitialDelay = configuration.get[Int]("docusign.scheduler.initialDelay").seconds
   private val docusignOAuthTokenIntervalTime = configuration.get[Int]("docusign.scheduler.intervalTime").minutes
 
@@ -146,7 +147,9 @@ class OAuthTokens @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = docusignOAuthTokenInitialDelay, interval = docusignOAuthTokenIntervalTime) {
-    Utility.regenerateOAuthToken()
-  }(schedulerExecutionContext)
+  if (enableActor) {
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = docusignOAuthTokenInitialDelay, delay = docusignOAuthTokenIntervalTime) { () =>
+      Utility.regenerateOAuthToken()
+    }(schedulerExecutionContext)
+  }
 }
