@@ -1,0 +1,11 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.SubmitProposal
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SubmitProposal]) { submitProposal =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(submitProposal.proposer, routes.ViewController.wallet(submitProposal.proposer)))
+    @commonTextInfo(constants.View.CONTENT, submitProposal.content.toString)))
+    @commonTextInfo(constants.View.INITIAL_DEPOSIT, submitProposal.initialDeposit.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
+}
