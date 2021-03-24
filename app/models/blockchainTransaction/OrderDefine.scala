@@ -60,6 +60,8 @@ class OrderDefines @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
+
   private def add(orderDefine: OrderDefine): Future[String] = db.run((orderDefineTable returning orderDefineTable.map(_.ticketID) += serialize(orderDefine)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -240,7 +242,7 @@ class OrderDefines @Inject()(
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
+  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
     actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

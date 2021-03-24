@@ -61,6 +61,8 @@ class AssetDefines @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
+
   private def add(assetDefine: AssetDefine): Future[String] = db.run((assetDefineTable returning assetDefineTable.map(_.ticketID) += serialize(assetDefine)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -241,7 +243,7 @@ class AssetDefines @Inject()(
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
+  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
     actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
   }
 }
