@@ -1,8 +1,8 @@
-package queries.responses.common
+package blockchain.common
 
 import models.common.Serializable
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 import utilities.MicroNumber
 
 case class Coin(denom: String, amount: MicroNumber) {
@@ -17,4 +17,8 @@ object Coin {
       (JsPath \ "amount").read[String]
     ) (apply _)
 
+  implicit val coinWrites: Writes[Coin] = (coin: Coin) => Json.obj(
+    "denom" -> coin.denom,
+    "amount" -> coin.amount.toMicroString
+  )
 }

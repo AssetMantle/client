@@ -1,4 +1,4 @@
-package queries.responses.common
+package blockchain.common
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads}

@@ -1,10 +1,11 @@
 package queries.responses.blockchain
 
+import blockchain.common.{Account, Coin, Delegation, Validator}
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
 import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.responses.blockchain.TransactionResponse.Msg
-import queries.responses.common.{Account, Coin, Delegation, Validator}
+import blockchain.common.Validator
 import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
 

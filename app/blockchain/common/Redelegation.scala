@@ -1,10 +1,10 @@
-package queries.responses.common
+package blockchain.common
 
-import models.blockchain.{Redelegation => BlockchainRedelegation}
 import models.common.Serializable
-import play.api.libs.functional.syntax._
+import models.blockchain.{Redelegation => BlockchainRedelegation}
 import play.api.libs.json.{JsPath, Json, Reads}
 import utilities.MicroNumber
+import play.api.libs.functional.syntax._
 
 object Redelegation {
 

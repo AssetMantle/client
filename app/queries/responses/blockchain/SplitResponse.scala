@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchain.common.ID
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.ID
 import transactions.Abstract.BaseResponse
 
 object SplitResponse {

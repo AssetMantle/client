@@ -1,9 +1,9 @@
-package queries.responses.common
+package blockchain.common
 
 import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import queries.Abstract.{Account, PublicKey}
+import play.api.libs.functional.syntax._
 
 object Account {
 
@@ -19,6 +19,11 @@ object Account {
     (JsPath \ "type").read[String] and
       (JsPath \ "value").read[String]
     ) (SinglePublicKey.apply _)
+
+  implicit val singlePublicKeyWrites: Writes[SinglePublicKey] = (singlePublicKey: SinglePublicKey) => Json.obj(
+    "type" -> singlePublicKey.publicKeyType,
+    "value" -> singlePublicKey.value
+  )
 
   case class MultiSigPublicKeyValue(threshold: String, pubkeys: Seq[SinglePublicKey])
 

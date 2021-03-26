@@ -3,13 +3,13 @@ package models.blockchain
 import java.sql.Timestamp
 import java.time.Duration
 
+import blockchain.common.Header
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.common.{Header => BlockHeader}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -87,7 +87,7 @@ class AverageBlockTimes @Inject()(
 
     def get: Future[Double] = tryGetValue.map(x => x.toDouble / 1000)
 
-    def set(blockHeader: BlockHeader): Future[Double] = {
+    def set(blockHeader: Header): Future[Double] = {
       if (blockHeader.height == 1) {
         for {
           _ <- upsert(AverageBlockTime(AVERAGE_BLOCK_TIME, 1, 0, blockHeader.time))

@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchain.common.Account
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Account
 import transactions.Abstract.BaseResponse
 
 object AccountResponse {

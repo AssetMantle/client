@@ -1,17 +1,20 @@
 package controllers
 
+import java.util.Base64
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.blockchain
+import models.{blockchain, blockchainTransaction}
 import models.blockchain.{Maintainer, Meta}
 import models.master._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import services.Startup
-
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{Json, OWrites}
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -28,6 +31,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 blockchainClassifications: blockchain.Classifications,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
+                                transactionBroadcast: transactions.blockchain.Broadcast,
+                                queryAccount: queries.blockchain.GetAccount,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -38,7 +43,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-
       loginState match {
         case Some(loginState)=>
           implicit val loginStateImplicit: LoginState = loginState
@@ -56,10 +60,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         }
         case None=> Future(Ok(views.html.index()))
       }
-
   }
-
-
 
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -110,5 +111,5 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
-  startup.start()
+ startup.start()
 }

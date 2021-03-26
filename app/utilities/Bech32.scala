@@ -1,9 +1,6 @@
 package utilities
 
 import java.security.MessageDigest
-
-import exceptions.BaseException
-
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success, Try}
 
@@ -63,7 +60,7 @@ object Bech32 {
   }
 
   final def encode(hrp: String, data: Seq[Int5]): Try[String] = Try {
-    require(hrp.length >= 1, s"Invalid hrp length ${hrp.length}.")
+    require(hrp.nonEmpty, s"Invalid hrp length ${hrp.length}.")
     hrp + SEP + (data ++ createChecksum(hrp, data)).map(CHARSET_REVERSE_MAP).mkString
   }.recover {
     case _: java.util.NoSuchElementException =>
@@ -137,7 +134,7 @@ object Bech32 {
     val input = bech32.toLowerCase()
     val hrp = input.take(sepPosition)
     val data = input.drop(sepPosition + 1).map(CHARSET_MAP)
-    require(hrp.length >= 1, s"Invalid Bech32: $bech32. Invalid hrp length ${hrp.length}.")
+    require(hrp.nonEmpty, s"Invalid Bech32: $bech32. Invalid hrp length ${hrp.length}.")
     require(data.length >= 6, s"Invalid Bech32: $bech32. Invalid data length ${data.length}.")
     require(verifyCheckSum(hrp, data), s"Invalid checksum for $bech32")
     (hrp, data.dropRight(6))
