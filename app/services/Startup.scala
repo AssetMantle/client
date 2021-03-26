@@ -59,6 +59,8 @@ class Startup @Inject()(
 
   private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
+  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
+
   private val explorerInitialDelay = configuration.get[Int]("blockchain.explorer.initialDelay").millis
 
   private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
@@ -261,7 +263,7 @@ class Startup @Inject()(
       def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerHeight: Int) = if (latestExplorerHeight == 0) {
         for {
           _ <- onGenesis()
-          _ <- insertBlock(1)
+          _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
         val updateBlockHeight = latestExplorerHeight + 1

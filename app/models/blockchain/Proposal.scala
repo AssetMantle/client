@@ -113,7 +113,12 @@ class Proposals @Inject()(
 
   private def getByID(id: Int): Future[Option[ProposalSerialized]] = db.run(proposalTable.filter(_.id === id).result.headOption)
 
-  private def getProposalsSize: Future[Int] = db.run(proposalTable.size.result)
+  private def getMaxProposalID: Future[Int] = db.run(proposalTable.map(_.id).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
 
   private def getAllProposals: Future[Seq[ProposalSerialized]] = db.run(proposalTable.result)
 
@@ -160,7 +165,7 @@ class Proposals @Inject()(
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 
-    def getSize: Future[Int] = getProposalsSize
+    def getLatestProposalID: Future[Int] = getMaxProposalID
 
     def getAllActiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.votingEndTime != "" && utilities.Date.isMature(completionTimestamp = x.votingEndTime, currentTimeStamp = time)).map(_.deserialize))
 
@@ -175,21 +180,19 @@ class Proposals @Inject()(
   object Utility {
 
     def onSubmitProposal(submitProposal: SubmitProposal)(implicit blockHeader: Header): Future[Unit] = {
-      val totalProposals = Service.getSize
-      val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
+      val latestProposalID = Service.getLatestProposalID
 
-      def upsert(totalProposal: Int, governanceParameters: GovernanceParameter) = Service.insertOrUpdate(Proposal(id = totalProposal + startingProposalID, content = submitProposal.content, status = constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD, finalTallyResult = FinalTallyResult(0, 0, 0, 0), submitTime = blockHeader.time, depositEndTime = utilities.Date.addTime(blockHeader.time, governanceParameters.maxDepositPeriod), totalDeposit = Seq(), votingStartTime = "", votingEndTime = ""))
+      def upsert(latestProposalID: Int) = insertOrUpdateProposal(latestProposalID + startingProposalID)
 
       (for {
-        totalProposals <- totalProposals
-        governanceParameters <- governanceParameters
-        _ <- upsert(totalProposals, governanceParameters)
+        latestProposalID <- latestProposalID
+        _ <- upsert(latestProposalID)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    def insertOrUpdateProposal(id: Int): Future[Unit] = {
+    def insertOrUpdateProposal(id: Int): Future[ProposalResponse] = {
       val proposalResponse = getProposal.Service.get(id)
 
       def upsert(proposalResponse: ProposalResponse) = Service.insertOrUpdate(proposalResponse.proposal.toSerializableProposal)
@@ -197,7 +200,7 @@ class Proposals @Inject()(
       (for {
         proposalResponse <- proposalResponse
         _ <- upsert(proposalResponse)
-      } yield ()).recover {
+      } yield proposalResponse).recover {
         case baseException: BaseException => throw baseException
       }
     }

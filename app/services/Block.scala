@@ -281,21 +281,19 @@ class Block @Inject()(
 
     def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
-    def addEvents(validatorReasons: Map[String, String]): Future[Seq[Unit]] = {
-      utilitiesOperations.traverse(validatorReasons.keySet.toSeq) { operatorAddress =>
-        val validator = blockchainValidators.Service.tryGet(operatorAddress)
+    def addEvents(validatorReasons: Map[String, String]): Future[Seq[Unit]] = Future.traverse(validatorReasons.keySet.toSeq) { operatorAddress =>
+      val validator = blockchainValidators.Service.tryGet(operatorAddress)
 
-        def insertNotification(validator: Validator) = utilities.Validator.getSlashingReason(validatorReasons.getOrElse(operatorAddress, "")) match {
-          case constants.View.MISSING_SIGNATURE => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSING_SIGNATURE_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
-          case constants.View.DOUBLE_SIGNING => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_DOUBLE_SIGNING_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
-          case _ => Future("")
-        }
-
-        for {
-          validator <- validator
-          _ <- insertNotification(validator)
-        } yield ()
+      def insertNotification(validator: Validator) = utilities.Validator.getSlashingReason(validatorReasons.getOrElse(operatorAddress, "")) match {
+        case constants.View.MISSING_SIGNATURE => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSING_SIGNATURE_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
+        case constants.View.DOUBLE_SIGNING => masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_DOUBLE_SIGNING_SLASHING, validator.description.moniker, height.toString)(s"'${validator.operatorAddress}'")
+        case _ => Future("")
       }
+
+      for {
+        validator <- validator
+        _ <- insertNotification(validator)
+      } yield ()
     }
 
     (for {
@@ -312,7 +310,6 @@ class Block @Inject()(
   } else Future()
 
   def onMissedBlockEvents(livenessEvents: Seq[Event], height: Int): Future[Unit] = if (livenessEvents.nonEmpty) {
-
     val slashingParameter = blockchainParameters.Service.tryGetSlashingParameter
 
     def addEvent(validator: Validator, missedBlockCounter: Int, height: Int, slashingParameter: SlashingParameter): Future[String] = {
@@ -324,19 +321,18 @@ class Block @Inject()(
       } else Future("")
     }
 
-    def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) {
-      event =>
-        val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value)
-        val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.toInt)
-        val validator = blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress))
+    def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
+      val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value)
+      val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.toInt)
+      val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
 
-        (for {
-          validator <- validator
-          _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
-        } yield ()
-          ).recover {
-          case baseException: BaseException => throw baseException
-        }
+      (for {
+        validator <- validator
+        _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
 
     (for {

@@ -11,7 +11,7 @@
         @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
         @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
         @commonTextInfo(constants.View.STATUS, Messages(proposal.status))
-        @commonTextInfo(constants.View.SUBMIT_TIME, proposal.submitTime)
+        @commonTextInfo(constants.View.SUBMIT_TIME, utilities.Date.bcTimestampToString(proposal.submitTime))
         @commonTextInfo(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime)
         @commonTextInfo(constants.View.TOTAL_DEPOSIT, proposal.totalDeposit.map(x => x.amount.toMicroString + x.denom).mkString(","))
         @commonTextInfo(constants.View.VOTING_START, proposal.votingStartTime)
