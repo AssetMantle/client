@@ -7,11 +7,17 @@
 
 @defining(msg.asInstanceOf[EditValidator]) { editValidator =>
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(editValidator.validatorAddress, routes.ViewController.validator(editValidator.validatorAddress)))
-    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, editValidator.commissionRate))
-    @commonTextInfo(constants.View.VALIDATOR_MONIKER, editValidator.description.moniker)
-    @commonTextInfo(constants.View.VALIDATOR_IDENTITY, editValidator.description.identity)
-    @commonTextInfo(constants.View.VALIDATOR_WEBSITE, editValidator.description.website)
-    @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, editValidator.description.securityContact)
-    @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, editValidator.description.details)
-    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, editValidator.minSelfDelegation)
+    @if(editValidator.commissionRate.isDefined) {
+        @commonTextInfo(constants.View.COMMISSION_RATE, (editValidator.commissionRate.get*100).toString)%)
+    }
+    @if(editValidator.description.isDefined) {
+        @commonTextInfo(constants.View.VALIDATOR_MONIKER, editValidator.description.get.moniker)
+        @commonTextInfo(constants.View.VALIDATOR_IDENTITY, editValidator.description.get.identity)
+        @commonTextInfo(constants.View.VALIDATOR_WEBSITE, editValidator.description.get.website)
+        @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, editValidator.description.get.securityContact)
+        @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, editValidator.description.get.details)
+    }
+    @if(editValidator.minSelfDelegation.isDefined) {
+        @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, editValidator.minSelfDelegation.get.toString)
+    }
 }

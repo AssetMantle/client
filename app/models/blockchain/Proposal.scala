@@ -21,10 +21,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Proposal(id: Int, content: ProposalContent, proposalType: String, status: String, finalTallyResult: FinalTallyResult, submitTime: String, depositEndTime: String, totalDeposit: Seq[Coin], votingStartTime: String, votingEndTime: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Proposal(id: Int, content: ProposalContent, status: String, finalTallyResult: FinalTallyResult, submitTime: String, depositEndTime: String, totalDeposit: Seq[Coin], votingStartTime: String, votingEndTime: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
   def addDeposit(depositCoins: Seq[Coin]): Proposal = Proposal(
-    id = id, content = content, proposalType = proposalType, status = status, finalTallyResult = finalTallyResult, submitTime = submitTime, depositEndTime = depositEndTime,
+    id = id, content = content, status = status, finalTallyResult = finalTallyResult, submitTime = submitTime, depositEndTime = depositEndTime,
     totalDeposit = utilities.Blockchain.addCoins(totalDeposit, depositCoins),
     votingStartTime = votingStartTime, votingEndTime = votingEndTime)
 
@@ -46,7 +46,7 @@ case class Proposal(id: Int, content: ProposalContent, proposalType: String, sta
   }
 
   def activateVotingPeriod(currentTime: String, votingPeriod: Long): Proposal = Proposal(
-    id = id, content = content, proposalType = proposalType,
+    id = id, content = content,
     status = constants.Blockchain.Proposal.Status.VOTING_PERIOD,
     finalTallyResult = finalTallyResult, submitTime = submitTime, depositEndTime = depositEndTime,
     totalDeposit = totalDeposit,
@@ -82,11 +82,11 @@ class Proposals @Inject()(
 
   private[models] val proposalTable = TableQuery[ProposalTable]
 
-  case class ProposalSerialized(id: Int, content: String, proposalType: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), proposalType = proposalType, status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = submitTime, depositEndTime = depositEndTime, totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = votingStartTime, votingEndTime = votingEndTime, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ProposalSerialized(id: Int, content: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = submitTime, depositEndTime = depositEndTime, totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = votingStartTime, votingEndTime = votingEndTime, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = Json.toJson(proposal.content).toString, proposalType = proposal.proposalType, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime, depositEndTime = proposal.depositEndTime, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime, votingEndTime = proposal.votingEndTime, createdBy = proposal.createdBy, createdOn = proposal.createdOn, createdOnTimeZone = proposal.createdOnTimeZone, updatedBy = proposal.updatedBy, updatedOn = proposal.updatedOn, updatedOnTimeZone = proposal.updatedOnTimeZone)
+  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = Json.toJson(proposal.content).toString, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime, depositEndTime = proposal.depositEndTime, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime, votingEndTime = proposal.votingEndTime, createdBy = proposal.createdBy, createdOn = proposal.createdOn, createdOnTimeZone = proposal.createdOnTimeZone, updatedBy = proposal.updatedBy, updatedOn = proposal.updatedOn, updatedOnTimeZone = proposal.updatedOnTimeZone)
 
   private def add(proposal: Proposal): Future[Int] = db.run((proposalTable returning proposalTable.map(_.id) += serialize(proposal)).asTry).map {
     case Success(result) => result
@@ -119,13 +119,11 @@ class Proposals @Inject()(
 
   private[models] class ProposalTable(tag: Tag) extends Table[ProposalSerialized](tag, "Proposal_BC") {
 
-    def * = (id, content, proposalType, status, finalTallyResult, submitTime, depositEndTime, totalDeposit, votingStartTime, votingEndTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalSerialized.tupled, ProposalSerialized.unapply)
+    def * = (id, content, status, finalTallyResult, submitTime, depositEndTime, totalDeposit, votingStartTime, votingEndTime, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalSerialized.tupled, ProposalSerialized.unapply)
 
     def id = column[Int]("id", O.PrimaryKey)
 
     def content = column[String]("content")
-
-    def proposalType = column[String]("proposalType")
 
     def status = column[String]("status")
 
@@ -180,7 +178,7 @@ class Proposals @Inject()(
       val totalProposals = Service.getSize
       val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
 
-      def upsert(totalProposal: Int, governanceParameters: GovernanceParameter) = Service.insertOrUpdate(Proposal(id = totalProposal + startingProposalID, content = submitProposal.content, proposalType = submitProposal.content.proposalContentType, status = constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD, finalTallyResult = FinalTallyResult(0, 0, 0, 0), submitTime = blockHeader.time, depositEndTime = utilities.Date.addTime(blockHeader.time, governanceParameters.maxDepositPeriod), totalDeposit = Seq(), votingStartTime = "", votingEndTime = ""))
+      def upsert(totalProposal: Int, governanceParameters: GovernanceParameter) = Service.insertOrUpdate(Proposal(id = totalProposal + startingProposalID, content = submitProposal.content, status = constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD, finalTallyResult = FinalTallyResult(0, 0, 0, 0), submitTime = blockHeader.time, depositEndTime = utilities.Date.addTime(blockHeader.time, governanceParameters.maxDepositPeriod), totalDeposit = Seq(), votingStartTime = "", votingEndTime = ""))
 
       (for {
         totalProposals <- totalProposals

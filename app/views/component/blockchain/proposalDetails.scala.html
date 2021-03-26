@@ -11,12 +11,17 @@
         @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
         @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
         @commonTextInfo(constants.View.STATUS, proposal.status)
-        @commonTextInfo(constants.View.ID, proposal.finalTallyResult.toString)
-        @commonTextInfo(constants.View.ID, proposal.submitTime)
-        @commonTextInfo(constants.View.ID, proposal.depositEndTime)
-        @commonTextInfo(constants.View.ID, proposal.totalDeposit.toString)
-        @commonTextInfo(constants.View.ID, proposal.votingStartTime)
-        @commonTextInfo(constants.View.ID, proposal.votingEndTime)
+        @commonTextInfo(constants.View.SUBMIT_TIME, proposal.submitTime)
+        @commonTextInfo(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime)
+        @commonTextInfo(constants.View.TOTAL_DEPOSIT, proposal.totalDeposit.map(x => x.amount.toMicroString + x.denom).mkString(","))
+        @commonTextInfo(constants.View.VOTING_START, proposal.votingStartTime)
+        @commonTextInfo(constants.View.VOTING_END, proposal.votingEndTime)
+        <div>@Messages(constants.View.FINAL_TALLY_RESULTS):
+            @commonTextInfo(constants.View.YES, proposal.finalTallyResult.yes.toString())
+            @commonTextInfo(constants.View.NO, proposal.finalTallyResult.no.toString())
+            @commonTextInfo(constants.View.NO_WITH_VETO, proposal.finalTallyResult.noWithVeto.toString())
+            @commonTextInfo(constants.View.ABSTAIN, proposal.finalTallyResult.abstain.toString())
+        </div>
     }
 
 }

@@ -222,7 +222,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Proposal_BC"
 (
     "id"                INTEGER NOT NULL,
     "content"           VARCHAR NOT NULL,
-    "proposalType"      VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
     "finalTallyResult"  VARCHAR NOT NULL,
     "submitTime"        VARCHAR NOT NULL,

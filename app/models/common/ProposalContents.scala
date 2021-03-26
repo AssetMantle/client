@@ -19,9 +19,7 @@ object ProposalContents {
 
   implicit val plainWrites: OWrites[Plan] = Json.writes[Plan]
 
-  case class SoftwareUpgrade(title: String, description: String, plan: Plan) extends ProposalContent {
-    val proposalContentType: String = constants.Blockchain.Proposal.SOFTWARE_UPGRADE
-  }
+  case class SoftwareUpgrade(title: String, description: String, plan: Plan, proposalContentType: String = constants.Blockchain.Proposal.SOFTWARE_UPGRADE) extends ProposalContent
 
   implicit val softwareUpgradeReads: Reads[SoftwareUpgrade] = Json.reads[SoftwareUpgrade]
 
@@ -33,35 +31,25 @@ object ProposalContents {
 
   implicit val changeWrites: OWrites[Change] = Json.writes[Change]
 
-  //TODO
-  case class ParameterChange(title: String, description: String, changes: Seq[Change]) extends ProposalContent {
-    val proposalContentType: String = constants.Blockchain.Proposal.PARAMETER_CHANGE
-  }
+  case class ParameterChange(title: String, description: String, changes: Seq[Change], proposalContentType: String = constants.Blockchain.Proposal.PARAMETER_CHANGE) extends ProposalContent
 
   implicit val parameterChangeReads: Reads[ParameterChange] = Json.reads[ParameterChange]
 
   implicit val parameterChangeWrites: OWrites[ParameterChange] = Json.writes[ParameterChange]
 
-  case class Text(title: String, description: String) extends ProposalContent {
-    val proposalContentType: String = constants.Blockchain.Proposal.TEXT
-  }
+  case class Text(title: String, description: String, proposalContentType: String = constants.Blockchain.Proposal.TEXT) extends ProposalContent
 
   implicit val textReads: Reads[Text] = Json.reads[Text]
 
   implicit val textWrites: OWrites[Text] = Json.writes[Text]
 
-  //TODO onNewBlock updated account balance of recipient if success
-  case class CommunityPoolSpend(title: String, description: String, recipient: String, amount: Seq[Coin]) extends ProposalContent {
-    val proposalContentType: String = constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND
-  }
+  case class CommunityPoolSpend(title: String, description: String, recipient: String, amount: Seq[Coin], proposalContentType: String = constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND) extends ProposalContent
 
   implicit val communityPoolSpendReads: Reads[CommunityPoolSpend] = Json.reads[CommunityPoolSpend]
 
   implicit val communityPoolSpendWrites: OWrites[CommunityPoolSpend] = Json.writes[CommunityPoolSpend]
 
-  case class CancelSoftwareUpgrade(title: String, description: String) extends ProposalContent {
-    val proposalContentType: String = constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE
-  }
+  case class CancelSoftwareUpgrade(title: String, description: String, proposalContentType: String = constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE) extends ProposalContent
 
   implicit val cancelSoftwareUpgradeReads: Reads[CancelSoftwareUpgrade] = Json.reads[CancelSoftwareUpgrade]
 
@@ -82,11 +70,11 @@ object ProposalContents {
     ) (proposalContentApply _)
 
   implicit val proposalContentWrites: Writes[ProposalContent] = {
-    case cancelSoftwareUpgrade: CancelSoftwareUpgrade => Json.toJson(cancelSoftwareUpgrade)(Json.writes[CancelSoftwareUpgrade])
-    case softwareUpgrade: SoftwareUpgrade => Json.toJson(softwareUpgrade)(Json.writes[SoftwareUpgrade])
-    case parameterChange: ParameterChange => Json.toJson(parameterChange)(Json.writes[ParameterChange])
-    case text: Text => Json.toJson(text)(Json.writes[Text])
-    case communityPoolSpend: CommunityPoolSpend => Json.toJson(communityPoolSpend)(Json.writes[CommunityPoolSpend])
+    case cancelSoftwareUpgrade: CancelSoftwareUpgrade => Json.toJson(cancelSoftwareUpgrade)
+    case softwareUpgrade: SoftwareUpgrade => Json.toJson(softwareUpgrade)
+    case parameterChange: ParameterChange => Json.toJson(parameterChange)
+    case text: Text => Json.toJson(text)
+    case communityPoolSpend: CommunityPoolSpend => Json.toJson(communityPoolSpend)
     case _ => throw new BaseException(constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE)
   }
 

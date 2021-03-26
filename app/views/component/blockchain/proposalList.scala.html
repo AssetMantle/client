@@ -17,8 +17,8 @@
     <tbody>
         @proposalList.map { proposal =>
             <tr>
-                <td>@commonVerticalHtmlInfo(constants.View.ID, commonLink(proposal.id.toString, routes.ViewController.proposal(proposal.id)))</td>
-                <td>@proposal.content.proposalContentType</td>
+                <td>@commonLink(proposal.id.toString, routes.ViewController.proposal(proposal.id))</td>
+                <td>@proposal.content.title</td>
                 <td>@proposal.status</td>
                 <td>@proposal.votingStartTime</td>
                 <td>@proposal.submitTime</td>
