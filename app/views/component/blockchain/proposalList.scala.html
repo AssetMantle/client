@@ -22,7 +22,7 @@
                 <td>@Messages(proposal.status)</td>
                 <td>@utilities.Date.bcTimestampToString(proposal.votingStartTime)</td>
                 <td>@utilities.Date.bcTimestampToString(proposal.submitTime)</td>
-                <td>@proposal.totalDeposit</td>
+                <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
             </tr>
         }
 
