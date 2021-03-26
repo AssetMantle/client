@@ -61,6 +61,8 @@ class Block @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val slashingNotificationFactor: BigDecimal = BigDecimal(configuration.get[String]("blockchain.explorer.slashingNotificationFactor"))
+
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
 
@@ -247,7 +249,7 @@ class Block @Inject()(
     }
   }
 
-  def onSlashingEvents(slashingEvents: Seq[Event], height: Int): Future[Unit] = {
+  def onSlashingEvents(slashingEvents: Seq[Event], height: Int): Future[Unit] = if (slashingEvents.nonEmpty) {
     val blockResponse = getBlock.Service.get(height)
     val slashingParameter = blockchainParameters.Service.tryGetSlashingParameter
     val slashing = blockchainTokens.Utility.onSlashing
@@ -307,7 +309,7 @@ class Block @Inject()(
       ).recover {
       case baseException: BaseException => throw baseException
     }
-  }
+  } else Future()
 
   def onMissedBlockEvents(livenessEvents: Seq[Event], height: Int): Future[Unit] = if (livenessEvents.nonEmpty) {
 
@@ -317,7 +319,7 @@ class Block @Inject()(
       //TODO criteria needs to be set to send notification
       //TODO In future if private notifications is asked for missing blocks then it needs to be done from here.
       val slashingOnMissingBlocks = slashingParameter.minSignedPerWindow * slashingParameter.signedBlocksWindow
-      if ((missedBlockCounter % (slashingOnMissingBlocks / 10) == 0) && missedBlockCounter != slashingOnMissingBlocks) {
+      if ((missedBlockCounter % (slashingOnMissingBlocks * slashingNotificationFactor) == 0) && missedBlockCounter != slashingOnMissingBlocks) {
         masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker, missedBlockCounter.toString, height.toString)(validator.operatorAddress)
       } else Future("")
     }

@@ -19,9 +19,9 @@
             <tr>
                 <td>@commonLink(proposal.id.toString, routes.ViewController.proposal(proposal.id))</td>
                 <td>@proposal.content.title</td>
-                <td>@proposal.status</td>
-                <td>@proposal.votingStartTime</td>
-                <td>@proposal.submitTime</td>
+                <td>@Messages(proposal.status)</td>
+                <td>@utilities.Date.bcTimestampToString(proposal.votingStartTime)</td>
+                <td>@utilities.Date.bcTimestampToString(proposal.submitTime)</td>
                 <td>@proposal.totalDeposit</td>
             </tr>
         }

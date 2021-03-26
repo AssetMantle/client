@@ -6,8 +6,8 @@
 
 @defining(msg.asInstanceOf[SubmitProposal]) { submitProposal =>
     @commonHtmlInfo(constants.View.FROM, commonLink(submitProposal.proposer, routes.ViewController.wallet(submitProposal.proposer)))
-    @commonTextInfo(constants.View.TITLE, submitProposal.content.title)))
-    @commonTextInfo(constants.View.DESCRIPTION, submitProposal.content.description)))
-    @commonTextInfo(constants.View.TYPE, submitProposal.content.proposalContentType)))
+    @commonTextInfo(constants.View.TITLE, submitProposal.content.title)
+    @commonTextInfo(constants.View.DESCRIPTION, submitProposal.content.description)
+    @commonTextInfo(constants.View.TYPE, submitProposal.content.proposalContentType)
     @commonTextInfo(constants.View.INITIAL_DEPOSIT, submitProposal.initialDeposit.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
 }
