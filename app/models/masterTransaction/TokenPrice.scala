@@ -52,9 +52,21 @@ class TokenPrices @Inject()(
     }
   }
 
-  private def getPrices(denom: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).take(n).result)
+  private def getLatestSerial(denom: String): Future[Int] = db.run(tokenPriceTable.filter(_.denom === denom).map(_.serial).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
 
-  private def getLatestPrices(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.sortBy(_.serial.desc).take(n * totalTokens).result)
+  private def getLatestSerial: Future[Int] = db.run(tokenPriceTable.map(_.serial).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def getAllTokensLatestPrices(serial: Int, n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(x => x.serial >= serial && x.serial <= (serial - n * totalTokens)).result)
 
   private[models] class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") {
 
@@ -83,11 +95,14 @@ class TokenPrices @Inject()(
 
     def create(denom: String, price: Double): Future[Int] = add(TokenPrice(denom = denom, price = price))
 
-    def get(denom: String, from: Timestamp, to: Timestamp, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Future[Seq[TokenPrice]] = getPrices(denom, 5)
-
-    def get(denom: String, n: Int): Future[Seq[TokenPrice]] = getPrices(denom, n)
-
-    def getLatest(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = getLatestPrices(n = n, totalTokens = totalTokens)
+    def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
+      (for {
+        latestSerial <- getLatestSerial
+        tokenPrices <- getAllTokensLatestPrices(serial = latestSerial, n = n, totalTokens = totalTokens)
+      } yield tokenPrices).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
   }
 

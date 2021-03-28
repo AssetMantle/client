@@ -3,6 +3,7 @@ package controllers
 import controllers.actions._
 import exceptions.BaseException
 import models.blockchain._
+import models.common.Serializable.Coin
 import models.keyBase
 import models.keyBase.ValidatorAccount
 import models.masterTransaction.TokenPrice
@@ -156,7 +157,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val allDenoms = blockchainTokens.Service.getAllDenoms
 
-      def allTokenPrices(allDenoms: Seq[String]) = masterTransactionTokenPrices.Service.getLatest(n = 5, totalTokens = allDenoms.length)
+      def allTokenPrices(allDenoms: Seq[String]) = masterTransactionTokenPrices.Service.getLatestForAllTokens(n = 5, totalTokens = allDenoms.length)
 
       def getTokenPricesMap(allTokenPrices: Seq[TokenPrice], allDenoms: Seq[String]): Map[String, ListMap[String, Double]] = allDenoms.map(denom => denom -> ListMap(allTokenPrices.filter(_.denom == denom).map(tokenPrice => (tokenPrice.createdOn.getOrElse(throw new BaseException(constants.Response.TIME_NOT_FOUND)).toString, tokenPrice.price)): _*))(collection.breakOut)
 
@@ -172,7 +173,7 @@ class ComponentViewController @Inject()(
   def accountWallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val operatorAddress = Future(utilities.Bech32.convertAccountAddressToOperatorAddress(address))
-      val balances = blockchainBalances.Service.tryGet(address)
+      val balances = blockchainBalances.Service.get(address)
       val delegations = blockchainDelegations.Service.getAllForDelegator(address)
       val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
       val allDenoms = blockchainTokens.Service.getAllDenoms
@@ -201,7 +202,7 @@ class ComponentViewController @Inject()(
         undelegations <- undelegations
         validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))
         allDenoms <- allDenoms
-      } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = balances.coins, delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
+      } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins), delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

@@ -96,7 +96,7 @@ object TransactionMessages {
   implicit val fundCommunityPoolWrites: OWrites[FundCommunityPool] = Json.writes[FundCommunityPool]
 
   //evidence - TODO As evidence interface
-  case class Equivocation(height: String, time: String, power: String, consensusAddress: String)
+  case class Equivocation(height: Int, time: String, power: String, consensusAddress: String)
 
   implicit val equivocationReads: Reads[Equivocation] = Json.reads[Equivocation]
 
@@ -156,7 +156,7 @@ object TransactionMessages {
 
   implicit val createValidatorWrites: OWrites[CreateValidator] = Json.writes[CreateValidator]
 
-  case class EditValidator(validatorAddress: String, commissionRate: Option[BigDecimal], description: Option[Serializable.Validator.Description], minSelfDelegation: Option[MicroNumber]) extends TransactionMessage {
+  case class EditValidator(validatorAddress: String, commissionRate: Option[BigDecimal], description: Serializable.Validator.Description, minSelfDelegation: Option[MicroNumber]) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress))
   }
 
@@ -187,6 +187,8 @@ object TransactionMessages {
   implicit val undelegateReads: Reads[Undelegate] = Json.reads[Undelegate]
 
   implicit val undelegateWrites: OWrites[Undelegate] = Json.writes[Undelegate]
+
+  import Serializable.IBC._
 
   //ibc-client
   case class CreateClient(signer: String) extends TransactionMessage {
@@ -220,8 +222,6 @@ object TransactionMessages {
   implicit val upgradeClientReads: Reads[UpgradeClient] = Json.reads[UpgradeClient]
 
   implicit val upgradeClientWrites: OWrites[UpgradeClient] = Json.writes[UpgradeClient]
-
-  import Serializable.IBC._
 
   //ibc-connection
   case class ConnectionOpenInit(clientID: String, counterparty: Counterparty, version: Version, delayPeriod: Int, signer: String) extends TransactionMessage {

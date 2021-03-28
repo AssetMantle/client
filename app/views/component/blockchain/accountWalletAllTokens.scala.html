@@ -7,7 +7,7 @@
     @if(accountBalances.nonEmpty) {
         <div>
         @accountBalances.map { balance =>
-            @commonTextInfo(balance.denom, utilities.NumericOperation.formatNumber(balance.amount.toMicroDouble))
+            @commonTextInfo(balance.denom, utilities.NumericOperation.formatNumber(balance.amount))
         }
         </div>
         @defining[ListMap[String, Double]](

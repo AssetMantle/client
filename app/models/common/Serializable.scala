@@ -41,7 +41,14 @@ object Serializable {
     implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
   }
 
-  case class Coin(denom: String, amount: MicroNumber)
+  case class Coin(denom: String, amount: MicroNumber) {
+    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else denom.toUpperCase()
+
+    def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} ${normalizeDenom}" else s"${amount.toString} ${normalizeDenom}"
+
+    def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} ${denom}"
+
+  }
 
   def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
 

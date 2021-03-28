@@ -1,0 +1,13 @@
+@import models.common.Serializable.IBC.Channel
+@import views.html.base._
+
+@(key: String, channel: Channel)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.STATE, channel.state)
+    @commonTextInfo(constants.View.ORDERING, channel.ordering)
+    @views.html.component.blockchain.txMessages.ibc.commonCounterparty(constants.View.COUNTERPARTY, channel.counterparty)
+    @commonTextInfo(constants.View.CONNECTION_HOPS, channel.connectionHops.mkString(", "))
+    @commonTextInfo(constants.View.VERSION, channel.version)
+</div>

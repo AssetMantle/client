@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Timeout
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Timeout]) { timeout =>
+    @views.html.component.blockchain.txMessages.ibc.commonPacket(constants.View.PACKET, timeout.packet)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, timeout.proofHeight)
+    @commonIntInfo(constants.View.NEXT_SEQUENCE_RECV, timeout.nextSequenceRecv)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(timeout.signer, routes.ViewController.wallet(timeout.signer)))
+}

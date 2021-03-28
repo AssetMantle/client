@@ -1,0 +1,10 @@
+@import models.common.Serializable.IBC.Counterparty
+@import views.html.base._
+
+@(key: String, counterparty: Counterparty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.CLIENT_ID, counterparty.clientID)
+    @commonTextInfo(constants.View.CONNECTION_ID, counterparty.connectionID)
+</div>

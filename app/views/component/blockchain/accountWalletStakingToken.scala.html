@@ -5,12 +5,12 @@
 @(availableAmount: MicroNumber, delegatedAmount: MicroNumber, undelegatingAmount: MicroNumber, delegationRewards: MicroNumber, isValidator: Boolean, commissionRewards: MicroNumber, stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
     <div>
-        @commonTextInfo(constants.View.AVAILABLE, s"${utilities.NumericOperation.formatNumber(availableAmount.toMicroDouble)} ${stakingDenom}")
-        @commonTextInfo(constants.View.DELEGATED, s"${utilities.NumericOperation.formatNumber(delegatedAmount.toMicroDouble)} ${stakingDenom}")
-        @commonTextInfo(constants.View.UNDELEGATING, s"${utilities.NumericOperation.formatNumber(undelegatingAmount.toMicroDouble)} ${stakingDenom}")
-        @commonTextInfo(constants.View.DELEGATOR_REWARDS, s"${utilities.NumericOperation.formatNumber(delegationRewards.toMicroDouble)} ${stakingDenom}")
+        @commonTextInfo(constants.View.AVAILABLE, s"${utilities.NumericOperation.formatNumber(availableAmount, normalize = false)} ${stakingDenom}")
+        @commonTextInfo(constants.View.DELEGATED, s"${utilities.NumericOperation.formatNumber(delegatedAmount, normalize = false)} ${stakingDenom}")
+        @commonTextInfo(constants.View.UNDELEGATING, s"${utilities.NumericOperation.formatNumber(undelegatingAmount, normalize = false)} ${stakingDenom}")
+        @commonTextInfo(constants.View.DELEGATOR_REWARDS, s"${utilities.NumericOperation.formatNumber(delegationRewards, normalize = false)} ${stakingDenom}")
         @if(isValidator) {
-            @commonTextInfo(constants.View.COMMISSION_REWARDS, Seq(commissionRewards.toString, stakingDenom).mkString(" "))
+            @commonTextInfo(constants.View.COMMISSION_REWARDS, Seq(commissionRewards.toMicroString, stakingDenom).mkString(" "))
         }
     </div>
     @if(availableAmount != MicroNumber.zero || delegatedAmount != MicroNumber.zero || undelegatingAmount != MicroNumber.zero) {

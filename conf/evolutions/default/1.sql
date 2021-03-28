@@ -1196,7 +1196,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("denom")
+    PRIMARY KEY ("serial")
 );
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"

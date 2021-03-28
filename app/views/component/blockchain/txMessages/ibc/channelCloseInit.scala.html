@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ChannelCloseInit
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ChannelCloseInit]) { channelCloseInit =>
+    @commonTextInfo(constants.View.PORT_ID, channelCloseInit.portID)
+    @commonTextInfo(constants.View.CHANNEL_ID, channelCloseInit.channelID)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelCloseInit.signer, routes.ViewController.wallet(channelCloseInit.signer)))
+}

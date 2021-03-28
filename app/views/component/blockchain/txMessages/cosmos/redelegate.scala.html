@@ -8,5 +8,5 @@
     @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(redelegate.delegatorAddress, routes.ViewController.wallet(redelegate.delegatorAddress)))
     @commonHtmlInfo(constants.View.VALIDATOR_SOURCE_ADDRESS, commonLink(redelegate.validatorSrcAddress, routes.ViewController.validator(redelegate.validatorSrcAddress)))
     @commonHtmlInfo(constants.View.VALIDATOR_DESTINATION_ADDRESS, commonLink(redelegate.validatorDstAddress, routes.ViewController.validator(redelegate.validatorDstAddress)))
-    @commonTextInfo(constants.View.AMOUNTS, s"${redelegate.amount.amount} ${redelegate.amount.denom}")
+    @commonTextInfo(constants.View.AMOUNTS, redelegate.amount.getAmountWithNormalizedDenom())
 }

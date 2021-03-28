@@ -84,7 +84,7 @@ object TransactionMessageResponses {
 
   //evidence - TODO As evidence interface
   case class Equivocation(height: String, time: String, power: String, consensus_address: String) {
-    def toEvidence: TransactionMessages.Equivocation = TransactionMessages.Equivocation(height = height, time = time, power = power, consensusAddress = consensus_address)
+    def toEvidence: TransactionMessages.Equivocation = TransactionMessages.Equivocation(height = height.toInt, time = time, power = power, consensusAddress = consensus_address)
   }
 
   implicit val equivocationReads: Reads[Equivocation] = Json.reads[Equivocation]
@@ -146,8 +146,8 @@ object TransactionMessageResponses {
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
-  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Option[Description], min_self_delegation: Option[String]) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate.fold[Option[BigDecimal]](None)(x => Some(BigDecimal(x))), description = description.fold[Option[Serializable.Validator.Description]](None)(x => Option(x.toDescription)), minSelfDelegation = min_self_delegation.fold[Option[MicroNumber]](None)(x => Some(MicroNumber(x))))
+  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Description, min_self_delegation: Option[String]) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate.fold[Option[BigDecimal]](None)(x => Some(BigDecimal(x))), description = description.toDescription, minSelfDelegation = min_self_delegation.fold[Option[MicroNumber]](None)(x => Some(MicroNumber(x))))
   }
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]

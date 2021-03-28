@@ -1,0 +1,16 @@
+@import models.common.Serializable.IBC.Packet
+@import views.html.base._
+
+@(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonIntInfo(constants.View.SEQUENCE, packet.sequence)
+    @commonTextInfo(constants.View.SOURCE_PORT, packet.sourcePort)
+    @commonTextInfo(constants.View.SOURCE_CHANNEL, packet.sourceChannel)
+    @commonTextInfo(constants.View.DESTINATION_PORT, packet.destinationPort)
+    @commonTextInfo(constants.View.DESTINATION_CHANNEL, packet.destinationChannel)
+    @views.html.component.blockchain.txMessages.ibc.commonFungibleTokenPacketData(constants.View.DATA, packet.data)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.TIMEOUT_HEIGHT, packet.timeoutHeight)
+    @commonIntInfo(constants.View.TIMEOUT_TIMESTAMP, packet.timeoutTimestamp)
+</div>

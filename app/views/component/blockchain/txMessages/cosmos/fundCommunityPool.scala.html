@@ -1,0 +1,10 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.FundCommunityPool
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[FundCommunityPool]) { fundCommunityPool =>
+    @commonHtmlInfo(constants.View.DEPOSITOR, commonLink(fundCommunityPool.depositor, routes.ViewController.wallet(fundCommunityPool.depositor)))
+    @commonTextInfo(constants.View.AMOUNTS, fundCommunityPool.amount.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
+}

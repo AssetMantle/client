@@ -81,15 +81,12 @@ class Block @Inject()(
     val transactionsByHeightResponse = getTransactionsByHeight.Service.get(header.height)
 
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
-      val transactionResponses = Future.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash))
-
-      def getTransactions(transactionResponses: Seq[TransactionResponse]): Future[Seq[blockchainTransaction]] = Future(transactionResponses.map(_.tx_response.toTransaction))
+      val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
 
       def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
       for {
-        transactionResponses <- transactionResponses
-        transactions <- getTransactions(transactionResponses)
+        transactions <- transactions
         _ <- actionsOnTransactions(transactions)(header)
         _ <- insertTxs(transactions)
       } yield transactions
@@ -256,22 +253,28 @@ class Block @Inject()(
 
     def update(blockResponse: BlockResponse, slashingParameter: SlashingParameter): Future[Map[String, String]] = {
       val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == constants.Blockchain.Event.Attribute.Reason))) { slashingEvent =>
-        val slashingReasonAttribute = slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason)
-        slashingReasonAttribute.fold(Future("", ""))(reasonAttribute => {
-          val hexAddress = utilities.Bech32.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value))
+        slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
+          val slashingReason = Future(slashingReasonAttribute.value.getOrElse(throw new BaseException(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND)))
+          val hexAddress = utilities.Bech32.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
-          val slashingFraction = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
 
-          val distributionHeight = if (reasonAttribute.value == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
+          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
           else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
-          def slashing(operatorAddress: String, distributionHeight: Int) = slash(validatorAddress = operatorAddress, infractionHeight = distributionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
+
+          def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
+            val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
+
+
+            slash(validatorAddress = operatorAddress, infractionHeight = distributionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
+          }
 
           for {
             operatorAddress <- operatorAddress
-            distributionHeight <- distributionHeight
-            _ <- slashing(operatorAddress, distributionHeight)
-          } yield (operatorAddress, reasonAttribute.value)
+            slashingReason <- slashingReason
+            distributionHeight <- getDistributionHeight(slashingReason)
+            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = distributionHeight)
+          } yield (operatorAddress, slashingReason)
         })
       }
       for {
@@ -322,8 +325,8 @@ class Block @Inject()(
     }
 
     def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
-      val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value)
-      val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.toInt)
+      val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
+      val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
       val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
 
       (for {
@@ -346,7 +349,7 @@ class Block @Inject()(
 
   def onProposalEvents(proposalEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(proposalEvents)(event => {
     val processInactiveProposal = if (event.`type` == constants.Blockchain.Event.InactiveProposal) {
-      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.toInt)
+      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
       val deleteDeposits = blockchainProposalDeposits.Service.deleteByProposalID(proposalID)
 
       def deleteProposal() = blockchainProposals.Service.delete(proposalID)
@@ -358,7 +361,7 @@ class Block @Inject()(
     } else Future()
 
     val processActiveProposal = if (event.`type` == constants.Blockchain.Event.ActiveProposal) {
-      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.toInt)
+      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
       val oldProposal = blockchainProposals.Service.tryGet(proposalID)
       val proposalResponse = getProposal.Service.get(proposalID)
 
@@ -407,8 +410,8 @@ class Block @Inject()(
   })
 
   def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
-    val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value)
-    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value)
+    val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
+    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator) else Future(throw new BaseException(constants.Response.INVALID_UNBONDING_COMPLETION_EVENT))
     (for {
       _ <- process
@@ -420,9 +423,9 @@ class Block @Inject()(
 
 
   def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
-    val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value)
-    val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value)
-    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value)
+    val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value.getOrElse(""))
+    val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
+    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator) else Future(throw new BaseException(constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT))
     (for {
       _ <- process
