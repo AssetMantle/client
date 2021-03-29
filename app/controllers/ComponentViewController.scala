@@ -77,6 +77,8 @@ class ComponentViewController @Inject()(
 
   private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
+  private val priceChartDataPoints = configuration.get[Int]("blockchain.token.priceChartDataPoints")
+
   private val chainID = configuration.get[String]("blockchain.chainID")
 
   def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -132,10 +134,10 @@ class ComponentViewController @Inject()(
 
   def tokensStatistics(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val tokens = blockchainTokens.Service.getAll
+      val token = blockchainTokens.Service.getStakingToken
       (for {
-        tokens <- tokens
-      } yield Ok(views.html.component.blockchain.tokensStatistics(tokens = tokens, stakingDenom = stakingDenom))
+        token <- token
+      } yield Ok(views.html.component.blockchain.tokensStatistics(token = token))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -157,16 +159,12 @@ class ComponentViewController @Inject()(
 
   def tokensPrices(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val allDenoms = blockchainTokens.Service.getAllDenoms
 
-      def allTokenPrices(allDenoms: Seq[String]) = masterTransactionTokenPrices.Service.getLatestForAllTokens(n = 5, totalTokens = allDenoms.length)
-
-      def getTokenPricesMap(allTokenPrices: Seq[TokenPrice], allDenoms: Seq[String]): Map[String, ListMap[String, Double]] = allDenoms.map(denom => denom -> ListMap(allTokenPrices.filter(_.denom == denom).map(tokenPrice => (tokenPrice.createdOn.getOrElse(throw new BaseException(constants.Response.TIME_NOT_FOUND)).toString, tokenPrice.price)): _*))(collection.breakOut)
+      def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByToken(denom = stakingDenom, n = priceChartDataPoints)
 
       (for {
-        allDenoms <- allDenoms
-        allTokenPrices <- allTokenPrices(allDenoms)
-      } yield Ok(views.html.component.blockchain.tokensPrices(getTokenPricesMap(allTokenPrices, allDenoms)))
+        tokenPrices <- getTokenPrices
+      } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, stakingDenom))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

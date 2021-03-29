@@ -95,7 +95,6 @@ object TransactionMessages {
 
   implicit val fundCommunityPoolWrites: OWrites[FundCommunityPool] = Json.writes[FundCommunityPool]
 
-  //evidence - TODO As evidence interface
   case class Equivocation(height: Int, time: String, power: String, consensusAddress: String)
 
   implicit val equivocationReads: Reads[Equivocation] = Json.reads[Equivocation]
@@ -224,7 +223,7 @@ object TransactionMessages {
   implicit val upgradeClientWrites: OWrites[UpgradeClient] = Json.writes[UpgradeClient]
 
   //ibc-connection
-  case class ConnectionOpenInit(clientID: String, counterparty: Counterparty, version: Version, delayPeriod: Int, signer: String) extends TransactionMessage {
+  case class ConnectionOpenInit(clientID: String, counterparty: ConnectionCounterparty, version: Version, delayPeriod: Int, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -248,7 +247,7 @@ object TransactionMessages {
 
   implicit val connectionOpenAckWrites: OWrites[ConnectionOpenAck] = Json.writes[ConnectionOpenAck]
 
-  case class ConnectionOpenTry(clientID: String, previousConnectionID: String, counterparty: Counterparty, delayPeriod: Int, counterpartyVersions: Seq[Version], proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
+  case class ConnectionOpenTry(clientID: String, previousConnectionID: String, counterparty: ConnectionCounterparty, delayPeriod: Int, counterpartyVersions: Seq[Version], proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 

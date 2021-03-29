@@ -2,22 +2,15 @@
 @import views.html.base._
 @import views.html.helper.select
 @import scala.collection.immutable.ListMap
+@import models.masterTransaction.TokenPrice
 
-@(allTokenPrices: Map[String, ListMap[String, Double]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(tokenPrices: Seq[TokenPrice], stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKENS_PRICE) {
-    @if(allTokenPrices.nonEmpty) {
-        <div class="cardHeaderSelect">
-        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(allTokenPrices.keys.head)), for(denom <- allTokenPrices.keys.toList) yield (constants.Blockchain.Token.getOrElse(denom, denom), constants.Blockchain.Token.getOrElse(denom, denom)), 'id -> "tokensPricesSymbolSelect", 'value -> s"'${allTokenPrices.keys.head}'", 'onClick -> s"showPrices('${allTokenPrices.keys}')", 'class -> "cmuk-select", 'label -> "")
-        </div>
-    }
+    @stakingDenom
 } {
-    @if(allTokenPrices.keys.nonEmpty) {
-        @for((denom, tokenPrices) <- allTokenPrices) {
-            <div id="@Seq("tokenPrices", constants.Blockchain.Token.getOrElse(denom, denom)).mkString("_")" class="hidden">
-            @commonLineChart(Seq("tokenPricesChart", constants.Blockchain.Token.getOrElse(denom, denom)).mkString("_"), tokenPrices, constants.Blockchain.Token.getOrElse(denom, denom), showLegend = false)
-            </div>
-        }
+    @if(tokenPrices.nonEmpty) {
+        @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOn.fold("")(_.toString) -> token.price).reverse: _*), constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom), showLegend = false)
     }
-    <script src="@routes.Assets.versioned("javascripts/tokensPrices.js")" type="text/javascript"></script>
+@*    <script src="@routes.Assets.versioned("javascripts/tokensPrices.js")" type="text/javascript"></script>*@
 }

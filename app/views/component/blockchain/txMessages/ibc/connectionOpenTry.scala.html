@@ -7,7 +7,7 @@
 @defining(msg.asInstanceOf[ConnectionOpenTry]) { connectionOpenTry =>
     @commonTextInfo(constants.View.CLIENT_ID, connectionOpenTry.clientID)
     @commonTextInfo(constants.View.PREVIOUS_CONNECTION_ID, connectionOpenTry.previousConnectionID)
-    @views.html.component.blockchain.txMessages.ibc.commonCounterparty(constants.View.COUNTERPARTY, connectionOpenTry.counterparty)
+    @views.html.component.blockchain.txMessages.ibc.commonConnectionCounterparty(constants.View.COUNTERPARTY, connectionOpenTry.counterparty)
     @commonIntInfo(constants.View.DELAY_PERIOD, connectionOpenTry.delayPeriod)
     <div>
     @connectionOpenTry.counterpartyVersions.zipWithIndex.map { case (version, index) => {

@@ -45,10 +45,10 @@ object Serializable {
     def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (amount.value >= BigInt(10000)) {
-      if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} ${normalizeDenom}" else s"${amount.toString} ${normalizeDenom}"
-    } else if (formatted) s"${utilities.NumericOperation.formatNumber(amount, false)} u${normalizeDenom}" else s"${amount.toMicroString} u${normalizeDenom}"
+      if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
+    } else if (formatted) s"${utilities.NumericOperation.formatNumber(amount, normalize = false)} u$normalizeDenom" else s"${amount.toMicroString} u$normalizeDenom"
 
-    def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} ${denom}"
+    def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
 
   }
 
@@ -220,11 +220,17 @@ object Serializable {
 
   object IBC {
 
-    case class Counterparty(clientID: String, connectionID: String)
+    case class ConnectionCounterparty(clientID: String, connectionID: String)
 
-    implicit val counterpartyReads: Reads[Counterparty] = Json.reads[Counterparty]
+    implicit val connectionCounterpartyReads: Reads[ConnectionCounterparty] = Json.reads[ConnectionCounterparty]
 
-    implicit val counterpartyWrites: OWrites[Counterparty] = Json.writes[Counterparty]
+    implicit val connectionCounterpartyWrites: OWrites[ConnectionCounterparty] = Json.writes[ConnectionCounterparty]
+
+    case class ChannelCounterparty(portID: String, channelID: String)
+
+    implicit val channelCounterpartyReads: Reads[ChannelCounterparty] = Json.reads[ChannelCounterparty]
+
+    implicit val channelCounterpartyWrites: OWrites[ChannelCounterparty] = Json.writes[ChannelCounterparty]
 
     case class Version(identifier: String, features: Seq[String])
 
@@ -238,7 +244,7 @@ object Serializable {
 
     implicit val clientHeightWrites: OWrites[ClientHeight] = Json.writes[ClientHeight]
 
-    case class Channel(state: String, ordering: String, counterparty: Counterparty, connectionHops: Seq[String], version: String)
+    case class Channel(state: String, ordering: String, counterparty: ChannelCounterparty, connectionHops: Seq[String], version: String)
 
     implicit val channelReads: Reads[Channel] = Json.reads[Channel]
 

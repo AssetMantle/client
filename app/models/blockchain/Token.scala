@@ -74,7 +74,7 @@ class Tokens @Inject()(
     }
   }
 
-  private def findBydenom(denom: String): Future[TokenSerialized] = db.run(tokenTable.filter(_.denom === denom).result.head.asTry).map {
+  private def findByDenom(denom: String): Future[TokenSerialized] = db.run(tokenTable.filter(_.denom === denom).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
@@ -155,11 +155,13 @@ class Tokens @Inject()(
 
     def create(token: Token): Future[String] = add(token)
 
-    def get(denom: String): Future[Token] = findBydenom(denom).map(_.deserialize)
+    def get(denom: String): Future[Token] = findByDenom(denom).map(_.deserialize)
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
 
     def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
+
+    def getStakingToken: Future[Token] = findByDenom(stakingDenom).map(_.deserialize)
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 

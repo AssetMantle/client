@@ -6,7 +6,7 @@
 
 @defining(msg.asInstanceOf[ConnectionOpenInit]) { connectionOpenInit =>
     @commonTextInfo(constants.View.CLIENT_ID, connectionOpenInit.clientID)
-    @views.html.component.blockchain.txMessages.ibc.commonCounterparty(constants.View.COUNTERPARTY, connectionOpenInit.counterparty)
+    @views.html.component.blockchain.txMessages.ibc.commonConnectionCounterparty(constants.View.COUNTERPARTY, connectionOpenInit.counterparty)
     @views.html.component.blockchain.txMessages.ibc.commonVersion(constants.View.VERSION, connectionOpenInit.version)
     @commonIntInfo(constants.View.DELAY_PERIOD, connectionOpenInit.delayPeriod)
     @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenInit.signer, routes.ViewController.wallet(connectionOpenInit.signer)))

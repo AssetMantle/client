@@ -62,6 +62,13 @@ class TokenPrices @Inject()(
     }
   }
 
+  private def getLatestTokens(denom: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).take(n).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private def getLatestSerial: Future[Int] = db.run(tokenPriceTable.map(_.serial).max.result.asTry).map {
     case Success(result) => result.getOrElse(0)
     case Failure(exception) => exception match {
@@ -98,6 +105,8 @@ class TokenPrices @Inject()(
 
     def create(denom: String, price: Double): Future[Int] = add(TokenPrice(denom = denom, price = price))
 
+    def getLatestByToken(denom: String, n: Int): Future[Seq[TokenPrice]] = getLatestTokens(denom = denom, n = n)
+
     def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
       (for {
         latestSerial <- getLatestSerial
@@ -114,11 +123,14 @@ class TokenPrices @Inject()(
       val denoms = blockchainTokens.Service.getAllDenoms
 
       def update(denoms: Seq[String]) = utilitiesOperations.traverse(denoms) { denom =>
-        val price = getAscendexTicker.Service.get(constants.Blockchain.Token.getOrElse(denom, throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND))).map(_.data.close.toDouble)
-        for {
-          price <- price
-          _ <- Service.create(denom = denom, price = price)
-        } yield ()
+        val denomTicker = constants.Blockchain.TokenTickers.get(denom)
+        if (denomTicker.isDefined) {
+          val price = getAscendexTicker.Service.get(denomTicker.get).map(_.data.close.toDouble)
+          for {
+            price <- price
+            _ <- Service.create(denom = denom, price = price)
+          } yield ()
+        } else Future()
       }
 
       (for {
