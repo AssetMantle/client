@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[Delegate]) { delegate =>
     @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(delegate.delegatorAddress, routes.ViewController.wallet(delegate.delegatorAddress)))
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(delegate.validatorAddress, routes.ViewController.validator(delegate.validatorAddress)))
-    @commonTextInfo(constants.View.AMOUNTS, s"${delegate.amount.amount} ${delegate.amount.denom}")
+    @commonTextInfo(constants.View.AMOUNTS, delegate.amount.getAmountWithNormalizedDenom())
 }

@@ -1,31 +1,32 @@
 @import utilities.MicroNumber
 @import views.html.base._
 @import scala.collection.immutable.ListMap
+@import models.common.Serializable.Coin
 
-@(availableAmount: MicroNumber, delegatedAmount: MicroNumber, undelegatingAmount: MicroNumber, delegationRewards: MicroNumber, isValidator: Boolean, commissionRewards: MicroNumber, stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(available: Coin, delegated: Coin, undelegating: Coin, delegationRewards: Coin, isValidator: Boolean, commissionRewards: Coin)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
     <div>
-        @commonTextInfo(constants.View.AVAILABLE, s"${utilities.NumericOperation.formatNumber(availableAmount, normalize = false)} ${stakingDenom}")
-        @commonTextInfo(constants.View.DELEGATED, s"${utilities.NumericOperation.formatNumber(delegatedAmount, normalize = false)} ${stakingDenom}")
-        @commonTextInfo(constants.View.UNDELEGATING, s"${utilities.NumericOperation.formatNumber(undelegatingAmount, normalize = false)} ${stakingDenom}")
-        @commonTextInfo(constants.View.DELEGATOR_REWARDS, s"${utilities.NumericOperation.formatNumber(delegationRewards, normalize = false)} ${stakingDenom}")
+        @commonTextInfo(constants.View.AVAILABLE, available.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.DELEGATED, delegated.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.UNDELEGATING, undelegating.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.DELEGATOR_REWARDS, delegationRewards.getAmountWithNormalizedDenom())
         @if(isValidator) {
-            @commonTextInfo(constants.View.COMMISSION_REWARDS, Seq(commissionRewards.toMicroString, stakingDenom).mkString(" "))
+            @commonTextInfo(constants.View.COMMISSION_REWARDS, commissionRewards.getAmountWithNormalizedDenom())
         }
     </div>
-    @if(availableAmount != MicroNumber.zero || delegatedAmount != MicroNumber.zero || undelegatingAmount != MicroNumber.zero) {
+    @if(available.amount != MicroNumber.zero || delegated.amount != MicroNumber.zero || undelegating.amount != MicroNumber.zero) {
         @defining(if(isValidator)
             ListMap(
-                constants.View.AVAILABLE -> availableAmount.toDouble,
-                constants.View.DELEGATED -> delegatedAmount.toDouble,
-                constants.View.UNDELEGATING -> undelegatingAmount.toDouble,
-                constants.View.DELEGATOR_REWARDS -> delegationRewards.toDouble,
-                constants.View.COMMISSION_REWARDS -> delegationRewards.toDouble,
+                constants.View.AVAILABLE -> available.amount.toDouble,
+                constants.View.DELEGATED -> delegated.amount.toDouble,
+                constants.View.UNDELEGATING -> undelegating.amount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationRewards.amount.toDouble,
+                constants.View.COMMISSION_REWARDS -> delegationRewards.amount.toDouble,
             ) else ListMap(
-                constants.View.AVAILABLE -> availableAmount.toDouble,
-                constants.View.DELEGATED -> delegatedAmount.toDouble,
-                constants.View.UNDELEGATING -> undelegatingAmount.toDouble,
-                constants.View.DELEGATOR_REWARDS -> delegationRewards.toDouble,
+                constants.View.AVAILABLE -> available.amount.toDouble,
+                constants.View.DELEGATED -> delegated.amount.toDouble,
+                constants.View.UNDELEGATING -> undelegating.amount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationRewards.amount.toDouble,
             )
         ) { dataMap =>
             @commonPieChart("accountWalletStakingTokenChart", dataMap, showLegend = true)

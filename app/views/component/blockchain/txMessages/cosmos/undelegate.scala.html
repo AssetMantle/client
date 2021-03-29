@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[Undelegate]) { undelegate =>
     @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(undelegate.delegatorAddress, routes.ViewController.wallet(undelegate.delegatorAddress)))
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(undelegate.validatorAddress, routes.ViewController.validator(undelegate.validatorAddress)))
-    @commonTextInfo(constants.View.AMOUNTS, s"${undelegate.amount.amount} ${undelegate.amount.denom}")
+    @commonTextInfo(constants.View.AMOUNTS, undelegate.amount.getAmountWithNormalizedDenom())
 }

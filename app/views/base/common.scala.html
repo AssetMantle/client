@@ -109,56 +109,56 @@
 
                         @loginState match {
                             case null => {
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
-                                        <span class="singUpIcon">@commonIcon("signUp")</span>
-                                        @Messages(constants.Form.SIGN_UP.legend)
-                                    </a>
+@*                                <li>*@
+@*                                    <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">*@
+@*                                        <span class="singUpIcon">@commonIcon("signUp")</span>*@
+@*                                        @Messages(constants.Form.SIGN_UP.legend)*@
+@*                                    </a>*@
 
-                                </li>
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">
-                                        <span class="loginIcon">@commonIcon("login")</span>
-                                        @Messages(constants.Form.LOGIN.legend)
-                                    </a>
-                                </li>
+@*                                </li>*@
+@*                                <li>*@
+@*                                    <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())" class="loginLink">*@
+@*                                        <span class="loginIcon">@commonIcon("login")</span>*@
+@*                                        @Messages(constants.Form.LOGIN.legend)*@
+@*                                    </a>*@
+@*                                </li>*@
                             }
                             case default => {
-                                <li>
-                                    <a class="navItemRippleEffect">
-                                        @loginState.username
-                                    <span cmuk-icon="user" class="loginIcon"></span>
-                                    </a>
-                                    <div class="cmuk-navbar-dropdown profileDropdown">
-                                        <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                            <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect">
-                                            @Messages(constants.View.IDENTITY)
-                                            </a>
-                                            </li>
-                                            <li><a href="@controllers.routes.ViewController.asset()" class="navItemRippleEffect">
-                                            @Messages(constants.View.ASSET)
-                                            </a>
-                                            </li>
-                                            <li><a href="@controllers.routes.ViewController.order()" class="navItemRippleEffect">
-                                            @Messages(constants.View.ORDER)
-                                            </a>
-                                            </li>
-                                            <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect">
-                                            @Messages(constants.View.ACCOUNT)
-                                            </a>
-                                            </li>
-                                            <li><a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">
-                                            @Messages(constants.View.PROFILE)
-                                            </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">
-                                        <span class="logoutIcon">@commonIcon("logout")</span>
-                                    </a>
-                                </li>
+@*                                <li>*@
+@*                                    <a class="navItemRippleEffect">*@
+@*                                        @loginState.username*@
+@*                                    <span cmuk-icon="user" class="loginIcon"></span>*@
+@*                                    </a>*@
+@*                                    <div class="cmuk-navbar-dropdown profileDropdown">*@
+@*                                        <ul class="cmuk-nav cmuk-navbar-dropdown-nav">*@
+@*                                            <li><a href="@controllers.routes.ViewController.identity()" class="navItemRippleEffect">*@
+@*                                            @Messages(constants.View.IDENTITY)*@
+@*                                            </a>*@
+@*                                            </li>*@
+@*                                            <li><a href="@controllers.routes.ViewController.asset()" class="navItemRippleEffect">*@
+@*                                            @Messages(constants.View.ASSET)*@
+@*                                            </a>*@
+@*                                            </li>*@
+@*                                            <li><a href="@controllers.routes.ViewController.order()" class="navItemRippleEffect">*@
+@*                                            @Messages(constants.View.ORDER)*@
+@*                                            </a>*@
+@*                                            </li>*@
+@*                                            <li><a href="@controllers.routes.ViewController.account()" class="navItemRippleEffect">*@
+@*                                            @Messages(constants.View.ACCOUNT)*@
+@*                                            </a>*@
+@*                                            </li>*@
+@*                                            <li><a href="@controllers.routes.ViewController.profile()" class="navItemRippleEffect">*@
+@*                                            @Messages(constants.View.PROFILE)*@
+@*                                            </a>*@
+@*                                            </li>*@
+@*                                        </ul>*@
+@*                                    </div>*@
+@*                                </li>*@
+@*                                <li>*@
+@*                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())" class="navItemRippleEffect">*@
+@*                                        <span class="logoutIcon">@commonIcon("logout")</span>*@
+@*                                    </a>*@
+@*                                </li>*@
 
                             }
                         }

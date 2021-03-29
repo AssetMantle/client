@@ -4,7 +4,7 @@
 @import views.html.component.blockchain.{accountWalletAllTokens, accountWalletStakingToken}
 @import scala.collection.immutable.ListMap
 
-@(address: String, accountBalances: Seq[Coin], delegatedAmount: MicroNumber, undelegatingAmount: MicroNumber, delegationRewards: MicroNumber, isValidator: Boolean, commissionRewards: MicroNumber, stakingDenom: String, totalTokens: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.ACCOUNT_WALLET) {
     @address
@@ -12,10 +12,10 @@
     @if(totalTokens > 1) {
         @commonHorizontalSwitcher(ListMap(
             constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances),
-            constants.View.STAKING_TOKEN -> accountWalletStakingToken(availableAmount = accountBalances.find(_.denom == stakingDenom).fold(MicroNumber.zero)(_.amount), delegatedAmount = delegatedAmount, undelegatingAmount = undelegatingAmount, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom))
+            constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards))
         )
     } else {
-        @accountWalletStakingToken(availableAmount = accountBalances.find(_.denom == stakingDenom).fold(MicroNumber.zero)(_.amount), delegatedAmount = delegatedAmount, undelegatingAmount = undelegatingAmount, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom)
+        @accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards)
     }
 
 }

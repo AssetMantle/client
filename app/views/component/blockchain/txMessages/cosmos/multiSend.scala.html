@@ -8,11 +8,11 @@
     @Messages(constants.View.INPUTS):
     @multiSend.inputs.map { input =>
         @commonHtmlInfo(constants.View.ADDRESS, commonLink(input.address, routes.ViewController.wallet(input.address)))
-        @commonTextInfo(constants.View.AMOUNTS, input.coins.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
+        @commonTextInfo(constants.View.AMOUNTS, input.coins.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
     }
     @Messages(constants.View.OUTPUTS):
     @multiSend.outputs.map { output =>
         @commonHtmlInfo(constants.View.ADDRESS, commonLink(output.address, routes.ViewController.wallet(output.address)))
-        @commonTextInfo(constants.View.AMOUNTS, output.coins.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
+        @commonTextInfo(constants.View.AMOUNTS, output.coins.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
     }
 }

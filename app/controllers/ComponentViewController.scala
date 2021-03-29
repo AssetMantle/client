@@ -180,17 +180,17 @@ class ComponentViewController @Inject()(
 
       def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
 
-      def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[MicroNumber] = if (isValidator) {
-        getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount))
-      } else Future(MicroNumber.zero)
+      def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[Coin] = if (isValidator) {
+        getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
+      } else Future(Coin(stakingDenom, MicroNumber.zero))
 
-      def getDelegationRewards(delegatorAddress: String) = getDelegatorRewards.Service.get(delegatorAddress).map(_.total.headOption.fold(MicroNumber.zero)(_.amount))
+      def getDelegationRewards(delegatorAddress: String): Future[Coin] = getDelegatorRewards.Service.get(delegatorAddress).map(_.total.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
 
       def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 
-      def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): MicroNumber = delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum
+      def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(stakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum)
 
-      def getUndelegatingAmount(undelegations: Seq[Undelegation]): MicroNumber = undelegations.map(_.entries.map(_.balance).sum).sum
+      def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(stakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
       (for {
         operatorAddress <- operatorAddress
@@ -202,7 +202,7 @@ class ComponentViewController @Inject()(
         undelegations <- undelegations
         validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))
         allDenoms <- allDenoms
-      } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins), delegatedAmount = getDelegatedAmount(delegations, validators), undelegatingAmount = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
+      } yield Ok(views.html.component.blockchain.accountWallet(address = address, accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins), delegated = getDelegatedAmount(delegations, validators), undelegating = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

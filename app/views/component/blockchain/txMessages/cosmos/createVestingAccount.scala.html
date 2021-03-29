@@ -7,7 +7,7 @@
 @defining(msg.asInstanceOf[CreateVestingAccount]) { createVestingAccount =>
     @commonHtmlInfo(constants.View.FROM, commonLink(createVestingAccount.fromAddress, routes.ViewController.wallet(createVestingAccount.fromAddress)))
     @commonHtmlInfo(constants.View.TO, commonLink(createVestingAccount.toAddress, routes.ViewController.wallet(createVestingAccount.toAddress)))
-    @commonTextInfo(constants.View.AMOUNTS, createVestingAccount.amount.map(amt => s"${amt.amount.toMicroString} ${amt.denom}").mkString(", "))
+    @commonTextInfo(constants.View.AMOUNTS, createVestingAccount.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
     @commonTextInfo(constants.View.END_TIME, createVestingAccount.endTime)
     @commonBooleanInfo(constants.View.DELAYED, Option(createVestingAccount.delayed))
 }
