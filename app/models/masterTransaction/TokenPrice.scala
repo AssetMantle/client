@@ -8,6 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.blockchain
+import queries.ascendex.GetTicker
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -24,7 +25,9 @@ class TokenPrices @Inject()(
                              actorSystem: ActorSystem,
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
+                             getAscendexTicker: GetTicker,
                              blockchainTokens: blockchain.Tokens,
+                             utilitiesOperations: utilities.Operations
                            )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -108,17 +111,14 @@ class TokenPrices @Inject()(
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val r = new Random(System.currentTimeMillis())
       val denoms = blockchainTokens.Service.getAllDenoms
 
-      def update(denoms: Seq[String]) = {
-        Future.traverse(denoms) { denom =>
-          val price = Future(2.5 + 5 * r.nextDouble())
-          for {
-            price <- price
-            _ <- Service.create(denom = denom, price = price)
-          } yield ()
-        }
+      def update(denoms: Seq[String]) = utilitiesOperations.traverse(denoms) { denom =>
+        val price = getAscendexTicker.Service.get(constants.Blockchain.Token.getOrElse(denom, throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND))).map(_.data.close.toDouble)
+        for {
+          price <- price
+          _ <- Service.create(denom = denom, price = price)
+        } yield ()
       }
 
       (for {
