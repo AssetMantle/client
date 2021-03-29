@@ -42,6 +42,8 @@ class TokenPrices @Inject()(
 
   private[models] val tokenPriceTable = TableQuery[TokenPriceTable]
 
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private val tokenPriceIntialDelay = configuration.get[Int]("blockchain.token.priceInitialDelay")
@@ -120,26 +122,16 @@ class TokenPrices @Inject()(
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val denoms = blockchainTokens.Service.getAllDenoms
-
-      def update(denoms: Seq[String]) = utilitiesOperations.traverse(denoms) { denom =>
-        val denomTicker = constants.Blockchain.TokenTickers.get(denom)
-        if (denomTicker.isDefined) {
-          val price = getAscendexTicker.Service.get(denomTicker.get).map(_.data.close.toDouble)
-          for {
-            price <- price
-            _ <- Service.create(denom = denom, price = price)
-          } yield ()
-        } else Future()
-      }
-
-      (for {
-        denoms <- denoms
-        _ <- update(denoms)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
+      val denomTicker = constants.Blockchain.TokenTickers.get(stakingDenom)
+      if (denomTicker.isDefined) {
+        val price = getAscendexTicker.Service.get(denomTicker.get).map(_.data.close.toDouble)
+        (for {
+          price <- price
+          _ <- Service.create(denom = stakingDenom, price = price)
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        }
+      } else Future()
     }
   }
 
