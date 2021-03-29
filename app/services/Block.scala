@@ -284,7 +284,7 @@ class Block @Inject()(
 
     def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
-    def addEvents(validatorReasons: Map[String, String]): Future[Seq[Unit]] = Future.traverse(validatorReasons.keySet.toSeq) { operatorAddress =>
+    def addEvents(validatorReasons: Map[String, String]): Future[Seq[Unit]] = utilitiesOperations.traverse(validatorReasons.keySet.toSeq) { operatorAddress =>
       val validator = blockchainValidators.Service.tryGet(operatorAddress)
 
       def insertNotification(validator: Validator) = utilities.Validator.getSlashingReason(validatorReasons.getOrElse(operatorAddress, "")) match {

@@ -24,6 +24,7 @@ case class ValidatorAccount(address: String, identity: String, username: Option[
 class ValidatorAccounts @Inject()(
                                    wsClient: WSClient,
                                    getValidatorKeyBaseAccount: GetValidatorKeyBaseAccount,
+                                   utilitiesOperations: utilities.Operations,
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
@@ -156,7 +157,7 @@ class ValidatorAccounts @Inject()(
     def scheduleUpdates(): Future[Unit] = {
       val allValidatorAccounts = Service.getAll
 
-      def updateAll(validatorAccounts: Seq[ValidatorAccount]) = Future.traverse(validatorAccounts)(validatorAccount => insertOrUpdateKeyBaseAccount(validatorAddress = validatorAccount.address, identity = validatorAccount.identity))
+      def updateAll(validatorAccounts: Seq[ValidatorAccount]) = utilitiesOperations.traverse(validatorAccounts)(validatorAccount => insertOrUpdateKeyBaseAccount(validatorAddress = validatorAccount.address, identity = validatorAccount.identity))
 
       (for {
         allValidatorAccounts <- allValidatorAccounts
