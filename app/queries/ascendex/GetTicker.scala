@@ -24,7 +24,7 @@ class GetTicker @Inject()()(implicit wsClient: WSClient, configuration: Configur
 
   private val url = host + path1
 
-  private def action(tokenName: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + path1 + tokenName + path2).get)
+  private def action(tokenName: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + tokenName + path2).get)
 
   object Service {
 

@@ -69,7 +69,7 @@ class TokenPrices @Inject()(
     }
   }
 
-  private def getAllTokensLatestPrices(serial: Int, n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(x => x.serial >= serial && x.serial <= (serial - n * totalTokens)).result)
+  private def getAllTokensBySerial(startSerial: Int, endSerial: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(x => x.serial >= startSerial && x.serial <= endSerial).result)
 
   private[models] class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") {
 
@@ -101,7 +101,7 @@ class TokenPrices @Inject()(
     def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
       (for {
         latestSerial <- getLatestSerial
-        tokenPrices <- getAllTokensLatestPrices(serial = latestSerial, n = n, totalTokens = totalTokens)
+        tokenPrices <- getAllTokensBySerial(startSerial = latestSerial - (n * totalTokens), endSerial = latestSerial)
       } yield tokenPrices).recover {
         case baseException: BaseException => throw baseException
       }

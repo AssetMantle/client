@@ -8,14 +8,14 @@
 @commonCard(constants.View.TOKENS_PRICE) {
     @if(allTokenPrices.nonEmpty) {
         <div class="cardHeaderSelect">
-        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(allTokenPrices.keys.head)), for(denom <- allTokenPrices.keys.toList) yield (denom, denom), 'id -> "tokensPricesSymbolSelect", 'value -> s"'${allTokenPrices.keys.head}'", 'onClick -> s"showPrices('${allTokenPrices.keys}')", 'class -> "cmuk-select", 'label -> "")
+        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(allTokenPrices.keys.head)), for(denom <- allTokenPrices.keys.toList) yield (constants.Blockchain.Token.getOrElse(denom, denom), constants.Blockchain.Token.getOrElse(denom, denom)), 'id -> "tokensPricesSymbolSelect", 'value -> s"'${allTokenPrices.keys.head}'", 'onClick -> s"showPrices('${allTokenPrices.keys}')", 'class -> "cmuk-select", 'label -> "")
         </div>
     }
 } {
     @if(allTokenPrices.keys.nonEmpty) {
         @for((denom, tokenPrices) <- allTokenPrices) {
-            <div id="@Seq("tokenPrices", denom).mkString("_")" class="hidden">
-            @commonLineChart(Seq("tokenPricesChart", denom).mkString("_"), tokenPrices, denom, showLegend = false)
+            <div id="@Seq("tokenPrices", constants.Blockchain.Token.getOrElse(denom, denom)).mkString("_")" class="hidden">
+            @commonLineChart(Seq("tokenPricesChart", constants.Blockchain.Token.getOrElse(denom, denom)).mkString("_"), tokenPrices, constants.Blockchain.Token.getOrElse(denom, denom), showLegend = false)
             </div>
         }
     }
