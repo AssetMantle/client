@@ -54,6 +54,11 @@ case class Proposal(id: Int, content: ProposalContent, status: String, finalTall
     votingEndTime = utilities.Date.addTime(currentTime, votingPeriod)
   )
 
+  def isPassed: Boolean = status match {
+    case constants.Blockchain.Proposal.Status.PASSED => true
+    case _ => false
+  }
+
 }
 
 @Singleton
@@ -192,7 +197,7 @@ class Proposals @Inject()(
       }
     }
 
-    def insertOrUpdateProposal(id: Int): Future[ProposalResponse] = {
+    def insertOrUpdateProposal(id: Int): Future[Proposal] = {
       val proposalResponse = getProposal.Service.get(id)
 
       def upsert(proposalResponse: ProposalResponse) = Service.insertOrUpdate(proposalResponse.proposal.toSerializableProposal)
@@ -200,48 +205,51 @@ class Proposals @Inject()(
       (for {
         proposalResponse <- proposalResponse
         _ <- upsert(proposalResponse)
-      } yield proposalResponse).recover {
+      } yield proposalResponse.proposal.toSerializableProposal).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    def tally(finalTallyResult: FinalTallyResult): Future[(Boolean, Boolean)] = {
-      val governanceParameter = blockchainParameters.Service.tryGetGovernanceParameter
-      val totalVotingPower = blockchainValidators.Service.getTotalVotingPower.map(x => BigDecimal(x.toMicroString))
-      val totalBondedTokens = blockchainTokens.Service.getTotalBondedAmount.map(x => BigDecimal(x.toMicroString))
-
-      (for {
-        governanceParameter <- governanceParameter
-        totalVotingPower <- totalVotingPower
-        totalBondedTokens <- totalBondedTokens
-      } yield {
-        // Maintain this order
-        if (totalBondedTokens == 0) {
-          return Future(false, false)
-        }
-
-        if ((totalVotingPower / totalBondedTokens) < governanceParameter.quorum) {
-          return Future(false, true)
-        }
-
-        if ((totalVotingPower - finalTallyResult.abstain) == 0) {
-          return Future(false, false)
-        }
-
-        if ((finalTallyResult.noWithVeto / totalVotingPower) > governanceParameter.vetoThreshold) {
-          return Future(false, true)
-        }
-
-        if ((finalTallyResult.yes / (totalVotingPower - finalTallyResult.abstain)) > governanceParameter.threshold) {
-          return Future(true, false)
-        }
-        else {
-          return Future(false, false)
-        }
-      }).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
+    // WARNING: Risky to use due to state difference
+    //    def tally(finalTallyResult: FinalTallyResult): Future[(Boolean, Boolean)] = {
+    //      val governanceParameter = blockchainParameters.Service.tryGetGovernanceParameter
+    //      val totalVotingPower = blockchainValidators.Service.getTotalVotingPower.map(x => BigDecimal(x.toMicroString))
+    //      val totalBondedTokens = blockchainTokens.Service.getTotalBondedAmount.map(x => BigDecimal(x.toMicroString))
+    //
+    //      def getResults(governanceParameter: GovernanceParameter, totalVotingPower: BigDecimal, totalBondedTokens: BigDecimal): (Boolean, Boolean) = {
+    //        // Maintain this order
+    //        if (totalBondedTokens == 0) {
+    //          return (false, false)
+    //        }
+    //
+    //        if ((totalVotingPower / totalBondedTokens) < governanceParameter.quorum) {
+    //          return (false, true)
+    //        }
+    //
+    //        if ((totalVotingPower - finalTallyResult.abstain) == 0) {
+    //          return (false, false)
+    //        }
+    //
+    //        if ((finalTallyResult.noWithVeto / totalVotingPower) > governanceParameter.vetoThreshold) {
+    //          return (false, true)
+    //        }
+    //
+    //        if ((finalTallyResult.yes / (totalVotingPower - finalTallyResult.abstain)) > governanceParameter.threshold) {
+    //          (true, false)
+    //        }
+    //        else {
+    //          (false, false)
+    //        }
+    //      }
+    //
+    //      (for {
+    //        governanceParameter <- governanceParameter
+    //        totalVotingPower <- totalVotingPower
+    //        totalBondedTokens <- totalBondedTokens
+    //      } yield getResults(governanceParameter = governanceParameter, totalVotingPower = totalVotingPower, totalBondedTokens = totalBondedTokens)).recover {
+    //        case baseException: BaseException => throw baseException
+    //      }
+    //    }
 
   }
 

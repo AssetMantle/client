@@ -363,20 +363,17 @@ class Block @Inject()(
     val processActiveProposal = if (event.`type` == constants.Blockchain.Event.ActiveProposal) {
       val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
       val oldProposal = blockchainProposals.Service.tryGet(proposalID)
-      val proposalResponse = getProposal.Service.get(proposalID)
 
-      def process(oldProposal: Proposal, proposalResponse: ProposalResponse) = {
-        val tally = blockchainProposals.Utility.tally(proposalResponse.proposal.final_tally_result.toSerializableFinalTallyResult)
+      def process(oldProposal: Proposal) = {
 
-        def updateDeposits(burnDeposits: Boolean) = if (burnDeposits) blockchainProposalDeposits.Service.deleteByProposalID(oldProposal.id)
-        else blockchainProposalDeposits.Utility.refundDeposits(oldProposal.id)
+        def updateDeposits() = blockchainProposalDeposits.Utility.burnOrRefundDeposits(oldProposal.id)
 
-        def updateProposal() = blockchainProposals.Service.insertOrUpdate(oldProposal.copy(finalTallyResult = proposalResponse.proposal.final_tally_result.toSerializableFinalTallyResult, status = proposalResponse.proposal.status))
+        def updateProposal() = blockchainProposals.Utility.insertOrUpdateProposal(oldProposal.id)
 
-        def actOnProposal(proposalPasses: Boolean): Future[Unit] = if (proposalPasses) {
-          proposalResponse.proposal.content.proposalContentType match {
-            case constants.Blockchain.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposalResponse.proposal.content.toSerializableProposalContent.asInstanceOf[ParameterChange])
-            case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposalResponse.proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
+        def actOnProposal(proposal: Proposal): Future[Unit] = if (proposal.isPassed) {
+          proposal.content.proposalContentType match {
+            case constants.Blockchain.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposal.content.asInstanceOf[ParameterChange])
+            case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
             case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => Future()
             case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
             case constants.Blockchain.Proposal.TEXT => Future()
@@ -385,17 +382,15 @@ class Block @Inject()(
         } else Future()
 
         for {
-          (proposalPasses, burnDeposits) <- tally
-          _ <- updateDeposits(burnDeposits)
-          _ <- updateProposal()
-          _ <- actOnProposal(proposalPasses)
+          _ <- updateDeposits()
+          proposal <- updateProposal()
+          _ <- actOnProposal(proposal)
         } yield ()
       }
 
       for {
         oldProposal <- oldProposal
-        proposalResponse <- proposalResponse
-        _ <- process(oldProposal, proposalResponse)
+        _ <- process(oldProposal)
       } yield ()
 
     } else Future()

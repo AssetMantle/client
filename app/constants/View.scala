@@ -501,5 +501,9 @@ object View {
   val TOKEN = "TOKEN"
   val VOTER = "VOTER"
   val OPTION = "OPTION"
+  val SUBSAPCE = "SUBSAPCE"
+  val KEY = "KEY"
+  val RECIPIENT = "RECIPIENT"
+  val INFO = "INFO"
 
 }

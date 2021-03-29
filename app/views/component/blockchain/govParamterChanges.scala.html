@@ -1,0 +1,12 @@
+@import views.html.base._
+@import models.common.ProposalContents._
+
+@(parameterChange: ParameterChange)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@parameterChange.changes.map { change =>
+    <div>
+        @commonTextInfo(constants.View.SUBSAPCE, change.subspace)
+        @commonTextInfo(constants.View.KEY, change.key)
+        @commonTextInfo(constants.View.VALUE, change.value)
+    </div>
+}

@@ -233,7 +233,7 @@ class Startup @Inject()(
   private def actionsOnEvents(blockResultResponse: BlockResultResponse): Future[Unit] = {
     val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
     val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
-    val proposal = blocksServices.onProposalEvents(blockResultResponse.result.begin_block_events.filter(x => x.`type` == constants.Blockchain.Event.InactiveProposal || x.`type` == constants.Blockchain.Event.ActiveProposal).map(_.decode))
+    val proposal = blocksServices.onProposalEvents(blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(x => x.`type` == constants.Blockchain.Event.InactiveProposal || x.`type` == constants.Blockchain.Event.ActiveProposal).map(_.decode))
     val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode))
     val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode))
     (for {

@@ -143,14 +143,14 @@ class ProposalDeposits @Inject()(
       }
     }
 
-    def refundDeposits(proposalID: Int): Future[Unit] = {
+    def burnOrRefundDeposits(proposalID: Int): Future[Unit] = {
       val deposits = Service.getByProposalID(proposalID)
 
-      def refundAll(deposits: Seq[ProposalDeposit]) = utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor))
+      def updateAll(deposits: Seq[ProposalDeposit]) = utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor))
 
       (for {
         deposits <- deposits
-        _ <- refundAll(deposits)
+        _ <- updateAll(deposits)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
