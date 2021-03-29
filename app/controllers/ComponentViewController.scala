@@ -49,6 +49,8 @@ class ComponentViewController @Inject()(
                                          blockchainTransactionsOrderCancels: blockchainTransaction.OrderCancels,
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainProposals: blockchain.Proposals,
+                                         blockchainProposalDeposits: blockchain.ProposalDeposits,
+                                         blockchainProposalVotes: blockchain.ProposalVotes,
                                          blockchainValidators: blockchain.Validators,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
@@ -372,6 +374,29 @@ class ComponentViewController @Inject()(
       (for {
         proposal <- proposal
       } yield Ok(views.html.component.blockchain.proposalDetails(proposal))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def proposalDeposits(id: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val proposalDeposits = blockchainProposalDeposits.Service.getByProposalID(id)
+      (for {
+        proposalDeposits <- proposalDeposits
+      } yield Ok(views.html.component.blockchain.proposalDeposits(proposalDeposits))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+
+  def proposalVotes(id: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
+      (for {
+        proposalVotes <- proposalVotes
+      } yield Ok(views.html.component.blockchain.proposalVotes(proposalVotes))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

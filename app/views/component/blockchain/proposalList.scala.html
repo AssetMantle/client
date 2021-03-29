@@ -1,6 +1,5 @@
 @import views.html.base._
 @import models.blockchain.Proposal
-@import scala.collection.immutable.ListMap
 
 @(proposalList: Seq[Proposal])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <table class="cmuk-table cmuk-table-striped tableSort">
@@ -25,22 +24,5 @@
                 <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
             </tr>
         }
-
-        @*
-    @validators.map { validator =>
-        <tr>
-            <td class="blockHeightItem">
-                @keyBaseValidators.find(x=>x.address == validator.operatorAddress && x.pictureURL.isDefined).flatMap(_.pictureURL) match {
-                    case Some(pictureURL)=>{@commonImageResource(pictureURL)}
-                    case None=>{@commonImage("note.svg")}
-                }
-            <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
-            </td>
-            <td>@validator.tokens (@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble)%)</td>
-            <td>@validator.commission.commissionRates.rate.toString %</td>
-        </tr>
-    }
-        *@
     </tbody>
 </table>
-@*<script src="@routes.Assets.versioned("javascripts/dataTables/dataTable.js")" type="text/javascript"></script>*@

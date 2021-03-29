@@ -59,7 +59,7 @@ class ProposalVotes @Inject()(
     }
   }
 
-  private def getByID(proposalID: Int): Future[Option[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.headOption)
+  private def getByID(proposalID: Int): Future[Seq[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result)
 
   private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote_BC") {
 
@@ -90,7 +90,7 @@ class ProposalVotes @Inject()(
 
     def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
 
-    def get(proposalID: Int): Future[Option[ProposalVote]] = getByID(proposalID)
+    def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
   }
 
   object Utility {

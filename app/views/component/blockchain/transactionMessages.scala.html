@@ -64,6 +64,63 @@
                 case constants.Blockchain.TransactionMessage.UNDELEGATE => {
                     @views.html.component.blockchain.txMessages.cosmos.undelegate(msg.message)
                 }
+                case constants.Blockchain.TransactionMessage.CREATE_CLIENT => {
+                    @views.html.component.blockchain.txMessages.ibc.createClient(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.UPDATE_CLIENT => {
+                    @views.html.component.blockchain.txMessages.ibc.updateClient(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.UPGRADE_CLIENT => {
+                    @views.html.component.blockchain.txMessages.ibc.upgradeClient(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR => {
+                    @views.html.component.blockchain.txMessages.ibc.submitMisbehaviour(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT => {
+                    @views.html.component.blockchain.txMessages.ibc.connectionOpenInit(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY => {
+                    @views.html.component.blockchain.txMessages.ibc.connectionOpenTry(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK => {
+                    @views.html.component.blockchain.txMessages.ibc.connectionOpenAck(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM => {
+                    @views.html.component.blockchain.txMessages.ibc.connectionOpenConfirm(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT => {
+                    @views.html.component.blockchain.txMessages.ibc.channelOpenInit(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY => {
+                    @views.html.component.blockchain.txMessages.ibc.channelOpenTry(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK => {
+                    @views.html.component.blockchain.txMessages.ibc.channelOpenAck(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM => {
+                    @views.html.component.blockchain.txMessages.ibc.channelOpenConfirm(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => {
+                    @views.html.component.blockchain.txMessages.ibc.channelCloseInit(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => {
+                    @views.html.component.blockchain.txMessages.ibc.channelCloseConfirm(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.RECV_PACKET => {
+                    @views.html.component.blockchain.txMessages.ibc.recvPacket(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.TIMEOUT => {
+                    @views.html.component.blockchain.txMessages.ibc.timeout(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => {
+                    @views.html.component.blockchain.txMessages.ibc.timeoutOnCLose(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => {
+                    @views.html.component.blockchain.txMessages.ibc.acknowledgement(msg.message)
+                }
+                case constants.Blockchain.TransactionMessage.TRANSFER => {
+                    @views.html.component.blockchain.txMessages.ibc.transfer(msg.message)
+                }
                 case constants.Blockchain.TransactionMessage.ASSET_DEFINE => {
                     @views.html.component.blockchain.txMessages.persistence.assetDefine(msg.message)
                 }

@@ -154,7 +154,9 @@ GET         /component/blockDetails                              controllers.Com
 GET         /component/blockTransactions                         controllers.ComponentViewController.blockTransactions(height: Int)
 
 GET         /component/proposalList                              controllers.ComponentViewController.proposalList
-GET         /component/proposalInfo                              controllers.ComponentViewController.proposalDetails(id: Int)
+GET         /component/proposalDetails                           controllers.ComponentViewController.proposalDetails(id: Int)
+GET         /component/proposalDeposits                          controllers.ComponentViewController.proposalDeposits(id: Int)
+GET         /component/proposalVotes                             controllers.ComponentViewController.proposalVotes(id: Int)
 
 GET         /component/transactionList                           controllers.ComponentViewController.transactionList
 GET         /component/transactionListPage                       controllers.ComponentViewController.transactionListPage(pageNumber: Int)
