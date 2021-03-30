@@ -7,7 +7,7 @@
 @(token: Token)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKENS_STATISTICS) {
-    @token.denom
+    @constants.Blockchain.TokenTickers.getOrElse(token.denom, token.denom)
 } {
     <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
         @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
