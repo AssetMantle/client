@@ -105,8 +105,13 @@
                         <div class="searchContainer hidden">
                         @searchField()
                         </div>
-                        <ul class="cmuk-navbar-nav">
-
+                        <ul class="cmuk-navbar-nav top-nav-dropdown">
+                            <li>
+                                <select class="uk-select" onchange="location = this.value;">
+                                    <option value="https://test-core-1.explorer.persistence.one/">test-core-1</option>
+                                    <option value="https://crust-2.explorer.persistence.one/">crust-2</option>
+                                </select>
+                            </li>
                         @loginState match {
                             case null => {
 @*                                <li>*@

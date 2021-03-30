@@ -47,11 +47,32 @@ body .cmuk-table td {
   margin-bottom: 10px;
   margin-left: 10px;
 }
+.cmuk-navbar-nav.top-nav-dropdown {
+  padding: 0 40px 0 10px;
+  li select{
+    padding: 0 20px 0 10px;
+    background: #282E38;
+    color: #fff;
+    border: 1px solid #282E38;
+    border-radius: 0;
+    font-weight: 600;
+    height: 35px;
+    font-size: 0.875rem !important;
+    option{
+      cursor: pointer;
+
+    }
+    &:focus{
+      outline: -webkit-focus-ring-color auto 0px
+    }
+  }
+
+}
 #validatorDetails {
-  height: 250px;
+
   overflow: hidden;
     .cmuk-height-medium{
-      height: 210px;
+
       padding-top: 20px;
       padding-bottom: 20px;
     }
