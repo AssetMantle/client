@@ -96,7 +96,7 @@
                             <li><a href="@controllers.routes.ViewController.proposals()" class="navItemRippleEffect"><span class="proposalsIcon">
                             @commonIcon("proposals")
                             </span>
-                                @Messages(constants.View.PROPOSALS)
+                                &nbsp;&nbsp;@Messages(constants.View.PROPOSALS)
                             </a>
                             </li>
                         </ul>
@@ -108,6 +108,7 @@
                         <ul class="cmuk-navbar-nav top-nav-dropdown">
                             <li>
                                 <select class="uk-select" onchange="location = this.value;">
+                                    <option selected value="">core-1</option>
                                     <option value="https://test-core-1.explorer.persistence.one/">test-core-1</option>
                                     <option value="https://crust-2.explorer.persistence.one/">crust-2</option>
                                 </select>
