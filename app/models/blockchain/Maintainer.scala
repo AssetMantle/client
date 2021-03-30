@@ -154,7 +154,7 @@ class Maintainers @Inject()(
         _ <- upsert
         _ <- masterOperations
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

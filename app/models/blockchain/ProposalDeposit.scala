@@ -139,7 +139,7 @@ class ProposalDeposits @Inject()(
         _ <- updateProposal(proposal, governanceParameters)
         _ <- upsertDeposit(proposalDeposit)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

@@ -133,7 +133,7 @@ class Metas @Inject()(
         _ <- upsertMeta
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.META_REVEAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

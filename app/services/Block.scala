@@ -165,7 +165,7 @@ class Block @Inject()(
 
   def actionOnTxMessages(stdMsg: StdMsg)(implicit header: Header): Future[Unit] = {
     try {
-      stdMsg.messageType match {
+      val processMsg = stdMsg.messageType match {
         //auth
         case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => blockchainAccounts.Utility.onCreateVestingAccount(stdMsg.message.asInstanceOf[CreateVestingAccount])
         //bank
@@ -175,7 +175,7 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => blockchainBalances.Utility.insertOrUpdateBalance(stdMsg.message.asInstanceOf[VerifyInvariant].sender) // Since no crisis module, so directly updating the account balance
         //distribution
         case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(stdMsg.message.asInstanceOf[SetWithdrawAddress])
-        case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegationReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
+        case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegatorReward(stdMsg.message.asInstanceOf[WithdrawDelegatorReward])
         case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(stdMsg.message.asInstanceOf[WithdrawValidatorCommission])
         case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => blockchainBalances.Utility.insertOrUpdateBalance(stdMsg.message.asInstanceOf[FundCommunityPool].depositor)
         //evidence
@@ -241,7 +241,14 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => blockchainMaintainers.Utility.onDeputize(stdMsg.message.asInstanceOf[MaintainerDeputize])
         case _ => Future(logger.info(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.messageType))
       }
-    } catch {
+      (for {
+        _ <- processMsg
+      } yield ()).recover {
+        case _: BaseException => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: Exception => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+      }
+    }
+    catch {
       case _: Exception => Future(logger.error(constants.Response.TRANSACTION_STRUCTURE_CHANGED.logMessage + ": " + stdMsg.messageType))
     }
   }

@@ -170,7 +170,7 @@ class Assets @Inject()(
         _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -204,7 +204,7 @@ class Assets @Inject()(
         _ <- masterOperations(assetID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_MINT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -220,7 +220,7 @@ class Assets @Inject()(
         _ <- upsertAsset(oldAsset, scrubbedMutableMetaProperties)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_MUTATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -235,7 +235,7 @@ class Assets @Inject()(
         _ <- masterOperations
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_BURN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
   }

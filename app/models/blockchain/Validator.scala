@@ -270,7 +270,7 @@ class Validators @Inject()(
         _ <- updateOtherDetails()
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -286,7 +286,7 @@ class Validators @Inject()(
         _ <- addEvent(validator)
         - <- insertKeyBaseAccount(validator)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -300,7 +300,7 @@ class Validators @Inject()(
         _ <- updateActiveValidatorSet()
         _ <- addEvent(validator)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -317,17 +317,17 @@ class Validators @Inject()(
         _ <- withdrawRewards
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
-    def onWithdrawDelegationReward(withdrawDelegatorReward: WithdrawDelegatorReward): Future[Unit] = {
+    def onWithdrawDelegatorReward(withdrawDelegatorReward: WithdrawDelegatorReward): Future[Unit] = {
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(withdrawDelegatorReward.delegatorAddress)
 
       (for {
         _ <- withdrawBalance
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -338,7 +338,7 @@ class Validators @Inject()(
       (for {
         _ <- withdrawBalance
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 

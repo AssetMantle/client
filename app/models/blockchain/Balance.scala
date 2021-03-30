@@ -117,7 +117,7 @@ class Balances @Inject()(
         _ <- fromAccount
         _ <- toAccount
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SEND_COIN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -130,7 +130,7 @@ class Balances @Inject()(
         _ <- inputAccounts
         _ <- outputAccounts
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.MULTI_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -145,7 +145,7 @@ class Balances @Inject()(
         _ <- updateReceiver
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          logger.error(constants.Blockchain.TransactionMessage.RECV_PACKET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -160,7 +160,7 @@ class Balances @Inject()(
         _ <- updateReceiver
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          logger.error(constants.Blockchain.TransactionMessage.TIMEOUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -175,7 +175,7 @@ class Balances @Inject()(
         _ <- updateReceiver
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          logger.error(constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -190,7 +190,7 @@ class Balances @Inject()(
         _ <- updateReceiver
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          logger.error(constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -205,7 +205,7 @@ class Balances @Inject()(
         _ <- updateReceiver
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          logger.error(constants.Blockchain.TransactionMessage.TRANSFER + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
 
     }
