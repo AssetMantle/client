@@ -66,9 +66,9 @@ class Splits @Inject()(
 
   private def getByOwnerOrOwnableID(id: String) = db.run(splitTable.filter(x => x.ownerID === id || x.ownableID === id).result)
 
-  private def getByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x=>x.ownableID === ownableID && x.ownerID === ownerID).result.headOption)
+  private def getByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x => x.ownableID === ownableID && x.ownerID === ownerID).result.headOption)
 
-  private def tryGetByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x=>x.ownableID === ownableID && x.ownerID === ownerID).result.head.asTry).map {
+  private def tryGetByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x => x.ownableID === ownableID && x.ownerID === ownerID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SPLIT_NOT_FOUND, noSuchElementException)
@@ -172,7 +172,7 @@ class Splits @Inject()(
           _ <- upsertToSplit(oldToSplit)
           _ <- masterOperations((oldFromSplit.split - splitSend.split) == 0)
         } yield ()).recover {
-          case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
         }
       } else Future()
     }
@@ -206,7 +206,7 @@ class Splits @Inject()(
         _ <- updateSplits
         _ <- masterOperations
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_WRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
@@ -224,7 +224,7 @@ class Splits @Inject()(
         _ <- updateAccountBalance
         _ <- masterOperations(oldFromSplit)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_UNWRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
       }
     }
 
