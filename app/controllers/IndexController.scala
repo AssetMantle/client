@@ -41,6 +41,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
+      val a = "CqcBCqQBCiUvY29zbW9zLnN0YWtpbmcudjFiZXRhMS5Nc2dVbmRlbGVnYXRlEnsKMnBlcnNpc3RlbmNlMXhmZzI4Y3pqeHNmNzV4OXRoNGtlanJqdjNuNnQ3d2ZjdTZnanBlEjlwZXJzaXN0ZW5jZXZhbG9wZXIxeGZnMjhjemp4c2Y3NXg5dGg0a2Vqcmp2M242dDd3ZmM0N2cwZ3EaCgoFdXhwcnQSATESWApQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohAtPShcQkaoW8XM32RiViq0DulpOZ9IJVPVCxF073796oEgQKAggBGAQSBBDAmgwaQOqwKRjpptD5hLQDGN0mTs/ZMTeKS4vCi9mn4w2/p8Sqfy2PwrinLiG+kRI232tWNz53Pg1/cr+XGmiDBcme1uY="
+      println(utilities.Hash.base64URLDecoder(a))
       loginState match {
         case Some(loginState) =>
           implicit val loginStateImplicit: LoginState = loginState
