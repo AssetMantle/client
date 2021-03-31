@@ -15,6 +15,7 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegation}
 import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
@@ -132,7 +133,7 @@ class Undelegations @Inject()(
 
   object Utility {
 
-    def onUndelegation(undelegate: Undelegate): Future[Unit] = {
+    def onUndelegation(undelegate: Undelegate)(implicit header: Header): Future[Unit] = {
       val undelegationsResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.delegatorAddress, validatorAddress = undelegate.validatorAddress)
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.validatorAddress)
@@ -150,7 +151,7 @@ class Undelegations @Inject()(
         _ <- updateOrDeleteDelegation
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

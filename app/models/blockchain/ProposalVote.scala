@@ -95,13 +95,13 @@ class ProposalVotes @Inject()(
 
   object Utility {
 
-    def onVote(vote: Vote)(implicit blockHeader: Header): Future[Unit] = {
+    def onVote(vote: Vote)(implicit header: Header): Future[Unit] = {
       val upsert = Service.insertOrUpdate(ProposalVote(proposalID = vote.proposalID, voter = vote.voter, option = vote.option))
 
       (for {
         _ <- upsert
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

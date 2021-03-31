@@ -8,6 +8,7 @@ import models.master.{Split => masterSplit}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -136,7 +137,7 @@ class Splits @Inject()(
 
   object Utility {
 
-    def onSend(splitSend: SplitSend): Future[Unit] = {
+    def onSend(splitSend: SplitSend)(implicit header: Header): Future[Unit] = {
       if (splitSend.fromID != splitSend.toID) {
         val oldFromSplit = Service.tryGet(ownerID = splitSend.fromID, ownableID = splitSend.ownableID)
         val oldToSplit = Service.get(ownerID = splitSend.toID, ownableID = splitSend.ownableID)
@@ -172,12 +173,12 @@ class Splits @Inject()(
           _ <- upsertToSplit(oldToSplit)
           _ <- masterOperations((oldFromSplit.split - splitSend.split) == 0)
         } yield ()).recover {
-          case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+          case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
         }
       } else Future()
     }
 
-    def onWrap(splitWrap: SplitWrap): Future[Unit] = {
+    def onWrap(splitWrap: SplitWrap)(implicit header: Header): Future[Unit] = {
       val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(splitWrap.from)
       val updateSplits = Future.traverse(splitWrap.coins) { coin =>
         val oldSplit = Service.get(ownerID = splitWrap.fromID, ownableID = coin.denom)
@@ -206,11 +207,11 @@ class Splits @Inject()(
         _ <- updateSplits
         _ <- masterOperations
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_WRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_WRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onUnwrap(splitUnwrap: SplitUnwrap): Future[Unit] = {
+    def onUnwrap(splitUnwrap: SplitUnwrap)(implicit header: Header): Future[Unit] = {
       val oldFromSplit = Service.tryGet(ownerID = splitUnwrap.fromID, ownableID = splitUnwrap.ownableID)
       val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(splitUnwrap.from)
 
@@ -224,7 +225,7 @@ class Splits @Inject()(
         _ <- updateAccountBalance
         _ <- masterOperations(oldFromSplit)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_UNWRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SPLIT_UNWRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

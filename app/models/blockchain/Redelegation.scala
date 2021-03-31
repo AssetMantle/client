@@ -15,6 +15,7 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRedelegations, GetValidatorDelegatorDelegation}
 import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
 import queries.responses.blockchain.DelegatorRedelegationsResponse.{Response => DelegatorRedelegationsResponse}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
@@ -130,7 +131,7 @@ class Redelegations @Inject()(
 
   object Utility {
 
-    def onRedelegation(redelegate: Redelegate): Future[Unit] = {
+    def onRedelegation(redelegate: Redelegate)(implicit header: Header): Future[Unit] = {
       val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = redelegate.delegatorAddress, sourceValidatorAddress = redelegate.validatorSrcAddress, destinationValidatorAddress = redelegate.validatorDstAddress)
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorSrcAddress)
       val updateDstValidatorDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorDstAddress)
@@ -157,7 +158,7 @@ class Redelegations @Inject()(
         _ <- updateValidators
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

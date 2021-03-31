@@ -167,7 +167,7 @@ class Orders @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.chainID")
 
-    def onDefine(orderDefine: OrderDefine): Future[Unit] = {
+    def onDefine(orderDefine: OrderDefine)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.immutableMetaTraits.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.mutableMetaTraits.metaPropertyList)
 
@@ -198,7 +198,7 @@ class Orders @Inject()(
         _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
@@ -256,11 +256,11 @@ class Orders @Inject()(
         _ <- upsertOrder(oldOrder, scrubbedMutableMetaProperties, orderID, immutables)
         _ <- masterOperations(orderID)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_MAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_MAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onTake(orderTake: OrderTake): Future[Unit] = {
+    def onTake(orderTake: OrderTake)(implicit header: Header): Future[Unit] = {
       val oldOrder = Service.tryGet(orderTake.orderID)
 
       def getData(oldOrder: Order) = {
@@ -338,11 +338,11 @@ class Orders @Inject()(
         _ <- transferSplits(oldOrder = oldOrder, sendTakerOwnableSplit = sendTakerOwnableSplit, sendMakerOwnableSplit = sendMakerOwnableSplit)
         _ <- masterOperations(orderID = orderTake.orderID, orderDeleted = orderDeleted, metaMutables = metaMutables)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_TAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_TAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onCancel(orderCancel: OrderCancel): Future[Unit] = {
+    def onCancel(orderCancel: OrderCancel)(implicit header: Header): Future[Unit] = {
       val oldOrder = Service.tryGet(orderCancel.orderID)
 
       def getMakerOwnableSplitData(oldOrder: Order) = blockchainMetas.Service.tryGetData(id = oldOrder.getMakerOwnableSplit.fact.hash, dataType = constants.Blockchain.DataType.DEC_DATA)
@@ -367,7 +367,7 @@ class Orders @Inject()(
         _ <- removeOrder(orderCancel.orderID)
         _ <- masterOperations(orderCancel.orderID)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_CANCEL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_CANCEL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
   }
