@@ -1,6 +1,6 @@
 package queries.responses.blockchain
 
-import blockchain.common.Validator
+import blockchainTx.common.Validator
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
 

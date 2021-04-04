@@ -8,6 +8,7 @@ import play.api.{Configuration, Logger}
 
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
+import transactions.Abstract.BaseRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +29,7 @@ class Broadcast @Inject()(wsClient: WSClient)(implicit configuration: Configurat
 
   private val url = ip + ":" + port + "/" + path
 
-  case class Request(tx:StdTx, mode:String)
+  case class Request(tx:StdTx, mode:String) extends BaseRequest
   implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))

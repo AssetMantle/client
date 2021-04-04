@@ -5,20 +5,20 @@ import java.util.Base64
 
 import org.bitcoinj.core.{ECKey, Sha256Hash, Utils}
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import blockchain.common.Account.SinglePublicKey
+import blockchainTx.common.Account.SinglePublicKey
 import transactions.request.Serializable.{SignMeta, Signature, StdSignMsg, StdTx, Tx}
 
 object SignTx {
 
-  def sign(tx: Tx, meta: SignMeta, key: Key) = {
-    val signature = createSignature(StdSignMsg(meta.account_number, meta.chain_id, tx.fee, tx.memo, tx.msg, meta.sequence), key)
+  def sign(tx: Tx, meta: SignMeta, ecKey: ECKey) = {
+    val signature = createSignature(StdSignMsg(meta.account_number, meta.chain_id, tx.fee, tx.memo, tx.msg, meta.sequence), ecKey)
     StdTx(tx.msg, tx.fee, Seq(signature), tx.memo)
   }
 
-  def createSignature(stdSignMsg: StdSignMsg, key: Key) = Signature(ecdsaSign(canonicalizeJson(Json.toJson(stdSignMsg)).toString(), key), SinglePublicKey(constants.Blockchain.PublicKey.SINGLE, Base64.getEncoder.encodeToString(key.publicKey)))
+  def createSignature(stdSignMsg: StdSignMsg, ecKey: ECKey) = Signature(ecdsaSign(canonicalizeJson(Json.toJson(stdSignMsg)).toString(), ecKey), SinglePublicKey(constants.Blockchain.PublicKey.SINGLE, Base64.getEncoder.encodeToString(ecKey.getPubKey)))
 
-  def ecdsaSign(message: String, key: Key) = {
-    val ecdsaSignature = ECKey.fromPrivateAndPrecalculatedPublic(key.privateKey, key.publicKey).sign(Sha256Hash.wrap(Sha256Hash.hash(message.getBytes(StandardCharsets.UTF_8))))
+  def ecdsaSign(message: String, ecKey: ECKey) = {
+    val ecdsaSignature = ecKey.sign(Sha256Hash.wrap(Sha256Hash.hash(message.getBytes(StandardCharsets.UTF_8))))
     Base64.getEncoder.encodeToString(Utils.bigIntegerToBytes(ecdsaSignature.r, 32) ++ Utils.bigIntegerToBytes(ecdsaSignature.s, 32))
   }
 

@@ -1,6 +1,6 @@
 package queries.responses.blockchain
 
-import blockchain.common.Undelegation
+import blockchainTx.common.Undelegation
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
 

@@ -12,7 +12,7 @@ object Blockchain {
   val AccountPrefix = "cosmos"
   val ValidatorPrefix = "cosmosvaloper"
   val NegotiationDefaultTime = 5000000
-  val DefaultZoneFaucetAmount = new MicroNumber(100000000)
+  val DefaultZoneFaucetAmount = new MicroNumber(10000000)
   val DefaultOrganizationFaucetAmount = new MicroNumber(100000)
   val DefaultTraderFaucetAmount = new MicroNumber(100)
   val DefaultFaucetAmount = new MicroNumber(1)

@@ -1,6 +1,6 @@
 package services
 
-import blockchain.common.{Event, Header => BlockHeader}
+import blockchainTx.common.{Event, Header => BlockHeader}
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
 import models.blockchain.{Validator, Transaction => blockchainTransaction}

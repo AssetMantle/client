@@ -1,6 +1,6 @@
 package queries.responses.blockchain
 
-import blockchain.common.Header
+import blockchainTx.common.Header
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps

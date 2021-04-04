@@ -1,5 +1,7 @@
 package utilities
 
+import java.math.BigInteger
+
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import exceptions.BaseException

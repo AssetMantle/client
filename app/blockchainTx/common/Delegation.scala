@@ -1,4 +1,4 @@
-package blockchain.common
+package blockchainTx.common
 
 import play.api.libs.json.{Json, Reads}
 import models.blockchain.{Delegation => BlockchainDelegation}

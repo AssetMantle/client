@@ -1,11 +1,11 @@
 package transactions.request
 
-import blockchain.Abstract.BlockchainStdMessage
+import blockchainTx.Abstract.BlockchainStdMessage
 import models.common.Serializable.{Coin, Fee}
 import play.api.Logger
 import play.api.libs.json.{Json, OWrites}
-import blockchain.common.Account.SinglePublicKey
-import blockchain.messages.Messages.transactionWrites
+import blockchainTx.common.Account.SinglePublicKey
+import blockchainTx.messages.Messages.transactionWrites
 
 object Serializable{
 

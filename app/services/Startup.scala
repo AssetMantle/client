@@ -2,9 +2,9 @@ package services
 
 import akka.actor.Cancellable
 import exceptions.BaseException
-import blockchain.common.Validator.{Result => ValidatorResult}
-import blockchain.common.Header
-import blockchain.common._
+import blockchainTx.common.Validator.{Result => ValidatorResult}
+import blockchainTx.common.Header
+import blockchainTx.common._
 import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}

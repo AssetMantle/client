@@ -3,7 +3,7 @@ package models.blockchain
 import java.sql.Timestamp
 import java.time.Duration
 
-import blockchain.common.Header
+import blockchainTx.common.Header
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged

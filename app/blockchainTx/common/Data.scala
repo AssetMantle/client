@@ -1,4 +1,4 @@
-package blockchain.common
+package blockchainTx.common
 
 import models.common.DataValue._
 import models.common.Serializable

@@ -1,4 +1,4 @@
-package blockchain.Abstract
+package blockchainTx.Abstract
 
 import models.Abstract.TransactionMessage
 
