@@ -1032,7 +1032,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   display: flex; }
   .comdex table.dataTable tbody td.blockHeightItem img {
     width: 25px;
-    height: auto;
+    height: 25px;
     float: left;
     border-radius: 50%;
     display: inline-block;
