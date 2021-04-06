@@ -125,10 +125,9 @@ class ValidatorAccounts @Inject()(
 
   object Utility {
 
-    def insertOrUpdateKeyBaseAccount(validatorAddress: String, identity: String): Future[Unit] = {
+    def insertOrUpdateKeyBaseAccount(validatorAddress: String, identity: String): Future[Unit] = if (identity != "" || identity != "[do-not-modify]") {
       val validatorAccount = if (identity != "") {
         val keyBaseResponse = getValidatorKeyBaseAccount.Service.get(identity)
-        println(identity)
 
         def getImageURL(keyBaseResponse: ValidatorKeyBaseAccountResponse): Option[String] = {
           keyBaseResponse.them.headOption.fold[Option[String]](None) { them =>
@@ -152,7 +151,7 @@ class ValidatorAccounts @Inject()(
         ).recover {
         case baseException: BaseException => throw baseException
       }
-    }
+    } else Future()
 
     def scheduleUpdates(): Future[Unit] = {
       val allValidatorAccounts = Service.getAll

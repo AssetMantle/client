@@ -116,7 +116,7 @@ class ProposalDeposits @Inject()(
 
   object Utility {
 
-    def onDeposit(deposit: Deposit)(implicit blockHeader: Header): Future[Unit] = {
+    def onDeposit(deposit: Deposit)(implicit header: Header): Future[Unit] = {
       val proposal = blockchainProposals.Service.tryGet(deposit.proposalID)
       val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
       val proposalDeposit = Service.get(deposit.proposalID, deposit.depositor)
@@ -125,7 +125,7 @@ class ProposalDeposits @Inject()(
 
       def updateProposal(proposal: Proposal, governanceParameters: GovernanceParameter) = {
         if (proposal.status == constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD && proposal.isTotalDepositGTEMinimum(governanceParameters.minDeposit)) {
-          blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.amount).activateVotingPeriod(currentTime = blockHeader.time, votingPeriod = governanceParameters.votingPeriod))
+          blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.amount).activateVotingPeriod(currentTime = header.time, votingPeriod = governanceParameters.votingPeriod))
         } else blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.amount))
       }
 
@@ -139,7 +139,7 @@ class ProposalDeposits @Inject()(
         _ <- updateProposal(proposal, governanceParameters)
         _ <- upsertDeposit(proposalDeposit)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

@@ -127,7 +127,7 @@ class Delegations @Inject()(
         delegationResponse <- delegationResponse
         _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorDelegationNotFound)) throw baseException else logger.info(baseException.failure.logMessage)
       }
     }
 
@@ -146,7 +146,7 @@ class Delegations @Inject()(
             _ <- delete
           } yield ()
             ).recover {
-            case baseException: BaseException => throw baseException
+            case baseException: BaseException => logger.info(baseException.failure.logMessage)
           }
         } else throw baseException
       }

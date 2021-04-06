@@ -244,8 +244,8 @@ class Block @Inject()(
       (for {
         _ <- processMsg
       } yield ()).recover {
-        case _: BaseException => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
-        case _: Exception => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: Exception => logger.error(stdMsg.messageType + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
     catch {

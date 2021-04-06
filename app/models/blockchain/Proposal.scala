@@ -184,7 +184,7 @@ class Proposals @Inject()(
 
   object Utility {
 
-    def onSubmitProposal(submitProposal: SubmitProposal)(implicit blockHeader: Header): Future[Unit] = {
+    def onSubmitProposal(submitProposal: SubmitProposal)(implicit header: Header): Future[Unit] = {
       val latestProposalID = Service.getLatestProposalID
 
       def upsert(latestProposalID: Int) = insertOrUpdateProposal(latestProposalID + startingProposalID)
@@ -193,7 +193,7 @@ class Proposals @Inject()(
         latestProposalID <- latestProposalID
         _ <- upsert(latestProposalID)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

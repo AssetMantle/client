@@ -250,7 +250,7 @@ class Validators @Inject()(
 
   object Utility {
 
-    def onCreateValidator(createValidator: CreateValidator): Future[Unit] = {
+    def onCreateValidator(createValidator: CreateValidator)(implicit header: Header): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(createValidator.validatorAddress)
 
       def updateOtherDetails() = {
@@ -270,11 +270,11 @@ class Validators @Inject()(
         _ <- updateOtherDetails()
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onEditValidator(editValidator: EditValidator): Future[Unit] = {
+    def onEditValidator(editValidator: EditValidator)(implicit header: Header): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(editValidator.validatorAddress)
 
       def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_EDITED, validator.description.moniker)(s"'${validator.operatorAddress}'")
@@ -286,11 +286,11 @@ class Validators @Inject()(
         _ <- addEvent(validator)
         - <- insertKeyBaseAccount(validator)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onUnjail(unjail: Unjail): Future[Unit] = {
+    def onUnjail(unjail: Unjail)(implicit header: Header): Future[Unit] = {
       val upsertValidator = insertOrUpdateValidator(unjail.validatorAddress)
 
       def addEvent(validator: Validator) = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_UNJAILED, validator.description.moniker)(s"'${validator.operatorAddress}'")
@@ -300,11 +300,11 @@ class Validators @Inject()(
         _ <- updateActiveValidatorSet()
         _ <- addEvent(validator)
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onDelegation(delegate: Delegate): Future[Unit] = {
+    def onDelegation(delegate: Delegate)(implicit header: Header): Future[Unit] = {
       val updateValidator = insertOrUpdateValidator(delegate.validatorAddress)
       val accountBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegate.delegatorAddress)
       val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.delegatorAddress, validatorAddress = delegate.validatorAddress)
@@ -317,28 +317,28 @@ class Validators @Inject()(
         _ <- withdrawRewards
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onWithdrawDelegatorReward(withdrawDelegatorReward: WithdrawDelegatorReward): Future[Unit] = {
+    def onWithdrawDelegatorReward(withdrawDelegatorReward: WithdrawDelegatorReward)(implicit header: Header): Future[Unit] = {
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(withdrawDelegatorReward.delegatorAddress)
 
       (for {
         _ <- withdrawBalance
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onWithdrawValidatorCommission(withdrawValidatorCommission: WithdrawValidatorCommission): Future[Unit] = {
+    def onWithdrawValidatorCommission(withdrawValidatorCommission: WithdrawValidatorCommission)(implicit header: Header): Future[Unit] = {
       val accountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.validatorAddress)
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(accountAddress)
 
       (for {
         _ <- withdrawBalance
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

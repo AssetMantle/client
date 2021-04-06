@@ -1,14 +1,15 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.TransactionMessages.SetWithdrawAddress
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -103,13 +104,13 @@ class WithdrawAddresses @Inject()(
   }
 
   object Utility {
-    def onSetWithdrawAddress(setWithdrawAddress: SetWithdrawAddress): Future[Unit] = {
+    def onSetWithdrawAddress(setWithdrawAddress: SetWithdrawAddress)(implicit header: Header): Future[Unit] = {
       val insert = Service.insertOrUpdate(WithdrawAddress(delegatorAddress = setWithdrawAddress.delegatorAddress, withdrawAddress = setWithdrawAddress.withdrawAddress))
 
       (for {
         _ <- insert
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
