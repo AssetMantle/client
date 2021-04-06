@@ -1294,7 +1294,7 @@ class ComponentViewController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(negotiationID)
 
-      def getAsset(assetID: String) = masterProperties.Service.getPropertyMap(assetID)
+      def getAssetProperty(assetID: String) = masterProperties.Service.getAssetProperty(assetID)
 
       def getOrder(orderID: String): Future[Option[Order]] = masterOrders.Service.get(orderID)
 
@@ -1318,12 +1318,12 @@ class ComponentViewController @Inject()(
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        asset <- getAsset(negotiation.assetID)
+        assetProperty <- getAssetProperty(negotiation.assetID)
         order <- getOrder(negotiation.orderID.getOrElse(""))
         counterPartyTrader <- getCounterPartyTrader(traderID, negotiation)
         buyerAddress <- getBuyerAddress(traderID, negotiation, counterPartyTrader.accountID)
         sellerAddress <- getSellerAddress(traderID, negotiation, counterPartyTrader.accountID)
-        result <- getResult(traderID, negotiation, order, asset, counterPartyTrader)
+        result <- getResult(traderID, negotiation, order, assetProperty, counterPartyTrader)
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)

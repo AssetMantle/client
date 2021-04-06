@@ -4,17 +4,18 @@ import exceptions.BaseException
 import models.Trait.Logged
 import models.blockchain
 import models.blockchain.Meta
-import models.common.Serializable.BaseProperty
+import models.common.Serializable.{AssetOtherDetails, BaseProperty}
 import models.common.{DataValue, Serializable}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 case class Property(entityID: String, entityType: String, name: String, value: Option[String], dataType: String, isMeta: Boolean, isMutable: Boolean, hashID: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
@@ -23,6 +24,8 @@ case class Property(entityID: String, entityType: String, name: String, value: O
   def toSerializableProperty: Serializable.Property = Serializable.Property(id = name, fact = Serializable.NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = value)))
 
 }
+
+case class AssetProperty(id: String, assetType: String, description: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, moderated: Boolean, takerID: Option[String] = None, shippingPeriod: Int, portOfLoading: String, portOfDischarge: String)
 
 @Singleton
 class Properties @Inject()(
@@ -146,6 +149,42 @@ class Properties @Inject()(
 
     def deleteAll(entityID: String, entityType: String): Future[Int] = deleteByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
 
+    def getAssetProperty(assetID:String) = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map{ properties=>
+      AssetProperty(
+        id = assetID,
+        assetType = properties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        description = properties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        quantity = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        quantityUnit = properties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        price = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        moderated = Try(properties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        takerID = properties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.FAILURE)).value,
+        shippingPeriod = Try(properties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        portOfLoading = properties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        portOfDischarge = properties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+      )
+    }
+
+    def getAssetPropertyList(assetIDs: Seq[String]) = getAllByEntityIDsAndEntityType(entityIDs = assetIDs, entityType = constants.Blockchain.Entity.ASSET).map{properties=>
+      assetIDs.map{assetID=>
+        val assetProperties = properties.filter(_.entityID == assetID)
+        AssetProperty(
+          id = assetID,
+          assetType = assetProperties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          description = assetProperties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          quantity = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          quantityUnit = assetProperties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          price = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          moderated = Try(assetProperties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          takerID = assetProperties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.FAILURE)).value,
+          shippingPeriod = Try(assetProperties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          portOfLoading = assetProperties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          portOfDischarge = assetProperties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        )
+      }
+
+    }
+
     def getPropertyMap(assetID:String): Future[Map[String,Option[String]]] = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map(x=> x.map(a => a.name -> a.value).toMap)
 
     def getPropertyListMap(assetIDs:Seq[String]): Future[Map[String, Map[String,Option[String]]]] = getAllByEntityIDsAndEntityType(assetIDs, constants.Blockchain.Entity.ASSET).map(assetProperties=> assetIDs.map(assetID=> assetID -> assetProperties.filter(_.entityID == assetID).map(property=> property.name-> property.value).toMap).toMap)
@@ -153,8 +192,6 @@ class Properties @Inject()(
   }
 
   object Utilities {
-
-    private val chainID = configuration.get[String]("blockchain.chainID")
 
     def upsertProperties(entityType: String, entityID: String, immutableMetas: Seq[BaseProperty], immutables: Seq[BaseProperty], mutableMetas: Seq[BaseProperty], mutables: Seq[BaseProperty]): Future[String] = {
       val upsertImmutableMetas = utilitiesOperations.traverse(immutableMetas)(x => Service.insertOrUpdate(Property(entityID = entityID, entityType = entityType, name = x.dataName, value = x.dataValue, dataType = x.dataType, isMeta = true, isMutable = false, hashID = DataValue.getHash(DataValue.getDataValue(dataType = x.dataType, dataValue = x.dataValue)))))
