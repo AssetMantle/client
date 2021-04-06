@@ -5,7 +5,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(negotiation: Negotiation, assetProperties: Map[String,Option[String]], counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiation: Negotiation, assetProperty: AssetProperty, counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <legend class="cmuk-legend">
     @Messages(constants.View.NEGOTIATION_ID): @negotiation.id

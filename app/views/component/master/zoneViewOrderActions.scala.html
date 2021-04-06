@@ -5,7 +5,7 @@
 @import models.master.Trader
 
 @import models.master.Order
-@(negotiation: Negotiation, asset: Map[String,Option[String]], order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiation: Negotiation, assetProperty: AssetProperty, order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORDER_ACTIONS,  'cardIconPath -> "images/icons/icons.svg#orderActions"){
 }{

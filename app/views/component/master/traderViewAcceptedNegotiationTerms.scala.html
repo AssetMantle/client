@@ -6,7 +6,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], assetProperties: Map[String,Option[String]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], assetProperty: AssetProperty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">

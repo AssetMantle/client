@@ -4,7 +4,7 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(traderList: Seq[Trader], organizationList: Seq[Organization], negotiation: Negotiation, asset: Map[String,Option[String]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(traderList: Seq[Trader], organizationList: Seq[Organization], negotiation: Negotiation, assetProperty: AssetProperty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">

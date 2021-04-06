@@ -103,6 +103,8 @@ class AssetController @Inject()(
 
             val allAssetSplits = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
 
+            def getAssetPropertyList(assetIDs: Seq[String]) = masterProperties.Service.getAssetPropertyList(assetIDs)
+
             def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String, Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
 
             def getAllTradableAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllTradableAssets(assetIDs)

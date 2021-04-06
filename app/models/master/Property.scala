@@ -182,7 +182,6 @@ class Properties @Inject()(
           portOfDischarge = assetProperties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
         )
       }
-
     }
 
     def getPropertyMap(assetID:String): Future[Map[String,Option[String]]] = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map(x=> x.map(a => a.name -> a.value).toMap)
