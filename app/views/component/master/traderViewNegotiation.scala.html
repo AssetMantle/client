@@ -4,6 +4,7 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+@import models.master.AssetProperty
 
 @(negotiation: Negotiation, assetProperty: AssetProperty, counterPartyTrader: Trader, counterPartyOrganization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -15,7 +16,7 @@
 
 <div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DETAILS):</div>
 <div class="traderCommodity cmuk-text-left">
-    <span class="commodityImage">@commonImage("icons/"+assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("")+".svg")</span><span class="tradeName">@Messages(assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))</span>
+    <span class="commodityImage">@commonImage("icons/"+assetProperty.assetType+".svg")</span><span class="tradeName">@Messages(assetProperty.assetType)</span>
 </div>
 
     @commonTextInfo(constants.View.ASSET_DESCRIPTION, negotiation.assetDescription)

@@ -6,14 +6,15 @@
 @import models.master.Trader
 @import models.master.Organization
 
+@import models.master.AssetProperty
 @(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], assetProperty: AssetProperty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity commodityTitleSection">
             <div class="cmuk-flex cmuk-flex-middle">
-                <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("") + ".svg")"></span>
-                <span class="tradeName">@Messages(assetProperties.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("")) &nbsp;</span>
+                <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType + ".svg")"></span>
+                <span class="tradeName">@Messages(assetProperty.assetType) &nbsp;</span>
             </div>
             <div id='@Seq(negotiation.id, "SuccessiveTransaction").mkString("")'>
             @traderID match {
@@ -30,7 +31,7 @@
                                     }
                                 }
                                 case None => {
-                                    @if(assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.FALSE) {
+                                    @if(!assetProperty.moderated) {
                                         @commonFormButton(constants.Form.ORDER_MAKE, 'parameters -> s"'${negotiation.id}'")
                                     }
                                 }
@@ -47,7 +48,7 @@
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
                             @order match {
                                 case Some(order) => {
-                                    @if(order.status.isEmpty && assetProperties.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("") == constants.Boolean.FALSE){
+                                    @if(order.status.isEmpty && !assetProperty.moderated){
                                         @commonFormButton(constants.Form.ORDER_TAKE, 'parameters -> s"'${order.id}'")
                                     }
                                 }

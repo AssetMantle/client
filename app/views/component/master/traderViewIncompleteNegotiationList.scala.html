@@ -5,7 +5,8 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(incompleteNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Map[String, Map[String,Option[String]]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(incompleteNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetPropertyList: Seq[AssetProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div class="salesQuoteCard">
     @incompleteNegotiationList.map { incompleteNegotiation =>
@@ -14,13 +15,13 @@
                 <div class="salesQuoteCategory sell">
                 </div>
                 <div class="content">
-                @assetList.get(incompleteNegotiation.assetID) match {
-                    case Some(asset) => {
+                @assetPropertyList.find(_.id == incompleteNegotiation.assetID) match {
+                    case Some(assetProperty) => {
                         <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse("") + ".svg")"></span>
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@Messages(asset.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))</p>
+                            <p class="assetTitle">@Messages(assetProperty.assetType)</p>
                             <p class="assetQuantity">@Seq(incompleteNegotiation.quantity.toRoundedOffString(), incompleteNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
@@ -29,7 +30,7 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
-                @assetList.find(_._1 == incompleteNegotiation.assetID) match {
+                @assetPropertyList.find(_.id == incompleteNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((incompleteNegotiation.price/incompleteNegotiation.quantity).toRoundedOffString(), Messages(constants.View.PER), incompleteNegotiation.quantityUnit).mkString(" ")</p>

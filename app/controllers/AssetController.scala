@@ -7,7 +7,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.AssetDocumentContent
 import models.common.Serializable._
-import models.master.{Negotiation, Trader}
+import models.master.{AssetProperty, Negotiation, Trader}
 import models.masterTransaction.AssetFile
 import models.{blockchain, blockchainTransaction, master, _}
 import play.api.i18n.{I18nSupport, Messages}
@@ -103,9 +103,7 @@ class AssetController @Inject()(
 
             val allAssetSplits = masterSplits.Service.getAllAssetsByOwnerIDs(Seq(traderID))
 
-            def getAssetPropertyList(assetIDs: Seq[String]) = masterProperties.Service.getAssetPropertyList(assetIDs)
-
-            def getAllTradableAssetProperties(assetIDs: Seq[String]): Future[Map[String, Map[String, Option[String]]]] = masterProperties.Service.getPropertyListMap(assetIDs)
+            def getAssetPropertyList(assetIDs: Seq[String]): Future[Seq[AssetProperty]] = masterProperties.Service.getAssetPropertyList(assetIDs)
 
             def getAllTradableAssetList(assetIDs: Seq[String]) = masterAssets.Service.getAllTradableAssets(assetIDs)
 
@@ -119,12 +117,12 @@ class AssetController @Inject()(
               for {
                 _ <- issueModeratedAsset
                 allAssetSplits <- allAssetSplits
-                tradableAssetProperties <- getAllTradableAssetProperties(allAssetSplits.map(_.ownableID))
+                assetPropertyList <- getAssetPropertyList(allAssetSplits.map(_.ownableID))
                 tradableAssetList <- getAllTradableAssetList(allAssetSplits.map(_.ownableID))
                 counterPartyList <- getCounterPartyList(traderID)
                 counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
                 counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-                result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetProperties = tradableAssetProperties, tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
+                result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(assetPropertyList = assetPropertyList, tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
               } yield result
             } else {
               val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueAssetData.password.getOrElse(""))
@@ -144,12 +142,12 @@ class AssetController @Inject()(
                 for {
                   ticketID <- sendTransaction
                   allAssetSplits <- allAssetSplits
-                  tradableAssetProperties <- getAllTradableAssetProperties(allAssetSplits.map(_.ownableID))
+                  assetPropertyList <- getAssetPropertyList(allAssetSplits.map(_.ownableID))
                   tradableAssetList <- getAllTradableAssetList(allAssetSplits.map(_.ownableID))
                   counterPartyList <- getCounterPartyList(traderID)
                   counterPartyTraderList <- getCounterPartyTraderList(counterPartyList)
                   counterPartyOrganizationList <- getCounterPartyOrganizations(counterPartyTraderList.map(_.organizationID))
-                  result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(tradableAssetProperties = tradableAssetProperties, tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
+                  result <- withUsernameToken.PartialContent(views.html.component.master.negotiationRequest(assetPropertyList = assetPropertyList, tradableAssetList = tradableAssetList, counterPartyTraderList = counterPartyTraderList, counterPartyOrganizationList = counterPartyOrganizationList))
                 } yield result
               } else Future(BadRequest(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(issueAssetData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message))))
 
