@@ -18,6 +18,8 @@ object Date {
 
   def sqlDateToUtilDate(sqlDate: java.sql.Date): java.util.Date = new java.util.Date(sqlDate.getTime)
 
+  def getTimeFromSqlTimestamp(sqlTime: java.sql.Timestamp): String = ZonedDateTime.parse(sqlTime.toInstant.toString).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+
   def stringDateToTimeStamp(stringDate: String): Timestamp =
     try {
       Timestamp.valueOf(stringDate)
@@ -39,7 +41,7 @@ object Date {
       ZonedDateTime.parse(timestamp).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)).format(dateTimeFormat)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        ""
+        timestamp
     }
   }
 

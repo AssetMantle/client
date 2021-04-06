@@ -6,11 +6,11 @@
 
 @(tokenPrices: Seq[TokenPrice], stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonCard(constants.View.TOKENS_PRICE) {
+@commonCard(constants.View.TOKEN_PRICE) {
     @constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom)
 } {
     @if(tokenPrices.nonEmpty) {
-        @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOn.fold("")(_.toString) -> token.price).reverse: _*), constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom), showLegend = false)
+        @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOn.fold("")(x => utilities.Date.getTimeFromSqlTimestamp(x)) -> token.price).reverse: _*), constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom), showLegend = false)
     }
 @*    <script src="@routes.Assets.versioned("javascripts/tokensPrices.js")" type="text/javascript"></script>*@
 }

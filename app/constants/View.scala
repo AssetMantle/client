@@ -249,10 +249,8 @@ object View {
   val TOKENS_STATISTICS = "TOKENS_STATISTICS"
   val VOTING_POWERS = "VOTING_POWERS"
   val TOTAL_ACTIVE_VALIDATORS = "TOTAL_ACTIVE_VALIDATORS"
-
   val ACCOUNT_WALLET = "ACCOUNT_WALLET"
-
-  val TOKENS_PRICE = "TOKENS_PRICE"
+  val TOKEN_PRICE = "TOKEN_PRICE"
 
   val PROPOSAL = "PROPOSAL"
   val PROPOSAL_DEPOSITS = "PROPOSAL_DEPOSITS"
@@ -505,5 +503,46 @@ object View {
   val KEY = "KEY"
   val RECIPIENT = "RECIPIENT"
   val INFO = "INFO"
+  val MESSAGES_TYPE = "MESSAGES_TYPE"
+
+  val TxMessagesMap: Map[String, String] = Map(
+    constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
+    constants.Blockchain.TransactionMessage.SEND_COIN -> "MESSAGE_SEND",
+    constants.Blockchain.TransactionMessage.MULTI_SEND -> "MESSAGE_MULTI_SEND",
+    constants.Blockchain.TransactionMessage.VERIFY_INVARIANT -> "MESSAGE_VERIFY_INVARIANT",
+    constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS -> "MESSAGE_SET_WITHDRAW_ADDRESS",
+    constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD -> "MESSAGE_WITHDRAW_REWARD",
+    constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION -> "MESSAGE_WITHDRAW_COMMISSION",
+    constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL -> "MESSAGE_FUND_COMMUNITY_POOL",
+    constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE -> "MESSAGE_SUBMIT_EVIDENCE",
+    constants.Blockchain.TransactionMessage.DEPOSIT -> "MESSAGE_DEPOSIT",
+    constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL -> "MESSAGE_PROPOSAL",
+    constants.Blockchain.TransactionMessage.VOTE -> "MESSAGE_VOTE",
+    constants.Blockchain.TransactionMessage.UNJAIL -> "MESSAGE_UNJAIL",
+    constants.Blockchain.TransactionMessage.CREATE_VALIDATOR -> "MESSAGE_CREATE_VALIDATOR",
+    constants.Blockchain.TransactionMessage.EDIT_VALIDATOR -> "MESSAGE_EDIT_VALIDATOR",
+    constants.Blockchain.TransactionMessage.DELEGATE -> "MESSAGE_DELEGATE",
+    constants.Blockchain.TransactionMessage.REDELEGATE -> "MESSAGE_REDELEGATE",
+    constants.Blockchain.TransactionMessage.UNDELEGATE -> "MESSAGE_UNBOND",
+    constants.Blockchain.TransactionMessage.CREATE_CLIENT -> "MESSAGE_IBC_CREATE_CLIENT",
+    constants.Blockchain.TransactionMessage.UPDATE_CLIENT -> "MESSAGE_IBC_UPDATE_CLIENT",
+    constants.Blockchain.TransactionMessage.UPGRADE_CLIENT -> "MESSAGE_IBC_UPGRADE_CLIENT",
+    constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR -> "MESSAGE_IBC_MISBEHAVIOUR",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT -> "MESSAGE_IBC_CONN_OPEN_INIT",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY -> "MESSAGE_IBC_CONN_OPEN_TRY",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK -> "MESSAGE_IBC_CONN_OPEN_ACK",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM -> "MESSAGE_IBC_CONN_OPEN_CONFIRM",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT -> "MESSAGE_IBC_CHANNEL_OPEN_INIT",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY -> "MESSAGE_IBC_CHANNEL_OPEN_TRY",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK -> "MESSAGE_IBC_CHANNEL_OPEN_ACK",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM -> "MESSAGE_IBC_CHANNEL_OPEN_CONFIRM",
+    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT -> "MESSAGE_IBC_CHANNEL_CLOSE_INIT",
+    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM -> "MESSAGE_IBC_CHANNEL_CLOSE_CONFIRM",
+    constants.Blockchain.TransactionMessage.RECV_PACKET -> "MESSAGE_IBC_RECV_PACKET",
+    constants.Blockchain.TransactionMessage.TIMEOUT -> "MESSAGE_IBC_TIMEOUT",
+    constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
+    constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
+    constants.Blockchain.TransactionMessage.TRANSFER -> "MESSAGE_IBC_TRANSFER",
+  )
 
 }

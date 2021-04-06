@@ -6,7 +6,7 @@
 @commonCard(constants.View.TRANSACTION_MESSAGES) {
 } {
     @messages.map { msg =>
-        @commonCard(msg.messageType) {
+        @commonCard(constants.View.TxMessagesMap.getOrElse(msg.messageType, msg.messageType)) {
         } {
             <div class="tableViewCard">
             @msg.messageType match {

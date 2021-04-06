@@ -6,6 +6,6 @@
 @commonCard(constants.View.VALIDATOR_DELEGATIONS) {
 } {
     @commonPieChart("validatorDelegationsChart", delegationsMap, showLegend = true)
-    @commonTextInfo(constants.View.SELF_DELEGATED, Seq(selfDelegatedPercentage.toString, "%").mkString(" "))
-    @commonTextInfo(constants.View.OTHERS_DELEGATED, Seq(othersDelegatedPercentage.toString, "%").mkString(" "))
+    @commonTextInfo(constants.View.SELF_DELEGATED, s"${utilities.NumericOperation.roundOff(selfDelegatedPercentage)} %")
+    @commonTextInfo(constants.View.OTHERS_DELEGATED, s"${utilities.NumericOperation.roundOff(othersDelegatedPercentage)} %")
 }

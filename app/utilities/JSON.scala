@@ -25,7 +25,7 @@ object JSON {
               logger.error(response.body)
               throw new BaseException(constants.Response.JSON_UNMARSHALLING_ERROR)
           }
-          throw new BaseException(new Failure(errorResponse.error.getOrElse(errorResponse.message.getOrElse(constants.Response.JSON_PARSE_EXCEPTION.message)), null))
+          throw new BaseException(errorResponse.error.fold(errorResponse.message.fold(constants.Response.JSON_PARSE_EXCEPTION)(x => new Failure(x)))(x => new Failure(x)), null)
       }
     }.recover {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
