@@ -1,7 +1,7 @@
 package controllers
 
 import constants.Response.Success
-import controllers.actions._
+import controllers.actions.{WithGenesisLoginAction, _}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models.{blockchain, blockchainTransaction, master}
@@ -11,8 +11,8 @@ import play.api.{Configuration, Logger}
 import utilities.MicroNumber
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -41,7 +41,8 @@ class IdentityController @Inject()(
                                     masterClassifications: master.Classifications,
                                     masterAccounts: master.Accounts,
                                     withoutLoginAction: WithoutLoginAction,
-                                    withoutLoginActionAsync: WithoutLoginActionAsync
+                                    withoutLoginActionAsync: WithoutLoginActionAsync,
+                                    withGenesisLoginAction: WithGenesisLoginAction
                                   )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)

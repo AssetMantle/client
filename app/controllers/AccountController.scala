@@ -1,10 +1,10 @@
 package controllers
 
+import java.util.Base64
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
 import models.{blockchain, master, masterTransaction}
@@ -18,6 +18,7 @@ import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -27,8 +28,6 @@ class AccountController @Inject()(
                                    withUserLoginAction: WithUserLoginAction,
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
-                                   blockchainAclHashes: blockchain.ACLHashes,
-                                   blockchainAclAccounts: blockchain.ACLAccounts,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
@@ -70,7 +69,7 @@ class AccountController @Inject()(
         signUpData => {
           val mnemonics = utilities.Bip39.getMnemonics()
 
-          def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
+          def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, privateKeyEncrypted = Base64.getEncoder.encodeToString(utilities.Crypto.encrypt(utilities.KeyGenerator.getKey(mnemonics).privateKey, signUpData.password)), mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
 
           (for {
             _ <- addLogin(mnemonics)
@@ -129,7 +128,7 @@ class AccountController @Inject()(
             result <- createAccountAndGetResult(validateUsernamePassword, masterAccount)
           } yield result)
             .recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
         }
       )
@@ -137,7 +136,7 @@ class AccountController @Inject()(
 
   def checkMnemonics(mnemonics: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      if (utilities.Bip39.check(mnemonics)) Ok else NoContent
+      if (utilities.Bip39.validate(mnemonics)) Ok else NoContent
   }
 
   def importWalletForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
@@ -152,7 +151,7 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.importWallet(formWithErrors)))
         },
         importWalletData => {
-          val validMnemonics = utilities.Bip39.check(importWalletData.mnemonics)
+          val validMnemonics = utilities.Bip39.validate(importWalletData.mnemonics)
 
           val createAccountAndGetResult: Future[Result] = if (validMnemonics && importWalletData.password == importWalletData.confirmPassword) {
             //TODO Stop creating a key on BC node
@@ -167,7 +166,7 @@ class AccountController @Inject()(
               val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey, coins = Seq.empty, accountNumber = "", sequence = ""))
               val createMasterAccount = {
                 val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
-                masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
+                masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, privateKeyEncrypted = Base64.getEncoder.encodeToString(utilities.Crypto.encrypt(utilities.KeyGenerator.getKey(mnemonicList).privateKey, importWalletData.password)), language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
               }
 
               def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(addKeyResponse.result.keyOutput.address)
@@ -304,9 +303,9 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

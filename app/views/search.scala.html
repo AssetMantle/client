@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.blockchain._
 
-@(asset: Option[AssetNew], identity: Option[Identity], splits: Seq[Split], order: Option[OrderNew], metaList: Seq[Meta], classification: Option[Classification], maintainer: Option[Maintainer], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(asset: Option[Asset], identity: Option[Identity], splits: Seq[Split], order: Option[Order], metaList: Seq[Meta], classification: Option[Classification], maintainer: Option[Maintainer], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 

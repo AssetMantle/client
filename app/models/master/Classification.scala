@@ -71,7 +71,14 @@ class Classifications @Inject()(
     }
   }
 
-  private def getByID(id: String) = db.run(identityTable.filter(_.id === id).result.headOption)
+  private def tryGetClassificationIDByByEntityTypeLabelAndMaintainer(maintainerID:String, entityType:String, label:String): Future[String] = db.run(identityTable.filter(x => x.entityType === entityType && x.maintainerID === maintainerID && x.label === label).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def getByID(id: String, maintainerID: String) = db.run(identityTable.filter(x=> x.id === id && x.maintainerID === maintainerID).result.headOption)
 
   private def getByMaintainers(ids: Seq[String]) = db.run(identityTable.filter(_.maintainerID.inSet(ids)).result)
 
@@ -124,7 +131,7 @@ class Classifications @Inject()(
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def get(id: String): Future[Option[Classification]] = getByID(id)
+    def get(id: String, maintainerID: String): Future[Option[Classification]] = getByID(id,maintainerID)
 
     def updateLabel(id: String, maintainerID: String, label: String): Future[Int] = updateLabelByIDAndMaintainerID(id = id, maintainerID = maintainerID, label = Option(label))
 
@@ -139,6 +146,9 @@ class Classifications @Inject()(
     def getMaintainerIDs(id: String): Future[Seq[String]] = getMaintainerIDsByID(id)
 
     def tryGetEntityType(id: String, maintainerID: String): Future[String] = tryGetEntityTypeByIDAndMaintainer(id = id, maintainerID = maintainerID)
+
+    def tryGetClassificationID(maintainerID:String, entityType:String, label:String) = tryGetClassificationIDByByEntityTypeLabelAndMaintainer(maintainerID,entityType,label)
+
   }
 
 }

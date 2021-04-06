@@ -1,6 +1,9 @@
 package models.blockchain
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.MaintainerDeputize
@@ -11,8 +14,6 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -26,6 +27,10 @@ case class Maintainer(id: String, maintainedTraits: Mutables, addMaintainer: Boo
 class Maintainers @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
+                             masterIdentities: master.Identities,
+                             masterZones: master.Zones,
+                             masterOrganizations: master.Organizations,
+                             masterTraders: master.Traders,
                              masterClassifications: master.Classifications
                            )(implicit executionContext: ExecutionContext) {
 
@@ -140,13 +145,75 @@ class Maintainers @Inject()(
       val upsert = Service.insertOrUpdate(Maintainer(id = maintainerID, maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
       val masterOperations = {
-        val entityType = masterClassifications.Service.tryGetEntityType(id = maintainerDeputize.classificationID, maintainerID = maintainerDeputize.fromID)
+        val classification = masterClassifications.Service.get(maintainerDeputize.classificationID, maintainerDeputize.fromID)
 
-        def insertClassification(entityType: String) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = entityType, maintainerID = maintainerDeputize.toID, status = Option(true))
+        def insertClassification(classification: models.master.Classification) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = classification.entityType, maintainerID = maintainerDeputize.toID, label = classification.label, status = Option(true))
+
+        def updateDeputizeStatus = {
+          val identity = masterIdentities.Service.get(maintainerDeputize.toID)
+
+          def updateUserDeputizeStatus(identity: models.master.Identity) = {
+            identity.label.getOrElse("") match {
+              case constants.User.ZONE => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  if (constants.Blockchain.Acl.ZONE.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.ZONE) {
+                    masterZones.Service.markDeputized(maintainerDeputize.toID)
+                  } else Future(0)
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case constants.User.ORGANIZATION => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  if (constants.Blockchain.Acl.ORGANIZATION.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.ORGANIZATION) {
+                    masterOrganizations.Service.markDeputized(maintainerDeputize.toID)
+                  } else Future(0)
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case constants.User.TRADER => {
+                val identityClassifications = masterClassifications.Service.getByIdentityIDs(Seq(maintainerDeputize.toID))
+
+                def updateStatus(identityClassifications: Seq[models.master.Classification]) = {
+                  if (constants.Blockchain.Acl.TRADER.intersect(identityClassifications.map(_.id)) == constants.Blockchain.Acl.TRADER) {
+                    masterTraders.Service.markDeputized(maintainerDeputize.toID)
+                  } else {
+                    Future(0)
+                  }
+                }
+
+                for {
+                  identityClassifications <- identityClassifications
+                  _ <- updateStatus(identityClassifications)
+                } yield ()
+              }
+              case _ => throw new BaseException(constants.Response.USER_TYPE_DOES_NOT_EXIST)
+            }
+
+          }
+
+          for{
+            identity<-identity
+            updateUserDeputizeStatus<-updateUserDeputizeStatus(identity.getOrElse(throw new BaseException(constants.Response.IDENTITY_NOT_FOUND)))
+          }yield ()
+
+        }
 
         for {
-          entityType <- entityType
-          _ <- insertClassification(entityType)
+          classification <- classification
+          _ <- insertClassification(classification.getOrElse(throw new BaseException(constants.Response.FAILURE)))
+          _<- updateDeputizeStatus
         } yield ()
       }
 

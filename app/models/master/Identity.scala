@@ -65,6 +65,13 @@ class Identities @Inject()(
 
   private def getByID(id: String) = db.run(identityTable.filter(_.id === id).result.headOption)
 
+  private def getIDByLabel(label: String) = db.run(identityTable.filter(_.label === label).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
   private def deleteByID(id: String) = db.run(identityTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -112,6 +119,8 @@ class Identities @Inject()(
     def getAllByIDs(ids: Seq[String]): Future[Seq[Identity]] = getAllByIdentityIDs(ids)
 
     def get(id: String): Future[Option[Identity]] = getByID(id)
+
+    def tryGetIDByLabel(label: String): Future[String] = getIDByLabel(label)
 
     def updateLabel(id: String, label: String): Future[Int] = updateLabelByID(id = id, label = Option(label))
 

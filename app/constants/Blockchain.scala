@@ -2,13 +2,17 @@ package constants
 
 import utilities.MicroNumber
 
+import com.google.common.collect
+import com.google.common.collect.ImmutableList
+import org.bitcoinj.crypto.ChildNumber
+
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
   val AccountPrefix = "cosmos"
   val ValidatorPrefix = "cosmosvaloper"
   val NegotiationDefaultTime = 5000000
-  val DefaultZoneFaucetAmount = new MicroNumber(100000000)
+  val DefaultZoneFaucetAmount = new MicroNumber(10000000)
   val DefaultOrganizationFaucetAmount = new MicroNumber(100000)
   val DefaultTraderFaucetAmount = new MicroNumber(100)
   val DefaultFaucetAmount = new MicroNumber(1)
@@ -26,7 +30,18 @@ object Blockchain {
   val DataNameAndTypeSeparator = ":"
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
-  val HeightDataDefaultValue = -1
+  val mainIdentityID = "test.cGn3HMW8M3t5gMDv-wXa9sseHnA=|e4lo1Ovc23oHP-8t9IXwIudkE0w="
+  val expiresIn = 100000
+  val HeightDataDefaultValue: Int = -1
+  val CoinType = 118
+  val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
+    new ChildNumber(44, true),
+    new ChildNumber(CoinType, true),
+    new ChildNumber(0, true),
+    new ChildNumber(0, false),
+    new ChildNumber(0, false)
+  )
+
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
@@ -45,6 +60,17 @@ object Blockchain {
     val MINTING = "MINTING"
     val DISTRIBUTION = "DISTRIBUTION"
     val GOVERNANCE = "GOVERNANCE"
+  }
+
+  object Classification {
+
+    val ZONE = "test.E17cGd1x9uCXCJyVH_wJZE-vCis="
+    val ORGANIZATION = "test.OvSt7cLb1EgjmCk9pqooU2vsCnQ="
+    val TRADER = "test.MXs3XqfLPAosgO-W_IOUM10oDKk="
+    val MODERATED_ASSET = "test.HnMyc9-9BCCw2WaolT1qCTkO_UY="
+    val UNMODERATED_ASSET = "test.mKTDAiKuC-DoE_aESt27Vp0Jytg="
+    val FIAT = "test.6T9EyLje2HjG6CL2i6Mc600oBZc="
+    val ORDER = "test.vZaNZY9lTO4XfL9gMrraNgBDwhE="
   }
 
   object Event {
@@ -247,5 +273,58 @@ object Blockchain {
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
   }
 
+  object Parameters {
+
+    val USER_TYPE = "USER_TYPE"
+    val CURRENCY = "CURRENCY"
+    val ZONE_ID = "ZONE_ID"
+    val NAME = "NAME"
+    val ADDRESS = "ADDRESS"
+    val ORGANIZATION_ID = "ORGANIZATION_ID"
+    val ACCOUNT_ID = "ACCOUNT_ID"
+    val BUYER_ACCOUNT_ID = "BUYER_ACCOUNT_ID"
+    val SELLER_ACCOUNT_ID = "SELLER_ACCOUNT_ID"
+
+    //ASSET
+    val ASSET_TYPE = "ASSET_TYPE"
+    val ASSET_DESCRIPTION = "ASSET_DESCRIPTION"
+    val ASSET_QUANTITY = "ASSET_QUANTITY"
+    val QUANTITY_UNIT = "QUANTITY_UNIT"
+    val ASSET_PRICE_PER_UNIT = "ASSET_PRICE_PER_UNIT"
+    val SHIPPING_PERIOD = "SHIPPING_PERIOD"
+    val PORT_OF_LOADING = "PORT_OF_LOADING"
+    val PORT_OF_DISCHARGE = "PORT_OF_DISCHARGE"
+    val LOCKED = "LOCKED"
+    val MODERATED = "MODERATED"
+    val ORDER_TYPE = "ORDER_TYPE"
+    val FIAT_PROOF = "FIAT_PROOF"
+    val PRICE = "PRICE"
+    val QUANTITY = "QUANTITY"
+
+    //ORDER
+    val EXCHANGE_RATE = "exchangeRate"
+    val EXPIRY = "expiry"
+    val TAKER_ID = "takerID"
+    val MAKER_OWNABLE_SPLIT = "makerOwnableSplit"
+
+    val TYPE="TYPE"
+    val AMOUNT="AMOUNT"
+    val NEGOTIATION_ID="NEGOTIATION_ID"
+    val EXTRA_INFO="EXTRA_INFO"
+  }
+
+  object parameterValues {
+
+    val ORDER_TYPE = "COMDEX_ORDER"
+    val FIAT = "FIAT"
+
+  }
+
+  object Acl {
+
+    val ZONE = Seq(Classification.ORGANIZATION, Classification.TRADER, Classification.MODERATED_ASSET, Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
+    val ORGANIZATION = Seq(Classification.TRADER, Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
+    val TRADER = Seq(Classification.UNMODERATED_ASSET, Classification.FIAT, Classification.ORDER)
+  }
 
 }

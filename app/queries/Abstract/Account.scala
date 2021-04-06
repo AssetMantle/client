@@ -1,6 +1,6 @@
 package queries.Abstract
 
-import queries.responses.common.Coin
+import blockchainTx.common.Coin
 
 abstract class Account {
   val address: String

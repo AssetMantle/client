@@ -6,7 +6,7 @@ function searchFunctionOnEnter(event, id) {
 }
 
 function searchFunction(id) {
-    let source = $('#' + id).val();
+    let source = $('#' + $.escapeSelector(id)).val();
     const route = jsRoutes.controllers.IndexController.search(source);
     $.ajax({
         url: route.url,

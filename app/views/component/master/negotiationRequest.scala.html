@@ -4,17 +4,18 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.MicroNumber
 
-@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetProperties: Map[String, Map[String,Option[String]]], tradableAssetList:Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
     <div id="selectAsset">
         <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
         <div class="cmuk-panel cmuk-panel-scrollable">
             <ul class="cmuk-list">
-            @tradableAssetList.map { asset =>
-                <li onclick="selectAsset('@asset.id', '@asset.description', '@Messages(asset.assetType)', '@Seq((asset.price/asset.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(asset.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" ")', '@Seq(asset.quantity.toString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
-                    @asset.description | @Messages(constants.View.STATUS): @Messages(asset.status)
+            @tradableAssetProperties.map { asset =>
+                <li onclick="selectAsset('@asset._1', '@asset._2.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse("")', '@Messages(asset._2.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))', '@Seq((asset._2.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse("").toDouble/asset._2.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse("").toDouble).toString, Messages(constants.View.USD), Messages(constants.View.PER), asset._2.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" ")', '@Seq(MicroNumber(BigInt( asset._2.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse(""))).toString, Messages(constants.View.USD)).mkString(" ")', '@Seq(MicroNumber(BigInt( asset._2.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse(""))).toString, asset._2.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" ")', '@asset._2.getOrElse(constants.Property.SHIPPING_PERIOD.dataName,Some("")).getOrElse("")','@asset._2.getOrElse(constants.Property.PORT_OF_LOADING.dataName,Some("")).getOrElse("")','@asset._2.getOrElse(constants.Property.PORT_OF_DISCHARGE.dataName,Some("")).getOrElse("")')">
+                    @asset._2.getOrElse(constants.Property.ASSET_DESCRIPTION.dataName,Some("")).getOrElse("") | @Messages(constants.View.STATUS): @Messages(tradableAssetList.find(x=> x.id == asset._1).map(x=> x.status).getOrElse(""))
                 </li>
             }
             </ul>

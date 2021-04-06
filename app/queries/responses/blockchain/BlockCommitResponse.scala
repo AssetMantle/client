@@ -1,10 +1,10 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.Header
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
-import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
 
 object BlockCommitResponse {

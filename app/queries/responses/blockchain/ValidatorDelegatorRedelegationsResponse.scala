@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.Redelegation
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Redelegation
 import transactions.Abstract.BaseResponse
 
 object ValidatorDelegatorRedelegationsResponse {

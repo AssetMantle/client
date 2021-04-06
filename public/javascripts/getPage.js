@@ -1,5 +1,5 @@
 function getPage(jsRoute, elementID) {
-    let route = jsRoute($('#' + elementID).text().replace(/^\s+|\s+$/g, ''));
+    let route = jsRoute($('#' + $.escapeSelector(elementID)).text().replace(/^\s+|\s+$/g, ''));
     $.ajax({
         url: route.url,
         type: route.type,

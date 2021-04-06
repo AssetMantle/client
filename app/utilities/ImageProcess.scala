@@ -6,6 +6,7 @@ import com.sksamuel.scrimage.nio.JpegWriter
 import exceptions.BaseException
 import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64
+import org.bouncycastle.its.asn1.Signature
 import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}

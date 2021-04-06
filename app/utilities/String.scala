@@ -42,4 +42,6 @@ object String {
   def getPropertyRequestNameAndType(dataType: String, dataName: String): String = Seq(dataName, DataValue.getFactTypeFromDataType(dataType)).mkString(constants.Blockchain.DataNameAndTypeSeparator)
 
   def getPropertyRequestWithValue(dataNameWithType: String, dataValue: Option[String]): String = Seq(dataNameWithType, dataValue.getOrElse("")).mkString(constants.Blockchain.DataTypeAndValueSeparator)
+
+  def removeUnacceptableCharacterFromID(id:String)= id.replace("|","@")
 }

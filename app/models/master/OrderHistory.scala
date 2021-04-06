@@ -12,7 +12,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrderHistory(id: String, orderID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class OrderHistory(id: String, label: Option[String] = None, makerID: String, makerOwnableID: String, takerOwnableID: String, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
 
 @Singleton
 class OrderHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -40,13 +40,19 @@ class OrderHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private[models] class OrderHistoryTable(tag: Tag) extends Table[OrderHistory](tag, "Order_History") {
 
-    def * = (id, orderID, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (OrderHistory.tupled, OrderHistory.unapply)
+    def * = (id, label.?, makerID, makerOwnableID, takerOwnableID, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (OrderHistory.tupled, OrderHistory.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def orderID = column[String]("orderID")
+    def label = column[String]("label")
 
-    def status = column[String]("status")
+    def makerID = column[String]("makerID")
+
+    def makerOwnableID = column[String]("makerOwnableID")
+
+    def takerOwnableID = column[String]("takerOwnableID")
+
+    def status = column[Boolean]("status")
 
     def createdBy = column[String]("createdBy")
 

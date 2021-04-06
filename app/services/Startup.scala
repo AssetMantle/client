@@ -2,6 +2,9 @@ package services
 
 import akka.actor.Cancellable
 import exceptions.BaseException
+import blockchainTx.common.Validator.{Result => ValidatorResult}
+import blockchainTx.common.Header
+import blockchainTx.common._
 import models.blockchain.{Parameter, Token, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
@@ -15,11 +18,9 @@ import queries.responses.blockchain.GenesisResponse._
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
-import queries.responses.common.Validator.{Result => ValidatorResult}
-import queries.responses.common.{Account, Header}
 import utilities.MicroNumber
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}

@@ -122,7 +122,7 @@ function replyMessage(route, messageID) {
         },
         statusCode: {
             200: function (data) {
-                $('#' + data.id + messageID).html(data.text);
+                $('#' + $.escapeSelector(data.id + messageID)).html(data.text);
             },
             401: function (data) {
                 replaceDocument(data.responseText);

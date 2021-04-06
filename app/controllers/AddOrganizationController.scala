@@ -1,19 +1,23 @@
 package controllers
 
 import java.nio.file.Files
+import java.util.Base64
 
+import blockchainTx.common.Coin
+import blockchainTx.messages.Messages.SendCoin
 import controllers.actions._
-import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchainTransaction.AddOrganization
 import models.common.Serializable._
 import models.master._
 import models.{blockchain, blockchainTransaction, master, memberCheck}
+import org.bitcoinj.core.ECKey
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import queries.blockchain.GetAccount
+import transactions.request.Serializable.{Message, SignMeta, Tx}
 import views.companion.master.FileUpload
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,19 +31,24 @@ class AddOrganizationController @Inject()(
                                            transaction: utilities.Transaction,
                                            masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails,
                                            utilitiesNotification: utilities.Notification,
+                                           getAccount: GetAccount,
                                            masterOrganizationKYCs: master.OrganizationKYCs,
                                            masterOrganizationUBOs: master.OrganizationUBOs,
                                            memberCheckCorporateScanResultDecisions: memberCheck.CorporateScanDecisions,
-                                           transactionsAddOrganization: transactions.AddOrganization,
-                                           transactionsSendCoin: transactions.SendCoin,
                                            masterZones: master.Zones,
                                            masterIdentifications: master.Identifications,
                                            masterEmails: master.Emails,
                                            masterMobiles: master.Mobiles,
                                            blockchainAccounts: blockchain.Accounts,
-                                           blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations,
+                                           masterProperties: master.Properties,
+                                           masterClassifications: master.Classifications,
+                                           transactionsIdentityIssue: transactions.blockchain.IdentityIssue,
+                                           transactionsBroadcast: transactions.blockchain.Broadcast,
                                            blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
+                                           blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
                                            masterOrganizations: master.Organizations,
+                                           transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
+                                           blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
                                            withUserLoginAction: WithUserLoginAction,
                                            withZoneLoginAction: WithZoneLoginAction,
                                            withUsernameToken: WithUsernameToken,
@@ -49,7 +58,9 @@ class AddOrganizationController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val denom = configuration.get[String]("blockchain.denom")
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
+
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ORGANIZATION
 
@@ -86,6 +97,8 @@ class AddOrganizationController @Inject()(
           } yield BadRequest(views.html.component.master.addOrganization(formWithErrors, zones = zones))
         },
         addOrganizationData => {
+          val immutables = Seq(constants.Property.NAME.withValue(addOrganizationData.name))
+          val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.ORGANIZATION))
           val verificationStatus = masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)
           val identification = masterIdentifications.Service.tryGet(loginState.username)
           val email = masterEmails.Service.tryGet(loginState.username)
@@ -96,13 +109,15 @@ class AddOrganizationController @Inject()(
             else if (!identification.verificationStatus.getOrElse(false)) throw new BaseException(constants.Response.ACCOUNT_KYC_PENDING)
             else if (!email.status || !mobile.status) throw new BaseException(constants.Response.CONTACT_VERIFICATION_PENDING)
             else {
-              val id = masterOrganizations.Service.insertOrUpdate(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
+
+              val identityID = utilities.IDGenerator.getIdentityID(constants.Blockchain.Classification.ORGANIZATION, Immutables(Properties((immutableMetas ++ immutables).map(_.toProperty))))
+              val upsert = masterOrganizations.Service.insertOrUpdate(id = identityID, zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
 
               def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
               for {
-                id <- id
-                organizationKYCs <- getOrganizationKYCs(id)
+                _ <- upsert
+                organizationKYCs <- getOrganizationKYCs(identityID)
                 result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
               } yield result
             }
@@ -123,7 +138,7 @@ class AddOrganizationController @Inject()(
 
   def userAddUBOForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.userAddUBO())
+      Ok(views.html.component.master.userAddUBO())
   }
 
   def userAddUBO(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
@@ -157,7 +172,7 @@ class AddOrganizationController @Inject()(
 
   def addUBOForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.addUBO())
+      Ok(views.html.component.master.addUBO())
   }
 
   def addUBO(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
@@ -191,7 +206,7 @@ class AddOrganizationController @Inject()(
 
   def userDeleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
+      Ok(views.html.component.master.userDeleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
   def userDeleteUBO(): Action[AnyContent] = withUserLoginAction { implicit loginState =>
@@ -219,7 +234,7 @@ class AddOrganizationController @Inject()(
 
   def deleteUBOForm(id: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
+      Ok(views.html.component.master.deleteUBO(views.companion.master.DeleteUBO.form.fill(views.companion.master.DeleteUBO.Data(id = id))))
   }
 
   def deleteUBO(): Action[AnyContent] = withOrganizationLoginAction { implicit loginState =>
@@ -301,7 +316,7 @@ class AddOrganizationController @Inject()(
 
   def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
+      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
   }
 
   def userUploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -350,7 +365,7 @@ class AddOrganizationController @Inject()(
 
   def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
+      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
   def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction { implicit loginState =>
@@ -515,39 +530,52 @@ class AddOrganizationController @Inject()(
 
           def checkMemberCheckVerified(organizationID: String): Future[Boolean] = memberCheckCorporateScanResultDecisions.Service.checkOrganizationApproved(organizationID)
 
-          def sendTransactionsAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, zoneID: String, validateUsernamePassword: Boolean, organization: Organization): Future[Result] = {
+          def sendTransactionsAndGetResult(checkAllKYCFilesVerified: Boolean, checkMemberCheckVerified: Boolean, validateUsernamePassword: Boolean, organization: Organization): Future[Result] = {
             if (validateUsernamePassword) {
               if (!checkMemberCheckVerified) throw new BaseException(constants.Response.MEMBER_CHECK_NOT_VERIFIED)
               else if (checkAllKYCFilesVerified) {
                 val organizationAccountID = masterOrganizations.Service.tryGetAccountID(acceptRequestData.organizationID)
+                val zoneAccount = masterAccounts.Service.tryGet(loginState.username)
+                val zoneBlockchainAccount = getAccount.Service.get(loginState.address)
 
                 def getOrganizationAccountAddress(accountId: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountId)
 
-                def sendCoinTransaction(organizationAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount =Seq(Coin(denom, constants.Blockchain.DefaultOrganizationFaucetAmount)) , gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = organizationAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultOrganizationFaucetAmount)), password = acceptRequestData.password, mode = transactionMode),
-                  action = transactionsSendCoin.Service.post,
-                  onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-                  onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-                )
+                def issueIdentityTransaction(zoneAccount: Account, zoneBlockchainAccount: queries.responses.blockchain.AccountResponse.Response, organizationAccountAddress: String) = {
+                  val immutables = Seq(constants.Property.NAME.withValue(organization.name))
+                  val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.ORGANIZATION))
+                  val mutableMetas = Seq(constants.Property.ZONE_ID.withValue(utilities.String.removeUnacceptableCharacterFromID(organization.zoneID)))
+                  val mutables = Seq(constants.Property.ADDRESS.withValue(organization.registeredAddress.toString.filter(_.isLetter)))
 
-                def sendAddOrganizationTransaction(organizationAccountAddress: String): Future[String] = transaction.process[AddOrganization, transactionsAddOrganization.Request](
-                  entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-                  request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = loginState.address, gas = acceptRequestData.gas), to = organizationAccountAddress, organizationID = acceptRequestData.organizationID, zoneID = zoneID, password = acceptRequestData.password, mode = transactionMode),
-                  action = transactionsAddOrganization.Service.post,
-                  onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
-                  onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
-                )
+                  val sendCoin = transaction.process[blockchainTransaction.SendCoin, transactionsBroadcast.Request](
+                    entity = blockchainTransaction.SendCoin(from = loginState.address, to = organizationAccountAddress, amount = Seq(models.common.Serializable.Coin(stakingDenom, constants.Blockchain.DefaultZoneFaucetAmount)), gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                    request = transactionsBroadcast.Request(utilities.SignTx.sign(Tx(Seq(Message(constants.Blockchain.TransactionMessage.SEND_COIN, SendCoin(from_address = loginState.address, to_address = organizationAccountAddress, Seq(Coin(stakingDenom, constants.Blockchain.DefaultOrganizationFaucetAmount))))), Fee(Seq(), acceptRequestData.gas.toMicroString)), SignMeta(zoneBlockchainAccount.result.value.accountNumber, chainID, zoneBlockchainAccount.result.value.sequence), ECKey.fromPrivate(utilities.Crypto.decrypt(Base64.getDecoder.decode(zoneAccount.privateKeyEncrypted.getOrElse(throw new BaseException(constants.Response.FAILURE))), acceptRequestData.password))), transactionMode),
+                    action = transactionsBroadcast.Service.post,
+                    onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                    onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash)
+
+                  def issueIdentity = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+                    entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = organization.zoneID, classificationID = constants.Blockchain.Classification.ORGANIZATION, to = organizationAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = acceptRequestData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
+                    request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = acceptRequestData.gas), fromID = organization.zoneID, classificationID = constants.Blockchain.Classification.ORGANIZATION, to = organizationAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                    action = transactionsIdentityIssue.Service.post,
+                    onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
+                    onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
+
+                  for {
+                    _ <- sendCoin
+                    ticketID <- issueIdentity
+                  } yield ticketID
+                }
 
                 for {
                   organizationAccountID <- organizationAccountID
+                  zoneAccount <- zoneAccount
+                  zoneBlockchainAccount <- zoneBlockchainAccount
                   organizationAccountAddress <- getOrganizationAccountAddress(organizationAccountID)
-                  _ <- sendCoinTransaction(organizationAccountAddress)
-                  ticketID <- sendAddOrganizationTransaction(organizationAccountAddress)
+                  ticketID <- issueIdentityTransaction(zoneAccount, zoneBlockchainAccount, organizationAccountAddress)
                   _ <- utilitiesNotification.send(organizationAccountID, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)()
                   _ <- utilitiesNotification.send(loginState.username, constants.Notification.ORGANIZATION_REQUEST_ACCEPTED, ticketID)()
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_REQUEST_ACCEPTED)))
@@ -562,7 +590,145 @@ class AddOrganizationController @Inject()(
             organization <- organization
             checkAllKYCFilesVerified <- checkAllKYCFilesVerified(zoneID, organization)
             checkMemberCheckVerified <- checkMemberCheckVerified(organization.id)
-            result <- sendTransactionsAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, zoneID = zoneID, validateUsernamePassword = validateUsernamePassword, organization = organization)
+            result <- sendTransactionsAndGetResult(checkAllKYCFilesVerified = checkAllKYCFilesVerified, checkMemberCheckVerified = checkMemberCheckVerified, validateUsernamePassword = validateUsernamePassword, organization = organization)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def deputizeForm(organizationID: String): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
+    implicit request =>
+      Future(Ok(views.html.component.master.deputizeOrganization(organizationID = organizationID)))
+  }
+
+  def deputize: Action[AnyContent] = withZoneLoginAction { implicit loginState =>
+    implicit request =>
+      views.companion.master.DeputizeOrganization.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.deputizeOrganization(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name))))
+        },
+        deputizeOrganizationData => {
+          val organization = masterOrganizations.Service.tryGet(deputizeOrganizationData.organizationID)
+          val organizationClassifications = masterClassifications.Service.getByIdentityIDs(Seq(deputizeOrganizationData.organizationID))
+
+          def deputizeAndGetResult(organization: Organization, organizationClassifications: Seq[Classification]) = {
+            if (!organization.deputizeStatus) {
+              //TODO Need to implement better solution than manual delays for deputize
+              def deputizeTraderClassification = {
+                if (deputizeOrganizationData.addTrader && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.TRADER)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.TRADER, constants.Blockchain.Entity.IDENTITY_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.TRADER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.TRADER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield Thread.sleep(2000)
+                } else {
+                  Future()
+                }
+              }
+
+              def deputizeUnmoderatedAssetClassification = {
+                if (deputizeOrganizationData.createUnmoderatedAsset && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.UNMODERATED_ASSET)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.UNMODERATED_ASSET, constants.Blockchain.Entity.ASSET_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.UNMODERATED_ASSET, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield Thread.sleep(2000)
+
+                } else {
+                  Future()
+                }
+              }
+
+              def deputizeFiatClassification = {
+                if (deputizeOrganizationData.createFiat && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.FIAT)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.FIAT, constants.Blockchain.Entity.ASSET_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.FIAT, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield Thread.sleep(3000)
+
+                } else {
+                  Future()
+                }
+              }
+
+
+              def deputizeOrderClassification = {
+                if (deputizeOrganizationData.createOrder && !organizationClassifications.map(_.id).contains(constants.Blockchain.Classification.ORDER)) {
+                  val classificationProperties = masterProperties.Service.getAll(constants.Blockchain.Classification.ORDER, constants.Blockchain.Entity.ORDER_DEFINITION)
+
+                  def broadcastTx(classificationProperties: Seq[models.master.Property]) = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
+                    entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true, gas = deputizeOrganizationData.gas, ticketID = "", mode = transactionMode),
+                    blockchainTransactionCreate = blockchainTransactionMaintainerDeputizes.Service.create,
+                    request = transactionsMaintainerDeputize.Request(transactionsMaintainerDeputize.Message(transactionsMaintainerDeputize.BaseReq(from = loginState.address, gas = deputizeOrganizationData.gas), fromID = organization.zoneID, toID = deputizeOrganizationData.organizationID, classificationID = constants.Blockchain.Classification.ORDER, maintainedTraits = classificationProperties.filter(_.isMutable).map(x => BaseProperty(x.dataType, x.name, x.value)), addMaintainer = true, mutateMaintainer = true, removeMaintainer = true)),
+                    action = transactionsMaintainerDeputize.Service.post,
+                    onSuccess = blockchainTransactionMaintainerDeputizes.Utility.onSuccess,
+                    onFailure = blockchainTransactionMaintainerDeputizes.Utility.onFailure,
+                    updateTransactionHash = blockchainTransactionMaintainerDeputizes.Service.updateTransactionHash
+                  )
+
+                  for {
+                    classificationProperties <- classificationProperties
+                    _ <- broadcastTx(classificationProperties)
+                  } yield ()
+                } else {
+                  Future()
+                }
+              }
+
+              for {
+                _ <- deputizeTraderClassification
+                _ <- deputizeUnmoderatedAssetClassification
+                _ <- deputizeFiatClassification
+                _ <- deputizeOrderClassification
+              } yield ()
+            } else {
+              throw new BaseException(constants.Response.FAILURE)
+            }
+          }
+
+
+          (for {
+            organization <- organization
+            organizationClassifications <- organizationClassifications
+            _ <- deputizeAndGetResult(organization, organizationClassifications)
+            result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ORGANIZATION_DEPUTIZED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
@@ -657,7 +823,7 @@ class AddOrganizationController @Inject()(
 
   def rejectRequestForm(organizationID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.rejectOrganizationRequest(organizationID = organizationID))
+      Ok(views.html.component.master.rejectOrganizationRequest(organizationID = organizationID))
   }
 
   def rejectRequest(): Action[AnyContent] = withZoneLoginAction { implicit loginState =>
@@ -685,12 +851,12 @@ class AddOrganizationController @Inject()(
 
   def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
+      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
   }
 
   def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
+      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
   }
 
   def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -758,26 +924,4 @@ class AddOrganizationController @Inject()(
       }
   }
 
-  def blockchainAddOrganizationForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-    Ok(views.html.component.blockchain.addOrganization())
-  }
-
-  def blockchainAddOrganization: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-    views.companion.blockchain.AddOrganization.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.component.blockchain.addOrganization(formWithErrors)))
-      },
-      addOrganizationData => {
-        val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = addOrganizationData.mode))
-        (for {
-          _ <- postRequest
-        } yield Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
-          ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
 }
