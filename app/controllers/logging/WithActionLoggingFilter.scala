@@ -1,21 +1,22 @@
 package controllers.logging
 
-import controllers.actions.LoginState
+import controllers.view.OtherApp
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, master, masterTransaction}
-import org.slf4j.MarkerFactory
 import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, Request, Result, Results}
-import play.api.MarkerContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WithActionLoggingFilter @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi, utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val lang = Lang(configuration.get[String]("play.log.lang"))
+  private implicit val lang: Lang = Lang(configuration.get[String]("play.log.lang"))
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def next(f: => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = Action { implicit request ⇒
     val startTime = System.currentTimeMillis()

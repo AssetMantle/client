@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions._
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.blockchain._
 import models.common.Serializable.Coin
@@ -32,7 +33,6 @@ class ComponentViewController @Inject()(
                                          blockchainMetas: blockchain.Metas,
                                          blockchainUndelegations: blockchain.Undelegations,
                                          blockchainBlocks: blockchain.Blocks,
-                                         blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                                          blockchainTransactions: blockchain.Transactions,
                                          blockchainTransactionsIdentityDefines: blockchainTransaction.IdentityDefines,
                                          blockchainTransactionsIdentityNubs: blockchainTransaction.IdentityNubs,
@@ -81,6 +81,10 @@ class ComponentViewController @Inject()(
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Ok(views.html.component.master.commonHome()))
@@ -118,13 +122,14 @@ class ComponentViewController @Inject()(
   def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val latestBlock = blockchainBlocks.Service.getLatestBlock
-      val averageBlockTime = blockchainAverageBlockTimes.Service.get
+
+      def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
       def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
 
       (for {
         latestBlock <- latestBlock
-        averageBlockTime <- averageBlockTime
+        averageBlockTime <- getAverageBlockTime(latestBlock)
         proposer <- getProposer(latestBlock.proposerAddress)
       } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
         ).recover {
@@ -145,13 +150,13 @@ class ComponentViewController @Inject()(
 
   def votingPowers(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val allValidators = blockchainValidators.Service.getAll
+      val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
 
-      def getVotingPowerMap(validators: Seq[Validator]): ListMap[String, Double] = validators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
+      def getVotingPowerMap(sortedBondedValidators: Seq[Validator]): ListMap[String, Double] = sortedBondedValidators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
 
       (for {
-        allValidators <- allValidators
-      } yield Ok(views.html.component.blockchain.votingPowers(votingPowerMap = getVotingPowerMap(allValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)), totalActiveValidators = allValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allValidators.length))
+        allSortedValidators <- allSortedValidators
+      } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = getVotingPowerMap(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

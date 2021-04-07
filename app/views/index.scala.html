@@ -2,8 +2,9 @@
 @import play.twirl.api.Html
 @import views.html.base._
 @import scala.collection.immutable.ListMap
+@import controllers.view.OtherApp
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
     @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 

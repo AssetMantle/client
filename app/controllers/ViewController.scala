@@ -2,12 +2,15 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.blockchain
 import play.api.i18n.I18nSupport
+import play.api.libs.json.{Json, Reads}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
+import play.api.{ConfigLoader, Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,6 +26,10 @@ class ViewController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

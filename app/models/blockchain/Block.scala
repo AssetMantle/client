@@ -1,8 +1,6 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
@@ -12,6 +10,7 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
+import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -32,6 +31,8 @@ class Blocks @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
 
   private val blocksPerPage = configuration.get[Int]("blockchain.blocks.perPage")
+
+  private val numBlocksAvgBlockTimes = configuration.get[Int]("blockchain.avgBlockTimes")
 
   import databaseConfig.profile.api._
 
@@ -148,6 +149,25 @@ class Blocks @Inject()(
         blockList <- getBlocksByHeightRange(latestBlockHeight - n + 1 to latestBlockHeight).map(_.map(_.deserialize))
       } yield blockList
     }
+  }
+
+  object Utility {
+
+    def getAverageBlockTime(fromBlock: Option[Int] = None, numBlocks: Int = numBlocksAvgBlockTimes): Future[Double] = {
+      val lastBlock = fromBlock.fold(Service.getLatestBlock)(height => Service.tryGet(height))
+
+      // Should not use block height 1 since time difference between block 1 and block 2 can be very high
+      def getFirstBlock(lastBlock: Block) = if (lastBlock.height == 1) Future(lastBlock) else if (lastBlock.height <= numBlocks) Service.tryGet(2) else Service.tryGet(lastBlock.height - numBlocks)
+
+      (for {
+        lastBlock <- lastBlock
+        firstBlock <- getFirstBlock(lastBlock)
+      } yield utilities.NumericOperation.roundOff(Duration.between(utilities.Date.bcTimestampToZonedDateTime(lastBlock.time), utilities.Date.bcTimestampToZonedDateTime(firstBlock.time)).abs().toSeconds.toDouble / (lastBlock.height - firstBlock.height))
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
   }
 
 }

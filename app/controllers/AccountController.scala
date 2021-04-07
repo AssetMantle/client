@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
@@ -51,6 +52,10 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>

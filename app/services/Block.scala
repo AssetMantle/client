@@ -30,7 +30,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class Block @Inject()(
                        blockchainBlocks: blockchain.Blocks,
                        blockchainAccounts: blockchain.Accounts,
-                       blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                        blockchainAssets: blockchain.Assets,
                        blockchainProposals: blockchain.Proposals,
                        blockchainProposalDeposits: blockchain.ProposalDeposits,
@@ -110,10 +109,6 @@ class Block @Inject()(
     }
   }
 
-  def setAverageBlockTime(header: Header): Future[Double] = blockchainAverageBlockTimes.Service.set(header)
-
-  def getAverageBlockTime: Future[Double] = blockchainAverageBlockTimes.Service.get
-
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnNewBlock(header: Header): Future[Unit] = {
     val validators = blockchainValidators.Utility.onNewBlock(header)
@@ -138,7 +133,10 @@ class Block @Inject()(
     val proposer = blockchainValidators.Service.tryGetProposerName(blockCommitResponse.result.signed_header.header.proposer_address)
 
     def getWebSocketNewBlock(proposer: String): actorsMessage.WebSocket.NewBlock = actorsMessage.WebSocket.NewBlock(
-      block = actorsMessage.WebSocket.Block(height = blockCommitResponse.result.signed_header.header.height, time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time), proposer = proposer),
+      block = actorsMessage.WebSocket.Block(
+        height = blockCommitResponse.result.signed_header.header.height,
+        time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time),
+        proposer = proposer),
       txs = transactions.map(tx => actorsMessage.WebSocket.Tx(
         hash = tx.hash,
         status = tx.status,

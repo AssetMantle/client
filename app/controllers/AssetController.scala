@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -44,6 +45,10 @@ class AssetController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_ASSET
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 

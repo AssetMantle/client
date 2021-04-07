@@ -1,50 +1,51 @@
 @import views.html.base._
 @import controllers.actions.LoginState
 @import models.common.TransactionMessages._
+@import controllers.view.OtherApp
 
-@(txHash: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(txHash: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
-    @views.html.base.common(Messages(constants.View.BLOCK), failures, warnings, successes, infos)(left)(center)(right)
+@views.html.base.common(Messages(constants.View.BLOCK), failures, warnings, successes, infos)(left)(center)(right)
 
-    @left = {
-        <div class="leftContainer">
-            <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
-        </div>
-        <script>
-                componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
-                componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
-        </script>
-    }
+@left = {
+    <div class="leftContainer">
+        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+    </div>
+    <script>
+            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
+            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+    </script>
+}
 
-    @center = {
-        <div class="cmuk-container cmuk-margin-bottom">
-            <div class="cmuk-grid-match" cmuk-grid>
-                <div class="cmuk-width-expand@@m">
-                    <div id="transactionDetails" class="tableViewCard"></div>
-                </div>
-            </div>
-            <div class="cmuk-grid-match" cmuk-grid>
-                <div class="cmuk-width-expand@@m">
-                    <div id="transactionMessages" class="transactionMessages"></div>
-                </div>
+@center = {
+    <div class="cmuk-container cmuk-margin-bottom">
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="transactionDetails" class="tableViewCard"></div>
             </div>
         </div>
-        <script>
-                componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
-                componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
-        </script>
-    }
-
-    @right = {
-        <div class="rightContainer">
-            <div class="recentActivityContainer">
-                <div id="recentActivities"></div>
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="transactionMessages" class="transactionMessages"></div>
             </div>
-            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
         </div>
-        <script>
-                componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-                componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
-        </script>
-    }
+    </div>
+    <script>
+            componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
+            componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
+    </script>
+}
+
+@right = {
+    <div class="rightContainer">
+        <div class="recentActivityContainer">
+            <div id="recentActivities"></div>
+        </div>
+        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
+    </div>
+    <script>
+            componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
+            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
+    </script>
+}
