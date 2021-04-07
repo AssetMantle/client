@@ -7,7 +7,7 @@
 @undelegations.map { case (validatorAddress, undelegationEntries) =>
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), routes.ViewController.validator(validatorAddress)))
     @undelegationEntries.map { undelegationEntry =>
-        @commonDoubleInfo(constants.View.AMOUNT_UNDELEGATING, utilities.NumericOperation.roundOff(undelegationEntry.balance.toMicroDouble))
+        @commonTextInfo(constants.View.AMOUNT_UNDELEGATING, utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble)))
         @commonTextInfo(constants.View.COMPLETION_TIME, utilities.Date.bcTimestampToString(undelegationEntry.completionTime))
     }
 }
