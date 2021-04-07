@@ -14,5 +14,6 @@ dist
 /.settings
 /.idea/
 *.css.map
+run/explorer.run.xml
 public/stylesheets/.sass-cache*
 .bsp
