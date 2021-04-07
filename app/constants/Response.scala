@@ -146,6 +146,7 @@ object Response {
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val INVALID_INPUT = new Failure("INVALID_INPUT")
+  val INVALID_QUERY = new Failure("INVALID_QUERY")
   val NO_FILE = new Failure("NO_FILE")
   val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
   val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")

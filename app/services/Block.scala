@@ -1,6 +1,7 @@
 package services
 
 import actors.{Message => actorsMessage}
+import constants.Log.Messages
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
@@ -9,6 +10,8 @@ import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.mvc.MessagesControllerComponents
 import play.api.{Configuration, Logger}
 import queries.Abstract.TendermintEvidence
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
@@ -55,11 +58,14 @@ class Block @Inject()(
                        getProposal: GetProposal,
                        masterTransactionNotifications: masterTransaction.Notifications,
                        utilitiesOperations: utilities.Operations,
+                       messagesApi: MessagesApi
                      )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_BLOCK
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val webSocketMessageLang: Lang = Lang(configuration.get[String]("blockchain.explorer.webSocketMessageLang"))
 
   private val slashingNotificationFactor: BigDecimal = BigDecimal(configuration.get[String]("blockchain.explorer.slashingNotificationFactor"))
 
@@ -97,7 +103,7 @@ class Block @Inject()(
       transactions <- insertTransactions(transactionsByHeightResponse.result.txs.map(_.hash))
     } yield transactions
       ).recover {
-      case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR) {
+      case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR || baseException.failure == constants.Response.JSON_PARSE_EXCEPTION) {
         logger.error(baseException.failure.message)
         Seq.empty
       } else throw baseException
@@ -133,7 +139,12 @@ class Block @Inject()(
 
     def getWebSocketNewBlock(proposer: String): actorsMessage.WebSocket.NewBlock = actorsMessage.WebSocket.NewBlock(
       block = actorsMessage.WebSocket.Block(height = blockCommitResponse.result.signed_header.header.height, time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time), proposer = proposer),
-      txs = transactions.map(tx => actorsMessage.WebSocket.Tx(hash = tx.hash, status = tx.status, numMsgs = tx.messages.length, fees = tx.fee)),
+      txs = transactions.map(tx => actorsMessage.WebSocket.Tx(
+        hash = tx.hash,
+        status = tx.status,
+        numMsgs = tx.messages.length,
+        messageTypes = if (tx.messages.length == 1) messagesApi(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType)) else s"${messagesApi(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))} (+${tx.messages.length - 1})",
+        fees = tx.fee)),
       averageBlockTime = averageBlockTime,
       validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address)
     )

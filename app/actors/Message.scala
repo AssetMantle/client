@@ -24,7 +24,7 @@ object Message {
 
     implicit val blockWrites: OWrites[Block] = Json.writes[Block]
 
-    case class Tx(hash: String, status: Boolean, numMsgs: Int, fees: Fee)
+    case class Tx(hash: String, status: Boolean, numMsgs: Int, messageTypes: String, fees: Fee)
 
     implicit val txWrites: OWrites[Tx] = Json.writes[Tx]
 

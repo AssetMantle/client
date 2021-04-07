@@ -289,7 +289,7 @@ object Blockchain {
     val TIMEOUT_ON_CLOSE = "/ibc.core.channel.v1.MsgTimeoutOnClose"
     val ACKNOWLEDGEMENT = "/ibc.core.channel.v1.MsgAcknowledgement"
     //ibc-transfer
-    val TRANSFER = "./ibc.applications.transfer.v1.MsgTransfer"
+    val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
     val ASSET_DEFINE = "/xprt/assets/define/message"
     val ASSET_MINT = "/xprt/assets/mint/message"
