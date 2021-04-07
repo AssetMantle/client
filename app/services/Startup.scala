@@ -211,7 +211,7 @@ class Startup @Inject()(
 
     def insertTransactions(blockHeader: Header): Future[Seq[blockchainTransaction]] = blocksServices.insertTransactionsOnBlock(blockHeader)
 
-    def averageBlockTime(blockHeader: Header): Future[Double] = blocksServices.setAverageBlockTime(blockHeader)
+    def getAverageBlockTime(blockHeader: Header): Future[Double] = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(blockHeader.height))
 
     def checksAndUpdatesOnNewBlock(blockHeader: Header): Future[Unit] = blocksServices.checksAndUpdatesOnNewBlock(blockHeader)
 
@@ -220,7 +220,7 @@ class Startup @Inject()(
     (for {
       blockCommitResponse <- blockCommitResponse
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
-      averageBlockTime <- averageBlockTime(blockCommitResponse.result.signed_header.header)
+      averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       blockResultResponse <- blockResultResponse
       _ <- actionsOnEvents(blockResultResponse)
@@ -256,7 +256,7 @@ class Startup @Inject()(
       //TODO (also may be akka.dispatch.TaskInvocation)
       //TODO ILLEGAL_STATE_EXCEPTION comes only once at start if the GET request is done Await.result(getABCIInfo.Service.get(), Duration, Inf)
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
-      val abciInfo = getABCIInfo.Service.get()
+      val abciInfo = Await.result(getABCIInfo.Service.get(), Duration.Inf)
 
       def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
 
@@ -272,7 +272,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-        abciInfo <- abciInfo
+        //        abciInfo <- abciInfo
         latestExplorerHeight <- latestExplorerHeight
         _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
       } yield ()

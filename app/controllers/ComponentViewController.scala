@@ -32,7 +32,6 @@ class ComponentViewController @Inject()(
                                          blockchainMetas: blockchain.Metas,
                                          blockchainUndelegations: blockchain.Undelegations,
                                          blockchainBlocks: blockchain.Blocks,
-                                         blockchainAverageBlockTimes: blockchain.AverageBlockTimes,
                                          blockchainTransactions: blockchain.Transactions,
                                          blockchainTransactionsIdentityDefines: blockchainTransaction.IdentityDefines,
                                          blockchainTransactionsIdentityNubs: blockchainTransaction.IdentityNubs,
@@ -118,13 +117,14 @@ class ComponentViewController @Inject()(
   def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val latestBlock = blockchainBlocks.Service.getLatestBlock
-      val averageBlockTime = blockchainAverageBlockTimes.Service.get
+
+      def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
       def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
 
       (for {
         latestBlock <- latestBlock
-        averageBlockTime <- averageBlockTime
+        averageBlockTime <- getAverageBlockTime(latestBlock)
         proposer <- getProposer(latestBlock.proposerAddress)
       } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
         ).recover {

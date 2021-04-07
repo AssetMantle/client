@@ -9,6 +9,6 @@ const firebaseConfig = {
 };
 
 const ws = {
-    url: 'wss://' + $(location).attr('host') + '/websocket',
+    url: 'ws://' + $(location).attr('host') + '/websocket',
     start: 'START',
 };
