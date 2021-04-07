@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Maintainer, Meta}
@@ -39,6 +40,10 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   def index: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       loginState match {
@@ -52,7 +57,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
 
-      if (query == "") Future(Ok(views.html.dashboard(failures= Seq(constants.Response.INVALID_QUERY))))
+      if (query == "") Future(Ok(views.html.dashboard(failures = Seq(constants.Response.INVALID_QUERY))))
       else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ViewController.wallet(query)))
       else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
       else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ViewController.transaction(query)))

@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -34,6 +35,10 @@ class MetaController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_META
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def revealForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>

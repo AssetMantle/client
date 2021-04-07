@@ -127,6 +127,7 @@ class Delegations @Inject()(
         delegationResponse <- delegationResponse
         _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
+        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
         case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorDelegationNotFound)) throw baseException else logger.info(baseException.failure.logMessage)
       }
     }
