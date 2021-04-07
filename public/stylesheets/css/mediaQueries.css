@@ -150,8 +150,7 @@
         border: none; }
 
   .tableViewCard .infoRow .infoRowLabel {
-    width: 125px;
-    vertical-align: inherit; } }
+    width: 125px; } }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
     top: 10%;
