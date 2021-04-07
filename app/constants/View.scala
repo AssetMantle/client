@@ -306,7 +306,8 @@ object View {
   val TOTAL_SUPPLY = "TOTAL_SUPPLY"
   val COMMUNITY_POOL = "COMMUNITY_POOL"
   val INFLATION = "INFLATION"
-
+  val BONDED_TOKENS = "BONDED_TOKENS"
+  val STAKING_POOL = "STAKING_POOL"
   val EVENTS = "EVENTS"
   val NO_EVENTS = "NO_EVENTS"
 
@@ -499,7 +500,7 @@ object View {
   val TOKEN = "TOKEN"
   val VOTER = "VOTER"
   val OPTION = "OPTION"
-  val SUBSAPCE = "SUBSAPCE"
+  val SUBSPACE = "SUBSPACE"
   val KEY = "KEY"
   val RECIPIENT = "RECIPIENT"
   val INFO = "INFO"
