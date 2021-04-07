@@ -28,7 +28,7 @@
     @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
     @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonLink(selfDelegationAddress, routes.ViewController.wallet(selfDelegationAddress)))
     @commonTextInfo(constants.View.COMMISSION_RATE, utilities.NumericOperation.formatNumber(validator.commission.commissionRates.rate * 100) + "%")
-    @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
+                    @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
     @commonTextInfo(constants.View.VALIDATOR_IDENTITY, validator.description.identity)
     @commonTextInfo(constants.View.VALIDATOR_WEBSITE, validator.description.website)
     @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, validator.description.securityContact)
