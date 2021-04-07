@@ -474,6 +474,10 @@ body.darkMode {
   .timeline-content:hover{
     background: #383941;
   }
+  .notification .notificationTime{
+    color:#cccccc;
+
+  }
 }
 
 // End Of Dark Mode Styles
@@ -547,6 +551,10 @@ body.lightMode {
   }
   .timeline-content:hover{
     background: #e7eaf3;
+  }
+  .notification .notificationTime{
+    color:#2E3239;
+
   }
 }
 %scroller{
@@ -1050,10 +1058,13 @@ body.lightMode {
 .tableViewCard{
   .infoRow {
     display: table-row;
+    &:last-child{
+      display: block;
+    }
 
     .infoRowLabel {
       text-align: left;
-      vertical-align: bottom;
+      vertical-align: top;
       font-size: 1rem;
       font-weight: 500;
       color: #8D9CB5;
@@ -1064,7 +1075,7 @@ body.lightMode {
     .infoRowLabel, .infoRowValue {
       padding: 7px 20px;
       display: table-cell;
-      vertical-align: baseline;
+      vertical-align: top;
       font-size: 0.875rem;
     }
   }
@@ -3493,7 +3504,7 @@ header:before,
   .notificationTime{
     font-weight: 600;
     font-size: 10px;
-    color: #2E3239;
+
   }
 }
 

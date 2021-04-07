@@ -308,6 +308,8 @@ body.darkMode .cmuk-navbar-dropdown-nav > li > a {
   color: #D0D0D0; }
 body.darkMode .timeline-content:hover {
   background: #383941; }
+body.darkMode .notification .notificationTime {
+  color: #cccccc; }
 
 body.lightMode .buttonPrimary {
   background: #E50913; }
@@ -344,6 +346,8 @@ body.lightMode .cmuk-navbar-dropdown {
   color: #666; }
 body.lightMode .timeline-content:hover {
   background: #e7eaf3; }
+body.lightMode .notification .notificationTime {
+  color: #2E3239; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
   scrollbar-color: #E2E4E6 #FFFFFF;
@@ -741,9 +745,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .tableViewCard .infoRow {
   display: table-row; }
+  .tableViewCard .infoRow:last-child {
+    display: block; }
   .tableViewCard .infoRow .infoRowLabel {
     text-align: left;
-    vertical-align: bottom;
+    vertical-align: top;
     font-size: 1rem;
     font-weight: 500;
     color: #8D9CB5;
@@ -752,7 +758,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue {
     padding: 7px 20px;
     display: table-cell;
-    vertical-align: baseline;
+    vertical-align: top;
     font-size: 0.875rem; }
 
 .textOverflowCopy {
@@ -2509,8 +2515,7 @@ header:before,
     background-color: #fff2e8; }
   .notification .notificationTime {
     font-weight: 600;
-    font-size: 10px;
-    color: #2E3239; }
+    font-size: 10px; }
 
 .notification > div, .NotificationButton {
   padding: 15px 25px; }
