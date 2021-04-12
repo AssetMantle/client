@@ -3,38 +3,19 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.common.Serializable.{
-  BankAccount,
-  BeneficiaryPayment,
-  ConversionDetails
-}
-import models.master.{AccountKYC, AccountKYCs, Negotiations, Organization}
+import models.master.{AccountKYCs, Negotiations}
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{WallexSimplePaymentDetails, _}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
-import play.api.mvc.{
-  AbstractController,
-  Action,
-  AnyContent,
-  MessagesControllerComponents
-}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import transactions._
-import transactions.responses.WallexResponse.{
-  CreateCollectionResponse,
-  CreateDocumentResponse,
-  CreatePaymentQuoteResponse,
-  GetBalanceResponse,
-  PaymentFileUploadResponse,
-  WalletToWalletXferResponse
-}
+import transactions.responses.WallexResponse.{CreateCollectionResponse, PaymentFileUploadResponse, WalletToWalletXferResponse}
 import utilities.{KeyStore, MicroNumber, WallexAuthToken}
-import views.companion.master.AddOrgWallexBeneficiaryDetails.BankData
 
 import java.io.File
-import java.text.SimpleDateFormat
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -256,7 +237,7 @@ class WallexZoneController @Inject() (
                   wallexWalletTransfer.Request(
                     onBehalfOf = wallexTransfer.onBehalfOf,
                     receiverAccountId = wallexTransfer.receiverAccountId,
-                    amount = /*wallexTransfer.amount*/ 10.00,
+                    amount = wallexTransfer.amount,
                     currency = wallexTransfer.currency,
                     purposesOfTransfer = wallexTransfer.purposesOfTransfer,
                     reference = wallexTransfer.reference,

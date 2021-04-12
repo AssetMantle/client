@@ -1050,7 +1050,7 @@ class WallexController @Inject() (
                   views.companion.master.WallexWalletTransfer.Data(
                     onBehalfOf = buyerAccId,
                     receiverAccountId = sellerAccId,
-                    amount = /*amount*/ 10.00,
+                    amount = amount,
                     currency = "",
                     purposesOfTransfer = "",
                     reference = negotiationID,
@@ -1072,7 +1072,7 @@ class WallexController @Inject() (
             getSellerWallexAccountId(negotiation.sellerTraderID)
           balance <- walletBalanceRespone(authToken, buyerWallexAcctId.wallexId)
           result <-
-            if (balance.data.amount > 10.0) {
+            if (balance.data.amount > negotiation.price) {
               formResult(
                 buyerWallexAcctId.accountId,
                 sellerWallexAcctId.accountId,
