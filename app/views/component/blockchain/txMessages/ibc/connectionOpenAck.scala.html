@@ -7,7 +7,9 @@
 @defining(msg.asInstanceOf[ConnectionOpenAck]) { connectionOpenAck =>
     @commonTextInfo(constants.View.CONNECTION_ID, connectionOpenAck.connectionID)
     @commonTextInfo(constants.View.COUNTERPARTY_CONNECTION_ID, connectionOpenAck.counterpartyConnectionID)
-    @views.html.component.blockchain.txMessages.ibc.commonVersion(constants.View.VERSION, connectionOpenAck.version)
+    @if(connectionOpenAck.version.isDefined) {
+        @views.html.component.blockchain.txMessages.ibc.commonVersion(constants.View.VERSION, connectionOpenAck.version.get)
+    }
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenAck.proofHeight)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.CONSENSUS_HEIGHT, connectionOpenAck.consensusHeight)
     @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenAck.signer, routes.ViewController.wallet(connectionOpenAck.signer)))

@@ -223,7 +223,7 @@ object TransactionMessages {
   implicit val upgradeClientWrites: OWrites[UpgradeClient] = Json.writes[UpgradeClient]
 
   //ibc-connection
-  case class ConnectionOpenInit(clientID: String, counterparty: ConnectionCounterparty, version: Version, delayPeriod: Int, signer: String) extends TransactionMessage {
+  case class ConnectionOpenInit(clientID: String, counterparty: ConnectionCounterparty, version: Option[Version], delayPeriod: String, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -239,7 +239,7 @@ object TransactionMessages {
 
   implicit val connectionOpenConfirmWrites: OWrites[ConnectionOpenConfirm] = Json.writes[ConnectionOpenConfirm]
 
-  case class ConnectionOpenAck(connectionID: String, counterpartyConnectionID: String, version: Version, proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
+  case class ConnectionOpenAck(connectionID: String, counterpartyConnectionID: String, version: Option[Version], proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -247,7 +247,7 @@ object TransactionMessages {
 
   implicit val connectionOpenAckWrites: OWrites[ConnectionOpenAck] = Json.writes[ConnectionOpenAck]
 
-  case class ConnectionOpenTry(clientID: String, previousConnectionID: String, counterparty: ConnectionCounterparty, delayPeriod: Int, counterpartyVersions: Seq[Version], proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
+  case class ConnectionOpenTry(clientID: String, previousConnectionID: String, counterparty: ConnectionCounterparty, delayPeriod: String, counterpartyVersions: Seq[Version], proofHeight: ClientHeight, consensusHeight: ClientHeight, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -312,7 +312,7 @@ object TransactionMessages {
 
   implicit val recvPacketWrites: OWrites[RecvPacket] = Json.writes[RecvPacket]
 
-  case class Timeout(packet: Packet, proofHeight: ClientHeight, nextSequenceRecv: Int, signer: String) extends TransactionMessage {
+  case class Timeout(packet: Packet, proofHeight: ClientHeight, nextSequenceRecv: String, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -320,7 +320,7 @@ object TransactionMessages {
 
   implicit val timeoutWrites: OWrites[Timeout] = Json.writes[Timeout]
 
-  case class TimeoutOnClose(packet: Packet, proofHeight: ClientHeight, nextSequenceRecv: Int, signer: String) extends TransactionMessage {
+  case class TimeoutOnClose(packet: Packet, proofHeight: ClientHeight, nextSequenceRecv: String, signer: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(signer)
   }
 
@@ -337,7 +337,7 @@ object TransactionMessages {
   implicit val acknowledgementWrites: OWrites[Acknowledgement] = Json.writes[Acknowledgement]
 
   //ibc-transfer
-  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: Int) extends TransactionMessage {
+  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(sender)
   }
 

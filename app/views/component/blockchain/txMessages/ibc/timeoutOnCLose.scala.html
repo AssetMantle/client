@@ -7,6 +7,6 @@
 @defining(msg.asInstanceOf[TimeoutOnClose]) { timeoutOnClose =>
     @views.html.component.blockchain.txMessages.ibc.commonPacket(constants.View.PACKET, timeoutOnClose.packet)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, timeoutOnClose.proofHeight)
-    @commonIntInfo(constants.View.NEXT_SEQUENCE_RECV, timeoutOnClose.nextSequenceRecv)
+    @commonTextInfo(constants.View.NEXT_SEQUENCE_RECV, timeoutOnClose.nextSequenceRecv)
     @commonHtmlInfo(constants.View.SIGNER, commonLink(timeoutOnClose.signer, routes.ViewController.wallet(timeoutOnClose.signer)))
 }

@@ -197,8 +197,8 @@ object TransactionMessageResponses {
   implicit val upgradeClientReads: Reads[UpgradeClient] = Json.reads[UpgradeClient]
 
   //ibc-connection
-  case class ConnectionOpenInit(client_id: String, counterparty: ConnectionCounterparty, version: Version, delay_period: String, signer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenInit(clientID = client_id, counterparty = counterparty.toSerializableIBCConnectionCounterparty, version = version.toSerializableIBCVersion, delayPeriod = delay_period.toInt, signer = signer)
+  case class ConnectionOpenInit(client_id: String, counterparty: ConnectionCounterparty, version: Option[Version], delay_period: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenInit(clientID = client_id, counterparty = counterparty.toSerializableIBCConnectionCounterparty, version = version.fold[Option[Serializable.IBC.Version]](None)(x => Option(x.toSerializableIBCVersion)), delayPeriod = delay_period, signer = signer)
   }
 
   implicit val connectionOpenInitReads: Reads[ConnectionOpenInit] = Json.reads[ConnectionOpenInit]
@@ -209,14 +209,14 @@ object TransactionMessageResponses {
 
   implicit val connectionOpenConfirmReads: Reads[ConnectionOpenConfirm] = Json.reads[ConnectionOpenConfirm]
 
-  case class ConnectionOpenAck(connection_id: String, counterparty_connection_id: String, version: Version, proof_height: ClientHeight, consensus_height: ClientHeight, signer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenAck(connectionID = connection_id, counterpartyConnectionID = counterparty_connection_id, version = version.toSerializableIBCVersion, proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
+  case class ConnectionOpenAck(connection_id: String, counterparty_connection_id: String, version: Option[Version], proof_height: ClientHeight, consensus_height: ClientHeight, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenAck(connectionID = connection_id, counterpartyConnectionID = counterparty_connection_id, version = version.fold[Option[Serializable.IBC.Version]](None)(x => Option(x.toSerializableIBCVersion)), proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
   }
 
   implicit val connectionOpenAckReads: Reads[ConnectionOpenAck] = Json.reads[ConnectionOpenAck]
 
   case class ConnectionOpenTry(client_id: String, previous_connection_id: String, counterparty: ConnectionCounterparty, delay_period: String, counterparty_versions: Seq[Version], proof_height: ClientHeight, consensus_height: ClientHeight, signer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenTry(clientID = client_id, previousConnectionID = previous_connection_id, counterparty = counterparty.toSerializableIBCConnectionCounterparty, delayPeriod = delay_period.toInt, counterpartyVersions = counterparty_versions.map(_.toSerializableIBCVersion), proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
+    def toTxMsg: TransactionMessage = TransactionMessages.ConnectionOpenTry(clientID = client_id, previousConnectionID = previous_connection_id, counterparty = counterparty.toSerializableIBCConnectionCounterparty, delayPeriod = delay_period, counterpartyVersions = counterparty_versions.map(_.toSerializableIBCVersion), proofHeight = proof_height.toSerializableIBCClientHeight, consensusHeight = consensus_height.toSerializableIBCClientHeight, signer = signer)
   }
 
   implicit val connectionOpenTryReads: Reads[ConnectionOpenTry] = Json.reads[ConnectionOpenTry]
@@ -266,13 +266,13 @@ object TransactionMessageResponses {
   implicit val recvPacketReads: Reads[RecvPacket] = Json.reads[RecvPacket]
 
   case class Timeout(packet: Packet, proof_height: ClientHeight, next_sequence_recv: String, signer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Timeout(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv.toInt, signer = signer)
+    def toTxMsg: TransactionMessage = TransactionMessages.Timeout(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv, signer = signer)
   }
 
   implicit val timeoutReads: Reads[Timeout] = Json.reads[Timeout]
 
-  case class TimeoutOnClose(packet: Packet, proof_height: ClientHeight, next_sequence_recv: Int, signer: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.TimeoutOnClose(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv.toInt, signer = signer)
+  case class TimeoutOnClose(packet: Packet, proof_height: ClientHeight, next_sequence_recv: String, signer: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.TimeoutOnClose(packet = packet.toSerializableIBCPacket, proofHeight = proof_height.toSerializableIBCClientHeight, nextSequenceRecv = next_sequence_recv, signer = signer)
   }
 
   implicit val timeoutOnCloseReads: Reads[TimeoutOnClose] = Json.reads[TimeoutOnClose]
@@ -284,8 +284,8 @@ object TransactionMessageResponses {
   implicit val acknowledgementReads: Reads[Acknowledgement] = Json.reads[Acknowledgement]
 
   //ibc-transfer
-  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp.toInt)
+    case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
   }
 
   implicit val transferReads: Reads[Transfer] = Json.reads[Transfer]

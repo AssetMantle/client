@@ -256,7 +256,7 @@ object Serializable {
 
     implicit val fungibleTokenPacketDataWrites: OWrites[FungibleTokenPacketData] = Json.writes[FungibleTokenPacketData]
 
-    case class Packet(sequence: Int, sourcePort: String, sourceChannel: String, destinationPort: String, destinationChannel: String, data: FungibleTokenPacketData, timeoutHeight: ClientHeight, timeoutTimestamp: Int)
+    case class Packet(sequence: String, sourcePort: String, sourceChannel: String, destinationPort: String, destinationChannel: String, data: FungibleTokenPacketData, timeoutHeight: ClientHeight, timeoutTimestamp: String)
 
     implicit val packetReads: Reads[Packet] = Json.reads[Packet]
 

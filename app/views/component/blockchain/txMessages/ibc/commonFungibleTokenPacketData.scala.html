@@ -8,5 +8,5 @@
     @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.denom)
     @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.amount, false))
     @commonTextInfo(constants.View.SENDER, fungibleTokenPacketData.sender)
-    @commonTextInfo(constants.View.RECEIVER, fungibleTokenPacketData.receiver)
+    @commonHtmlInfo(constants.View.RECEIVER, commonLink(fungibleTokenPacketData.receiver, routes.ViewController.wallet(fungibleTokenPacketData.receiver)))
 </div>
