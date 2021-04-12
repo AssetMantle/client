@@ -1750,7 +1750,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
 
 CREATE TABLE IF NOT EXISTS WALLEX."WallexCollectionAccountDetail"
 (
-    "id "                 varchar not null,
+    "id"                 varchar not null,
     "wallexId"          varchar not null,
     "accountId"         varchar not null,
     "createdBy"         varchar,
