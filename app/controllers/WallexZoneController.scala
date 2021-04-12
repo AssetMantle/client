@@ -274,7 +274,7 @@ class WallexZoneController @Inject() (
               def updateStatus(
                   wallexTransferRes: WalletToWalletXferResponse
               ) = {
-                val status = if (wallexTransferRes.status == "completed") {
+                val status = if (wallexTransferRes.status == constants.Status.SendWalletTransfer.COMPLETED) {
                   constants.Status.SendWalletTransfer.SENT
                 } else { constants.Status.SendWalletTransfer.ZONE_APPROVED }
 

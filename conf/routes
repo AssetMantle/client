@@ -575,8 +575,8 @@ POST        /master/wallex/user/add                                             
 GET         /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccountForm
 POST        /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccount
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
-GET         /wallex/kyc/add/WallexDocumentForm                                                    controllers.WallexController.addWallexDocumentForm
-POST        /wallex/kyc/add/WallexDocument                                                        controllers.WallexController.addWallexDocument
+GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocumentForm
+POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocument
 GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPaymentForm
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuoteForm(quoteId: String)

@@ -19,4 +19,7 @@ object External {
     }
   }
 
+  //wallex date format
+  val DATE_FORMAT = "dd-MM-yyyy"
+
 }

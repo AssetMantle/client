@@ -3228,7 +3228,7 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         orgWallexAccountDetails <- getOrgWallexAccountDetails(organizationID)
-        collectionWallexDetail <- getWallexCollectionAccountDetails(orgWallexAccountDetails.accountId)
+        collectionWallexDetail <-  getWallexCollectionAccountDetails(orgWallexAccountDetails.accountId)
       } yield Ok(views.html.component.master.wallexCollectionAccountDetails(orgWallexAccountDetails,collectionWallexDetail))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)

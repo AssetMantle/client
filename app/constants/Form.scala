@@ -176,7 +176,7 @@ object Form {
   //WALLEX CONTROLLER
   val ADD_OR_UPDATE_WALLEX_ACCOUNT = new Form("ADD_OR_UPDATE_WALLEX_ACCOUNT", routes.WallexController.createOrganizationWallexAccount(), routes.javascript.WallexController.createOrganizationWallexAccountForm)
   val UPDATE_WALLEX_ACCOUNT = new Form("UPDATE_WALLEX_ACCOUNT", routes.WallexController.updateWallexAccount(), routes.javascript.WallexController.updateWallexAccountForm)
-  val ADD_OR_UPDATE_WALLEX_DOCUMENT = new Form("ADD_OR_UPDATE_WALLEX_DOCUMENT", routes.WallexController.addWallexDocument(), routes.javascript.WallexController.addWallexDocumentForm)
+  val ADD_OR_UPDATE_WALLEX_DOCUMENT = new Form("ADD_OR_UPDATE_WALLEX_DOCUMENT", routes.WallexController.wallexDocument(), routes.javascript.WallexController.wallexDocumentForm)
   val INITIATE_WALLEX_PAYMENT = new Form("INITIATE_WALLEX_PAYMENT", routes.WallexController.initiateWallexPayment(), routes.javascript.WallexController.initiateWallexPaymentForm)
   val ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST = new Form("ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST", routes.WallexController.acceptWallexQuote(), routes.javascript.WallexController.acceptWallexQuoteForm)
   val ADD_BENEFICIARY_DETAILS_WALLEX = new Form("ADD_BENEFICIARY_DETAILS_WALLEX", routes.WallexController.createBeneficiaries(), routes.javascript.WallexController.createBeneficiariesForm)

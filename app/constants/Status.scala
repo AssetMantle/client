@@ -59,6 +59,7 @@ object Status {
     val ZONE_APPROVED = "ZONE_APPROVED"
     val BLOCKCHAIN_FAILURE = "BLOCKCHAIN_FAILURE"
     val SENT = "SENT"
+    val COMPLETED = "completed"
   }
 
   object ReceiveFiat {

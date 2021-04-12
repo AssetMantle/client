@@ -230,14 +230,14 @@ class WallexController @Inject() (
           )
     }
 
-  def addWallexDocumentForm(): Action[AnyContent] =
+  def wallexDocumentForm(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         Future(Ok(views.html.component.master.addOrUpdateWallexDocument()))
 
     }
 
-  def addWallexDocument(): Action[AnyContent] =
+  def wallexDocument(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         views.companion.master.AddWallexDocuments.form
@@ -1191,7 +1191,7 @@ class WallexController @Inject() (
                     city = updateDetails.city,
                     registrationNumber = updateDetails.registrationNumber,
                     incorporationDate = {
-                      new SimpleDateFormat("dd-MM-yyyy")
+                      new SimpleDateFormat(constants.External.DATE_FORMAT)
                         .format(updateDetails.incorporationDate)
                     }
                   )
