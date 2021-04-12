@@ -565,7 +565,6 @@ POST        /chat/sendMessage                                                   
 GET         /chat/markChatAsRead                                                                  controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
-GET         /wallex                                                                               controllers.ViewController.wallex
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.organizationWallexAccount
 GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
 GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationBeneficiaryDetails

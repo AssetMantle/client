@@ -394,7 +394,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.trades,
         routes.javascript.ViewController.tradeRoom,
-        routes.javascript.ViewController.wallex,
 
         routes.javascript.BackgroundCheckController.memberScanForm,
         routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
