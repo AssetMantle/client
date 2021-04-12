@@ -1,0 +1,14 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@import views.companion.master.CreateWallexCollectionAccount
+
+@(wallexCollectionAccount: Form[CreateWallexCollectionAccount.Data] = CreateWallexCollectionAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.ADD_OR_UPDATE_WALLEX_ACCOUNT, wallexCollectionAccount) {
+    @commonInputText(wallexCollectionAccount, constants.FormField.ON_BEHALF_OF, 'readonly -> true)
+    @commonInputText(wallexCollectionAccount, constants.FormField.NAME)
+    @commonInputText(wallexCollectionAccount, constants.FormField.WALLEX_REFERENCE)
+    @commonSelect(wallexCollectionAccount, constants.FormField.CURRENCY)
+    @commonInputText(wallexCollectionAccount, constants.FormField.PURPOSE)
+    @commonInputText(wallexCollectionAccount, constants.FormField.DESCRIPTION)
+}

@@ -1,0 +1,12 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationWallexDetail
+
+@(organizationWallexDetail: OrganizationWallexDetail)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonTextInfo(constants.View.WALLEX_ID, organizationWallexDetail.wallexId)
+@commonTextInfo(constants.View.STATUS, organizationWallexDetail.status)
+@commonTextInfo(constants.View.EMAIL_ADDRESS, organizationWallexDetail.email)
+@commonTextInfo(constants.View.FIRST_NAME, organizationWallexDetail.firstName)
+@commonTextInfo(constants.View.LAST_NAME, organizationWallexDetail.lastName)
+@commonTextInfo(constants.View.ACCOUNT_ID, organizationWallexDetail.accountId)

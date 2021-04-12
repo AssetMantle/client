@@ -1,0 +1,39 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import transactions.responses.WallexResponse.WalletToWalletXferResponse
+
+@(transferResponse: WalletToWalletXferResponse)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.WALLEX_WALLET_TRANSFER)
+</legend>
+<hr>
+
+
+
+@*<div class="modalInfoBlock">
+@transferResponse.data match {
+    case datas => {
+        @commonTextInfo(constants.View.ID, datas.id)
+        @commonTextInfo(constants.View.SENDER_ACCOUNT_ID, datas.senderAccountId)
+        @commonTextInfo(constants.View.RECEIVER_ACCOUNT_ID, datas.receiverAccountId)
+        @commonDoubleInfo(constants.View.AMOUNT, datas.amount)
+        @commonTextInfo(constants.View.CURRENCY, datas.currency)
+        @commonTextInfo(constants.View.PURPOSE_OF_TRANSFER, datas.purposesOfTransfer)
+        @commonTextInfo(constants.View.REFERENCE, datas.reference)
+        @commonTextInfo(constants.View.REMARKS, datas.remarks)
+        @commonTextInfo(constants.View.TYPE, datas.`type`)
+        @commonTextInfo(constants.View.STATUS, datas.status)
+        @commonTextInfo(constants.View.CREATED_AT, datas.createdAt)
+
+        @if(datas.status != "completed") {
+            @commonJavascriptButton(constants.Form.ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST.button, JavaScript(s"""getForm(jsRoutes.controllers.WallexController.acceptWallexQuoteForm('${datas.id}'))"""))
+        }
+    }
+    case _ => {
+        @commonTextInfo("Message", "Please check with admin further")
+    }
+
+}
+</div>*@

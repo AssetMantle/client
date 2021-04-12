@@ -137,7 +137,7 @@ object FileOperations {
 
   def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
     try {
-      new File(directoryName, fileName)
+      new   File(directoryName, fileName)
     } catch {
       case baseException: BaseException => throw baseException
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage)

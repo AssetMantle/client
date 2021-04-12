@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddOrgWallexBeneficiaryDetails
+
+@(addOrgWallexBeneficiaryDetails: Form[AddOrgWallexBeneficiaryDetails.Data] = AddOrgWallexBeneficiaryDetails.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.ADD_BENEFICIARY_DETAILS_WALLEX, addOrgWallexBeneficiaryDetails) {
+
+    @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.COUNTRY_CODE2)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_ADDRESS)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.CITY)
+    @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.ENTITY_TYPE)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_NAME)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.NICK_NAME)
+    @defining(Option(constants.FormField.WALLEX_BANK_DATA)) { implicit nestedFormField =>
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.BANK_NAME)
+        @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.COUNTRY_CODE2)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.BANK_ADDRESS)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_NUMBER)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_HOLDER_NAME)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.SWIFT_CODE)
+        @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_CURRENCIES)
+    }
+}

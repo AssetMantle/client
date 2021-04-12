@@ -28,7 +28,7 @@
                                     @order.status match {
                                         case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => {
                                             @if(asset.moderated) {
-                                                @commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")
+                                                @commonFormButton(constants.Form.WALLEX_WALLET_TRANSFER, 'parameters -> s"'${negotiation.id}'")
                                             }
                                         }
                                         case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
@@ -44,7 +44,7 @@
                                 }
                                 case None => {
                                     @if(asset.moderated) {
-                                        @commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")
+                                        @commonFormButton(constants.Form.WALLEX_WALLET_TRANSFER, 'parameters -> s"'${negotiation.id}'")
                                     }
                                 }
                             }

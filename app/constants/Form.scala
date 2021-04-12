@@ -173,6 +173,20 @@ object Form {
   val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.TraderController.organizationModifyTrader(), routes.javascript.TraderController.organizationModifyTraderForm)
   val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
 
+  //WALLEX CONTROLLER
+  val ADD_OR_UPDATE_WALLEX_ACCOUNT = new Form("ADD_OR_UPDATE_WALLEX_ACCOUNT", routes.WallexController.createOrganizationWallexAccount(), routes.javascript.WallexController.createOrganizationWallexAccountForm)
+  val UPDATE_WALLEX_ACCOUNT = new Form("UPDATE_WALLEX_ACCOUNT", routes.WallexController.updateWallexAccount(), routes.javascript.WallexController.updateWallexAccountForm)
+  val ADD_OR_UPDATE_WALLEX_DOCUMENT = new Form("ADD_OR_UPDATE_WALLEX_DOCUMENT", routes.WallexController.addWallexDocument(), routes.javascript.WallexController.addWallexDocumentForm)
+  val INITIATE_WALLEX_PAYMENT = new Form("INITIATE_WALLEX_PAYMENT", routes.WallexController.initiateWallexPayment(), routes.javascript.WallexController.initiateWallexPaymentForm)
+  val ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST = new Form("ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST", routes.WallexController.acceptWallexQuote(), routes.javascript.WallexController.acceptWallexQuoteForm)
+  val ADD_BENEFICIARY_DETAILS_WALLEX = new Form("ADD_BENEFICIARY_DETAILS_WALLEX", routes.WallexController.createBeneficiaries(), routes.javascript.WallexController.createBeneficiariesForm)
+  val DELETE_WALLEX_BENEFICIARY = new Form("DELETE_WALLEX_BENEFICIARY", routes.WallexController.deleteBeneficiary(), routes.javascript.WallexController.deleteBeneficiaryForm)
+  val WALLEX_WALLET_TRANSFER = new Form("WALLEX_WALLET_TRANSFER", routes.WallexController.walletTransfer(), routes.javascript.WallexController.walletTransferForm)
+  val ZONE_WALLEX_WALLET_TRANSFER = new Form("ZONE_WALLEX_WALLET_TRANSFER", routes.WallexZoneController.zoneCreateWalletTransfer(), routes.javascript.WallexZoneController.zoneWalletTransferForm)
+  val WALLEX_CREATE_COLLECTION_ACCOUNT = new Form("WALLEX_CREATE_COLLECTION_ACCOUNT", routes.WallexController.createCollectionAccounts(), routes.javascript.WallexController.createCollectionAccountsForm)
+  val GET_COLLECTION_ACCOUNT_DETAILS = new Form("GET_COLLECTION_ACCOUNT_DETAILS", routes.WallexController.getCollectionAccounts(), routes.javascript.WallexController.getCollectionAccountsForm)
+  val WALLEX_SUBMIT_DOCUMENT = new Form("WALLEX_SUBMIT_DOCUMENT", routes.WallexController.submitDocumentToWallex(), routes.javascript.WallexController.submitDocumentToWallexForm)
+
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"
   val REFERENCE = "reference"

@@ -1,11 +1,27 @@
 package constants
 
 object SelectFieldOptions {
-  val ASSET_TYPES: Seq[String] = Seq("OIL", "COAL", "GOLD", "WHEAT", "COPPER", "CORN", "IRON", "PALM_OIL", "RICE",
-    "SOYBEAN", "STEEL", "OTHER")
+  val ASSET_TYPES: Seq[String] = Seq(
+    "OIL",
+    "COAL",
+    "GOLD",
+    "WHEAT",
+    "COPPER",
+    "CORN",
+    "IRON",
+    "PALM_OIL",
+    "RICE",
+    "SOYBEAN",
+    "STEEL",
+    "OTHER"
+  )
   val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val CURRENCIES: Seq[String] = Seq("USD")
-  val COUNTRIES: Seq[String] = Seq("Afghanistan", "Albania", "Algeria",
+  val ACCOUNT_TYPE: Seq[String] = Seq("individual", "company")
+  val COUNTRIES: Seq[String] = Seq(
+    "Afghanistan",
+    "Albania",
+    "Algeria",
     "Andorra",
     "Angola",
     "Antigua & Deps",
@@ -198,20 +214,28 @@ object SelectFieldOptions {
     "Vietnam",
     "Yemen",
     "Zambia",
-    "Zimbabwe")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq("BANK", "TRUST", "COURIER")
-  val PAYMENT_TERMS: Seq[String] = Seq(constants.View.ONLY_SUPPLIER, constants.View.ONLY_BUYER, constants.View.BOTH_PARTIES)
+    "Zimbabwe"
+  )
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] =
+    Seq("BANK", "TRUST", "COURIER")
+  val PAYMENT_TERMS: Seq[String] = Seq(
+    constants.View.ONLY_SUPPLIER,
+    constants.View.ONLY_BUYER,
+    constants.View.BOTH_PARTIES
+  )
   val MODE: Seq[String] = Seq("async", "sync", "block")
   val REFERENCE_DATES: Seq[String] = Seq("INVOICE_DATE", "SHIPPING_DATE")
-
 
   //memberCheck
   val MATCH_TYPE: Seq[String] = Seq("Exact", "Close")
   val WHITELIST: Seq[String] = Seq("Apply", "Ignore")
-  val RESIDENCE: Seq[String] = Seq("ApplyPEP", "ApplyAll", "Ignore", "ApplySIP", "ApplyRCA")
+  val RESIDENCE: Seq[String] =
+    Seq("ApplyPEP", "ApplyAll", "Ignore", "ApplySIP", "ApplyRCA")
   val PEP_JURISDICTION: Seq[String] = Seq("Apply", "Ignore")
-  val MATCH_DECISION: Seq[String] = Seq("Match", "NoMatch", "NotSure", "NotReviewed", "Invalid")
-  val ASSESSED_RISK: Seq[String] = Seq("Unallocated", "Low", "Med", "High", "Invalid")
+  val MATCH_DECISION: Seq[String] =
+    Seq("Match", "NoMatch", "NotSure", "NotReviewed", "Invalid")
+  val ASSESSED_RISK: Seq[String] =
+    Seq("Unallocated", "Low", "Med", "High", "Invalid")
 
   val COUNTRY_CODES: Seq[String] = Seq(
     "+1",
@@ -444,4 +468,70 @@ object SelectFieldOptions {
     "+996",
     "+998"
   )
+
+  val COUNTRY_CODE2: Seq[String] = Seq("SG", "HK", "US")
+  val WALLEX_CURRENCIES: Seq[String] = Seq("USD", "SGD", "IDR")
+  val WALLEX_DOCUMENT_TYPE: Seq[String] = Seq(
+    "national_identity",
+    "company_proof",
+    "company_address_proof",
+    "nric",
+    "passport",
+    "ktp",
+    "employment_pass",
+    "s_pass",
+    "work_permit",
+    "photo",
+    "bank_statement",
+    "utility_bill",
+    "phone_bill",
+    "tax_bill",
+    "family_card",
+    "identity_report",
+    "fdw"
+  )
+  val FUNDING_SOURCE: Seq[String] = Seq(
+    "SALARY_WAGES",
+    "INVESTMENTS",
+    "PERSONAL_SAVINGS",
+    "PERSONAL_WEALTH",
+    "RETIREMENT_FUNDS",
+    "FAMILY_FRIEND_CO_WORKER",
+    "BUSINESS_OWNER_OR_SHAREHOLDER",
+    "LOAN_FACILITY",
+    "COMPANY_BANK_ACCOUNT",
+    "THIRD_PARTY",
+    "PERSONAL_ACCOUNT",
+    "OTHER"
+  )
+
+  val PURPOSE_OF_TRANSFER: Seq[String] = Seq(
+    "SUPP",
+  )
+
+  val BUSINESS_TYPE: Seq[String] = Seq(
+    "Agriculture",
+    "Banking/Financial/Insurance",
+    "Construction & Development",
+    "Engineering",
+    "Entertainment & Recreation",
+    "Food & Beverages",
+    "Forestry & Logging",
+    "Information Technology",
+    "Logistics",
+    "Manufacturing",
+    "Media & Communications",
+    "Medical & Healthcare",
+    "Mining & Quarrying",
+    "Money Lending",
+    "Non-Profit Organisation",
+    "Oil & Gas",
+    "Real Estate",
+    "Trading/Retail/Wholesale",
+    "Transportation",
+    "Utilities",
+    "Unknown - Unknown",
+    "Others",
+  )
+
 }

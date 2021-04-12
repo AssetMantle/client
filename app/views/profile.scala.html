@@ -9,11 +9,13 @@
     <div class="leftContainer">
         <div id="financials" class="financial"></div>
     </div>
+
     <script>
         @loginState.userType match {
             case constants.User.TRADER => {
                 componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
-            }
+
+        }
             case constants.User.ORGANIZATION => {
             componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
             }
@@ -66,12 +68,29 @@
                     </div>
 
                     <div class="cmuk-width-1-2@@m">
+                        <div id="organizationWallexAccount"></div>
+                    </div>
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="beneficiaryDetails" ></div>
+                    </div>
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="collectionAccountDetails" ></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
                         <div id="traderViewOrganizationBankAccount"></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="organizationWallexAccount" class="organizationUbos"></div>
                     </div>
 
                     <script>
                         componentResource('traderViewOrganization', jsRoutes.controllers.ComponentViewController.traderViewOrganization());
                         componentResource('traderViewOrganizationBankAccount', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccount());
+                        componentResource('organizationWallexAccount', jsRoutes.controllers.ComponentViewController.organizationWallexAccount());
+                        componentResource('beneficiaryDetails', jsRoutes.controllers.ComponentViewController.organizationBeneficiaryDetails());
+                        componentResource('collectionAccountDetails', jsRoutes.controllers.ComponentViewController.wallexCollectionAccountDetail());
                     </script>
                 }
                 case constants.User.ORGANIZATION => {
@@ -82,6 +101,7 @@
                     <div class="cmuk-width-1-2@@m">
                         <div id="organizationBankAccount"></div>
                     </div>
+
                     <div class="cmuk-width-1-2@@m">
                         <div id="viewOrganizationUBOs" class="organizationUbos"></div>
                     </div>
@@ -93,6 +113,7 @@
                     <script>
                         componentResource('organization', jsRoutes.controllers.ComponentViewController.organization());
                         componentResource('organizationBankAccount', jsRoutes.controllers.ComponentViewController.organizationBankAccount());
+
                         componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
                         componentResource('organizationDeclarations', jsRoutes.controllers.ComponentViewController.organizationDeclarations());
                     </script>

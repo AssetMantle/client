@@ -565,6 +565,45 @@ POST        /chat/sendMessage                                                   
 GET         /chat/markChatAsRead                                                                  controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
+GET         /wallex                                                                               controllers.ViewController.wallex
+GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.organizationWallexAccount
+GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
+GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationBeneficiaryDetails
+GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp
+GET         /component/collection/account                                                         controllers.ComponentViewController.wallexCollectionAccountDetail
+GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccountForm
+POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccount
+GET         /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccountForm
+POST        /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccount
+GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
+GET         /wallex/kyc/add/WallexDocumentForm                                                    controllers.WallexController.addWallexDocumentForm
+POST        /wallex/kyc/add/WallexDocument                                                        controllers.WallexController.addWallexDocument
+GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPaymentForm
+POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPayment
+GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuoteForm(quoteId: String)
+POST        /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuote
+GET         /wallex/beneficiaries/create                                                          controllers.WallexController.createBeneficiariesForm
+POST        /wallex/beneficiaries/create                                                          controllers.WallexController.createBeneficiaries
+GET         /wallex/beneficiaries/delete                                                          controllers.WallexController.deleteBeneficiaryForm(beneficiaryId: String)
+POST        /wallex/beneficiaries/delete                                                          controllers.WallexController.deleteBeneficiary
+GET         /wallex/upload/file                                                                   controllers.FileController.uploadWallexDocumentForm(documentType: String)
+POST        /wallex/upload/uploadFile                                                             controllers.FileController.uploadWallexDocument(documentType: String)
+GET         /wallex/upload/storeFile                                                              controllers.FileController.storeWallexDocument(name: String, documentType: String)
+GET         /wallex/file                                                                          controllers.FileController.getWallexKYCFile(name: String, documentType: String)
+GET         /wallex/file/updateForm                                                               controllers.FileController.updateWallexKYCForm(documentType: String)
+GET         /wallex/file/update                                                                   controllers.FileController.updateWallexKYC(name: String, documentType: String)
+GET         /wallex/payment/wallet/transfer                                                       controllers.WallexController.walletTransferForm(negotiationID:String)
+POST        /wallex/payment/wallet/transfer                                                       controllers.WallexController.walletTransfer
+GET         /wallex/collection/create                                                             controllers.WallexController.createCollectionAccountsForm(accountId:String)
+POST        /wallex/collection/create                                                             controllers.WallexController.createCollectionAccounts
+GET         /wallex/collection/get                                                                controllers.WallexController.getCollectionAccountsForm(accountId: String)
+POST        /wallex/collection/get                                                                controllers.WallexController.getCollectionAccounts
+GET         /wallex/document/submit                                                               controllers.WallexController.submitDocumentToWallexForm(documentType: String)
+POST        /wallex/document/submit                                                               controllers.WallexController.submitDocumentToWallex
+GET         /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneWalletTransferForm(negotiationId: String)
+POST        /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneCreateWalletTransfer
+GET         /wallex/zone/view/transferRequest                                                     controllers.WallexZoneController.zoneViewWalletTransferRequestList
+
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB
 POST        /wu/portalRedirect                                                                    controllers.WesternUnionController.westernUnionPortalRedirect

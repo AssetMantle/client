@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrgWallexBeneficiaryDetail
+
+@(organizationWallexBeneficiaryDetail: Option[OrgWallexBeneficiaryDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@organizationWallexBeneficiaryDetail match {
+    case Some(orgWallexBeneficiaryDetail) => {
+        @commonCard(constants.View.ORGANIZATION_WALLEX_BENEFICIARY_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+
+            @commonFormButton(constants.Form.DELETE_WALLEX_BENEFICIARY, 'parameters -> s"'${orgWallexBeneficiaryDetail.beneficiaryId}'")
+        } {
+            @commonTextInfo(constants.View.WALLEX_ID, orgWallexBeneficiaryDetail.wallexId)
+            @commonTextInfo(constants.View.BENEFICIARY_ID, orgWallexBeneficiaryDetail.beneficiaryId)
+            @commonTextInfo(constants.View.COMPANY_NAME, orgWallexBeneficiaryDetail.companyName)
+            @commonTextInfo(constants.View.NICK_NAME, orgWallexBeneficiaryDetail.nickname)
+            @commonTextInfo(constants.View.ACCOUNT_TYPE, orgWallexBeneficiaryDetail.accountType)
+            @commonTextInfo(constants.View.ACCOUNT_NUMBER, orgWallexBeneficiaryDetail.bankAccount.accountNumber)
+            @commonTextInfo(constants.View.BANK_NAME, orgWallexBeneficiaryDetail.bankAccount.bankName)
+            @commonTextInfo(constants.View.SWIFT_CODE, orgWallexBeneficiaryDetail.bankAccount.bicSwift)
+            @commonTextInfo(constants.View.ACCOUNT_HOLDER_NAME, orgWallexBeneficiaryDetail.bankAccount.bankAccountHolderName)
+            @* <div class="cmuk-text-center cmuk-margin-top">
+            @commonFormButton(constants.Form.DELETE_WALLEX_BENEFICIARY, 'parameters -> s"'${orgWallexBeneficiaryDetail.beneficiaryId}'")
+            </div>*@
+        }
+    }
+    case _ => {
+        @commonCard(constants.View.ORGANIZATION_WALLEX_BENEFICIARY_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+
+        }{
+            <div class="cmuk-position-center">
+            @commonFormButton(constants.Form.ADD_BENEFICIARY_DETAILS_WALLEX)
+            </div>
+        }
+
+    }
+}

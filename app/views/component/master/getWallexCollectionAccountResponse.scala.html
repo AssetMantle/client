@@ -1,0 +1,35 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import transactions.responses.WallexResponse.CreateCollectionResponse
+
+@(collectionResponse: CreateCollectionResponse)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.COLLECTION_ACCOUNT)
+</legend>
+<hr>
+
+
+
+<div class="modalInfoBlock">
+@collectionResponse match {
+    case datas => {
+        @commonTextInfo(constants.View.ID, datas.id)
+        @commonTextInfo(constants.View.NAME, datas.name)
+        @commonTextInfo(constants.View.CREATED_AT, datas.createdAt)
+        @datas.bankDetails.map { bankDetails =>
+            @commonTextInfo(constants.View.ID, bankDetails.bankName)
+            @commonTextInfo(constants.View.CURRENCY, bankDetails.currency)
+            @commonTextInfo(constants.View.ACCOUNT_HOLDER_NAME, bankDetails.accountHolderName)
+            @commonTextInfo(constants.View.ACCOUNT_NUMBER, bankDetails.accountNumber)
+            @commonTextInfo(constants.View.ACCOUNT_NUMBER_TYPE, bankDetails.accountNumberType)
+
+        }
+    }
+    case _ => {
+        @commonTextInfo("Message", "No Collection Exists for this account ID")
+    }
+
+}
+</div>

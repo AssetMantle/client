@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationWallexDetail
+@import scala.collection.immutable.ListMap
+@import models.wallex.WallexDocument
+@(organizationWallexDetail: Option[OrganizationWallexDetail],wallexDocument: Seq[WallexDocument])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.ORGANIZATION_WALLEX_ACCOUNT_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+    @if(organizationWallexDetail.isDefined) {
+        @commonFormButton(constants.Form.UPDATE_WALLEX_ACCOUNT)
+    }
+} {
+    @organizationWallexDetail match {
+        case Some(organizationWallexDetail) => {
+
+            @commonHorizontalSwitcher(ListMap(
+                constants.View.DETAILS -> views.html.component.master.wallexAccountInformation(organizationWallexDetail),
+                constants.View.DOCUMENTS -> views.html.component.master.wallexKYCDocuments(wallexDocument))
+            )
+        }
+        case _ => {
+            <div class="cmuk-position-center">
+            @commonFormButton(constants.Form.ADD_OR_UPDATE_WALLEX_ACCOUNT)
+            </div>
+        }
+    }
+}

@@ -45,6 +45,8 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
   private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
 
+  private val uploadWallexDocumentsPath: String = rootFilePath + configuration.get[String]("upload.wallex.identificationPath")
+
 
   def getAccountKYCFilePath(documentType: String): String = {
     documentType match {
@@ -94,6 +96,10 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
       case constants.File.Account.PROFILE_PICTURE => uploadAccountProfilePicturePath
       case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
     }
+  }
+
+  def getWallexFilePath(documentType: String): String = {
+      uploadWallexDocumentsPath
   }
 
   def storeFile[T <: Document[T]](name: String, path: String, document: T, masterCreate: T => Future[String]): Future[Unit] = {

@@ -16,3 +16,4 @@ dist
 /.idea/
 *.css.map
 public/stylesheets/.sass-cache*
+/.run

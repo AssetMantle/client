@@ -117,6 +117,29 @@ object FormField {
   val SALES_QUOTE_ID = new StringFormField("SALES_QUOTE_ID", 32, 32)
   val ASSET_ID = new StringFormField("ASSET_ID", 1, 100)
   val NEGOTIATION_ID = new StringFormField("NEGOTIATION_ID", 1, 100)
+  val DOCUMENT_NAME = new StringFormField("DOCUMENT_NAME", 1, 100)
+  val CURRENCY_PAIR = new StringFormField("CURRENCY_PAIR", 1, 100)
+  val BUY_CURRENCY = new StringFormField("BUY_CURRENCY", 1, 100)
+  val SELL_CURRENCY = new StringFormField("SELL_CURRENCY", 1, 100)
+  val EXPIRES_AT = new StringFormField("EXPIRES_AT", 1, 100)
+  val QUOTE_ID = new StringFormField("QUOTE_ID", 1, 100)
+  val PAYMENT_CHANNEL = new StringFormField("PAYMENT_CHANNEL", 1, 100)
+  val FIXED_SIDE = new StringFormField("FIXED_SIDE", 0, 100)
+  val WALLEX_DOCUMENT_NAME = new StringFormField("WALLEX_DOCUMENT_NAME", 1, 100)
+  val ABA = new StringFormField("ABA", 9, 9, RegularExpression.ABA)
+  val STATE_OR_PROVINCE = new StringFormField("STATE_OR_PROVINCE", 1, 255)
+  val COMPANY_ADDRESS = new StringFormField("COMPANY_ADDRESS", 1, 255)
+  val BANK_ADDRESS = new StringFormField("BANK_ADDRESS", 1, 255)
+  val BENEFICIARY_ID = new StringFormField("BENEFICIARY_ID", 1, 255)
+  val PAYMENT_REFERENCE = new StringFormField("PAYMENT_REFERENCE", 0, 255)
+  val ON_BEHALF_OF = new StringFormField("ON_BEHALF_OF", 1, 255)
+  val RECEIVER_ACCOUNT_ID = new StringFormField("RECEIVER_ACCOUNT_ID", 1, 255)
+  val REMARKS = new StringFormField("REMARKS", 0, 255)
+  val WALLEX_REFERENCE = new StringFormField("WALLEX_REFERENCE", 0,255)
+  val REGISTRATION_NUMBER = new StringFormField("REGISTRATION_NUMBER", 0,255)
+  val DESCRIPTION = new StringFormField("DESCRIPTION", 0,255)
+  val PURPOSE = new StringFormField("PURPOSE", 0,255)
+
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -130,7 +153,20 @@ object FormField {
   val REGISTERED_COUNTRY = new SelectFormField("REGISTERED_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
+  val COUNTRY_CODE2 = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRY_CODE2)
+  val COUNTRY_OF_OPERATIONS = new SelectFormField("COUNTRY_OF_OPERATIONS", constants.SelectFieldOptions.COUNTRY_CODE2)
+  val COUNTRY_OF_INCORPORATION = new SelectFormField("COUNTRY_OF_INCORPORATION", constants.SelectFieldOptions.COUNTRY_CODE2)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
+  val ACCOUNT_TYPE = new SelectFormField("ACCOUNT_TYPE", constants.SelectFieldOptions.ACCOUNT_TYPE)
+  val ENTITY_TYPE = new SelectFormField("ENTITY_TYPE", constants.SelectFieldOptions.ACCOUNT_TYPE)
+  val WALLEX_CURRENCIES_SELL = new SelectFormField("WALLEX_CURRENCIES_SELL", constants.SelectFieldOptions.CURRENCIES)
+  val WALLEX_CURRENCIES_BUY = new SelectFormField("WALLEX_CURRENCIES_BUY", constants.SelectFieldOptions.CURRENCIES)
+  val WALLEX_CURRENCIES = new SelectFormField("WALLEX_CURRENCIES", constants.SelectFieldOptions.CURRENCIES)
+  val WALLEX_DOCUMENT_TYPE = new SelectFormField("DOCUMENT_TYPE", constants.SelectFieldOptions.WALLEX_DOCUMENT_TYPE)
+  val FUNDING_SOURCE = new SelectFormField("FUNDING_SOURCE", constants.SelectFieldOptions.FUNDING_SOURCE)
+  val PURPOSE_OF_TRANSFER = new SelectFormField("PURPOSE_OF_TRANSFER", constants.SelectFieldOptions.PURPOSE_OF_TRANSFER)
+  val BUSINESS_TYPE = new SelectFormField("BUSINESS_TYPE", constants.SelectFieldOptions.BUSINESS_TYPE)
+
 
   //IntFormField
   val BID = new IntFormField("BID", 0, Int.MaxValue)
@@ -148,10 +184,24 @@ object FormField {
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
   val DATE_OF_BIRTH = new DateFormField("DATE_OF_BIRTH")
   val TENTATIVE_DATE = new DateFormField("TENTATIVE_DATE")
+  val INCORPORATION_DATE = new DateFormField("INCORPORATION_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   val ADVANCE_PERCENTAGE = new DoubleFormField("ADVANCE_PERCENTAGE", 0.0, 100.0)
+  val BUY_AMOUNT = new DoubleFormField("BUY_AMOUNT", 0.0, 1000000000000000.00)
+  val SELL_AMOUNT = new DoubleFormField("SELL_AMOUNT", 0.0, 1000000000000000.00)
+  val RATE = new DoubleFormField("RATE", 0.0, 1000000000000000.00)
+  val PARTNER_RATE = new DoubleFormField("PARTNER_RATE", 0.0, 1000000000000000.00)
+  val PARTNER_BUY_AMOUNT = new DoubleFormField("PARTNER_BUY_AMOUNT", 0.0, 1000000000000000.00)
+  val PARTNER_SELL_AMOUNT = new DoubleFormField("PARTNER_SELL_AMOUNT", 0.0, 1000000000000000.00)
+  val PARTNER_PAYMENT_FEE = new DoubleFormField("PARTNER_PAYMENT_FEE", 0.0, 1000000000000000.00)
+  val PAYMENT_FEE = new DoubleFormField("PAYMENT_FEE", 0.0, 1000000000000000.00)
+  val TOTAL_FEE = new DoubleFormField("TOTAL_FEE", 0.0, 1000000000000000.00)
+  val TOTAL_AMOUNT = new DoubleFormField("TOTAL_AMOUNT", 0.0, 1000000000000000.00)
+  val BANK_CHARGE = new DoubleFormField("BANK_CHARGE", 0.0, 1000000000000000.00)
+  val CONVERSION_FEE = new DoubleFormField("CONVERSION_FEE", 0.0, 1000000000000000.00)
+  val AMOUNT_WALLEX = new DoubleFormField("AMOUNT_WALLEX", 0.0, 1000000000000000.00)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -188,6 +238,8 @@ object FormField {
   val BUYER_OTHER_DOCUMENTS = new BooleanFormField("BUYER_OTHER_DOCUMENTS")
   val CONFIRM = new BooleanFormField("CONFIRM")
   val DOCUMENT_LIST_COMPLETED = new BooleanFormField("DOCUMENT_LIST_COMPLETED")
+  val SUPPORTING_DOC_REQUIRED = new BooleanFormField("SUPPORTING_DOC_REQUIRED")
+  val ACCEPT_WALLEX_PAYMENT = new BooleanFormField("ACCEPT_WALLEX_PAYMENT")
 
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
@@ -196,6 +248,7 @@ object FormField {
   val UBOS = new NestedFormField("UBOS")
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
+  val WALLEX_BANK_DATA = new NestedFormField("BANK_DETAILS")
 
   //MicroNumberFormField
   val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))

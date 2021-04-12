@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.CreateWallexPaymentQuote
+
+@(wallexQuote: Form[CreateWallexPaymentQuote.Data] = CreateWallexPaymentQuote.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.INITIATE_WALLEX_PAYMENT, wallexQuote) {
+    @commonSelect(wallexQuote, constants.FormField.WALLEX_CURRENCIES_SELL)
+    @commonSelect(wallexQuote, constants.FormField.WALLEX_CURRENCIES_BUY)
+    @commonInputText(wallexQuote, constants.FormField.BENEFICIARY_ID)
+    @commonInputDouble(wallexQuote, constants.FormField.AMOUNT_WALLEX)
+}
