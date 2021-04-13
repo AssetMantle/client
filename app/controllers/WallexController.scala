@@ -432,7 +432,7 @@ class WallexController @Inject() (
           )
         } yield result
     }
-  def initiateWallexPaymentForm(): Action[AnyContent] =
+  def initiatePaymentForm(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         Future(
@@ -443,7 +443,7 @@ class WallexController @Inject() (
         )
     }
 
-  def initiateWallexPayment(): Action[AnyContent] =
+  def initiatePayment(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         views.companion.master.CreateWallexPaymentQuote.form
@@ -1406,7 +1406,7 @@ class WallexController @Inject() (
           )
     }
 
-  def getWallexUserForm: Action[AnyContent] =
+  def getUserForm: Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         val organizationID =
@@ -1443,7 +1443,7 @@ class WallexController @Inject() (
 
     }
 
-  def getWallexUser: Action[AnyContent] =
+  def getUser: Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         views.companion.master.GetUserWallexAccount.form

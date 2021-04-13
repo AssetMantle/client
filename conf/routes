@@ -577,13 +577,13 @@ GET         /master/wallex/company/update                                       
 POST        /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccount
 GET         /master/wallex/user/update                                                            controllers.WallexController.updateAccountForm
 POST        /master/wallex/user/update                                                            controllers.WallexController.updateAccount
-GET         /master/wallex/user                                                                   controllers.WallexController.getWallexUserForm
-POST        /master/wallex/user                                                                   controllers.WallexController.getWallexUser
+GET         /master/wallex/user                                                                   controllers.WallexController.getUserForm
+POST        /master/wallex/user                                                                   controllers.WallexController.getUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
 GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocumentForm
 POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocument
-GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPaymentForm
-POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiateWallexPayment
+GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm
+POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuoteForm(quoteId: String)
 POST        /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuote
 GET         /wallex/beneficiaries/create                                                          controllers.WallexController.createBeneficiariesForm
