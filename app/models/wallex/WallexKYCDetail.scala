@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 
 case class WallexKYCDetail(
     id: String,
-    orgId: String,
+    organizationID: String,
     wallexId: String,
     url: String,
     documentName: String,
@@ -104,7 +104,7 @@ class WallexKYCDetails @Inject() (
     override def * =
       (
         id,
-        orgId,
+        organizationID,
         wallexId,
         url,
         documentName,
@@ -119,7 +119,7 @@ class WallexKYCDetails @Inject() (
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def orgId = column[String]("orgId")
+    def organizationID = column[String]("organizationID")
 
     def wallexId = column[String]("wallexId")
 
@@ -145,7 +145,7 @@ class WallexKYCDetails @Inject() (
   object Service {
     def create(
         id: String,
-        orgId: String,
+        organizationID: String,
         wallexId: String,
         url: String,
         documentName: String,
@@ -154,7 +154,7 @@ class WallexKYCDetails @Inject() (
       add(
         WallexKYCDetail(
           id = id,
-          orgId = orgId,
+          organizationID = organizationID,
           wallexId = wallexId,
           url = url,
           documentName = documentName,
@@ -164,7 +164,7 @@ class WallexKYCDetails @Inject() (
 
     def insertOrUpdate(
         id: String,
-        orgId: String,
+        organizationID: String,
         wallexId: String,
         url: String,
         documentName: String,
@@ -173,7 +173,7 @@ class WallexKYCDetails @Inject() (
       upsert(
         WallexKYCDetail(
           id = id,
-          orgId = orgId,
+          organizationID = organizationID,
           wallexId = wallexId,
           url = url,
           documentName = documentName,

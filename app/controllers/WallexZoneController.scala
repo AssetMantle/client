@@ -208,7 +208,7 @@ class WallexZoneController @Inject() (
 
               def getWallexDetails(accountId: String) =
                 orgWallexDetails.Service.tryGetByAccountId(accountId)
-              val zoneId =
+              val zoneID =
                 masterZones.Service
                   .tryGetID(loginState.username)
 
@@ -263,14 +263,14 @@ class WallexZoneController @Inject() (
 
               def insert(
                   wallexTransferResponse: WalletToWalletXferResponse,
-                  orgId: String,
-                  zoneId: String,
+                  organizationID: String,
+                  zoneID: String,
                   wallexId: String
               ) = {
                 walletTransferDetails.Service.insertOrUpdate(
                   id = wallexTransferResponse.id,
-                  orgId = orgId,
-                  zoneId = zoneId,
+                  organizationID = organizationID,
+                  zoneID = zoneID,
                   wallexId = wallexId,
                   senderAccountId = wallexTransferResponse.senderAccountId,
                   receiverAccountId = wallexTransferResponse.receiverAccountId,
@@ -329,8 +329,8 @@ class WallexZoneController @Inject() (
               (for {
                 negotiationFile <- negotiationFile
                 negotiationDetail <- negotiation
-                zoneId <- zoneId
-                zoneAccountID <- zoneAccountID(zoneId)
+                zoneID <- zoneID
+                zoneAccountID <- zoneAccountID(zoneID)
                 zoneAddress <- zoneAddress(zoneAccountID)
                 traderAccountId <- getTraderId(negotiationDetail.buyerTraderID)
                 traderAddress <- traderAddress(traderAccountId)
@@ -350,13 +350,13 @@ class WallexZoneController @Inject() (
                 _ <- updateStatus(wallexTransferResponse)
                 _ <- insert(
                   wallexTransferResponse,
-                  wallexDetails.orgId,
-                  zoneId,
+                  wallexDetails.organizationID,
+                  zoneID,
                   wallexDetails.wallexId
                 )
                 _ <- zoneAutomatedIssueFiat(
                   traderAddress,
-                  zoneId,
+                  zoneID,
                   zoneAddress,
                   wallexTransferResponse
                 )
@@ -386,7 +386,7 @@ class WallexZoneController @Inject() (
         def pendingWalletTransferRequests(
             zoneID: String
         ): Future[Seq[WalletTransferRequest]] =
-          walletTransferRequests.Service.tryGetPendingByZoneId(zoneID)
+          walletTransferRequests.Service.tryGetPendingByZoneID(zoneID)
 
         (for {
           zoneID <- zoneID

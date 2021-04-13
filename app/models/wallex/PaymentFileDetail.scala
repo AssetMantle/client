@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class PaymentFileDetail(
-    orgId: String,
+    organizationID: String,
     quoteId:String,
     negotiationId: String,
     wallexId: String,
@@ -103,7 +103,7 @@ class PaymentFileDetails @Inject() (
 
     override def * =
       (
-        orgId,
+        organizationID,
         quoteId,
         negotiationId,
         wallexId,
@@ -117,7 +117,7 @@ class PaymentFileDetails @Inject() (
         updatedOnTimeZone.?
       ) <> (PaymentFileDetail.tupled, PaymentFileDetail.unapply)
 
-    def orgId = column[String]("orgId")
+    def organizationID = column[String]("organizationID")
 
     def quoteId = column[String]("quoteId", O.PrimaryKey)
 
@@ -144,7 +144,7 @@ class PaymentFileDetails @Inject() (
 
   object Service {
     def create(
-        orgId: String,
+        organizationID: String,
         negotiationId: String,
         quoteId:String,
         wallexId: String,
@@ -153,7 +153,7 @@ class PaymentFileDetails @Inject() (
     ): Future[String] =
       add(
         PaymentFileDetail(
-          orgId = orgId,
+          organizationID = organizationID,
           quoteId = quoteId,
           negotiationId = negotiationId,
           wallexId = wallexId,
@@ -163,7 +163,7 @@ class PaymentFileDetails @Inject() (
       )
 
     def insertOrUpdate(
-        orgId: String,
+        organizationID: String,
         negotiationId: String,
         quoteId:String,
         wallexId: String,
@@ -172,7 +172,7 @@ class PaymentFileDetails @Inject() (
     ): Future[String] =
       add(
         PaymentFileDetail(
-          orgId = orgId,
+          organizationID = organizationID,
           quoteId = quoteId,
           negotiationId = negotiationId,
           wallexId = wallexId,

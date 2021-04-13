@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 
 case class WallexQuoteDetail(
     wallexId: String,
-    zoneId: String,
+    zoneID: String,
     accountId: String,
     quoteId: String,
     partnerRate: Double,
@@ -63,7 +63,7 @@ class WallexQuoteDetails @Inject() (
   ): WallexQuoteDetailSerialized =
     WallexQuoteDetailSerialized(
       wallexId = wallexQuoteDetail.wallexId,
-      zoneId = wallexQuoteDetail.zoneId,
+      zoneID = wallexQuoteDetail.zoneID,
       accountId = wallexQuoteDetail.accountId,
       quoteId = wallexQuoteDetail.quoteId,
       partnerRate = wallexQuoteDetail.partnerRate,
@@ -167,7 +167,7 @@ class WallexQuoteDetails @Inject() (
 
   case class WallexQuoteDetailSerialized(
       wallexId: String,
-      zoneId: String,
+      zoneID: String,
       accountId: String,
       quoteId: String,
       partnerRate: Double,
@@ -192,7 +192,7 @@ class WallexQuoteDetails @Inject() (
     def deserialize: WallexQuoteDetail =
       WallexQuoteDetail(
         wallexId = wallexId,
-        zoneId = zoneId,
+        zoneID = zoneID,
         accountId = accountId,
         quoteId = quoteId,
         partnerRate = partnerRate,
@@ -226,7 +226,7 @@ class WallexQuoteDetails @Inject() (
     override def * =
       (
         wallexId,
-        zoneId,
+        zoneID,
         accountId,
         quoteId,
         partnerRate,
@@ -251,7 +251,7 @@ class WallexQuoteDetails @Inject() (
 
     def wallexId = column[String]("wallexId")
 
-    def zoneId = column[String]("zoneId")
+    def zoneID = column[String]("zoneID")
 
     def accountId = column[String]("accountId")
 
@@ -298,7 +298,7 @@ class WallexQuoteDetails @Inject() (
   object Service {
     def create(
         wallexId: String,
-        zoneId: String,
+        zoneID: String,
         accountId: String,
         quoteId: String,
         partnerRate: Double,
@@ -318,7 +318,7 @@ class WallexQuoteDetails @Inject() (
         serialize(
           WallexQuoteDetail(
             wallexId = wallexId,
-            zoneId = zoneId,
+            zoneID = zoneID,
             accountId = accountId,
             partnerRate = partnerRate,
             partnerBuyAmount = partnerBuyAmount,
@@ -339,7 +339,7 @@ class WallexQuoteDetails @Inject() (
 
     def insertOrUpdate(
         wallexId: String,
-        zoneId: String,
+        zoneID: String,
         accountId: String,
         quoteId: String,
         partnerRate: Double,
@@ -359,7 +359,7 @@ class WallexQuoteDetails @Inject() (
         serialize(
           WallexQuoteDetail(
             wallexId = wallexId,
-            zoneId = zoneId,
+            zoneID = zoneID,
             accountId = accountId,
             partnerRate = partnerRate,
             partnerBuyAmount = partnerBuyAmount,

@@ -8,7 +8,7 @@
 } {
     @walletRequestList.map { fiatRequest =>
         @commonVerticalInfoBox() {
-            @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, fiatRequest.orgId)
+            @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, fiatRequest.organizationID)
             @commonVerticalTextInfo(constants.View.TRADER_ID, fiatRequest.traderId)
             @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, fiatRequest.negotiationId)
             @commonVerticalTextInfo(constants.View.ON_BEHALF_OF, fiatRequest.onBehalfOf)

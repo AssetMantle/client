@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 
 case class OrganizationWallexDetail(
     zoneID: String,
-    orgId: String,
+    organizationID: String,
     wallexId: String,
     email: String,
     firstName: String,
@@ -55,7 +55,7 @@ class OrganizationWallexDetails @Inject() (
   ): Future[String] =
     db.run(
         (organizationWallexAccountDetailTable returning organizationWallexAccountDetailTable
-          .map(_.orgId) += organizationWallexDetail).asTry
+          .map(_.organizationID) += organizationWallexDetail).asTry
       )
       .map {
         case Success(result) => result
@@ -90,11 +90,11 @@ class OrganizationWallexDetails @Inject() (
       }
 
   private def findById(
-      orgId: String
+                        organizationID: String
   ): Future[Option[OrganizationWallexDetail]] =
     db.run(
       organizationWallexAccountDetailTable
-        .filter(_.orgId === orgId)
+        .filter(_.organizationID === organizationID)
         .result
         .headOption
     )
@@ -156,7 +156,7 @@ class OrganizationWallexDetails @Inject() (
     override def * =
       (
         zoneID,
-        orgId,
+        organizationID,
         wallexId,
         email,
         firstName,
@@ -175,7 +175,7 @@ class OrganizationWallexDetails @Inject() (
 
     def zoneID = column[String]("zoneID", O.PrimaryKey)
 
-    def orgId = column[String]("orgId", O.PrimaryKey)
+    def organizationID = column[String]("organizationID", O.PrimaryKey)
 
     def wallexId = column[String]("wallexId", O.PrimaryKey)
 
@@ -209,7 +209,7 @@ class OrganizationWallexDetails @Inject() (
   object Service {
     def create(
         zoneID: String,
-        orgId: String,
+        organizationID: String,
         wallexId: String,
         email: String,
         firstName: String,
@@ -222,7 +222,7 @@ class OrganizationWallexDetails @Inject() (
       add(
         OrganizationWallexDetail(
           zoneID = zoneID,
-          orgId = orgId,
+          organizationID = organizationID,
           wallexId = wallexId,
           email = email,
           firstName = firstName,
@@ -236,7 +236,7 @@ class OrganizationWallexDetails @Inject() (
 
     def insertOrUpdate(
         zoneID: String,
-        orgId: String,
+        organizationID: String,
         wallexId: String,
         email: String,
         firstName: String,
@@ -249,7 +249,7 @@ class OrganizationWallexDetails @Inject() (
       upsert(
         OrganizationWallexDetail(
           zoneID = zoneID,
-          orgId = orgId,
+          organizationID = organizationID,
           wallexId = wallexId,
           email = email,
           firstName = firstName,
@@ -267,15 +267,15 @@ class OrganizationWallexDetails @Inject() (
     ): Future[Int] =
       updateStatusById(wallexID, status)
 
-    def tryGet(orgId: String): Future[OrganizationWallexDetail] =
-      findById(orgId).map { detail =>
+    def tryGet(organizationID: String): Future[OrganizationWallexDetail] =
+      findById(organizationID).map { detail =>
         detail.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
-    def get(orgId: String): Future[Option[OrganizationWallexDetail]] =
-      findById(orgId)
+    def get(organizationID: String): Future[Option[OrganizationWallexDetail]] =
+      findById(organizationID)
 
     def tryGetByAccountId(accountId: String): Future[OrganizationWallexDetail] =
       findByAccountId(accountId).map { detail =>

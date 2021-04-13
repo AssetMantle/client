@@ -2625,13 +2625,13 @@ class ComponentViewController @Inject()(
   def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val orgID = masterOrganizations.Service.tryGetID(loginState.username)
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def getIssueFiatRequestList(orgID: String) = walletTransferRequests.Service.getAllByOrgID(orgID)
+      def getIssueFiatRequestList(organizationID: String) = walletTransferRequests.Service.getAllByOrganizationID(organizationID)
 
       (for {
-        orgID <- orgID
-        issueFiatRequestList <- getIssueFiatRequestList(orgID)
+        organizationID <- organizationID
+        issueFiatRequestList <- getIssueFiatRequestList(organizationID)
       } yield Ok(views.html.component.master.wallexOrgViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -2664,7 +2664,7 @@ class ComponentViewController @Inject()(
 
       val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-      def getIssueFiatRequestList(zoneID: String) = walletTransferRequests.Service.tryGetByZoneId(zoneID)
+      def getIssueFiatRequestList(zoneID: String) = walletTransferRequests.Service.tryGetByZoneID(zoneID)
 
       (for {
         zoneID <- zoneID

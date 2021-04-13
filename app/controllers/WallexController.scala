@@ -152,15 +152,12 @@ class WallexController @Inject() (
             },
             orgWallexAccountDetailData => {
 
-              def getZoneID(orgID: String) =
-                masterOrganizations.Service.tryGetZoneID(orgID)
+              def getZoneID(organizationID: String) =
+                masterOrganizations.Service.tryGetZoneID(organizationID)
 
               val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
-
-              def organization(orgId: String) =
-                masterOrganizations.Service.tryGet(orgId)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -182,7 +179,7 @@ class WallexController @Inject() (
 
               def insertOrUpdate(
                   zoneID: String,
-                  orgId: String,
+                  organizationID: String,
                   email: String,
                   firstName: String,
                   lastName: String,
@@ -194,7 +191,7 @@ class WallexController @Inject() (
               ): Future[Int] =
                 orgWallexDetails.Service.insertOrUpdate(
                   zoneID = zoneID,
-                  orgId = orgId,
+                  organizationID = organizationID,
                   email = email,
                   firstName = firstName,
                   lastName = lastName,
@@ -312,8 +309,8 @@ class WallexController @Inject() (
               val organizationID = masterTraders.Service
                 .getOrganizationIDByAccountID(loginState.username)
 
-              def wallexDetails(orgId: String) =
-                orgWallexDetails.Service.tryGet(orgId)
+              def wallexDetails(organizationID: String) =
+                orgWallexDetails.Service.tryGet(organizationID)
 
               def getWallexDocument(
                   documentType: String
@@ -364,7 +361,7 @@ class WallexController @Inject() (
               ) = {
                 wallexKYCDetails.Service.insertOrUpdate(
                   id = documentResponse.id,
-                  orgId = organizationID,
+                  organizationID = organizationID,
                   wallexId = wallexId,
                   url = documentResponse.uploadURL,
                   documentName = documentResponse.documentName,
@@ -465,8 +462,8 @@ class WallexController @Inject() (
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
 
-              def getWallexDetails(orgId: String) =
-                orgWallexDetails.Service.tryGet(orgId)
+              def getWallexDetails(organizationID: String) =
+                orgWallexDetails.Service.tryGet(organizationID)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -522,14 +519,14 @@ class WallexController @Inject() (
               }
 
               /*def insert(
-                    orgId: String,
+                    organizationID: String,
                     wallexId: String,
                     fileId: String,
                     fileType: String,
                     quoteId: String
                 ) =
                   paymentFileDetails.Service.insertOrUpdate(
-                    orgId = orgId,
+                    organizationID = organizationID,
                     negotiationId = paymentQuote.negotiationID,
                     quoteId = quoteId,
                     wallexId = wallexId,
@@ -552,7 +549,7 @@ class WallexController @Inject() (
                 postResponse <- createPaymentQuote(authToken)
                 result <- getQuoteResponse(postResponse)
                 /* _ <- insert(
-                    orgId,
+                    organizationID,
                     wallexDetails.wallexId,
                     fileUrlResponse.data.fileId,
                     "INVOICE",
@@ -608,12 +605,12 @@ class WallexController @Inject() (
               val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
-              val zoneId =
+              val zoneID =
                 masterTraders.Service
                   .tryGetZoneIDByAccountID(loginState.username)
 
-              def getWallexDetails(orgId: String) =
-                orgWallexDetails.Service.tryGet(orgId)
+              def getWallexDetails(organizationID: String) =
+                orgWallexDetails.Service.tryGet(organizationID)
 
               val file =
                 paymentFileDetails.Service.tryGet(createPaymentResponse.quoteId)
@@ -637,7 +634,7 @@ class WallexController @Inject() (
 
               def insertOrUpdate(
                   wallexId: String,
-                  zoneId: String,
+                  zoneID: String,
                   simplePaymentId: String,
                   status: String,
                   createdAt: String,
@@ -652,7 +649,7 @@ class WallexController @Inject() (
               ) =
                 wallexSimplePaymentDetails.Service.create(
                   wallexId = wallexId,
-                  zoneId = zoneId,
+                  zoneID = zoneID,
                   simplePaymentId = simplePaymentId,
                   status = status,
                   createdAt = createdAt,
@@ -668,14 +665,14 @@ class WallexController @Inject() (
 
               (for {
                 organizationID <- organizationID
-                zoneId <- zoneId
+                zoneID <- zoneID
                 wallexDetails <- getWallexDetails(organizationID)
                 authToken <- authToken
                 file <- file
                 simplePaymentResponse <- createSimplePayment(authToken, file)
                 simplePayment <- insertOrUpdate(
                   wallexId = wallexDetails.wallexId,
-                  zoneId = zoneId,
+                  zoneID = zoneID,
                   simplePaymentId = simplePaymentResponse.data.simplePaymentId,
                   status = simplePaymentResponse.data.status,
                   createdAt = simplePaymentResponse.data.createdAt,
@@ -747,7 +744,6 @@ class WallexController @Inject() (
   def createBeneficiariesForm(): Action[AnyContent] = {
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
-
         val getOrganizationBeneficiaryDetail =
           orgWallexBeneficiaryDetails.Service.tryGet(loginState.username)
 
@@ -818,7 +814,7 @@ class WallexController @Inject() (
 
               def beneficiaryDetails =
                 orgWallexBeneficiaryDetails.Service
-                  .getByTraderId(loginState.username)
+                  .getByTraderID(loginState.username)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -847,8 +843,8 @@ class WallexController @Inject() (
               }
 
               def insertOrUpdate(
-                  orgId: String,
-                  traderId: String,
+                  organizationID: String,
+                  traderID: String,
                   wallexId: String,
                   beneficiaryId: String,
                   address: String,
@@ -861,8 +857,8 @@ class WallexController @Inject() (
                   bankAccount: BankAccount
               ) =
                 orgWallexBeneficiaryDetails.Service.create(
-                  orgId = orgId,
-                  traderId = traderId,
+                  organizationID = organizationID,
+                  traderID = traderID,
                   wallexId = wallexId,
                   beneficiaryId = beneficiaryId,
                   address = address,
@@ -949,7 +945,7 @@ class WallexController @Inject() (
             deleteBeneficiary => {
               val beneficiary =
                 orgWallexBeneficiaryDetails.Service
-                  .getByTraderId(loginState.username)
+                  .getByTraderID(loginState.username)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -992,8 +988,8 @@ class WallexController @Inject() (
   def walletTransferForm(negotiationID: String): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
-        def getWallexDetails(orgId: String) =
-          orgWallexDetails.Service.tryGet(orgId)
+        def getWallexDetails(organizationID: String) =
+          orgWallexDetails.Service.tryGet(organizationID)
 
         val authToken = wallexAuthToken.Service.getToken()
 
@@ -1130,8 +1126,8 @@ class WallexController @Inject() (
               ) =
                 walletTransferRequest.Service.insertOrUpdate(
                   negotiationId = wallexTransfer.negotiationId,
-                  zoneId = trader.zoneID,
-                  orgId = trader.organizationID,
+                  zoneID = trader.zoneID,
+                  organizationID = trader.organizationID,
                   traderId = trader.id,
                   onBehalfOf = wallexTransfer.onBehalfOf,
                   receiverAccountId = wallexTransfer.receiverAccountId,
@@ -1287,11 +1283,11 @@ class WallexController @Inject() (
               )
             },
             collectionAccount => {
-              val orgId = masterTraders.Service
+              val organizationID = masterTraders.Service
                 .getOrganizationIDByAccountID(loginState.username)
 
-              def wallexDetails(orgId: String) =
-                orgWallexDetails.Service.tryGet(orgId)
+              def wallexDetails(organizationID: String) =
+                orgWallexDetails.Service.tryGet(organizationID)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -1320,9 +1316,9 @@ class WallexController @Inject() (
                 )
               }
               (for {
-                orgId <- orgId
+                organizationID <- organizationID
                 authToken <- authToken
-                wallexDetails <- wallexDetails(orgId)
+                wallexDetails <- wallexDetails(organizationID)
                 collectionResponse <- createCollectionAccount(authToken)
                 _ <- insertOrUpdate(
                   collectionResponse,
@@ -1458,12 +1454,12 @@ class WallexController @Inject() (
               )
             },
             orgWallexAccountDetailData => {
-              val orgID =
+              val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
 
-              def wallexDetails(orgId: String) =
-                orgWallexDetails.Service.tryGet(orgId)
+              def wallexDetails(organizationID: String) =
+                orgWallexDetails.Service.tryGet(organizationID)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -1479,9 +1475,9 @@ class WallexController @Inject() (
                 )
 
               (for {
-                orgID <- orgID
+                organizationID <- organizationID
                 authToken <- authToken
-                wallexDetail <- wallexDetails(orgID)
+                wallexDetail <- wallexDetails(organizationID)
                 wallexGetUserResponse <-
                   wallexGetUser(wallexDetail.wallexId, authToken)
                 _ <- updateStatus(wallexGetUserResponse)

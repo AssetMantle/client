@@ -14,8 +14,8 @@ import scala.util.{Failure, Success}
 
 case class WallexWalletTransferDetail(
     id: String,
-    orgId: String,
-    zoneId: String,
+    organizationID: String,
+    zoneID: String,
     wallexId: String,
     senderAccountId: String,
     receiverAccountId: String,
@@ -121,8 +121,8 @@ class WallexWalletTransferDetails @Inject() (
     override def * =
       (
         id,
-        orgId,
-        zoneId,
+        organizationID,
+        zoneID,
         wallexId,
         senderAccountId,
         receiverAccountId,
@@ -144,9 +144,9 @@ class WallexWalletTransferDetails @Inject() (
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def orgId = column[String]("orgId")
+    def organizationID = column[String]("organizationID")
 
-    def zoneId = column[String]("zoneId")
+    def zoneID = column[String]("zoneID")
 
     def wallexId = column[String]("wallexId", O.PrimaryKey)
 
@@ -186,8 +186,8 @@ class WallexWalletTransferDetails @Inject() (
   object Service {
     def create(
         id: String,
-        orgId: String,
-        zoneId: String,
+        organizationID: String,
+        zoneID: String,
         wallexId: String,
         senderAccountId: String,
         receiverAccountId: String,
@@ -203,8 +203,8 @@ class WallexWalletTransferDetails @Inject() (
       add(
         WallexWalletTransferDetail(
           id = id,
-          orgId = orgId,
-          zoneId = zoneId,
+          organizationID = organizationID,
+          zoneID = zoneID,
           wallexId = wallexId,
           senderAccountId = senderAccountId,
           receiverAccountId = receiverAccountId,
@@ -221,8 +221,8 @@ class WallexWalletTransferDetails @Inject() (
 
     def insertOrUpdate(
         id: String,
-        orgId: String,
-        zoneId: String,
+        organizationID: String,
+        zoneID: String,
         wallexId: String,
         senderAccountId: String,
         receiverAccountId: String,
@@ -238,8 +238,8 @@ class WallexWalletTransferDetails @Inject() (
       upsert(
         WallexWalletTransferDetail(
           id = id,
-          orgId = orgId,
-          zoneId = zoneId,
+          organizationID = organizationID,
+          zoneID = zoneID,
           wallexId = wallexId,
           senderAccountId = senderAccountId,
           receiverAccountId = receiverAccountId,
@@ -254,14 +254,14 @@ class WallexWalletTransferDetails @Inject() (
         )
       )
 
-    def tryGet(orgId: String): Future[WallexWalletTransferDetail] =
-      findById(orgId).map { detail =>
+    def tryGet(organizationID: String): Future[WallexWalletTransferDetail] =
+      findById(organizationID).map { detail =>
         detail.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
-    def get(orgId: String): Future[Option[WallexWalletTransferDetail]] =
-      findById(orgId)
+    def get(organizationID: String): Future[Option[WallexWalletTransferDetail]] =
+      findById(organizationID)
   }
 }

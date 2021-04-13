@@ -1625,8 +1625,8 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
 
 CREATE TABLE IF NOT EXISTS WALLEX."OrganizationWallexAccountDetail"
 (
-    "orgId"             VARCHAR NOT NULL,
-    "zoneID"            VARCHAR NOT NULL, 
+    "organizationID"    VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
     "wallexId"          VARCHAR NOT NULL,
     "email"             VARCHAR NOT NULL,
     "firstName"         VARCHAR NOT NULL,
@@ -1641,7 +1641,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationWallexAccountDetail"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("orgId", "wallexId","zoneID")
+    PRIMARY KEY ("organizationID", "wallexId","zoneID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."WallexDocument"
@@ -1662,7 +1662,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexDocument"
 
 CREATE TABLE IF NOT EXISTS WALLEX."WallexBeneficiaryDetail"
 (
-    "orgId"             VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
     "traderId"          VARCHAR NOT NULL,
     "wallexId"          VARCHAR NOT NULL,
     "beneficiaryId"     VARCHAR NOT NULL,
@@ -1682,12 +1682,12 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexBeneficiaryDetail"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("orgId", "wallexId")
+    PRIMARY KEY ("organizationID", "wallexId")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."WallexPaymentDetail"
 (
-    "zoneId"            VARCHAR NOT NULL,
+    "zoneID"            VARCHAR NOT NULL,
     "wallexId"          VARCHAR NOT NULL,
     "simplePaymentId"   VARCHAR NOT NULL,
     "createdAt"         VARCHAR,
@@ -1711,7 +1711,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexPaymentDetail"
 
 CREATE TABLE IF NOT EXISTS WALLEX."PaymentFileDetail"
 (
-    "orgId"             varchar not null,
+    "organizationID"    varchar not null,
     "negotiationId"     varchar not null,
     "wallexId"          varchar not null,
     "fileType"          varchar not null,
@@ -1736,8 +1736,8 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
     "purposeOfTransfer" varchar          not null,
     "reference"           varchar,
     "remarks"             varchar,
-    "zoneId"            varchar          not null,
-    "orgId"             varchar          not null,
+    "zoneID"            varchar          not null,
+    "organizationID"             varchar          not null,
     "status"              varchar,
     "traderId"           varchar not null,
     "createdBy"         varchar,
@@ -1768,7 +1768,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexCollectionAccountDetail"
 CREATE TABLE IF NOT EXISTS WALLEX."WallexKYCDetail"
 (
     "id"                  varchar not null,
-    "orgId"             varchar not null,
+    "organizationID"     varchar not null,
     "wallexId"          varchar not null,
     "url"                 varchar not null,
     "documentType"      varchar not null,
@@ -1785,8 +1785,8 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexKYCDetail"
 CREATE TABLE IF NOT EXISTS WALLEX."WallexWalletTransfer"
 (
     "id"                   varchar not null,
-    "orgId"              varchar not null,
-    "zoneId"             varchar not null,
+    "organizationID"              varchar not null,
+    "zoneID"             varchar not null,
     "wallexId"           varchar not null,
     "senderAccountId"    varchar not null,
     "receiverAccountId"  varchar not null,
@@ -1959,13 +1959,13 @@ ALTER TABLE WESTERN_UNION."RTCB"
     ADD CONSTRAINT RTCB_FiatRequest_externalReference FOREIGN KEY ("externalReference") REFERENCES WESTERN_UNION."FiatRequest" ("id");
 
 ALTER TABLE WALLEX."OrganizationWallexAccountDetail"
-    ADD CONSTRAINT OrganizationWallexAccount_Org_id FOREIGN KEY ("orgId") REFERENCES MASTER."Organization" ("id");
+    ADD CONSTRAINT OrganizationWallexAccount_Org_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 ALTER TABLE WALLEX."WallexDocument"
     ADD CONSTRAINT WallexDocument_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE WALLEX."WallexBeneficiaryDetail"
-    ADD CONSTRAINT WallexBeneficiaryDetail_Org_id FOREIGN KEY ("orgId") REFERENCES MASTER."Organization" ("id");
+    ADD CONSTRAINT WallexBeneficiaryDetail_Org_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 
 /*Triggers*/

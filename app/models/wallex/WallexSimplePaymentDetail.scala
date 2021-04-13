@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 
 case class WallexSimplePaymentDetail(
     wallexId: String,
-    zoneId: String,
+    zoneID: String,
     simplePaymentId: String,
     status: String,
     createdAt: String,
@@ -60,7 +60,7 @@ class WallexSimplePaymentDetails @Inject() (
   ): WallexSimplePaymentDetailSerialized =
     WallexSimplePaymentDetailSerialized(
       wallexId = simplePaymentDetail.wallexId,
-      zoneId = simplePaymentDetail.zoneId,
+      zoneID = simplePaymentDetail.zoneID,
       simplePaymentId = simplePaymentDetail.simplePaymentId,
       status = simplePaymentDetail.status,
       createdAt = simplePaymentDetail.createdAt,
@@ -160,7 +160,7 @@ class WallexSimplePaymentDetails @Inject() (
 
   case class WallexSimplePaymentDetailSerialized(
       wallexId: String,
-      zoneId: String,
+      zoneID: String,
       simplePaymentId: String,
       status: String,
       createdAt: String,
@@ -183,7 +183,7 @@ class WallexSimplePaymentDetails @Inject() (
     def deserialize: WallexSimplePaymentDetail =
       WallexSimplePaymentDetail(
         wallexId = wallexId,
-        zoneId = zoneId,
+        zoneID = zoneID,
         simplePaymentId = simplePaymentId,
         status = status,
         createdAt = createdAt,
@@ -216,7 +216,7 @@ class WallexSimplePaymentDetails @Inject() (
     override def * =
       (
         wallexId,
-        zoneId,
+        zoneID,
         simplePaymentId,
         status,
         createdAt,
@@ -238,7 +238,7 @@ class WallexSimplePaymentDetails @Inject() (
 
     def wallexId = column[String]("wallexId")
 
-    def zoneId = column[String]("zoneId")
+    def zoneID = column[String]("zoneID")
 
     def simplePaymentId = column[String]("simplePaymentId", O.PrimaryKey)
 
@@ -278,7 +278,7 @@ class WallexSimplePaymentDetails @Inject() (
   object Service {
     def create(
         wallexId: String,
-        zoneId: String,
+        zoneID: String,
         simplePaymentId: String,
         status: String,
         createdAt: String,
@@ -301,7 +301,7 @@ class WallexSimplePaymentDetails @Inject() (
         serialize(
           WallexSimplePaymentDetail(
             wallexId = wallexId,
-            zoneId = zoneId,
+            zoneID = zoneID,
             simplePaymentId = simplePaymentId,
             status = status,
             createdAt = createdAt,
@@ -325,7 +325,7 @@ class WallexSimplePaymentDetails @Inject() (
 
     def insertOrUpdate(
         wallexId: String,
-        zoneId: String,
+        zoneID: String,
         simplePaymentId: String,
         status: String,
         createdAt: String,
@@ -349,7 +349,7 @@ class WallexSimplePaymentDetails @Inject() (
         serialize(
           WallexSimplePaymentDetail(
             wallexId = wallexId,
-            zoneId = zoneId,
+            zoneID = zoneID,
             simplePaymentId = simplePaymentId,
             status = status,
             createdAt = createdAt,

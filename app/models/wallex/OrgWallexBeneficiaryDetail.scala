@@ -15,8 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class OrgWallexBeneficiaryDetail(
-    orgId: String,
-    traderId: String,
+    organizationID: String,
+    traderID: String,
     wallexId: String,
     beneficiaryId: String,
     address: String,
@@ -58,8 +58,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
       beneficiaryDetail: OrgWallexBeneficiaryDetail
   ): OrgWallexBeneficiaryDetailSerialized =
     OrgWallexBeneficiaryDetailSerialized(
-      orgId = beneficiaryDetail.orgId,
-      traderId = beneficiaryDetail.traderId,
+      organizationID = beneficiaryDetail.organizationID,
+      traderID = beneficiaryDetail.traderID,
       wallexId = beneficiaryDetail.wallexId,
       beneficiaryId = beneficiaryDetail.beneficiaryId,
       address = beneficiaryDetail.address,
@@ -83,7 +83,7 @@ class OrgWallexBeneficiaryDetails @Inject() (
   ): Future[String] =
     db.run(
         (orgWallexBeneficiaryDetailTable returning orgWallexBeneficiaryDetailTable
-          .map(_.orgId) += orgWallexBeneficiaryDetail).asTry
+          .map(_.organizationID) += orgWallexBeneficiaryDetail).asTry
       )
       .map {
         case Success(result) => result
@@ -117,22 +117,22 @@ class OrgWallexBeneficiaryDetails @Inject() (
           }
       }
 
-  private def getByOrgId(
-      orgId: String
+  private def getByorganizationID(
+      organizationID: String
   ): Future[Option[OrgWallexBeneficiaryDetailSerialized]] =
     db.run(
       orgWallexBeneficiaryDetailTable
-        .filter(_.orgId === orgId)
+        .filter(_.organizationID === organizationID)
         .result
         .headOption
     )
 
   private def tryGetByOrdId(
-      orgId: String
+      organizationID: String
   ): Future[OrgWallexBeneficiaryDetailSerialized] =
     db.run(
         orgWallexBeneficiaryDetailTable
-          .filter(_.orgId === orgId)
+          .filter(_.organizationID === organizationID)
           .result
           .head
           .asTry
@@ -170,12 +170,12 @@ class OrgWallexBeneficiaryDetails @Inject() (
               )
           }
       }
-  private def tryGetByTraderId(
-      traderId: String
+  private def tryGetByTraderID(
+      traderID: String
   ): Future[OrgWallexBeneficiaryDetailSerialized] =
     db.run(
         orgWallexBeneficiaryDetailTable
-          .filter(_.traderId === traderId)
+          .filter(_.traderID === traderID)
           .result
           .head
           .asTry
@@ -217,8 +217,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
       }
 
   case class OrgWallexBeneficiaryDetailSerialized(
-      orgId: String,
-      traderId: String,
+      organizationID: String,
+      traderID: String,
       wallexId: String,
       beneficiaryId: String,
       address: String,
@@ -239,8 +239,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
 
     def deserialize: OrgWallexBeneficiaryDetail =
       OrgWallexBeneficiaryDetail(
-        orgId = orgId,
-        traderId = traderId,
+        organizationID = organizationID,
+        traderID = traderID,
         wallexId = wallexId,
         beneficiaryId = beneficiaryId,
         address = address,
@@ -270,8 +270,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
 
     override def * =
       (
-        orgId,
-        traderId,
+        organizationID,
+        traderID,
         wallexId,
         beneficiaryId,
         address,
@@ -290,9 +290,9 @@ class OrgWallexBeneficiaryDetails @Inject() (
         updatedOnTimeZone.?
       ) <> (OrgWallexBeneficiaryDetailSerialized.tupled, OrgWallexBeneficiaryDetailSerialized.unapply)
 
-    def orgId = column[String]("orgId", O.PrimaryKey)
+    def organizationID = column[String]("organizationID", O.PrimaryKey)
 
-    def traderId = column[String]("traderId", O.PrimaryKey)
+    def traderID = column[String]("traderID", O.PrimaryKey)
 
     def wallexId = column[String]("wallexId", O.PrimaryKey)
 
@@ -329,8 +329,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
 
   object Service {
     def create(
-        orgId: String,
-        traderId: String,
+        organizationID: String,
+        traderID: String,
         wallexId: String,
         beneficiaryId: String,
         address: String,
@@ -351,8 +351,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
       add(
         serialize(
           OrgWallexBeneficiaryDetail(
-            orgId = orgId,
-            traderId = traderId,
+            organizationID = organizationID,
+            traderID = traderID,
             wallexId = wallexId,
             beneficiaryId = beneficiaryId,
             address = address,
@@ -374,8 +374,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
       )
 
     def insertOrUpdate(
-        orgId: String,
-        traderId: String,
+        organizationID: String,
+        traderID: String,
         wallexId: String,
         beneficiaryId: String,
         address: String,
@@ -396,8 +396,8 @@ class OrgWallexBeneficiaryDetails @Inject() (
       upsert(
         serialize(
           OrgWallexBeneficiaryDetail(
-            orgId = orgId,
-            traderId = traderId,
+            organizationID = organizationID,
+            traderID = traderID,
             wallexId = wallexId,
             beneficiaryId = beneficiaryId,
             address = address,
@@ -418,23 +418,23 @@ class OrgWallexBeneficiaryDetails @Inject() (
         )
       )
 
-    def tryGet(orgId: String): Future[OrgWallexBeneficiaryDetail] =
-      tryGetByOrdId(orgId).map(_.deserialize)
+    def tryGet(organizationID: String): Future[OrgWallexBeneficiaryDetail] =
+      tryGetByOrdId(organizationID).map(_.deserialize)
 
     def get(
-        orgId: String
+        organizationID: String
     ): Future[Option[OrgWallexBeneficiaryDetail]] =
-      getByOrgId(orgId).map(_.map(_.deserialize))
+      getByorganizationID(organizationID).map(_.map(_.deserialize))
 
     def getByBeneficiaryId(
         beneficiaryId: String
     ): Future[OrgWallexBeneficiaryDetailSerialized] =
       tryGetByBeneficiaryId(beneficiaryId)
 
-    def getByTraderId(
-        traderId: String
+    def getByTraderID(
+        traderID: String
     ): Future[OrgWallexBeneficiaryDetailSerialized] =
-      tryGetByTraderId(traderId)
+      tryGetByTraderID(traderID)
 
     def delete(beneficiaryId: String): Future[Int] =
       deleteById(beneficiaryId)
