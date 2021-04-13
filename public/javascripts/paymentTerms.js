@@ -38,7 +38,15 @@ function tentativeDateInput() {
 }
 
 function tenureInput() {
-    if ($('#tenure').val()) {
+    if ($('#tenure').val() || $('#reference').val()) {
+        $('#tentativeDate').val('').prop('disabled', true);
+    } else {
+        $('#tentativeDate').prop('disabled', false);
+    }
+}
+
+function refrenceInput() {
+    if ($('#tenure').val() || $('#reference').val()) {
         $('#tentativeDate').val('').prop('disabled', true);
     } else {
         $('#tentativeDate').prop('disabled', false);

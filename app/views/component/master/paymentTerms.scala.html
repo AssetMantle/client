@@ -12,7 +12,7 @@
         @commonInputDate(paymentTermsForm, constants.FormField.TENTATIVE_DATE, 'id -> "tentativeDate", 'oninput -> "tentativeDateInput()")
         <span> @Messages(constants.View.OR)</span>
         @commonInputInt(paymentTermsForm, constants.FormField.TENURE, 'id -> "tenure", 'oninput -> "tenureInput()")
-        @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'id -> "reference")
+        @commonSelect(paymentTermsForm, constants.FormField.REFERENCE, 'id -> "reference", 'oninput -> "refrenceInput()")
     }
 }
 <script src="@routes.Assets.versioned("javascripts/paymentTerms.js")" type="text/javascript"></script>
