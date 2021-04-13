@@ -490,6 +490,12 @@ object SelectFieldOptions {
     "identity_report",
     "fdw"
   )
+
+  val IDENTIFICATION_DOCUMENT_TYPE: Seq[String] = Seq(
+    "nric",
+    "passport"
+  )
+
   val FUNDING_SOURCE: Seq[String] = Seq(
     "SALARY_WAGES",
     "INVESTMENTS",
@@ -507,6 +513,11 @@ object SelectFieldOptions {
 
   val PURPOSE_OF_TRANSFER: Seq[String] = Seq(
     "SUPP",
+  )
+
+  val GENDER: Seq[String] = Seq(
+    "male",
+    "female"
   )
 
   val BUSINESS_TYPE: Seq[String] = Seq(

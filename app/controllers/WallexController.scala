@@ -79,7 +79,8 @@ class WallexController @Inject() (
     wallexKYCDetails: WallexKYCDetails,
     collectionAccountDetails: WallexCollectionAccountDetails,
     wallexGetWalletBalance: WallexGetWalletBalance,
-    walletTransferRequest: WalletTransferRequests
+    walletTransferRequest: WalletTransferRequests,
+    updateCompanyDetails: WallexUpdateCompanyDetails
 )(implicit
     executionContext: ExecutionContext,
     configuration: Configuration,
@@ -94,7 +95,7 @@ class WallexController @Inject() (
   private val transactionMode =
     configuration.get[String]("blockchain.transaction.mode")
 
-  def createOrganizationWallexAccountForm(): Action[AnyContent] =
+  def createOrganizationAccountForm(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         val organizationID =
@@ -135,7 +136,7 @@ class WallexController @Inject() (
 
     }
 
-  def createOrganizationWallexAccount(): Action[AnyContent] =
+  def createOrganizationAccount(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         views.companion.master.AddOrUpdateOrganizationWallexAccount.form
@@ -154,7 +155,7 @@ class WallexController @Inject() (
               def getZoneID(orgID: String) =
                 masterOrganizations.Service.tryGetZoneID(orgID)
 
-              val orgId =
+              val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
 
@@ -205,15 +206,15 @@ class WallexController @Inject() (
                 )
 
               (for {
-                orgId <- orgId
-                zoneID <- getZoneID(orgId)
+                organizationID <- organizationID
+                zoneID <- getZoneID(organizationID)
                 authToken <- authToken
                 wallexUserSignUp <- wallexUserSignUp(authToken)
                 wallexGetUser <-
                   wallexGetUser(wallexUserSignUp.userId, authToken)
                 _ <- insertOrUpdate(
                   zoneID,
-                  orgId,
+                  organizationID,
                   wallexUserSignUp.email,
                   wallexUserSignUp.firstName,
                   wallexUserSignUp.lastName,
@@ -308,7 +309,7 @@ class WallexController @Inject() (
             },
             wallexDocument => {
 
-              val orgId = masterTraders.Service
+              val organizationID = masterTraders.Service
                 .getOrganizationIDByAccountID(loginState.username)
 
               def wallexDetails(orgId: String) =
@@ -357,13 +358,13 @@ class WallexController @Inject() (
               }
 
               def insertDocumentDetails(
-                  orgId: String,
+                  organizationID: String,
                   wallexId: String,
                   documentResponse: CreateDocumentResponse
               ) = {
                 wallexKYCDetails.Service.insertOrUpdate(
                   id = documentResponse.id,
-                  orgId = orgId,
+                  orgId = organizationID,
                   wallexId = wallexId,
                   url = documentResponse.uploadURL,
                   documentName = documentResponse.documentName,
@@ -381,9 +382,9 @@ class WallexController @Inject() (
                 )
 
               (for {
-                orgId <- orgId
+                organizationID <- organizationID
                 authToken <- authToken
-                wallexDetails <- wallexDetails(orgId)
+                wallexDetails <- wallexDetails(organizationID)
                 wallexDoc <- getWallexDocument(wallexDocument.documentType)
                 createDocument <- createDocument(
                   authToken,
@@ -394,7 +395,7 @@ class WallexController @Inject() (
                 _ <-
                   uploadDocument(authToken, createDocument.uploadURL, wallexDoc)
                 _ <- insertDocumentDetails(
-                  orgId,
+                  organizationID,
                   wallexDetails.wallexId,
                   createDocument
                 )
@@ -460,7 +461,7 @@ class WallexController @Inject() (
             },
             paymentQuote => {
 
-              val orgId =
+              val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
 
@@ -538,7 +539,7 @@ class WallexController @Inject() (
 
               (for {
                 //negotiationFile <- negotiationFile
-                orgId <- orgId
+                organizationID <- organizationID
                 authToken <- authToken
                 /*fileUrlResponse <-
                     uploadFileURLRespone(authToken, negotiationFile)
@@ -547,7 +548,7 @@ class WallexController @Inject() (
                     fileUrlResponse.data.uploadUrl,
                     negotiationFile
                   )*/
-                wallexDetails <- getWallexDetails(orgId)
+                wallexDetails <- getWallexDetails(organizationID)
                 postResponse <- createPaymentQuote(authToken)
                 result <- getQuoteResponse(postResponse)
                 /* _ <- insert(
@@ -604,7 +605,7 @@ class WallexController @Inject() (
             },
             createPaymentResponse => {
 
-              val orgId =
+              val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
               val zoneId =
@@ -666,9 +667,9 @@ class WallexController @Inject() (
                 )
 
               (for {
-                orgId <- orgId
+                organizationID <- organizationID
                 zoneId <- zoneId
-                wallexDetails <- getWallexDetails(orgId)
+                wallexDetails <- getWallexDetails(organizationID)
                 authToken <- authToken
                 file <- file
                 simplePaymentResponse <- createSimplePayment(authToken, file)
@@ -746,10 +747,6 @@ class WallexController @Inject() (
   def createBeneficiariesForm(): Action[AnyContent] = {
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
-        val organizationID =
-          masterTraders.Service.getOrganizationIDByAccountID(
-            loginState.username
-          )
 
         val getOrganizationBeneficiaryDetail =
           orgWallexBeneficiaryDetails.Service.tryGet(loginState.username)
@@ -1166,14 +1163,14 @@ class WallexController @Inject() (
 
     }
 
-  def updateWallexAccountForm(): Action[AnyContent] =
+  def updateCompanyAccountForm(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         Future(Ok(views.html.component.master.updateDetailsWallexAccount()))
 
     }
 
-  def updateWallexAccount(): Action[AnyContent] =
+  def updateCompanyAccount(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
         views.companion.master.UpdateDetailsWallexAccount.form
@@ -1201,10 +1198,10 @@ class WallexController @Inject() (
 
               val authToken = wallexAuthToken.Service.getToken()
 
-              def wallexUserUpdate(authToken: String, wallexID: String) = {
-                userDetailsUpdate.Service.post(
+              def companyDetailsUpdate(authToken: String, wallexID: String) = {
+                updateCompanyDetails.Service.post(
                   authToken,
-                  userDetailsUpdate.Request(
+                  updateCompanyDetails.Request(
                     countryOfIncorporation =
                       updateDetails.countryOfIncorporation,
                     countryOfOperations = updateDetails.countryOfOperations,
@@ -1229,7 +1226,7 @@ class WallexController @Inject() (
                   getOrganizationWallexAccountDetail(organizationID)
                 authToken <- authToken
                 wallexDetailsUpdate <-
-                  wallexUserUpdate(authToken, wallexDetails.wallexId)
+                  companyDetailsUpdate(authToken, wallexDetails.wallexId)
                 result <- withUsernameToken.Ok(
                   views.html.index(successes =
                     Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
@@ -1501,5 +1498,96 @@ class WallexController @Inject() (
               }
             }
           )
+    }
+
+  def updateAccountForm(): Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        Future(Ok(views.html.component.master.updateUserDetailsWallexAccount()))
+
+    }
+
+  def updateAccount(): Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        views.companion.master.UpdateUserDetailsWallexAccount.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              Future(
+                BadRequest(
+                  views.html.component.master
+                    .updateUserDetailsWallexAccount(formWithErrors)
+                )
+              )
+            },
+            updateDetails => {
+
+              val organizationID =
+                masterTraders.Service.getOrganizationIDByAccountID(
+                  loginState.username
+                )
+
+              def getOrganizationWallexAccountDetail(
+                  organizationID: String
+              ): Future[OrganizationWallexDetail] =
+                orgWallexDetails.Service.tryGet(organizationID)
+
+              val authToken = wallexAuthToken.Service.getToken()
+
+              def wallexUserUpdate(authToken: String, wallexID: String) = {
+                userDetailsUpdate.Service.post(
+                  authToken,
+                  userDetailsUpdate.Request(
+                    mobileCountryCode = updateDetails.mobileCountryCode,
+                    mobileNumber = updateDetails.mobileNumber,
+                    gender = updateDetails.gender,
+                    countryOfBirth = updateDetails.countryOfBirth,
+                    nationality = updateDetails.nationality,
+                    countryOfResidence = updateDetails.countryOfResidence,
+                    residentialAddress = updateDetails.residentialAddress,
+                    countryCode = updateDetails.countryCode,
+                    postalCode = updateDetails.postalCode,
+                    dateOfBirth = {
+                      new SimpleDateFormat(constants.External.DATE_FORMAT)
+                        .format(updateDetails.dateOfBirth)
+                    },
+                    identificationType = updateDetails.identificationType,
+                    identificationNumber = updateDetails.identificationNumber,
+                    issueDate = {
+                      new SimpleDateFormat(constants.External.DATE_FORMAT)
+                        .format(updateDetails.issueDate)
+                    },
+                    expiryDate = {
+                      new SimpleDateFormat(constants.External.DATE_FORMAT)
+                        .format(updateDetails.expiryDate)
+                    }
+                  ),
+                  userId = wallexID
+                )
+              }
+
+              (for {
+                organizationID <- organizationID
+                wallexDetails <-
+                  getOrganizationWallexAccountDetail(organizationID)
+                authToken <- authToken
+                wallexDetailsUpdate <-
+                  wallexUserUpdate(authToken, wallexDetails.wallexId)
+                result <- withUsernameToken.Ok(
+                  views.html.index(successes =
+                    Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
+                  )
+                )
+              } yield result).recover {
+                case baseException: BaseException =>
+                  InternalServerError(
+                    views.html.index(failures = Seq(baseException.failure))
+                  )
+              }
+
+            }
+          )
+
     }
 }

@@ -140,6 +140,10 @@ object FormField {
   val DESCRIPTION = new StringFormField("DESCRIPTION", 0,255)
   val PURPOSE = new StringFormField("PURPOSE", 0,255)
   val USER_ID = new StringFormField("USER_ID", 0,255)
+  val COUNTRY_OF_BIRTH = new StringFormField("COUNTRY_OF_BIRTH", 0,255)
+  val COUNTRY_OF_RESIDENCE = new StringFormField("COUNTRY_OF_RESIDENCE", 0,255)
+  val RESIDENTIAL_ADDRESS = new StringFormField("RESIDENTIAL_ADDRESS", 0,255)
+  val IDENTIFICATION_NUMBER = new StringFormField("IDENTIFICATION_NUMBER", 0,255)
 
 
   //SelectFormField
@@ -155,6 +159,7 @@ object FormField {
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY_CODE2 = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRY_CODE2)
+  val NATIONALITY = new SelectFormField("NATIONALITY", constants.SelectFieldOptions.COUNTRY_CODE2)
   val COUNTRY_OF_OPERATIONS = new SelectFormField("COUNTRY_OF_OPERATIONS", constants.SelectFieldOptions.COUNTRY_CODE2)
   val COUNTRY_OF_INCORPORATION = new SelectFormField("COUNTRY_OF_INCORPORATION", constants.SelectFieldOptions.COUNTRY_CODE2)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
@@ -167,6 +172,8 @@ object FormField {
   val FUNDING_SOURCE = new SelectFormField("FUNDING_SOURCE", constants.SelectFieldOptions.FUNDING_SOURCE)
   val PURPOSE_OF_TRANSFER = new SelectFormField("PURPOSE_OF_TRANSFER", constants.SelectFieldOptions.PURPOSE_OF_TRANSFER)
   val BUSINESS_TYPE = new SelectFormField("BUSINESS_TYPE", constants.SelectFieldOptions.BUSINESS_TYPE)
+  val GENDER = new SelectFormField("GENDER", constants.SelectFieldOptions.GENDER)
+  val IDENTIFICATION_TYPE = new SelectFormField("IDENTIFICATION_TYPE", constants.SelectFieldOptions.IDENTIFICATION_DOCUMENT_TYPE)
 
 
   //IntFormField
@@ -186,6 +193,8 @@ object FormField {
   val DATE_OF_BIRTH = new DateFormField("DATE_OF_BIRTH")
   val TENTATIVE_DATE = new DateFormField("TENTATIVE_DATE")
   val INCORPORATION_DATE = new DateFormField("INCORPORATION_DATE")
+  val ISSUE_DATE = new DateFormField("ISSUE_DATE")
+  val EXPIRY_DATE = new DateFormField("EXPIRY_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)

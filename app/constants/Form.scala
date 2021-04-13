@@ -174,8 +174,8 @@ object Form {
   val ACCEPT_REJECT_TRADER_RELATION = new Form("ACCEPT_REJECT_TRADER_RELATION", routes.TraderController.acceptOrRejectTraderRelation(), routes.javascript.TraderController.acceptOrRejectTraderRelationForm)
 
   //WALLEX CONTROLLER
-  val ADD_OR_UPDATE_WALLEX_ACCOUNT = new Form("ADD_OR_UPDATE_WALLEX_ACCOUNT", routes.WallexController.createOrganizationWallexAccount(), routes.javascript.WallexController.createOrganizationWallexAccountForm)
-  val UPDATE_WALLEX_ACCOUNT = new Form("UPDATE_WALLEX_ACCOUNT", routes.WallexController.updateWallexAccount(), routes.javascript.WallexController.updateWallexAccountForm)
+  val ADD_OR_UPDATE_WALLEX_ACCOUNT = new Form("ADD_OR_UPDATE_WALLEX_ACCOUNT", routes.WallexController.createOrganizationAccount(), routes.javascript.WallexController.createOrganizationAccountForm)
+  val UPDATE_WALLEX_ACCOUNT = new Form("UPDATE_WALLEX_ACCOUNT", routes.WallexController.updateCompanyAccount(), routes.javascript.WallexController.updateCompanyAccountForm)
   val ADD_OR_UPDATE_WALLEX_DOCUMENT = new Form("ADD_OR_UPDATE_WALLEX_DOCUMENT", routes.WallexController.wallexDocument(), routes.javascript.WallexController.wallexDocumentForm)
   val INITIATE_WALLEX_PAYMENT = new Form("INITIATE_WALLEX_PAYMENT", routes.WallexController.initiateWallexPayment(), routes.javascript.WallexController.initiateWallexPaymentForm)
   val ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST = new Form("ACCEPT_WALLEX_PAYMENT_QUOTE_REQUEST", routes.WallexController.acceptWallexQuote(), routes.javascript.WallexController.acceptWallexQuoteForm)
@@ -188,6 +188,7 @@ object Form {
   val WALLEX_SUBMIT_DOCUMENT = new Form("WALLEX_SUBMIT_DOCUMENT", routes.WallexController.submitDocumentToWallex(), routes.javascript.WallexController.submitDocumentToWallexForm)
   val WALLEX_GET_USER = new Form("WALLEX_GET_USER", routes.WallexController.getWallexUser(), routes.javascript.WallexController.getWallexUserForm)
   val WALLEX_SEND_USER_FOR_SCREENING = new Form("WALLEX_SEND_USER_FOR_SCREENING", routes.WallexZoneController.sendForScreening(), routes.javascript.WallexZoneController.sendForScreeningForm)
+  val UPDATE_USER_DETAILS = new Form("UPDATE_USER_DETAILS", routes.WallexController.updateAccount(), routes.javascript.WallexController.updateAccountForm)
 
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"

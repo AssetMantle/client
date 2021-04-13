@@ -3,7 +3,7 @@
 @import models.wallex.OrganizationWallexDetail
 @import scala.collection.immutable.ListMap
 @import models.wallex.WallexDocument
-@(organizationWallexDetail: Option[OrganizationWallexDetail],wallexDocument: Seq[WallexDocument])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexDocument: Seq[WallexDocument])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ORGANIZATION_WALLEX_ACCOUNT_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
     @if(organizationWallexDetail.isDefined) {

@@ -13,7 +13,11 @@
     @commonTextInfo(constants.View.ACCOUNT_ID, organizationWallexDetail.accountId)
 </div>
 
-@if(organizationWallexDetail.status != constants.External.APPROVED) {
+<div class="cmuk-text-center cmuk-margin-top">
+@commonFormButton(constants.Form.UPDATE_USER_DETAILS)
+</div>
+
+@if(organizationWallexDetail.status != constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING || organizationWallexDetail.status != constants.External.APPROVED) {
     <div class="cmuk-text-center cmuk-margin-top">
     @commonFormButton(constants.Form.WALLEX_GET_USER, 'class -> "cmuk-button buttonPrimary")
     </div>

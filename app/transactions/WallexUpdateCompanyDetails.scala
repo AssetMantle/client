@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.UpdateUserDetailsResponse
+import transactions.responses.WallexResponse.UpdateDetailsResponse
 import utilities.KeyStore
 
 import java.net.ConnectException
@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WallexUserDetailsUpdate @Inject() (
+class WallexUpdateCompanyDetails @Inject()(
     wsClient: WSClient,
     keyStore: KeyStore
 )(implicit
@@ -40,7 +40,7 @@ class WallexUserDetailsUpdate @Inject() (
   private val baseURL = configuration.get[String]("wallex.url")
 
   private val endpoint =
-    configuration.get[String]("wallex.endpoints.updateUserDetails")
+    configuration.get[String]("wallex.endpoints.updateCompany")
 
   private val url = baseURL + endpoint
 
@@ -48,12 +48,12 @@ class WallexUserDetailsUpdate @Inject() (
       request: Request,
       authToken: String,
       userId: String
-  ): Future[UpdateUserDetailsResponse] =
-    utilities.JSON.getResponseFromJson[UpdateUserDetailsResponse] {
+  ): Future[UpdateDetailsResponse] =
+    utilities.JSON.getResponseFromJson[UpdateDetailsResponse] {
       val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
       wsClient
-        .url(url.replace("userId", userId))
+        .url(url.replace("userId",userId))
         .withHttpHeaders(apiKeyHeader, authTokenHeader)
         .patch(Json.toJson(request))
     }
@@ -61,20 +61,15 @@ class WallexUserDetailsUpdate @Inject() (
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   case class Request(
-      mobileCountryCode: String,
-      mobileNumber: String,
-      gender: String,
-      countryOfBirth: String,
-      nationality: String,
-      countryOfResidence: String,
-      residentialAddress: String,
-      countryCode: String,
+      countryOfIncorporation: String,
+      countryOfOperations: String,
+      businessType: String,
+      companyAddress: String,
       postalCode: String,
-      dateOfBirth: String,
-      identificationType: String,
-      identificationNumber: String,
-      issueDate: String,
-      expiryDate: String
+      state: String,
+      city: String,
+      registrationNumber: String,
+      incorporationDate: String
   ) extends BaseRequest
 
   object Service {
@@ -82,9 +77,9 @@ class WallexUserDetailsUpdate @Inject() (
     def post(
         authToken: String,
         request: Request,
-        userId: String
-    ): Future[UpdateUserDetailsResponse] =
-      action(request, authToken, userId).recover {
+        userId:String
+    ): Future[UpdateDetailsResponse] =
+      action(request, authToken,userId).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

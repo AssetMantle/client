@@ -321,4 +321,27 @@ object WallexResponse {
     Json.reads[ScreeningResponse]
   implicit val screeningResponseWrites: OWrites[ScreeningResponse] =
     Json.writes[ScreeningResponse]
+
+  case class UpdateUserDetailsResponse(
+      firstName: String,
+      lastName: String,
+      mobileCountryCode: String,
+      mobileNumber: String,
+      gender: String,
+      countryOfBirth: String,
+      countryOfResidence: String,
+      countryCode: String,
+      postalCode: String,
+      dateOfBirth: String,
+      identificationType: String,
+      issueDate: String,
+      expiryDate: String
+  ) extends BaseResponse
+
+  implicit val updateUserDetailsResponseReads
+      : Reads[UpdateUserDetailsResponse] =
+    Json.reads[UpdateUserDetailsResponse]
+  implicit val updateUserDetailsResponseWrites
+      : OWrites[UpdateUserDetailsResponse] =
+    Json.writes[UpdateUserDetailsResponse]
 }

@@ -571,10 +571,12 @@ GET         /component/beneficiary/Details                                      
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp
 GET         /component/collection/account                                                         controllers.ComponentViewController.wallexCollectionAccountDetail
-GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccountForm
-POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccount
-GET         /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccountForm
-POST        /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccount
+GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccountForm
+POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccount
+GET         /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccountForm
+POST        /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccount
+GET         /master/wallex/user/update                                                            controllers.WallexController.updateAccountForm
+POST        /master/wallex/user/update                                                            controllers.WallexController.updateAccount
 GET         /master/wallex/user                                                                   controllers.WallexController.getWallexUserForm
 POST        /master/wallex/user                                                                   controllers.WallexController.getWallexUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
