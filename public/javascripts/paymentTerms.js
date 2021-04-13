@@ -18,9 +18,12 @@ function advancePercentageInput() {
         $('#tenure').val('').prop('disabled', true);
         $('#reference').val('').prop('disabled', true);
     } else {
-        $('#tentativeDate').prop('disabled', false);
-        $('#tenure').prop('disabled', false);
-        $('#reference').prop('disabled', false);
+        if ($('#tentativeDate').val()) {
+            $('#tenure').val('').prop('disabled', true);
+            $('#reference').val('').prop('disabled', true);
+        } else if($('#tenure').val() || $('#reference').val()) {
+            $('#tentativeDate').prop('disabled', true);
+        }
     }
 }
 
