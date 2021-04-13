@@ -59,7 +59,7 @@ class WallexGetUser @Inject() (
 
   object Service {
 
-    def post(userId: String, authToken: String): Future[GetUserResponse] =
+    def get(userId: String, authToken: String): Future[GetUserResponse] =
       action(userId, authToken).recover {
         case connectException: ConnectException =>
           logger.error(

@@ -11,7 +11,7 @@ import models._
 import models.common.Serializable._
 import models.master._
 import models.masterTransaction.{SendFiatRequest, _}
-import models.wallex.{OrgWallexBeneficiaryDetail, OrgWallexBeneficiaryDetails, OrganizationWallexDetail, OrganizationWallexDetails, WallexCollectionAccountDetail, WallexCollectionAccountDetails, WallexDocument, WallexDocuments}
+import models.wallex.{OrgWallexBeneficiaryDetail, OrgWallexBeneficiaryDetails, OrganizationWallexDetail, OrganizationWallexDetails, WalletTransferRequests, WallexCollectionAccountDetail, WallexCollectionAccountDetails, WallexDocument, WallexDocuments}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -77,7 +77,8 @@ class ComponentViewController @Inject()(
                                          organizationWallexDetails : OrganizationWallexDetails,
                                          orgWallexBeneficiaryDetails: OrgWallexBeneficiaryDetails,
                                          wallexDocuments: WallexDocuments,
-                                         collectionAccountDetails :WallexCollectionAccountDetails
+                                         collectionAccountDetails :WallexCollectionAccountDetails,
+                                         walletTransferRequests: WalletTransferRequests
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -2587,7 +2588,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  /*def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
@@ -2603,9 +2604,41 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }*/
+
+  def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val traderID = masterTraders.Service.tryGetID(loginState.username)
+
+      def getIssueFiatRequestList(traderID: String) = walletTransferRequests.Service.getAllByTraderID(traderID)
+
+      (for {
+        traderID <- traderID
+        issueFiatRequestList <- getIssueFiatRequestList(traderID)
+      } yield Ok(views.html.component.master.wallexTraderViewIssueFiatRequestList(issueFiatRequestList))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val orgID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getIssueFiatRequestList(orgID: String) = walletTransferRequests.Service.getAllByOrgID(orgID)
+
+      (for {
+        orgID <- orgID
+        issueFiatRequestList <- getIssueFiatRequestList(orgID)
+      } yield Ok(views.html.component.master.wallexOrgViewIssueFiatRequestList(issueFiatRequestList))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  /*def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
@@ -2624,9 +2657,24 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
-  }
+  }*/
 
   def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val zoneID = masterZones.Service.tryGetID(loginState.username)
+
+      def getIssueFiatRequestList(zoneID: String) = walletTransferRequests.Service.tryGetByZoneId(zoneID)
+
+      (for {
+        zoneID <- zoneID
+        issueFiatRequestList <- getIssueFiatRequestList(zoneID)
+      } yield Ok(views.html.component.master.wallexZoneViewIssueFiatRequestList(issueFiatRequestList))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+  /*def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
       val zoneID = masterZones.Service.tryGetID(loginState.username)
@@ -2649,7 +2697,7 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
-  }
+  }*/
 
   //Transaction View Cards
   def zoneViewSendFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -3158,6 +3206,22 @@ class ComponentViewController @Inject()(
         wallexDocuments <-getWallexKYCDocuments(loginState.username)
         orgWallexAccountDetailsDetail <- getOrgWallexAccountDetails(organizationID)
       } yield Ok(views.html.component.master.organizationWallexAccount(orgWallexAccountDetailsDetail,wallexDocuments))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def organizationViewWallexAccount : Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrgWallexAccountDetails(organizationID: String): Future[Option[OrganizationWallexDetail]] =
+        organizationWallexDetails.Service.get(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        orgWallexAccountDetailsDetail <- getOrgWallexAccountDetails(organizationID)
+      } yield Ok(views.html.component.master.organizationViewWallexAccount(orgWallexAccountDetailsDetail))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

@@ -108,6 +108,34 @@ class OrganizationWallexDetails @Inject() (
         .headOption
     )
 
+  private def updateStatusById(
+      wallexID: String,
+      status: String
+  ): Future[Int] =
+    db.run(
+        organizationWallexAccountDetailTable
+          .filter(_.wallexId === wallexID)
+          .map(_.status)
+          .update(status)
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
   private[models] class OrganizationWallexAccountDetailTable(tag: Tag)
       extends Table[OrganizationWallexDetail](
         tag,
@@ -214,6 +242,12 @@ class OrganizationWallexDetails @Inject() (
           accountType = accountType
         )
       )
+
+    def updateStatus(
+        wallexID: String,
+        status: String
+    ): Future[Int] =
+      updateStatusById(wallexID, status)
 
     def tryGet(orgId: String): Future[OrganizationWallexDetail] =
       findById(orgId).map { detail =>

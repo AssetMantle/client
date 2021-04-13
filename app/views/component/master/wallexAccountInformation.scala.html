@@ -4,9 +4,17 @@
 
 @(organizationWallexDetail: OrganizationWallexDetail)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonTextInfo(constants.View.WALLEX_ID, organizationWallexDetail.wallexId)
-@commonTextInfo(constants.View.STATUS, organizationWallexDetail.status)
-@commonTextInfo(constants.View.EMAIL_ADDRESS, organizationWallexDetail.email)
-@commonTextInfo(constants.View.FIRST_NAME, organizationWallexDetail.firstName)
-@commonTextInfo(constants.View.LAST_NAME, organizationWallexDetail.lastName)
-@commonTextInfo(constants.View.ACCOUNT_ID, organizationWallexDetail.accountId)
+<div>
+    @commonTextInfo(constants.View.WALLEX_ID, organizationWallexDetail.wallexId)
+    @commonTextInfo(constants.View.STATUS, organizationWallexDetail.status)
+    @commonTextInfo(constants.View.EMAIL_ADDRESS, organizationWallexDetail.email)
+    @commonTextInfo(constants.View.FIRST_NAME, organizationWallexDetail.firstName)
+    @commonTextInfo(constants.View.LAST_NAME, organizationWallexDetail.lastName)
+    @commonTextInfo(constants.View.ACCOUNT_ID, organizationWallexDetail.accountId)
+</div>
+
+@if(organizationWallexDetail.status != constants.External.APPROVED) {
+    <div class="cmuk-text-center cmuk-margin-top">
+    @commonFormButton(constants.Form.WALLEX_GET_USER, 'class -> "cmuk-button buttonPrimary")
+    </div>
+}

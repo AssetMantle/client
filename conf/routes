@@ -568,12 +568,15 @@ GET         /chat/replyToMessage                                                
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.organizationWallexAccount
 GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
 GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationBeneficiaryDetails
+GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp
 GET         /component/collection/account                                                         controllers.ComponentViewController.wallexCollectionAccountDetail
 GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccountForm
 POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationWallexAccount
 GET         /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccountForm
 POST        /master/wallex/user/update                                                            controllers.WallexController.updateWallexAccount
+GET         /master/wallex/user                                                                   controllers.WallexController.getWallexUserForm
+POST        /master/wallex/user                                                                   controllers.WallexController.getWallexUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
 GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocumentForm
 POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocument

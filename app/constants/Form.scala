@@ -186,6 +186,7 @@ object Form {
   val WALLEX_CREATE_COLLECTION_ACCOUNT = new Form("WALLEX_CREATE_COLLECTION_ACCOUNT", routes.WallexController.createCollectionAccounts(), routes.javascript.WallexController.createCollectionAccountsForm)
   val GET_COLLECTION_ACCOUNT_DETAILS = new Form("GET_COLLECTION_ACCOUNT_DETAILS", routes.WallexController.getCollectionAccounts(), routes.javascript.WallexController.getCollectionAccountsForm)
   val WALLEX_SUBMIT_DOCUMENT = new Form("WALLEX_SUBMIT_DOCUMENT", routes.WallexController.submitDocumentToWallex(), routes.javascript.WallexController.submitDocumentToWallexForm)
+  val WALLEX_GET_USER = new Form("WALLEX_GET_USER", routes.WallexController.getWallexUser(), routes.javascript.WallexController.getWallexUserForm)
 
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"

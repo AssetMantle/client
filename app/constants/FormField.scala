@@ -139,6 +139,7 @@ object FormField {
   val REGISTRATION_NUMBER = new StringFormField("REGISTRATION_NUMBER", 0,255)
   val DESCRIPTION = new StringFormField("DESCRIPTION", 0,255)
   val PURPOSE = new StringFormField("PURPOSE", 0,255)
+  val USER_ID = new StringFormField("USER_ID", 0,255)
 
 
   //SelectFormField

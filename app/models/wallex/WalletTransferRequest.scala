@@ -16,6 +16,7 @@ case class WalletTransferRequest(
     negotiationId: String,
     zoneId: String,
     orgId: String,
+    traderId: String,
     onBehalfOf: String,
     receiverAccountId: String,
     amount: Double,
@@ -100,7 +101,24 @@ class WalletTransferRequests @Inject() (
         .headOption
     )
 
-  private def findByZoneId(
+  private def findAllByOrgID(
+      orgID: String
+  ): Future[Seq[WalletTransferRequest]] =
+    db.run(
+      walletTranfserRequestTable
+        .filter(_.orgId === orgID)
+        .result
+    )
+  private def findAllByTraderID(
+      traderID: String
+  ): Future[Seq[WalletTransferRequest]] =
+    db.run(
+      walletTranfserRequestTable
+        .filter(_.traderId === traderID)
+        .result
+    )
+
+  private def findAllByZoneId(
       zoneId: String
   ): Future[Seq[WalletTransferRequest]] =
     db.run(
@@ -158,6 +176,7 @@ class WalletTransferRequests @Inject() (
         negotiationId,
         zoneId,
         orgId,
+        traderId,
         onBehalfOf,
         receiverAccountId,
         amount,
@@ -179,6 +198,8 @@ class WalletTransferRequests @Inject() (
     def zoneId = column[String]("zoneId", O.PrimaryKey)
 
     def orgId = column[String]("orgId")
+
+    def traderId = column[String]("traderId")
 
     def onBehalfOf = column[String]("onBehalfOf")
 
@@ -214,6 +235,7 @@ class WalletTransferRequests @Inject() (
         negotiationId: String,
         zoneId: String,
         orgId: String,
+        traderId: String,
         onBehalfOf: String,
         receiverAccountId: String,
         amount: Double,
@@ -228,6 +250,7 @@ class WalletTransferRequests @Inject() (
           negotiationId = negotiationId,
           zoneId = zoneId,
           orgId = orgId,
+          traderId = traderId,
           onBehalfOf = onBehalfOf,
           receiverAccountId = receiverAccountId,
           amount = amount,
@@ -243,6 +266,7 @@ class WalletTransferRequests @Inject() (
         negotiationId: String,
         zoneId: String,
         orgId: String,
+        traderId: String,
         onBehalfOf: String,
         receiverAccountId: String,
         amount: Double,
@@ -257,6 +281,7 @@ class WalletTransferRequests @Inject() (
           negotiationId = negotiationId,
           zoneId = zoneId,
           orgId = orgId,
+          traderId = traderId,
           onBehalfOf = onBehalfOf,
           receiverAccountId = receiverAccountId,
           amount = amount,
@@ -281,7 +306,7 @@ class WalletTransferRequests @Inject() (
     def tryGetByZoneId(
         zoneId: String
     ): Future[Seq[WalletTransferRequest]] =
-      findByZoneId(zoneId)
+      findAllByZoneId(zoneId)
 
     def tryGetPendingByZoneId(
         zoneId: String
@@ -293,6 +318,12 @@ class WalletTransferRequests @Inject() (
         status: String
     ): Future[Int] =
       updateStatusById(negotiationId, status)
+
+    def getAllByTraderID(traderID: String): Future[Seq[WalletTransferRequest]] =
+      findAllByTraderID(traderID)
+
+    def getAllByOrgID(orgID: String): Future[Seq[WalletTransferRequest]] =
+      findAllByOrgID(orgID)
   }
 
 }

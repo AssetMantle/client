@@ -413,6 +413,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationBeneficiaryDetails,
         routes.javascript.ComponentViewController.wallexBeneficiaryPaymentApp,
         routes.javascript.ComponentViewController.wallexCollectionAccountDetail,
+        routes.javascript.ComponentViewController.organizationViewWallexAccount,
         routes.javascript.WallexController.createOrganizationWallexAccountForm,
         routes.javascript.WallexController.createOrganizationWallexAccount,
         routes.javascript.WallexController.updateWallexAccountForm,
@@ -442,6 +443,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateWallexKYC,
         routes.javascript.WallexController.submitDocumentToWallexForm,
         routes.javascript.WallexController.submitDocumentToWallex,
+        routes.javascript.WallexController.getWallexUserForm,
+        routes.javascript.WallexController.getWallexUser,
 
         routes.javascript.WallexZoneController.zoneWalletTransferForm,
         routes.javascript.WallexZoneController.zoneCreateWalletTransfer,

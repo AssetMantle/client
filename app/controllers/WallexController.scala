@@ -8,7 +8,7 @@ import models.common.Serializable.{
   BeneficiaryPayment,
   ConversionDetails
 }
-import models.master.Negotiations
+import models.master.{Negotiations, Trader}
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{WallexSimplePaymentDetails, _}
 import models.{blockchainTransaction, master}
@@ -27,6 +27,7 @@ import transactions.responses.WallexResponse.{
   CreateDocumentResponse,
   CreatePaymentQuoteResponse,
   GetBalanceResponse,
+  GetUserResponse,
   PaymentFileUploadResponse
 }
 import utilities.{KeyStore, WallexAuthToken}
@@ -172,7 +173,7 @@ class WallexController @Inject() (
               }
 
               def wallexGetUser(wallexId: String, authToken: String) =
-                wallexGetUserRequest.Service.post(wallexId, authToken)
+                wallexGetUserRequest.Service.get(wallexId, authToken)
 
               def insertOrUpdate(
                   orgId: String,
@@ -251,15 +252,15 @@ class WallexController @Inject() (
                 )
               )
             },
-            filewile => {
+            file => {
               val wallexKYC = wallexDocuments.Service
-                .get(loginState.username, filewile.documentType)
+                .get(loginState.username, file.documentType)
               for {
                 wallexKYC <- wallexKYC
                 result <- withUsernameToken.PartialContent(
                   views.html.component.master.uploadOrUpdateWallexDocument(
                     wallexKYC,
-                    filewile.documentType
+                    file.documentType
                   )
                 )
               } yield result
@@ -1106,21 +1107,18 @@ class WallexController @Inject() (
             },
             wallexTransfer => {
 
-              val orgId =
+              val trader =
                 masterTraders.Service
-                  .getOrganizationIDByAccountID(loginState.username)
-              val zoneId =
-                masterTraders.Service
-                  .tryGetZoneIDByAccountID(loginState.username)
+                  .tryGetByAccountID(loginState.username)
 
               def insert(
-                  zoneId: String,
-                  orgId: String
+                  trader: Trader
               ) =
                 walletTransferRequest.Service.insertOrUpdate(
                   negotiationId = wallexTransfer.negotiationId,
-                  zoneId = zoneId,
-                  orgId = orgId,
+                  zoneId = trader.zoneID,
+                  orgId = trader.organizationID,
+                  traderId = trader.id,
                   onBehalfOf = wallexTransfer.onBehalfOf,
                   receiverAccountId = wallexTransfer.receiverAccountId,
                   amount = wallexTransfer.amount,
@@ -1132,9 +1130,8 @@ class WallexController @Inject() (
                 )
 
               (for {
-                orgId <- orgId
-                zoneId <- zoneId
-                _ <- insert(zoneId, orgId)
+                trader <- trader
+                _ <- insert(trader)
                 result <- withUsernameToken.Ok(
                   views.html.index(successes =
                     Seq(constants.Response.WALLEX_TRANSFER_REQUEST_SENT)
@@ -1376,6 +1373,100 @@ class WallexController @Inject() (
                   )
               }
 
+            }
+          )
+    }
+
+  def getWallexUserForm: Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        val organizationID =
+          masterTraders.Service.getOrganizationIDByAccountID(
+            loginState.username
+          )
+
+        def getOrganizationWallexAccountDetail(
+            organizationID: String
+        ): Future[OrganizationWallexDetail] =
+          orgWallexDetails.Service.tryGet(organizationID)
+
+        (for {
+          organizationID <- organizationID
+          organizationWallexAccountDetail <-
+            getOrganizationWallexAccountDetail(organizationID)
+          result <- withUsernameToken.Ok(
+            views.html.component.master.getUserWallexAccount(
+              views.companion.master.GetUserWallexAccount.form
+                .fill(
+                  views.companion.master.GetUserWallexAccount
+                    .Data(
+                      userID = organizationWallexAccountDetail.wallexId
+                    )
+                )
+            )
+          )
+        } yield result).recoverWith {
+          case _: BaseException =>
+            withUsernameToken.Ok(
+              views.html.component.master.getUserWallexAccount()
+            )
+        }
+
+    }
+
+  def getWallexUser: Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        views.companion.master.GetUserWallexAccount.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              Future(
+                BadRequest(
+                  views.html.component.master
+                    .getUserWallexAccount(formWithErrors)
+                )
+              )
+            },
+            orgWallexAccountDetailData => {
+              val orgID =
+                masterTraders.Service
+                  .getOrganizationIDByAccountID(loginState.username)
+
+              def wallexDetails(orgId: String) =
+                orgWallexDetails.Service.tryGet(orgId)
+
+              val authToken = wallexAuthToken.Service.getToken()
+
+              def wallexGetUser(wallexId: String, authToken: String) =
+                wallexGetUserRequest.Service.get(wallexId, authToken)
+
+              def updateStatus(
+                  wallexGetUserResponse: GetUserResponse
+              ): Future[Int] =
+                orgWallexDetails.Service.updateStatus(
+                  wallexID = wallexGetUserResponse.id,
+                  status = wallexGetUserResponse.status
+                )
+
+              (for {
+                orgID <- orgID
+                authToken <- authToken
+                wallexDetail <- wallexDetails(orgID)
+                wallexGetUserResponse <-
+                  wallexGetUser(wallexDetail.wallexId, authToken)
+                _ <- updateStatus(wallexGetUserResponse)
+                result <- withUsernameToken.Ok(
+                  views.html.profile(successes =
+                    Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
+                  )
+                )
+              } yield result).recover {
+                case baseException: BaseException =>
+                  InternalServerError(
+                    views.html.index(failures = Seq(baseException.failure))
+                  )
+              }
             }
           )
     }
