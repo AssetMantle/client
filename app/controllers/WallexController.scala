@@ -150,6 +150,10 @@ class WallexController @Inject() (
               )
             },
             orgWallexAccountDetailData => {
+
+              def getZoneID(orgID: String) =
+                masterOrganizations.Service.tryGetZoneID(orgID)
+
               val orgId =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
@@ -176,6 +180,7 @@ class WallexController @Inject() (
                 wallexGetUserRequest.Service.get(wallexId, authToken)
 
               def insertOrUpdate(
+                  zoneID: String,
                   orgId: String,
                   email: String,
                   firstName: String,
@@ -187,6 +192,7 @@ class WallexController @Inject() (
                   status: String
               ): Future[Int] =
                 orgWallexDetails.Service.insertOrUpdate(
+                  zoneID = zoneID,
                   orgId = orgId,
                   email = email,
                   firstName = firstName,
@@ -200,12 +206,13 @@ class WallexController @Inject() (
 
               (for {
                 orgId <- orgId
-                org <- organization(orgId)
+                zoneID <- getZoneID(orgId)
                 authToken <- authToken
                 wallexUserSignUp <- wallexUserSignUp(authToken)
                 wallexGetUser <-
                   wallexGetUser(wallexUserSignUp.userId, authToken)
                 _ <- insertOrUpdate(
+                  zoneID,
                   orgId,
                   wallexUserSignUp.email,
                   wallexUserSignUp.firstName,
@@ -364,6 +371,15 @@ class WallexController @Inject() (
                 )
               }
 
+              def updateStatus(
+                  wallexID: String
+              ): Future[Int] =
+                orgWallexDetails.Service.updateStatus(
+                  wallexID = wallexID,
+                  status =
+                    constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING
+                )
+
               (for {
                 orgId <- orgId
                 authToken <- authToken
@@ -382,6 +398,7 @@ class WallexController @Inject() (
                   wallexDetails.wallexId,
                   createDocument
                 )
+                _ <- updateStatus(wallexDetails.wallexId)
                 result <- withUsernameToken.Ok(
                   views.html.profile(successes =
                     Seq(constants.Response.WALLEX_DOCUMENT_SUBMITTED)
@@ -1172,9 +1189,19 @@ class WallexController @Inject() (
             },
             updateDetails => {
 
+              val organizationID =
+                masterTraders.Service.getOrganizationIDByAccountID(
+                  loginState.username
+                )
+
+              def getOrganizationWallexAccountDetail(
+                  organizationID: String
+              ): Future[OrganizationWallexDetail] =
+                orgWallexDetails.Service.tryGet(organizationID)
+
               val authToken = wallexAuthToken.Service.getToken()
 
-              def wallexUserUpdate(authToken: String) = {
+              def wallexUserUpdate(authToken: String, wallexID: String) = {
                 userDetailsUpdate.Service.post(
                   authToken,
                   userDetailsUpdate.Request(
@@ -1191,13 +1218,18 @@ class WallexController @Inject() (
                       new SimpleDateFormat(constants.External.DATE_FORMAT)
                         .format(updateDetails.incorporationDate)
                     }
-                  )
+                  ),
+                  userId = wallexID
                 )
               }
 
               (for {
+                organizationID <- organizationID
+                wallexDetails <-
+                  getOrganizationWallexAccountDetail(organizationID)
                 authToken <- authToken
-                wallexDetailsUpdate <- wallexUserUpdate(authToken)
+                wallexDetailsUpdate <-
+                  wallexUserUpdate(authToken, wallexDetails.wallexId)
                 result <- withUsernameToken.Ok(
                   views.html.index(successes =
                     Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)

@@ -9,10 +9,20 @@ import models.wallex.{WallexSimplePaymentDetails, _}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{
+  AbstractController,
+  Action,
+  AnyContent,
+  MessagesControllerComponents
+}
 import play.api.{Configuration, Logger}
 import transactions._
-import transactions.responses.WallexResponse.{CreateCollectionResponse, PaymentFileUploadResponse, WalletToWalletXferResponse}
+import transactions.responses.WallexResponse.{
+  CreateCollectionResponse,
+  PaymentFileUploadResponse,
+  ScreeningResponse,
+  WalletToWalletXferResponse
+}
 import utilities.{KeyStore, MicroNumber, WallexAuthToken}
 
 import java.io.File
@@ -61,7 +71,8 @@ class WallexZoneController @Inject() (
     walletTransferRequests: WalletTransferRequests,
     withZoneLoginAction: WithZoneLoginAction,
     masterZones: master.Zones,
-    blockchainAccounts: blockchain.Accounts
+    blockchainAccounts: blockchain.Accounts,
+    wallexUserScreening: WallexUserScreening
 )(implicit
     executionContext: ExecutionContext,
     configuration: Configuration,
@@ -190,7 +201,10 @@ class WallexZoneController @Inject() (
               val negotiation =
                 negotiations.Service.tryGet(wallexTransfer.negotiationId)
               val negotiationFile = negotiationFiles.Service
-                .tryGet(wallexTransfer.negotiationId, constants.File.Negotiation.INVOICE)
+                .tryGet(
+                  wallexTransfer.negotiationId,
+                  constants.File.Negotiation.INVOICE
+                )
 
               def getWallexDetails(accountId: String) =
                 orgWallexDetails.Service.tryGetByAccountId(accountId)
@@ -219,7 +233,8 @@ class WallexZoneController @Inject() (
                   uploadURL: String,
                   negotiationFile: NegotiationFile
               ) = {
-                val path = fileResourceManager.getNegotiationFilePath(constants.File.Negotiation.INVOICE)
+                val path = fileResourceManager
+                  .getNegotiationFilePath(constants.File.Negotiation.INVOICE)
                 val fetchFile: File = utilities.FileOperations
                   .fetchFile(path, negotiationFile.fileName)
                 val fileArray =
@@ -274,9 +289,12 @@ class WallexZoneController @Inject() (
               def updateStatus(
                   wallexTransferRes: WalletToWalletXferResponse
               ) = {
-                val status = if (wallexTransferRes.status == constants.Status.SendWalletTransfer.COMPLETED) {
-                  constants.Status.SendWalletTransfer.SENT
-                } else { constants.Status.SendWalletTransfer.ZONE_APPROVED }
+                val status =
+                  if (
+                    wallexTransferRes.status == constants.Status.SendWalletTransfer.COMPLETED
+                  ) {
+                    constants.Status.SendWalletTransfer.SENT
+                  } else { constants.Status.SendWalletTransfer.ZONE_APPROVED }
 
                 walletTransferRequests.Service
                   .updateZoneApprovalStatus(
@@ -433,4 +451,104 @@ class WallexZoneController @Inject() (
     }
 
   }
+
+  def zoneViewWallexKYCScreeningList(): Action[AnyContent] =
+    withZoneLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        val zoneID = masterZones.Service.tryGetID(loginState.username)
+        def pendingScreeningRequests(
+            zoneID: String
+        ): Future[Seq[OrganizationWallexDetail]] =
+          orgWallexDetails.Service.tryGetPendingByZoneID(zoneID)
+
+        (for {
+          zoneID <- zoneID
+          pendingKYCRequests <- pendingScreeningRequests(zoneID)
+        } yield Ok(
+          views.html.component.master
+            .zoneViewPendingWallexKYCRequestList(pendingKYCRequests)
+        )).recover {
+          case baseException: BaseException =>
+            InternalServerError(baseException.failure.message)
+        }
+    }
+
+  def sendForScreeningForm(wallexID: String): Action[AnyContent] =
+    withZoneLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        (for {
+          result <- withUsernameToken.Ok(
+            views.html.component.master.sendUserDetailsForScreening(
+              views.companion.master.SendUserDetailsForScreening.form
+                .fill(
+                  views.companion.master.SendUserDetailsForScreening
+                    .Data(
+                      userID = wallexID
+                    )
+                )
+            )
+          )
+        } yield result).recoverWith {
+          case _: BaseException =>
+            withUsernameToken.Ok(
+              views.html.component.master.sendUserDetailsForScreening()
+            )
+        }
+
+    }
+
+  def sendForScreening: Action[AnyContent] =
+    withZoneLoginAction.authenticated {
+      implicit loginState => implicit request =>
+        views.companion.master.SendUserDetailsForScreening.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              Future(
+                BadRequest(
+                  views.html.component.master
+                    .sendUserDetailsForScreening(formWithErrors)
+                )
+              )
+            },
+            orgWallexAccountDetailData => {
+
+              val authToken = wallexAuthToken.Service.getToken()
+
+              def sendForScreening(wallexId: String, authToken: String) =
+                wallexUserScreening.Service
+                  .post(
+                    wallexId,
+                    authToken,
+                    wallexUserScreening.Request(userId = wallexId)
+                  )
+
+              def updateStatus(
+                  screeningResponse: ScreeningResponse
+              ): Future[Int] =
+                orgWallexDetails.Service.updateStatus(
+                  wallexID = screeningResponse.id,
+                  status = screeningResponse.status
+                )
+
+              (for {
+                authToken <- authToken
+                screeningResponse <-
+                  sendForScreening(orgWallexAccountDetailData.userID, authToken)
+                _ <- updateStatus(screeningResponse)
+                result <- withUsernameToken.Ok(
+                  views.html.profile(successes =
+                    Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
+                  )
+                )
+              } yield result).recover {
+                case baseException: BaseException =>
+                  InternalServerError(
+                    views.html.index(failures = Seq(baseException.failure))
+                  )
+              }
+            }
+          )
+    }
+
 }

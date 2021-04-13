@@ -311,4 +311,14 @@ object WallexResponse {
     Json.reads[GetBalanceResponse]
   implicit val walletBalanceWrites: OWrites[GetBalanceResponse] =
     Json.writes[GetBalanceResponse]
+
+  case class ScreeningResponse(
+      id: String,
+      status: String
+  ) extends BaseResponse
+
+  implicit val screeningResponseReads: Reads[ScreeningResponse] =
+    Json.reads[ScreeningResponse]
+  implicit val screeningResponseWrites: OWrites[ScreeningResponse] =
+    Json.writes[ScreeningResponse]
 }

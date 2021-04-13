@@ -605,6 +605,9 @@ POST        /wallex/document/submit                                             
 GET         /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneWalletTransferForm(negotiationId: String)
 POST        /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneCreateWalletTransfer
 GET         /wallex/zone/view/transferRequest                                                     controllers.WallexZoneController.zoneViewWalletTransferRequestList
+GET         /wallex/zone/view/screeningList                                                       controllers.WallexZoneController.zoneViewWallexKYCScreeningList
+GET         /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreeningForm(wallexID: String)
+POST        /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreening
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB

@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class OrganizationWallexDetail(
+    zoneID: String,
     orgId: String,
     wallexId: String,
     email: String,
@@ -108,6 +109,16 @@ class OrganizationWallexDetails @Inject() (
         .headOption
     )
 
+  private def findByZoneID(
+      zoneID: String
+  ): Future[Seq[OrganizationWallexDetail]] =
+    db.run(
+      organizationWallexAccountDetailTable
+        .filter(_.zoneID === zoneID)
+        .filter(_.status === constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING)
+        .result
+    )
+
   private def updateStatusById(
       wallexID: String,
       status: String
@@ -144,6 +155,7 @@ class OrganizationWallexDetails @Inject() (
 
     override def * =
       (
+        zoneID,
         orgId,
         wallexId,
         email,
@@ -160,6 +172,8 @@ class OrganizationWallexDetails @Inject() (
         updatedOn.?,
         updatedOnTimeZone.?
       ) <> (OrganizationWallexDetail.tupled, OrganizationWallexDetail.unapply)
+
+    def zoneID = column[String]("zoneID", O.PrimaryKey)
 
     def orgId = column[String]("orgId", O.PrimaryKey)
 
@@ -194,6 +208,7 @@ class OrganizationWallexDetails @Inject() (
 
   object Service {
     def create(
+        zoneID: String,
         orgId: String,
         wallexId: String,
         email: String,
@@ -206,6 +221,7 @@ class OrganizationWallexDetails @Inject() (
     ): Future[String] =
       add(
         OrganizationWallexDetail(
+          zoneID = zoneID,
           orgId = orgId,
           wallexId = wallexId,
           email = email,
@@ -219,6 +235,7 @@ class OrganizationWallexDetails @Inject() (
       )
 
     def insertOrUpdate(
+        zoneID: String,
         orgId: String,
         wallexId: String,
         email: String,
@@ -231,6 +248,7 @@ class OrganizationWallexDetails @Inject() (
     ): Future[Int] =
       upsert(
         OrganizationWallexDetail(
+          zoneID = zoneID,
           orgId = orgId,
           wallexId = wallexId,
           email = email,
@@ -265,6 +283,9 @@ class OrganizationWallexDetails @Inject() (
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
+
+    def tryGetPendingByZoneID(zoneID: String): Future[Seq[OrganizationWallexDetail]] =
+      findByZoneID(zoneID)
   }
 
 }

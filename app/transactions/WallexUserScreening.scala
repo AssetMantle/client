@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.UpdateDetailsResponse
+import transactions.responses.WallexResponse.ScreeningResponse
 import utilities.KeyStore
 
 import java.net.ConnectException
@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WallexUserDetailsUpdate @Inject() (
+class WallexUserScreening @Inject() (
     wsClient: WSClient,
     keyStore: KeyStore
 )(implicit
@@ -22,7 +22,7 @@ class WallexUserDetailsUpdate @Inject() (
 ) {
 
   private implicit val module: String =
-    constants.Module.TRANSACTIONS_WALLEX_DETAILS_UPDATE
+    constants.Module.TRANSACTIONS_WALLEX_USER_SCREENING
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -40,46 +40,38 @@ class WallexUserDetailsUpdate @Inject() (
   private val baseURL = configuration.get[String]("wallex.url")
 
   private val endpoint =
-    configuration.get[String]("wallex.endpoints.updateCompany")
+    configuration.get[String]("wallex.endpoints.kycScreening")
 
   private val url = baseURL + endpoint
 
   private def action(
-      request: Request,
+      userID: String,
       authToken: String,
-      userId: String
-  ): Future[UpdateDetailsResponse] =
-    utilities.JSON.getResponseFromJson[UpdateDetailsResponse] {
+      request: Request
+  ): Future[ScreeningResponse] =
+    utilities.JSON.getResponseFromJson[ScreeningResponse] {
       val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
       wsClient
-        .url(url.replace("userId",userId))
+        .url(url.replace("userId", userID))
         .withHttpHeaders(apiKeyHeader, authTokenHeader)
-        .patch(Json.toJson(request))
+        .post(Json.toJson(request))
     }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   case class Request(
-      countryOfIncorporation: String,
-      countryOfOperations: String,
-      businessType: String,
-      companyAddress: String,
-      postalCode: String,
-      state: String,
-      city: String,
-      registrationNumber: String,
-      incorporationDate: String
+      userId: String
   ) extends BaseRequest
 
   object Service {
 
     def post(
+        userID: String,
         authToken: String,
-        request: Request,
-        userId:String
-    ): Future[UpdateDetailsResponse] =
-      action(request, authToken,userId).recover {
+        request: Request
+    ): Future[ScreeningResponse] =
+      action(userID, authToken,request).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

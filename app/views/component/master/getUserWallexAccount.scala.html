@@ -4,5 +4,5 @@
 
 @(wallexUser: Form[GetUserWallexAccount.Data] = GetUserWallexAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_GET_USER, wallexUser) {
-    @commonInputText(wallexUser, constants.FormField.USER_ID)
+    @commonInputText(wallexUser, constants.FormField.USER_ID , 'readonly -> true)
 }
