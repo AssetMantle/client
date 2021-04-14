@@ -5,10 +5,10 @@ import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.TransactionMessageResponse
-import blockchain.messages.Messages.msgApply
+import blockchainTx.messages.Messages.msgApply
 import transactions.Abstract.BaseResponse
-import blockchain.Abstract.{BlockchainStdMessage => BCTransaction}
-import blockchain.common.Coin
+import blockchainTx.Abstract.{BlockchainStdMessage => BCTransaction}
+import blockchainTx.common.Coin
 
 object TransactionResponse {
 

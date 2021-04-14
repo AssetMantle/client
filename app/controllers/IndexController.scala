@@ -1,7 +1,5 @@
 package controllers
 
-import java.util.Base64
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -13,7 +11,6 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import services.Startup
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{Json, OWrites}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

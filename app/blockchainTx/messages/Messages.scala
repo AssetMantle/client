@@ -1,7 +1,7 @@
-package blockchain.messages
+package blockchainTx.messages
 
-import blockchain.Abstract.BlockchainStdMessage
-import blockchain.common.{Coin, Height, ID, MetaFact, MetaProperties, Properties}
+import blockchainTx.Abstract.BlockchainStdMessage
+import blockchainTx.common.{Coin, Height, ID, MetaFact, MetaProperties, Properties}
 import exceptions.BaseException
 import models.Abstract.TransactionMessage
 import models.common.{Serializable, TransactionMessages}

@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.Base64
+
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -67,7 +69,7 @@ class AccountController @Inject()(
         signUpData => {
           val mnemonics = utilities.Bip39.getMnemonics()
 
-          def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
+          def addLogin(mnemonics: Seq[String]): Future[String] = masterAccounts.Service.addLogin(username = signUpData.username, password = signUpData.password, privateKeyEncrypted = Base64.getEncoder.encodeToString(utilities.Crypto.encrypt(utilities.KeyGenerator.getKey(mnemonics).privateKey, signUpData.password)), mnemonics = mnemonics.take(mnemonics.length - constants.Blockchain.MnemonicShown), language = request.lang)
 
           (for {
             _ <- addLogin(mnemonics)
@@ -164,7 +166,7 @@ class AccountController @Inject()(
               val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey, coins = Seq.empty, accountNumber = "", sequence = ""))
               val createMasterAccount = {
                 val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
-                masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
+                masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, privateKeyEncrypted = Base64.getEncoder.encodeToString(utilities.Crypto.encrypt(utilities.KeyGenerator.getKey(mnemonicList).privateKey, importWalletData.password)), language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
               }
 
               def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(addKeyResponse.result.keyOutput.address)

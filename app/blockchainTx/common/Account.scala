@@ -1,4 +1,4 @@
-package blockchain.common
+package blockchainTx.common
 
 import play.api.Logger
 import play.api.libs.json._

@@ -1,6 +1,6 @@
 package queries.responses.blockchain
 
-import blockchain.common.Coin
+import blockchainTx.common.Coin
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
 

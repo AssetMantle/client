@@ -12,7 +12,7 @@ import play.api.libs.json._
 import utilities.MicroNumber
 import java.sql.Date
 
-import blockchain.common.Account.SinglePublicKey
+import blockchainTx.common.Account.SinglePublicKey
 
 object Serializable {
 

@@ -1,4 +1,4 @@
-package blockchain.common
+package blockchainTx.common
 
 import models.common.Serializable
 import play.api.libs.json.{Json, OWrites, Reads}

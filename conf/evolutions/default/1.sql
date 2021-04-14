@@ -1010,17 +1010,18 @@ CREATE TABLE IF NOT EXISTS KEY_BASE."ValidatorAccount"
 
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
-    "id"                VARCHAR NOT NULL,
-    "secretHash"        VARCHAR,
-    "language"          VARCHAR,
-    "userType"          VARCHAR NOT NULL,
-    "partialMnemonic"   VARCHAR,
-    "createdBy"         VARCHAR,
-    "createdOn"         TIMESTAMP,
-    "createdOnTimeZone" VARCHAR,
-    "updatedBy"         VARCHAR,
-    "updatedOn"         TIMESTAMP,
-    "updatedOnTimeZone" VARCHAR,
+    "id"                    VARCHAR NOT NULL,
+    "secretHash"            VARCHAR,
+    "privateKeyEncrypted"   VARCHAR,
+    "language"              VARCHAR,
+    "userType"              VARCHAR NOT NULL,
+    "partialMnemonic"       VARCHAR,
+    "createdBy"             VARCHAR,
+    "createdOn"             TIMESTAMP,
+    "createdOnTimeZone"     VARCHAR,
+    "updatedBy"             VARCHAR,
+    "updatedOn"             TIMESTAMP,
+    "updatedOnTimeZone"     VARCHAR,
     PRIMARY KEY ("id")
 );
 

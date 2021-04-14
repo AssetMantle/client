@@ -1,7 +1,9 @@
 package controllers
 
 import java.nio.file.Files
+import java.util.Base64
 
+import blockchainTx.messages.Messages.SendCoin
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -10,11 +12,15 @@ import models.common.Serializable._
 import models.master._
 import models.masterTransaction.ZoneInvitation
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import org.bitcoinj.core.ECKey
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Logger}
-import utilities.KeyStore
+import transactions.request.Serializable.{Message, SignMeta, Tx}
+import utilities.{KeyStore, MicroNumber}
 import views.companion.master.FileUpload
+import blockchainTx.common.Coin
+import queries.blockchain.GetAccount
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +34,9 @@ class AddZoneController @Inject()(
                                    masterZoneKYCs: master.ZoneKYCs,
                                    blockchainAccounts: blockchain.Accounts,
                                    transactionsIdentityIssue: transactions.blockchain.IdentityIssue,
+                                   transactionsBroadcast: transactions.blockchain.Broadcast,
                                    blockchainTransactionIdentityIssues: blockchainTransaction.IdentityIssues,
+                                   blockchainTransactionSendCoins: blockchainTransaction.SendCoins,
                                    masterZones: master.Zones,
                                    masterEmails: master.Emails,
                                    masterIdentities: master.Identities,
@@ -36,6 +44,7 @@ class AddZoneController @Inject()(
                                    masterClassifications: master.Classifications,
                                    masterMobiles: master.Mobiles,
                                    masterAccounts: master.Accounts,
+                                   getAccount: GetAccount,
                                    withUserLoginAction: WithUserLoginAction,
                                    transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
                                    blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
@@ -44,6 +53,7 @@ class AddZoneController @Inject()(
                                    masterTransactionZoneInvitations: masterTransaction.ZoneInvitations,
                                    withoutLoginAction: WithoutLoginAction,
                                    withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   withLoginActionAsync: WithLoginActionAsync,
                                    keyStore: KeyStore
                                  )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -54,6 +64,10 @@ class AddZoneController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
 
   private val comdexURL: String = configuration.get[String]("webApp.url")
+
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
+
+  private val chainID = configuration.get[String]("blockchain.chainID")
 
   def inviteZoneForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
@@ -351,30 +365,49 @@ class AddZoneController @Inject()(
           def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
             if (allKYCFilesVerified) {
               val zone = masterZones.Service.tryGet(verifyZoneData.zoneID)
+              val mainAccount = masterAccounts.Service.tryGet(loginState.username)
+              val mainBlockchainAccount = getAccount.Service.get(loginState.address)
 
-              def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
+              def zoneAccount(accountID: String): Future[models.blockchain.Account] = blockchainAccounts.Service.tryGetByUsername(accountID)
 
-              def issueIdentityTransaction(zoneAccountAddress: String, zone: Zone) = {
+              def sendTransactions(mainAccount: Account, mainBlockchainAccount: queries.responses.blockchain.AccountResponse.Response, zoneAccount: models.blockchain.Account, zone: Zone) = {
                 val immutables = Seq(constants.Property.NAME.withValue(zone.name))
                 val immutableMetas = Seq(constants.Property.USER_TYPE.withValue(constants.User.ZONE))
                 val mutableMetas = Seq(constants.Property.CURRENCY.withValue(zone.currency))
                 val mutables = Seq(constants.Property.ADDRESS.withValue(zone.address.toString.filter(_.isLetter)))
 
-                transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
-                  entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                val sendCoin = transaction.process[blockchainTransaction.SendCoin, transactionsBroadcast.Request](
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccount.address, amount = Seq(models.common.Serializable.Coin(stakingDenom, constants.Blockchain.DefaultZoneFaucetAmount)), gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                  request = transactionsBroadcast.Request(utilities.SignTx.sign(Tx(Seq(Message(constants.Blockchain.TransactionMessage.SEND_COIN, SendCoin(from_address = loginState.address, to_address = zoneAccount.address, Seq(Coin(stakingDenom, constants.Blockchain.DefaultZoneFaucetAmount))))), Fee(Seq(), verifyZoneData.gas.toMicroString)), SignMeta(mainBlockchainAccount.result.value.accountNumber, chainID, mainBlockchainAccount.result.value.sequence), ECKey.fromPrivate(utilities.Crypto.decrypt(Base64.getDecoder.decode(mainAccount.privateKeyEncrypted.getOrElse(throw new BaseException(constants.Response.FAILURE))), verifyZoneData.password))), transactionMode),
+                  action = transactionsBroadcast.Service.post,
+                  onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash)
+
+
+                def issueIdentity = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
+                  entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccount.address, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
-                  request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyZoneData.gas), fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccountAddress, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
+                  request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = verifyZoneData.gas), fromID = constants.Blockchain.mainIdentityID, classificationID = constants.Blockchain.Classification.ZONE, to = zoneAccount.address, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                   action = transactionsIdentityIssue.Service.post,
                   onSuccess = blockchainTransactionIdentityIssues.Utility.onSuccess,
                   onFailure = blockchainTransactionIdentityIssues.Utility.onFailure,
                   updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
+
+                for {
+                  _ <- sendCoin
+                  _ <- issueIdentity
+                } yield ()
               }
 
               for {
                 zone <- zone
-                zoneAccountAddress <- zoneAccountAddress(zone.accountID)
-                _ <- issueIdentityTransaction(zoneAccountAddress, zone)
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
+                mainAccount <- mainAccount
+                mainBlockchainAccount <- mainBlockchainAccount
+                zoneAccount <- zoneAccount(zone.accountID)
+                _ <- sendTransactions(mainAccount, mainBlockchainAccount, zoneAccount, zone)
+                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.FIAT_SENT)))
                 _ <- utilitiesNotification.send(zone.accountID, constants.Notification.ADD_ZONE_CONFIRMED, zone.accountID)()
               } yield {
                 result
