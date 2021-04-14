@@ -212,8 +212,8 @@ class WallexZoneController @Inject() (
                 masterZones.Service
                   .tryGetID(loginState.username)
 
-              def getTraderId(traderId: String) =
-                masterTraders.Service.tryGetAccountId(traderId)
+              def getTraderID(traderID: String) =
+                masterTraders.Service.tryGetAccountId(traderID)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -332,7 +332,7 @@ class WallexZoneController @Inject() (
                 zoneID <- zoneID
                 zoneAccountID <- zoneAccountID(zoneID)
                 zoneAddress <- zoneAddress(zoneAccountID)
-                traderAccountId <- getTraderId(negotiationDetail.buyerTraderID)
+                traderAccountId <- getTraderID(negotiationDetail.buyerTraderID)
                 traderAddress <- traderAddress(traderAccountId)
                 authToken <- authToken
                 wallexDetails <- getWallexDetails(wallexTransfer.onBehalfOf)

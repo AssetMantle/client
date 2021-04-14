@@ -1663,7 +1663,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexDocument"
 CREATE TABLE IF NOT EXISTS WALLEX."WallexBeneficiaryDetail"
 (
     "organizationID"    VARCHAR NOT NULL,
-    "traderId"          VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
     "wallexId"          VARCHAR NOT NULL,
     "beneficiaryId"     VARCHAR NOT NULL,
     "address"           VARCHAR NOT NULL,
@@ -1739,7 +1739,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
     "zoneID"            varchar          not null,
     "organizationID"             varchar          not null,
     "status"              varchar,
-    "traderId"           varchar not null,
+    "traderID"           varchar not null,
     "createdBy"         varchar,
     "createdOn"         timestamp,
     "createdOnTimeZone" varchar,

@@ -16,7 +16,7 @@ case class WalletTransferRequest(
     negotiationId: String,
     zoneID: String,
     organizationID: String,
-    traderId: String,
+    traderID: String,
     onBehalfOf: String,
     receiverAccountId: String,
     amount: Double,
@@ -114,7 +114,7 @@ class WalletTransferRequests @Inject() (
   ): Future[Seq[WalletTransferRequest]] =
     db.run(
       walletTranfserRequestTable
-        .filter(_.traderId === traderID)
+        .filter(_.traderID === traderID)
         .result
     )
 
@@ -176,7 +176,7 @@ class WalletTransferRequests @Inject() (
         negotiationId,
         zoneID,
         organizationID,
-        traderId,
+        traderID,
         onBehalfOf,
         receiverAccountId,
         amount,
@@ -199,7 +199,7 @@ class WalletTransferRequests @Inject() (
 
     def organizationID = column[String]("organizationID")
 
-    def traderId = column[String]("traderId")
+    def traderID = column[String]("traderID")
 
     def onBehalfOf = column[String]("onBehalfOf")
 
@@ -235,7 +235,7 @@ class WalletTransferRequests @Inject() (
         negotiationId: String,
         zoneID: String,
         organizationID: String,
-        traderId: String,
+        traderID: String,
         onBehalfOf: String,
         receiverAccountId: String,
         amount: Double,
@@ -250,7 +250,7 @@ class WalletTransferRequests @Inject() (
           negotiationId = negotiationId,
           zoneID = zoneID,
           organizationID = organizationID,
-          traderId = traderId,
+          traderID = traderID,
           onBehalfOf = onBehalfOf,
           receiverAccountId = receiverAccountId,
           amount = amount,
@@ -266,7 +266,7 @@ class WalletTransferRequests @Inject() (
         negotiationId: String,
         zoneID: String,
         organizationID: String,
-        traderId: String,
+        traderID: String,
         onBehalfOf: String,
         receiverAccountId: String,
         amount: Double,
@@ -281,7 +281,7 @@ class WalletTransferRequests @Inject() (
           negotiationId = negotiationId,
           zoneID = zoneID,
           organizationID = organizationID,
-          traderId = traderId,
+          traderID = traderID,
           onBehalfOf = onBehalfOf,
           receiverAccountId = receiverAccountId,
           amount = amount,

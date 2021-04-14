@@ -1128,7 +1128,7 @@ class WallexController @Inject() (
                   negotiationId = wallexTransfer.negotiationId,
                   zoneID = trader.zoneID,
                   organizationID = trader.organizationID,
-                  traderId = trader.id,
+                  traderID = trader.id,
                   onBehalfOf = wallexTransfer.onBehalfOf,
                   receiverAccountId = wallexTransfer.receiverAccountId,
                   amount = wallexTransfer.amount,
