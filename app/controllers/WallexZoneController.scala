@@ -2,27 +2,17 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, WSException}
 import models.master.{AccountKYCs, Negotiations}
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{WallexSimplePaymentDetails, _}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
-import play.api.mvc.{
-  AbstractController,
-  Action,
-  AnyContent,
-  MessagesControllerComponents
-}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import transactions._
-import transactions.responses.WallexResponse.{
-  CreateCollectionResponse,
-  PaymentFileUploadResponse,
-  ScreeningResponse,
-  WalletToWalletXferResponse
-}
+import transactions.responses.WallexResponse.{CreateCollectionResponse, PaymentFileUploadResponse, ScreeningResponse, WalletToWalletXferResponse}
 import utilities.{KeyStore, MicroNumber, WallexAuthToken}
 
 import java.io.File
@@ -87,65 +77,6 @@ class WallexZoneController @Inject() (
   private val transactionMode =
     configuration.get[String]("blockchain.transaction.mode")
 
-  def sendForKycScreeningForm(accountId: String): Action[AnyContent] =
-    withoutLoginAction { implicit request =>
-      Ok(
-        views.html.component.master.getWallexCollectionAccount(
-          views.companion.master.GetWallexCollectionAccount.form.fill(
-            views.companion.master.GetWallexCollectionAccount
-              .Data(accountId = accountId)
-          )
-        )
-      )
-    }
-
-  def sendForKycScreening(): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState => implicit request =>
-        views.companion.master.GetWallexCollectionAccount.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => {
-              Future(
-                BadRequest(
-                  views.html.component.master
-                    .getWallexCollectionAccount(
-                      formWithErrors
-                    )
-                )
-              )
-            },
-            collectionAccount => {
-
-              val authToken = wallexAuthToken.Service.getToken()
-
-              def getCollectionAccount(authToken: String, accountId: String)
-                  : Future[CreateCollectionResponse] =
-                wallexGetCollectionAccount.Service.get(
-                  authToken,
-                  accountId
-                )
-
-              (for {
-                authToken <- authToken
-                collectionResponse <-
-                  getCollectionAccount(authToken, collectionAccount.accountId)
-                result <- withUsernameToken.PartialContent(
-                  views.html.component.master
-                    .getWallexCollectionAccountResponse(
-                      collectionResponse
-                    )
-                )
-              } yield result).recover {
-                case baseException: BaseException =>
-                  InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
-                  )
-              }
-
-            }
-          )
-    }
 
   def zoneWalletTransferForm(negotiationId: String): Action[AnyContent] =
     withZoneLoginAction.authenticated {
@@ -372,6 +303,13 @@ class WallexZoneController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
+                  )
               }
             }
           )
@@ -545,6 +483,10 @@ class WallexZoneController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(errorMessage = wsException.errorMessage,failures = Seq(wsException.failure))
                   )
               }
             }

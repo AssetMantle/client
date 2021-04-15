@@ -1,16 +1,22 @@
 package transactions
 
-import exceptions.BaseException
-import play.api.libs.json.{Json, OWrites}
+import com.fasterxml.jackson.core.JsonParseException
+import exceptions.{BaseException, WSException}
+import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.UpdateUserDetailsResponse
+import transactions.responses.WallexResponse.{
+  UpdateUserDetailsResponse,
+  WallexErrorResponse
+}
 import utilities.KeyStore
 
+import java.io.IOException
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 @Singleton
 class WallexUserDetailsUpdate @Inject() (
@@ -48,15 +54,32 @@ class WallexUserDetailsUpdate @Inject() (
       request: Request,
       authToken: String,
       userId: String
-  ): Future[UpdateUserDetailsResponse] =
-    utilities.JSON.getResponseFromJson[UpdateUserDetailsResponse] {
-      val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
+  ): Future[Either[WallexErrorResponse, UpdateUserDetailsResponse]] = {
+    val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
-      wsClient
-        .url(url.replace("userId", userId))
-        .withHttpHeaders(apiKeyHeader, authTokenHeader)
-        .patch(Json.toJson(request))
+    wsClient
+      .url(url.replace("userId", userId))
+      .withHttpHeaders(apiKeyHeader, authTokenHeader)
+      .patch(Json.toJson(request)) map { response =>
+      if (response.status >= 400) {
+        logger.error(response.body[JsValue].toString())
+        Left(response.body[JsValue].as[WallexErrorResponse])
+      } else
+        Right(response.body[JsValue].as[UpdateUserDetailsResponse])
+    } andThen {
+      case Failure(exception) =>
+        exception match {
+          case parsingError: JsonParseException =>
+            logger.error(
+              parsingError.getMessage
+            )
+          case networkingError: IOException =>
+            logger.error(
+              networkingError.getMessage
+            )
+        }
     }
+  }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
@@ -84,7 +107,20 @@ class WallexUserDetailsUpdate @Inject() (
         request: Request,
         userId: String
     ): Future[UpdateUserDetailsResponse] =
-      action(request, authToken, userId).recover {
+      action(request, authToken, userId) map {
+        case Left(errorResponse: WallexErrorResponse) => {
+          logger.error(
+            errorResponse.toString
+          )
+          throw new WSException(
+            constants.Response.WALLEX_EXCEPTION,
+            null,
+            errorResponse.message
+          )
+        }
+        case Right(updateUserDetailsResponse: UpdateUserDetailsResponse) =>
+          updateUserDetailsResponse
+      } recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

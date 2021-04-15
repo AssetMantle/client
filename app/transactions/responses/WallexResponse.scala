@@ -243,7 +243,7 @@ object WallexResponse {
   implicit val paymentFileUploadWrites: OWrites[PaymentFileUploadResponse] =
     Json.writes[PaymentFileUploadResponse]
 
-  case class UpdateDetailsResponse(
+  case class UpdateCompanyDetailsResponse(
       accountId: String,
       companyName: String,
       countryOfIncorporation: String,
@@ -257,10 +257,10 @@ object WallexResponse {
       incorporationDate: String
   ) extends BaseResponse
 
-  implicit val updateDetailsResponseReads: Reads[UpdateDetailsResponse] =
-    Json.reads[UpdateDetailsResponse]
-  implicit val updateDetailsResponseWrites: OWrites[UpdateDetailsResponse] =
-    Json.writes[UpdateDetailsResponse]
+  implicit val updateDetailsResponseReads: Reads[UpdateCompanyDetailsResponse] =
+    Json.reads[UpdateCompanyDetailsResponse]
+  implicit val updateDetailsResponseWrites: OWrites[UpdateCompanyDetailsResponse] =
+    Json.writes[UpdateCompanyDetailsResponse]
 
   case class CollectionBankDetails(
       bankName: String,
@@ -344,4 +344,12 @@ object WallexResponse {
   implicit val updateUserDetailsResponseWrites
       : OWrites[UpdateUserDetailsResponse] =
     Json.writes[UpdateUserDetailsResponse]
+
+  case class WallexErrorResponse(error_code: String, message: String)
+      extends BaseResponse
+
+  implicit val ErrorResponseReads: Reads[WallexErrorResponse] =
+    Json.reads[WallexErrorResponse]
+  implicit val ErrorResponseWrites: OWrites[WallexErrorResponse] =
+    Json.writes[WallexErrorResponse]
 }

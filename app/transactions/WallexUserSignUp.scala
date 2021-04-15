@@ -1,16 +1,19 @@
 package transactions
 
-import exceptions.BaseException
-import play.api.libs.json.{Json, OWrites}
+import com.fasterxml.jackson.core.JsonParseException
+import exceptions.{BaseException, WSException}
+import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.Response
+import transactions.responses.WallexResponse.{Response, WallexErrorResponse}
 import utilities.KeyStore
 
+import java.io.IOException
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 @Singleton
 class WallexUserSignUp @Inject() (
@@ -29,7 +32,8 @@ class WallexUserSignUp @Inject() (
   private val apiKeyHeaderName =
     configuration.get[String]("wallex.apiKeyHeaderName")
 
-  private val apiKeyHeaderValue = keyStore.getPassphrase(constants.KeyStore.WALLEX_API_HEADER_VALUE)
+  private val apiKeyHeaderValue =
+    keyStore.getPassphrase(constants.KeyStore.WALLEX_API_HEADER_VALUE)
 
   private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiKeyHeaderValue)
 
@@ -43,15 +47,35 @@ class WallexUserSignUp @Inject() (
 
   private val url = baseURL + endpoint
 
-  private def action(request: Request, authToken: String): Future[Response] =
-    utilities.JSON.getResponseFromJson[Response] {
-      val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
+  private def action(
+      request: Request,
+      authToken: String
+  ): Future[Either[WallexErrorResponse, Response]] = {
+    val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
-      wsClient
-        .url(url)
-        .withHttpHeaders(apiKeyHeader, authTokenHeader)
-        .post(Json.toJson(request))
+    wsClient
+      .url(url)
+      .withHttpHeaders(apiKeyHeader, authTokenHeader)
+      .post(Json.toJson(request)) map { response =>
+      if (response.status >= 400) {
+        logger.error(response.body[JsValue].toString())
+        Left(response.body[JsValue].as[WallexErrorResponse])
+      } else
+        Right(response.body[JsValue].as[Response])
+    } andThen {
+      case Failure(exception) =>
+        exception match {
+          case parsingError: JsonParseException =>
+            logger.error(
+              parsingError.getMessage
+            )
+          case networkingError: IOException =>
+            logger.error(
+              networkingError.getMessage
+            )
+        }
     }
+  }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
@@ -66,7 +90,20 @@ class WallexUserSignUp @Inject() (
   object Service {
 
     def post(authToken: String, request: Request): Future[Response] =
-      action(request, authToken).recover {
+      action(request, authToken) map {
+        case Left(errorResponse: WallexErrorResponse) => {
+          logger.error(
+            errorResponse.toString
+          )
+          throw new WSException(
+            constants.Response.WALLEX_EXCEPTION,
+            null,
+            errorResponse.message
+          )
+        }
+        case Right(response: Response) =>
+          response
+      } recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

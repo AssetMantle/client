@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, WSException}
 import models.common.Serializable.{
   BankAccount,
   BeneficiaryPayment,
@@ -231,6 +231,13 @@ class WallexController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
+                  )
               }
             }
           )
@@ -408,6 +415,13 @@ class WallexController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
+                  )
               }
 
             }
@@ -559,6 +573,13 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
                   )
               }
             }
@@ -734,6 +755,13 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
                   )
               }
 
@@ -911,6 +939,13 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
                   )
               }
             }
@@ -1232,6 +1267,13 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
                   )
               }
 
@@ -1579,6 +1621,13 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
+                  )
+                case wsException: WSException =>
+                  InternalServerError(
+                    views.html.index(
+                      errorMessage = wsException.errorMessage,
+                      failures = Seq(wsException.failure)
+                    )
                   )
               }
 
