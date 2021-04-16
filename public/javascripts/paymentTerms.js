@@ -23,6 +23,10 @@ function advancePercentageInput() {
             $('#reference').val('').prop('disabled', true);
         } else if($('#tenure').val() || $('#reference').val()) {
             $('#tentativeDate').prop('disabled', true);
+        } else {
+            $('#tentativeDate').prop('disabled', false);
+            $('#tenure').prop('disabled', false);
+            $('#reference').prop('disabled', false);
         }
     }
 }

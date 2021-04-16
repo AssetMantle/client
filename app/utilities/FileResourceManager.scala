@@ -43,6 +43,8 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
 
   private val uploadNegotiationInsurancePath: String = rootFilePath + configuration.get[String]("upload.negotiation.insurance")
 
+  private val uploadNegotiationFiatProofPath: String = rootFilePath + configuration.get[String]("upload.negotiation.fiatProof")
+
   private val uploadNegotiationOthersPath: String = rootFilePath + configuration.get[String]("upload.negotiation.others")
 
 
@@ -84,6 +86,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
       case constants.File.Negotiation.BILL_OF_EXCHANGE => uploadNegotiationBillOfExchangePath
       case constants.File.Negotiation.CONTRACT => uploadNegotiationContractPath
       case constants.File.Negotiation.INSURANCE => uploadNegotiationInsurancePath
+      case constants.File.Negotiation.FIAT_PROOF => uploadNegotiationFiatProofPath
       case constants.File.Negotiation.OTHERS => uploadNegotiationOthersPath
       case _ => uploadNegotiationOthersPath
     }
