@@ -253,6 +253,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.tradeDocuments,
         routes.javascript.ComponentViewController.tradeActivities,
         routes.javascript.ComponentViewController.completedTradeActivities,
+        routes.javascript.ComponentViewController.traderViewCompletedNegotiationDocumentContent,
         routes.javascript.ComponentViewController.traderViewNegotiationDocumentContent,
         routes.javascript.ComponentViewController.traderViewAssetDocumentContent,
         routes.javascript.ComponentViewController.organizationViewNegotiationDocumentContent,

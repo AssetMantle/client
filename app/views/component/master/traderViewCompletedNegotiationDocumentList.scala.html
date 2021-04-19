@@ -43,7 +43,7 @@
                             @negotiationFile.documentType match{
                                 case constants.File.Negotiation.INVOICE | constants.File.Negotiation.CONTRACT => {
                                     <td colspan="2">
-                                        <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewNegotiationDocumentContent('@negotiationHistory.id','@negotiationFile.documentType'))")>
+                                        <span class="seenIcon"  onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewCompletedNegotiationDocumentContent('@negotiationHistory.id','@negotiationFile.documentType'))")>
                                         @commonIcon("seen")
                                         </span>
                                     </td>
