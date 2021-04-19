@@ -187,7 +187,7 @@
                     </div>
 
                 }
-                @if(!errorMessage.isBlank) {
+                @if(errorMessage !="") {
                     <div class="cmuk-alert-danger" onclick="getForm(@errorMessage)" cmuk-alert>
                         <a class="cmuk-alert-close" cmuk-close></a>
                         <p>@Messages(errorMessage)</p>

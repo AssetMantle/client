@@ -1682,7 +1682,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."WallexBeneficiaryDetail"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("organizationID", "wallexId")
+    PRIMARY KEY ("organizationID", "wallexId","beneficiaryId")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."WallexPaymentDetail"

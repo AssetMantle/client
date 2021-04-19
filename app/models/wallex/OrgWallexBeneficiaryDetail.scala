@@ -119,12 +119,11 @@ class OrgWallexBeneficiaryDetails @Inject() (
 
   private def getByorganizationID(
       organizationID: String
-  ): Future[Option[OrgWallexBeneficiaryDetailSerialized]] =
+  ): Future[Seq[OrgWallexBeneficiaryDetailSerialized]] =
     db.run(
       orgWallexBeneficiaryDetailTable
         .filter(_.organizationID === organizationID)
         .result
-        .headOption
     )
 
   private def tryGetByOrdId(
@@ -423,7 +422,7 @@ class OrgWallexBeneficiaryDetails @Inject() (
 
     def get(
         organizationID: String
-    ): Future[Option[OrgWallexBeneficiaryDetail]] =
+    ): Future[Seq[OrgWallexBeneficiaryDetail]] =
       getByorganizationID(organizationID).map(_.map(_.deserialize))
 
     def getByBeneficiaryId(

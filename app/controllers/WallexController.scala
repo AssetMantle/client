@@ -772,45 +772,7 @@ class WallexController @Inject() (
   def createBeneficiariesForm(): Action[AnyContent] = {
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
-        val getOrganizationBeneficiaryDetail =
-          orgWallexBeneficiaryDetails.Service.tryGet(loginState.username)
-
-        (for {
-          beneficiaryDetails <- getOrganizationBeneficiaryDetail
-          result <- withUsernameToken.Ok(
-            views.html.component.master.addOrgWallexBeneficiaryDetails(
-              views.companion.master.AddOrgWallexBeneficiaryDetails.form
-                .fill(
-                  views.companion.master.AddOrgWallexBeneficiaryDetails
-                    .Data(
-                      country = beneficiaryDetails.country,
-                      address = beneficiaryDetails.address,
-                      city = beneficiaryDetails.city,
-                      entityType = beneficiaryDetails.entityType,
-                      companyName = beneficiaryDetails.companyName,
-                      nickName = beneficiaryDetails.nickname,
-                      bankData = BankData(
-                        accountNumber =
-                          beneficiaryDetails.bankAccount.accountNumber,
-                        bankName = beneficiaryDetails.bankAccount.bankName,
-                        bicSwift = beneficiaryDetails.bankAccount.bicSwift,
-                        country = beneficiaryDetails.bankAccount.country,
-                        currency = beneficiaryDetails.bankAccount.currency,
-                        address = beneficiaryDetails.bankAccount.address,
-                        accountHolderName =
-                          beneficiaryDetails.bankAccount.bankAccountHolderName
-                      )
-                    )
-                )
-            )
-          )
-        } yield result).recoverWith {
-          case _: BaseException =>
-            withUsernameToken.Ok(
-              views.html.component.master.addOrgWallexBeneficiaryDetails()
-            )
-
-        }
+        Future(Ok(views.html.component.master.addOrgWallexBeneficiaryDetails()))
     }
   }
 
@@ -839,10 +801,6 @@ class WallexController @Inject() (
                   organizationID: String
               ): Future[OrganizationWallexDetail] =
                 orgWallexDetails.Service.tryGet(organizationID)
-
-              def beneficiaryDetails =
-                orgWallexBeneficiaryDetails.Service
-                  .getByTraderID(loginState.username)
 
               val authToken = wallexAuthToken.Service.getToken()
 
@@ -929,7 +887,6 @@ class WallexController @Inject() (
                       beneficiaryResponse.data.bankAccount.bankAccountHolderName
                   )
                 )
-                beneficiary <- beneficiaryDetails
                 result <- withUsernameToken.Ok(
                   views.html.profile(successes =
                     Seq(constants.Response.WALLEX_BENEFICIARY_DETAILS_SUBMITTED)

@@ -3,8 +3,8 @@
 
 @import models.wallex.OrganizationWallexDetail
 @import models.wallex.OrgWallexBeneficiaryDetail
-@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexBeneficiary: Option[OrgWallexBeneficiaryDetail])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@if(organizationWallexDetail.isDefined && wallexBeneficiary.isDefined) {
+@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexBeneficiary: Seq[OrgWallexBeneficiaryDetail])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(organizationWallexDetail.isDefined && !wallexBeneficiary.isEmpty) {
     @*<div class="financialCard">
     @commonCard(constants.View.PAY_TO_BENEFICIARY, 'cardIconPath -> "images/icons/icons.svg#tradeFinance") {
     } {

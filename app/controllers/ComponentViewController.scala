@@ -3250,7 +3250,7 @@ class ComponentViewController @Inject()(
       def getOrgWallexAccountDetails(organizationID: String): Future[Option[OrganizationWallexDetail]] =
         organizationWallexDetails.Service.get(organizationID)
 
-      def getOrgWallexBeneficiaryDetail(organizationID: String): Future[Option[OrgWallexBeneficiaryDetail]] =
+      def getOrgWallexBeneficiaryDetail(organizationID: String): Future[Seq[OrgWallexBeneficiaryDetail]] =
         orgWallexBeneficiaryDetails.Service.get(organizationID)
 
       (for {
@@ -3267,7 +3267,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
-      def getOrgWallexBeneficiaryDetail(organizationID: String): Future[Option[OrgWallexBeneficiaryDetail]] =
+      def getOrgWallexBeneficiaryDetail(organizationID: String): Future[Seq[OrgWallexBeneficiaryDetail]] =
         orgWallexBeneficiaryDetails.Service.get(organizationID)
 
       (for {
