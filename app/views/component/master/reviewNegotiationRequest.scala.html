@@ -15,7 +15,6 @@
     @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(asset.quantity.toRoundedOffString(), asset.quantityUnit).mkString(" "))
     @commonTextInfo(constants.View.ASSET_PRICE_PER_UNIT, Seq((asset.price/asset.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" "))
     @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
-    @commonBooleanInfo(constants.View.MODERATED, Option(asset.moderated))
     @commonIntInfo(constants.View.SHIPPING_PERIOD, asset.otherDetails.shippingDetails.shippingPeriod)
     @commonTextInfo(constants.View.PORT_OF_LOADING, asset.otherDetails.shippingDetails.portOfLoading)
     @commonTextInfo(constants.View.PORT_OF_DISCHARGE, asset.otherDetails.shippingDetails.portOfDischarge)
