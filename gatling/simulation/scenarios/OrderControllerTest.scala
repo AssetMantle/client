@@ -52,6 +52,34 @@ object OrderControllerTest {
 
   val unmoderatedBuyerExecuteOrderScenario: ScenarioBuilder = scenario("UnmoderatedBuyerExecuteOrder")
     .feed(FiatProofHashFeeder.fiatProofHashFeed)
+    .exec(AssetControllerTest.imageFeed)
+    .exec(http("Fiat_Proof_Upload_FORM")
+    .get(session => routes.FileController.uploadNegotiationForm(constants.File.Negotiation.FIAT_PROOF,session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+    .check(status.is(200))
+    .check(css("button:contains(Browse)").exists)
+    .check(css("[name=%s]".format(Test.CSRF_TOKEN), "value").saveAs(Test.CSRF_TOKEN))
+  )
+    .pause(Test.REQUEST_DELAY)
+    .exec(http("Fiat_Proof_Upload_")
+      .post(session => routes.FileController.uploadNegotiation(constants.File.Negotiation.FIAT_PROOF).url)
+      .formParamMap(Map(
+        Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN),
+        Form.RESUMABLE_CHUNK_NUMBER -> "1",
+        Form.RESUMABLE_CHUNK_SIZE -> "1048576",
+        Form.RESUMABLE_TOTAL_SIZE -> "${%s}".format(Test.TEST_FILE_SIZE),
+        Form.RESUMABLE_IDENTIFIER -> "document",
+        Form.RESUMABLE_FILE_NAME -> "${%s}".format(Test.TEST_FILE_NAME)))
+      .bodyPart(RawFileBodyPart("file", Test.TEST_IMAGE_PATH + "${%s}".format(Test.TEST_FILE_NAME))
+        .transferEncoding("binary")).asMultipartForm
+      .check(status.is(200))
+    )
+    .exec(
+      http("Store_Organization_KYC_" + "${%s}".format(Test.TEST_DOCUMENT_TYPE))
+        .get(session => routes.FileController.storeNegotiation(session(Test.TEST_FILE_NAME).as[String], constants.File.Negotiation.FIAT_PROOF,session(Test.TEST_NEGOTIATION_ID).as[String]).url)
+        .check(status.is(206))
+        //.check(substring("Fiat P").exists)
+    )
+    .pause(Test.REQUEST_DELAY)
     .exec(http("Unmoderated_Buyer_Execute_Order_Form_GET")
       .get(session => routes.OrderController.buyerExecuteForm(session(Test.TEST_NEGOTIATION_ID).as[String]).url)
       .check(status.is(200))
@@ -63,7 +91,6 @@ object OrderControllerTest {
       .post(routes.OrderController.buyerExecute().url)
       .formParamMap(Map(
         constants.FormField.ORDER_ID.name -> "${%s}".format(Test.TEST_NEGOTIATION_ID),
-        constants.FormField.FIAT_PROOF.name -> "${%s}".format(Test.TEST_FIAT_PROOF_HASH),
         constants.FormField.GAS.name -> "${%s}".format(Test.TEST_GAS),
         constants.FormField.PASSWORD.name -> "${%s}".format(Test.TEST_PASSWORD),
         Test.CSRF_TOKEN -> "${%s}".format(Test.CSRF_TOKEN)))

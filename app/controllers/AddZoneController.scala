@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -294,7 +294,9 @@ class AddZoneController @Inject()(
                 } catch {
                   case baseException: BaseException => throw baseException
                 }
+
                 def markZoneFormCompleted = masterZones.Service.markZoneFormCompleted(id)
+
                 for {
                   _ <- markZoneFormCompleted
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
@@ -332,50 +334,54 @@ class AddZoneController @Inject()(
           Future(BadRequest(views.html.component.master.verifyZone(formWithErrors, zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name))))
         },
         verifyZoneData => {
+          val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = verifyZoneData.password)
           val allKYCFilesVerified = masterZoneKYCs.Service.checkAllKYCFilesVerified(verifyZoneData.zoneID)
 
-          def sendTransactionsAndGetResult(allKYCFilesVerified: Boolean): Future[Result] = {
-            if (allKYCFilesVerified) {
-              val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
+          def sendTransactionsAndGetResult(validateUsernamePassword: Boolean, allKYCFilesVerified: Boolean): Future[Result] = {
+            if (validateUsernamePassword) {
+              if (allKYCFilesVerified) {
+                val accountID = masterZones.Service.tryGetAccountID(verifyZoneData.zoneID)
 
-              def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
+                def zoneAccountAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-              def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetAmount, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetAmount)), password = verifyZoneData.password, mode = transactionMode),
-                action = transactionsSendCoin.Service.post,
-                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-              )
+                def sendCoinTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                  entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccountAddress, amount = constants.Blockchain.DefaultZoneFaucetAmount, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                  request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, amount = Seq(transactionsSendCoin.Amount(denom, constants.Blockchain.DefaultZoneFaucetAmount)), password = verifyZoneData.password, mode = transactionMode),
+                  action = transactionsSendCoin.Service.post,
+                  onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                  onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+                )
 
-              def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
-                entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
-                request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
-                action = transactionsAddZone.Service.post,
-                onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
-                onFailure = blockchainTransactionAddZones.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
-              )
+                def addZoneTransaction(zoneAccountAddress: String): Future[String] = transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+                  entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                  blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
+                  request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+                  action = transactionsAddZone.Service.post,
+                  onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
+                  onFailure = blockchainTransactionAddZones.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
+                )
 
-              for {
-                accountID <- accountID
-                zoneAccountAddress <- zoneAccountAddress(accountID)
-                _ <- sendCoinTransaction(zoneAccountAddress)
-                _ <- addZoneTransaction(zoneAccountAddress)
-                result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
-                _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
-              } yield {
-                result
-              }
-            } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+                for {
+                  accountID <- accountID
+                  zoneAccountAddress <- zoneAccountAddress(accountID)
+                  _ <- sendCoinTransaction(zoneAccountAddress)
+                  _ <- addZoneTransaction(zoneAccountAddress)
+                  result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ZONE_VERIFIED)))
+                  _ <- utilitiesNotification.send(accountID, constants.Notification.ADD_ZONE_CONFIRMED, accountID)
+                } yield {
+                  result
+                }
+              } else Future(PreconditionFailed(views.html.account(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED))))
+            } else Future(BadRequest(views.html.component.master.verifyZone(views.companion.master.VerifyZone.form.fill(verifyZoneData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), zoneID = verifyZoneData.zoneID)))
           }
 
           (for {
+            validateUsernamePassword <- validateUsernamePassword
             allKYCFilesVerified <- allKYCFilesVerified
-            result <- sendTransactionsAndGetResult(allKYCFilesVerified)
+            result <- sendTransactionsAndGetResult(validateUsernamePassword, allKYCFilesVerified)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.ADD_ZONE_CONFIRMED, loginState.username)
           } yield {
             result

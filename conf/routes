@@ -231,6 +231,8 @@ GET         /component/fiatList                                                 
 GET         /component/traderViewNegotiationDocumentContent                                       controllers.ComponentViewController.traderViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/traderViewAssetDocumentContent                                             controllers.ComponentViewController.traderViewAssetDocumentContent(id: String, documentType: String)
 
+GET         /component/traderViewCompletedNegotiationDocumentContent                              controllers.ComponentViewController.traderViewCompletedNegotiationDocumentContent(id: String, documentType: String)
+
 GET         /component/organizationViewNegotiationDocumentContent                                 controllers.ComponentViewController.organizationViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/organizationViewAssetDocumentContent                                       controllers.ComponentViewController.organizationViewAssetDocumentContent(id: String, documentType: String)
 

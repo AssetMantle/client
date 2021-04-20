@@ -1,0 +1,63 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.masterTransaction.NegotiationFile
+@import models.common.Serializable
+@import models.Abstract.NegotiationDocumentContent
+@import models.master.NegotiationHistory
+@import models.master.Trader
+@import models.master.Organization
+@(documentType:String, documentContent: Option[NegotiationDocumentContent], negotiation: NegotiationHistory, traderList: Seq[Trader], organizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@documentContent match {
+    case Some(content)=> {
+        @documentType match {
+            case constants.File.Negotiation.INVOICE => {
+                <legend class="cmuk-legend">
+                @Messages(constants.File.Negotiation.INVOICE)
+                </legend>
+                <hr>
+                <div class="modalInfoBlock">
+
+                @defining(content.asInstanceOf[Serializable.Invoice]){invoiceDetails=>
+
+                    @traderList.map{ trader =>
+                        @trader.id match {
+                            case negotiation.sellerTraderID=>{
+                                @organizationList.find(_.id == trader.organizationID) match {
+                                    case Some(organization)=>{@commonTextInfo(constants.View.SELLER_ORGANIZATION, organization.name)}
+                                    case None=> {}
+                                }
+                            }
+                            case negotiation.buyerTraderID=>{
+                                @organizationList.find(_.id == trader.organizationID) match {
+                                    case Some(organization)=>{@commonTextInfo(constants.View.BUYER_ORGANIZATION, organization.name)}
+                                    case None=> {}
+                                }
+                            }
+                            case _=>{}
+                        }
+                    }
+
+                    @commonTextInfo(constants.View.INVOICE_NUMBER, invoiceDetails.invoiceNumber)
+                    @commonMicroNumberInfo(constants.View.AMOUNT, invoiceDetails.invoiceAmount)
+                    @commonDateInfo(constants.View.INVOICE_DATE, invoiceDetails.invoiceDate)
+                    }
+                </div>
+                }
+                case constants.File.Negotiation.CONTRACT =>{
+                    <legend class="cmuk-legend">
+                    @Messages(constants.File.Negotiation.CONTRACT)
+                    </legend>
+                    <hr>
+                    <div class="modalInfoBlock">
+                    @defining(content.asInstanceOf[Serializable.Contract]){contractDetails=>
+                        @commonTextInfo(constants.View.CONTRACT_NUMBER, contractDetails.contractNumber)
+                    }
+                    </div>
+                }
+                case _ => {}
+                    }
+                    }
+                case None=>{<div class="modalInfoBlock">
+                @Messages(constants.View.CONTENT_NOT_FOUND)
+                </div>}
+    }
