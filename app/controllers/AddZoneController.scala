@@ -376,14 +376,14 @@ class AddZoneController @Inject()(
                 val mutableMetas = Seq(constants.Property.CURRENCY.withValue(zone.currency))
                 val mutables = Seq(constants.Property.ADDRESS.withValue(zone.address.toString.filter(_.isLetter)))
 
-              /*  val sendCoin = transaction.process[blockchainTransaction.SendCoin, transactionsBroadcast.Request](
+                val sendCoin = transaction.process[blockchainTransaction.SendCoin, transactionsBroadcast.Request](
                   entity = blockchainTransaction.SendCoin(from = loginState.address, to = zoneAccount.address, amount = Seq(models.common.Serializable.Coin(stakingDenom, constants.Blockchain.DefaultZoneFaucetAmount)), gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
                   request = transactionsBroadcast.Request(utilities.SignTx.sign(Tx(Seq(Message(constants.Blockchain.TransactionMessage.SEND_COIN, SendCoin(from_address = loginState.address, to_address = zoneAccount.address, Seq(Coin(stakingDenom, constants.Blockchain.DefaultZoneFaucetAmount))))), Fee(Seq(), verifyZoneData.gas.toMicroString)), SignMeta(mainBlockchainAccount.result.value.accountNumber, chainID, mainBlockchainAccount.result.value.sequence), ECKey.fromPrivate(utilities.Crypto.decrypt(Base64.getDecoder.decode(mainAccount.privateKeyEncrypted.getOrElse(throw new BaseException(constants.Response.FAILURE))), verifyZoneData.password))), transactionMode),
                   action = transactionsBroadcast.Service.post,
                   onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                   onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash)*/
+                  updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash)
 
 
                 def issueIdentity = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
@@ -396,7 +396,7 @@ class AddZoneController @Inject()(
                   updateTransactionHash = blockchainTransactionIdentityIssues.Service.updateTransactionHash)
 
                 for {
-                  //_ <- sendCoin
+                  _ <- sendCoin
                   _ <- issueIdentity
                 } yield ()
               }
