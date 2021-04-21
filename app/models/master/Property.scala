@@ -137,8 +137,6 @@ class Properties @Inject()(
 
     def getAll(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType)
 
-    //def getAllInMapForm(entityID: String, entityType: String) = getAllByEntityIDAndEntityType(entityID = entityID, entityType = entityType).map(x=> x.map(a => a.name -> a.value).toMap)
-
     def insertMultiple(properties: Seq[Property]): Future[Seq[String]] = addMultiple(properties)
 
     def tryGet(entityID: String, entityType: String, name: String): Future[Property] = tryGetByEntityIDEntityTypeAndName(entityID = entityID, entityType = entityType, name = name)
@@ -152,16 +150,16 @@ class Properties @Inject()(
     def getAssetProperty(assetID:String) = getAllByEntityIDAndEntityType(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET).map{ properties=>
       AssetProperty(
         id = assetID,
-        assetType = properties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        description = properties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        quantity = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        quantityUnit = properties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        price = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        moderated = Try(properties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        takerID = properties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.FAILURE)).value,
-        shippingPeriod = Try(properties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        portOfLoading = properties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-        portOfDischarge = properties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+        assetType = properties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        description = properties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        quantity = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        quantityUnit = properties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        price = Try(MicroNumber(BigInt(properties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        moderated = Try(properties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        takerID = properties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)).value,
+        shippingPeriod = Try(properties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        portOfLoading = properties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+        portOfDischarge = properties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
       )
     }
 
@@ -170,16 +168,16 @@ class Properties @Inject()(
         val assetProperties = properties.filter(_.entityID == assetID)
         AssetProperty(
           id = assetID,
-          assetType = assetProperties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          description = assetProperties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          quantity = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          quantityUnit = assetProperties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          price = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          moderated = Try(assetProperties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          takerID = assetProperties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.FAILURE)).value,
-          shippingPeriod = Try(assetProperties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          portOfLoading = assetProperties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
-          portOfDischarge = assetProperties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.FAILURE)),
+          assetType = assetProperties.find(_.name == constants.Property.ASSET_TYPE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          description = assetProperties.find(_.name == constants.Property.ASSET_DESCRIPTION.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          quantity = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.QUANTITY.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          quantityUnit = assetProperties.find(_.name == constants.Property.QUANTITY_UNIT.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          price = Try(MicroNumber(BigInt(assetProperties.find(_.name == constants.Property.PRICE.dataName).flatMap(_.value).getOrElse("")))).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          moderated = Try(assetProperties.find(_.name == constants.Property.MODERATED.dataName).flatMap(_.value).getOrElse("").toBoolean).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          takerID = assetProperties.find(_.name == constants.Property.TAKER_ID.dataName).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)).value,
+          shippingPeriod = Try(assetProperties.find(_.name == constants.Property.SHIPPING_PERIOD.dataName).flatMap(_.value).getOrElse("").toInt).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          portOfLoading = assetProperties.find(_.name == constants.Property.PORT_OF_LOADING.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
+          portOfDischarge = assetProperties.find(_.name == constants.Property.PORT_OF_DISCHARGE.dataName).flatMap(_.value).getOrElse(throw new BaseException(constants.Response.ASSET_PROPERTY_CONFORM_ERROR)),
         )
       }
     }
