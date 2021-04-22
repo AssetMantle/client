@@ -2,23 +2,24 @@
 @import models.master.Asset
 @import views.html.base._
 
-@(assets:Seq[Asset],assetRequests: Map[String, Map[String,Option[String]]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(assets:Seq[Asset],assetPropertyList: Seq[AssetProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
-        @if(assetRequests.isEmpty) {
+        @if(assets.isEmpty) {
             <span>@Messages(constants.View.NO_REQUESTS_FOUND)</span>
         } else {
-            @for(assetRequest <- assetRequests) {
+            @for(assetProperty <- assetPropertyList) {
                 <div>
-                @commonCard(assetRequest._1) {
+                @commonCard(assetProperty.id) {
                 } {
-                    @commonTextInfo(constants.View.ASSET_ID, assetRequest._1)
-                    @commonTextInfo(constants.View.ASSET_TYPE, assetRequest._2.getOrElse(constants.Property.ASSET_TYPE.dataName,Some("")).getOrElse(""))
-                    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetRequest._2.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse(""), assetRequest._2.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" "))
-                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((assetRequest._2.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse("").toDouble/assetRequest._2.getOrElse(constants.Property.QUANTITY.dataName,Some("")).getOrElse("").toDouble), Messages(constants.View.USD), Messages(constants.View.PER), assetRequest._2.getOrElse(constants.Property.QUANTITY_UNIT.dataName,Some("")).getOrElse("")).mkString(" "))
-                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetRequest._2.getOrElse(constants.Property.PRICE.dataName,Some("")).getOrElse(""), Messages(constants.View.USD)).mkString(" "))
-                    @commonBooleanInfo(constants.View.MODERATED, Option(assetRequest._2.getOrElse(constants.Property.MODERATED.dataName,Some("")).getOrElse("").toBoolean))
-                    @commonTextInfo(constants.View.STATUS, assets.find(_.id == assetRequest._1).map(_.status).getOrElse(""))
+                    @commonTextInfo(constants.View.ASSET_ID, assetProperty.id)
+                    @commonTextInfo(constants.View.ASSET_TYPE, assetProperty.assetType)
+                    @commonTextInfo(constants.View.ASSET_QUANTITY, Seq(assetProperty.quantityUnit, assetProperty.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((assetProperty.price/assetProperty.quantity), Messages(constants.View.USD), Messages(constants.View.PER), assetProperty.quantityUnit).mkString(" "))
+                    @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(assetProperty.price, Messages(constants.View.USD)).mkString(" "))
+                    @commonBooleanInfo(constants.View.MODERATED, Option(assetProperty.moderated))
+                    @commonTextInfo(constants.View.STATUS, assets.find(_.id == assetProperty.id).map(_.status).getOrElse(""))
                 }
                 </div>
             }

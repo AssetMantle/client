@@ -5,11 +5,12 @@
 @import models.master.Trader
 
 @import models.master.Order
-@(negotiation: Negotiation, asset: Map[String,Option[String]], order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(negotiation: Negotiation, assetProperty: AssetProperty, order: Option[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonCard(constants.View.ORDER_ACTIONS,  'cardIconPath -> "images/icons/icons.svg#orderActions"){
 }{
-    @if(asset.getOrElse(constants.Property.MODERATED.dataName,"") == "true"){
+    @if(assetProperty.moderated){
         @negotiation.status match {
             case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED  => {
                 @order match {
