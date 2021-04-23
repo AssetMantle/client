@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationBeneficiary
+
+@(organizationWallexBeneficiaryDetail: Seq[OrganizationBeneficiary])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+    @commonCard(constants.View.ORGANIZATION_WALLEX_BENEFICIARY_DETAIL, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+
+        @commonFormButton(constants.Form.WALLEX_ADD_BENEFICIARY_DETAILS)
+    } {
+        @organizationWallexBeneficiaryDetail.map { beneficiary =>
+            @commonVerticalInfoBox() {
+                <div>
+                    @commonTextInfo(constants.View.BENEFICIARY_ID, beneficiary.beneficiaryId)
+                    @commonTextInfo(constants.View.COMPANY_NAME, beneficiary.companyName)
+                    @commonTextInfo(constants.View.NICK_NAME, beneficiary.nickname)
+                    @commonTextInfo(constants.View.ACCOUNT_TYPE, beneficiary.accountType)
+                    @commonTextInfo(constants.View.ACCOUNT_NUMBER, beneficiary.bankAccount.accountNumber)
+                    @commonTextInfo(constants.View.BANK_NAME, beneficiary.bankAccount.bankName)
+                    @commonTextInfo(constants.View.SWIFT_CODE, beneficiary.bankAccount.bicSwift)
+                    @commonTextInfo(constants.View.ACCOUNT_HOLDER_NAME, beneficiary.bankAccount.bankAccountHolderName)
+                    <div class="cmuk-text-center cmuk-margin-top">
+                    @commonFormButton(constants.Form.WALLEX_DELETE_BENEFICIARY, 'parameters -> s"'${beneficiary.beneficiaryId}'")
+                    </div>
+                </div>
+            }
+        }
+    }
+
+

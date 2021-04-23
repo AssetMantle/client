@@ -1,0 +1,55 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@import transactions.responses.WallexResponse.CreatePaymentQuoteResponse
+@(quoteResponse: CreatePaymentQuoteResponse)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.QUOTE_RESPONSE)
+</legend>
+<hr>
+
+
+
+<div class="modalInfoBlock">
+@quoteResponse.data match {
+    case datas => {
+        @commonTextInfo(constants.View.CURRENCY_PAIR, datas.currencyPair)
+        @commonTextInfo(constants.View.BUY_CURRENCY, datas.buyCurrency)
+        @commonTextInfo(constants.View.SELL_CURRENCY, datas.sellCurrency)
+        @commonDoubleInfo(constants.View.BUY_AMOUNT, datas.buyAmount)
+        @commonDoubleInfo(constants.View.SELL_AMOUNT, datas.sellAmount)
+        @commonTextInfo(constants.View.FIXED_SIDE, datas.fixedSide)
+        @commonDoubleInfo(constants.View.RATE, datas.rate)
+        @commonDoubleInfo(constants.View.PARTNER_RATE, datas.partnerRate)
+        @commonDoubleInfo(constants.View.PARTNER_BUY_AMOUNT, datas.partnerBuyAmount)
+        @commonDoubleInfo(constants.View.PARTNER_SELL_AMOUNT, datas.partnerSellAmount)
+        @datas.partnerPaymentFee match {
+            case Some(ppfee) => {
+                @commonDoubleInfo(constants.View.PARTNER_PAYMENT_FEE, ppfee)
+            }
+            case None => {
+                @commonDoubleInfo(constants.View.PARTNER_PAYMENT_FEE, 0.00)
+            }
+
+        }
+        @commonTextInfo(constants.View.EXPIRES_AT, datas.expiresAt)
+        @commonTextInfo(constants.View.QUOTE_ID, datas.quoteId)
+        @commonDoubleInfo(constants.View.CONVERSION_FEE, datas.conversionFee)
+        @commonDoubleInfo(constants.View.PAYMENT_FEE, datas.paymentFee)
+        @commonDoubleInfo(constants.View.TOTAL_FEE, datas.totalFee)
+        @commonDoubleInfo(constants.View.WALLEX_TOTAL_AMOUNT, datas.totalAmount)
+        @commonTextInfo(constants.View.PAYMENT_CHANNEL, datas.paymentChannel)
+        @commonDoubleInfo(constants.View.BANK_CHARGE, datas.bankCharges)
+        @commonBooleanInfo(constants.View.SUPPORTING_DOC_REQUIRED, Some(datas.supportingDocumentsRequired))
+
+        @commonJavascriptButton(constants.Form.WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST.button, JavaScript(s"""getForm(jsRoutes.controllers.WallexController.acceptWallexQuoteForm('${datas.quoteId}'))"""))
+
+    }
+    case _ => {
+        @commonTextInfo("Message", "No Quote found")
+    }
+
+}
+</div>

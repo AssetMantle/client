@@ -16,11 +16,11 @@ case class OrganizationWallexDetail(
     zoneID: String,
     organizationID: String,
     wallexId: String,
+    accountId: String,
     email: String,
     firstName: String,
     lastName: String,
     status: String,
-    accountId: String,
     countryCode: String,
     accountType: String,
     createdBy: Option[String] = None,
@@ -158,11 +158,11 @@ class OrganizationWallexDetails @Inject() (
         zoneID,
         organizationID,
         wallexId,
+        accountId,
         email,
         firstName,
         lastName,
         status,
-        accountId,
         countryCode,
         accountType,
         createdBy.?,
@@ -173,11 +173,13 @@ class OrganizationWallexDetails @Inject() (
         updatedOnTimeZone.?
       ) <> (OrganizationWallexDetail.tupled, OrganizationWallexDetail.unapply)
 
-    def zoneID = column[String]("zoneID", O.PrimaryKey)
+    def zoneID = column[String]("zoneID")
 
     def organizationID = column[String]("organizationID", O.PrimaryKey)
 
     def wallexId = column[String]("wallexId", O.PrimaryKey)
+
+    def accountId = column[String]("accountId", O.PrimaryKey)
 
     def email = column[String]("email")
 
@@ -186,8 +188,6 @@ class OrganizationWallexDetails @Inject() (
     def lastName = column[String]("lastName")
 
     def status = column[String]("status")
-
-    def accountId = column[String]("accountId", O.PrimaryKey)
 
     def countryCode = column[String]("countryCode")
 
@@ -211,11 +211,11 @@ class OrganizationWallexDetails @Inject() (
         zoneID: String,
         organizationID: String,
         wallexId: String,
+        accountId: String,
         email: String,
         firstName: String,
         lastName: String,
         status: String,
-        accountId: String,
         countryCode: String,
         accountType: String
     ): Future[String] =
@@ -224,11 +224,11 @@ class OrganizationWallexDetails @Inject() (
           zoneID = zoneID,
           organizationID = organizationID,
           wallexId = wallexId,
+          accountId = accountId,
           email = email,
           firstName = firstName,
           lastName = lastName,
           status = status,
-          accountId = accountId,
           countryCode = countryCode,
           accountType = accountType
         )
@@ -238,11 +238,11 @@ class OrganizationWallexDetails @Inject() (
         zoneID: String,
         organizationID: String,
         wallexId: String,
+        accountId: String,
         email: String,
         firstName: String,
         lastName: String,
         status: String,
-        accountId: String,
         countryCode: String,
         accountType: String
     ): Future[Int] =
@@ -251,11 +251,11 @@ class OrganizationWallexDetails @Inject() (
           zoneID = zoneID,
           organizationID = organizationID,
           wallexId = wallexId,
+          accountId = accountId,
           email = email,
           firstName = firstName,
           lastName = lastName,
           status = status,
-          accountId = accountId,
           countryCode = countryCode,
           accountType = accountType
         )

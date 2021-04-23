@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.UpdateDetailsWallexAccount
+@import views.html.base._
+
+@(updateDetailsWallexAccount: Form[UpdateDetailsWallexAccount.Data] = UpdateDetailsWallexAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.WALLEX_UPDATE_ACCOUNT, updateDetailsWallexAccount) {
+    @commonSelect(updateDetailsWallexAccount, constants.FormField.COUNTRY_OF_INCORPORATION)
+    @commonSelect(updateDetailsWallexAccount, constants.FormField.COUNTRY_OF_OPERATIONS)
+    @commonSelect(updateDetailsWallexAccount, constants.FormField.BUSINESS_TYPE)
+    @commonInputText(updateDetailsWallexAccount, constants.FormField.COMPANY_ADDRESS)
+    @commonInputText(updateDetailsWallexAccount, constants.FormField.POSTAL_ZIP_CODE)
+    @commonInputText(updateDetailsWallexAccount, constants.FormField.STATE_OR_PROVINCE)
+    @commonInputText(updateDetailsWallexAccount, constants.FormField.CITY)
+    @commonInputText(updateDetailsWallexAccount, constants.FormField.REGISTRATION_NUMBER)
+    @commonInputDate(updateDetailsWallexAccount, constants.FormField.INCORPORATION_DATE)
+}

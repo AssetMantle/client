@@ -10,7 +10,7 @@ import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
 import models.common.Serializable._
 import models.master._
 import models.masterTransaction.{AssetFile, NegotiationFile}
-import models.wallex.{WallexDocument, WallexDocuments}
+import models.wallex.{UserKYC, UserKYCs}
 import models.{docusign, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
@@ -46,7 +46,7 @@ class FileController @Inject()(
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
-                                wallexDocuments: WallexDocuments
+                                wallexDocuments: UserKYCs
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -877,7 +877,7 @@ class FileController @Inject()(
   def updateWallexKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val oldDocument = wallexDocuments.Service.tryGet(id = loginState.username, documentType = documentType)
-      def updateFile(oldDocument: WallexDocument): Future[Boolean] = fileResourceManager.updateFile[WallexDocument](
+      def updateFile(oldDocument: UserKYC): Future[Boolean] = fileResourceManager.updateFile[UserKYC](
         name = name,
         path = fileResourceManager.getWallexFilePath(documentType),
         oldDocument = oldDocument,
@@ -886,40 +886,40 @@ class FileController @Inject()(
 
       def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
 
-      def getResult(wallexDocument: Option[WallexDocument]) = documentType match {
-        case constants.File.Wallex.NATIONAL_IDENTITY => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+      def getResult(wallexDocument: Option[UserKYC]) = documentType match {
+        case constants.File.Wallex.NATIONAL_IDENTITY => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.COMPANY_PROOF => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.COMPANY_PROOF => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.COMPANY_PROOF_ADDRESS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.COMPANY_PROOF_ADDRESS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.NRIC => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.NRIC => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PASSPORT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PASSPORT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.KTP => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.KTP => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.EMPLOYMENT_PASS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.EMPLOYMENT_PASS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.S_PASS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.S_PASS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.WORK_PERMIT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.WORK_PERMIT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PHOTO => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PHOTO => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.BANK_STATEMENT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.BANK_STATEMENT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.UTILITY_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.UTILITY_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PHONE_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PHONE_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.TAX_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.TAX_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.FAMILY_CARD => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.FAMILY_CARD => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.IDENTITY_REPORT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.IDENTITY_REPORT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.FDW => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.FDW => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
 
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
@@ -959,49 +959,49 @@ class FileController @Inject()(
 
   def storeWallexDocument(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val storeFile = fileResourceManager.storeFile[WallexDocument](
+      val storeFile = fileResourceManager.storeFile[UserKYC](
         name = name,
         path = fileResourceManager.getWallexFilePath(documentType),
-        document = WallexDocument(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        document = UserKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = wallexDocuments.Service.create
       )
 
       def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
 
-      def getResult(wallexDocument: Option[WallexDocument]) = documentType match {
-        case constants.File.Wallex.NATIONAL_IDENTITY => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+      def getResult(wallexDocument: Option[UserKYC]) = documentType match {
+        case constants.File.Wallex.NATIONAL_IDENTITY => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.COMPANY_PROOF => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.COMPANY_PROOF => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.COMPANY_PROOF_ADDRESS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.COMPANY_PROOF_ADDRESS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.NRIC => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.NRIC => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PASSPORT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PASSPORT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.KTP => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.KTP => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.EMPLOYMENT_PASS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.EMPLOYMENT_PASS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.S_PASS => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.S_PASS => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.WORK_PERMIT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.WORK_PERMIT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PHOTO => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PHOTO => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.BANK_STATEMENT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.BANK_STATEMENT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.UTILITY_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.UTILITY_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.PHONE_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.PHONE_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.TAX_BILL => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.TAX_BILL => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.FAMILY_CARD => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.FAMILY_CARD => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.IDENTITY_REPORT => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.IDENTITY_REPORT => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
-        case constants.File.Wallex.FDW => withUsernameToken.PartialContent(views.html.component.master.uploadOrUpdateWallexDocument
+        case constants.File.Wallex.FDW => withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
         (wallexDocument, documentType))
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }

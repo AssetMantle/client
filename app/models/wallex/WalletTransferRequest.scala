@@ -14,8 +14,8 @@ import scala.util.{Failure, Success}
 
 case class WalletTransferRequest(
     negotiationId: String,
-    zoneID: String,
     organizationID: String,
+    zoneID: String,
     traderID: String,
     onBehalfOf: String,
     receiverAccountId: String,
@@ -174,8 +174,8 @@ class WalletTransferRequests @Inject() (
     override def * =
       (
         negotiationId,
-        zoneID,
         organizationID,
+        zoneID,
         traderID,
         onBehalfOf,
         receiverAccountId,
@@ -195,9 +195,9 @@ class WalletTransferRequests @Inject() (
 
     def negotiationId = column[String]("negotiationId", O.PrimaryKey)
 
-    def zoneID = column[String]("zoneID", O.PrimaryKey)
+    def organizationID = column[String]("organizationID",O.PrimaryKey)
 
-    def organizationID = column[String]("organizationID")
+    def zoneID = column[String]("zoneID")
 
     def traderID = column[String]("traderID")
 

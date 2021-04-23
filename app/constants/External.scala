@@ -19,8 +19,10 @@ object External {
     }
   }
 
-  //wallex date format
-  val DATE_FORMAT = "dd-MM-yyyy"
-  val APPROVED = "approved"
+  object Wallex {
+    //wallex date format
+    val DATE_FORMAT = "dd-MM-yyyy"
+    val APPROVED = "approved"
+  }
 
 }

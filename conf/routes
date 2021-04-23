@@ -567,10 +567,10 @@ GET         /chat/replyToMessage                                                
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.organizationWallexAccount
 GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
-GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationBeneficiaryDetails
+GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp
-GET         /component/collection/account                                                         controllers.ComponentViewController.wallexCollectionAccountDetail
+GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount
 GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccountForm
 POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccount
 GET         /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccountForm
@@ -580,8 +580,8 @@ POST        /master/wallex/user/update                                          
 GET         /master/wallex/user                                                                   controllers.WallexController.getUserForm
 POST        /master/wallex/user                                                                   controllers.WallexController.getUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
-GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocumentForm
-POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.wallexDocument
+GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.documentForm
+POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.document
 GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuoteForm(quoteId: String)

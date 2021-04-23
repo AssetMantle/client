@@ -76,8 +76,6 @@ object File {
     val FAMILY_CARD = "family_card"
     val IDENTITY_REPORT = "identity_report"
     val FDW = "fdw"
-
-
   }
 
   //Seq

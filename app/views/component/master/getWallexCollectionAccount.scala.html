@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.html.base._
-@import views.companion.master.GetWallexCollectionAccount
-
-@(wallexCollectionAccount: Form[GetWallexCollectionAccount.Data] = GetWallexCollectionAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@commonForm(constants.Form.ORGANIZATION_REJECT_TRADER_REQUEST, wallexCollectionAccount) {
-    @commonInputText(wallexCollectionAccount, constants.FormField.ACCOUNT_ID, 'readonly -> true)
-}

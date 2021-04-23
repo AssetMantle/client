@@ -1,0 +1,18 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.wallex.SubmitDocumentToWallex
+
+@(submitWallexDocuments: Form[SubmitDocumentToWallex.Data] = SubmitDocumentToWallex.form,documentType:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+    @commonForm(constants.Form.WALLEX_SUBMIT_DOCUMENT, submitWallexDocuments) {
+        @commonInputText(submitWallexDocuments, constants.FormField.DOCUMENT_TYPE, 'readonly -> true ,'containerDivClass -> "hidden")
+
+        @commonInfoBox() {
+            <div class="cmuk-flex cmuk-flex-wrap infoRowBox cmuk-flex-middle">
+                <p>
+                @commonTextInfo(constants.View.DOCUMENT_TYPE, documentType)
+                </p>
+            </div>
+            </p>
+            <p class="cmuk-margin-remove">@Messages(constants.View.SUBMIT_DOCUMENT_TERMS)</p>
+        }
+    }

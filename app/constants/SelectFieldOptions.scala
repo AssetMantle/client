@@ -513,6 +513,10 @@ object SelectFieldOptions {
 
   val PURPOSE_OF_TRANSFER: Seq[String] = Seq(
     "SUPP",
+    "IVPT",
+    "ADVA",
+    "WX12",
+    "INTC"
   )
 
   val GENDER: Seq[String] = Seq(

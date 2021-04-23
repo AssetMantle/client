@@ -3,17 +3,19 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.{BaseException, WSException}
-import models.master.{AccountKYCs, Negotiations}
+import models.master. Negotiations
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
-import models.wallex.{WallexSimplePaymentDetails, _}
+import models.wallex.{SimplePayments, _}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import transactions._
-import transactions.responses.WallexResponse.{CreateCollectionResponse, PaymentFileUploadResponse, ScreeningResponse, WalletToWalletXferResponse}
-import utilities.{KeyStore, MicroNumber, WallexAuthToken}
+import transactions.responses.WallexResponse.{PaymentFileUploadResponse, ScreeningResponse, WalletToWalletXferResponse}
+import transactions.wallex._
+import utilities.{KeyStore, MicroNumber}
+import views.companion
+import views.companion.wallex.WallexWalletTransfer
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
@@ -21,48 +23,26 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WallexZoneController @Inject() (
-    messagesControllerComponents: MessagesControllerComponents,
-    withoutLoginActionAsync: WithoutLoginActionAsync,
-    withUserLoginAction: WithUserLoginAction,
-    withLoginAction: WithLoginAction,
-    masterOrganizations: master.Organizations,
-    withUsernameToken: WithUsernameToken,
-    orgWallexDetails: OrganizationWallexDetails,
-    withOrganizationLoginAction: WithOrganizationLoginAction,
-    wallexUserSignUpRequest: WallexUserSignUp,
-    wallexGetUserRequest: WallexGetUser,
-    wallexDocuments: WallexDocuments,
-    wallexCreateDocument: WallexCreateDocument,
-    wallexAuthToken: WallexAuthToken,
-    createWallexPaymentQuote: CreateWallexPaymentQuote,
-    withTraderLoginAction: WithTraderLoginAction,
-    masterTraders: master.Traders,
-    orgWallexBeneficiaryDetails: OrgWallexBeneficiaryDetails,
-    wallexCreateBeneficiary: WallexCreateBeneficiary,
-    withoutLoginAction: WithoutLoginAction,
-    wallexDeleteBeneficiary: WallexDeleteBeneficiary,
-    wallexCreateSimplePayment: WallexCreateSimplePayment,
-    wallexSimplePaymentDetails: WallexSimplePaymentDetails,
-    wallexUploadPaymentFile: WallexUploadPaymentFile,
-    negotiationFiles: NegotiationFiles,
-    paymentFileDetails: PaymentFileDetails,
-    fileResourceManager: utilities.FileResourceManager,
-    wallexWalletTransfer: WallexWalletTransfer,
-    walletTransferDetails: WallexWalletTransferDetails,
-    accountKYCs: AccountKYCs,
-    userDetailsUpdate: WallexUserDetailsUpdate,
-    keyStore: KeyStore,
-    transactionsIssueFiat: transactions.IssueFiat,
-    transaction: utilities.Transaction,
-    blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
-    negotiations: Negotiations,
-    wallexCreateCollectionAccount: WallexCreateCollectionAccount,
-    wallexGetCollectionAccount: WallexGetCollectionAccount,
-    walletTransferRequests: WalletTransferRequests,
-    withZoneLoginAction: WithZoneLoginAction,
-    masterZones: master.Zones,
-    blockchainAccounts: blockchain.Accounts,
-    wallexUserScreening: WallexUserScreening
+                                       messagesControllerComponents: MessagesControllerComponents,
+                                       withUsernameToken: WithUsernameToken,
+                                       organizationWallexDetails: OrganizationWallexDetails,
+                                       wallexAuthToken: WallexAuthToken,
+                                       masterTraders: master.Traders,
+                                       wallexUploadPaymentFile: WallexUploadPaymentFile,
+                                       negotiationFiles: NegotiationFiles,
+                                       fileResourceManager: utilities.FileResourceManager,
+                                       wallexWalletTransfer: WallexWalletTransfer,
+                                       walletTransferDetails: WalletTransfers,
+                                       keyStore: KeyStore,
+                                       transactionsIssueFiat: transactions.IssueFiat,
+                                       transaction: utilities.Transaction,
+                                       blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats,
+                                       negotiations: Negotiations,
+                                       walletTransferRequests: WalletTransferRequests,
+                                       withZoneLoginAction: WithZoneLoginAction,
+                                       masterZones: master.Zones,
+                                       blockchainAccounts: blockchain.Accounts,
+                                       wallexUserScreening: WallexUserScreening
 )(implicit
     executionContext: ExecutionContext,
     configuration: Configuration,
@@ -80,7 +60,8 @@ class WallexZoneController @Inject() (
 
   def zoneWalletTransferForm(negotiationId: String): Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
+      implicit loginState =>
+        implicit request =>
         def transferRequests: Future[WalletTransferRequest] =
           walletTransferRequests.Service.tryGet(
             negotiationId = negotiationId
@@ -89,9 +70,9 @@ class WallexZoneController @Inject() (
         (for {
           transferRequest <- transferRequests
           result <- withUsernameToken.Ok(
-            views.html.component.master.zoneWallexWalletTransfer(
-              views.companion.master.WallexWalletTransfer.form.fill(
-                views.companion.master.WallexWalletTransfer.Data(
+            views.html.component.wallex.zoneWallexWalletTransfer(
+              WallexWalletTransfer.form.fill(
+                companion.wallex.WallexWalletTransfer.Data(
                   onBehalfOf = transferRequest.onBehalfOf,
                   receiverAccountId = transferRequest.receiverAccountId,
                   amount = transferRequest.amount,
@@ -115,14 +96,15 @@ class WallexZoneController @Inject() (
 
   def zoneCreateWalletTransfer(): Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
-        views.companion.master.WallexWalletTransfer.form
+      implicit loginState =>
+        implicit request =>
+        companion.wallex.WallexWalletTransfer.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
               Future(
                 BadRequest(
-                  views.html.component.master
+                  views.html.component.wallex
                     .zoneWallexWalletTransfer(formWithErrors)
                 )
               )
@@ -138,7 +120,7 @@ class WallexZoneController @Inject() (
                 )
 
               def getWallexDetails(accountId: String) =
-                orgWallexDetails.Service.tryGetByAccountId(accountId)
+                organizationWallexDetails.Service.tryGetByAccountId(accountId)
               val zoneID =
                 masterZones.Service
                   .tryGetID(loginState.username)
@@ -169,7 +151,7 @@ class WallexZoneController @Inject() (
                 val fetchFile: File = utilities.FileOperations
                   .fetchFile(path, negotiationFile.fileName)
                 val fileArray =
-                  utilities.FileOperations.convertToByteArray(fetchFile)
+                    utilities.FileOperations.convertToByteArray(fetchFile)
                 wallexUploadPaymentFile.Service
                   .put(authToken, uploadURL, fileArray)
               }
@@ -318,7 +300,8 @@ class WallexZoneController @Inject() (
 
   def zoneViewWalletTransferRequestList(): Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
+      implicit loginState =>
+        implicit request =>
         val zoneID = masterZones.Service.tryGetID(loginState.username)
 
         def pendingWalletTransferRequests(
@@ -330,7 +313,7 @@ class WallexZoneController @Inject() (
           zoneID <- zoneID
           pendingWalletRequests <- pendingWalletTransferRequests(zoneID)
         } yield Ok(
-          views.html.component.master
+          views.html.component.wallex
             .zoneViewPendingWalletTransferRequestList(pendingWalletRequests)
         )).recover {
           case baseException: BaseException =>
@@ -392,18 +375,19 @@ class WallexZoneController @Inject() (
 
   def zoneViewWallexKYCScreeningList(): Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
+      implicit loginState =>
+        implicit request =>
         val zoneID = masterZones.Service.tryGetID(loginState.username)
         def pendingScreeningRequests(
             zoneID: String
         ): Future[Seq[OrganizationWallexDetail]] =
-          orgWallexDetails.Service.tryGetPendingByZoneID(zoneID)
+          organizationWallexDetails.Service.tryGetPendingByZoneID(zoneID)
 
         (for {
           zoneID <- zoneID
           pendingKYCRequests <- pendingScreeningRequests(zoneID)
         } yield Ok(
-          views.html.component.master
+          views.html.component.wallex
             .zoneViewPendingWallexKYCRequestList(pendingKYCRequests)
         )).recover {
           case baseException: BaseException =>
@@ -413,7 +397,8 @@ class WallexZoneController @Inject() (
 
   def sendForScreeningForm(wallexID: String): Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
+      implicit loginState =>
+        implicit request =>
         (for {
           result <- withUsernameToken.Ok(
             views.html.component.master.sendUserDetailsForScreening(
@@ -437,7 +422,8 @@ class WallexZoneController @Inject() (
 
   def sendForScreening: Action[AnyContent] =
     withZoneLoginAction.authenticated {
-      implicit loginState => implicit request =>
+      implicit loginState =>
+        implicit request =>
         views.companion.master.SendUserDetailsForScreening.form
           .bindFromRequest()
           .fold(
@@ -464,7 +450,7 @@ class WallexZoneController @Inject() (
               def updateStatus(
                   screeningResponse: ScreeningResponse
               ): Future[Int] =
-                orgWallexDetails.Service.updateStatus(
+                organizationWallexDetails.Service.updateStatus(
                   wallexID = screeningResponse.id,
                   status = screeningResponse.status
                 )
