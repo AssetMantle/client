@@ -5,7 +5,11 @@
 
 @commonCard(constants.View.VALIDATOR_DELEGATIONS) {
 } {
-    @commonPieChart("validatorDelegationsChart", delegationsMap, showLegend = true)
-    @commonTextInfo(constants.View.SELF_DELEGATED, s"${utilities.NumericOperation.roundOff(selfDelegatedPercentage)} %")
-    @commonTextInfo(constants.View.OTHERS_DELEGATED, s"${utilities.NumericOperation.roundOff(othersDelegatedPercentage)} %")
+    @if(delegationsMap.nonEmpty) {
+        @commonPieChart("validatorDelegationsChart", delegationsMap, showLegend = true)
+        @commonTextInfo(constants.View.SELF_DELEGATED, s"${utilities.NumericOperation.roundOff(selfDelegatedPercentage)} %")
+        @commonTextInfo(constants.View.OTHERS_DELEGATED, s"${utilities.NumericOperation.roundOff(othersDelegatedPercentage)} %")
+    } else {
+        @Messages(constants.View.NO_DELEGATIONS_FOUND)
+    }
 }

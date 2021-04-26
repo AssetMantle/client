@@ -506,6 +506,7 @@ object View {
   val RECIPIENT = "RECIPIENT"
   val INFO = "INFO"
   val MESSAGES_TYPE = "MESSAGES_TYPE"
+  val NO_DELEGATIONS_FOUND = "NO_DELEGATIONS_FOUND"
 
   val TxMessagesMap: Map[String, String] = Map(
     constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
