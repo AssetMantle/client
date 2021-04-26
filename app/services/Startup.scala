@@ -221,9 +221,9 @@ class Startup @Inject()(
       blockCommitResponse <- blockCommitResponse
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
-      _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       blockResultResponse <- blockResultResponse
       _ <- actionsOnEvents(blockResultResponse)
+      _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
     } yield ()).recover {
       case baseException: BaseException => throw baseException
