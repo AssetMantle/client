@@ -360,7 +360,7 @@ class Validators @Inject()(
       val unbondingValidators = Service.getAllUnbondingValidatorList
 
       def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
-        if (header.height >= unbondingValidator.unbondingHeight && utilities.Date.isMature(header.time, unbondingValidator.unbondingTime)) {
+        if (header.height >= unbondingValidator.unbondingHeight && utilities.Date.isMature(completionTimestamp = unbondingValidator.unbondingTime, currentTimeStamp = header.time)) {
           val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
           val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Bech32.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
 

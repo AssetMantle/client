@@ -111,18 +111,18 @@ class Block @Inject()(
 
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnNewBlock(header: Header): Future[Unit] = {
-    val validators = blockchainValidators.Utility.onNewBlock(header)
     val halving = blockchainParameters.Utility.onNewBlock(header)
     val tokens = blockchainTokens.Utility.updateAll()
+    val validators = blockchainValidators.Utility.onNewBlock(header)
     // Evidence BeginBlocker is handled via Events
     // Gov EndBlocker is handled via Events
     // Slashing BeginBlocker is handled via Events
     // Staking Unbonding and Redelegation Completion EndBlocker is handled via Events
 
     (for {
-      _ <- validators
       _ <- halving
       _ <- tokens
+      _ <- validators
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
