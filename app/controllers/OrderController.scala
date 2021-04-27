@@ -236,6 +236,7 @@ class OrderController @Inject()(
           val negotiation = masterNegotiations.Service.tryGet(buyerExecuteData.orderID)
           val order = masterOrders.Service.tryGet(buyerExecuteData.orderID)
           val negotiationFile = masterTransactionNegotiationFiles.Service.tryGet(buyerExecuteData.orderID, constants.File.Negotiation.FIAT_PROOF)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
@@ -243,9 +244,9 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String, negotiation: Negotiation): Future[Result] = {
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, traderID: String, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, fiatProofHash: String, negotiation: Negotiation): Future[Result] = {
             if (validateUsernamePassword) {
-              if (asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
+              if (negotiation.buyerTraderID == traderID && asset.status == constants.Status.Asset.IN_ORDER && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).buyerExecuteOrder) {
                 val ticketID = asset.pegHash match {
                   case Some(pegHash) => transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
                     entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = buyerExecuteData.gas, ticketID = "", mode = transactionMode),
@@ -276,10 +277,11 @@ class OrderController @Inject()(
             negotiation <- negotiation
             order <- order
             negotiationFile <- negotiationFile
+            traderID <- traderID
             asset <- getAsset(negotiation.assetID)
             sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
             sellerAddress <- getAddress(sellerAccountID)
-            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = loginState.username, sellerAccountID = sellerAccountID, buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = utilities.FileOperations.getFileNameWithoutExtension(negotiationFile.fileName), negotiation)
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, traderID = traderID, buyerAccountID = loginState.username, sellerAccountID = sellerAccountID, buyerAddress = loginState.address, sellerAddress = sellerAddress, asset = asset, order = order, fiatProofHash = utilities.FileOperations.getFileNameWithoutExtension(negotiationFile.fileName), negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = buyerExecuteData.orderID, failures = Seq(baseException.failure)))
@@ -302,6 +304,7 @@ class OrderController @Inject()(
           val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sellerExecuteData.password)
           val negotiation = masterNegotiations.Service.tryGet(sellerExecuteData.orderID)
           val order = masterOrders.Service.tryGet(sellerExecuteData.orderID)
+          val traderID = masterTraders.Service.tryGetID(loginState.username)
 
           def getAsset(assetID: String): Future[Asset] = masterAssets.Service.tryGet(assetID)
 
@@ -311,9 +314,9 @@ class OrderController @Inject()(
 
           def getAddress(accountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(accountID)
 
-          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile, negotiation: Negotiation): Future[Result] = {
+          def sendTransactionAndGetResult(validateUsernamePassword: Boolean, traderID: String, buyerAccountID: String, sellerAccountID: String, buyerAddress: String, sellerAddress: String, asset: Asset, order: Order, billOfLading: AssetFile, negotiation: Negotiation): Future[Result] = {
             if (validateUsernamePassword) {
-              if (asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sellerExecuteOrder) {
+              if (negotiation.sellerTraderID == traderID && asset.status == constants.Status.Asset.IN_ORDER && billOfLading.status.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_VERIFICATION_STATUS_PENDING)) && Seq(constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING).contains(order.status) && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).sellerExecuteOrder) {
                 val awbProofHash = utilities.String.sha256Sum(Json.toJson(billOfLading.documentContent.getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))).toString)
                 val ticketID = asset.pegHash match {
                   case Some(pegHash) => transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
@@ -343,11 +346,12 @@ class OrderController @Inject()(
             validateUsernamePassword <- validateUsernamePassword
             negotiation <- negotiation
             order <- order
+            traderID <- traderID
             asset <- getAsset(negotiation.assetID)
             billOfLading <- getBillOfLading(negotiation.assetID)
             buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
-            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerAccountID = loginState.username, buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, order = order, billOfLading = billOfLading, negotiation = negotiation)
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, traderID = traderID, buyerAccountID = buyerAccountID, sellerAccountID = loginState.username, buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, order = order, billOfLading = billOfLading, negotiation = negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sellerExecuteData.orderID, failures = Seq(baseException.failure)))
