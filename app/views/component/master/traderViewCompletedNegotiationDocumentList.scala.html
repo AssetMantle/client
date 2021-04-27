@@ -18,7 +18,7 @@
                             </td>
                             @assetFile.documentType match{
                                 case constants.File.Asset.BILL_OF_LADING=> {
-                                    <td> <span class="seenIcon" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiationHistory.assetID', '@assetFile.documentType'))")>
+                                    <td colspan="2"> <span class="seenIcon" onclick="getForm(jsRoutes.controllers.ComponentViewController.traderViewAssetDocumentContent('@negotiationHistory.assetID', '@assetFile.documentType'))")>
                                     @commonIcon("seen")
                                     </span>
                                     </td>
@@ -47,9 +47,11 @@
                                         @commonIcon("seen")
                                         </span>
                                     </td>
-                                    @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <td><span class="cmuk-badge verified">@constants.View.SIGNED</span></td>}
+                                    <td>
+                                    @if(negotiationFile.documentType ==constants.File.Negotiation.CONTRACT) { <span class="cmuk-badge verified">@constants.View.SIGNED</span>}
+                                    </td>
                                 }
-                                case _=>{<td colspan="3"></td>}
+                                case _=>{<td colspan="2"></td>}
                             }
                         </tr>
                     }
