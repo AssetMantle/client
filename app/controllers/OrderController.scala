@@ -340,14 +340,14 @@ class OrderController @Inject()(
           }
 
           (for {
-            validateUsernamePassword<-validateUsernamePassword
+            validateUsernamePassword <- validateUsernamePassword
             negotiation <- negotiation
             order <- order
             asset <- getAsset(negotiation.assetID)
             billOfLading <- getBillOfLading(negotiation.assetID)
             buyerAccountID <- getTraderAccountID(negotiation.buyerTraderID)
             buyerAddress <- getAddress(buyerAccountID)
-            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerAccountID = loginState.username,buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, order = order, billOfLading = billOfLading, negotiation = negotiation)
+            result <- sendTransactionAndGetResult(validateUsernamePassword = validateUsernamePassword, buyerAccountID = buyerAccountID, sellerAccountID = loginState.username, buyerAddress = buyerAddress, sellerAddress = loginState.address, asset = asset, order = order, billOfLading = billOfLading, negotiation = negotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = sellerExecuteData.orderID, failures = Seq(baseException.failure)))
