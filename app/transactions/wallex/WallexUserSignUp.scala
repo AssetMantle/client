@@ -1,7 +1,7 @@
 package transactions.wallex
 
 import com.fasterxml.jackson.core.JsonParseException
-import exceptions.{BaseException, WSException}
+import exceptions.BaseException
 import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -50,31 +50,22 @@ class WallexUserSignUp @Inject() (
   private def action(
       request: Request,
       authToken: String
-  ): Future[Either[WallexErrorResponse, Response]] = {
+  ): Future[Response] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
-
-    wsClient
-      .url(url)
-      .withHttpHeaders(apiKeyHeader, authTokenHeader)
-      .post(Json.toJson(request)) map { response =>
-      if (response.status >= 400) {
-        logger.error(response.body[JsValue].toString())
-        Left(response.body[JsValue].as[WallexErrorResponse])
-      } else
-        Right(response.body[JsValue].as[Response])
-    } andThen {
-      case Failure(exception) =>
-        exception match {
-          case parsingError: JsonParseException =>
-            logger.error(
-              parsingError.getMessage
-            )
-          case networkingError: IOException =>
-            logger.error(
-              networkingError.getMessage
-            )
-        }
-    }
+    utilities.JSON
+      .getResponseFromJson[Response](
+        wsClient
+          .url(url)
+          .withHttpHeaders(apiKeyHeader, authTokenHeader)
+          .post(Json.toJson(request))
+      ).recover {
+        case baseException: BaseException =>
+          logger.error(
+            constants.Response.WALLEX_EXCEPTION.message,
+            baseException
+          )
+          throw new BaseException(constants.Response.WALLEX_EXCEPTION)
+      }
   }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
@@ -90,20 +81,7 @@ class WallexUserSignUp @Inject() (
   object Service {
 
     def post(authToken: String, request: Request): Future[Response] =
-      action(request, authToken) map {
-        case Left(errorResponse: WallexErrorResponse) => {
-          logger.error(
-            errorResponse.toString
-          )
-          throw new WSException(
-            constants.Response.WALLEX_EXCEPTION,
-            null,
-            errorResponse.message
-          )
-        }
-        case Right(response: Response) =>
-          response
-      } recover {
+      action(request, authToken).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

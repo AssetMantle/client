@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, WSException}
+import exceptions.BaseException
 import models.common.Serializable.{BankAccount, BeneficiaryPayment, ConversionDetails}
 import models.master.{Negotiations, Trader}
 import models.masterTransaction.NegotiationFile
@@ -29,32 +29,32 @@ class WallexController @Inject() (
                                    masterOrganizations: master.Organizations,
                                    withUsernameToken: WithUsernameToken,
                                    organizationWallexDetails: OrganizationWallexDetails,
-                                   wallexUserSignUpRequest: WallexUserSignUp,
-                                   wallexGetUserRequest: WallexGetUser,
-                                   wallexKYCs: UserKYCs,
-                                   wallexCreateDocument: WallexCreateDocument,
-                                   wallexAuthToken: WallexAuthToken,
-                                   createWallexPaymentQuote: CreateWallexPaymentQuote,
                                    withTraderLoginAction: WithTraderLoginAction,
                                    masterTraders: master.Traders,
-                                   orgWallexBeneficiaryDetails: OrganizationBeneficiaries,
-                                   wallexCreateBeneficiary: WallexCreateBeneficiary,
                                    withoutLoginAction: WithoutLoginAction,
-                                   wallexDeleteBeneficiary: WallexDeleteBeneficiary,
-                                   wallexCreateSimplePayment: WallexCreateSimplePayment,
-                                   wallexSimplePaymentDetails: SimplePayments,
-                                   wallexUploadPaymentFile: WallexUploadPaymentFile,
-                                   paymentFileDetails: PaymentFiles,
                                    fileResourceManager: utilities.FileResourceManager,
                                    userDetailsUpdate: WallexUserDetailsUpdate,
                                    negotiations: Negotiations,
+                                   paymentFiles: PaymentFiles,
+                                   updateCompanyDetails: WallexUpdateCompanyDetails,
+                                   wallexOrganizationBeneficiaries: OrganizationBeneficiaries,
+                                   wallexCreateBeneficiary: WallexCreateBeneficiary,
+                                   wallexDeleteBeneficiary: WallexDeleteBeneficiary,
+                                   wallexCreateSimplePayment: WallexCreateSimplePayment,
+                                   wallexSimplePayments: SimplePayments,
+                                   wallexUploadPaymentFile: WallexUploadPaymentFile,
                                    wallexCreateCollectionAccount: WallexCreateCollectionAccount,
                                    wallexGetCollectionAccount: WallexGetCollectionAccount,
-                                   wallexKYCDetails: UserKYCDetails,
-                                   collectionAccountDetails: CollectionAccounts,
+                                   wallexUserKYCDetails: UserKYCDetails,
+                                   wallexCollectionAccounts: CollectionAccounts,
                                    wallexGetWalletBalance: WallexGetWalletBalance,
-                                   walletTransferRequest: WalletTransferRequests,
-                                   updateCompanyDetails: WallexUpdateCompanyDetails
+                                   wallexUserSignUpRequest: WallexUserSignUp,
+                                   wallexGetUserRequest: WallexGetUser,
+                                   wallexUserKYCs: UserKYCs,
+                                   wallexCreateDocument: WallexCreateDocument,
+                                   wallexAuthToken: WallexAuthToken,
+                                   wallexCreatePaymentQuote: CreateWallexPaymentQuote,
+                                   walletTransferRequest: WalletTransferRequests
 )(implicit
     executionContext: ExecutionContext,
     configuration: Configuration,
@@ -207,13 +207,6 @@ class WallexController @Inject() (
                     InternalServerError(
                       views.html.index(failures = Seq(baseException.failure))
                     )
-                  case wsException: WSException =>
-                    InternalServerError(
-                      views.html.index(
-                        errorMessage = wsException.errorMessage,
-                        failures = Seq(wsException.failure)
-                      )
-                    )
                 }
               }
             )
@@ -243,7 +236,7 @@ class WallexController @Inject() (
                 )
               },
               file => {
-                val wallexKYC = wallexKYCs.Service
+                val wallexKYC = wallexUserKYCs.Service
                   .get(loginState.username, file.documentType)
                 for {
                   wallexKYC <- wallexKYC
@@ -302,7 +295,7 @@ class WallexController @Inject() (
                 def getWallexDocument(
                                        documentType: String
                                      ): Future[models.wallex.UserKYC] = {
-                  wallexKYCs.Service.tryGet(
+                  wallexUserKYCs.Service.tryGet(
                     loginState.username,
                     documentType
                   )
@@ -346,7 +339,7 @@ class WallexController @Inject() (
                                            wallexId: String,
                                            documentResponse: CreateDocumentResponse
                                          ) = {
-                  wallexKYCDetails.Service.insertOrUpdate(
+                  wallexUserKYCDetails.Service.insertOrUpdate(
                     id = documentResponse.id,
                     organizationID = organizationID,
                     wallexId = wallexId,
@@ -395,13 +388,6 @@ class WallexController @Inject() (
                     InternalServerError(
                       views.html.index(failures = Seq(baseException.failure))
                     )
-                  case wsException: WSException =>
-                    InternalServerError(
-                      views.html.index(
-                        errorMessage = wsException.errorMessage,
-                        failures = Seq(wsException.failure)
-                      )
-                    )
                 }
 
               }
@@ -411,7 +397,7 @@ class WallexController @Inject() (
   def uploadOrUpdateWallexDocument(documentType: String): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState => implicit request =>
-        val wallexKYC = wallexKYCs.Service
+        val wallexKYC = wallexUserKYCs.Service
           .get(loginState.username, documentType)
         for {
           wallexKYC <- wallexKYC
@@ -464,9 +450,9 @@ class WallexController @Inject() (
               val authToken = wallexAuthToken.Service.getToken()
 
               def createPaymentQuote(authToken: String) =
-                createWallexPaymentQuote.Service.post(
+                wallexCreatePaymentQuote.Service.post(
                   authToken,
-                  createWallexPaymentQuote.Request(
+                  wallexCreatePaymentQuote.Request(
                     sellCurrency = paymentQuote.sellCurrency,
                     buyCurrency = paymentQuote.buyCurrency,
                     amount = paymentQuote.amount,
@@ -556,13 +542,6 @@ class WallexController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
-                  )
               }
             }
           )
@@ -617,7 +596,7 @@ class WallexController @Inject() (
                 organizationWallexDetails.Service.tryGet(organizationID)
 
               val file =
-                paymentFileDetails.Service.tryGet(createPaymentResponse.quoteId)
+                paymentFiles.Service.tryGet(createPaymentResponse.quoteId)
               val authToken = wallexAuthToken.Service.getToken()
 
               def createSimplePayment(
@@ -651,7 +630,7 @@ class WallexController @Inject() (
                   conversionDetails: ConversionDetails,
                   zoneApproved: Option[Boolean]
               ) =
-                wallexSimplePaymentDetails.Service.create(
+                wallexSimplePayments.Service.create(
                   wallexId = wallexId,
                   zoneID = zoneID,
                   simplePaymentId = simplePaymentId,
@@ -739,13 +718,6 @@ class WallexController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
-                  )
               }
 
             }
@@ -775,7 +747,7 @@ class WallexController @Inject() (
                 )
               )
             },
-            beneficiaryDetail => {
+            beneficiary => {
 
               val organizationID =
                 masterTraders.Service.getOrganizationIDByAccountID(
@@ -793,21 +765,21 @@ class WallexController @Inject() (
                 wallexCreateBeneficiary.Service.post(
                   authToken,
                   wallexCreateBeneficiary.Request(
-                    country = beneficiaryDetail.country,
-                    address = beneficiaryDetail.address,
-                    city = beneficiaryDetail.city,
-                    nickname = beneficiaryDetail.nickName,
-                    entityType = beneficiaryDetail.entityType,
-                    companyName = beneficiaryDetail.companyName,
+                    country = beneficiary.country,
+                    address = beneficiary.address,
+                    city = beneficiary.city,
+                    nickname = beneficiary.nickName,
+                    entityType = beneficiary.entityType,
+                    companyName = beneficiary.companyName,
                     bankAccount = BankAccount(
-                      bankName = beneficiaryDetail.bankData.bankName,
-                      currency = beneficiaryDetail.bankData.currency,
-                      country = beneficiaryDetail.bankData.country,
-                      accountNumber = beneficiaryDetail.bankData.accountNumber,
-                      bicSwift = beneficiaryDetail.bankData.bicSwift,
-                      address = beneficiaryDetail.bankData.address,
+                      bankName = beneficiary.bankData.bankName,
+                      currency = beneficiary.bankData.currency,
+                      country = beneficiary.bankData.country,
+                      accountNumber = beneficiary.bankData.accountNumber,
+                      bicSwift = beneficiary.bankData.bicSwift,
+                      address = beneficiary.bankData.address,
                       bankAccountHolderName =
-                        beneficiaryDetail.bankData.accountHolderName
+                        beneficiary.bankData.accountHolderName
                     )
                   )
                 )
@@ -827,7 +799,7 @@ class WallexController @Inject() (
                   accountType: String,
                   bankAccount: BankAccount
               ) =
-                orgWallexBeneficiaryDetails.Service.create(
+                wallexOrganizationBeneficiaries.Service.create(
                   organizationID = organizationID,
                   traderID = traderID,
                   wallexId = wallexId,
@@ -882,13 +854,6 @@ class WallexController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
-                  )
               }
             }
           )
@@ -922,7 +887,7 @@ class WallexController @Inject() (
             },
             deleteBeneficiary => {
               val beneficiary =
-                orgWallexBeneficiaryDetails.Service
+                wallexOrganizationBeneficiaries.Service
                   .getByTraderID(loginState.username)
 
               val authToken = wallexAuthToken.Service.getToken()
@@ -936,7 +901,7 @@ class WallexController @Inject() (
               }
 
               def deleteBeneficiary(beneficiaryId: String): Future[Int] =
-                orgWallexBeneficiaryDetails.Service
+                wallexOrganizationBeneficiaries.Service
                   .delete(beneficiaryId)
 
               (for {
@@ -1164,7 +1129,7 @@ class WallexController @Inject() (
                 )
               )
             },
-            updateDetails => {
+            updateCompany => {
 
               val organizationID =
                 masterTraders.Service.getOrganizationIDByAccountID(
@@ -1183,17 +1148,17 @@ class WallexController @Inject() (
                   authToken,
                   updateCompanyDetails.Request(
                     countryOfIncorporation =
-                      updateDetails.countryOfIncorporation,
-                    countryOfOperations = updateDetails.countryOfOperations,
-                    businessType = updateDetails.businessType,
-                    companyAddress = updateDetails.companyAddress,
-                    postalCode = updateDetails.postalCode,
-                    state = updateDetails.state,
-                    city = updateDetails.city,
-                    registrationNumber = updateDetails.registrationNumber,
+                      updateCompany.countryOfIncorporation,
+                    countryOfOperations = updateCompany.countryOfOperations,
+                    businessType = updateCompany.businessType,
+                    companyAddress = updateCompany.companyAddress,
+                    postalCode = updateCompany.postalCode,
+                    state = updateCompany.state,
+                    city = updateCompany.city,
+                    registrationNumber = updateCompany.registrationNumber,
                     incorporationDate = {
                       new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT)
-                        .format(updateDetails.incorporationDate)
+                        .format(updateCompany.incorporationDate)
                     }
                   ),
                   userId = wallexID
@@ -1216,13 +1181,6 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
-                  )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
                   )
               }
 
@@ -1302,7 +1260,7 @@ class WallexController @Inject() (
                   wallexId: String,
                   accountId: String
               ) = {
-                collectionAccountDetails.Service.create(
+                wallexCollectionAccounts.Service.create(
                   id = collectionResponse.id,
                   wallexId = wallexId,
                   accountId = accountId
@@ -1449,7 +1407,7 @@ class WallexController @Inject() (
                 )
               )
             },
-            orgWallexAccountDetailData => {
+            organizationAccountData => {
               val organizationID =
                 masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
@@ -1515,7 +1473,7 @@ class WallexController @Inject() (
                 )
               )
             },
-            updateDetails => {
+            userUpdateAccount => {
 
               val organizationID =
                 masterTraders.Service.getOrganizationIDByAccountID(
@@ -1533,28 +1491,28 @@ class WallexController @Inject() (
                 userDetailsUpdate.Service.post(
                   authToken,
                   userDetailsUpdate.Request(
-                    mobileCountryCode = updateDetails.mobileCountryCode,
-                    mobileNumber = updateDetails.mobileNumber,
-                    gender = updateDetails.gender,
-                    countryOfBirth = updateDetails.countryOfBirth,
-                    nationality = updateDetails.nationality,
-                    countryOfResidence = updateDetails.countryOfResidence,
-                    residentialAddress = updateDetails.residentialAddress,
-                    countryCode = updateDetails.countryCode,
-                    postalCode = updateDetails.postalCode,
+                    mobileCountryCode = userUpdateAccount.mobileCountryCode,
+                    mobileNumber = userUpdateAccount.mobileNumber,
+                    gender = userUpdateAccount.gender,
+                    countryOfBirth = userUpdateAccount.countryOfBirth,
+                    nationality = userUpdateAccount.nationality,
+                    countryOfResidence = userUpdateAccount.countryOfResidence,
+                    residentialAddress = userUpdateAccount.residentialAddress,
+                    countryCode = userUpdateAccount.countryCode,
+                    postalCode = userUpdateAccount.postalCode,
                     dateOfBirth = {
                       new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT)
-                        .format(updateDetails.dateOfBirth)
+                        .format(userUpdateAccount.dateOfBirth)
                     },
-                    identificationType = updateDetails.identificationType,
-                    identificationNumber = updateDetails.identificationNumber,
+                    identificationType = userUpdateAccount.identificationType,
+                    identificationNumber = userUpdateAccount.identificationNumber,
                     issueDate = {
                       new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT)
-                        .format(updateDetails.issueDate)
+                        .format(userUpdateAccount.issueDate)
                     },
                     expiryDate = {
                       new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT)
-                        .format(updateDetails.expiryDate)
+                        .format(userUpdateAccount.expiryDate)
                     }
                   ),
                   userId = wallexID
@@ -1577,13 +1535,6 @@ class WallexController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
-                  )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
                   )
               }
 

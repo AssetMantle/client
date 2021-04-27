@@ -56,8 +56,14 @@ class WallexCreateDocument @Inject() (
       wsClient
         .url(url.replace("userId",wallexUserID))
         .withHttpHeaders(apiKeyHeader, authTokenHeader)
-        .post(Json.toJson(request))
-    )
+        .post(Json.toJson(request))).recover {
+      case baseException: BaseException =>
+        logger.error(
+          constants.Response.WALLEX_EXCEPTION.message,
+          baseException
+        )
+        throw new BaseException(constants.Response.WALLEX_EXCEPTION)
+    }
   }
 
   private def putAction(

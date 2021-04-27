@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq(),errorMessage:String ="")(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -186,12 +186,6 @@
                             @Messages(info.message)</p>
                     </div>
 
-                }
-                @if(errorMessage !="") {
-                    <div class="cmuk-alert-danger" onclick="getForm(@errorMessage)" cmuk-alert>
-                        <a class="cmuk-alert-close" cmuk-close></a>
-                        <p>@Messages(errorMessage)</p>
-                    </div>
                 }
             </div>
 

@@ -1,19 +1,16 @@
 package transactions.wallex
 
-import com.fasterxml.jackson.core.JsonParseException
-import exceptions.{BaseException, WSException}
-import play.api.libs.json.{JsValue, Json, OWrites}
+import exceptions.BaseException
+import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.{WalletToWalletXferResponse, WallexErrorResponse}
+import transactions.responses.WallexResponse.WalletToWalletXferResponse
 import utilities.KeyStore
 
-import java.io.IOException
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Failure
 
 @Singleton
 class WallexWalletTransfer @Inject() (
@@ -50,31 +47,22 @@ class WallexWalletTransfer @Inject() (
   private def action(
       request: Request,
       authToken: String
-  ): Future[Either[WallexErrorResponse, WalletToWalletXferResponse]] = {
+  ): Future[WalletToWalletXferResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
-
-    wsClient
-      .url(url)
-      .withHttpHeaders(apiKeyHeader, authTokenHeader)
-      .post(Json.toJson(request)) map { response =>
-      if (response.status >= 400) {
-        logger.error(response.body[JsValue].toString())
-        Left(response.body[JsValue].as[WallexErrorResponse])
-      } else
-        Right(response.body[JsValue].as[WalletToWalletXferResponse])
-    } andThen {
-      case Failure(exception) =>
-        exception match {
-          case parsingError: JsonParseException =>
-            logger.error(
-              parsingError.getMessage
-            )
-          case networkingError: IOException =>
-            logger.error(
-              networkingError.getMessage
-            )
-        }
-    }
+    utilities.JSON
+      .getResponseFromJson[WalletToWalletXferResponse](
+        wsClient
+          .url(url)
+          .withHttpHeaders(apiKeyHeader, authTokenHeader)
+          .post(Json.toJson(request))
+      ).recover {
+        case baseException: BaseException =>
+          logger.error(
+            constants.Response.WALLEX_EXCEPTION.message,
+            baseException
+          )
+          throw new BaseException(constants.Response.WALLEX_EXCEPTION)
+      }
   }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
@@ -96,20 +84,7 @@ class WallexWalletTransfer @Inject() (
         authToken: String,
         request: Request
     ): Future[WalletToWalletXferResponse] =
-      action(request, authToken) map {
-        case Left(errorResponse: WallexErrorResponse) => {
-          logger.error(
-            errorResponse.toString
-          )
-          throw new WSException(
-            constants.Response.WALLEX_EXCEPTION,
-            null,
-            errorResponse.message
-          )
-        }
-        case Right(walletToWalletXferResponse: WalletToWalletXferResponse) =>
-          walletToWalletXferResponse
-      } recover {
+      action(request, authToken).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

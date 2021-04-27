@@ -1,12 +1,15 @@
 package transactions.wallex
 
 import com.fasterxml.jackson.core.JsonParseException
-import exceptions.{BaseException, WSException}
+import exceptions.BaseException
 import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.{CreateSimplePaymentResponse, WallexErrorResponse}
+import transactions.responses.WallexResponse.{
+  CreateSimplePaymentResponse,
+  WallexErrorResponse
+}
 import utilities.KeyStore
 
 import java.io.IOException
@@ -50,31 +53,23 @@ class WallexCreateSimplePayment @Inject() (
   private def action(
       request: Request,
       authToken: String
-  ): Future[Either[WallexErrorResponse, CreateSimplePaymentResponse]] = {
+  ): Future[CreateSimplePaymentResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
-    wsClient
-      .url(url)
-      .withHttpHeaders(apiKeyHeader, authTokenHeader)
-      .post(Json.toJson(request)) map { response =>
-      if (response.status >= 400) {
-        logger.error(response.body[JsValue].toString())
-        Left(response.body[JsValue].as[WallexErrorResponse])
-      } else
-        Right(response.body[JsValue].as[CreateSimplePaymentResponse])
-    } andThen {
-      case Failure(exception) =>
-        exception match {
-          case parsingError: JsonParseException =>
-            logger.error(
-              parsingError.getMessage
-            )
-          case networkingError: IOException =>
-            logger.error(
-              networkingError.getMessage
-            )
-        }
-    }
+    utilities.JSON
+      .getResponseFromJson[CreateSimplePaymentResponse](
+        wsClient
+          .url(url)
+          .withHttpHeaders(apiKeyHeader, authTokenHeader)
+          .post(Json.toJson(request))
+      ).recover {
+        case baseException: BaseException =>
+          logger.error(
+            constants.Response.WALLEX_EXCEPTION.message,
+            baseException
+          )
+          throw new BaseException(constants.Response.WALLEX_EXCEPTION)
+      }
   }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
@@ -94,20 +89,7 @@ class WallexCreateSimplePayment @Inject() (
         authToken: String,
         request: Request
     ): Future[CreateSimplePaymentResponse] =
-      action(request, authToken) map {
-        case Left(errorResponse: WallexErrorResponse) => {
-          logger.error(
-            errorResponse.toString
-          )
-          throw new WSException(
-            constants.Response.WALLEX_EXCEPTION,
-            null,
-            errorResponse.message
-          )
-        }
-        case Right(createSimplePaymentResponse: CreateSimplePaymentResponse) =>
-          createSimplePaymentResponse
-      } recover {
+      action(request, authToken).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

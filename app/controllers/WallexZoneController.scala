@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, WSException}
+import exceptions.BaseException
 import models.master. Negotiations
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{SimplePayments, _}
@@ -285,13 +285,6 @@ class WallexZoneController @Inject() (
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
                   )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(
-                      errorMessage = wsException.errorMessage,
-                      failures = Seq(wsException.failure)
-                    )
-                  )
               }
             }
           )
@@ -469,10 +462,6 @@ class WallexZoneController @Inject() (
                 case baseException: BaseException =>
                   InternalServerError(
                     views.html.index(failures = Seq(baseException.failure))
-                  )
-                case wsException: WSException =>
-                  InternalServerError(
-                    views.html.index(errorMessage = wsException.errorMessage,failures = Seq(wsException.failure))
                   )
               }
             }
