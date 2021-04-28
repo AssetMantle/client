@@ -1408,4 +1408,5 @@ IDENTIFICATION_NUMBER = Identification Number
 ISSUE_DATE = Issue Date
 EXPIRY_DATE = Expiry Date
 WALLEX_ACCOUNT_CREATE = Register for Wallex
+WALLEX_POWERED_BY = Powered By @
 
