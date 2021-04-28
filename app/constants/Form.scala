@@ -178,7 +178,7 @@ object Form {
   val WALLEX_UPDATE_ACCOUNT = new Form("WALLEX_UPDATE_ACCOUNT", routes.WallexController.updateCompanyAccount(), routes.javascript.WallexController.updateCompanyAccountForm)
   val WALLEX_ADD_OR_UPDATE_DOCUMENT = new Form("ADD_OR_UPDATE_WALLEX_DOCUMENT", routes.WallexController.document(), routes.javascript.WallexController.documentForm)
   val WALLEX_INITIATE_PAYMENT = new Form("WALLEX_INITIATE_PAYMENT", routes.WallexController.initiatePayment(), routes.javascript.WallexController.initiatePaymentForm)
-  val WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST = new Form("WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST", routes.WallexController.acceptWallexQuote(), routes.javascript.WallexController.acceptWallexQuoteForm)
+  val WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST = new Form("WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST", routes.WallexController.acceptQuote(), routes.javascript.WallexController.acceptQuoteForm)
   val WALLEX_ADD_BENEFICIARY_DETAILS = new Form("WALLEX_ADD_BENEFICIARY_DETAILS", routes.WallexController.createBeneficiaries(), routes.javascript.WallexController.createBeneficiariesForm)
   val WALLEX_DELETE_BENEFICIARY = new Form("WALLEX_DELETE_BENEFICIARY", routes.WallexController.deleteBeneficiary(), routes.javascript.WallexController.deleteBeneficiaryForm)
   val WALLEX_WALLET_TRANSFER = new Form("WALLEX_WALLET_TRANSFER", routes.WallexController.walletTransfer(), routes.javascript.WallexController.walletTransferForm)

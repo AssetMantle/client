@@ -78,6 +78,8 @@ class WallexCreateBeneficiary @Inject() (
       country: String,
       address: String,
       city: String,
+      postcode:String,
+      stateOrProvince:String,
       nickname: String,
       entityType: String,
       companyName: String,

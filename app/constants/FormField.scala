@@ -126,8 +126,8 @@ object FormField {
   val PAYMENT_CHANNEL = new StringFormField("PAYMENT_CHANNEL", 1, 100)
   val FIXED_SIDE = new StringFormField("FIXED_SIDE", 0, 100)
   val WALLEX_DOCUMENT_NAME = new StringFormField("WALLEX_DOCUMENT_NAME", 1, 100)
-  val ABA = new StringFormField("ABA", 9, 9, RegularExpression.ABA)
-  val STATE_OR_PROVINCE = new StringFormField("STATE_OR_PROVINCE", 1, 255)
+  val ABA = new StringFormField("ABA", 0, 9)
+  val STATE_OR_PROVINCE = new StringFormField("STATE_OR_PROVINCE", 0, 255)
   val COMPANY_ADDRESS = new StringFormField("COMPANY_ADDRESS", 1, 255)
   val BANK_ADDRESS = new StringFormField("BANK_ADDRESS", 1, 255)
   val BENEFICIARY_ID = new StringFormField("BENEFICIARY_ID", 1, 255)
@@ -144,6 +144,7 @@ object FormField {
   val COUNTRY_OF_RESIDENCE = new StringFormField("COUNTRY_OF_RESIDENCE", 0,255)
   val RESIDENTIAL_ADDRESS = new StringFormField("RESIDENTIAL_ADDRESS", 0,255)
   val IDENTIFICATION_NUMBER = new StringFormField("IDENTIFICATION_NUMBER", 0,255)
+  val US_POSTAL_CODE = new StringFormField("US_POSTAL_CODE", 0,255)
 
 
   //SelectFormField

@@ -118,6 +118,7 @@ object Serializable {
       address: String,
       bankName: String,
       bicSwift: String,
+      aba:String,
       country: String,
       currency: String,
       bankAccountHolderName: String

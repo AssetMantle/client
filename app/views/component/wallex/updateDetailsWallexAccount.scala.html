@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.companion.wallex.UpdateDetailsWallexAccount
+@import views.companion.wallex.UpdateCompanyAccount
 @import views.html.base._
 
-@(updateDetailsWallexAccount: Form[UpdateDetailsWallexAccount.Data] = UpdateDetailsWallexAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(updateDetailsWallexAccount: Form[UpdateCompanyAccount.Data] = UpdateCompanyAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_UPDATE_ACCOUNT, updateDetailsWallexAccount) {
     @commonSelect(updateDetailsWallexAccount, constants.FormField.COUNTRY_OF_INCORPORATION)
     @commonSelect(updateDetailsWallexAccount, constants.FormField.COUNTRY_OF_OPERATIONS)

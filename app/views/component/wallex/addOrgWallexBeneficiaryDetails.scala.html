@@ -1,13 +1,15 @@
 @import controllers.actions.LoginState
-@import views.companion.wallex.AddOrgWallexBeneficiaryDetails
+@import views.companion.wallex.AddOrganizationBeneficiary
 @import views.html.base._
 
-@(addOrgWallexBeneficiaryDetails: Form[AddOrgWallexBeneficiaryDetails.Data] = AddOrgWallexBeneficiaryDetails.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(addOrgWallexBeneficiaryDetails: Form[AddOrganizationBeneficiary.Data] = AddOrganizationBeneficiary.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_ADD_BENEFICIARY_DETAILS, addOrgWallexBeneficiaryDetails) {
 
     @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.COUNTRY_CODE2)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_ADDRESS)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.CITY)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.STATE_OR_PROVINCE)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.US_POSTAL_CODE)
     @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.ENTITY_TYPE)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_NAME)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.NICK_NAME)
@@ -18,6 +20,7 @@
         @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_NUMBER)
         @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_HOLDER_NAME)
         @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.SWIFT_CODE)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ABA)
         @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_CURRENCIES)
     }
 }

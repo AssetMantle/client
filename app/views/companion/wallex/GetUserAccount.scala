@@ -3,7 +3,7 @@ package views.companion.wallex
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object GetUserWallexAccount {
+object GetUserAccount {
 
   val form = Form(
     mapping(

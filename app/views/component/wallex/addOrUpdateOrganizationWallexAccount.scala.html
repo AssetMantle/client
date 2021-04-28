@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.companion.wallex.AddOrUpdateOrganizationWallexAccount
+@import views.companion.wallex.AddOrUpdateOrganizationAccount
 @import views.html.base._
 
-@(addOrUpdateOrganizationWallexAccount: Form[AddOrUpdateOrganizationWallexAccount.Data] = AddOrUpdateOrganizationWallexAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(addOrUpdateOrganizationWallexAccount: Form[AddOrUpdateOrganizationAccount.Data] = AddOrUpdateOrganizationAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_ADD_OR_UPDATE_ACCOUNT, addOrUpdateOrganizationWallexAccount) {
     @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.FIRST_NAME)
     @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.LAST_NAME)

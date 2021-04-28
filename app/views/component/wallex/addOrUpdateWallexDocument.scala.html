@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.companion.wallex.AddWallexDocuments
+@import views.companion.wallex.AddDocuments
 @import views.html.base._
 
-@(addWallexDocuments: Form[AddWallexDocuments.Data] = AddWallexDocuments.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(addWallexDocuments: Form[AddDocuments.Data] = AddDocuments.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_ADD_OR_UPDATE_DOCUMENT, addWallexDocuments) {
     @commonSelect(addWallexDocuments, constants.FormField.WALLEX_DOCUMENT_TYPE)
 }

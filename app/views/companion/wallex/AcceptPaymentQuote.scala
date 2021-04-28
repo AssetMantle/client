@@ -3,7 +3,7 @@ package views.companion.wallex
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object AcceptWallexPaymentQuote {
+object AcceptPaymentQuote {
   val form = Form(
     mapping(
       constants.FormField.QUOTE_ID.name -> constants.FormField.QUOTE_ID.field,

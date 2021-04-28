@@ -584,8 +584,8 @@ GET         /wallex/kyc/add/wallexDocument                                      
 POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.document
 GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
-GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuoteForm(quoteId: String)
-POST        /wallex/payment/accept/quote                                                          controllers.WallexController.acceptWallexQuote
+GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuoteForm(quoteId: String)
+POST        /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuote
 GET         /wallex/beneficiaries/create                                                          controllers.WallexController.createBeneficiariesForm
 POST        /wallex/beneficiaries/create                                                          controllers.WallexController.createBeneficiaries
 GET         /wallex/beneficiaries/delete                                                          controllers.WallexController.deleteBeneficiaryForm(beneficiaryId: String)

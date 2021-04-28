@@ -15,7 +15,7 @@ import transactions.responses.WallexResponse.{PaymentFileUploadResponse, Screeni
 import transactions.wallex._
 import utilities.{KeyStore, MicroNumber}
 import views.companion
-import views.companion.wallex.WallexWalletTransfer
+import views.companion.wallex.WalletTransfer
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
@@ -71,8 +71,8 @@ class WallexZoneController @Inject() (
           transferRequest <- transferRequests
           result <- withUsernameToken.Ok(
             views.html.component.wallex.zoneWallexWalletTransfer(
-              WallexWalletTransfer.form.fill(
-                companion.wallex.WallexWalletTransfer.Data(
+              WalletTransfer.form.fill(
+                companion.wallex.WalletTransfer.Data(
                   onBehalfOf = transferRequest.onBehalfOf,
                   receiverAccountId = transferRequest.receiverAccountId,
                   amount = transferRequest.amount,
@@ -98,7 +98,7 @@ class WallexZoneController @Inject() (
     withZoneLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        companion.wallex.WallexWalletTransfer.form
+        companion.wallex.WalletTransfer.form
           .bindFromRequest()
           .fold(
             formWithErrors => {

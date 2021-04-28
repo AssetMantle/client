@@ -5,7 +5,7 @@ import play.api.data.Forms.mapping
 
 import java.util.Date
 
-object UpdateDetailsWallexAccount {
+object UpdateCompanyAccount {
 
   val form = Form(
     mapping(

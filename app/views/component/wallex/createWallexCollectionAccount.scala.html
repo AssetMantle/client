@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import views.companion.wallex.CreateWallexCollectionAccount
+@import views.companion.wallex.CreateCollectionAccount
 @import views.html.base._
 
-@(wallexCollectionAccount: Form[CreateWallexCollectionAccount.Data] = CreateWallexCollectionAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(wallexCollectionAccount: Form[CreateCollectionAccount.Data] = CreateCollectionAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @commonForm(constants.Form.WALLEX_ADD_OR_UPDATE_ACCOUNT, wallexCollectionAccount) {
     @commonInputText(wallexCollectionAccount, constants.FormField.ON_BEHALF_OF, 'readonly -> true)
     @commonInputText(wallexCollectionAccount, constants.FormField.NAME)

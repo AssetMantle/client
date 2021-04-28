@@ -44,7 +44,7 @@
         @commonDoubleInfo(constants.View.BANK_CHARGE, datas.bankCharges)
         @commonBooleanInfo(constants.View.SUPPORTING_DOC_REQUIRED, Some(datas.supportingDocumentsRequired))
 
-        @commonJavascriptButton(constants.Form.WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST.button, JavaScript(s"""getForm(jsRoutes.controllers.WallexController.acceptWallexQuoteForm('${datas.quoteId}'))"""))
+        @commonJavascriptButton(constants.Form.WALLEX_ACCEPT_PAYMENT_QUOTE_REQUEST.button, JavaScript(s"""getForm(jsRoutes.controllers.WallexController.acceptQuoteForm('${datas.quoteId}'))"""))
 
     }
     case _ => {

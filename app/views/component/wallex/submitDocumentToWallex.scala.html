@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.wallex.SubmitDocumentToWallex
+@import views.companion.wallex.SubmitDocument
 
-@(submitWallexDocuments: Form[SubmitDocumentToWallex.Data] = SubmitDocumentToWallex.form,documentType:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(submitWallexDocuments: Form[SubmitDocument.Data] = SubmitDocument.form,documentType:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
     @commonForm(constants.Form.WALLEX_SUBMIT_DOCUMENT, submitWallexDocuments) {
         @commonInputText(submitWallexDocuments, constants.FormField.DOCUMENT_TYPE, 'readonly -> true ,'containerDivClass -> "hidden")
 

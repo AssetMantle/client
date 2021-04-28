@@ -15,7 +15,7 @@ import play.api.{Configuration, Logger}
 import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDocumentResponse, CreatePaymentQuoteResponse, GetBalanceResponse, GetUserResponse, PaymentFileUploadResponse}
 import transactions.wallex._
 import views.companion
-import views.companion.wallex.{AcceptWallexPaymentQuote, AddOrUpdateOrganizationWallexAccount, AddOrgWallexBeneficiaryDetails, AddWallexDocuments, CreateWallexCollectionAccount, CreateWallexPaymentQuote, DeleteBeneficiary, GetUserWallexAccount, GetWallexCollectionAccount, WallexWalletTransfer}
+import views.companion.wallex.{AcceptPaymentQuote, AddOrUpdateOrganizationAccount, AddOrganizationBeneficiary, AddDocuments, CreateCollectionAccount, CreatePaymentQuote, DeleteBeneficiary, GetUserAccount, GetCollectionAccount, WalletTransfer}
 
 import java.io.File
 import java.text.SimpleDateFormat
@@ -89,9 +89,9 @@ class WallexController @Inject() (
               getOrganizationWallexAccountDetail(organizationID)
             result <- withUsernameToken.Ok(
               views.html.component.wallex.addOrUpdateOrganizationWallexAccount(
-                AddOrUpdateOrganizationWallexAccount.form
+                AddOrUpdateOrganizationAccount.form
                   .fill(
-                    AddOrUpdateOrganizationWallexAccount
+                    AddOrUpdateOrganizationAccount
                       .Data(
                         firstName = organizationWallexAccountDetail.firstName,
                         lastName = organizationWallexAccountDetail.lastName,
@@ -115,7 +115,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-          companion.wallex.AddOrUpdateOrganizationWallexAccount.form
+          companion.wallex.AddOrUpdateOrganizationAccount.form
             .bindFromRequest()
             .fold(
               formWithErrors => {
@@ -224,7 +224,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-          AddWallexDocuments.form
+          AddDocuments.form
             .bindFromRequest()
             .fold(
               formWithErrors => {
@@ -258,8 +258,8 @@ class WallexController @Inject() (
           Future(
             Ok(
               views.html.component.wallex.submitDocumentToWallex(
-                views.companion.wallex.SubmitDocumentToWallex.form.fill(
-                  views.companion.wallex.SubmitDocumentToWallex.Data(
+                views.companion.wallex.SubmitDocument.form.fill(
+                  views.companion.wallex.SubmitDocument.Data(
                     documentType = documentType
                   )
                 ),documentType = documentType
@@ -272,7 +272,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-          companion.wallex.SubmitDocumentToWallex.form
+          companion.wallex.SubmitDocument.form
             .bindFromRequest()
             .fold(
               formWithErrors => {
@@ -425,7 +425,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        CreateWallexPaymentQuote.form
+        CreatePaymentQuote.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -547,7 +547,7 @@ class WallexController @Inject() (
           )
     }
 
-  def acceptWallexQuoteForm(
+  def acceptQuoteForm(
       quoteId: String
   ): Action[AnyContent] = {
     withoutLoginActionAsync { implicit request =>
@@ -565,11 +565,11 @@ class WallexController @Inject() (
   /*
     Creates simple payment
    */
-  def acceptWallexQuote(): Action[AnyContent] =
+  def acceptQuote(): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        AcceptWallexPaymentQuote.form
+        AcceptPaymentQuote.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -684,6 +684,7 @@ class WallexController @Inject() (
                         simplePaymentResponse.data.beneficiary.bankAccount.bankName,
                       bicSwift =
                         simplePaymentResponse.data.beneficiary.bankAccount.bicSwift,
+                      aba = simplePaymentResponse.data.beneficiary.bankAccount.aba,
                       country =
                         simplePaymentResponse.data.beneficiary.bankAccount.country,
                       currency =
@@ -736,7 +737,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        AddOrgWallexBeneficiaryDetails.form
+        AddOrganizationBeneficiary.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -768,6 +769,8 @@ class WallexController @Inject() (
                     country = beneficiary.country,
                     address = beneficiary.address,
                     city = beneficiary.city,
+                    postcode = beneficiary.postcode,
+                    stateOrProvince = beneficiary.stateOrProvince,
                     nickname = beneficiary.nickName,
                     entityType = beneficiary.entityType,
                     companyName = beneficiary.companyName,
@@ -777,6 +780,7 @@ class WallexController @Inject() (
                       country = beneficiary.bankData.country,
                       accountNumber = beneficiary.bankData.accountNumber,
                       bicSwift = beneficiary.bankData.bicSwift,
+                      aba = beneficiary.bankData.aba,
                       address = beneficiary.bankData.address,
                       bankAccountHolderName =
                         beneficiary.bankData.accountHolderName
@@ -839,6 +843,7 @@ class WallexController @Inject() (
                     bankName = beneficiaryResponse.data.bankAccount.bankName,
                     bicSwift = beneficiaryResponse.data.bankAccount.bicSwift,
                     country = beneficiaryResponse.data.bankAccount.country,
+                    aba = beneficiaryResponse.data.bankAccount.aba,
                     currency = beneficiaryResponse.data.bankAccount.country,
                     bankAccountHolderName =
                       beneficiaryResponse.data.bankAccount.bankAccountHolderName
@@ -985,7 +990,7 @@ class WallexController @Inject() (
             result <- Future(
               BadRequest(
                 views.html.component.wallex.wallexWalletTransfer(
-                  WallexWalletTransfer.form
+                  WalletTransfer.form
                     .withGlobalError(
                       constants.Response.WALLEX_WALLET_LOW_BALANCE.message
                     )
@@ -1003,8 +1008,8 @@ class WallexController @Inject() (
           for {
             result <- withUsernameToken.Ok(
               views.html.component.wallex.wallexWalletTransfer(
-                WallexWalletTransfer.form.fill(
-                  companion.wallex.WallexWalletTransfer.Data(
+                WalletTransfer.form.fill(
+                  companion.wallex.WalletTransfer.Data(
                     onBehalfOf = buyerAccId,
                     receiverAccountId = sellerAccId,
                     amount = amount,
@@ -1051,7 +1056,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        companion.wallex.WallexWalletTransfer.form
+        companion.wallex.WalletTransfer.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -1118,7 +1123,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        views.companion.wallex.UpdateDetailsWallexAccount.form
+        views.companion.wallex.UpdateCompanyAccount.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -1196,9 +1201,9 @@ class WallexController @Inject() (
         (for {
           result <- withUsernameToken.Ok(
             views.html.component.wallex.createWallexCollectionAccount(
-              CreateWallexCollectionAccount.form
+              CreateCollectionAccount.form
                 .fill(
-                  CreateWallexCollectionAccount
+                  CreateCollectionAccount
                     .Data(
                       onBehalfOf = accountId,
                       name = "",
@@ -1222,7 +1227,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        companion.wallex.CreateWallexCollectionAccount.form
+        companion.wallex.CreateCollectionAccount.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -1297,8 +1302,8 @@ class WallexController @Inject() (
     withoutLoginAction { implicit request =>
       Ok(
         views.html.component.wallex.getWallexCollectionAccount(
-          GetWallexCollectionAccount.form.fill(
-            GetWallexCollectionAccount
+          GetCollectionAccount.form.fill(
+            GetCollectionAccount
               .Data(accountId = accountId)
           )
         )
@@ -1309,7 +1314,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        companion.wallex.GetWallexCollectionAccount.form
+        companion.wallex.GetCollectionAccount.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -1374,9 +1379,9 @@ class WallexController @Inject() (
             getOrganizationWallexAccountDetail(organizationID)
           result <- withUsernameToken.Ok(
             views.html.component.wallex.getUserWallexAccount(
-              GetUserWallexAccount.form
+              GetUserAccount.form
                 .fill(
-                  GetUserWallexAccount
+                  GetUserAccount
                     .Data(
                       userID = organizationWallexAccountDetail.wallexId
                     )
@@ -1396,7 +1401,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        companion.wallex.GetUserWallexAccount.form
+        companion.wallex.GetUserAccount.form
           .bindFromRequest()
           .fold(
             formWithErrors => {
@@ -1462,7 +1467,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-        views.companion.wallex.UpdateUserDetailsWallexAccount.form
+        views.companion.wallex.UpdateUserAccount.form
           .bindFromRequest()
           .fold(
             formWithErrors => {

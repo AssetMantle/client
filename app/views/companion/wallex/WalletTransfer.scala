@@ -3,7 +3,7 @@ package views.companion.wallex
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object WallexWalletTransfer {
+object WalletTransfer {
   val form = Form(
     mapping(
       constants.FormField.ON_BEHALF_OF.name -> constants.FormField.ON_BEHALF_OF.field,
