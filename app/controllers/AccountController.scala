@@ -398,7 +398,7 @@ class AccountController @Inject()(
     } yield if (checkUsernameAvailable) Ok else NoContent
   }
 
-  def addIdentificationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addIdentificationForm(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
 
@@ -416,7 +416,7 @@ class AccountController @Inject()(
       }
   }
 
-  def addIdentification(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addIdentification(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddIdentification.form.bindFromRequest().fold(
         formWithErrors => {

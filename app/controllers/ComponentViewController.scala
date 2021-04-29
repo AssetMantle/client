@@ -991,7 +991,6 @@ class ComponentViewController @Inject()(
       def getOrganizationOrNoneByAccountID(accountID: String): Future[Option[Organization]] = masterOrganizations.Service.getByAccountID(accountID)
 
       def getUserResult(identification: Option[Identification], contactStatus: Seq[String]): Future[Result] = {
-        val identificationStatus = if (identification.isDefined) identification.get.verificationStatus.getOrElse(false) else false
         for {
           trader <- getTraderByAccountID(loginState.username)
           traderOrganization <- getTraderOrganization(trader)
