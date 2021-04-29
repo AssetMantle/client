@@ -120,15 +120,18 @@ class SimplePayments @Inject() (
           }
       }
 
-  private def findById(
-      simplePaymentId: String
-  ): Future[Option[SimplePaymentSerialized]] =
-    db.run(
-      simplePaymentTable
-        .filter(_.simplePaymentId === simplePaymentId)
-        .result
-        .headOption
-    )
+  private def findById(simplePaymentId: String): Future[SimplePaymentSerialized] =
+    db.run(simplePaymentTable.filter(_.simplePaymentId === simplePaymentId).result.head.asTry).map {
+      case Success(result) => result
+      case Failure(exception) =>
+        exception match {
+          case noSuchElementException: NoSuchElementException =>
+            throw new BaseException(
+              constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+              noSuchElementException
+            )
+        }
+    }
 
   private def updateStatus(
       simplePaymentId: String,
@@ -348,25 +351,12 @@ class SimplePayments @Inject() (
 
     def tryGet(
         simplePaymentId: String
-    ): Future[SimplePaymentSerialized] =
-      findById(simplePaymentId).map { detail =>
-        detail.getOrElse(
-          throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-        )
-      }
+    ): Future[SimplePayment] =
+      findById(simplePaymentId).map(_.deserialize)
 
-    def get(
-        quoteId: String
-    ): Future[Option[SimplePaymentSerialized]] =
-      findById(quoteId)
+    def updateZoneApprovedStatus(simplePaymentId: String,zoneApproved: Boolean): Future[Int] =
+      updateStatus(simplePaymentId = simplePaymentId, zoneApproved = zoneApproved
+      )
   }
 
-  def updateZoneApprovedStatus(
-      simplePaymentId: String,
-      zoneApproved: Boolean
-  ): Future[Int] =
-    updateStatus(
-      simplePaymentId = simplePaymentId,
-      zoneApproved = zoneApproved
-    )
 }
