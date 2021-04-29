@@ -3,10 +3,20 @@
 @import views.html.base._
 
 @(addOrUpdateOrganizationWallexAccount: Form[AddOrUpdateOrganizationAccount.Data] = AddOrUpdateOrganizationAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-@commonForm(constants.Form.WALLEX_ADD_OR_UPDATE_ACCOUNT, addOrUpdateOrganizationWallexAccount) {
-    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.FIRST_NAME)
-    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.LAST_NAME)
-    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.EMAIL_ADDRESS)
-    @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.COUNTRY_CODE2)
-    @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.ACCOUNT_TYPE)
-}
+    @commonForm(constants.Form.WALLEX_ADD_OR_UPDATE_ACCOUNT, addOrUpdateOrganizationWallexAccount) {
+        @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.FIRST_NAME)
+        @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.LAST_NAME)
+        @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.EMAIL_ADDRESS)
+        @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.COUNTRY_CODE2)
+        @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.ACCOUNT_TYPE)
+    }
+
+    <div id="wallexMessage">
+        <div class="wallexNote">
+        <div class="wallexNoteText">
+         @Messages(constants.View.WALLEX_COMPLIANCE_MESSAGE)
+        </div>
+        </div>
+        @Messages(constants.View.WALLEX_POWERED_BY)
+    <img src="@routes.Assets.versioned("images/wallex.png")" alt = "@Messages(constants.View.WALLEX_LOGO)" class="wallexLogo"/>
+    </div>

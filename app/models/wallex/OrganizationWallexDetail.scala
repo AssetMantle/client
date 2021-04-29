@@ -110,12 +110,13 @@ class OrganizationWallexDetails @Inject() (
     )
 
   private def findByZoneID(
-      zoneID: String
+      zoneID: String,
+      status: String,
   ): Future[Seq[OrganizationWallexDetail]] =
     db.run(
       organizationWallexAccountDetailTable
         .filter(_.zoneID === zoneID)
-        .filter(_.status === constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING)
+        .filter(_.status === status)
         .result
     )
 
@@ -285,7 +286,7 @@ class OrganizationWallexDetails @Inject() (
       }
 
     def tryGetPendingByZoneID(zoneID: String): Future[Seq[OrganizationWallexDetail]] =
-      findByZoneID(zoneID)
+      findByZoneID(zoneID,constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING)
   }
 
 }

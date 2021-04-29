@@ -5,38 +5,45 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models.common.Serializable.{BankAccount, BeneficiaryPayment, ConversionDetails}
 import models.master.{Negotiations, Trader}
-import models.masterTransaction.NegotiationFile
+import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{SimplePayments, _}
-import models.master
+import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDocumentResponse, CreatePaymentQuoteResponse, GetBalanceResponse, GetUserResponse, PaymentFileUploadResponse}
 import transactions.wallex._
 import views.companion
-import views.companion.wallex.{AcceptPaymentQuote, AddOrUpdateOrganizationAccount, AddOrganizationBeneficiary, AddDocuments, CreateCollectionAccount, CreatePaymentQuote, DeleteBeneficiary, GetUserAccount, GetCollectionAccount, WalletTransfer}
+import views.companion.wallex.{WalletTransfer => _, _}
 
-import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WallexController @Inject() (
-                                   messagesControllerComponents: MessagesControllerComponents,
-                                   withoutLoginActionAsync: WithoutLoginActionAsync,
-                                   masterOrganizations: master.Organizations,
-                                   withUsernameToken: WithUsernameToken,
-                                   organizationWallexDetails: OrganizationWallexDetails,
-                                   withTraderLoginAction: WithTraderLoginAction,
-                                   masterTraders: master.Traders,
-                                   withoutLoginAction: WithoutLoginAction,
+                                   blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats,
+                                   blockchainAccounts: blockchain.Accounts,
                                    fileResourceManager: utilities.FileResourceManager,
-                                   userDetailsUpdate: WallexUserDetailsUpdate,
+                                   masterAccounts: master.Accounts,
+                                   masterZones: master.Zones,
+                                   masterOrganizations: master.Organizations,
+                                   masterTraders: master.Traders,
+                                   masterTransactionRedeemFiatRequests: masterTransaction.RedeemFiatRequests,
+                                   messagesControllerComponents: MessagesControllerComponents,
                                    negotiations: Negotiations,
+                                   negotiationFiles: NegotiationFiles,
                                    paymentFiles: PaymentFiles,
+                                   organizationWallexDetails: OrganizationWallexDetails,
+                                   transactionsRedeemFiat: transactions.RedeemFiat,
+                                   transaction: utilities.Transaction,
+                                   userDetailsUpdate: WallexUserDetailsUpdate,
                                    updateCompanyDetails: WallexUpdateCompanyDetails,
+                                   withoutLoginActionAsync: WithoutLoginActionAsync,
+                                   withUsernameToken: WithUsernameToken,
+                                   withTraderLoginAction: WithTraderLoginAction,
+                                   withoutLoginAction: WithoutLoginAction,
                                    wallexOrganizationBeneficiaries: OrganizationBeneficiaries,
                                    wallexCreateBeneficiary: WallexCreateBeneficiary,
                                    wallexDeleteBeneficiary: WallexDeleteBeneficiary,
@@ -235,15 +242,15 @@ class WallexController @Inject() (
                   )
                 )
               },
-              file => {
+              addWallexDocumentData => {
                 val wallexKYC = wallexUserKYCs.Service
-                  .get(loginState.username, file.documentType)
+                  .get(loginState.username, addWallexDocumentData.documentType)
                 for {
                   wallexKYC <- wallexKYC
                   result <- withUsernameToken.PartialContent(
                     views.html.component.wallex.uploadOrUpdateWallexDocument(
                       wallexKYC,
-                      file.documentType
+                      addWallexDocumentData.documentType
                     )
                   )
                 } yield result
@@ -284,7 +291,7 @@ class WallexController @Inject() (
                   )
                 )
               },
-              wallexDocument => {
+              documentData => {
 
                 val organizationID = masterTraders.Service
                   .getOrganizationIDByAccountID(loginState.username)
@@ -323,15 +330,10 @@ class WallexController @Inject() (
                                     uploadUrl: String,
                                     userKYC: UserKYC
                                   ) = {
-                  val path =
-                    fileResourceManager
-                      .getWallexFilePath(userKYC.documentType)
-                  val fetchFile: File = utilities.FileOperations
-                    .fetchFile(path, userKYC.fileName)
-                  val fileArray =
-                    utilities.FileOperations.convertToByteArray(fetchFile)
-                  wallexCreateDocument.Service
-                    .put(authToken, uploadUrl, fileArray)
+                  val fileArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations
+                                 .fetchFile(fileResourceManager.getWallexFilePath(userKYC.documentType), userKYC.fileName))
+
+                  wallexCreateDocument.Service.put(authToken, uploadUrl, fileArray)
                 }
 
                 def insertDocumentDetails(
@@ -362,7 +364,7 @@ class WallexController @Inject() (
                   organizationID <- organizationID
                   authToken <- authToken
                   wallexDetails <- wallexDetails(organizationID)
-                  wallexDoc <- getWallexDocument(wallexDocument.documentType)
+                  wallexDoc <- getWallexDocument(documentData.documentType)
                   createDocument <- createDocument(
                     authToken,
                     wallexDetails.wallexId,
@@ -409,14 +411,14 @@ class WallexController @Inject() (
           )
         } yield result
     }
-  def initiatePaymentForm(): Action[AnyContent] =
+  def initiatePaymentForm(negotiationID: String): Action[AnyContent] =
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
         Future(
           Ok(
             views.html.component.wallex
-              .createWallexPaymentQuote()
+              .createWallexPaymentQuote(negotiationID = negotiationID)
           )
         )
     }
@@ -433,16 +435,18 @@ class WallexController @Inject() (
                 BadRequest(
                   views.html.component.wallex
                     .createWallexPaymentQuote(
-                      formWithErrors
+                      formWithErrors,
+                      formWithErrors.data(constants.FormField.NEGOTIATION_ID.name)
                     )
                 )
               )
             },
-            paymentQuote => {
+            paymentQuoteData => {
 
-              val organizationID =
-                masterTraders.Service
-                  .getOrganizationIDByAccountID(loginState.username)
+              val negotiationID = paymentQuoteData.negotiationID
+              val negotiationFile = negotiationFiles.Service.tryGet(negotiationID,constants.File.Negotiation.INVOICE)
+
+              val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
               def getWallexDetails(organizationID: String) =
                 organizationWallexDetails.Service.tryGet(organizationID)
@@ -453,10 +457,10 @@ class WallexController @Inject() (
                 wallexCreatePaymentQuote.Service.post(
                   authToken,
                   wallexCreatePaymentQuote.Request(
-                    sellCurrency = paymentQuote.sellCurrency,
-                    buyCurrency = paymentQuote.buyCurrency,
-                    amount = paymentQuote.amount,
-                    beneficiaryId = paymentQuote.beneficiaryId
+                    sellCurrency = paymentQuoteData.sellCurrency,
+                    buyCurrency = paymentQuoteData.buyCurrency,
+                    amount = paymentQuoteData.amount,
+                    beneficiaryId = paymentQuoteData.beneficiaryId
                   )
                 )
 
@@ -474,7 +478,7 @@ class WallexController @Inject() (
 
               }
 
-              def uploadFileURLRespone(
+              def getUploadFileURL(
                   authToken: String,
                   negotiationFile: NegotiationFile
               ): Future[PaymentFileUploadResponse] =
@@ -490,53 +494,49 @@ class WallexController @Inject() (
                   uploadURL: String,
                   negotiationFile: NegotiationFile
               ) = {
-                val path = fileResourceManager
-                  .getNegotiationFilePath(constants.File.Negotiation.INVOICE)
-                val fetchFile: File = utilities.FileOperations
-                  .fetchFile(path, negotiationFile.fileName)
-                val fileArray =
-                  utilities.FileOperations.convertToByteArray(fetchFile)
-                wallexUploadPaymentFile.Service
-                  .put(authToken, uploadURL, fileArray)
+                val fileArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations
+                    .fetchFile(fileResourceManager.getNegotiationFilePath(constants.File.Negotiation.INVOICE), negotiationFile.fileName))
+
+                wallexUploadPaymentFile.Service.put(authToken, uploadURL, fileArray)
               }
 
-              /*def insert(
+              def insert(
                     organizationID: String,
                     wallexId: String,
                     fileId: String,
                     fileType: String,
                     quoteId: String
                 ) =
-                  paymentFileDetails.Service.insertOrUpdate(
+                  paymentFiles.Service.insertOrUpdate(
                     organizationID = organizationID,
-                    negotiationId = paymentQuote.negotiationID,
+                    negotiationId = paymentQuoteData.negotiationID,
                     quoteId = quoteId,
                     wallexId = wallexId,
                     fileId = fileId,
                     fileType = fileType
-                  )*/
+                  )
 
               (for {
-                //negotiationFile <- negotiationFile
+                negotiationFile <- negotiationFile
                 organizationID <- organizationID
                 authToken <- authToken
-                /*fileUrlResponse <-
-                    uploadFileURLRespone(authToken, negotiationFile)
-                  uploadFile <- uploadFileToWallex(
+                fileUrlResponse <-
+                  getUploadFileURL(authToken, negotiationFile)
+                uploadFile <- uploadFileToWallex(
                     authToken,
                     fileUrlResponse.data.uploadUrl,
                     negotiationFile
-                  )*/
+                  )
                 wallexDetails <- getWallexDetails(organizationID)
                 postResponse <- createPaymentQuote(authToken)
                 result <- getQuoteResponse(postResponse)
-                /* _ <- insert(
+                _ <- insert(
                     organizationID,
                     wallexDetails.wallexId,
                     fileUrlResponse.data.fileId,
-                    "INVOICE",
+                    constants.File.Negotiation.INVOICE,
                     postResponse.data.quoteId
-                  )*/
+                  )
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
@@ -583,20 +583,21 @@ class WallexController @Inject() (
                 )
               )
             },
-            createPaymentResponse => {
+            createPaymentData => {
 
-              val organizationID =
-                masterTraders.Service
-                  .getOrganizationIDByAccountID(loginState.username)
-              val zoneID =
-                masterTraders.Service
-                  .tryGetZoneIDByAccountID(loginState.username)
+              val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = createPaymentData.password)
+
+              val trader = masterTraders.Service.tryGetByAccountID(loginState.username)
+              val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+              val zoneID = masterTraders.Service.tryGetZoneIDByAccountID(loginState.username)
+              def zoneAccountID(zoneID: String): Future[String] = masterZones.Service.tryGetAccountID(zoneID)
+              def zoneAddress(zoneAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
               def getWallexDetails(organizationID: String) =
                 organizationWallexDetails.Service.tryGet(organizationID)
 
               val file =
-                paymentFiles.Service.tryGet(createPaymentResponse.quoteId)
+                paymentFiles.Service.tryGet(createPaymentData.quoteId)
               val authToken = wallexAuthToken.Service.getToken()
 
               def createSimplePayment(
@@ -606,19 +607,19 @@ class WallexController @Inject() (
                 wallexCreateSimplePayment.Service.post(
                   authToken,
                   wallexCreateSimplePayment.Request(
-                    fundingSource = createPaymentResponse.fundingSource,
-                    paymentReference = createPaymentResponse.paymentReference,
-                    quoteId = createPaymentResponse.quoteId,
-                    purposeOfTransfer = createPaymentResponse.purposeOfTransfer,
+                    fundingSource = createPaymentData.fundingSource,
+                    paymentReference = createPaymentData.paymentReference,
+                    quoteId = createPaymentData.quoteId,
+                    purposeOfTransfer = createPaymentData.purposeOfTransfer,
                     referenceId = file.negotiationId,
                     files = Seq(file.fileId)
                   )
                 )
 
               def insertOrUpdate(
+                  simplePaymentId: String,
                   wallexId: String,
                   zoneID: String,
-                  simplePaymentId: String,
                   status: String,
                   createdAt: String,
                   referenceId: String,
@@ -631,9 +632,9 @@ class WallexController @Inject() (
                   zoneApproved: Option[Boolean]
               ) =
                 wallexSimplePayments.Service.create(
+                  simplePaymentId = simplePaymentId,
                   wallexId = wallexId,
                   zoneID = zoneID,
-                  simplePaymentId = simplePaymentId,
                   status = status,
                   createdAt = createdAt,
                   referenceId = referenceId,
@@ -646,17 +647,50 @@ class WallexController @Inject() (
                   zoneApproved = zoneApproved
                 )
 
+              def sendTransactionAndGetResult(validateUsernamePassword: Boolean, toAddress: String, trader: Trader, redeemAmount: Double): Future[Result] = {
+                if (validateUsernamePassword) {
+                  if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
+                    val ticketID = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+                      entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemAmount,
+                        gas = createPaymentData.gas, ticketID = "", mode = transactionMode),
+                      blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
+                      request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = createPaymentData.gas), to = toAddress,
+                        password = createPaymentData.password, redeemAmount = redeemAmount, mode = transactionMode),
+                      action = transactionsRedeemFiat.Service.post,
+                      onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
+                      onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
+                      updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
+                    )
+                    for {
+                      ticketID <- ticketID
+                      _ <- createRedeemFiatRequests(trader.id, ticketID, redeemAmount)
+                      result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
+                    } yield result
+                  } else throw new BaseException(constants.Response.UNAUTHORIZED)
+                } else Future(BadRequest(views.html.component.wallex.acceptWallexPaymentQuoteRequest(views.companion.wallex.
+                  AcceptPaymentQuote.form.fill(createPaymentData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message),
+                  quoteId = createPaymentData.quoteId)))
+              }
+
+              def createRedeemFiatRequests(traderID: String, ticketID: String, redeemAmount: Double): Future[String] =
+                masterTransactionRedeemFiatRequests.Service.create(traderID, ticketID, redeemAmount)
+
+
               (for {
+                validateUsernamePassword <- validateUsernamePassword
+                trader <- trader
                 organizationID <- organizationID
                 zoneID <- zoneID
+                zoneAccountID <- zoneAccountID(zoneID)
+                zoneAddress <- zoneAddress(zoneAccountID)
                 wallexDetails <- getWallexDetails(organizationID)
                 authToken <- authToken
                 file <- file
                 simplePaymentResponse <- createSimplePayment(authToken, file)
                 simplePayment <- insertOrUpdate(
+                  simplePaymentId = simplePaymentResponse.data.simplePaymentId,
                   wallexId = wallexDetails.wallexId,
                   zoneID = zoneID,
-                  simplePaymentId = simplePaymentResponse.data.simplePaymentId,
                   status = simplePaymentResponse.data.status,
                   createdAt = simplePaymentResponse.data.createdAt,
                   referenceId = simplePaymentResponse.data.referenceId,
@@ -709,9 +743,10 @@ class WallexController @Inject() (
                   zoneApproved = None
                 )
 
+                _ <- sendTransactionAndGetResult(validateUsernamePassword,zoneAddress,trader,simplePaymentResponse.data.totalAmount)
                 result <- withUsernameToken.Ok(
                   views.html.index(successes =
-                    Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
+                    Seq(constants.Response.WALLEX_SIMPLE_PAYMENT_CREATED)
                   )
                 )
               } yield result).recover {
@@ -899,10 +934,10 @@ class WallexController @Inject() (
 
               def deleteBeneficiaryFromWallex(
                   authToken: String,
-                  benefeciaryId: String
+                  beneficiaryId: String
               ) = {
                 wallexDeleteBeneficiary.Service
-                  .delete(authToken, beneficiaryId = benefeciaryId)
+                  .delete(authToken, beneficiaryId = beneficiaryId)
               }
 
               def deleteBeneficiary(beneficiaryId: String): Future[Int] =
@@ -947,7 +982,7 @@ class WallexController @Inject() (
 
 
 
-        def walletBalanceRespone(
+        def walletBalanceResponse(
             authToken: String,
             userId: String
         ): Future[GetBalanceResponse] =
@@ -990,7 +1025,7 @@ class WallexController @Inject() (
             result <- Future(
               BadRequest(
                 views.html.component.wallex.wallexWalletTransfer(
-                  WalletTransfer.form
+                  companion.wallex.WalletTransfer.form
                     .withGlobalError(
                       constants.Response.WALLEX_WALLET_LOW_BALANCE.message
                     )
@@ -1001,17 +1036,17 @@ class WallexController @Inject() (
           } yield result
         }
         def formResult(
-            buyerAccId: String,
-            sellerAccId: String,
+            buyerAccountID: String,
+            sellerAccountID: String,
             amount: Double
         ) = {
           for {
             result <- withUsernameToken.Ok(
               views.html.component.wallex.wallexWalletTransfer(
-                WalletTransfer.form.fill(
+                companion.wallex.WalletTransfer.form.fill(
                   companion.wallex.WalletTransfer.Data(
-                    onBehalfOf = buyerAccId,
-                    receiverAccountId = sellerAccId,
+                    onBehalfOf = buyerAccountID,
+                    receiverAccountId = sellerAccountID,
                     amount = amount,
                     currency = "",
                     purposesOfTransfer = "",
@@ -1028,16 +1063,16 @@ class WallexController @Inject() (
         (for {
           negotiation <- negotiation
           authToken <- authToken
-          buyerWallexAcctId <-
+          buyerWallexAcctountID <-
             getBuyerWallexAccountId(negotiation.buyerTraderID)
-          sellerWallexAcctId <-
+          sellerWallexAccountID <-
             getSellerWallexAccountId(negotiation.sellerTraderID)
-          balance <- walletBalanceRespone(authToken, buyerWallexAcctId.wallexId)
+          balance <- walletBalanceResponse(authToken, buyerWallexAcctountID.wallexId)
           result <-
             if (balance.data.amount > negotiation.price) {
               formResult(
-                buyerWallexAcctId.accountId,
-                sellerWallexAcctId.accountId,
+                buyerWallexAcctountID.accountId,
+                sellerWallexAccountID.accountId,
                 negotiation.price.toDouble
               )
             } else {

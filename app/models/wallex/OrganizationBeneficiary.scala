@@ -291,7 +291,7 @@ class OrganizationBeneficiaries @Inject()(
 
     def organizationID = column[String]("organizationID", O.PrimaryKey)
 
-    def traderID = column[String]("traderID", O.PrimaryKey)
+    def traderID = column[String]("traderID")
 
     def wallexId = column[String]("wallexId", O.PrimaryKey)
 
@@ -339,13 +339,7 @@ class OrganizationBeneficiaries @Inject()(
         companyName: String,
         nickname: String,
         accountType: String,
-        bankAccount: BankAccount,
-        createdBy: Option[String] = None,
-        createdOn: Option[Timestamp] = None,
-        createdOnTimeZone: Option[String] = None,
-        updatedBy: Option[String] = None,
-        updatedOn: Option[Timestamp] = None,
-        updatedOnTimeZone: Option[String] = None
+        bankAccount: BankAccount
     ): Future[String] =
       add(
         serialize(
@@ -361,13 +355,7 @@ class OrganizationBeneficiaries @Inject()(
             companyName = companyName,
             nickname = nickname,
             accountType = accountType,
-            bankAccount = bankAccount,
-            createdBy = createdBy,
-            createdOn = createdOn,
-            createdOnTimeZone = createdOnTimeZone,
-            updatedBy = updatedBy,
-            updatedOn = updatedOn,
-            updatedOnTimeZone = updatedOnTimeZone
+            bankAccount = bankAccount
           )
         )
       )
@@ -384,13 +372,7 @@ class OrganizationBeneficiaries @Inject()(
         companyName: String,
         nickname: String,
         accountType: String,
-        bankAccount: BankAccount,
-        createdBy: Option[String] = None,
-        createdOn: Option[Timestamp] = None,
-        createdOnTimeZone: Option[String] = None,
-        updatedBy: Option[String] = None,
-        updatedOn: Option[Timestamp] = None,
-        updatedOnTimeZone: Option[String] = None
+        bankAccount: BankAccount
     ): Future[Int] =
       upsert(
         serialize(
@@ -406,13 +388,7 @@ class OrganizationBeneficiaries @Inject()(
             companyName = companyName,
             nickname = nickname,
             accountType = accountType,
-            bankAccount = bankAccount,
-            createdBy = createdBy,
-            createdOn = createdOn,
-            createdOnTimeZone = createdOnTimeZone,
-            updatedBy = updatedBy,
-            updatedOn = updatedOn,
-            updatedOnTimeZone = updatedOnTimeZone
+            bankAccount = bankAccount
           )
         )
       )
@@ -427,13 +403,13 @@ class OrganizationBeneficiaries @Inject()(
 
     def getByBeneficiaryId(
         beneficiaryId: String
-    ): Future[OrganizationBeneficiarySerialized] =
-      tryGetByBeneficiaryId(beneficiaryId)
+    ): Future[OrganizationBeneficiary] =
+      tryGetByBeneficiaryId(beneficiaryId).map(_.deserialize)
 
     def getByTraderID(
         traderID: String
-    ): Future[OrganizationBeneficiarySerialized] =
-      tryGetByTraderID(traderID)
+    ): Future[OrganizationBeneficiary] =
+      tryGetByTraderID(traderID).map(_.deserialize)
 
     def delete(beneficiaryId: String): Future[Int] =
       deleteById(beneficiaryId)

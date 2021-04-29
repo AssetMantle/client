@@ -125,15 +125,18 @@ class Quotes @Inject() (
           }
       }
 
-  private def findById(
-      quoteId: String
-  ): Future[Option[QuoteSerialized]] =
-    db.run(
-      quoteTable
-        .filter(_.quoteId === quoteId)
-        .result
-        .headOption
-    )
+  private def findById(quoteId: String): Future[QuoteSerialized] =
+    db.run(quoteTable.filter(_.quoteId === quoteId).result.head.asTry).map {
+      case Success(result) => result
+      case Failure(exception) =>
+        exception match {
+          case noSuchElementException: NoSuchElementException =>
+            throw new BaseException(
+              constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+              noSuchElementException
+            )
+        }
+    }
 
   private def updateStatus(
       quoteId: String,
@@ -376,20 +379,14 @@ class Quotes @Inject() (
         )
       )
 
-    def tryGet(quoteId: String): Future[QuoteSerialized] =
-      findById(quoteId).map { detail =>
-        detail.getOrElse(
-          throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-        )
-      }
+    def tryGet(quoteId: String): Future[Quote] =
+      findById(quoteId).map(_.deserialize)
 
-    def get(quoteId: String): Future[Option[QuoteSerialized]] =
-      findById(quoteId)
+    def updateQuoteStatus(quoteId: String, status: String): Future[Int] =
+      updateStatus(
+        quoteId = quoteId,
+        status = status
+      )
   }
 
-  def updateQuoteStatus(quoteId: String, status: String): Future[Int] =
-    updateStatus(
-      quoteId = quoteId,
-      status = status
-    )
 }

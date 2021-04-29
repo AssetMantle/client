@@ -291,28 +291,7 @@ class WallexZoneController @Inject() (
 
     }
 
-  def zoneViewWalletTransferRequestList(): Action[AnyContent] =
-    withZoneLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-        val zoneID = masterZones.Service.tryGetID(loginState.username)
 
-        def pendingWalletTransferRequests(
-            zoneID: String
-        ): Future[Seq[WalletTransferRequest]] =
-          walletTransferRequests.Service.tryGetPendingByZoneID(zoneID)
-
-        (for {
-          zoneID <- zoneID
-          pendingWalletRequests <- pendingWalletTransferRequests(zoneID)
-        } yield Ok(
-          views.html.component.wallex
-            .zoneViewPendingWalletTransferRequestList(pendingWalletRequests)
-        )).recover {
-          case baseException: BaseException =>
-            InternalServerError(baseException.failure.message)
-        }
-    }
 
   private def issueFiat(
       traderAddress: String,
@@ -366,27 +345,7 @@ class WallexZoneController @Inject() (
 
   }
 
-  def zoneViewWallexKYCScreeningList(): Action[AnyContent] =
-    withZoneLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-        val zoneID = masterZones.Service.tryGetID(loginState.username)
-        def pendingScreeningRequests(
-            zoneID: String
-        ): Future[Seq[OrganizationWallexDetail]] =
-          organizationWallexDetails.Service.tryGetPendingByZoneID(zoneID)
 
-        (for {
-          zoneID <- zoneID
-          pendingKYCRequests <- pendingScreeningRequests(zoneID)
-        } yield Ok(
-          views.html.component.wallex
-            .zoneViewPendingWallexKYCRequestList(pendingKYCRequests)
-        )).recover {
-          case baseException: BaseException =>
-            InternalServerError(baseException.failure.message)
-        }
-    }
 
   def sendForScreeningForm(wallexID: String): Action[AnyContent] =
     withZoneLoginAction.authenticated {

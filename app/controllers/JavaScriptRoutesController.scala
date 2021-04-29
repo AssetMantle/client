@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
+
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import play.api.mvc._
@@ -267,10 +268,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ComponentViewController.organizationWallexAccount,
         routes.javascript.ComponentViewController.organizationWallexPaymentApp,
-        routes.javascript.ComponentViewController.organizationViewBeneficiary,
+        routes.javascript.ComponentViewController.traderViewBeneficiary,
         routes.javascript.ComponentViewController.wallexBeneficiaryPaymentApp,
         routes.javascript.ComponentViewController.traderViewWallexCollectionAccount,
         routes.javascript.ComponentViewController.organizationViewWallexAccount,
+
+        routes.javascript.ComponentViewController.zoneViewWalletTransferRequestList,
+        routes.javascript.ComponentViewController.zoneViewWallexKYCScreeningList,
 
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
@@ -453,8 +457,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.WallexZoneController.zoneWalletTransferForm,
         routes.javascript.WallexZoneController.zoneCreateWalletTransfer,
-        routes.javascript.WallexZoneController.zoneViewWalletTransferRequestList,
-        routes.javascript.WallexZoneController.zoneViewWallexKYCScreeningList,
         routes.javascript.WallexZoneController.sendForScreeningForm,
         routes.javascript.WallexZoneController.sendForScreening
 

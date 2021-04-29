@@ -567,10 +567,12 @@ GET         /chat/replyToMessage                                                
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.organizationWallexAccount
 GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
-GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.organizationViewBeneficiary
+GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.traderViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
-GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp
+GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp(negotiationID: String)
 GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount
+GET         /wallex/zone/view/transferRequest                                                     controllers.ComponentViewController.zoneViewWalletTransferRequestList
+GET         /wallex/zone/view/screeningList                                                       controllers.ComponentViewController.zoneViewWallexKYCScreeningList
 GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccountForm
 POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccount
 GET         /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccountForm
@@ -582,7 +584,7 @@ POST        /master/wallex/user                                                 
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
 GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.documentForm
 POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.document
-GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm
+GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm(negotiationID: String)
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuoteForm(quoteId: String)
 POST        /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuote
@@ -606,8 +608,6 @@ GET         /wallex/document/submit                                             
 POST        /wallex/document/submit                                                               controllers.WallexController.submitDocumentToWallex
 GET         /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneWalletTransferForm(negotiationId: String)
 POST        /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneCreateWalletTransfer
-GET         /wallex/zone/view/transferRequest                                                     controllers.WallexZoneController.zoneViewWalletTransferRequestList
-GET         /wallex/zone/view/screeningList                                                       controllers.WallexZoneController.zoneViewWallexKYCScreeningList
 GET         /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreeningForm(wallexID: String)
 POST        /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreening
 

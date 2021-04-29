@@ -9,4 +9,7 @@
     @commonSelect(acceptWallexPaymentQuoteForm, constants.FormField.FUNDING_SOURCE)
     @commonInputText(acceptWallexPaymentQuoteForm, constants.FormField.PAYMENT_REFERENCE)
     @commonSelect(acceptWallexPaymentQuoteForm, constants.FormField.PURPOSE_OF_TRANSFER)
+    @commonInputPassword(acceptWallexPaymentQuoteForm, constants.FormField.PASSWORD)
+    @commonInputMicroNumber(acceptWallexPaymentQuoteForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+
 }

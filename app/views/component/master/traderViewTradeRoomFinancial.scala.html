@@ -2,7 +2,7 @@
 @import views.html.base._
 @import utilities.MicroNumber
 
-@(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber, traderID: String, moderated: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(walletBalance: MicroNumber, amountPaid: MicroNumber, amountPending: MicroNumber, traderID: String, moderated: Boolean, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="financialCard cardPaddingRemove">
     <ul class="financialCardSection">
     <li class="cmuk-flex">
@@ -40,6 +40,13 @@
                 }</p>
             </div>
         </div>
+    <li class="cmuk-flex">
+        <div class="leftContainer">
+            <div id="wallexPanel" class="financial"></div>
+        </div>
+        <script>
+                componentResource('wallexPanel', jsRoutes.controllers.ComponentViewController.wallexBeneficiaryPaymentApp('@negotiationID'));
+        </script>
     </li>
 </ul>
 

@@ -1410,4 +1410,5 @@ ISSUE_DATE = Issue Date
 EXPIRY_DATE = Expiry Date
 WALLEX_ACCOUNT_CREATE = Register for Wallex
 WALLEX_POWERED_BY = Powered By @
+WALLEX_COMPLIANCE_MESSAGE = By Sign up shows you have agreed to wallex Teram and condition 1. I know and agree to become a customer of wallex. 2. I know and agree that my information will be used to open an account in wallex. 3. I know and agree that wallex processes my transaction and receive my funds. Notice for non-Singapore residents: Wallex Technologies Pte. Ltd. is liscensed by the Monetory Authority of Singapore to provide e- money issuance services. Please note that this does not mean you wull be able to recover all the money you paid to Wallex Technologies Pte. Ltd. if WallexTechnologies Pte. Ltd.'s business fails.
 

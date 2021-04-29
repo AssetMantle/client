@@ -37,7 +37,7 @@ case class SimplePayment(
 ) extends Logged
 
 @Singleton
-class SimplePayments @Inject()(
+class SimplePayments @Inject() (
     protected val databaseConfigProvider: DatabaseConfigProvider
 )(implicit executionContext: ExecutionContext) {
 
@@ -59,9 +59,9 @@ class SimplePayments @Inject()(
       simplePaymentDetail: SimplePayment
   ): SimplePaymentSerialized =
     SimplePaymentSerialized(
+      simplePaymentId = simplePaymentDetail.simplePaymentId,
       wallexId = simplePaymentDetail.wallexId,
       zoneID = simplePaymentDetail.zoneID,
-      simplePaymentId = simplePaymentDetail.simplePaymentId,
       status = simplePaymentDetail.status,
       createdAt = simplePaymentDetail.createdAt,
       referenceId = simplePaymentDetail.referenceId,
@@ -159,9 +159,9 @@ class SimplePayments @Inject()(
       }
 
   case class SimplePaymentSerialized(
+      simplePaymentId: String,
       wallexId: String,
       zoneID: String,
-      simplePaymentId: String,
       status: String,
       createdAt: String,
       referenceId: String,
@@ -182,9 +182,9 @@ class SimplePayments @Inject()(
 
     def deserialize: SimplePayment =
       SimplePayment(
+        simplePaymentId = simplePaymentId,
         wallexId = wallexId,
         zoneID = zoneID,
-        simplePaymentId = simplePaymentId,
         status = status,
         createdAt = createdAt,
         referenceId = referenceId,
@@ -277,9 +277,9 @@ class SimplePayments @Inject()(
 
   object Service {
     def create(
+        simplePaymentId: String,
         wallexId: String,
         zoneID: String,
-        simplePaymentId: String,
         status: String,
         createdAt: String,
         referenceId: String,
@@ -289,20 +289,14 @@ class SimplePayments @Inject()(
         fundingCutoffTime: String,
         beneficiary: BeneficiaryPayment,
         conversionDetails: ConversionDetails,
-        zoneApproved: Option[Boolean],
-        createdBy: Option[String] = None,
-        createdOn: Option[Timestamp] = None,
-        createdOnTimeZone: Option[String] = None,
-        updatedBy: Option[String] = None,
-        updatedOn: Option[Timestamp] = None,
-        updatedOnTimeZone: Option[String] = None
+        zoneApproved: Option[Boolean]
     ): Future[String] =
       add(
         serialize(
           SimplePayment(
+            simplePaymentId = simplePaymentId,
             wallexId = wallexId,
             zoneID = zoneID,
-            simplePaymentId = simplePaymentId,
             status = status,
             createdAt = createdAt,
             referenceId = referenceId,
@@ -312,45 +306,32 @@ class SimplePayments @Inject()(
             fundingCutoffTime = fundingCutoffTime,
             beneficiary = beneficiary,
             conversionDetails = conversionDetails,
-            zoneApproved = zoneApproved,
-            createdBy = createdBy,
-            createdOn = createdOn,
-            createdOnTimeZone = createdOnTimeZone,
-            updatedBy = updatedBy,
-            updatedOn = updatedOn,
-            updatedOnTimeZone = updatedOnTimeZone
+            zoneApproved = zoneApproved
           )
         )
       )
 
     def insertOrUpdate(
+        simplePaymentId: String,
         wallexId: String,
         zoneID: String,
-        simplePaymentId: String,
         status: String,
         createdAt: String,
         referenceId: String,
-        failureReason: String,
         fundingSource: String,
         purposeOfTransfer: String,
         fundingReference: String,
         fundingCutoffTime: String,
         beneficiary: BeneficiaryPayment,
         conversionDetails: ConversionDetails,
-        zoneApproved: Option[Boolean],
-        createdBy: Option[String] = None,
-        createdOn: Option[Timestamp] = None,
-        createdOnTimeZone: Option[String] = None,
-        updatedBy: Option[String] = None,
-        updatedOn: Option[Timestamp] = None,
-        updatedOnTimeZone: Option[String] = None
+        zoneApproved: Option[Boolean]
     ): Future[Int] =
       upsert(
         serialize(
           SimplePayment(
+            simplePaymentId = simplePaymentId,
             wallexId = wallexId,
             zoneID = zoneID,
-            simplePaymentId = simplePaymentId,
             status = status,
             createdAt = createdAt,
             referenceId = referenceId,
@@ -360,13 +341,7 @@ class SimplePayments @Inject()(
             fundingCutoffTime = fundingCutoffTime,
             beneficiary = beneficiary,
             conversionDetails = conversionDetails,
-            zoneApproved = zoneApproved,
-            createdBy = createdBy,
-            createdOn = createdOn,
-            createdOnTimeZone = createdOnTimeZone,
-            updatedBy = updatedBy,
-            updatedOn = updatedOn,
-            updatedOnTimeZone = updatedOnTimeZone
+            zoneApproved = zoneApproved
           )
         )
       )

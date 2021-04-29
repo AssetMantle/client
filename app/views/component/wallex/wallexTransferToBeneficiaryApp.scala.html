@@ -3,7 +3,7 @@
 
 @import models.wallex.OrganizationWallexDetail
 @import models.wallex.OrganizationBeneficiary
-@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexBeneficiary: Seq[OrganizationBeneficiary])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexBeneficiary: Seq[OrganizationBeneficiary],negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @if(organizationWallexDetail.isDefined && !wallexBeneficiary.isEmpty) {
-    @commonFormButton(constants.Form.WALLEX_INITIATE_PAYMENT)
+    @commonFormButton(constants.Form.WALLEX_INITIATE_PAYMENT, 'parameters -> s"'${negotiationID}'")
 }
