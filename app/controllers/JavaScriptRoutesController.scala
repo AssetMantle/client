@@ -266,7 +266,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewNegotiation,
         routes.javascript.ComponentViewController.organizationViewNegotiation,
 
-        routes.javascript.ComponentViewController.organizationWallexAccount,
+        routes.javascript.ComponentViewController.traderViewOrganizationWallexAccount,
         routes.javascript.ComponentViewController.organizationWallexPaymentApp,
         routes.javascript.ComponentViewController.traderViewBeneficiary,
         routes.javascript.ComponentViewController.wallexBeneficiaryPaymentApp,

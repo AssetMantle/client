@@ -3128,7 +3128,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def organizationWallexAccount : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderViewOrganizationWallexAccount : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
