@@ -152,16 +152,14 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
       def getOTP: Future[String] = masterTransactionEmailOTPs.Service.get(loginState.username)
 
-      def sendOTPAndGetResult(emailAddress: String, otp: String): Future[Result] = {
-        utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
-      }
+      def sendOTP(emailAddress: String, otp: String): Future[String] = utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
 
       (for {
         emailAddress <- emailAddress
         otp <- getOTP
-        result <- sendOTPAndGetResult(emailAddress = emailAddress, otp = otp)
-      } yield result).recover {
+        _ <- sendOTP(emailAddress = emailAddress, otp = otp)
+      } yield Ok(views.html.component.master.verifyEmailAddress())
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -180,11 +178,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyEmailAddress(otpVerified)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)
-          } yield {
-            result
-          }
+            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
@@ -202,8 +198,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         mobileNumber <- mobileNumber
         otp <- getOTP
         _ <- utilitiesNotification.sendSMSToMobileNumber(fromAccountID = loginState.username, mobileNumber = mobileNumber, sms = constants.Notification.VERIFY_PHONE.sms.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
-        result <- withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
-      } yield result).recover {
+      } yield Ok(views.html.component.master.verifyMobileNumber())).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }

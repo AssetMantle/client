@@ -7,12 +7,13 @@ import javax.inject.{Inject, Singleton}
 import models.Abstract.NegotiationDocumentContent
 import models._
 import models.common.Serializable._
-import models.master.{Asset, Negotiation, Organization, Trader}
+import models.master.{Asset, Negotiation, Trader}
 import models.masterTransaction.{AssetFile, NegotiationFile, TradeActivity, TradeActivityHistory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import utilities.MicroNumber
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -137,7 +138,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.paymentTerms(views.companion.master.PaymentTerms.form.fill(views.companion.master.PaymentTerms.Data(id = id, advancePercentage = negotiation.paymentTerms.advancePercentage, credit = negotiation.paymentTerms.credit.map(credit => views.companion.master.PaymentTerms.CreditData(tenure = credit.tenure, tentativeDate = credit.tentativeDate.map(date => utilities.Date.sqlDateToUtilDate(date)), reference = credit.reference)))), id = id))
+        Future(Ok(views.html.component.master.paymentTerms(views.companion.master.PaymentTerms.form.fill(views.companion.master.PaymentTerms.Data(id = id, advancePercentage = negotiation.paymentTerms.advancePercentage, credit = negotiation.paymentTerms.credit.map(credit => views.companion.master.PaymentTerms.CreditData(tenure = credit.tenure, tentativeDate = credit.tentativeDate.map(date => utilities.Date.sqlDateToUtilDate(date)), reference = credit.reference)))), id = id)))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -197,7 +198,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia)), id = id))
+        Future(Ok(views.html.component.master.documentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = (negotiation.documentList.assetDocuments ++ negotiation.documentList.negotiationDocuments).map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia)), id = id)))
       } else throw new BaseException(constants.Response.UNAUTHORIZED)
 
       (for {
@@ -279,8 +280,7 @@ class NegotiationController @Inject()(
         negotiation <- negotiation
         asset <- getAsset(traderID, negotiation)
         counterPartyTrader <- getTrader(negotiation.buyerTraderID)
-        result <- withUsernameToken.Ok(views.html.component.master.reviewNegotiationRequest(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
-      } yield result
+      } yield Ok(views.html.component.master.reviewNegotiationRequest(asset = asset, negotiation = negotiation, counterPartyTrader = counterPartyTrader))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -352,18 +352,17 @@ class NegotiationController @Inject()(
 
       def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-      def getResult(traderID: String, negotiation: Negotiation, sellerAccountID: String): Future[Result] = if (traderID == negotiation.buyerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.acceptNegotiationRequest(negotiation = negotiation, sellerAccountID = sellerAccountID))
-      } else {
-        throw new BaseException(constants.Response.UNAUTHORIZED)
-      }
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
         sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
-        result <- getResult(traderID = traderID, negotiation = negotiation, sellerAccountID = sellerAccountID)
-      } yield result
+      } yield {
+        if (traderID == negotiation.buyerTraderID) {
+          Ok(views.html.component.master.acceptNegotiationRequest(negotiation = negotiation, sellerAccountID = sellerAccountID))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -470,18 +469,17 @@ class NegotiationController @Inject()(
 
       def getTraderAccountID(traderID: String): Future[String] = masterTraders.Service.tryGetAccountId(traderID)
 
-      def getResult(traderID: String, negotiation: Negotiation, sellerAccountID: String): Future[Result] = if (traderID == negotiation.buyerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.rejectNegotiationRequest(negotiation = negotiation, sellerAccountID = sellerAccountID))
-      } else {
-        throw new BaseException(constants.Response.UNAUTHORIZED)
-      }
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
         sellerAccountID <- getTraderAccountID(negotiation.sellerTraderID)
-        result <- getResult(traderID = traderID, negotiation = negotiation, sellerAccountID = sellerAccountID)
-      } yield result
+      } yield {
+        if (traderID == negotiation.buyerTraderID) {
+          Ok(views.html.component.master.rejectNegotiationRequest(negotiation = negotiation, sellerAccountID = sellerAccountID))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -539,7 +537,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = ""))))
+        Future(Ok(views.html.component.master.updateNegotiationAssetTerms(views.companion.master.UpdateNegotiationAssetTerms.form.fill(views.companion.master.UpdateNegotiationAssetTerms.Data(id = negotiation.id, description = negotiation.assetDescription, pricePerUnit = negotiation.price / negotiation.quantity, quantity = negotiation.quantity, quantityUnit = negotiation.quantityUnit, gas = constants.FormField.GAS.maximumValue, password = "")))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -628,7 +626,7 @@ class NegotiationController @Inject()(
       val negotiation = masterNegotiations.Service.tryGet(id)
 
       def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateNegotiationAssetOtherDetails(views.companion.master.UpdateNegotiationAssetOtherDetails.form.fill(views.companion.master.UpdateNegotiationAssetOtherDetails.Data(id = negotiation.id, shippingPeriod = negotiation.assetOtherDetails.shippingDetails.shippingPeriod, portOfLoading = negotiation.assetOtherDetails.shippingDetails.portOfLoading, portOfDischarge = negotiation.assetOtherDetails.shippingDetails.portOfDischarge))))
+        Future(Ok(views.html.component.master.updateNegotiationAssetOtherDetails(views.companion.master.UpdateNegotiationAssetOtherDetails.form.fill(views.companion.master.UpdateNegotiationAssetOtherDetails.Data(id = negotiation.id, shippingPeriod = negotiation.assetOtherDetails.shippingDetails.shippingPeriod, portOfLoading = negotiation.assetOtherDetails.shippingDetails.portOfLoading, portOfDischarge = negotiation.assetOtherDetails.shippingDetails.portOfDischarge)))))
       } else {
         throw new BaseException(constants.Response.UNAUTHORIZED)
       }
@@ -686,17 +684,16 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updatePaymentTerms(views.companion.master.PaymentTerms.form.fill(views.companion.master.PaymentTerms.Data(id = id, advancePercentage = negotiation.paymentTerms.advancePercentage, credit = negotiation.paymentTerms.credit.map(credit => views.companion.master.PaymentTerms.CreditData(tenure = credit.tenure, tentativeDate = credit.tentativeDate.map(date => utilities.Date.sqlDateToUtilDate(date)), reference = credit.reference))))))
-      } else {
-        throw new BaseException(constants.Response.UNAUTHORIZED)
-      }
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(traderID = traderID, negotiation = negotiation)
-      } yield result
+      } yield {
+        if (traderID == negotiation.sellerTraderID) {
+          Ok(views.html.component.master.updatePaymentTerms(views.companion.master.PaymentTerms.form.fill(views.companion.master.PaymentTerms.Data(id = id, advancePercentage = negotiation.paymentTerms.advancePercentage, credit = negotiation.paymentTerms.credit.map(credit => views.companion.master.PaymentTerms.CreditData(tenure = credit.tenure, tentativeDate = credit.tentativeDate.map(date => utilities.Date.sqlDateToUtilDate(date)), reference = credit.reference))))))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -745,17 +742,16 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.sellerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = negotiation.documentList.assetDocuments.map(document => Option(document)) ++ negotiation.documentList.negotiationDocuments.map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia))))
-      } else {
-        throw new BaseException(constants.Response.UNAUTHORIZED)
-      }
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(traderID = traderID, negotiation = negotiation)
-      } yield result
+      } yield {
+        if (traderID == negotiation.sellerTraderID) {
+          Ok(views.html.component.master.updateDocumentList(views.companion.master.DocumentList.form.fill(views.companion.master.DocumentList.Data(id = id, documentList = negotiation.documentList.assetDocuments.map(document => Option(document)) ++ negotiation.documentList.negotiationDocuments.map(document => Option(document)), documentListCompleted = true, physicalDocumentsHandledVia = negotiation.physicalDocumentsHandledVia))))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -808,17 +804,16 @@ class NegotiationController @Inject()(
       val traderID = masterTraders.Service.tryGetID(loginState.username)
       val negotiation = masterNegotiations.Service.tryGet(id)
 
-      def getResult(traderID: String, negotiation: Negotiation): Future[Result] = if (traderID == negotiation.buyerTraderID) {
-        withUsernameToken.Ok(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = termType, status = false))
-      } else {
-        throw new BaseException(constants.Response.UNAUTHORIZED)
-      }
-
       (for {
         traderID <- traderID
         negotiation <- negotiation
-        result <- getResult(traderID = traderID, negotiation = negotiation)
-      } yield result
+      } yield {
+        if (traderID == negotiation.buyerTraderID) {
+          Ok(views.html.component.master.acceptOrRejectNegotiationTerms(negotiationID = negotiation.id, termType = termType, status = false))
+        } else {
+          throw new BaseException(constants.Response.UNAUTHORIZED)
+        }
+      }
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -877,26 +872,23 @@ class NegotiationController @Inject()(
 
       def getOrganizationList(organizationIDs: Seq[String]) = masterOrganizations.Service.getOrganizations(organizationIDs)
 
-      def getResult(documentContent: Option[NegotiationDocumentContent], negotiation: Negotiation, traderList: Seq[Trader], organizationList: Seq[Organization]) = {
+      (for {
+        documentContent <- documentContent
+        negotiation <- negotiation
+        traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
+        organizationList <- getOrganizationList(traderList.map(_.organizationID))
+      } yield {
         documentContent match {
           case Some(content) => {
             val invoice: Invoice = content match {
               case x: Invoice => x
               case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
             }
-            withUsernameToken.Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
+            Ok(views.html.component.master.addInvoice(views.companion.master.AddInvoice.form.fill(views.companion.master.AddInvoice.Data(negotiationID = negotiationID, invoiceNumber = invoice.invoiceNumber, invoiceAmount = invoice.invoiceAmount, invoiceDate = utilities.Date.sqlDateToUtilDate(invoice.invoiceDate))), negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
+          case None => Ok(views.html.component.master.addInvoice(negotiationID = negotiationID, negotiation = negotiation, traderList = traderList, organizationList = organizationList))
         }
       }
-
-      (for {
-        documentContent <- documentContent
-        negotiation <- negotiation
-        traderList <- getTraderList(Seq(negotiation.sellerTraderID, negotiation.buyerTraderID))
-        organizationList <- getOrganizationList(traderList.map(_.organizationID))
-        result <- getResult(documentContent, negotiation, traderList, organizationList)
-      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -961,23 +953,20 @@ class NegotiationController @Inject()(
     implicit request =>
       val documentContent = masterTransactionNegotiationFiles.Service.getDocumentContent(negotiationID, constants.File.Negotiation.CONTRACT)
 
-      def getResult(documentContent: Option[NegotiationDocumentContent]) = {
+      (for {
+        documentContent <- documentContent
+      } yield {
         documentContent match {
           case Some(content) => {
             val contract: Contract = content match {
               case x: Contract => x
               case _ => throw new BaseException(constants.Response.CONTENT_CONVERSION_ERROR)
             }
-            withUsernameToken.Ok(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
+            Ok(views.html.component.master.addContract(views.companion.master.AddContract.form.fill(views.companion.master.AddContract.Data(negotiationID = negotiationID, contractNumber = contract.contractNumber)), negotiationID = negotiationID))
           }
-          case None => withUsernameToken.Ok(views.html.component.master.addContract(negotiationID = negotiationID))
+          case None => Ok(views.html.component.master.addContract(negotiationID = negotiationID))
         }
       }
-
-      (for {
-        documentContent <- documentContent
-        result <- getResult(documentContent)
-      } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.tradeRoom(negotiationID = negotiationID, failures = Seq(baseException.failure)))
       }
@@ -1325,7 +1314,7 @@ class NegotiationController @Inject()(
 
   def confirmAllNegotiationTermsForm(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      withUsernameToken.Ok(views.html.component.master.confirmAllNegotiationTerms(negotiationID = negotiationID))
+      Future(Ok(views.html.component.master.confirmAllNegotiationTerms(negotiationID = negotiationID)))
   }
 
   def confirmAllNegotiationTerms: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
