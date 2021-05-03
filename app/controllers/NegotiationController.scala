@@ -13,6 +13,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import utilities.MicroNumber
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -1063,7 +1064,7 @@ class NegotiationController @Inject()(
 
           def getResult(negotiation: Negotiation, negotiationDocumentList: Seq[NegotiationFile], assetDocumentList: Seq[AssetFile]): Future[Result] = {
             if (negotiation.documentList.negotiationDocuments.diff(negotiationDocumentList.filterNot(_.documentType == constants.File.Negotiation.CONTRACT).map(_.documentType)).isEmpty && negotiation.documentList.assetDocuments.diff(assetDocumentList.map(_.documentType)).isEmpty) {
-              if (assetDocumentList.find(_.documentType == constants.File.Asset.BILL_OF_LADING).getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND)).status == Option(true)) {
+              if (assetDocumentList.find(_.documentType == constants.File.Asset.BILL_OF_LADING).map(billOfLading => billOfLading.status == Option(true) && (if (billOfLading.documentContent.isDefined) true else throw new BaseException(constants.Response.BILL_OF_LADING_CONTENT_NOT_FOUND))).getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))) {
                 val buyerTraderID = masterTraders.Service.tryGetID(loginState.username)
                 val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = buyerConfirmData.password)
                 val contract = masterTransactionNegotiationFiles.Service.tryGet(id = buyerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
@@ -1169,7 +1170,7 @@ class NegotiationController @Inject()(
 
           def getResult(negotiation: Negotiation, negotiationDocumentList: Seq[NegotiationFile], assetDocumentList: Seq[AssetFile]): Future[Result] = {
             if (negotiation.documentList.negotiationDocuments.diff(negotiationDocumentList.filterNot(_.documentType == constants.File.Negotiation.CONTRACT).map(_.documentType)).isEmpty && negotiation.documentList.assetDocuments.diff(assetDocumentList.map(_.documentType)).isEmpty) {
-              if (assetDocumentList.find(_.documentType == constants.File.Asset.BILL_OF_LADING).getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND)).status == Option(true)) {
+              if (assetDocumentList.find(_.documentType == constants.File.Asset.BILL_OF_LADING).map(billOfLading => billOfLading.status == Option(true) && (if (billOfLading.documentContent.isDefined) true else throw new BaseException(constants.Response.BILL_OF_LADING_CONTENT_NOT_FOUND))).getOrElse(throw new BaseException(constants.Response.BILL_OF_LADING_NOT_FOUND))) {
                 val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sellerConfirmData.password)
                 val sellerTraderID = masterTraders.Service.tryGetID(loginState.username)
                 val contract = masterTransactionNegotiationFiles.Service.tryGet(id = sellerConfirmData.id, documentType = constants.File.Negotiation.CONTRACT)
