@@ -8,7 +8,7 @@
 @(identification: Option[Identification], contactStatus: Seq[String], organizationZone: Option[Zone] = None, organization: Option[Organization] = None, organizationKYCs: Seq[OrganizationKYC] = Seq(), traderOrganization: Option[Organization] = None, trader: Option[Trader] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.REQUEST) {
-    @if(organization.isEmpty && trader.isDefined) {
+    @if(organization.isEmpty && trader.isDefined && identification.flatMap(_.verificationStatus).getOrElse(false)) {
         @commonFormButton(constants.Form.ADD_ORGANIZATION)
     }
     @if(trader.isEmpty && organization.isDefined) {
