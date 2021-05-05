@@ -1,9 +1,6 @@
 @import controllers.actions.LoginState
+@import models.master.{AssetHistory, NegotiationHistory, Organization, Trader}
 @import views.html.base._
-@import models.master.NegotiationHistory
-@import models.master.AssetHistory
-@import models.master.Trader
-@import models.master.Organization
 
 @(completedNegotiationList: Seq[NegotiationHistory], traderList: Seq[Trader], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization], assetList: Seq[AssetHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="salesQuoteCard">
@@ -12,48 +9,64 @@
             case Some(trader) => {
                 @trader.id match {
                     case completedNegotiation.buyerTraderID => {
-                    @commonVerticalInfoBox() {
-                        <div class="salesQuoteCardLeft salesChild">
-                            <div class="salesQuoteCategory buy">
-                            </div>
-                            <div class="content">
-                            @assetList.find(_.id == completedNegotiation.assetID) match {
-                                case Some(asset) => {
-                                    <div class="assetIcon">
-                                        <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
-                                    </div>
-                                    <div class="assetInitialData">
-                                        <p class="assetTitle">@Messages(asset.assetType)</p>
-                                        <p class="assetQuantity">@Seq(completedNegotiation.quantity.toRoundedOffString(), completedNegotiation.quantityUnit).mkString(" ")</p>
-                                    </div>
+                        @commonVerticalInfoBox() {
+                            <div class="salesQuoteCardLeft salesChild">
+                                <div class="salesQuoteCategory buy">
+
+                                </div>
+                                <div class="content">
+                                @assetList.find(_.id == completedNegotiation.assetID) match {
+                                    case Some(asset) => {
+                                        <div class="assetIcon">
+                                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                                        </div>
+                                        <div class="assetInitialData">
+                                            <p class="assetTitle">@Messages(asset.assetType)</p>
+                                            <p class="assetQuantity">@Seq(completedNegotiation.quantity.toRoundedOffString(), completedNegotiation.quantityUnit).mkString(" ")</p>
+                                        </div>
+                                    }
+                                    case None => {}
                                 }
+                                </div>
+                            </div>
+                            <div class="salesQuoteCardMiddle salesChild">
+                                @assetList.find(_.id == completedNegotiation.assetID) match {
+                                case Some(asset) => {
+                                <div class="assetInitialData">
+                                    <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
+                                </div>
+                            }
                                 case None => {}
                             }
-                            </div>
-                        </div>
-                    <div class="salesQuoteCardMiddle salesChild">
-                        @assetList.find(_.id == completedNegotiation.assetID) match {
-                        case Some(asset) => {
-                        <div class="assetInitialData">
-                            <p class="assetPrice">@Seq((completedNegotiation.price/completedNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), completedNegotiation.quantityUnit).mkString(" ")</p>
-                        </div>
-                    }
-                        case None => {}
-                    }
+                        @counterPartyTraderList.find(_.id == completedNegotiation.sellerTraderID) match {
+                            case Some(counterPartyTrader) => {
+                                @counterPartyOrganizationList.find(_.id == counterPartyTrader.organizationID) match {
+                                    case Some(organization) => {
+                                        <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
+                                    }
+                                    case None => {}
+                                }
+                                <p><span cmuk-tooltip="@Messages(constants.View.SELLER)"> @counterPartyTrader.accountID</span>
+                                <span class="lines">---</span>
+                            }
+                            case None => {}
+                        }
+                        <span cmuk-tooltip="@Messages(constants.View.BUYER)">@trader.accountID</span></p>
+
                     </div>
                         <div class="salesQuoteCardRight salesChild">
                             <div class="cmuk-flex">
                                 <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
                                 <div class="cmuk-text-left">
-                                <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                                <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                                    <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                                    <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                                </div>
+                                @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class -> "cmuk-button buttonPrimary")
                             </div>
-                        @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class -> "cmuk-button buttonPrimary")
-                </div>
 
+                            }
                 }
-                    }
-                    case completedNegotiation.sellerTraderID => {
+                case completedNegotiation.sellerTraderID => {
                 @commonVerticalInfoBox() {
                     <div class="salesQuoteCardLeft salesChild">
                         <div class="salesQuoteCategory sell">
@@ -82,23 +95,38 @@
                             }
                             case None => {}
                         }
+                        @counterPartyTraderList.find(_.id == completedNegotiation.buyerTraderID) match {
+                            case Some(counterPartyTrader) => {
+                                @counterPartyOrganizationList.find(_.id == counterPartyTrader.organizationID) match {
+                                    case Some(organization) => {
+                                        <p><span class="organizationName" cmuk-tooltip="@Messages(constants.View.ORGANIZATION)">@organization.name</span> </p>
+                                    }
+                                    case None => {}
+                                }
+                                <p><span cmuk-tooltip="@Messages(constants.View.BUYER)"> @counterPartyTrader.accountID</span>
+                                <span class="lines">---</span>
+                            }
+                            case None => {}
+                        }
+                        <span cmuk-tooltip="@Messages(constants.View.SELLER)">@trader.accountID</span></p>
+
                     </div>
                     <div class="salesQuoteCardRight salesChild">
                         <div class="cmuk-flex">
                             <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
                             <div class="cmuk-text-left">
-                            <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                            <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                                <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
+                                <p><span>@completedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                            </div>
                         </div>
-                        </div>
-                    @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class->"cmuk-button buttonPrimary")
+                        @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoomCompleted(completedNegotiation.id), 'class->"cmuk-button buttonPrimary")
                     </div>
                         }
                     }
                     case _ => {}
-                }
+                        }
+                    }
+                    case None=>{}
             }
-            case None=>{}
         }
-    }
 </div>
