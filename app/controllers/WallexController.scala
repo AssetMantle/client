@@ -237,7 +237,7 @@ class WallexController @Inject() (
     withTraderLoginAction.authenticated {
       implicit loginState =>
         implicit request =>
-          AddDocuments.form
+          SubmitDocument.form
             .bindFromRequest()
             .fold(
               formWithErrors => {
