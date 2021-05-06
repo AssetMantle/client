@@ -15,12 +15,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SimplePayment(
-    simplePaymentId: String,
-    wallexId: String,
-    zoneID: String,
+    simplePaymentID: String,
+    wallexID: String,
+    organizationID: String,
     status: String,
     createdAt: String,
-    referenceId: String,
+    referenceID: String,
     fundingSource: String,
     purposeOfTransfer: String,
     fundingReference: String,
@@ -59,12 +59,12 @@ class SimplePayments @Inject() (
       simplePaymentDetail: SimplePayment
   ): SimplePaymentSerialized =
     SimplePaymentSerialized(
-      simplePaymentId = simplePaymentDetail.simplePaymentId,
-      wallexId = simplePaymentDetail.wallexId,
-      zoneID = simplePaymentDetail.zoneID,
+      simplePaymentID = simplePaymentDetail.simplePaymentID,
+      wallexID = simplePaymentDetail.wallexID,
+      organizationID = simplePaymentDetail.organizationID,
       status = simplePaymentDetail.status,
       createdAt = simplePaymentDetail.createdAt,
-      referenceId = simplePaymentDetail.referenceId,
+      referenceID = simplePaymentDetail.referenceID,
       fundingSource = simplePaymentDetail.fundingSource,
       purposeOfTransfer = simplePaymentDetail.purposeOfTransfer,
       fundingReference = simplePaymentDetail.fundingReference,
@@ -86,7 +86,7 @@ class SimplePayments @Inject() (
   ): Future[String] =
     db.run(
         (simplePaymentTable returning simplePaymentTable
-          .map(_.simplePaymentId) += wallexSimplePaymentDetail).asTry
+          .map(_.simplePaymentID) += wallexSimplePaymentDetail).asTry
       )
       .map {
         case Success(result) => result
@@ -120,8 +120,8 @@ class SimplePayments @Inject() (
           }
       }
 
-  private def findById(simplePaymentId: String): Future[SimplePaymentSerialized] =
-    db.run(simplePaymentTable.filter(_.simplePaymentId === simplePaymentId).result.head.asTry).map {
+  private def findById(simplePaymentID: String): Future[SimplePaymentSerialized] =
+    db.run(simplePaymentTable.filter(_.simplePaymentID === simplePaymentID).result.head.asTry).map {
       case Success(result) => result
       case Failure(exception) =>
         exception match {
@@ -134,12 +134,12 @@ class SimplePayments @Inject() (
     }
 
   private def updateStatus(
-      simplePaymentId: String,
+      simplePaymentID: String,
       zoneApproved: Boolean
   ): Future[Int] =
     db.run(
         simplePaymentTable
-          .filter(_.simplePaymentId === simplePaymentId)
+          .filter(_.simplePaymentID === simplePaymentID)
           .map(_.zoneApproved)
           .update(zoneApproved)
           .asTry
@@ -162,12 +162,12 @@ class SimplePayments @Inject() (
       }
 
   case class SimplePaymentSerialized(
-      simplePaymentId: String,
-      wallexId: String,
-      zoneID: String,
+      simplePaymentID: String,
+      wallexID: String,
+      organizationID: String,
       status: String,
       createdAt: String,
-      referenceId: String,
+      referenceID: String,
       fundingSource: String,
       purposeOfTransfer: String,
       fundingReference: String,
@@ -185,12 +185,12 @@ class SimplePayments @Inject() (
 
     def deserialize: SimplePayment =
       SimplePayment(
-        simplePaymentId = simplePaymentId,
-        wallexId = wallexId,
-        zoneID = zoneID,
+        simplePaymentID = simplePaymentID,
+        wallexID = wallexID,
+        organizationID = organizationID,
         status = status,
         createdAt = createdAt,
-        referenceId = referenceId,
+        referenceID = referenceID,
         fundingSource = fundingSource,
         purposeOfTransfer = purposeOfTransfer,
         fundingReference = fundingReference,
@@ -218,12 +218,12 @@ class SimplePayments @Inject() (
 
     override def * =
       (
-        simplePaymentId,
-        wallexId,
-        zoneID,
+        simplePaymentID,
+        wallexID,
+        organizationID,
         status,
         createdAt,
-        referenceId,
+        referenceID,
         fundingSource,
         purposeOfTransfer,
         fundingReference,
@@ -239,17 +239,17 @@ class SimplePayments @Inject() (
         updatedOnTimeZone.?
       ) <> (SimplePaymentSerialized.tupled, SimplePaymentSerialized.unapply)
 
-    def simplePaymentId = column[String]("simplePaymentId", O.PrimaryKey)
+    def simplePaymentID = column[String]("simplePaymentID", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId", O.PrimaryKey)
+    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
-    def zoneID = column[String]("zoneID")
+    def organizationID = column[String]("organizationID")
 
     def status = column[String]("status")
 
     def createdAt = column[String]("createdAt")
 
-    def referenceId = column[String]("referenceId")
+    def referenceID = column[String]("referenceID")
 
     def fundingSource = column[String]("fundingSource")
 
@@ -280,12 +280,12 @@ class SimplePayments @Inject() (
 
   object Service {
     def create(
-        simplePaymentId: String,
-        wallexId: String,
-        zoneID: String,
+        simplePaymentID: String,
+        wallexID: String,
+        organizationID: String,
         status: String,
         createdAt: String,
-        referenceId: String,
+        referenceID: String,
         fundingSource: String,
         purposeOfTransfer: String,
         fundingReference: String,
@@ -297,12 +297,12 @@ class SimplePayments @Inject() (
       add(
         serialize(
           SimplePayment(
-            simplePaymentId = simplePaymentId,
-            wallexId = wallexId,
-            zoneID = zoneID,
+            simplePaymentID = simplePaymentID,
+            wallexID = wallexID,
+            organizationID = organizationID,
             status = status,
             createdAt = createdAt,
-            referenceId = referenceId,
+            referenceID = referenceID,
             fundingSource = fundingSource,
             purposeOfTransfer = purposeOfTransfer,
             fundingReference = fundingReference,
@@ -315,12 +315,12 @@ class SimplePayments @Inject() (
       )
 
     def insertOrUpdate(
-        simplePaymentId: String,
-        wallexId: String,
-        zoneID: String,
+        simplePaymentID: String,
+        wallexID: String,
+        organizationID: String,
         status: String,
         createdAt: String,
-        referenceId: String,
+        referenceID: String,
         fundingSource: String,
         purposeOfTransfer: String,
         fundingReference: String,
@@ -332,12 +332,12 @@ class SimplePayments @Inject() (
       upsert(
         serialize(
           SimplePayment(
-            simplePaymentId = simplePaymentId,
-            wallexId = wallexId,
-            zoneID = zoneID,
+            simplePaymentID = simplePaymentID,
+            wallexID = wallexID,
+            organizationID = organizationID,
             status = status,
             createdAt = createdAt,
-            referenceId = referenceId,
+            referenceID = referenceID,
             fundingSource = fundingSource,
             purposeOfTransfer = purposeOfTransfer,
             fundingReference = fundingReference,
@@ -350,12 +350,12 @@ class SimplePayments @Inject() (
       )
 
     def tryGet(
-        simplePaymentId: String
+        simplePaymentID: String
     ): Future[SimplePayment] =
-      findById(simplePaymentId).map(_.deserialize)
+      findById(simplePaymentID).map(_.deserialize)
 
-    def updateZoneApprovedStatus(simplePaymentId: String,zoneApproved: Boolean): Future[Int] =
-      updateStatus(simplePaymentId = simplePaymentId, zoneApproved = zoneApproved
+    def updateZoneApprovedStatus(simplePaymentID: String,zoneApproved: Boolean): Future[Int] =
+      updateStatus(simplePaymentID = simplePaymentID, zoneApproved = zoneApproved
       )
   }
 

@@ -1,0 +1,30 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.AddOrganizationBeneficiary
+@import views.html.base._
+
+@(addOrgWallexBeneficiaryDetails: Form[AddOrganizationBeneficiary.Data] = AddOrganizationBeneficiary.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.WALLEX_TRADER_BENEFICIARY_ADD, addOrgWallexBeneficiaryDetails) {
+
+    @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_COUNTRY_CODE)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_COMPANY_ADDRESS)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.CITY)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_STATE_OR_PROVINCE)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_US_POSTAL_CODE)
+    @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_ENTITY_TYPE)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_NAME)
+    @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.NICK_NAME)
+    @defining(Option(constants.FormField.WALLEX_BANK_DATA)) { implicit nestedFormField =>
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.BANK_NAME)
+        @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_COUNTRY_CODE)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_BANK_ADDRESS)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_NUMBER)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.ACCOUNT_HOLDER_NAME)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.SWIFT_CODE)
+        @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_ABA)
+        @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_CURRENCIES)
+    }
+}
+<div id="wallexMessage">
+    @Messages(constants.View.WALLEX_POWERED_BY)
+    <span class="wallexLogo">@commonImage("wallex.png")</span>
+</div>

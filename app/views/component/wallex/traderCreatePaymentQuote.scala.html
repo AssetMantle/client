@@ -1,0 +1,18 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.CreatePaymentQuote
+@import views.html.base._
+
+@(wallexQuote: Form[CreatePaymentQuote.Data] = CreatePaymentQuote.form, negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.WALLEX_TRADER_PAYMENT_INITIATE, wallexQuote) {
+    @commonSelect(wallexQuote, constants.FormField.WALLEX_CURRENCIES_SELL)
+    @commonSelect(wallexQuote, constants.FormField.WALLEX_CURRENCIES_BUY)
+    @commonInputText(wallexQuote, constants.FormField.WALLEX_BENEFICIARY_ID)
+    @commonInputDouble(wallexQuote, constants.FormField.WALLEX_AMOUNT)
+    @commonInputText(wallexQuote, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID,'containerDivClass -> "hidden")
+
+}
+
+<div id="wallexMessage">
+    @Messages(constants.View.WALLEX_POWERED_BY)
+    <span class="wallexLogo">@commonImage("wallex.png")</span>
+</div>

@@ -14,8 +14,8 @@ import scala.util.{Failure, Success}
 
 case class CollectionAccount(
     id: String,
-    wallexId: String,
-    accountId: String,
+    wallexID: String,
+    accountID: String,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
     createdOnTimeZone: Option[String] = None,
@@ -44,11 +44,11 @@ class CollectionAccounts @Inject()(
     TableQuery[CollectionAccountTable]
 
   private def add(
-      wallexCollectionAccountDetail: CollectionAccount
+      collectionAccount: CollectionAccount
   ): Future[String] =
     db.run(
         (collectionAccountTable returning collectionAccountTable
-          .map(_.id) += wallexCollectionAccountDetail).asTry
+          .map(_.id) += collectionAccount).asTry
       )
       .map {
         case Success(result) => result
@@ -63,11 +63,11 @@ class CollectionAccounts @Inject()(
       }
 
   private def upsert(
-      wallexCollectionAccountDetail: CollectionAccount
+      collectionAccount: CollectionAccount
   ): Future[Int] =
     db.run(
         collectionAccountTable
-          .insertOrUpdate(wallexCollectionAccountDetail)
+          .insertOrUpdate(collectionAccount)
           .asTry
       )
       .map {
@@ -82,7 +82,7 @@ class CollectionAccounts @Inject()(
           }
       }
 
-  private def findById(
+  private def findByID(
       id: String
   ): Future[Option[CollectionAccount]] =
     db.run(
@@ -92,12 +92,12 @@ class CollectionAccounts @Inject()(
         .headOption
     )
 
-  private def findByAccountId(
-      accountId: String
+  private def findByAccountID(
+      accountID: String
   ): Future[Option[CollectionAccount]] =
     db.run(
       collectionAccountTable
-        .filter(_.accountId === accountId)
+        .filter(_.accountID === accountID)
         .result
         .headOption
     )
@@ -111,8 +111,8 @@ class CollectionAccounts @Inject()(
     override def * =
       (
         id,
-        wallexId,
-        accountId,
+        wallexID,
+        accountID,
         createdBy.?,
         createdOn.?,
         createdOnTimeZone.?,
@@ -123,9 +123,9 @@ class CollectionAccounts @Inject()(
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId", O.PrimaryKey)
+    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
-    def accountId = column[String]("accountId", O.PrimaryKey)
+    def accountID = column[String]("accountID", O.PrimaryKey)
 
     def createdBy = column[String]("createdBy")
 
@@ -143,52 +143,52 @@ class CollectionAccounts @Inject()(
   object Service {
     def create(
         id: String,
-        wallexId: String,
-        accountId: String
+        wallexID: String,
+        accountID: String
     ): Future[String] =
       add(
         CollectionAccount(
           id = id,
-          wallexId = wallexId,
-          accountId = accountId
+          wallexID = wallexID,
+          accountID = accountID
         )
       )
 
     def insertOrUpdate(
         id: String,
-        wallexId: String,
-        accountId: String
+        wallexID: String,
+        accountID: String
     ): Future[String] =
       add(
         CollectionAccount(
           id = id,
-          wallexId = wallexId,
-          accountId = accountId
+          wallexID = wallexID,
+          accountID = accountID
         )
       )
 
     def tryGet(id: String): Future[CollectionAccount] =
-      findById(id).map { detail =>
+      findByID(id).map { detail =>
         detail.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
     def get(id: String): Future[Option[CollectionAccount]] =
-      findById(id)
+      findByID(id)
 
-  def tryGetByAccountId(
-      accountId: String
+  def tryGetByAccountID(
+      accountID: String
   ): Future[CollectionAccount] =
-    findByAccountId(accountId).map { detail =>
+    findByAccountID(accountID).map { detail =>
       detail.getOrElse(
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       )
     }
 
-  def getByAccountId(
-      accountId: String
+  def getByAccountID(
+      accountID: String
   ): Future[Option[CollectionAccount]] =
-    findByAccountId(accountId)
+    findByAccountID(accountID)
 }
 }

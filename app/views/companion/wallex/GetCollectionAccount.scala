@@ -12,7 +12,7 @@ object GetCollectionAccount {
   )
 
   case class Data(
-      accountId: String
+      accountID: String
   )
 
 }

@@ -16,7 +16,7 @@ case class UserKYCDetail(
     id: String,
     documentType: String,
     organizationID: String,
-    wallexId: String,
+    wallexID: String,
     url: String,
     documentName: String,
     createdBy: Option[String] = None,
@@ -106,7 +106,7 @@ class UserKYCDetails @Inject() (
         id,
         documentType,
         organizationID,
-        wallexId,
+        wallexID,
         url,
         documentName,
         createdBy.?,
@@ -123,7 +123,7 @@ class UserKYCDetails @Inject() (
 
     def organizationID = column[String]("organizationID", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId")
+    def wallexID = column[String]("wallexID")
 
     def url = column[String]("url")
 
@@ -146,7 +146,7 @@ class UserKYCDetails @Inject() (
     def create(
         id: String,
         organizationID: String,
-        wallexId: String,
+        wallexID: String,
         url: String,
         documentName: String,
         documentType: String
@@ -155,7 +155,7 @@ class UserKYCDetails @Inject() (
         UserKYCDetail(
           id = id,
           organizationID = organizationID,
-          wallexId = wallexId,
+          wallexID = wallexID,
           url = url,
           documentName = documentName,
           documentType = documentType
@@ -165,7 +165,7 @@ class UserKYCDetails @Inject() (
     def insertOrUpdate(
         id: String,
         organizationID: String,
-        wallexId: String,
+        wallexID: String,
         url: String,
         documentName: String,
         documentType: String
@@ -174,7 +174,7 @@ class UserKYCDetails @Inject() (
         UserKYCDetail(
           id = id,
           organizationID = organizationID,
-          wallexId = wallexId,
+          wallexID = wallexID,
           url = url,
           documentName = documentName,
           documentType = documentType

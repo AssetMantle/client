@@ -13,9 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class WalletTransferRequest(
-    negotiationId: String,
+    negotiationID: String,
     organizationID: String,
-    zoneID: String,
     traderID: String,
     onBehalfOf: String,
     receiverAccountId: String,
@@ -57,7 +56,7 @@ class WalletTransferRequests @Inject() (
   ): Future[String] =
     db.run(
         (walletTranfserRequestTable returning walletTranfserRequestTable
-          .map(_.negotiationId) += walletTransferRequest).asTry
+          .map(_.negotiationID) += walletTransferRequest).asTry
       )
       .map {
         case Success(result) => result
@@ -92,11 +91,11 @@ class WalletTransferRequests @Inject() (
       }
 
   private def findById(
-      negotiationId: String
+      negotiationID: String
   ): Future[Option[WalletTransferRequest]] =
     db.run(
       walletTranfserRequestTable
-        .filter(_.negotiationId === negotiationId)
+        .filter(_.negotiationID === negotiationID)
         .result
         .headOption
     )
@@ -109,6 +108,15 @@ class WalletTransferRequests @Inject() (
         .filter(_.organizationID === organizationID)
         .result
     )
+
+  private def findAllByOrganizationIDs(
+      organizationIDs: Seq[String]
+  ): Future[Seq[WalletTransferRequest]] =
+    db.run(
+      walletTranfserRequestTable
+        .filter(_.organizationID inSet organizationIDs)
+        .result
+    )
   private def findAllByTraderID(
       traderID: String
   ): Future[Seq[WalletTransferRequest]] =
@@ -118,32 +126,24 @@ class WalletTransferRequests @Inject() (
         .result
     )
 
-  private def findAllByZoneID(
-      zoneID: String
+  private def findPendingRequests(
+      organizationIDs: Seq[String],
+      status: String
   ): Future[Seq[WalletTransferRequest]] =
     db.run(
       walletTranfserRequestTable
-        .filter(_.zoneID === zoneID)
-        .result
-    )
-
-  private def findPendingByZoneID(
-      zoneID: String
-  ): Future[Seq[WalletTransferRequest]] =
-    db.run(
-      walletTranfserRequestTable
-        .filter(_.zoneID === zoneID)
-        .filter(_.status === constants.Status.SendWalletTransfer.ZONE_APPROVAL)
+        .filter(_.organizationID inSet organizationIDs)
+        .filter(_.status === status)
         .result
     )
 
   private def updateStatusById(
-      negotiationId: String,
+      negotiationID: String,
       status: String
   ): Future[Int] =
     db.run(
         walletTranfserRequestTable
-          .filter(_.negotiationId === negotiationId)
+          .filter(_.negotiationID === negotiationID)
           .map(_.status)
           .update(status)
           .asTry
@@ -173,9 +173,8 @@ class WalletTransferRequests @Inject() (
 
     override def * =
       (
-        negotiationId,
+        negotiationID,
         organizationID,
-        zoneID,
         traderID,
         onBehalfOf,
         receiverAccountId,
@@ -193,11 +192,9 @@ class WalletTransferRequests @Inject() (
         updatedOnTimeZone.?
       ) <> (WalletTransferRequest.tupled, WalletTransferRequest.unapply)
 
-    def negotiationId = column[String]("negotiationId", O.PrimaryKey)
+    def negotiationID = column[String]("negotiationID", O.PrimaryKey)
 
-    def organizationID = column[String]("organizationID",O.PrimaryKey)
-
-    def zoneID = column[String]("zoneID")
+    def organizationID = column[String]("organizationID", O.PrimaryKey)
 
     def traderID = column[String]("traderID")
 
@@ -232,8 +229,7 @@ class WalletTransferRequests @Inject() (
 
   object Service {
     def create(
-        negotiationId: String,
-        zoneID: String,
+        negotiationID: String,
         organizationID: String,
         traderID: String,
         onBehalfOf: String,
@@ -247,8 +243,7 @@ class WalletTransferRequests @Inject() (
     ): Future[String] =
       add(
         WalletTransferRequest(
-          negotiationId = negotiationId,
-          zoneID = zoneID,
+          negotiationID = negotiationID,
           organizationID = organizationID,
           traderID = traderID,
           onBehalfOf = onBehalfOf,
@@ -263,8 +258,7 @@ class WalletTransferRequests @Inject() (
       )
 
     def insertOrUpdate(
-        negotiationId: String,
-        zoneID: String,
+        negotiationID: String,
         organizationID: String,
         traderID: String,
         onBehalfOf: String,
@@ -278,8 +272,7 @@ class WalletTransferRequests @Inject() (
     ): Future[Int] =
       upsert(
         WalletTransferRequest(
-          negotiationId = negotiationId,
-          zoneID = zoneID,
+          negotiationID = negotiationID,
           organizationID = organizationID,
           traderID = traderID,
           onBehalfOf = onBehalfOf,
@@ -293,37 +286,42 @@ class WalletTransferRequests @Inject() (
         )
       )
 
-    def tryGet(negotiationId: String): Future[WalletTransferRequest] =
-      findById(negotiationId).map { detail =>
+    def tryGet(negotiationID: String): Future[WalletTransferRequest] =
+      findById(negotiationID).map { detail =>
         detail.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
-    def get(negotiationId: String): Future[Option[WalletTransferRequest]] =
-      findById(negotiationId)
+    def get(negotiationID: String): Future[Option[WalletTransferRequest]] =
+      findById(negotiationID)
 
-    def tryGetByZoneID(
-        zoneID: String
+    def tryGetPendingRequests(
+        organizationIDs: Seq[String]
     ): Future[Seq[WalletTransferRequest]] =
-      findAllByZoneID(zoneID)
-
-    def tryGetPendingByZoneID(
-        zoneID: String
-    ): Future[Seq[WalletTransferRequest]] =
-      findPendingByZoneID(zoneID)
+      findPendingRequests(
+        organizationIDs,
+        constants.Status.SendWalletTransfer.ZONE_APPROVAL
+      )
 
     def updateZoneApprovalStatus(
-        negotiationId: String,
+        negotiationID: String,
         status: String
     ): Future[Int] =
-      updateStatusById(negotiationId, status)
+      updateStatusById(negotiationID, status)
 
     def getAllByTraderID(traderID: String): Future[Seq[WalletTransferRequest]] =
       findAllByTraderID(traderID)
 
-    def getAllByOrganizationID(organizationID: String): Future[Seq[WalletTransferRequest]] =
+    def getAllByOrganizationID(
+        organizationID: String
+    ): Future[Seq[WalletTransferRequest]] =
       findAllByOrganizationID(organizationID)
+
+    def getAllByOrganizationIDs(
+        organizationIDs: Seq[String]
+    ): Future[Seq[WalletTransferRequest]] =
+      findAllByOrganizationIDs(organizationIDs)
   }
 
 }

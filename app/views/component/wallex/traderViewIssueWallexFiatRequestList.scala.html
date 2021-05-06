@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.WalletTransferRequest
+
+@(walletRequestList: Seq[WalletTransferRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.FIAT_TRANSACTIONS, 'cardIconPath -> "images/icons/icons.svg#fundDeposits") {
+} {
+    @walletRequestList.map { fiatRequest =>
+        @commonVerticalInfoBox() {
+            @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, fiatRequest.negotiationID)
+            @commonVerticalTextInfo(constants.View.WALLEX_ON_BEHALF_OF, fiatRequest.onBehalfOf)
+            @commonVerticalTextInfo(constants.View.WALLEX_RECEIVER_ACCOUNT_ID, fiatRequest.receiverAccountId)
+            @commonVerticalMicroNumberInfo(constants.View.AMOUNT_REQUESTED, fiatRequest.amount)
+                @commonVerticalTextInfo(constants.View.STATUS, fiatRequest.status)
+        }
+
+    }
+}
+
+

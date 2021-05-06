@@ -22,7 +22,12 @@ object External {
   object Wallex {
     //wallex date format
     val DATE_FORMAT = "dd-MM-yyyy"
+    val STANDARD = "STANDARD"
+    val APPLICATION_TYPE = "application/pdf"
+
+    object Status {
     val APPROVED = "approved"
+    }
   }
 
 }

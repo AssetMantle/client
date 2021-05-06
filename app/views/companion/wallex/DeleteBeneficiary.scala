@@ -7,7 +7,7 @@ object DeleteBeneficiary {
 
   val form = Form(
     mapping(
-      constants.FormField.BENEFICIARY_ID.name -> constants.FormField.BENEFICIARY_ID.field
+      constants.FormField.WALLEX_BENEFICIARY_ID.name -> constants.FormField.WALLEX_BENEFICIARY_ID.field
     )(Data.apply)(Data.unapply)
   )
 

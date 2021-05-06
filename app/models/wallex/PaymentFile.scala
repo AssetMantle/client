@@ -13,12 +13,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class PaymentFile(
-    quoteId: String,
-    fileId: String,
+    quoteID: String,
+    fileID: String,
     fileType: String,
     organizationID: String,
-    negotiationId: String,
-    wallexId: String,
+    negotiationID: String,
+    wallexID: String,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
     createdOnTimeZone: Option[String] = None,
@@ -44,14 +44,14 @@ class PaymentFiles @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val paymentFileTable =
-    TableQuery[PaymentFileDetailTable]
+    TableQuery[PaymentFileTable]
 
   private def add(
       paymentFile: PaymentFile
   ): Future[String] =
     db.run(
         (paymentFileTable returning paymentFileTable
-          .map(_.quoteId) += paymentFile).asTry
+          .map(_.quoteID) += paymentFile).asTry
       )
       .map {
         case Success(result) => result
@@ -86,16 +86,16 @@ class PaymentFiles @Inject()(
       }
 
   private def findById(
-      quoteId: String
+      quoteID: String
   ): Future[Option[PaymentFile]] =
     db.run(
       paymentFileTable
-        .filter(_.quoteId === quoteId)
+        .filter(_.quoteID === quoteID)
         .result
         .headOption
     )
 
-  private[models] class PaymentFileDetailTable(tag: Tag)
+  private[models] class PaymentFileTable(tag: Tag)
       extends Table[PaymentFile](
         tag,
         "PaymentFile"
@@ -103,12 +103,12 @@ class PaymentFiles @Inject()(
 
     override def * =
       (
-        quoteId,
-        fileId,
+        quoteID,
+        fileID,
         fileType,
         organizationID,
-        negotiationId,
-        wallexId,
+        negotiationID,
+        wallexID,
         createdBy.?,
         createdOn.?,
         createdOnTimeZone.?,
@@ -117,17 +117,17 @@ class PaymentFiles @Inject()(
         updatedOnTimeZone.?
       ) <> (PaymentFile.tupled, PaymentFile.unapply)
 
-    def quoteId = column[String]("quoteId", O.PrimaryKey)
+    def quoteID = column[String]("quoteID", O.PrimaryKey)
 
-    def fileId = column[String]("fileId", O.PrimaryKey)
+    def fileID = column[String]("fileID", O.PrimaryKey)
 
     def fileType = column[String]("fileType", O.PrimaryKey)
 
     def organizationID = column[String]("organizationID")
 
-    def negotiationId = column[String]("negotiationId")
+    def negotiationID = column[String]("negotiationID")
 
-    def wallexId = column[String]("wallexId")
+    def wallexID = column[String]("wallexID")
 
     def createdBy = column[String]("createdBy")
 
@@ -145,50 +145,50 @@ class PaymentFiles @Inject()(
   object Service {
     def create(
         organizationID: String,
-        negotiationId: String,
-        quoteId: String,
-        wallexId: String,
-        fileId: String,
+        negotiationID: String,
+        quoteID: String,
+        wallexID: String,
+        fileID: String,
         fileType: String
     ): Future[String] =
       add(
         PaymentFile(
           organizationID = organizationID,
-          quoteId = quoteId,
-          negotiationId = negotiationId,
-          wallexId = wallexId,
-          fileId = fileId,
+          quoteID = quoteID,
+          negotiationID = negotiationID,
+          wallexID = wallexID,
+          fileID = fileID,
           fileType = fileType
         )
       )
 
     def insertOrUpdate(
         organizationID: String,
-        negotiationId: String,
-        quoteId: String,
-        wallexId: String,
-        fileId: String,
+        negotiationID: String,
+        quoteID: String,
+        wallexID: String,
+        fileID: String,
         fileType: String
     ): Future[String] =
       add(
         PaymentFile(
           organizationID = organizationID,
-          quoteId = quoteId,
-          negotiationId = negotiationId,
-          wallexId = wallexId,
-          fileId = fileId,
+          quoteID = quoteID,
+          negotiationID = negotiationID,
+          wallexID = wallexID,
+          fileID = fileID,
           fileType = fileType
         )
       )
 
-    def tryGet(quoteId: String): Future[PaymentFile] =
-      findById(quoteId).map { detail =>
+    def tryGet(quoteID: String): Future[PaymentFile] =
+      findById(quoteID).map { detail =>
         detail.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
-    def get(quoteId: String): Future[Option[PaymentFile]] =
-      findById(quoteId)
+    def get(quoteID: String): Future[Option[PaymentFile]] =
+      findById(quoteID)
   }
 }

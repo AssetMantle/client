@@ -16,9 +16,8 @@ import scala.util.{Failure, Success}
 
 case class OrganizationBeneficiary(
     organizationID: String,
-    traderID: String,
-    wallexId: String,
-    beneficiaryId: String,
+    wallexID: String,
+    beneficiaryID: String,
     address: String,
     country: String,
     city: String,
@@ -59,9 +58,8 @@ class OrganizationBeneficiaries @Inject()(
   ): OrganizationBeneficiarySerialized =
     OrganizationBeneficiarySerialized(
       organizationID = beneficiaryDetail.organizationID,
-      traderID = beneficiaryDetail.traderID,
-      wallexId = beneficiaryDetail.wallexId,
-      beneficiaryId = beneficiaryDetail.beneficiaryId,
+      wallexID = beneficiaryDetail.wallexID,
+      beneficiaryID = beneficiaryDetail.beneficiaryID,
       address = beneficiaryDetail.address,
       country = beneficiaryDetail.country,
       city = beneficiaryDetail.city,
@@ -117,7 +115,7 @@ class OrganizationBeneficiaries @Inject()(
           }
       }
 
-  private def getByorganizationID(
+  private def getByOrganizationID(
       organizationID: String
   ): Future[Seq[OrganizationBeneficiarySerialized]] =
     db.run(
@@ -126,7 +124,7 @@ class OrganizationBeneficiaries @Inject()(
         .result
     )
 
-  private def tryGetByOrdId(
+  private def tryGetByOrganizationID(
       organizationID: String
   ): Future[OrganizationBeneficiarySerialized] =
     db.run(
@@ -149,32 +147,11 @@ class OrganizationBeneficiaries @Inject()(
       }
 
   private def tryGetByBeneficiaryId(
-      beneficiaryId: String
+      beneficiaryID: String
   ): Future[OrganizationBeneficiarySerialized] =
     db.run(
         beneficiaryTable
-          .filter(_.beneficiaryId === beneficiaryId)
-          .result
-          .head
-          .asTry
-      )
-      .map {
-        case Success(result) => result
-        case Failure(exception) =>
-          exception match {
-            case noSuchElementException: NoSuchElementException =>
-              throw new BaseException(
-                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
-                noSuchElementException
-              )
-          }
-      }
-  private def tryGetByTraderID(
-      traderID: String
-  ): Future[OrganizationBeneficiarySerialized] =
-    db.run(
-        beneficiaryTable
-          .filter(_.traderID === traderID)
+          .filter(_.beneficiaryID === beneficiaryID)
           .result
           .head
           .asTry
@@ -191,10 +168,10 @@ class OrganizationBeneficiaries @Inject()(
           }
       }
 
-  private def deleteById(beneficiaryId: String) =
+  private def deleteById(beneficiaryID: String) =
     db.run(
         beneficiaryTable
-          .filter(_.beneficiaryId === beneficiaryId)
+          .filter(_.beneficiaryID === beneficiaryID)
           .delete
           .asTry
       )
@@ -217,9 +194,8 @@ class OrganizationBeneficiaries @Inject()(
 
   case class OrganizationBeneficiarySerialized(
       organizationID: String,
-      traderID: String,
-      wallexId: String,
-      beneficiaryId: String,
+      wallexID: String,
+      beneficiaryID: String,
       address: String,
       country: String,
       city: String,
@@ -239,9 +215,8 @@ class OrganizationBeneficiaries @Inject()(
     def deserialize: OrganizationBeneficiary =
       OrganizationBeneficiary(
         organizationID = organizationID,
-        traderID = traderID,
-        wallexId = wallexId,
-        beneficiaryId = beneficiaryId,
+        wallexID = wallexID,
+        beneficiaryID = beneficiaryID,
         address = address,
         country = country,
         city = city,
@@ -270,9 +245,8 @@ class OrganizationBeneficiaries @Inject()(
     override def * =
       (
         organizationID,
-        traderID,
-        wallexId,
-        beneficiaryId,
+        wallexID,
+        beneficiaryID,
         address,
         country,
         city,
@@ -291,11 +265,9 @@ class OrganizationBeneficiaries @Inject()(
 
     def organizationID = column[String]("organizationID", O.PrimaryKey)
 
-    def traderID = column[String]("traderID")
+    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId", O.PrimaryKey)
-
-    def beneficiaryId = column[String]("beneficiaryId", O.PrimaryKey)
+    def beneficiaryID = column[String]("beneficiaryID", O.PrimaryKey)
 
     def address = column[String]("address")
 
@@ -329,9 +301,8 @@ class OrganizationBeneficiaries @Inject()(
   object Service {
     def create(
         organizationID: String,
-        traderID: String,
-        wallexId: String,
-        beneficiaryId: String,
+        wallexID: String,
+        beneficiaryID: String,
         address: String,
         country: String,
         city: String,
@@ -345,9 +316,8 @@ class OrganizationBeneficiaries @Inject()(
         serialize(
           OrganizationBeneficiary(
             organizationID = organizationID,
-            traderID = traderID,
-            wallexId = wallexId,
-            beneficiaryId = beneficiaryId,
+            wallexID = wallexID,
+            beneficiaryID = beneficiaryID,
             address = address,
             country = country,
             city = city,
@@ -362,9 +332,8 @@ class OrganizationBeneficiaries @Inject()(
 
     def insertOrUpdate(
         organizationID: String,
-        traderID: String,
-        wallexId: String,
-        beneficiaryId: String,
+        wallexID: String,
+        beneficiaryID: String,
         address: String,
         country: String,
         city: String,
@@ -378,9 +347,8 @@ class OrganizationBeneficiaries @Inject()(
         serialize(
           OrganizationBeneficiary(
             organizationID = organizationID,
-            traderID = traderID,
-            wallexId = wallexId,
-            beneficiaryId = beneficiaryId,
+            wallexID = wallexID,
+            beneficiaryID = beneficiaryID,
             address = address,
             country = country,
             city = city,
@@ -394,25 +362,20 @@ class OrganizationBeneficiaries @Inject()(
       )
 
     def tryGet(organizationID: String): Future[OrganizationBeneficiary] =
-      tryGetByOrdId(organizationID).map(_.deserialize)
+      tryGetByOrganizationID(organizationID).map(_.deserialize)
 
     def get(
         organizationID: String
     ): Future[Seq[OrganizationBeneficiary]] =
-      getByorganizationID(organizationID).map(_.map(_.deserialize))
+      getByOrganizationID(organizationID).map(_.map(_.deserialize))
 
     def getByBeneficiaryId(
-        beneficiaryId: String
+        beneficiaryID: String
     ): Future[OrganizationBeneficiary] =
-      tryGetByBeneficiaryId(beneficiaryId).map(_.deserialize)
+      tryGetByBeneficiaryId(beneficiaryID).map(_.deserialize)
 
-    def getByTraderID(
-        traderID: String
-    ): Future[OrganizationBeneficiary] =
-      tryGetByTraderID(traderID).map(_.deserialize)
-
-    def delete(beneficiaryId: String): Future[Int] =
-      deleteById(beneficiaryId)
+    def delete(beneficiaryID: String): Future[Int] =
+      deleteById(beneficiaryID)
   }
 
 }

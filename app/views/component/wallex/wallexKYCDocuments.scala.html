@@ -12,12 +12,12 @@
         @commonDocumentViewer(wallexDocument) {
             @routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType)
         } {
-            <a href="@routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType)" target="_blank">@Messages(wallexDocument.documentType)</a>
+            @commonLink(wallexDocument.documentType, routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType))
         } {
 
         }
     }
         <div class="cmuk-text-center cmuk-margin-top">
-        @commonFormButton(constants.Form.WALLEX_ADD_OR_UPDATE_DOCUMENT)
+        @commonFormButton(constants.Form.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE)
         </div>
 }

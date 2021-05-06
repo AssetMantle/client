@@ -469,8 +469,8 @@ object SelectFieldOptions {
     "+998"
   )
 
-  val COUNTRY_CODE2: Seq[String] = Seq("SG", "HK", "US")
-  val WALLEX_CURRENCIES: Seq[String] = Seq("USD", "SGD", "IDR")
+  val WALLEX_COUNTRY_CODE: Seq[String] = Seq("SG", "HK", "US")
+  val WALLEX_CURRENCIES: Seq[String] = Seq("USD")
   val WALLEX_DOCUMENT_TYPE: Seq[String] = Seq(
     "national_identity",
     "company_proof",
@@ -491,12 +491,12 @@ object SelectFieldOptions {
     "fdw"
   )
 
-  val IDENTIFICATION_DOCUMENT_TYPE: Seq[String] = Seq(
+  val WALLEX_IDENTIFICATION_DOCUMENT_TYPE: Seq[String] = Seq(
     "nric",
     "passport"
   )
 
-  val FUNDING_SOURCE: Seq[String] = Seq(
+  val WALLEX_FUNDING_SOURCE: Seq[String] = Seq(
     "SALARY_WAGES",
     "INVESTMENTS",
     "PERSONAL_SAVINGS",
@@ -511,7 +511,7 @@ object SelectFieldOptions {
     "OTHER"
   )
 
-  val PURPOSE_OF_TRANSFER: Seq[String] = Seq(
+  val WALLEX_PURPOSE_OF_TRANSFER: Seq[String] = Seq(
     "SUPP",
     "IVPT",
     "ADVA",
@@ -519,12 +519,12 @@ object SelectFieldOptions {
     "INTC"
   )
 
-  val GENDER: Seq[String] = Seq(
+  val WALLEX_GENDER: Seq[String] = Seq(
     "male",
     "female"
   )
 
-  val BUSINESS_TYPE: Seq[String] = Seq(
+  val WALLEX_BUSINESS_TYPE: Seq[String] = Seq(
     "Agriculture",
     "Banking/Financial/Insurance",
     "Construction & Development",

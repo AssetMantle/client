@@ -433,9 +433,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WallexController.updateCompanyAccount,
         routes.javascript.WallexController.updateAccountForm,
         routes.javascript.WallexController.updateAccount,
-        routes.javascript.WallexController.documentForm,
+        routes.javascript.WallexController.addDocumentForm,
         routes.javascript.WallexController.uploadOrUpdateWallexDocument,
-        routes.javascript.WallexController.document,
+        routes.javascript.WallexController.addDocument,
         routes.javascript.WallexController.initiatePaymentForm,
         routes.javascript.WallexController.initiatePayment,
         routes.javascript.WallexController.acceptQuoteForm,
@@ -454,11 +454,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WallexController.submitDocumentToWallex,
         routes.javascript.WallexController.getUserForm,
         routes.javascript.WallexController.getUser,
-
-        routes.javascript.WallexZoneController.zoneWalletTransferForm,
-        routes.javascript.WallexZoneController.zoneCreateWalletTransfer,
-        routes.javascript.WallexZoneController.sendForScreeningForm,
-        routes.javascript.WallexZoneController.sendForScreening
+        routes.javascript.WallexController.zoneWalletTransferForm,
+        routes.javascript.WallexController.zoneCreateWalletTransfer,
+        routes.javascript.WallexController.sendForScreeningForm,
+        routes.javascript.WallexController.sendForScreening
 
       )
     ).as("text/javascript")

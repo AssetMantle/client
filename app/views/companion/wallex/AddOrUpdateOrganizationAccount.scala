@@ -10,8 +10,8 @@ object AddOrUpdateOrganizationAccount {
       constants.FormField.FIRST_NAME.name -> constants.FormField.FIRST_NAME.field,
       constants.FormField.LAST_NAME.name -> constants.FormField.LAST_NAME.field,
       constants.FormField.EMAIL_ADDRESS.name -> constants.FormField.EMAIL_ADDRESS.field,
-      constants.FormField.COUNTRY_CODE2.name -> constants.FormField.COUNTRY_CODE2.field,
-      constants.FormField.ACCOUNT_TYPE.name -> constants.FormField.ACCOUNT_TYPE.field
+      constants.FormField.WALLEX_COUNTRY_CODE.name -> constants.FormField.WALLEX_COUNTRY_CODE.field,
+      constants.FormField.WALLEX_ACCOUNT_TYPE.name -> constants.FormField.WALLEX_ACCOUNT_TYPE.field
     )(Data.apply)(Data.unapply)
   )
 

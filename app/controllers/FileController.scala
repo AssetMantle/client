@@ -887,7 +887,7 @@ class FileController @Inject()(
       def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
 
       def getResult(wallexDocument: Option[UserKYC]) =
-        withUsernameToken.PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument
+        withUsernameToken.PartialContent(views.html.component.wallex.traderUploadOrUpdateDocument
       (wallexDocument, documentType))
 
 
@@ -935,7 +935,7 @@ class FileController @Inject()(
       def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
 
       def getResult(wallexDocument: Option[UserKYC]) = withUsernameToken.
-        PartialContent(views.html.component.wallex.uploadOrUpdateWallexDocument(wallexDocument, documentType))
+        PartialContent(views.html.component.wallex.traderUploadOrUpdateDocument(wallexDocument, documentType))
 
       (for {
         _ <- storeFile

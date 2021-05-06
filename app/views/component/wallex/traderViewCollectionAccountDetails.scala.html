@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationAccountDetail
+@import models.wallex.CollectionAccount
+
+@(organizationAccountDetail: OrganizationAccountDetail, collectionWallexDetail: Option[CollectionAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+    @commonCard(constants.View.WALLEX_COLLECTION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+        @if(collectionWallexDetail.isEmpty) {
+            @commonFormButton(constants.Form.WALLEX_TRADER_CREATE_COLLECTION_ACCOUNT, 'parameters -> s"'${organizationAccountDetail.accountID}'")
+        }
+    } {
+        @if(collectionWallexDetail.isDefined) {
+            @commonFormButton(constants.Form.WALLEX_TRADER_GET_COLLECTION_ACCOUNT, 'parameters -> s"'${organizationAccountDetail.accountID}'")
+        }
+    }

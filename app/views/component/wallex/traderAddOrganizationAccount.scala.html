@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.AddOrUpdateOrganizationAccount
+@import views.html.base._
+
+@(addOrUpdateOrganizationWallexAccount: Form[AddOrUpdateOrganizationAccount.Data] = AddOrUpdateOrganizationAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+    @commonForm(constants.Form.WALLEX__TRADER_ACCOUNT_ADD_OR_UPDATE, addOrUpdateOrganizationWallexAccount) {
+    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.FIRST_NAME)
+    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.LAST_NAME)
+    @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.EMAIL_ADDRESS)
+    @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.WALLEX_COUNTRY_CODE)
+    @commonSelect(addOrUpdateOrganizationWallexAccount, constants.FormField.WALLEX_ACCOUNT_TYPE)
+
+
+    <div id="wallexMessage">
+        <div class="wallexNote">
+            @Messages(constants.View.WALLEX_COMPLIANCE_MESSAGE)
+        </div>
+        @Messages(constants.View.WALLEX_POWERED_BY)
+        <span class="wallexLogo">@commonImage("wallex.png")</span>
+    </div>
+}

@@ -2,7 +2,7 @@
 @import views.html.base._
 @import views.companion.master.SendUserDetailsForScreening
 
-@(wallexUser: Form[SendUserDetailsForScreening.Data] = SendUserDetailsForScreening.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-@commonForm(constants.Form.WALLEX_SEND_USER_FOR_SCREENING, wallexUser) {
-    @commonInputText(wallexUser, constants.FormField.USER_ID, 'readonly -> true)
+@(wallexUser: Form[SendUserDetailsForScreening.Data] = SendUserDetailsForScreening.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.WALLEX_ZONE_SEND_USER_FOR_SCREENING, wallexUser) {
+    @commonInputText(wallexUser, constants.FormField.WALLEX_USER_ID, 'readonly -> true)
 }

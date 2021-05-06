@@ -1,26 +1,26 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationWallexDetail
+@import models.wallex.OrganizationAccountDetail
 @import scala.collection.immutable.ListMap
 @import models.wallex.UserKYC
 
-@(organizationWallexDetail: Option[OrganizationWallexDetail], wallexDocument: Seq[UserKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+@(organizationAccountDetail: Option[OrganizationAccountDetail], wallexDocument: Seq[UserKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.ORGANIZATION_WALLEX_ACCOUNT_DETAIL, 'cardIconPath -> "../../../../public/images/icons/icons.svg") {
-    @if(organizationWallexDetail.isDefined) {
-        @commonFormButton(constants.Form.WALLEX_UPDATE_ACCOUNT)
+@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "../../../../public/images/icons/icons.svg") {
+    @if(organizationAccountDetail.isDefined) {
+        @commonFormButton(constants.Form.WALLEX_TRADER_ACCOUNT_UPDATE)
     }
 } {
-    @organizationWallexDetail match {
+    @organizationAccountDetail match {
         case Some(organizationWallexDetail) => {
 
             @commonHorizontalSwitcher(ListMap(
-                constants.View.DETAILS -> views.html.component.wallex.wallexAccountInformation(organizationWallexDetail),
+                constants.View.DETAILS -> views.html.component.wallex.userViewAccountInformation(organizationWallexDetail),
                 constants.View.DOCUMENTS -> views.html.component.wallex.wallexKYCDocuments(wallexDocument))
             )
         }
-        case _ => {
-            @commonFormButton(constants.Form.WALLEX_ADD_OR_UPDATE_ACCOUNT, 'class -> "cmuk-position-center cmuk-button cmuk-button-primary")
+        case None => {
+            @commonFormButton(constants.Form.WALLEX__TRADER_ACCOUNT_ADD_OR_UPDATE, 'class -> "cmuk-position-center cmuk-button cmuk-button-primary")
         }
     }
 }

@@ -14,9 +14,8 @@ import scala.util.{Failure, Success}
 
 case class WalletTransfer(
     id: String,
-    wallexId: String,
+    wallexID: String,
     organizationID: String,
-    zoneID: String,
     senderAccountId: String,
     receiverAccountId: String,
     amount: Double,
@@ -112,9 +111,8 @@ class WalletTransfers @Inject()(
     override def * =
       (
         id,
-        wallexId,
+        wallexID,
         organizationID,
-        zoneID,
         senderAccountId,
         receiverAccountId,
         amount,
@@ -135,7 +133,7 @@ class WalletTransfers @Inject()(
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId", O.PrimaryKey)
+    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
     def organizationID = column[String]("organizationID")
 
@@ -179,7 +177,7 @@ class WalletTransfers @Inject()(
         id: String,
         organizationID: String,
         zoneID: String,
-        wallexId: String,
+        wallexID: String,
         senderAccountId: String,
         receiverAccountId: String,
         amount: Double,
@@ -195,8 +193,7 @@ class WalletTransfers @Inject()(
         WalletTransfer(
           id = id,
           organizationID = organizationID,
-          zoneID = zoneID,
-          wallexId = wallexId,
+          wallexID = wallexID,
           senderAccountId = senderAccountId,
           receiverAccountId = receiverAccountId,
           amount = amount,
@@ -213,8 +210,7 @@ class WalletTransfers @Inject()(
     def insertOrUpdate(
         id: String,
         organizationID: String,
-        zoneID: String,
-        wallexId: String,
+        wallexID: String,
         senderAccountId: String,
         receiverAccountId: String,
         amount: Double,
@@ -230,8 +226,7 @@ class WalletTransfers @Inject()(
         WalletTransfer(
           id = id,
           organizationID = organizationID,
-          zoneID = zoneID,
-          wallexId = wallexId,
+          wallexID = wallexID,
           senderAccountId = senderAccountId,
           receiverAccountId = receiverAccountId,
           amount = amount,

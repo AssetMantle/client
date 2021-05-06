@@ -15,10 +15,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Quote(
-    wallexId: String,
-    quoteId: String,
+    wallexID: String,
+    quoteID: String,
     zoneID: String,
-    accountId: String,
+    accountID: String,
     partnerRate: Double,
     partnerBuyAmount: Double,
     partnerSellAmount: Double,
@@ -62,10 +62,10 @@ class Quotes @Inject() (
       quote: Quote
   ): QuoteSerialized =
     QuoteSerialized(
-      wallexId = quote.wallexId,
+      wallexID = quote.wallexID,
       zoneID = quote.zoneID,
-      accountId = quote.accountId,
-      quoteId = quote.quoteId,
+      accountID = quote.accountID,
+      quoteID = quote.quoteID,
       partnerRate = quote.partnerRate,
       partnerBuyAmount = quote.partnerBuyAmount,
       partnerSellAmount = quote.partnerSellAmount,
@@ -91,7 +91,7 @@ class Quotes @Inject() (
   ): Future[String] =
     db.run(
         (quoteTable returning quoteTable
-          .map(_.quoteId) += quote).asTry
+          .map(_.quoteID) += quote).asTry
       )
       .map {
         case Success(result) => result
@@ -125,8 +125,8 @@ class Quotes @Inject() (
           }
       }
 
-  private def findById(quoteId: String): Future[QuoteSerialized] =
-    db.run(quoteTable.filter(_.quoteId === quoteId).result.head.asTry).map {
+  private def findById(quoteID: String): Future[QuoteSerialized] =
+    db.run(quoteTable.filter(_.quoteID === quoteID).result.head.asTry).map {
       case Success(result) => result
       case Failure(exception) =>
         exception match {
@@ -139,12 +139,12 @@ class Quotes @Inject() (
     }
 
   private def updateStatus(
-      quoteId: String,
+      quoteID: String,
       status: String
   ): Future[Int] =
     db.run(
         quoteTable
-          .filter(_.quoteId === quoteId)
+          .filter(_.quoteID === quoteID)
           .map(_.status)
           .update(status)
           .asTry
@@ -167,10 +167,10 @@ class Quotes @Inject() (
       }
 
   case class QuoteSerialized(
-      wallexId: String,
+      wallexID: String,
       zoneID: String,
-      accountId: String,
-      quoteId: String,
+      accountID: String,
+      quoteID: String,
       partnerRate: Double,
       partnerBuyAmount: Double,
       partnerSellAmount: Double,
@@ -192,10 +192,10 @@ class Quotes @Inject() (
   ) {
     def deserialize: Quote =
       Quote(
-        wallexId = wallexId,
+        wallexID = wallexID,
         zoneID = zoneID,
-        accountId = accountId,
-        quoteId = quoteId,
+        accountID = accountID,
+        quoteID = quoteID,
         partnerRate = partnerRate,
         partnerBuyAmount = partnerBuyAmount,
         partnerSellAmount = partnerSellAmount,
@@ -226,10 +226,10 @@ class Quotes @Inject() (
 
     override def * =
       (
-        wallexId,
+        wallexID,
         zoneID,
-        accountId,
-        quoteId,
+        accountID,
+        quoteID,
         partnerRate,
         partnerBuyAmount,
         partnerSellAmount,
@@ -250,13 +250,13 @@ class Quotes @Inject() (
         updatedOnTimeZone.?
       ) <> (QuoteSerialized.tupled, QuoteSerialized.unapply)
 
-    def quoteId = column[String]("quoteId", O.PrimaryKey)
+    def quoteID = column[String]("quoteID", O.PrimaryKey)
 
-    def wallexId = column[String]("wallexId", O.PrimaryKey)
+    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
     def zoneID = column[String]("zoneID")
 
-    def accountId = column[String]("accountId")
+    def accountID = column[String]("accountID")
 
     def partnerRate = column[Double]("partnerRate")
 
@@ -298,10 +298,10 @@ class Quotes @Inject() (
 
   object Service {
     def create(
-        wallexId: String,
+        wallexID: String,
         zoneID: String,
-        accountId: String,
-        quoteId: String,
+        accountID: String,
+        quoteID: String,
         partnerRate: Double,
         partnerBuyAmount: Double,
         partnerSellAmount: Double,
@@ -318,15 +318,15 @@ class Quotes @Inject() (
       add(
         serialize(
           Quote(
-            wallexId = wallexId,
+            wallexID = wallexID,
             zoneID = zoneID,
-            accountId = accountId,
+            accountID = accountID,
             partnerRate = partnerRate,
             partnerBuyAmount = partnerBuyAmount,
             partnerSellAmount = partnerSellAmount,
             partnerPaymentFee = partnerPaymentFee,
             expiresAt = expiresAt,
-            quoteId = quoteId,
+            quoteID = quoteID,
             conversionFee = conversionFee,
             paymentFee = paymentFee,
             paymentChannel = paymentChannel,
@@ -339,10 +339,10 @@ class Quotes @Inject() (
       )
 
     def insertOrUpdate(
-        wallexId: String,
+        wallexID: String,
         zoneID: String,
-        accountId: String,
-        quoteId: String,
+        accountID: String,
+        quoteID: String,
         partnerRate: Double,
         partnerBuyAmount: Double,
         partnerSellAmount: Double,
@@ -359,15 +359,15 @@ class Quotes @Inject() (
       upsert(
         serialize(
           Quote(
-            wallexId = wallexId,
+            wallexID = wallexID,
             zoneID = zoneID,
-            accountId = accountId,
+            accountID = accountID,
             partnerRate = partnerRate,
             partnerBuyAmount = partnerBuyAmount,
             partnerSellAmount = partnerSellAmount,
             partnerPaymentFee = partnerPaymentFee,
             expiresAt = expiresAt,
-            quoteId = quoteId,
+            quoteID = quoteID,
             conversionFee = conversionFee,
             paymentFee = paymentFee,
             paymentChannel = paymentChannel,
@@ -379,12 +379,12 @@ class Quotes @Inject() (
         )
       )
 
-    def tryGet(quoteId: String): Future[Quote] =
-      findById(quoteId).map(_.deserialize)
+    def tryGet(quoteID: String): Future[Quote] =
+      findById(quoteID).map(_.deserialize)
 
-    def updateQuoteStatus(quoteId: String, status: String): Future[Int] =
+    def updateQuoteStatus(quoteID: String, status: String): Future[Int] =
       updateStatus(
-        quoteId = quoteId,
+        quoteID = quoteID,
         status = status
       )
   }

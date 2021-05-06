@@ -582,8 +582,8 @@ POST        /master/wallex/user/update                                          
 GET         /master/wallex/user                                                                   controllers.WallexController.getUserForm
 POST        /master/wallex/user                                                                   controllers.WallexController.getUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
-GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.documentForm
-POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.document
+GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.addDocumentForm
+POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.addDocument
 GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm(negotiationID: String)
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuoteForm(quoteId: String)
@@ -606,10 +606,10 @@ GET         /wallex/collection/get                                              
 POST        /wallex/collection/get                                                                controllers.WallexController.getCollectionAccounts
 GET         /wallex/document/submit                                                               controllers.WallexController.submitDocumentToWallexForm(documentType: String)
 POST        /wallex/document/submit                                                               controllers.WallexController.submitDocumentToWallex
-GET         /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneWalletTransferForm(negotiationId: String)
-POST        /wallex/zone/acceptTransfer                                                           controllers.WallexZoneController.zoneCreateWalletTransfer
-GET         /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreeningForm(wallexID: String)
-POST        /wallex/zone/userScreening/send                                                       controllers.WallexZoneController.sendForScreening
+GET         /wallex/zone/acceptTransfer                                                           controllers.WallexController.zoneWalletTransferForm(negotiationId: String)
+POST        /wallex/zone/acceptTransfer                                                           controllers.WallexController.zoneCreateWalletTransfer
+GET         /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreeningForm(wallexID: String)
+POST        /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreening
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB

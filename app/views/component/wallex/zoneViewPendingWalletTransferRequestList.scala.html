@@ -6,15 +6,15 @@
 
 @walletTransferRequests.map { request =>
     @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, request.negotiationId)
-        @commonVerticalTextInfo(constants.View.ON_BEHALF_OF, request.onBehalfOf)
-        @commonVerticalTextInfo(constants.View.RECEIVER_ACCOUNT_ID, request.receiverAccountId)
+        @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, request.negotiationID)
+        @commonVerticalTextInfo(constants.View.WALLEX_ON_BEHALF_OF, request.onBehalfOf)
+        @commonVerticalTextInfo(constants.View.WALLEX_RECEIVER_ACCOUNT_ID, request.receiverAccountId)
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACTION)
             </p>
             <p class="listItemChildValue">
-            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.WallexZoneController.zoneWalletTransferForm, 'parameters -> s"'${request.negotiationId}'")
+            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.WallexController.zoneWalletTransferForm, 'parameters -> s"'${request.negotiationID}'")
             </p>
         </div>
     }

@@ -1623,16 +1623,15 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
     PRIMARY KEY ("id")
     );
 
-CREATE TABLE IF NOT EXISTS WALLEX."OrganizationWallexAccountDetail"
+CREATE TABLE IF NOT EXISTS WALLEX."OrganizationAccountDetail"
 (
     "organizationID"    VARCHAR NOT NULL,
-    "zoneID"            VARCHAR NOT NULL,
-    "wallexId"          VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
     "email"             VARCHAR NOT NULL,
     "firstName"         VARCHAR NOT NULL,
     "lastName"          VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
-    "accountId"         VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
     "countryCode"       VARCHAR NOT NULL,
     "accountType"       VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
@@ -1641,7 +1640,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationWallexAccountDetail"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("organizationID", "wallexId")
+    PRIMARY KEY ("organizationID", "wallexID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."UserKYC"
@@ -1662,27 +1661,26 @@ CREATE TABLE IF NOT EXISTS WALLEX."UserKYC"
 
 CREATE TABLE IF NOT EXISTS WALLEX."PaymentFile"
 (
-    "quoteId"           varchar not null,
+    "quoteID"           varchar not null,
+    "wallexID"          varchar not null,
+    "fileID"            varchar not null,
     "organizationID"    varchar not null,
-    "negotiationId"     varchar not null,
-    "wallexId"          varchar not null,
+    "negotiationID"     varchar not null,
     "fileType"          varchar not null,
-    "fileId"            varchar not null,
     "createdBy"         varchar,
     "createdOn"         timestamp,
     "createdOnTimeZone" varchar,
     "updatedBy"         varchar,
     "updatedOn"         timestamp,
     "updatedOnTimeZone" varchar,
-    PRIMARY KEY       ("fileId", "fileType","quoteId" )
+    PRIMARY KEY       ("fileID", "fileType","quoteID" )
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."OrganizationBeneficiary"
 (
     "organizationID"    VARCHAR NOT NULL,
-    "traderID"          VARCHAR NOT NULL,
-    "wallexId"          VARCHAR NOT NULL,
-    "beneficiaryId"     VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
+    "beneficiaryID"     VARCHAR NOT NULL,
     "address"           VARCHAR NOT NULL,
     "country"           VARCHAR NOT NULL,
     "state"             VARCHAR,
@@ -1699,16 +1697,16 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationBeneficiary"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("organizationID", "wallexId","beneficiaryId")
+    PRIMARY KEY ("organizationID", "wallexID","beneficiaryID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."SimplePayment"
 (
-    "zoneID"            VARCHAR NOT NULL,
-    "wallexId"          VARCHAR NOT NULL,
-    "simplePaymentId"   VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
+    "simplePaymentID"   VARCHAR NOT NULL,
+    "organizationID"            VARCHAR NOT NULL,
     "createdAt"         VARCHAR,
-    "referenceId"       VARCHAR,
+    "referenceID"       VARCHAR,
     "status"            VARCHAR NOT NULL,
     "fundingSource"     VARCHAR,
     "purposeOfTransfer" VARCHAR,
@@ -1723,21 +1721,20 @@ CREATE TABLE IF NOT EXISTS WALLEX."SimplePayment"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("simplePaymentId","wallexId")
+    PRIMARY KEY ("simplePaymentID","wallexID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
 (
-    "negotiationId"       varchar not null,
+    "negotiationID"       varchar not null,
+    "organizationID"      varchar not null,
     "onBehalfOf"          varchar not null,
-    "receiverAccountId"   varchar,
+    "receiverAccountID"   varchar,
     "amount"              double precision not null,
     "currency"            varchar,
     "purposeOfTransfer"   varchar not null,
     "reference"           varchar,
     "remarks"             varchar,
-    "zoneID"              varchar not null,
-    "organizationID"      varchar not null,
     "status"              varchar,
     "traderID"            varchar not null,
     "createdBy"           varchar,
@@ -1746,15 +1743,15 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
     "updatedBy"           varchar,
     "updatedOn"           timestamp,
     "updatedOnTimeZone"   varchar,
-    PRIMARY KEY       ("negotiationId","organizationID")
+    PRIMARY KEY       ("negotiationID","organizationID")
 
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."CollectionAccount"
 (
     "id"                varchar not null,
-    "wallexId"          varchar not null,
-    "accountId"         varchar not null,
+    "wallexID"          varchar not null,
+    "accountID"         varchar not null,
     "createdBy"         varchar,
     "createdOn"         timestamp,
     "createdOnTimeZone" varchar,
@@ -1762,16 +1759,16 @@ CREATE TABLE IF NOT EXISTS WALLEX."CollectionAccount"
     "updatedOn"         timestamp,
     "updatedOnTimeZone" varchar,
 
-    primary key ("id", "wallexId", "accountId")
+    primary key ("id", "wallexID", "accountID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."UserKYCDetail"
 (
     "id"                varchar not null,
-    "organizationID"    varchar not null,
-    "wallexId"          varchar not null,
-    "url"               varchar not null,
     "documentType"      varchar not null,
+    "organizationID"    varchar not null,
+    "wallexID"          varchar not null,
+    "url"               varchar not null,
     "documentName"      varchar not null,
     "createdBy"         varchar,
     "createdOn"         timestamp,
@@ -1787,9 +1784,9 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransfer"
     "id"                  varchar not null,
     "organizationID"      varchar not null,
     "zoneID"              varchar not null,
-    "wallexId"            varchar not null,
-    "senderAccountId"     varchar not null,
-    "receiverAccountId"   varchar not null,
+    "wallexID"            varchar not null,
+    "senderAccountID"     varchar not null,
+    "receiverAccountID"   varchar not null,
     "amount"              double precision not null,
     "status"              varchar,
     "currency"            varchar,
@@ -1958,8 +1955,8 @@ ALTER TABLE WESTERN_UNION."FiatRequest"
 ALTER TABLE WESTERN_UNION."RTCB"
     ADD CONSTRAINT RTCB_FiatRequest_externalReference FOREIGN KEY ("externalReference") REFERENCES WESTERN_UNION."FiatRequest" ("id");
 
-ALTER TABLE WALLEX."OrganizationWallexAccountDetail"
-    ADD CONSTRAINT OrganizationWallexAccount_Org_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE WALLEX."OrganizationAccountDetail"
+    ADD CONSTRAINT OrganizationAccountDetail_OrganizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 ALTER TABLE WALLEX."UserKYC"
     ADD CONSTRAINT UserKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
@@ -1971,16 +1968,16 @@ ALTER TABLE WALLEX."OrganizationBeneficiary"
     ADD CONSTRAINT OrganizationBeneficiary_Org_id FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 
 ALTER TABLE WALLEX."SimplePayment"
-    ADD CONSTRAINT SimplePayment_Wallex_id FOREIGN KEY ("wallexId") REFERENCES WALLEX."OrganizationWallexAccountDetail" ("wallexId");
+    ADD CONSTRAINT SimplePayment_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
 
 ALTER TABLE WALLEX."WalletTransferRequest"
-    ADD CONSTRAINT WalletTransferRequest_Negotiation_id FOREIGN KEY ("negotiationId") REFERENCES MASTER."Negotiation" ("negotiationID");
+    ADD CONSTRAINT WalletTransferRequest_Negotiation_id FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("negotiationID");
 
 ALTER TABLE WALLEX."CollectionAccount"
-    ADD CONSTRAINT CollectionAccount_Wallex_id FOREIGN KEY ("wallexId") REFERENCES WALLEX."OrganizationWallexAccountDetail" ("wallexId");
+    ADD CONSTRAINT CollectionAccount_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
 
 ALTER TABLE WALLEX."WalletTransfer"
-    ADD CONSTRAINT WalletTransfer_Wallex_id FOREIGN KEY ("wallexId") REFERENCES WALLEX."OrganizationWallexAccountDetail" ("wallexId");
+    ADD CONSTRAINT WalletTransfer_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
 
 /*Triggers*/
 
@@ -2391,37 +2388,37 @@ CREATE TRIGGER SFTP_FILE_TRANSACTION_LOG
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER ORGANIZATION_WALLEX_ACCOUNT_DETAIL_LOG
+CREATE TRIGGER WALLEX_ORGANIZATION_ACCOUNT_DETAIL_LOG
     BEFORE INSERT OR UPDATE
-                         ON WALLEX."OrganizationWallexAccountDetail"
+                         ON WALLEX."OrganizationAccountDetail"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_KYC_LOG
+CREATE TRIGGER WALLEX_USER_KYC_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."UserKYC"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER ORGANIZATION_WALLEX_BENEFICIARY_DETAIL_LOG
+CREATE TRIGGER WALLEX_ORGANIZATION_BENEFICIARY_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."OrganizationBeneficiary"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_PAYMENT_DETAIL_LOG
+CREATE TRIGGER WALLEX_SIMPLE_PAYMENT_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."SimplePayment"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_PAYMENT_FILE_DETAIL_LOG
+CREATE TRIGGER WALLEX_PAYMENT_FILE_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."PaymentFile"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_COLLECTION_DETAIL_LOG
+CREATE TRIGGER WALLEX_COLLECTION_ACCOUNT_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."CollectionAccount"
                          FOR EACH ROW
@@ -2433,7 +2430,7 @@ CREATE TRIGGER WALLEX_TRANSFER_REQUEST_LOG
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_KYC_DETAIL_LOG
+CREATE TRIGGER WALLEX_USER_KYC_DETAIL_LOG
     BEFORE INSERT OR UPDATE
                          ON WALLEX."UserKYCDetail"
                          FOR EACH ROW
@@ -2720,13 +2717,13 @@ DROP TRIGGER IF EXISTS FIAT_REQUEST_LOG ON WESTERN_UNION."FiatRequest" CASCADE;
 DROP TRIGGER IF EXISTS RTCB_LOG ON WESTERN_UNION."RTCB" CASCADE;
 DROP TRIGGER IF EXISTS SFTP_FILE_TRANSACTION_LOG ON WESTERN_UNION."SFTPFileTransaction" CASCADE;
 
-DROP TRIGGER IF EXISTS ORGANIZATION_WALLEX_ACCOUNT_DETAIL_LOG ON WALLEX."OrganizationWallexAccountDetail" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_KYC_LOG ON WALLEX."UserKYC" CASCADE;
-DROP TRIGGER IF EXISTS ORGANIZATION_WALLEX_BENEFICIARY_DETAIL_LOG ON WALLEX."OrganizationBeneficiary" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_PAYMENT_DETAIL_LOG ON WALLEX."SimplePayment" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_COLLECTION_DETAIL_LOG ON WALLEX."CollectionAccount" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_KYC_DETAIL_LOG ON WALLEX."UserKYCDetail" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_PAYMENT_FILE_DETAIL_LOG ON WALLEX."PaymentFile" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_ORGANIZATION_ACCOUNT_DETAIL_LOG ON WALLEX."OrganizationAccountDetail" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_USER_KYC_LOG ON WALLEX."UserKYC" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_ORGANIZATION_BENEFICIARY_LOG ON WALLEX."OrganizationBeneficiary" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_SIMPLE_PAYMENT_LOG ON WALLEX."SimplePayment" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_COLLECTION_ACCOUNT_LOG ON WALLEX."CollectionAccount" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_USER_KYC_DETAIL_LOG ON WALLEX."UserKYCDetail" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_PAYMENT_FILE_LOG ON WALLEX."PaymentFile" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_WALLET_TRANSFER_LOG ON WALLEX."WalletTransfer" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_TRANSFER_REQUEST_LOG ON WALLEX."WalletTransferRequest" CASCADE;
 
@@ -2804,7 +2801,7 @@ DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 
 
-DROP TABLE IF EXISTS WALLEX."OrganizationWallexAccountDetail" CASCADE;
+DROP TABLE IF EXISTS WALLEX."OrganizationAccountDetail" CASCADE;
 DROP TABLE IF EXISTS WALLEX."UserKYC" CASCADE;
 DROP TABLE IF EXISTS WALLEX."SimplePayment" CASCADE;
 DROP TABLE IF EXISTS WALLEX."CollectionAccount" CASCADE;

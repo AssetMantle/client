@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.GetUserAccount
+@import views.html.base._
+
+@(wallexUser: Form[GetUserAccount.Data] = GetUserAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.WALLEX_TRADER_GET_USER, wallexUser) {
+    @commonInputText(wallexUser, constants.FormField.WALLEX_USER_ID , 'readonly -> true)
+}

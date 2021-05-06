@@ -7,7 +7,7 @@ object GetUserAccount {
 
   val form = Form(
     mapping(
-      constants.FormField.USER_ID.name -> constants.FormField.USER_ID.field
+      constants.FormField.WALLEX_USER_ID.name -> constants.FormField.WALLEX_USER_ID.field
     )(Data.apply)(Data.unapply)
   )
 
