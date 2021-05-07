@@ -968,10 +968,13 @@ class ComponentViewController @Inject()(
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
       val identification = masterIdentifications.Service.get(loginState.username)
-      for {
+      (for {
         accountKYC <- accountKYC
         identification <- identification
       } yield Ok(views.html.component.master.identification(identification = identification, accountKYC = accountKYC))
+        ).recover{
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def userViewPendingRequests: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -1057,7 +1060,8 @@ class ComponentViewController @Inject()(
       (for {
         traderID <- traderID
         acceptedTraderRelations <- acceptedTraderRelations(traderID)
-      } yield Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))).recover {
+      } yield Ok(views.html.component.master.acceptedTraderRelationList(acceptedTraderRelationList = acceptedTraderRelations))
+        ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
