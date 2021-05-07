@@ -525,6 +525,13 @@ body.lightMode  {
   font-weight: bold;
 }
 
+.stringCompress{
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .mnemonicQuiz .hidden,
 .hidden{
   display: none;
@@ -2700,7 +2707,7 @@ header:before,
           a{
             color: #262525;
             white-space: nowrap;
-            width: 185px;
+            width: 165px;
             overflow: hidden;
             text-overflow: ellipsis;
           }
@@ -2720,7 +2727,8 @@ header:before,
     .cmuk-button{
       line-height: 28px;
       padding: 0 12px;
-      margin: 0;
+      margin: 0 0 5px 0;
+      white-space: nowrap;
     }
   }
   .cmuk-card{

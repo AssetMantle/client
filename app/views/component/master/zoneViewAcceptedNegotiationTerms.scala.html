@@ -150,7 +150,6 @@
                     <div class="termIdent">
                 @negotiation.paymentTerms.credit match {
                     case Some(credit) => {
-                        @Messages(constants.View.CREDIT_TERMS):
                         @credit.tentativeDate match {
                             case Some(date) => {
                                 @commonDateInfo(constants.View.TENTATIVE_DATE, date)

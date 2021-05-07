@@ -132,7 +132,6 @@
                     <div class="subTerms">
                     @negotiationHistory.paymentTerms.credit match {
                         case Some(credit) => {
-                            @Messages(constants.View.CREDIT_TERMS):
                             @credit.tentativeDate match {
                                 case Some(date) => {
                                     <p>@Messages(constants.View.TENTATIVE_DATE)
