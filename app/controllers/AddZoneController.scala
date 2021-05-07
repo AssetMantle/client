@@ -255,8 +255,7 @@ class AddZoneController @Inject()(
       (for {
         zone <- zone
         zoneKYCs <- zoneKYCs(zone.id)
-        result <- withUsernameToken.Ok(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
-      } yield result
+      } yield Ok(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
       }

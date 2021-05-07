@@ -70,7 +70,7 @@ class SetACLController @Inject()(
 
           def createSendInvitationAndGetResult(inviteeUserType: String): Future[Result] = {
             if (inviteeUserType != constants.User.USER) {
-              Future(BadRequest(views.html.account(failures = Seq(constants.Response.EMAIL_ADDRESS_TAKEN))))
+              Future(BadRequest(views.html.component.master.inviteTrader(views.companion.master.InviteTrader.form.fill(inviteTraderData).withGlobalError(constants.Response.EMAIL_ADDRESS_TAKEN.message))))
             } else {
               val organization = masterOrganizations.Service.tryGetByAccountID(loginState.username)
               val identification = masterIdentifications.Service.tryGet(loginState.username)
@@ -86,7 +86,7 @@ class SetACLController @Inject()(
                 organization <- organization
                 identification <- identification
                 _ <- createInvitation(organization)
-                _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION)
+                _ <- utilitiesNotification.send(accountID = organization.accountID, notification = constants.Notification.ORGANIZATION_TRADER_INVITATION, inviteTraderData.emailAddress)
                 result <- sendEmailAndGetResult(organization, identification)
               } yield result
             }

@@ -235,9 +235,11 @@ GET         /component/traderViewCompletedNegotiationDocumentContent            
 
 GET         /component/organizationViewNegotiationDocumentContent                                 controllers.ComponentViewController.organizationViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/organizationViewAssetDocumentContent                                       controllers.ComponentViewController.organizationViewAssetDocumentContent(id: String, documentType: String)
+GET         /component/organizationViewCompletedNegotiationDocumentContent                        controllers.ComponentViewController.organizationViewCompletedNegotiationDocumentContent(id: String, documentType: String)
 
 GET         /component/zoneViewNegotiationDocumentContent                                         controllers.ComponentViewController.zoneViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/zoneViewAssetDocumentContent                                               controllers.ComponentViewController.zoneViewAssetDocumentContent(id: String, documentType: String)
+GET         /component/zoneViewCompletedNegotiationDocumentContent                                controllers.ComponentViewController.zoneViewCompletedNegotiationDocumentContent(id: String, documentType: String)
 
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials
