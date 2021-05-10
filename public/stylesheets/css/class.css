@@ -1889,7 +1889,7 @@ header:before,
     color: #faa05a; }
 .documentView .documentList .docIcon {
   background: #FFFFFF;
-  border: 0.411524px solid #EAEAEA;
+  width: 20px;
   box-sizing: border-box;
   padding: 2px 0 5px 5px;
   border-radius: 1.6461px;
@@ -1918,9 +1918,15 @@ header:before,
     .documentView .documentList .table-scroll tbody tr td:first-child {
       padding-left: 15px;
       color: #636363;
+      display: flex;
+      align-items: center;
       font-size: 1rem; }
       .documentView .documentList .table-scroll tbody tr td:first-child a {
-        color: #262525; }
+        color: #262525;
+        white-space: nowrap;
+        width: 185px;
+        overflow: hidden;
+        text-overflow: ellipsis; }
     .documentView .documentList .table-scroll tbody tr td:last-child {
       padding-right: 10px; }
 .documentView .documentList .contractBox {
@@ -2577,10 +2583,11 @@ figure.zoom {
   .identificationCheckbox .commonCheckBox dl dd {
     margin: 0 5px 0 0; }
 
-  .wallexLogo{
+.wallexLogo{
     height: 17px;
     width: 60px;
   }
+
 .wallexNote {
   font-size: 0.9rem;
   text-align: justify;
@@ -2597,4 +2604,8 @@ figure.zoom {
 
 .wallexNote .wallexNoteText {
   width: 30%; }
+
+.fiat-proof p {
+  width: auto !important; }
+
 /*# sourceMappingURL=class.css.map */

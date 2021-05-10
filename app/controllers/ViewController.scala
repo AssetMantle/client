@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.ACLAccounts
+import models.master.{Negotiation, NegotiationHistory}
 import models.{blockchain, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -16,6 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ViewController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
+                                masterNegotiations: master.Negotiations,
+                                masterNegotiationHistories: master.NegotiationHistories,
                                 withLoginAction: WithLoginAction,
                                 withTraderLoginAction: WithTraderLoginAction,
                                 withZoneLoginAction: WithZoneLoginAction,
@@ -93,8 +96,18 @@ class ViewController @Inject()(
 
   def tradeRoom(id: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val negotiation = masterNegotiations.Service.get(id)
+
+      def getResult(negotiation: Option[Negotiation]) = {
+        negotiation match {
+          case Some(negotiation) => withUsernameToken.Ok(views.html.tradeRoom(id))
+          case None => Future(InternalServerError(views.html.trades(failures = Seq(constants.Response.NEGOTIATION_NOT_FOUND))))
+        }
+      }
+
       (for {
-        result <- withUsernameToken.Ok(views.html.tradeRoom(id))
+        negotiation <- negotiation
+        result <- getResult(negotiation)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
@@ -102,8 +115,18 @@ class ViewController @Inject()(
 
   def tradeRoomCompleted(id: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val negotiationHistory = masterNegotiationHistories.Service.get(id)
+
+      def getResult(negotiationHistory: Option[NegotiationHistory]) = {
+        negotiationHistory match {
+          case Some(negotiationHistory) => withUsernameToken.Ok(views.html.tradeRoomCompleted(id))
+          case None => Future(InternalServerError(views.html.trades(failures = Seq(constants.Response.NEGOTIATION_NOT_FOUND))))
+        }
+      }
+
       (for {
-        result <- withUsernameToken.Ok(views.html.tradeRoomCompleted(id))
+        negotiationHistory <- negotiationHistory
+        result <- getResult(negotiationHistory)
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }

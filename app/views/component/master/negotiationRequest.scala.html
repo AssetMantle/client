@@ -1,9 +1,7 @@
 @import controllers.actions.LoginState
+@import models.master.{Asset, Organization, Trader}
 @import views.companion.master.NegotiationRequest
 @import views.html.base._
-@import models.master.Asset
-@import models.master.Trader
-@import models.master.Organization
 
 @(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
@@ -46,7 +44,7 @@
             }
             </ul>
         </div>
-        @commonFormButton(constants.Form.TRADER_RELATION_REQUEST)
+        @commonFormButton(constants.Form.TRADER_RELATION_REQUEST, 'icon -> "plus")
         @commonInputText(negotiationRequestForm, constants.FormField.COUNTER_PARTY, 'id -> "negotiationRequestCounterParty", 'containerDivClass -> "hidden", 'readonly -> true)
         @commonTextInfo(constants.View.ACCOUNT_ID, "", 'id -> "selectedCounterPartyAccountID")
         @commonTextInfo(constants.View.ORGANIZATION_NAME, "", 'id -> "selectedCounterPartyOrganizationName")

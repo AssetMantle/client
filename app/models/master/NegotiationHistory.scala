@@ -80,6 +80,8 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
+  private def getByID(id: String): Future[Option[NegotiationHistorySerializable]] = db.run(negotiationHistoryTable.filter(_.id === id).result.headOption)
+
   private def tryGetByNegotiationID(negotiationID: String): Future[NegotiationHistorySerializable] = db.run(negotiationHistoryTable.filter(_.negotiationID === negotiationID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -275,6 +277,8 @@ class NegotiationHistories @Inject()(protected val databaseConfigProvider: Datab
   object Service {
 
     def tryGet(id: String): Future[NegotiationHistory] = tryGetByID(id).map(_.deserialize)
+
+    def get(id: String): Future[Option[NegotiationHistory]] = getByID(id).map(_.map(_.deserialize))
 
     def tryGetByBCNegotiationID(negotiationID: String): Future[NegotiationHistory] = tryGetByNegotiationID(negotiationID).map(_.deserialize)
 

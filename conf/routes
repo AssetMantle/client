@@ -147,8 +147,6 @@ GET         /negotiation/completedTradeActivityMessages                         
 GET         /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSignedForm(negotiationID: String)
 POST        /negotiation/updateContractSigned                                                     controllers.NegotiationController.updateContractSigned
 
-GET         /negotiation/tradeActivityMessages                                                    controllers.NegotiationController.tradeActivityMessages(negotiationID: String, pageNumber: Int)
-
 GET         /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecuteForm(orderID: String)
 POST        /order/moderatedBuyerExecute                                                          controllers.OrderController.moderatedBuyerExecute
 
@@ -233,11 +231,15 @@ GET         /component/fiatList                                                 
 GET         /component/traderViewNegotiationDocumentContent                                       controllers.ComponentViewController.traderViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/traderViewAssetDocumentContent                                             controllers.ComponentViewController.traderViewAssetDocumentContent(id: String, documentType: String)
 
+GET         /component/traderViewCompletedNegotiationDocumentContent                              controllers.ComponentViewController.traderViewCompletedNegotiationDocumentContent(id: String, documentType: String)
+
 GET         /component/organizationViewNegotiationDocumentContent                                 controllers.ComponentViewController.organizationViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/organizationViewAssetDocumentContent                                       controllers.ComponentViewController.organizationViewAssetDocumentContent(id: String, documentType: String)
+GET         /component/organizationViewCompletedNegotiationDocumentContent                        controllers.ComponentViewController.organizationViewCompletedNegotiationDocumentContent(id: String, documentType: String)
 
 GET         /component/zoneViewNegotiationDocumentContent                                         controllers.ComponentViewController.zoneViewNegotiationDocumentContent(id: String, documentType: String)
 GET         /component/zoneViewAssetDocumentContent                                               controllers.ComponentViewController.zoneViewAssetDocumentContent(id: String, documentType: String)
+GET         /component/zoneViewCompletedNegotiationDocumentContent                                controllers.ComponentViewController.zoneViewCompletedNegotiationDocumentContent(id: String, documentType: String)
 
 GET         /component/recentActivities                                                           controllers.ComponentViewController.recentActivities
 GET         /component/traderFinancials                                                           controllers.ComponentViewController.traderFinancials

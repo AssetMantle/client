@@ -248,6 +248,8 @@ class Orders @Inject()(actorSystem: ActorSystem,
             } yield {
               actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
               actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.ORDER, messageContent = actors.Message.Order())
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = buyerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
+              actors.Service.cometActor ! actors.Message.makeCometMessage(username = sellerAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(masterNegotiation.id))
             }
           }
         }
@@ -264,7 +266,11 @@ class Orders @Inject()(actorSystem: ActorSystem,
 
   val scheduledTask = new Runnable {
     override def run(): Unit = {
-      Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+      try {
+        Await.result(Utility.dirtyEntityUpdater(), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getMessage, exception)
+      }
     }
   }
 

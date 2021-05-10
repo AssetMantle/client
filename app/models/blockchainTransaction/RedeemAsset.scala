@@ -33,7 +33,8 @@ class RedeemAssets @Inject()(
                               blockchainAccounts: blockchain.Accounts,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              masterAssets: master.Assets
+                              masterAssets: master.Assets,
+                              masterNegotiations: master.Negotiations,
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
@@ -109,6 +110,8 @@ class RedeemAssets @Inject()(
   }
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(redeemAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+
+  private def getTransactionByBuyerSellerAddressesAndPegHash(from: String, to: String, pegHash: String) = db.run(redeemAssetTable.filter(x => x.from === from && x.to === to && x.pegHash === pegHash).sortBy(x => x.updatedOn.ifNull(x.createdOn).desc).result.headOption)
 
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
@@ -189,6 +192,8 @@ class RedeemAssets @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
+    def getTransactionStatus(buyerAddress: String, zoneAddress: String, pegHash: String) = getTransactionByBuyerSellerAddressesAndPegHash(buyerAddress, zoneAddress, pegHash).map(x => if (x.isDefined) x.get.status else Option(false))
+
   }
 
   object Utility {
@@ -208,6 +213,8 @@ class RedeemAssets @Inject()(
       }
 
       def getAccountID(address: String): Future[String] = blockchainAccounts.Service.tryGetUsername(address)
+      def assetID(pegHash: String): Future[String] = masterAssets.Service.tryGetIDByPegHash(pegHash)
+      def negotiations(assetID:String): Future[Seq[models.master.Negotiation]] = masterNegotiations.Service.getAllByAssetID(assetID)
 
       (for {
         _ <- markTransactionSuccessful
@@ -216,9 +223,13 @@ class RedeemAssets @Inject()(
         _ <- markDirty(redeemAsset)
         fromAccountID <- getAccountID(redeemAsset.from)
         toAccountID <- getAccountID(redeemAsset.to)
+        assetID<-assetID(redeemAsset.pegHash)
+        negotiations<-negotiations(assetID)
         _ <- utilitiesNotification.send(fromAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
         _ <- utilitiesNotification.send(toAccountID, constants.Notification.REDEEM_ASSET_SUCCESSFUL, blockResponse.txhash)
-      } yield ()).recover {
+      } yield {
+        negotiations.find(_.status == constants.Status.Negotiation.COMPLETED).map(negotiation=> actors.Service.cometActor ! actors.Message.makeCometMessage(username = fromAccountID, messageType = constants.Comet.NEGOTIATION, messageContent = actors.Message.Negotiation(negotiation.id))).getOrElse()
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
             (for {
@@ -252,7 +263,11 @@ class RedeemAssets @Inject()(
 
   val scheduledTask = new Runnable {
     override def run(): Unit = {
-      Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      try {
+       Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
+      } catch {
+        case exception: Exception => logger.error(exception.getMessage, exception)
+      }
     }
   }
 

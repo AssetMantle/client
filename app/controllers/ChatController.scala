@@ -63,7 +63,7 @@ class ChatController @Inject()(
           chats <- getChats(traderID, negotiation)
         } yield Ok(views.html.component.master.chatRoom(chatID = negotiation.chatID.getOrElse(throw new BaseException(constants.Response.CHAT_ROOM_NOT_FOUND)), chats = chats))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 

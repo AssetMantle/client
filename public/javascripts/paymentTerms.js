@@ -18,9 +18,16 @@ function advancePercentageInput() {
         $('#tenure').val('').prop('disabled', true);
         $('#reference').val('').prop('disabled', true);
     } else {
-        $('#tentativeDate').prop('disabled', false);
-        $('#tenure').prop('disabled', false);
-        $('#reference').prop('disabled', false);
+        if ($('#tentativeDate').val()) {
+            $('#tenure').val('').prop('disabled', true);
+            $('#reference').val('').prop('disabled', true);
+        } else if($('#tenure').val() || $('#reference').val()) {
+            $('#tentativeDate').prop('disabled', true);
+        } else {
+            $('#tentativeDate').prop('disabled', false);
+            $('#tenure').prop('disabled', false);
+            $('#reference').prop('disabled', false);
+        }
     }
 }
 
@@ -35,7 +42,15 @@ function tentativeDateInput() {
 }
 
 function tenureInput() {
-    if ($('#tenure').val()) {
+    if ($('#tenure').val() || $('#reference').val()) {
+        $('#tentativeDate').val('').prop('disabled', true);
+    } else {
+        $('#tentativeDate').prop('disabled', false);
+    }
+}
+
+function refrenceInput() {
+    if ($('#tenure').val() || $('#reference').val()) {
         $('#tentativeDate').val('').prop('disabled', true);
     } else {
         $('#tentativeDate').prop('disabled', false);

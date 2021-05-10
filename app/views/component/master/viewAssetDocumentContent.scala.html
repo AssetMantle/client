@@ -15,6 +15,7 @@
             case constants.File.Asset.BILL_OF_LADING => {
                 @defining(content.asInstanceOf[Serializable.BillOfLading]){billOfLading=>
                     @commonTextInfo(constants.View.BILL_OF_LADING_NUMBER, billOfLading.id)
+                    @commonTextInfo(constants.View.CONSIGNEE_TO, billOfLading.consigneeTo)
                     @commonTextInfo(constants.View.VESSEL_NAME, billOfLading.vesselName)
                     @commonTextInfo(constants.View.PORT_OF_LOADING, billOfLading.portOfLoading)
                     @commonTextInfo(constants.View.PORT_OF_DISCHARGE, billOfLading.portOfDischarge)

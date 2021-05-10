@@ -1,9 +1,10 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
+import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain.ACL
 import models.master.{Organization, Trader, TraderRelation}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -30,7 +31,8 @@ class TraderController @Inject()(
                                   transaction: utilities.Transaction,
                                   blockchainTransactionSetACLs: blockchainTransaction.SetACLs,
                                   transactionsSetACL: transactions.SetACL,
-                                  blockchainAclHashes: blockchain.ACLHashes,
+                                  blockchainACLHashes: blockchain.ACLHashes,
+                                  blockchainACLAccounts: blockchain.ACLAccounts,
                                   withZoneLoginAction: WithZoneLoginAction,
                                   withoutLoginAction: WithoutLoginAction,
                                 )
@@ -242,17 +244,27 @@ class TraderController @Inject()(
     implicit request =>
       val trader = masterTraders.Service.tryGetByAccountID(accountID)
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+      val address = blockchainAccounts.Service.tryGetAddress(accountID)
 
-      def getResult(trader: Trader, organizationID: String) = if (trader.organizationID == organizationID) {
-        Ok(views.html.component.master.organizationModifyTrader(accountID = accountID, trader = trader))
-      } else {
-        Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+      def getAclHash(address: String): Future[String] = blockchainACLAccounts.Service.tryGetACLHash(address)
+
+      def getAcl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
+
+      def getResult(trader: Trader, organizationID: String, acl: ACL) = {
+        if (trader.organizationID == organizationID) {
+          Ok(views.html.component.master.organizationModifyTrader(accountID = accountID, trader = trader, acl = acl))
+        } else {
+          Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
       }
 
       (for {
         trader <- trader
         organizationID <- organizationID
-      } yield getResult(trader, organizationID)).recover {
+        address <- address
+        aclHash <- getAclHash(address)
+        acl <- getAcl(aclHash)
+      } yield getResult(trader, organizationID, acl)).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -263,9 +275,14 @@ class TraderController @Inject()(
         formWithErrors => {
           val trader = masterTraders.Service.tryGetByAccountID(formWithErrors.data(constants.FormField.ACCOUNT_ID.name))
           val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+          val address = blockchainAccounts.Service.tryGetAddress(formWithErrors.data(constants.FormField.ACCOUNT_ID.name))
 
-          def getResult(trader: Trader, organizationID: String) = if (trader.organizationID == organizationID) {
-            BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors, accountID = formWithErrors.data(constants.FormField.ACCOUNT_ID.name), trader = trader))
+          def getAclHash(address: String) = blockchainACLAccounts.Service.tryGetACLHash(address)
+
+          def getAcl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
+
+          def getResult(trader: Trader, organizationID: String, acl: ACL) = if (trader.organizationID == organizationID) {
+            BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors, accountID = formWithErrors.data(constants.FormField.ACCOUNT_ID.name), trader = trader, acl = acl))
           } else {
             Unauthorized(views.html.account(failures = Seq(constants.Response.UNAUTHORIZED)))
           }
@@ -273,7 +290,10 @@ class TraderController @Inject()(
           (for {
             trader <- trader
             organizationID <- organizationID
-          } yield getResult(trader, organizationID)).recover {
+            address <- address
+            aclHash <- getAclHash(address)
+            acl <- getAcl(aclHash)
+          } yield getResult(trader, organizationID, acl)).recover {
             case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
           }
         },
@@ -281,15 +301,20 @@ class TraderController @Inject()(
           val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = modifyTraderData.password)
           val trader = masterTraders.Service.tryGetByAccountID(modifyTraderData.accountID)
           val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+          val address = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
 
-          def getResult(validateUsernamePassword: Boolean, trader: Trader, organizationID: String): Future[Result] = {
+          def getAclHash(address: String): Future[String] = blockchainACLAccounts.Service.tryGetACLHash(address)
+
+          def getAcl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.tryGetACL(aclHash)
+
+          def getResult(validateUsernamePassword: Boolean, trader: Trader, organizationID: String, acl: ACL): Future[Result] = {
             if (validateUsernamePassword) {
               if (trader.organizationID == organizationID) {
                 val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
                 val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
                 val aclAddress = blockchainAccounts.Service.tryGetAddress(modifyTraderData.accountID)
                 val acl = blockchain.ACL(issueAsset = modifyTraderData.issueAsset, issueFiat = modifyTraderData.issueFiat, sendAsset = modifyTraderData.sendAsset, sendFiat = modifyTraderData.sendFiat, redeemAsset = modifyTraderData.redeemAsset, redeemFiat = modifyTraderData.redeemFiat, sellerExecuteOrder = modifyTraderData.sellerExecuteOrder, buyerExecuteOrder = modifyTraderData.buyerExecuteOrder, changeBuyerBid = modifyTraderData.changeBuyerBid, changeSellerBid = modifyTraderData.changeSellerBid, confirmBuyerBid = modifyTraderData.confirmBuyerBid, confirmSellerBid = modifyTraderData.changeSellerBid, negotiation = modifyTraderData.negotiation, releaseAsset = modifyTraderData.releaseAsset)
-                val createACL = blockchainAclHashes.Service.create(acl)
+                val createACL = blockchainACLHashes.Service.create(acl)
 
                 def transactionProcess(aclAddress: String, zoneID: String, organizationID: String): Future[String] = transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
                   entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = modifyTraderData.gas, ticketID = "", mode = transactionMode),
@@ -310,14 +335,17 @@ class TraderController @Inject()(
                   result <- withUsernameToken.Ok(views.html.account(successes = Seq(constants.Response.ACL_SET)))
                 } yield result
               } else throw new BaseException(constants.Response.UNAUTHORIZED)
-            } else Future(BadRequest(views.html.component.master.organizationModifyTrader(views.companion.master.ModifyTrader.form.fill(modifyTraderData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), accountID = modifyTraderData.accountID, trader = trader)))
+            } else Future(BadRequest(views.html.component.master.organizationModifyTrader(views.companion.master.ModifyTrader.form.fill(modifyTraderData).withGlobalError(constants.Response.INCORRECT_PASSWORD.message), accountID = modifyTraderData.accountID, trader = trader, acl = acl)))
           }
 
           (for {
             trader <- trader
             validateUsernamePassword <- validateUsernamePassword
             organizationID <- organizationID
-            result <- getResult(validateUsernamePassword = validateUsernamePassword, trader = trader, organizationID = organizationID)
+            address <- address
+            aclHash <- getAclHash(address)
+            acl <- getAcl(aclHash)
+            result <- getResult(validateUsernamePassword = validateUsernamePassword, trader = trader, organizationID = organizationID, acl = acl)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))

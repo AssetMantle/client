@@ -1,25 +1,26 @@
 @import controllers.actions.LoginState
+@import models.blockchain.ACL
 @import models.master.Trader
 @import views.companion.master.ModifyTrader
 @import views.html.base._
 
-@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form, accountID: String, trader: Trader, acl: ACL)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
     @commonInputText(modifyTraderForm, constants.FormField.ACCOUNT_ID, 'value -> accountID, 'readonly -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_ASSET, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_FIAT, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.SEND_ASSET, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.SEND_FIAT, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.REDEEM_ASSET, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.REDEEM_FIAT, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_BUYER_BID, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.NEGOTIATION, 'checked -> true)
-    @commonCheckbox(modifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> true)
+    @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_ASSET, 'checked -> acl.issueAsset)
+    @commonCheckbox(modifyTraderForm, constants.FormField.ISSUE_FIAT, 'checked -> acl.issueFiat)
+    @commonCheckbox(modifyTraderForm, constants.FormField.SEND_ASSET, 'checked -> acl.sendAsset)
+    @commonCheckbox(modifyTraderForm, constants.FormField.SEND_FIAT, 'checked -> acl.sendFiat)
+    @commonCheckbox(modifyTraderForm, constants.FormField.REDEEM_ASSET, 'checked -> acl.redeemAsset)
+    @commonCheckbox(modifyTraderForm, constants.FormField.REDEEM_FIAT, 'checked -> acl.redeemFiat)
+    @commonCheckbox(modifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER, 'checked -> acl.sellerExecuteOrder)
+    @commonCheckbox(modifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER, 'checked -> acl.buyerExecuteOrder)
+    @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_BUYER_BID, 'checked -> acl.changeBuyerBid)
+    @commonCheckbox(modifyTraderForm, constants.FormField.CHANGE_SELLER_BID, 'checked -> acl.changeSellerBid)
+    @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_BUYER_BID, 'checked -> acl.confirmBuyerBid)
+    @commonCheckbox(modifyTraderForm, constants.FormField.CONFIRM_SELLER_BID, 'checked -> acl.confirmSellerBid)
+    @commonCheckbox(modifyTraderForm, constants.FormField.NEGOTIATION, 'checked -> acl.negotiation)
+    @commonCheckbox(modifyTraderForm, constants.FormField.RELEASE_ASSET, 'checked -> acl.releaseAsset)
     @commonInputMicroNumber(modifyTraderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
     @commonInputPassword(modifyTraderForm, constants.FormField.PASSWORD)
     @commonModalButton(constants.View.BACK, routes.javascript.ComponentViewController.organizationViewAcceptedTraderAccount, 'class -> "cmuk-margin-top buttonPrimary",  'parameters -> s"'${trader.id}'")

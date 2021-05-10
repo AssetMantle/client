@@ -1,6 +1,6 @@
 package transactions
 
-import java.net.ConnectException
+import java.net.{ConnectException, UnknownHostException}
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -41,8 +41,8 @@ class ForgotPassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
 
     def post(username: String, request: Request): Future[Response] = {
       action(username = username, request = request).recover {
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+        case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+        case unknownHostException: UnknownHostException => throw new BaseException(constants.Response.UNKNOWN_HOST_EXCEPTION, unknownHostException)
       }
     }
 
