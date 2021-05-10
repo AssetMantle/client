@@ -393,6 +393,16 @@ body.darkMode {
   .timeline-content:hover{
     background: #383941;
   }
+
+  .cmuk-card-styles {
+    color: #666;
+    border: 1px solid #31323A;
+    background: #282934;
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: $buttonBorderRadius;
+  }
+
+
 }
 
 // End Of Dark Mode Styles
@@ -421,7 +431,9 @@ body.lightMode {
 
   }
 
-  .cmuk-card-default {
+  .cmuk-card-styles {
+    color: #666;
+    border: 1px solid #e7eaf3;
     background: #FAFAFA;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: $buttonBorderRadius;
@@ -466,8 +478,31 @@ body.lightMode {
     background: #e7eaf3;
   }
 }
+
+.cmuk-card-styles{
+  .cmuk-card {
+    height: 100%;
+  }
+  .cmuk-card-body{
+    height: calc(100% - 51px);
+  }
+  .cmuk-card-header{
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+
+.containerHeight{
+  height: calc(50% - 20px) !important;
+}
+
+.componentError{
+  p{
+    word-break: break-word;
+  }
+}
+
 %scroller{
-  scrollbar-color: #E2E4E6 #FFFFFF;
+  scrollbar-color: #e5e5e5 #FFFFFF;
   scrollbar-width: thin;
 }
 
@@ -483,7 +518,7 @@ body.lightMode {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E2E4E6;
+  background: #e5e5e5;
   border-right: 1px solid white;
 }
 
@@ -1451,7 +1486,7 @@ body.lightMode {
     }
   }
   .cmuk-navbar-nav>li>a{
-    padding:0 25px;
+    padding:0 20px;
     font-weight: bold;
     font-size:$paragraphFontSizeSmall;
     letter-spacing: 0.4px;
@@ -2353,6 +2388,12 @@ form{
 }
 
 .leftContainer{
+  height: calc(100vh - 70px);
+  .cardContainer{
+    height: calc(50% - 20px) !important;
+    background: #FFffff;
+    overflow: auto;
+  }
   .tableCard table td, .comdex .tableCard table tr{
     padding:10px;
     font-size: $paragraphFontSizeSmall;
@@ -2565,7 +2606,9 @@ form{
 }
 
 .rightContainer{
+  height: calc(100vh - 70px);
   .recentActivityContainer{
+    height: calc(50% - 20px) !important;
     margin-bottom: 20px;
     .cmuk-card-header{
       padding:15px 20px;
@@ -2585,11 +2628,6 @@ form{
         @extend %scroller;
       }
     }
-  }
-  .cmuk-card-default{
-    background: #FAFAFA;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
   }
   .cmuk-card-header{
     font-size: $paragraphFontSizeMedium;
