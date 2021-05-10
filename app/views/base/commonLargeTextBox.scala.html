@@ -1,4 +1,4 @@
-@(value: String, className: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
-<p class="stringCompress @className" title="@value">
+@(value: String,  arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+<p class='@Seq("stringCompress", arguments.toMap.get('class).map(_.toString).getOrElse(" ")).mkString(" ")' title="@value">
 @value
 </p>

@@ -63,8 +63,8 @@
                 <div class="cmuk-flex">
                     <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
                     <div class="cmuk-text-left">
-                        @commonLargeTextBox(sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading, "")
-                        @commonLargeTextBox(sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge, "")
+                        @commonLargeTextBox(sellNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                        @commonLargeTextBox(sellNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                 </div>
                 </div>
             @commonLink(constants.View.GO_TO_TRADE_ROOM,routes.ViewController.tradeRoom(sellNegotiation.id), 'class->"cmuk-button buttonPrimary")
