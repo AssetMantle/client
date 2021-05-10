@@ -1,0 +1,31 @@
+name: Check
+
+on:
+  push:
+    branches:
+      - persistenceCore/action
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: SBT action test
+        id: sbt
+        uses: lokkju/github-action-sbt@11-1.3.0-2.12.10
+        with:
+          commands: dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: client.zip
+          path: target/universal/persistenceclient-1.0.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: client.zip
+          path: target/universal/persistenceclient-1.0.zip
+
+      
