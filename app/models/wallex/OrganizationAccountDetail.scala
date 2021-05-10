@@ -13,8 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class OrganizationAccountDetail(
-    organizationID: String,
     wallexID: String,
+    organizationID: String,
     accountID: String,
     email: String,
     firstName: String,
@@ -155,8 +155,8 @@ class OrganizationAccountDetails @Inject() (
 
     override def * =
       (
-        organizationID,
         wallexID,
+        organizationID,
         accountID,
         email,
         firstName,
@@ -172,9 +172,9 @@ class OrganizationAccountDetails @Inject() (
         updatedOnTimeZone.?
       ) <> (OrganizationAccountDetail.tupled, OrganizationAccountDetail.unapply)
 
-    def organizationID = column[String]("organizationID", O.PrimaryKey)
-
     def wallexID = column[String]("wallexID", O.PrimaryKey)
+
+    def organizationID = column[String]("organizationID")
 
     def accountID = column[String]("accountID")
 
@@ -205,8 +205,8 @@ class OrganizationAccountDetails @Inject() (
 
   object Service {
     def create(
-        organizationID: String,
         wallexID: String,
+        organizationID: String,
         accountID: String,
         email: String,
         firstName: String,
@@ -217,8 +217,8 @@ class OrganizationAccountDetails @Inject() (
     ): Future[String] =
       add(
         OrganizationAccountDetail(
-          organizationID = organizationID,
           wallexID = wallexID,
+          organizationID = organizationID,
           accountID = accountID,
           email = email,
           firstName = firstName,
@@ -230,8 +230,8 @@ class OrganizationAccountDetails @Inject() (
       )
 
     def insertOrUpdate(
-        organizationID: String,
         wallexID: String,
+        organizationID: String,
         accountID: String,
         email: String,
         firstName: String,
@@ -242,8 +242,8 @@ class OrganizationAccountDetails @Inject() (
     ): Future[Int] =
       upsert(
         OrganizationAccountDetail(
-          organizationID = organizationID,
           wallexID = wallexID,
+          organizationID = organizationID,
           accountID = accountID,
           email = email,
           firstName = firstName,

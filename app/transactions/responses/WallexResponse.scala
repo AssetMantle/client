@@ -147,7 +147,7 @@ object WallexResponse {
       : OWrites[DeleteBeneficiaryResponse] =
     Json.writes[DeleteBeneficiaryResponse]
 
-  case class WalletToWalletXferResponse(
+  case class WalletToWalletTransferResponse(
       id: String,
       senderAccountId: String,
       receiverAccountId: String,
@@ -161,13 +161,13 @@ object WallexResponse {
       createdAt: String
   ) extends BaseResponse
 
-  implicit val walletToWalletXferResponseReads
-      : Reads[WalletToWalletXferResponse] =
-    Json.reads[WalletToWalletXferResponse]
+  implicit val walletToWalletTransferResponseReads
+      : Reads[WalletToWalletTransferResponse] =
+    Json.reads[WalletToWalletTransferResponse]
 
-  implicit val walletToWalletXferResponseWrites
-      : OWrites[WalletToWalletXferResponse] =
-    Json.writes[WalletToWalletXferResponse]
+  implicit val walletToWalletTransferResponseWrites
+      : OWrites[WalletToWalletTransferResponse] =
+    Json.writes[WalletToWalletTransferResponse]
 
   case class BeneficiarySimplePayment(
       address: String,

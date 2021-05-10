@@ -2600,7 +2600,7 @@ class ComponentViewController @Inject()(
       (for {
         traderID <- traderID
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
-      } yield Ok(views.html.component.wallex.traderViewIssueWallexFiatRequestList(issueFiatRequestList))
+      } yield Ok(views.html.component.wallex.traderViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2618,7 +2618,7 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         issueFiatRequestList <- getIssueFiatRequestList(organizationID)
-      } yield Ok(views.html.component.wallex.organizationViewIssueWallexFiatRequestList(issueFiatRequestList))
+      } yield Ok(views.html.component.wallex.organizationViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2640,7 +2640,7 @@ class ComponentViewController @Inject()(
         zoneID <- zoneID
         organizations <- getOrganizations(zoneID)
         issueFiatRequestList <- getIssueFiatRequestList(getOrganizationIDs(organizations))
-      } yield Ok(views.html.component.wallex.zoneViewIssueWallexFiatRequestList(issueFiatRequestList))
+      } yield Ok(views.html.component.wallex.zoneViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -3152,7 +3152,7 @@ class ComponentViewController @Inject()(
         organizationID <- organizationID
         wallexDocuments <-getWallexKYCDocuments(loginState.username)
         organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
-      } yield Ok(views.html.component.wallex.organizationWallexAccount(organizationWallexAccount,wallexDocuments))
+      } yield Ok(views.html.component.wallex.organizationAccount(organizationWallexAccount,wallexDocuments))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -3168,7 +3168,7 @@ class ComponentViewController @Inject()(
       (for {
         organizationID <- organizationID
         organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
-      } yield Ok(views.html.component.wallex.organizationViewWallexAccount(organizationWallexAccount))
+      } yield Ok(views.html.component.wallex.organizationViewAccount(organizationWallexAccount))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -3290,7 +3290,7 @@ class ComponentViewController @Inject()(
             pendingKYCRequests <- pendingScreeningRequests(getOrganizationIDs(organizations))
           } yield Ok(
             views.html.component.wallex
-              .zoneViewPendingWallexKYCRequestList(pendingKYCRequests)
+              .zoneViewPendingKYCRequestList(pendingKYCRequests)
           )).recover {
             case baseException: BaseException =>
               InternalServerError(baseException.failure.message)

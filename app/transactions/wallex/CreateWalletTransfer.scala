@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.WalletToWalletXferResponse
+import transactions.responses.WallexResponse.WalletToWalletTransferResponse
 import utilities.KeyStore
 
 import java.net.ConnectException
@@ -47,10 +47,10 @@ class CreateWalletTransfer @Inject()(
   private def action(
       request: Request,
       authToken: String
-  ): Future[WalletToWalletXferResponse] = {
+  ): Future[WalletToWalletTransferResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
     utilities.JSON
-      .getResponseFromJson[WalletToWalletXferResponse](
+      .getResponseFromJson[WalletToWalletTransferResponse](
         wsClient
           .url(url)
           .withHttpHeaders(apiKeyHeader, authTokenHeader)
@@ -83,7 +83,7 @@ class CreateWalletTransfer @Inject()(
     def post(
         authToken: String,
         request: Request
-    ): Future[WalletToWalletXferResponse] =
+    ): Future[WalletToWalletTransferResponse] =
       action(request, authToken).recover {
         case connectException: ConnectException =>
           logger.error(

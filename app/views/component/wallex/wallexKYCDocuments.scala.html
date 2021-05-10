@@ -5,7 +5,7 @@
 @import views.html.component.master.commonDocumentViewer
 @(wallexDocuments: Seq[UserKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.WALLEX_KYC_DOCUMENTS, 'cardIconPath -> "../../../../public/images/icons/icons.svg") {
+@commonCard(constants.View.WALLEX_KYC_DOCUMENTS, 'cardIconPath -> "images/icons/icons.svg#kycDocuments") {
 } {
 
     @for(wallexDocument <- wallexDocuments) {

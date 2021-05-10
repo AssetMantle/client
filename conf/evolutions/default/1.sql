@@ -1625,8 +1625,8 @@ CREATE TABLE IF NOT EXISTS MEMBER_CHECK."VesselScanDecision_History"
 
 CREATE TABLE IF NOT EXISTS WALLEX."OrganizationAccountDetail"
 (
-    "organizationID"    VARCHAR NOT NULL,
     "wallexID"          VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL UNIQUE ,
     "email"             VARCHAR NOT NULL,
     "firstName"         VARCHAR NOT NULL,
     "lastName"          VARCHAR NOT NULL,
@@ -1640,7 +1640,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationAccountDetail"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("organizationID", "wallexID")
+    PRIMARY KEY ("wallexID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."UserKYC"

@@ -6,7 +6,7 @@
 
 @(organizationAccountDetail: Option[OrganizationAccountDetail], wallexDocument: Seq[UserKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "../../../../public/images/icons/icons.svg") {
+@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#wallexAccount") {
     @if(organizationAccountDetail.isDefined) {
         @commonFormButton(constants.Form.WALLEX_TRADER_ACCOUNT_UPDATE)
     }

@@ -46,7 +46,7 @@ class CreateDocument @Inject()(
 
   private def action(
       authToken: String,
-      wallexUserID:String,
+      wallexUserID: String,
       request: Request
   ): Future[CreateDocumentResponse] = {
 
@@ -94,7 +94,7 @@ class CreateDocument @Inject()(
 
     def post(
         authToken: String,
-        wallexUserID:String,
+        wallexUserID: String,
         request: Request
     ): Future[CreateDocumentResponse] =
       action(authToken, wallexUserID, request).recover {

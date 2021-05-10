@@ -54,34 +54,34 @@ class OrganizationBeneficiaries @Inject()(
     TableQuery[OrganizationBeneficiaryTable]
 
   private def serialize(
-      beneficiaryDetail: OrganizationBeneficiary
+      organizationBeneficiary: OrganizationBeneficiary
   ): OrganizationBeneficiarySerialized =
     OrganizationBeneficiarySerialized(
-      organizationID = beneficiaryDetail.organizationID,
-      wallexID = beneficiaryDetail.wallexID,
-      beneficiaryID = beneficiaryDetail.beneficiaryID,
-      address = beneficiaryDetail.address,
-      country = beneficiaryDetail.country,
-      city = beneficiaryDetail.city,
-      entityType = beneficiaryDetail.entityType,
-      companyName = beneficiaryDetail.companyName,
-      nickname = beneficiaryDetail.nickname,
-      accountType = beneficiaryDetail.accountType,
-      bankAccount = Json.toJson(beneficiaryDetail.bankAccount).toString,
-      createdBy = beneficiaryDetail.createdBy,
-      createdOn = beneficiaryDetail.createdOn,
-      createdOnTimeZone = beneficiaryDetail.createdOnTimeZone,
-      updatedBy = beneficiaryDetail.updatedBy,
-      updatedOn = beneficiaryDetail.updatedOn,
-      updatedOnTimeZone = beneficiaryDetail.updatedOnTimeZone
+      organizationID = organizationBeneficiary.organizationID,
+      wallexID = organizationBeneficiary.wallexID,
+      beneficiaryID = organizationBeneficiary.beneficiaryID,
+      address = organizationBeneficiary.address,
+      country = organizationBeneficiary.country,
+      city = organizationBeneficiary.city,
+      entityType = organizationBeneficiary.entityType,
+      companyName = organizationBeneficiary.companyName,
+      nickname = organizationBeneficiary.nickname,
+      accountType = organizationBeneficiary.accountType,
+      bankAccount = Json.toJson(organizationBeneficiary.bankAccount).toString,
+      createdBy = organizationBeneficiary.createdBy,
+      createdOn = organizationBeneficiary.createdOn,
+      createdOnTimeZone = organizationBeneficiary.createdOnTimeZone,
+      updatedBy = organizationBeneficiary.updatedBy,
+      updatedOn = organizationBeneficiary.updatedOn,
+      updatedOnTimeZone = organizationBeneficiary.updatedOnTimeZone
     )
 
   private def add(
-      orgWallexBeneficiaryDetail: OrganizationBeneficiarySerialized
+      organizationBeneficiary: OrganizationBeneficiarySerialized
   ): Future[String] =
     db.run(
         (beneficiaryTable returning beneficiaryTable
-          .map(_.organizationID) += orgWallexBeneficiaryDetail).asTry
+          .map(_.organizationID) += organizationBeneficiary).asTry
       )
       .map {
         case Success(result) => result
@@ -96,11 +96,11 @@ class OrganizationBeneficiaries @Inject()(
       }
 
   private def upsert(
-      organizationWallexDetail: OrganizationBeneficiarySerialized
+      organizationBeneficiary: OrganizationBeneficiarySerialized
   ): Future[Int] =
     db.run(
         beneficiaryTable
-          .insertOrUpdate(organizationWallexDetail)
+          .insertOrUpdate(organizationBeneficiary)
           .asTry
       )
       .map {

@@ -5,7 +5,7 @@
 
 @(organizationAccountDetail: Option[OrganizationAccountDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
-@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "../../../../public/images/icons/icons.svg") {
+@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#wallexAccount") {
 } {
     @organizationAccountDetail match {
         case Some(organizationWallexDetail) => {
