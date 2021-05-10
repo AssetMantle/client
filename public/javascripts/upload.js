@@ -8,7 +8,7 @@ function getFileTypes(documentType) {
             fileTypes = ['pdf'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf', 'doc', 'docx'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'JPG', 'JPEG', 'PNG', 'pdf'];
             break;
     }
     return fileTypes
