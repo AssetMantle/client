@@ -3168,7 +3168,7 @@ figure.zoom img {
   margin: 0;
   border-right: 1px solid #D0D0D0;
   border-left: 1px solid #D0D0D0;
-  flex: 25%;
+  flex: 30%;
   justify-content: center;
   display: flex;
   flex-direction: column;
@@ -3200,7 +3200,7 @@ figure.zoom img {
 .salesQuoteCard .salesQuoteCardRight {
   padding: 0 20px 0 0;
   justify-content: space-evenly;
-  flex: 50%;
+  flex: 45%;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
