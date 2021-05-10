@@ -73,7 +73,7 @@ body.darkMode {
       color: #ffffff;
     }
     .sellerTerm {
-      .documentTermName, .termIdent {
+      .documentTermName, .termIndent {
         color: $darkModePrimaryFontColor;
       }
 
@@ -2059,7 +2059,7 @@ form{
           hr{
             margin: 15px 0;
           }
-          .termIdent{
+          .termIndent{
             margin-left: 25px;
           }
         }
@@ -2089,6 +2089,10 @@ form{
             color: #061728;
             font-size: $paragraphFontSizeSmall;
             margin-left: 20px;
+            width: 150px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
           .sellerTermStatus{
             font-family: $fontFamilyPrimary;

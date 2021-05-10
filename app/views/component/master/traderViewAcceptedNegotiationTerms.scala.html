@@ -211,7 +211,7 @@
                             <span class="termIcon">@commonIcon("contractPrice")</span>
                             @commonTextInfo(constants.View.PRICE_PER_UNIT, Seq((negotiation.price / negotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), negotiation.quantityUnit).mkString(" "))
                         </div>
-                        <div class="cmuk-flex termIdent">
+                        <div class="cmuk-flex termIndent">
                             @commonTextInfo(constants.View.TOTAL_AMOUNT, Seq(negotiation.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" "))
                         </div>
                     </div>
@@ -248,10 +248,10 @@
                             <span class="termIcon">@commonIcon("port")</span>
                             @commonTextInfo(constants.View.LOAD_PORT, negotiation.assetOtherDetails.shippingDetails.portOfLoading)
                         </div>
-                        <div class="cmuk-flex termIdent">
+                        <div class="cmuk-flex termIndent">
                             @commonTextInfo(constants.View.DISCHARGE_PORT, negotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                         </div>
-                        <div class="cmuk-flex termIdent">
+                        <div class="cmuk-flex termIndent">
                             @commonIntInfo(constants.View.SHIPMENT_PERIOD, negotiation.assetOtherDetails.shippingDetails.shippingPeriod)
                         </div>
                     </div>
@@ -276,7 +276,7 @@
                             <span class="termIcon">@commonIcon("advancePayment")</span>
                             @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                         </div>
-                        <div class="termIdent">
+                        <div class="termIndent">
                         @negotiation.paymentTerms.credit match {
                             case Some(credit) => {
                                 @credit.tentativeDate match {
@@ -315,13 +315,13 @@
                         <p class="documentTermName cmuk-margin-remove"><span class="cmuk-text-bold">@Messages(constants.View.ASSET_DOCUMENTS):</span></p>
                     </div>
                         @negotiation.documentList.assetDocuments.map { assetDocument =>
-                            <p class="termIdent">
+                            <p class="termIndent">
                                 @Messages(assetDocument)
                             </p>
                         }
-                        <p class="termIdent"><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
+                        <p class="termIndent"><span class="cmuk-text-bold">@Messages(constants.View.NEGOTIATION_DOCUMENTS):</span></p>
                         @negotiation.documentList.negotiationDocuments.map { negotiationDocument =>
-                            <p class="termIdent">
+                            <p class="termIndent">
                                 @Messages(negotiationDocument)
                             </p>
                         }

@@ -66,7 +66,7 @@ body.darkMode .middle .mainTabs .tradeTerms .sellerTerm {
   border: none;
   filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
 }
-body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .documentTermName, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIdent {
+body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .documentTermName, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIndent {
   color: #D0D0D0;
 }
 body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIcon .icon {
@@ -1885,7 +1885,7 @@ form .formBody:after {
 .pageContainer .middle .mainTabs .tradeTerms .terms hr {
   margin: 15px 0;
 }
-.pageContainer .middle .mainTabs .tradeTerms .terms .termIdent {
+.pageContainer .middle .mainTabs .tradeTerms .terms .termIndent {
   margin-left: 25px;
 }
 .pageContainer .middle .mainTabs .tradeTerms .sellerTerm {
@@ -1915,6 +1915,10 @@ form .formBody:after {
   color: #061728;
   font-size: 0.875rem;
   margin-left: 20px;
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
   font-family: "Rubik", sans-serif;

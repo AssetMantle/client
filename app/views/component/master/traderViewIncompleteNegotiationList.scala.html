@@ -54,8 +54,8 @@
                 <div class="cmuk-flex">
                     <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
                     <div class="cmuk-text-left">
-                    <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <p><span>@incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                        @commonLargeTextBox(incompleteNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                        @commonLargeTextBox(incompleteNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                     </div>
                 </div>
                 <div class="viewQuotePayment">@commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.traderViewNegotiation, 'parameters -> s"'${incompleteNegotiation.id}'")
