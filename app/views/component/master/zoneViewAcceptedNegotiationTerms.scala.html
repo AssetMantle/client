@@ -147,7 +147,7 @@
                         <span class="termIcon">@commonIcon("advancePayment")</span>
                         @commonDoubleInfo(constants.View.ADVANCE_PERCENTAGE, negotiation.paymentTerms.advancePercentage)
                     </div>
-                    <div class="termIdent">
+                    <div class="termIndent">
                 @negotiation.paymentTerms.credit match {
                     case Some(credit) => {
                         @credit.tentativeDate match {

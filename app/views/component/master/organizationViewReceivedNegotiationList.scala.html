@@ -65,8 +65,8 @@
                 <div class="cmuk-flex">
                     <span class="arrowIcon">@commonIcon("navigationDownArrow")</span>
                     <div class="cmuk-text-left">
-                    <p><span>@receivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading</span></p>
-                    <p><span>@receivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge</span></p>
+                        @commonLargeTextBox(receivedNegotiation.assetOtherDetails.shippingDetails.portOfLoading)
+                        @commonLargeTextBox(receivedNegotiation.assetOtherDetails.shippingDetails.portOfDischarge)
                     </div>
                 </div>
             @commonModalButton(constants.View.VIEW_QUOTE, routes.javascript.ComponentViewController.organizationViewNegotiation, 'parameters -> s"'${receivedNegotiation.id}'")
