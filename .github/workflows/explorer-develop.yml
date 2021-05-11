@@ -35,6 +35,8 @@ jobs:
           host: ${{ secrets.EXPLORER_DEVELOP_HOST }}
           port: 22
           user: ${{ secrets.EXPLORER_DEVELOP_USERNAME }}
+          ssh_before: |
+            rm -r explorer.zip
           scp: |
            target/universal/persistenceclient-1.0.zip ${{ secrets.EXPLORER_DEVELOP_USERNAME }}@${{ secrets.EXPLORER_DEVELOP_HOST }}:~/explorer.zip
           # then run these commands
