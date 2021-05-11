@@ -1,9 +1,9 @@
-name: Check
+name: Explorer - Develop 
 
 on:
   push:
     branches:
-      - persistenceCore/action
+      - explorer/master
 
 jobs:
   build:
