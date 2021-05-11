@@ -8,8 +8,8 @@
 
 @left = {
     <div class="leftContainer">
-        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cardContainer cmuk-card-styles"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cardContainer cmuk-card-styles"></div>
     </div>
     <script>
             componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
@@ -21,7 +21,7 @@
     <div class="cmuk-container cmuk-margin-bottom">
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="tokensPrices" class="cardSelectHeader"></div>
+                <div id="tokensPrices" class="cardSelectHeader cmuk-card-styles"></div>
             </div>
         </div>
     </div>
@@ -30,12 +30,10 @@
     </script>
 }
 
-@right = {
-    <div class="rightContainer">
-        <div class="recentActivityContainer">
-            <div id="recentActivities"></div>
-        </div>
-        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
+    @right = {
+        <div class="rightContainer">
+                <div id="recentActivities" class="recentActivityContainer cmuk-card-styles"></div>
+                <div id="votingPowers" class="cmuk-margin-bottom tableViewCard containerHeight cmuk-card-styles"></div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

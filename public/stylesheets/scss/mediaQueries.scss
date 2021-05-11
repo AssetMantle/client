@@ -310,6 +310,7 @@
   .comdex {
     .cmuk-height-medium{
       height: 210px;
+      padding-left: 10px;
       padding-top: 20px;
       padding-bottom: 20px;
     }
@@ -446,27 +447,34 @@
     font-size: 16px;
   }
   .checkboxSection {
-    .commonCheckBox dt{
+    .commonCheckBox dt {
       width: auto;
       margin-right: 40px;
     }
   }
-  .showPassword, .checkIcon{
-    top:37px;
+  .showPassword, .checkIcon {
+    top: 37px;
   }
   .modal .modalContent .modalBody {
-    .modalInfoBlock, form .formBody{
+    .modalInfoBlock, form .formBody {
       .infoRowLabel {
         width: 300px;
       }
+
       .infoRowValue {
         text-align: left;
       }
-      .documentItem{
-        .infoRowLabel{
+
+      .documentItem {
+        .infoRowLabel {
           width: auto;
         }
       }
+    }
+  }
+  .cmuk-card-styles {
+    .cmuk-card-body {
+      height: calc(100% - 55px);
     }
   }
 }
