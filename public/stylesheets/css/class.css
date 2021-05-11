@@ -454,7 +454,7 @@ body.lightMode .commodityImage {
 }
 
 .stringCompress {
-  width: 200px;
+  width: 125px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1915,7 +1915,7 @@ form .formBody:after {
   color: #061728;
   font-size: 0.875rem;
   margin-left: 20px;
-  width: 150px;
+  width: 250px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
