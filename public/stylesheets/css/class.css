@@ -454,7 +454,7 @@ body.lightMode .commodityImage {
 }
 
 .stringCompress {
-  width: 150px;
+  width: 200px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -878,7 +878,7 @@ body.lightMode .commodityImage {
   background-color: #49A948;
 }
 .comdex .cmuk-badge.rejected {
-  background-color: #FE4350;
+  color: #FE4350;
 }
 .comdex .cmuk-badge.pending {
   background-color: #faa05a;
