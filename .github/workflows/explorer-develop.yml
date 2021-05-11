@@ -1,4 +1,4 @@
-name: Check
+name: Explorer - PersistenceCore
 
 on:
   push:
