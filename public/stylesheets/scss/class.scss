@@ -533,7 +533,7 @@ body.lightMode  {
 }
 
 .stringCompress{
-  width: 150px;
+  width: 125px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -972,7 +972,7 @@ padding:10px 20px;
   }
   .cmuk-badge.rejected{
     @extend  %verifiedLabel;
-    background-color: #FE4350;
+    color: #FE4350;
   }
   .cmuk-badge.pending{
     @extend %verifiedLabel;
@@ -2089,7 +2089,7 @@ form{
             color: #061728;
             font-size: $paragraphFontSizeSmall;
             margin-left: 20px;
-            width: 150px;
+            width: 250px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;

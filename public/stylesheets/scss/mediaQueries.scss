@@ -646,6 +646,14 @@
   }
 }
 
+@media (max-width: 1599.9px){
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue{
+    width: 150px;
+  }
+  .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel{
+    width: 200px;
+  }
+}
 @media (min-width: 1200px) and (max-width: 1399.9px){
   .documentView .documentList {
     .table-scroll tbody tr td:first-child a{
