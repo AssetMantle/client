@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.SendCoin
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SendCoin]) { sendCoin =>
+    @commonHtmlInfo(constants.View.FROM, commonLink(sendCoin.fromAddress, routes.ViewController.wallet(sendCoin.fromAddress)))
+    @commonHtmlInfo(constants.View.TO, commonLink(sendCoin.toAddress, routes.ViewController.wallet(sendCoin.toAddress)))
+    @commonTextInfo(constants.View.AMOUNTS, sendCoin.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+}

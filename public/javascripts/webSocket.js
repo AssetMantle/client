@@ -109,6 +109,7 @@ function updateTransactionList(message) {
             for (let i = transactionListPage.children().length - 1; i >= 0; i--) {
                 if (numTxs >= transactionListPage.children().length) {
                     $('#transactionListPageItemTxHash_' + i).text(message.txs[numTxs - i].hash);
+                    $('#transactionListPageItemTxMessageTypes_' + i).text(message.txs[numTxs - i].messageTypes);
                     $('#transactionListPageItemTxHeight_' + i).text(message.block.height);
                     $('#transactionListPageItemTxStatusStatic_' + i).hide();
                     if (message.txs[numTxs - i].status) {
@@ -122,6 +123,7 @@ function updateTransactionList(message) {
                 } else {
                     if (i <= (numTxs - 1)) {
                         $('#transactionListPageItemTxHash_' + i).text(message.txs[i].hash);
+                        $('#transactionListPageItemTxMessageTypes_' + i).text(message.txs[i].messageTypes);
                         $('#transactionListPageItemTxHeight_' + i).text(message.block.height);
                         $('#transactionListPageItemTxStatusStatic_' + i).hide();
                         if (message.txs[i].status) {
@@ -134,6 +136,7 @@ function updateTransactionList(message) {
                         $('#transactionListPageItemTxFees_' + i).text(message.txs[i].proposer);
                     } else {
                         $('#transactionListPageItemTxHash_' + i).text($('#transactionListPageItemTxHash_' + (i - 1)).text());
+                        $('#transactionListPageItemTxMessageTypes_' + i).text($('#transactionListPageItemTxMessageTypes_' + (i - 1)).text());
                         $('#transactionListPageItemTxHeight_' + i).text($('#transactionListPageItemTxHeight_' + (i - 1)).text());
                         $('#transactionListPageItemTxStatus_' + i).html($('#transactionListPageItemTxStatus_' + (i - 1)).html());
                         $('#transactionListPageItemTxFees_' + i).text($('#transactionListPageItemTxFees_' + (i - 1)).text());

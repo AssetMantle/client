@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.common.Serializable.Address
 import models.master.{Account, Identification}
@@ -51,6 +52,10 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
@@ -111,7 +116,7 @@ class AccountController @Inject()(
           def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
             val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, mnemonic = Seq(masterAccount.partialMnemonic.getOrElse(throw new BaseException(constants.Response.MNEMONIC_NOT_FOUND)).mkString(" "), createWalletData.mnemonics).mkString(" ")))
 
-            def createAccount(addKeyResponse: KeyResponse.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.result.keyOutput.address, username = createWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey)
+            def createAccount(addKeyResponse: KeyResponse.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.result.keyOutput.address, username = createWalletData.username, accountType = constants.Blockchain.Account.BASE, publicKey = None)
 
             for {
               addKeyResponse <- addKeyResponse
@@ -160,13 +165,13 @@ class AccountController @Inject()(
             def checkAccountExists(oldUsername: Option[String]) = oldUsername.fold(Future(false))(username => masterAccounts.Service.checkAccountExists(username))
 
             def checkAndUpdate(addKeyResponse: KeyResponse.Response, accountExists: Boolean) = if (!accountExists) {
-              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = addKeyResponse.result.keyOutput.pubkey, coins = Seq.empty, accountNumber = "", sequence = ""))
+              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = None, accountType = constants.Blockchain.Account.BASE, accountNumber = -1, sequence = 0, vestingParameters = None))
               val createMasterAccount = {
                 val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
                 masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
               }
 
-              def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountBalance(addKeyResponse.result.keyOutput.address)
+              def updateBCAccount(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(addKeyResponse.result.keyOutput.address)
 
               for {
                 _ <- createBCAccount
@@ -358,7 +363,7 @@ class AccountController @Inject()(
             otp <- otp
             _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)()
           } yield PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
-          ).recover {
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
           }
         }

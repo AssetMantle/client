@@ -1,9 +1,9 @@
 package models.blockchain
 
 import exceptions.BaseException
+import models.Abstract.PublicKey
 import models.Trait.Logged
-import models.common.Serializable.Coin
-import models.common.TransactionMessages.{MultiSend, SendCoin}
+import models.common.Serializable.Vesting.VestingParameters
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,13 +12,16 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import slick.jdbc.JdbcProfile
+import models.common.PublicKeys._
+import models.common.TransactionMessages.CreateVestingAccount
+import queries.responses.common.Header
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, coins: Seq[Coin], publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, accountType: String, publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -26,7 +29,8 @@ class Accounts @Inject()(
                           getAccount: GetAccount,
                           configuration: Configuration,
                           masterAccounts: master.Accounts,
-                          utilitiesOperations: utilities.Operations
+                          utilitiesOperations: utilities.Operations,
+                          blockchainBalances: Balances,
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -41,11 +45,11 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(address: String, username: String, coins: String, publicKey: String, accountNumber: String, sequence: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(address = address, username = username, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey.fold[Option[PublicKey]](None)(x => Option(utilities.JSON.convertJsonStringToObject[PublicKey](x))), accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, coins = Json.toJson(account.coins).toString, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, accountType = account.accountType, publicKey = account.publicKey.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
     case Success(result) => result
@@ -107,19 +111,21 @@ class Accounts @Inject()(
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account_BC") {
 
-    def * = (address, username, coins, publicKey, accountNumber, sequence, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (address, username, accountType, publicKey.?, accountNumber, sequence, vestingParameters.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
     def username = column[String]("username")
 
-    def coins = column[String]("coins")
+    def accountType = column[String]("accountType")
 
     def publicKey = column[String]("publicKey")
 
-    def accountNumber = column[String]("accountNumber")
+    def accountNumber = column[Int]("accountNumber")
 
-    def sequence = column[String]("sequence")
+    def sequence = column[Int]("sequence")
+
+    def vestingParameters = column[String]("vestingParameters")
 
     def createdBy = column[String]("createdBy")
 
@@ -136,7 +142,7 @@ class Accounts @Inject()(
 
   object Service {
 
-    def create(address: String, username: String, publicKey: String): Future[String] = add(Account(address = address, username = username, coins = Seq(), publicKey = publicKey, accountNumber = "", sequence = ""))
+    def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
@@ -160,71 +166,58 @@ class Accounts @Inject()(
 
   object Utility {
 
-    def onSendCoin(sendCoin: SendCoin): Future[Unit] = {
-      val fromAccount = insertOrUpdateAccountBalance(sendCoin.fromAddress)
-      val toAccount = insertOrUpdateAccountBalance(sendCoin.toAddress)
+    def onCreateVestingAccount(createVestingAccount: CreateVestingAccount)(implicit header: Header): Future[Unit] = {
+      val insert = insertOrUpdateAccountWithoutAnyTx(createVestingAccount.toAddress)
+      val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.toAddress)
 
       (for {
-        fromAccount <- fromAccount
-        toAccount <- toAccount
+        _ <- insert
+        _ <- insertBalance
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onMultiSend(multiSend: MultiSend): Future[Unit] = {
-      val inputAccounts = utilitiesOperations.traverse(multiSend.inputs)(input => insertOrUpdateAccountBalance(input.address))
-      val outputAccounts = utilitiesOperations.traverse(multiSend.outputs)(output => insertOrUpdateAccountBalance(output.address))
+    def incrementSequence(address: String): Future[Unit] = {
+      val bcAccount = Service.get(address)
 
-      (for {
-        inputAccounts <- inputAccounts
-        outputAccounts <- outputAccounts
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
-      }
-    }
-
-    private def subtractCoinsFromAccount(fromAccount: Account, subtractCoins: Seq[Coin]) = {
-      val updatedCoins = fromAccount.coins.map(accountCoin => subtractCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(subtractCoin => Coin(denom = accountCoin.denom, amount = accountCoin.amount - subtractCoin.amount)))
-      for {
-        _ <- Service.insertOrUpdate(fromAccount.copy(coins = updatedCoins))
-      } yield ()
-    }
-
-    private def addCoinsToAccount(toAddress: String, toAccount: Option[Account], addCoins: Seq[Coin]) = {
-      toAccount.fold {
-        val accountResponse = getAccount.Service.get(toAddress)
-
-        def insert(accountResponse: AccountResponse) = Service.insertOrUpdate(Account(address = toAddress, username = toAddress, coins = addCoins, publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
-
+      def getUpdatedAccount(bcAccount: Option[Account]): Future[Account] = bcAccount.fold {
+        val accountResponse = getAccount.Service.get(address)
         for {
           accountResponse <- accountResponse
-          _ <- insert(accountResponse)
-        } yield ()
-      } { account => {
-        val updatedCoins = if (account.coins.nonEmpty) {
-          val updatedAccountOldCoins = account.coins.map(accountCoin => addCoins.find(_.denom == accountCoin.denom).fold(accountCoin)(addCoin => Coin(denom = addCoin.denom, amount = accountCoin.amount + addCoin.amount)))
-          updatedAccountOldCoins ++ addCoins.filter(x => !updatedAccountOldCoins.map(_.denom).contains(x.denom))
-        } else addCoins
-        for {
-          _ <- Service.insertOrUpdate(account.copy(coins = updatedCoins))
-        } yield ()
-      }
+        } yield accountResponse.account.toSerializableAccount(address).copy(sequence = 1)
+      }(account => {
+        if (account.accountNumber == -1) {
+          val accountResponse = getAccount.Service.get(address)
+          for {
+            accountResponse <- accountResponse
+          } yield accountResponse.account.toSerializableAccount(account.username)
+        } else Future(account.copy(sequence = account.sequence + 1))
+      })
+
+      def update(account: Account) = Service.insertOrUpdate(account)
+
+      (for {
+        bcAccount <- bcAccount
+        updatedAccount <- getUpdatedAccount(bcAccount)
+        _ <- update(updatedAccount)
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
       }
     }
 
-    def insertOrUpdateAccountBalance(address: String): Future[Unit] = {
+    def insertOrUpdateAccountWithoutAnyTx(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
       val bcAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(Account(address = address, username = bcAccount.fold(address)(_.username), coins = accountResponse.result.value.coins.map(_.toCoin), publicKey = accountResponse.result.value.publicKeyValue, sequence = accountResponse.result.value.sequence, accountNumber = accountResponse.result.value.accountNumber))
+      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(accountResponse.account.toSerializableAccount(bcAccount.fold(address)(_.username)).copy(sequence = 0))
 
       (for {
         accountResponse <- accountResponse
         bcAccount <- bcAccount
         _ <- upsert(accountResponse, bcAccount)
       } yield ()).recover {
-        case _: BaseException => Future()
+        case baseException: BaseException => throw baseException
       }
     }
   }

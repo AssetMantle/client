@@ -1,0 +1,21 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ConnectionOpenTry
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ConnectionOpenTry]) { connectionOpenTry =>
+    @commonTextInfo(constants.View.CLIENT_ID, connectionOpenTry.clientID)
+    @commonTextInfo(constants.View.PREVIOUS_CONNECTION_ID, connectionOpenTry.previousConnectionID)
+    @views.html.component.blockchain.txMessages.ibc.commonConnectionCounterparty(constants.View.COUNTERPARTY, connectionOpenTry.counterparty)
+    @commonTextInfo(constants.View.DELAY_PERIOD, connectionOpenTry.delayPeriod)
+    <div>
+    @connectionOpenTry.counterpartyVersions.zipWithIndex.map { case (version, index) => {
+        views.html.component.blockchain.txMessages.ibc.commonVersion(index.toString, version)
+        }
+    }
+    </div>
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenTry.proofHeight)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.CONSENSUS_HEIGHT, connectionOpenTry.consensusHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenTry.signer, routes.ViewController.wallet(connectionOpenTry.signer)))
+}

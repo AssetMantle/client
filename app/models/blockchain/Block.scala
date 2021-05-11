@@ -1,8 +1,6 @@
 package models.blockchain
 
 import java.sql.Timestamp
-
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
@@ -12,6 +10,7 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
+import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -32,6 +31,8 @@ class Blocks @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
 
   private val blocksPerPage = configuration.get[Int]("blockchain.blocks.perPage")
+
+  private val numBlocksAvgBlockTimes = configuration.get[Int]("blockchain.avgBlockTimes")
 
   import databaseConfig.profile.api._
 
@@ -57,8 +58,8 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetLatestBlockHeight: Future[Int] = db.run(blockTable.map(_.height).sortBy(_.desc).result.head.asTry).map {
-    case Success(result) => result
+  private def tryGetLatestBlockHeight: Future[Int] = db.run(blockTable.map(_.height).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
     case Failure(exception) => exception match {
       case _: NoSuchElementException => 0
     }
@@ -85,11 +86,7 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetHeights(range: Seq[Int]): Future[Seq[Int]] = db.run(blockTable.map(_.height).filter(_.inSet(range)).result)
-
-  private def getBlocksForPageNumber(offset: Int, limit: Int): Future[Seq[BlockSerialized]] = db.run(blockTable.sortBy(_.time.desc).drop(offset).take(limit).result)
-
-  private def getBlocksByLastN(n: Int): Future[Seq[BlockSerialized]] = db.run(blockTable.sortBy(_.height.desc).take(n).result)
+  private def getBlocksByHeightRange(heightRange: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet heightRange).sortBy(_.time.desc).result)
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") {
 
@@ -128,11 +125,49 @@ class Blocks @Inject()(
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
-    def getLatestBlock: Future[Block] = tryGetLatestBlock.map(_.deserialize)
+    def getLatestBlock: Future[Block] = {
+      val latestBlockHeight = tryGetLatestBlockHeight
+      for {
+        latestBlockHeight <- latestBlockHeight
+        block <- tryGetBlockByHeight(latestBlockHeight).map(_.deserialize)
+      } yield block
+    }
 
-    def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = getBlocksForPageNumber(offset = (pageNumber - 1) * blocksPerPage, limit = blocksPerPage).map(_.map(_.deserialize))
+    def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
+      val latestBlockHeight = tryGetLatestBlockHeight
+      for {
+        latestBlockHeight <- latestBlockHeight
+        blockList <- getBlocksByHeightRange(latestBlockHeight - pageNumber * blocksPerPage + 1 to latestBlockHeight - (pageNumber - 1) * blocksPerPage).map(_.map(_.deserialize))
+      } yield blockList
+    }
 
-    def getLastNBlocks(n: Int): Future[Seq[Block]] = getBlocksByLastN(n).map(_.map(_.deserialize))
+    def getLastNBlocks(n: Int): Future[Seq[Block]] = {
+      val latestBlockHeight = tryGetLatestBlockHeight
+
+      for {
+        latestBlockHeight <- latestBlockHeight
+        blockList <- getBlocksByHeightRange(latestBlockHeight - n + 1 to latestBlockHeight).map(_.map(_.deserialize))
+      } yield blockList
+    }
+  }
+
+  object Utility {
+
+    def getAverageBlockTime(fromBlock: Option[Int] = None, numBlocks: Int = numBlocksAvgBlockTimes): Future[Double] = {
+      val lastBlock = fromBlock.fold(Service.getLatestBlock)(height => Service.tryGet(height))
+
+      // Should not use block height 1 since time difference between block 1 and block 2 can be very high
+      def getFirstBlock(lastBlock: Block) = if (lastBlock.height == 1) Future(lastBlock) else if (lastBlock.height <= numBlocks) Service.tryGet(2) else Service.tryGet(lastBlock.height - numBlocks)
+
+      (for {
+        lastBlock <- lastBlock
+        firstBlock <- getFirstBlock(lastBlock)
+      } yield utilities.NumericOperation.roundOff(Duration.between(utilities.Date.bcTimestampToZonedDateTime(lastBlock.time), utilities.Date.bcTimestampToZonedDateTime(firstBlock.time)).abs().toSeconds.toDouble / (lastBlock.height - firstBlock.height))
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+
   }
 
 }

@@ -1,5 +1,7 @@
 package queries.Abstract
 
+import models.Abstract.{PublicKey => SerializablePublicKey}
+
 abstract class PublicKey {
-  val publicKeyValue: String
+  def toSerializablePublicKey: SerializablePublicKey
 }

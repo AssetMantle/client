@@ -1,0 +1,14 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ChannelOpenTry
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ChannelOpenTry]) { channelOpenTry =>
+    @commonTextInfo(constants.View.PORT_ID, channelOpenTry.portID)
+    @commonTextInfo(constants.View.PREVIOUS_CHANNEL_ID, channelOpenTry.previousChannelID)
+    @views.html.component.blockchain.txMessages.ibc.commonChannel(constants.View.CHANNEL, channelOpenTry.channel)
+    @commonTextInfo(constants.View.COUNTERPARTY_VERSION, channelOpenTry.counterpartyVersion)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, channelOpenTry.proofHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelOpenTry.signer, routes.ViewController.wallet(channelOpenTry.signer)))
+}

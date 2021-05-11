@@ -71,6 +71,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionDetails,
           routes.javascript.ComponentViewController.transactionMessages,
 
+          routes.javascript.ComponentViewController.proposalList,
+          routes.javascript.ComponentViewController.proposalDetails,
+          routes.javascript.ComponentViewController.proposalDeposits,
+          routes.javascript.ComponentViewController.proposalVotes,
+
           routes.javascript.ComponentViewController.validatorList,
           routes.javascript.ComponentViewController.activeValidatorList,
           routes.javascript.ComponentViewController.inactiveValidatorList,

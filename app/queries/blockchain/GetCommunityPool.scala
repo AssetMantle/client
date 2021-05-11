@@ -20,7 +20,7 @@ class GetCommunityPool @Inject()()(implicit wsClient: WSClient, configuration: C
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val url = ip + ":" + port + "/distribution/community_pool"
+  private val url = ip + ":" + port + "/cosmos/distribution/v1beta1/community_pool"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

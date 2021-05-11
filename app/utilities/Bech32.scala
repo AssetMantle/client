@@ -1,10 +1,19 @@
 package utilities
 
+import exceptions.BaseException
+import play.api.Logger
+import utilities.KeyGenerator.BouncyHash
+
 import java.security.MessageDigest
+import java.util.Base64
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success, Try}
 
 object Bech32 {
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.UTILITIES_BECH32
+
   type Int5 = Byte
   final val CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
   final val CHARSET_MAP: Map[Char, Int5] = CHARSET.zipWithIndex.toMap.mapValues(_.toByte)
@@ -21,31 +30,52 @@ object Bech32 {
     MessageDigest.getInstance("SHA-256").digest(pubKeyBytes).slice(0, 20).map("%02x".format(_)).mkString.toUpperCase
   }
 
-  def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = "cosmosvaloper"): String = {
+  def convertValidatorPublicKeyToHexAddress(pubkey: String): String = {
+    MessageDigest
+      .getInstance("SHA-256")
+      .digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))
+      .slice(0, 20)
+      .map("%02x".format(_))
+      .mkString.toUpperCase
+  }
+
+  def convertAccountPublicKeyToAccountAddress(pubkey: String): String = {
+    encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))))) match {
+      case Success(address) => address
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
+    }
+  }
+
+  def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = constants.Blockchain.ValidatorPrefix): String = {
     val byteSeq = decode(accountAddress) match {
       case Success(value: (String, Seq[Int5])) => value._2
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
     }
     encode(hrp, byteSeq) match {
       case Success(value: String) => value
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
     }
   }
 
   //probably byteSeq converts operatorAddress to hexAddress and then encode converts into wallet address
-  def convertOperatorAddressToAccountAddress(operatorAddress: String, hrp: String = "cosmos"): String = {
+  def convertOperatorAddressToAccountAddress(operatorAddress: String, hrp: String = constants.Blockchain.AccountPrefix): String = {
     val byteSeq = decode(operatorAddress) match {
       case Success(value: (String, Seq[Int5])) => value._2
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
     }
     encode(hrp, byteSeq) match {
       case Success(value: String) => value
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
     }
   }
 
   def pubKeyToBech32(pubKey: String): String = {
-    convertAndEncode("cosmosvalconspub", "1624DE6420" + pubKey)
+    convertAndEncode(constants.Blockchain.ValidatorConsensusPublicPrefix, "1624DE6420" + pubKey)
   }
 
   def convertAndEncode(hrp: String, bytes: String): String = {
@@ -55,7 +85,8 @@ object Bech32 {
     }
     encode(hrp, to5Bit(bytesSeq)) match {
       case Success(value: String) => value
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_HRP_OR_BYTES)
     }
   }
 
@@ -121,7 +152,8 @@ object Bech32 {
   def decodeBech32(bech32Address: String): (String, String) = {
     decode(bech32Address) match {
       case Success(value: (String, Seq[Int5])) => (value._1, from5Bit(value._2).map("%02x".format(_)).mkString)
-      case Failure(exception) => throw exception
+      case Failure(exception) => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_BECH32_ADDRESS)
     }
   }
 

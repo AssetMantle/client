@@ -1,9 +1,9 @@
 import _root_.io.gatling.sbt.GatlingPlugin
 import _root_.sbt.Keys._
 
-name := "commitCentral"
+name := "persistenceClient"
 
-maintainer := "deepanshu@persistence.one"
+maintainer := "admin@persistence.one"
 
 version := "1.0"
 
@@ -66,4 +66,4 @@ libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
 
 libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
 
-libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.9"
+libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"

@@ -8,6 +8,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.blockchain
+import queries.ascendex.GetTicker
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -24,7 +25,9 @@ class TokenPrices @Inject()(
                              actorSystem: ActorSystem,
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
+                             getAscendexTicker: GetTicker,
                              blockchainTokens: blockchain.Tokens,
+                             utilitiesOperations: utilities.Operations
                            )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -39,6 +42,8 @@ class TokenPrices @Inject()(
 
   private[models] val tokenPriceTable = TableQuery[TokenPriceTable]
 
+  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private val tokenPriceIntialDelay = configuration.get[Int]("blockchain.token.priceInitialDelay")
@@ -52,9 +57,28 @@ class TokenPrices @Inject()(
     }
   }
 
-  private def getPrices(denom: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).take(n).result)
+  private def getLatestSerial(denom: String): Future[Int] = db.run(tokenPriceTable.filter(_.denom === denom).map(_.serial).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
 
-  private def getLatestPrices(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.sortBy(_.serial.desc).take(n * totalTokens).result)
+  private def getLatestTokens(denom: String, n: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).take(n).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def getLatestSerial: Future[Int] = db.run(tokenPriceTable.map(_.serial).max.result.asTry).map {
+    case Success(result) => result.getOrElse(0)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
+
+  private def getAllTokensBySerial(startSerial: Int, endSerial: Int): Future[Seq[TokenPrice]] = db.run(tokenPriceTable.filter(x => x.serial >= startSerial && x.serial <= endSerial).result)
 
   private[models] class TokenPriceTable(tag: Tag) extends Table[TokenPrice](tag, "TokenPrice") {
 
@@ -83,36 +107,31 @@ class TokenPrices @Inject()(
 
     def create(denom: String, price: Double): Future[Int] = add(TokenPrice(denom = denom, price = price))
 
-    def get(denom: String, from: Timestamp, to: Timestamp, timeZone: TimeZone = TimeZone.getTimeZone("UTC")): Future[Seq[TokenPrice]] = getPrices(denom, 5)
+    def getLatestByToken(denom: String, n: Int): Future[Seq[TokenPrice]] = getLatestTokens(denom = denom, n = n)
 
-    def get(denom: String, n: Int): Future[Seq[TokenPrice]] = getPrices(denom, n)
-
-    def getLatest(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = getLatestPrices(n = n, totalTokens = totalTokens)
+    def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
+      (for {
+        latestSerial <- getLatestSerial
+        tokenPrices <- getAllTokensBySerial(startSerial = latestSerial - (n * totalTokens), endSerial = latestSerial)
+      } yield tokenPrices).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
   }
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val r = new Random(System.currentTimeMillis())
-      val denoms = blockchainTokens.Service.getAllDenoms
-
-      def update(denoms: Seq[String]) = {
-        Future.traverse(denoms) { denom =>
-          val price = Future(2.5 + 5 * r.nextDouble())
-          for {
-            price <- price
-            _ <- Service.create(denom = denom, price = price)
-          } yield ()
+      val denomTicker = constants.Blockchain.TokenTickers.get(stakingDenom)
+      if (denomTicker.isDefined) {
+        val price = getAscendexTicker.Service.get(denomTicker.get).map(_.data.close.toDouble)
+        (for {
+          price <- price
+          _ <- Service.create(denom = stakingDenom, price = price)
+        } yield ()).recover {
+          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
-      }
-
-      (for {
-        denoms <- denoms
-        _ <- update(denoms)
-      } yield ()
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
+      } else Future()
     }
   }
 

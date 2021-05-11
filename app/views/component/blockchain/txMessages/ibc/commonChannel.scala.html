@@ -1,0 +1,17 @@
+@import models.common.Serializable.IBC.Channel
+@import views.html.base._
+
+@(key: String, channel: Channel)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.STATE, channel.state)
+    @commonTextInfo(constants.View.ORDERING, channel.ordering)
+    <div>
+        @Messages(constants.View.COUNTERPARTY):
+        @commonTextInfo(constants.View.PORT_ID, channel.counterparty.portID)
+        @commonTextInfo(constants.View.CHANNEL_ID, channel.counterparty.channelID)
+    </div>
+    @commonTextInfo(constants.View.CONNECTION_HOPS, channel.connectionHops.mkString(", "))
+    @commonTextInfo(constants.View.VERSION, channel.version)
+</div>

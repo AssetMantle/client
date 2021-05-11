@@ -1,0 +1,16 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Transfer
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Transfer]) { transfer =>
+    @commonTextInfo(constants.View.SOURCE_PORT, transfer.sourcePort)
+    @commonTextInfo(constants.View.SOURCE_CHANNEL, transfer.sourceChannel)
+    @commonTextInfo(constants.View.TOKEN, transfer.token.getMicroAmountWithDenom)
+    @commonHtmlInfo(constants.View.SENDER, commonLink(transfer.sender, routes.ViewController.wallet(transfer.sender)))
+    @commonTextInfo(constants.View.RECEIVER, transfer.receiver)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.TIMEOUT_HEIGHT, transfer.timeoutHeight)
+    @commonTextInfo(constants.View.TIMEOUT_TIMESTAMP, transfer.timeoutTimestamp)
+
+}

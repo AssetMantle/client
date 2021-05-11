@@ -10,6 +10,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -140,7 +141,7 @@ class Assets @Inject()(
 
   object Utility {
 
-    def onDefine(assetDefine: AssetDefine): Future[Unit] = {
+    def onDefine(assetDefine: AssetDefine)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.immutableMetaTraits.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetDefine.mutableMetaTraits.metaPropertyList)
 
@@ -170,11 +171,11 @@ class Assets @Inject()(
         _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onMint(assetMint: AssetMint): Future[Unit] = {
+    def onMint(assetMint: AssetMint)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.immutableMetaProperties.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMint.mutableMetaProperties.metaPropertyList)
 
@@ -190,7 +191,7 @@ class Assets @Inject()(
         } yield assetID
       }
 
-      def masterOperations(assetID: String) = {
+      def masterOperations(assetID: String)(implicit header: Header) = {
         val insert = masterAssets.Service.insertOrUpdate(masterAsset(id = assetID, status = Option(true)))
         for {
           _ <- insert
@@ -204,11 +205,11 @@ class Assets @Inject()(
         _ <- masterOperations(assetID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_MINT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onMutate(assetMutate: AssetMutate): Future[Unit] = {
+    def onMutate(assetMutate: AssetMutate)(implicit header: Header): Future[Unit] = {
       val oldAsset = Service.tryGet(assetMutate.assetID)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(assetMutate.mutableMetaProperties.metaPropertyList)
 
@@ -220,11 +221,11 @@ class Assets @Inject()(
         _ <- upsertAsset(oldAsset, scrubbedMutableMetaProperties)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_MUTATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onBurn(assetBurn: AssetBurn): Future[Unit] = {
+    def onBurn(assetBurn: AssetBurn)(implicit header: Header): Future[Unit] = {
       val burnAuxiliary = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.SmallestDec)
       val deleteAsset = Service.delete(assetBurn.assetID)
       val masterOperations = masterAssets.Service.delete(assetBurn.assetID)
@@ -235,7 +236,7 @@ class Assets @Inject()(
         _ <- masterOperations
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_BURN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
   }

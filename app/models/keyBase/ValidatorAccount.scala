@@ -18,12 +18,13 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ValidatorAccount(address: String, identity: Option[String], username: Option[String], picture: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ValidatorAccount(address: String, identity: String, username: Option[String], pictureURL: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class ValidatorAccounts @Inject()(
                                    wsClient: WSClient,
                                    getValidatorKeyBaseAccount: GetValidatorKeyBaseAccount,
+                                   utilitiesOperations: utilities.Operations,
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
@@ -48,14 +49,14 @@ class ValidatorAccounts @Inject()(
   private def add(validatorKeyBase: ValidatorAccount): Future[String] = db.run((validatorAccountTable returning validatorAccountTable.map(_.address) += validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPLOAD_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_INSERT_FAILED, psqlException)
     }
   }
 
   private def update(validatorKeyBase: ValidatorAccount): Future[Int] = db.run(validatorAccountTable.filter(_.address === validatorKeyBase.address).update(validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPDATE_FAILED, psqlException)
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, noSuchElementException)
     }
   }
@@ -63,23 +64,27 @@ class ValidatorAccounts @Inject()(
   private def upsert(validatorKeyBase: ValidatorAccount): Future[Int] = db.run(validatorAccountTable.insertOrUpdate(validatorKeyBase).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_UPDATE_FAILED, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPSERT_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_UPSERT_FAILED, noSuchElementException)
     }
   }
 
   private def tryGetByAddress(address: String): Future[ValidatorAccount] = db.run(validatorAccountTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.KEY_BASE_ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
+
+  private def getListByAddress(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address.inSet(addresses)).result)
+
+  private def getByAddress(address: String): Future[Option[ValidatorAccount]] = db.run(validatorAccountTable.filter(_.address === address).result.headOption)
 
   private def findAll: Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.result)
 
   private[models] class ValidatorAccountTable(tag: Tag) extends Table[ValidatorAccount](tag, "ValidatorAccount") {
 
-    def * = (address, identity.?, username.?, picture.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorAccount.tupled, ValidatorAccount.unapply)
+    def * = (address, identity, username.?, pictureURL.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorAccount.tupled, ValidatorAccount.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -87,7 +92,7 @@ class ValidatorAccounts @Inject()(
 
     def username = column[String]("username")
 
-    def picture = column[Array[Byte]]("picture")
+    def pictureURL = column[String]("pictureURL")
 
     def createdBy = column[String]("createdBy")
 
@@ -105,42 +110,39 @@ class ValidatorAccounts @Inject()(
 
   object Service {
 
-    def create(validatorKAccount: ValidatorAccount): Future[String] = add(validatorKAccount)
+    def create(validatorAccount: ValidatorAccount): Future[String] = add(validatorAccount)
 
-    def insertOrUpdate(validatorKAccount: ValidatorAccount): Future[Int] = upsert(validatorKAccount)
+    def insertOrUpdate(validatorAccount: ValidatorAccount): Future[Int] = upsert(validatorAccount)
 
     def tryGet(address: String): Future[ValidatorAccount] = tryGetByAddress(address)
+
+    def get(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = getListByAddress(addresses)
+
+    def get(address: String): Future[Option[ValidatorAccount]] = getByAddress(address)
 
     def getAll: Future[Seq[ValidatorAccount]] = findAll
   }
 
   object Utility {
 
-    def insertOrUpdateKeyBaseAccount(validatorAddress: String, identity: Option[String]): Future[Unit] = {
-      val validatorAccount = if (identity.isDefined) {
-        val keyBaseResponse = getValidatorKeyBaseAccount.Service.get(identity.get)
+    def insertOrUpdateKeyBaseAccount(validatorAddress: String, identity: String): Future[Unit] = if (identity != "" || identity != "[do-not-modify]") {
+      val validatorAccount = if (identity != "") {
+        val keyBaseResponse = getValidatorKeyBaseAccount.Service.get(identity)
 
-        def getImageByteArray(keyBaseResponse: ValidatorKeyBaseAccountResponse): Future[Option[Array[Byte]]] = {
-          keyBaseResponse.them.headOption.fold[Future[Option[Array[Byte]]]](Future(None)) { them =>
-            val imageURL: String = them.pictures.fold("")(x => x.primary.url)
-            val imageResponse: Future[Option[Array[Byte]]] = if (imageURL == "") Future(None) else wsClient.url(imageURL).get.map(x => Option(x.body[Array[Byte]]))
-            (for {
-              imageResponse <- imageResponse
-            } yield imageResponse
-              ).recover {
-              case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
-            }
+        def getImageURL(keyBaseResponse: ValidatorKeyBaseAccountResponse): Option[String] = {
+          keyBaseResponse.them.headOption.fold[Option[String]](None) { them =>
+            Some(them.pictures.fold("")(x => x.primary.url))
           }
+
         }
 
         (for {
           keyBaseResponse <- keyBaseResponse
-          image <- getImageByteArray(keyBaseResponse)
-        } yield ValidatorAccount(address = validatorAddress, identity = identity, username = keyBaseResponse.them.headOption.fold[Option[String]](None)(x => Option(x.basics.username)), picture = image)
+        } yield ValidatorAccount(address = validatorAddress, identity = identity, username = keyBaseResponse.them.headOption.fold[Option[String]](None)(x => Option(x.basics.username)), pictureURL = getImageURL(keyBaseResponse))
           ).recover {
           case baseException: BaseException => throw baseException
         }
-      } else Future(ValidatorAccount(address = validatorAddress, identity = None, username = None, picture = None))
+      } else Future(ValidatorAccount(address = validatorAddress, identity = "", username = None, pictureURL = None))
 
       (for {
         validatorAccount <- validatorAccount
@@ -149,12 +151,12 @@ class ValidatorAccounts @Inject()(
         ).recover {
         case baseException: BaseException => throw baseException
       }
-    }
+    } else Future()
 
     def scheduleUpdates(): Future[Unit] = {
       val allValidatorAccounts = Service.getAll
 
-      def updateAll(validatorAccounts: Seq[ValidatorAccount]) = Future.traverse(validatorAccounts)(validatorAccount => insertOrUpdateKeyBaseAccount(validatorAddress = validatorAccount.address, identity = validatorAccount.identity))
+      def updateAll(validatorAccounts: Seq[ValidatorAccount]) = utilitiesOperations.traverse(validatorAccounts)(validatorAccount => insertOrUpdateKeyBaseAccount(validatorAddress = validatorAccount.address, identity = validatorAccount.identity))
 
       (for {
         allValidatorAccounts <- allValidatorAccounts

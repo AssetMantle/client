@@ -5,17 +5,19 @@ import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.common.Parameters.SlashingParameter
 import models.common.Serializable.RedelegationEntry
 import models.common.TransactionMessages.Redelegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries._
-import queries.blockchain.{GetValidatorDelegatorDelegation, GetValidatorDelegatorRedelegations}
+import queries.blockchain.{GetDelegatorRedelegations, GetValidatorDelegatorDelegation}
 import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
-import queries.responses.blockchain.ValidatorDelegatorRedelegationsResponse.{Response => ValidatorDelegatorRedelegationsResponse}
+import queries.responses.blockchain.DelegatorRedelegationsResponse.{Response => DelegatorRedelegationsResponse}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -27,10 +29,12 @@ class Redelegations @Inject()(
                                blockchainDelegations: Delegations,
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                configuration: Configuration,
-                               getValidatorDelegatorRedelegations: GetValidatorDelegatorRedelegations,
-                               getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
+                               getDelegatorRedelegations: GetDelegatorRedelegations,
                                blockchainValidators: Validators,
                                blockchainWithdrawAddresses: WithdrawAddresses,
+                               blockchainParameters: Parameters,
+                               blockchainUndelegations: Undelegations,
+                               utilitiesOperations: utilities.Operations,
                              )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -127,8 +131,8 @@ class Redelegations @Inject()(
 
   object Utility {
 
-    def onRedelegation(redelegate: Redelegate): Future[Unit] = {
-      val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
+    def onRedelegation(redelegate: Redelegate)(implicit header: Header): Future[Unit] = {
+      val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = redelegate.delegatorAddress, sourceValidatorAddress = redelegate.validatorSrcAddress, destinationValidatorAddress = redelegate.validatorDstAddress)
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorSrcAddress)
       val updateDstValidatorDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = redelegate.delegatorAddress, validatorAddress = redelegate.validatorDstAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(redelegate.delegatorAddress)
@@ -141,73 +145,63 @@ class Redelegations @Inject()(
         } yield ()
       }
 
-      def upsertRedelegation(redelegationsResponse: ValidatorDelegatorRedelegationsResponse) = Service.insertOrUpdate(redelegationsResponse.result.find(x => x.delegator_address == redelegate.delegatorAddress && x.validator_src_address == redelegate.validatorSrcAddress && x.validator_dst_address == redelegate.validatorDstAddress).getOrElse(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)).toRedelegation)
+      def upsertRedelegation(redelegationResponse: DelegatorRedelegationsResponse) = redelegationResponse.redelegation_responses.headOption.map(x => Service.insertOrUpdate(x.toRedelegation)).getOrElse(Future(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)))
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
       (for {
-        redelegationsResponse <- redelegationsResponse
-        _ <- upsertRedelegation(redelegationsResponse)
+        redelegationResponse <- redelegationResponse
+        _ <- upsertRedelegation(redelegationResponse)
         _ <- updateSrcValidatorDelegation
         _ <- updateDstValidatorDelegation
         _ <- withdrawAddressBalanceUpdate
         _ <- updateValidators
         _ <- updateActiveValidatorSet()
       } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onSlashingEvent(validatorAddress: String): Future[Unit] = {
-      val redelegations = Service.getAllBySourceValidator(validatorAddress)
+    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String): Future[Unit] = {
+      val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = delegator, sourceValidatorAddress = srcValidator, destinationValidatorAddress = dstValidator)
 
-      def updateDelegations(redelegations: Seq[Redelegation]) = if (redelegations.nonEmpty) {
-        val redelegationsResponse = getValidatorDelegatorRedelegations.Service.get
-
-        def update(redelegationsResponse: ValidatorDelegatorRedelegationsResponse) = Future.traverse(redelegationsResponse.result.map(_.toRedelegation)) { redelegation =>
-          val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = redelegation.delegatorAddress, validatorAddress = redelegation.validatorDestinationAddress)
-
-          def updateDelegation(delegationResponse: ValidatorDelegatorDelegationResponse) = blockchainDelegations.Service.insertOrUpdate(delegationResponse.result.toDelegation)
-
-          for {
-            delegationResponse <- delegationResponse
-            _ <- updateDelegation(delegationResponse)
-          } yield ()
-        }
-
-        for {
-          redelegationsResponse <- redelegationsResponse
-          _ <- update(redelegationsResponse)
-        } yield ()
-      } else {
-        Future()
-      }
+      def checkAndDelete(redelegationResponse: DelegatorRedelegationsResponse) = if (redelegationResponse.redelegation_responses.nonEmpty) Service.insertOrUpdate(redelegationResponse.redelegation_responses.head.toRedelegation)
+      else Service.delete(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
 
       (for {
-        redelegations <- redelegations
-        _ <- updateDelegations(redelegations)
+        redelegationResponse <- redelegationResponse
+        _ <- checkAndDelete(redelegationResponse)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
-    def onNewBlock(blockTime: String): Future[Unit] = {
-      val allRedelegations = Service.getAll
+    def slashRedelegation(redelegation: Redelegation, infractionHeight: Int, currentBlockTIme: String, slashingFraction: BigDecimal): Future[MicroNumber] = {
+      val delegation = blockchainDelegations.Service.get(delegatorAddress = redelegation.delegatorAddress, operatorAddress = redelegation.validatorDestinationAddress)
+      val destinationValidator = blockchainValidators.Service.tryGet(redelegation.validatorDestinationAddress)
 
-      def checkAndDelete(allRedelegations: Seq[Redelegation]) = Future.traverse(allRedelegations) { redelegation =>
-        val updatedRedelegation = redelegation.copy(entries = redelegation.entries.filterNot(entry => utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = blockTime)))
-        val update = if (updatedRedelegation.entries.nonEmpty) Service.insertOrUpdate(updatedRedelegation) else Service.delete(delegatorAddress = updatedRedelegation.delegatorAddress, validatorSourceAddress = updatedRedelegation.validatorSourceAddress, validatorDestinationAddress = updatedRedelegation.validatorDestinationAddress)
-        for {
-          _ <- update
-        } yield ()
-      }
+      def update(optionalDelegation: Option[Delegation], destinationValidator: Validator) = optionalDelegation.fold(Future(MicroNumber.zero))(delegation => {
+        val updateEntries = utilitiesOperations.traverse(redelegation.entries)(entry => {
+          val sharesToUnbond = slashingFraction * entry.sharesDestination
+          val unbond = if (!(entry.creationHeight < infractionHeight) || !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTIme) || !(sharesToUnbond < 0)) {
+            val slashShares = if (sharesToUnbond > delegation.shares) delegation.shares else sharesToUnbond
+            blockchainUndelegations.Utility.unbond(delegation, destinationValidator, slashShares)
+          } else Future(MicroNumber.zero)
 
-      (for {
-        allRedelegations <- allRedelegations
-        _ <- checkAndDelete(allRedelegations)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+          for (
+            _ <- unbond
+          ) yield MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
+        })
+        for (
+          slashedAmounts <- updateEntries
+        ) yield slashedAmounts.sum
+      })
+
+      for {
+        delegation <- delegation
+        destinationValidator <- destinationValidator
+        totalSlashedAmount <- update(delegation, destinationValidator)
+      } yield totalSlashedAmount
     }
 
   }

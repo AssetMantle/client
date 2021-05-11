@@ -33,11 +33,11 @@ class ChatController @Inject()(
 
   private val messagesPerPage = configuration.get[Int]("chatRoom.messagesPerPage")
 
-  implicit val timeWrites = new Writes[Timestamp] {
+  implicit val timeWrites: Writes[Timestamp] = new Writes[Timestamp] {
     override def writes(t: Timestamp): JsValue = JsString(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(t))
   }
-  implicit val chatWrites: OWrites[Message] = Json.writes[Message]
 
+  implicit val chatWrites: OWrites[Message] = Json.writes[Message]
 
   // gets all chatWindows in chatRoom, position - right bottom
   def chatRoom(negotiationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -121,7 +121,7 @@ class ChatController @Inject()(
   //send chat form
   def sendMessageForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(views.html.component.master.sendMessage())
+      Ok(views.html.component.master.sendMessage())
   }
 
   def sendMessage(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>

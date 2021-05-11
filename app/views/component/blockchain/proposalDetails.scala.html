@@ -1,0 +1,56 @@
+@import views.html.base._
+@import models.blockchain.Proposal
+@import models.common.ProposalContents._
+
+@(proposal: Proposal)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.PROPOSAL) {
+} {
+    @commonInfoBox() {
+        @commonTextInfo(constants.View.ID, proposal.id.toString)
+        @commonTextInfo(constants.View.TITLE, proposal.content.title)
+        @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
+        @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
+        @commonTextInfo(constants.View.STATUS, Messages(proposal.status))
+        @commonTextInfo(constants.View.SUBMIT_TIME, utilities.Date.bcTimestampToString(proposal.submitTime))
+        @commonTextInfo(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime)
+        @commonTextInfo(constants.View.TOTAL_DEPOSIT, proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(","))
+        @commonTextInfo(constants.View.VOTING_START, proposal.votingStartTime)
+        @commonTextInfo(constants.View.VOTING_END, proposal.votingEndTime)
+        <div>
+            @Messages(constants.View.FINAL_TALLY_RESULTS):
+            @commonTextInfo(constants.View.YES, proposal.finalTallyResult.yes.toString())
+            @commonTextInfo(constants.View.NO, proposal.finalTallyResult.no.toString())
+            @commonTextInfo(constants.View.NO_WITH_VETO, proposal.finalTallyResult.noWithVeto.toString())
+            @commonTextInfo(constants.View.ABSTAIN, proposal.finalTallyResult.abstain.toString())
+        </div>
+        <div>
+            @Messages(constants.View.CONTENT):
+            @proposal.content.proposalContentType match {
+                case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
+                    @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
+                        views.html.component.blockchain.govParamterChanges(parameterChange)
+                    })
+                }
+                case constants.Blockchain.Proposal.TEXT => {}
+                case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => {
+                    @defining(proposal.content.asInstanceOf[CommunityPoolSpend])(communityPoolSpend => {
+                        commonTextInfo(constants.View.RECIPIENT, communityPoolSpend.recipient)
+                        commonTextInfo(constants.View.AMOUNT, communityPoolSpend.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+                    })
+                }
+                case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => {
+                    @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
+                        commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
+                        commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
+                        commonTextInfo(constants.View.TIME, softwareUpgrade.plan.time)
+                        commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
+                    })
+                }
+                case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {}
+                case _ => {}
+            }
+        </div>
+    }
+
+}

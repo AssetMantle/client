@@ -32,8 +32,8 @@
                     </td>
                     <td>@tx.messages.length</td>
                     <td>@if(tx.fee.amount.nonEmpty) {
-                        @tx.fee.amount.map(amt => s"${amt.amount} ${amt.denom}").mkString(", ")
-                    }else {
+                        @tx.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
+                    } else {
                         0
                     }</td>
                 </tr>

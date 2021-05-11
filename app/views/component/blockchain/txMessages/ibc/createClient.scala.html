@@ -1,0 +1,9 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.CreateClient
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[CreateClient]) { createClient =>
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(createClient.signer, routes.ViewController.wallet(createClient.signer)))
+}

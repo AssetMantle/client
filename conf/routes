@@ -23,9 +23,11 @@ GET         /wallet                                              controllers.Vie
 GET         /blocks                                              controllers.ViewController.blocks
 GET         /transactions                                        controllers.ViewController.transactions
 GET         /validators                                          controllers.ViewController.validators
+GET         /proposals                                           controllers.ViewController.proposals
 GET         /block                                               controllers.ViewController.block(height: Int)
 GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
 GET         /validator                                           controllers.ViewController.validator(address: String)
+GET         /proposal                                            controllers.ViewController.proposal(id: Int)
 GET         /identity                                            controllers.ViewController.identity
 GET         /account                                             controllers.ViewController.account
 GET         /asset                                               controllers.ViewController.asset
@@ -150,6 +152,11 @@ GET         /component/blockList                                 controllers.Com
 GET         /component/blockListPage                             controllers.ComponentViewController.blockListPage(pageNumber: Int)
 GET         /component/blockDetails                              controllers.ComponentViewController.blockDetails(height: Int)
 GET         /component/blockTransactions                         controllers.ComponentViewController.blockTransactions(height: Int)
+
+GET         /component/proposalList                              controllers.ComponentViewController.proposalList
+GET         /component/proposalDetails                           controllers.ComponentViewController.proposalDetails(id: Int)
+GET         /component/proposalDeposits                          controllers.ComponentViewController.proposalDeposits(id: Int)
+GET         /component/proposalVotes                             controllers.ComponentViewController.proposalVotes(id: Int)
 
 GET         /component/transactionList                           controllers.ComponentViewController.transactionList
 GET         /component/transactionListPage                       controllers.ComponentViewController.transactionListPage(pageNumber: Int)

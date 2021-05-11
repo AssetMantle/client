@@ -1,12 +1,14 @@
 package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Account
 import transactions.Abstract.BaseResponse
+import queries.Abstract.Account
 
 object AccountResponse {
 
-  case class Response(height: String, result: Account.Result) extends BaseResponse
+  import queries.responses.common.Accounts.accountReads
+
+  case class Response(account: Account) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

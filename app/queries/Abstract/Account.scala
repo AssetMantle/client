@@ -1,11 +1,8 @@
 package queries.Abstract
 
-import queries.responses.common.Coin
+import models.blockchain.{Account => blockchainAccount}
 
 abstract class Account {
   val address: String
-  val coins: Seq[Coin]
-  val publicKeyValue: String
-  val accountNumber: String
-  val sequence: String
+  def toSerializableAccount(username: String): blockchainAccount
 }

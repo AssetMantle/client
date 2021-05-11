@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.RecvPacket
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[RecvPacket]) { recvPacket =>
+    @views.html.component.blockchain.txMessages.ibc.commonPacket(constants.View.PACKET, recvPacket.packet)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, recvPacket.proofHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(recvPacket.signer, routes.ViewController.wallet(recvPacket.signer)))
+}

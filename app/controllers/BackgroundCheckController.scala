@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 
 import javax.inject._
@@ -43,10 +44,14 @@ class BackgroundCheckController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_BACKGROUND_CHECK
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   //UBO CHECKS
   def memberScanForm(uboID: String, firstName: String, lastName: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-     Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName))
+      Ok(views.html.component.master.memberCheckMemberScan(uboID = uboID, firstName = firstName, lastName = lastName))
   }
 
   def memberScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -213,7 +218,7 @@ class BackgroundCheckController @Inject()(
 
   def corporateScanResultDecisionForm(resultID: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-     Ok(views.html.component.master.memberCheckCorporateScanSingleResultDecision(resultID = resultID))
+      Ok(views.html.component.master.memberCheckCorporateScanSingleResultDecision(resultID = resultID))
   }
 
 
@@ -343,7 +348,7 @@ class BackgroundCheckController @Inject()(
 
   def addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int]): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-     Ok(views.html.component.master.addAssetMemberCheck(assetID = assetID, scanID = scanID, resultID = resultID))
+      Ok(views.html.component.master.addAssetMemberCheck(assetID = assetID, scanID = scanID, resultID = resultID))
   }
 
 

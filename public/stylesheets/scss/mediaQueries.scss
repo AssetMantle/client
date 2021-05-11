@@ -193,7 +193,7 @@
   .modal .modalContent{
     .modalBody {
       .infoBlock {
-       flex-direction: column;
+        flex-direction: column;
         max-width: 500px;
         max-height: 410px;
         .infoBlockItem{
@@ -209,7 +209,7 @@
   }
   .tableViewCard .infoRow .infoRowLabel{
     width: 125px;
-    vertical-align: inherit;
+
   }
 }
 
@@ -247,7 +247,7 @@
       .cmuk-switcher{
         ul li {
           padding: 10px 0;
-      }
+        }
       }
     }
     .addBalanceButton{
@@ -278,7 +278,7 @@
       .cmuk-card-body {
         height: auto;
         .cmuk-switcher{
-        height: 210px;
+          height: 210px;
         }
       }
     }
@@ -308,9 +308,15 @@
     }
   }
   .comdex {
-    //.cmuk-height-medium{
-    //  height: 210px;
-    //}
+    .cmuk-height-medium{
+      height: 210px;
+      padding-left: 10px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    #accountDelegations .cmuk-height-medium {
+      padding-top:0;
+    }
     .cmuk-card-header .cmuk-button
     {
       line-height: 26px;

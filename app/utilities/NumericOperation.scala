@@ -21,7 +21,7 @@ object NumericOperation {
 
   def checkPrecision(precision: Int, value: String): Boolean = if (value.split("""\.""")(1).length <= precision) true else false
 
-  def formatNumber(number: MicroNumber): String = formatNumber(number.value)
+  def formatNumber(number: MicroNumber, normalize: Boolean = true): String = if (normalize) formatNumber(number.toDouble) else formatNumber(number.value)
 
   def formatNumber(number: Double): String = try {
     NumberFormat.getNumberInstance().format(number)

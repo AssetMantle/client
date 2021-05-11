@@ -1,0 +1,9 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Unjail
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Unjail]) { unjail =>
+    @commonTextInfo(constants.View.VALIDATOR_ADDRESS, unjail.validatorAddress)
+}

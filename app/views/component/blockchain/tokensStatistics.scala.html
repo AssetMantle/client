@@ -4,29 +4,21 @@
 @import views.html.helper.select
 @import scala.collection.immutable.ListMap
 
-@(tokens: Seq[Token], stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(token: Token)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKENS_STATISTICS) {
-    @if(tokens.nonEmpty) {
-        <div class="cardHeaderSelect">
-        @select(Field(form = views.companion.blockchain.TokenDenom.form, name = constants.FormField.TOKEN_DENOM.name, constraints = Seq.empty, format = None, errors = Seq.empty, value = Option(tokens.head.denom)), for(denom <- tokens.map(_.denom)) yield (denom, denom), 'id -> "tokensStatisticsDenomSelect", 'value -> s"'${tokens.head.denom}'", 'onClick -> s"showStatistics('${tokens.map(_.denom)}')", 'class -> "cmuk-select", 'label -> "")
-        </div>
-    }
+    @constants.Blockchain.TokenTickers.getOrElse(token.denom, token.denom)
 } {
-    @if(tokens.nonEmpty) {
-        @tokens.map { token =>
-            <div id="@Seq("tokenStatistics", token.denom).mkString("_")" class="hidden">
-                @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
-                @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
-                @if(token.denom == stakingDenom) {
-                    @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
-                    @commonPieChart("bondingTokenStatisticsChart", ListMap(
-                        constants.View.BONDED_AMOUNT -> token.bondedAmount.toDouble,
-                        constants.View.NOT_BONDED_AMOUNT -> token.notBondedAmount.toDouble,
-                    ), showLegend = true)
-                }
-            </div>
-        }
-    }
-    <script src="@routes.Assets.versioned("javascripts/tokensStatistics.js")" type="text/javascript"></script>
+    <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
+        @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
+        @commonTextInfo(constants.View.BONDED_TOKENS, s"${utilities.NumericOperation.roundOff((token.bondedAmount / token.totalSupply).toDouble * 100)} %")
+        @commonTextInfo(constants.View.BONDED_AMOUNT, utilities.NumericOperation.formatNumber(token.bondedAmount))
+        @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
+        @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
+@*        @commonHtmlInfo(constants.View.STAKING_POOL, commonPieChart("bondingTokenStatisticsChart", ListMap(*@
+@*            constants.View.BONDED_AMOUNT -> token.bondedAmount.toDouble,*@
+@*            constants.View.NOT_BONDED_AMOUNT -> token.notBondedAmount.toDouble,*@
+@*        ), showLegend = true), 'class -> "")*@
+    </div>
+    @* <script src="@routes.Assets.versioned("javascripts/tokensStatistics.js")" type="text/javascript"></script>*@
 }

@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ChannelCloseConfirm
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ChannelCloseConfirm]) { channelCloseConfirm =>
+    @commonTextInfo(constants.View.PORT_ID, channelCloseConfirm.portID)
+    @commonTextInfo(constants.View.CHANNEL_ID, channelCloseConfirm.channelID)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, channelCloseConfirm.proofHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelCloseConfirm.signer, routes.ViewController.wallet(channelCloseConfirm.signer)))
+}

@@ -17,7 +17,7 @@ object TransactionResponse {
 
   implicit val asyncResponseReads: Reads[AsyncResponse] = Json.reads[AsyncResponse]
 
-  case class ErrorResponse(error: String) extends BaseResponse
+  case class ErrorResponse(error: Option[String], message: Option[String]) extends BaseResponse
 
   implicit val ErrorResponseReads: Reads[ErrorResponse] = Json.reads[ErrorResponse]
 

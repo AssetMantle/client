@@ -23,7 +23,7 @@
   }
 
   .mobile .cmuk-button {
-    background-color: #191616;
+    background-color: #E50913;
   }
 
   .switcherCard .cmuk-subnav {
@@ -202,7 +202,6 @@
 
   .tableViewCard .infoRow .infoRowLabel {
     width: 125px;
-    vertical-align: inherit;
   }
 }
 @media (min-width: 992px) and (max-width: 1600px) {
@@ -285,6 +284,15 @@
     padding: 11px;
   }
 
+  .comdex .cmuk-height-medium {
+    height: 210px;
+    padding-left: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .comdex #accountDelegations .cmuk-height-medium {
+    padding-top: 0;
+  }
   .comdex .cmuk-card-header .cmuk-button {
     line-height: 26px;
   }

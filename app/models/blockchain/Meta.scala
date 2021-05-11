@@ -8,6 +8,7 @@ import models.common.TransactionMessages.MetaReveal
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -127,13 +128,13 @@ class Metas @Inject()(
 
   object Utility {
 
-    def onReveal(metaReveal: MetaReveal): Future[Unit] = {
+    def onReveal(metaReveal: MetaReveal)(implicit header: Header): Future[Unit] = {
       val upsertMeta = Service.insertOrUpdate(metaReveal.metaFact.data)
       (for {
         _ <- upsertMeta
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.META_REVEAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

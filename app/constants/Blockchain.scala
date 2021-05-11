@@ -7,8 +7,9 @@ import org.bitcoinj.crypto.ChildNumber
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = "cosmos"
-  val ValidatorPrefix = "cosmosvaloper"
+  val AccountPrefix = "persistence"
+  val ValidatorPrefix = "persistencevaloper"
+  val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
@@ -23,7 +24,7 @@ object Blockchain {
   val DataTypeAndValueSeparator = "|"
   val MaxTraits = 22
   val HeightDataDefaultValue: Int = -1
-  val CoinType = 118
+  val CoinType = 750
   val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
@@ -32,24 +33,58 @@ object Blockchain {
     new ChildNumber(0, false)
   )
 
+  val TokenTickers: Map[String, String] = Map("uxprt" -> "XPRT")
 
   object PublicKey {
-    val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"
-    val SINGLE = "tendermint/PubKeySecp256k1"
+    val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
+    val SINGLE = "/cosmos.crypto.secp256k1.PubKey"
+    val VALIDATOR = "/cosmos.crypto.ed25519.PubKey"
   }
 
-  object Account {
-    val DELAYED_VESTING = "cosmos-sdk/DelayedVestingAccount"
-    val BASE = "cosmos-sdk/Account"
-    val MODULE = "cosmos-sdk/ModuleAccount"
+  object Proposal {
+    val PARAMETER_CHANGE = "/cosmos.params.v1beta1.ParameterChangeProposal"
+    val TEXT = "/cosmos.gov.v1beta1.TextProposal"
+    val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
+    val SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"
+    val CANCEL_SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"
+
+    object Status {
+      val UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED"
+      val DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
+      val VOTING_PERIOD = "PROPOSAL_STATUS_VOTING_PERIOD"
+      val PASSED = "PROPOSAL_STATUS_PASSED"
+      val REJECTED = "PROPOSAL_STATUS_REJECTED"
+      val FAILED = "PROPOSAL_STATUS_FAILED"
+    }
+
   }
 
   object ParameterType {
-    val STAKING = "STAKING"
-    val SLASHING = "SLASHING"
-    val MINTING = "MINTING"
-    val DISTRIBUTION = "DISTRIBUTION"
-    val GOVERNANCE = "GOVERNANCE"
+    val AUTH = "auth"
+    val BANK = "bank"
+    val CRISIS = "crisis"
+    val DISTRIBUTION = "distribution"
+    val GOVERNANCE = "gov"
+    val HALVING = "halving"
+    val IBC = "ibc"
+    val MINT = "mint"
+    val SLASHING = "slashing"
+    val STAKING = "staking"
+    val TRANSFER = "transfer"
+  }
+
+  object Account {
+    val BASE = "/cosmos.auth.v1beta1.BaseAccount"
+    val CONTINUOUS_VESTING = "/cosmos.vesting.v1beta1.ContinuousVestingAccount"
+    val DELAYED_VESTING = "/cosmos.vesting.v1beta1.DelayedVestingAccount"
+    val MODULE = "/cosmos.auth.v1beta1.ModuleAccount"
+    val PERIODIC_VESTING = "/cosmos.vesting.v1beta1.PeriodicVestingAccount"
+  }
+
+  object ValidatorStatus {
+    val BONED = "BOND_STATUS_BONDED"
+    val UNBONDED = "BOND_STATUS_UNBONDED"
+    val UNBONDING = "BOND_STATUS_UNBONDING"
   }
 
   object Event {
@@ -131,6 +166,11 @@ object Blockchain {
 
   }
 
+  object Tendermint {
+    val DuplicateVoteEvidence = "tendermint/DuplicateVoteEvidence"
+    val LightClientAttackEvidence = "tendermint/LightClientAttackEvidence"
+  }
+
   object Properties {
     val Burn = "burn"
     val Creation = "creation"
@@ -173,7 +213,6 @@ object Blockchain {
     val MAINTAINER = "MAINTAINER"
   }
 
-
   object TransactionRequest {
     //identity
     val IDENTITY_NUB = "/xprt/identities/nub/request"
@@ -202,30 +241,55 @@ object Blockchain {
   }
 
   object TransactionMessage {
+    //auth
+    val CREATE_VESTING_ACCOUNT = "/cosmos.vesting.v1beta1.MsgCreateVestingAccount"
     //bank
-    val SEND_COIN = "cosmos-sdk/MsgSend"
-    val MULTI_SEND = "cosmos-sdk/MsgMultiSend"
+    val SEND_COIN = "/cosmos.bank.v1beta1.MsgSend"
+    val MULTI_SEND = "/cosmos.bank.v1beta1.MsgMultiSend"
     //crisis
-    val VERIFY_INVARIANT = "cosmos-sdk/MsgVerifyInvariant"
+    val VERIFY_INVARIANT = "/cosmos.crisis.v1beta1.MsgVerifyInvariant"
     //distribution
-    val SET_WITHDRAW_ADDRESS = "cosmos-sdk/MsgModifyWithdrawAddress"
-    val WITHDRAW_DELEGATOR_REWARD = "cosmos-sdk/MsgWithdrawDelegationReward"
-    val WITHDRAW_VALIDATOR_COMMISSION = "cosmos-sdk/MsgWithdrawValidatorCommission"
-    val FUND_COMMUNITY_POOL = "cosmos-sdk/MsgFundCommunityPool"
+    val SET_WITHDRAW_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress"
+    val WITHDRAW_DELEGATOR_REWARD = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
+    val WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
+    val FUND_COMMUNITY_POOL = "/cosmos.distribution.v1beta1.MsgFundCommunityPool"
     //evidence
-    val SUBMIT_EVIDENCE = "cosmos-sdk/MsgSubmitEvidence"
+    val SUBMIT_EVIDENCE = "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
     //gov
-    val DEPOSIT = "cosmos-sdk/MsgDeposit"
-    val SUBMIT_PROPOSAL = "cosmos-sdk/MsgSubmitProposal"
-    val VOTE = "cosmos-sdk/MsgVote"
+    val DEPOSIT = "/cosmos.gov.v1beta1.MsgDeposit"
+    val SUBMIT_PROPOSAL = "/cosmos.gov.v1beta1.MsgSubmitProposal"
+    val VOTE = "/cosmos.gov.v1beta1.MsgVote"
     //slashing
-    val UNJAIL = "cosmos-sdk/MsgUnjail"
+    val UNJAIL = "/cosmos.slashing.v1beta1.MsgUnjail"
     //staking
-    val CREATE_VALIDATOR = "cosmos-sdk/MsgCreateValidator"
-    val EDIT_VALIDATOR = "cosmos-sdk/MsgEditValidator"
-    val DELEGATE = "cosmos-sdk/MsgDelegate"
-    val REDELEGATE = "cosmos-sdk/MsgBeginRedelegate"
-    val UNDELEGATE = "cosmos-sdk/MsgUndelegate"
+    val CREATE_VALIDATOR = "/cosmos.staking.v1beta1.MsgCreateValidator"
+    val EDIT_VALIDATOR = "/cosmos.staking.v1beta1.MsgEditValidator"
+    val DELEGATE = "/cosmos.staking.v1beta1.MsgDelegate"
+    val REDELEGATE = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
+    val UNDELEGATE = "/cosmos.staking.v1beta1.MsgUndelegate"
+    //ibc-client
+    val CREATE_CLIENT = "/ibc.core.client.v1.MsgCreateClient"
+    val UPDATE_CLIENT = "/ibc.core.client.v1.MsgUpdateClient"
+    val UPGRADE_CLIENT = "/ibc.core.client.v1.MsgUpgradeClient"
+    val SUBMIT_MISBEHAVIOUR = "/ibc.core.client.v1.MsgSubmitMisbehaviour"
+    //ibc-connection
+    val CONNECTION_OPEN_INIT = "/ibc.core.connection.v1.MsgConnectionOpenInit"
+    val CONNECTION_OPEN_TRY = "/ibc.core.connection.v1.MsgConnectionOpenTry"
+    val CONNECTION_OPEN_ACK = "/ibc.core.connection.v1.MsgConnectionOpenAck"
+    val CONNECTION_OPEN_CONFIRM = "/ibc.core.connection.v1.MsgConnectionOpenConfirm"
+    //ibc-channel
+    val CHANNEL_OPEN_INIT = "/ibc.core.channel.v1.MsgChannelOpenInit"
+    val CHANNEL_OPEN_TRY = "/ibc.core.channel.v1.MsgChannelOpenTry"
+    val CHANNEL_OPEN_ACK = "/ibc.core.channel.v1.MsgChannelOpenAck"
+    val CHANNEL_OPEN_CONFIRM = "/ibc.core.channel.v1.MsgChannelOpenConfirm"
+    val CHANNEL_CLOSE_INIT = "/ibc.core.channel.v1.MsgChannelCloseInit"
+    val CHANNEL_CLOSE_CONFIRM = "/ibc.core.channel.v1.MsgChannelCloseConfirm"
+    val RECV_PACKET = "/ibc.core.channel.v1.MsgRecvPacket"
+    val TIMEOUT = "/ibc.core.channel.v1.MsgTimeout"
+    val TIMEOUT_ON_CLOSE = "/ibc.core.channel.v1.MsgTimeoutOnClose"
+    val ACKNOWLEDGEMENT = "/ibc.core.channel.v1.MsgAcknowledgement"
+    //ibc-transfer
+    val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
     val ASSET_DEFINE = "/xprt/assets/define/message"
     val ASSET_MINT = "/xprt/assets/mint/message"

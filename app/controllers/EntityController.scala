@@ -2,6 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import controllers.view.OtherApp
 import exceptions.BaseException
 import models.common.Serializable.{Immutables, Mutables, Properties}
 import models.{blockchain, master}
@@ -40,6 +41,10 @@ class EntityController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ENTITY
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   def upsertLabelForm(entityID: String, entityType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(masterComponent.upsertEntityLabel(entityID = entityID, entityType = entityType))
@@ -59,7 +64,7 @@ class EntityController @Inject()(
               val maintainerIDs = masterClassifications.Service.getMaintainerIDs(upsertLabelData.entityID)
               val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-              def checkAndUpdate(maintainerIDs: Seq[String], identityIDs: Seq[String]) = if (identityIDs.intersect(maintainerIDs).nonEmpty) masterClassifications.Service.updateLabel(id = upsertLabelData.entityID, maintainerID = identityIDs.intersect(maintainerIDs).head, label = upsertLabelData.label)
+              def checkAndUpdate(maintainerIDs: Seq[String], identityIDs: Seq[String]) = if (identityIDs.intersect(maintainerIDs).nonEmpty) masterClassifications.Service.updateLabel(id = upsertLabelData.entityID, maintainerID = identityIDs.intersect(maintainerIDs).headOption.getOrElse(""), label = upsertLabelData.label)
               else throw new BaseException(constants.Response.UNAUTHORIZED)
 
               for {

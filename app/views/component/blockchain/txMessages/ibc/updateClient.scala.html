@@ -1,0 +1,10 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.UpdateClient
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[UpdateClient]) { updateClient =>
+    @commonTextInfo(constants.View.CLIENT_ID, updateClient.clientID)
+    @commonHtmlInfo(constants.View.SIGNER, commonLink(updateClient.signer, routes.ViewController.wallet(updateClient.signer)))
+}

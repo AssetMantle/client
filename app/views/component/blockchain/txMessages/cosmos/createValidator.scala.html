@@ -1,0 +1,21 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.CreateValidator
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[CreateValidator]) { createValidator =>
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(createValidator.delegatorAddress, routes.ViewController.wallet(createValidator.delegatorAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(createValidator.validatorAddress, routes.ViewController.validator(createValidator.validatorAddress)))
+    @commonTextInfo(constants.View.PUBLIC_KEY, createValidator.publicKey.value)
+    @commonTextInfo(constants.View.AMOUNT, createValidator.value.getAmountWithNormalizedDenom())
+    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(createValidator.minSelfDelegation.doubleValue))
+    @commonTextInfo(constants.View.VALIDATOR_MONIKER, createValidator.description.moniker)
+    @commonTextInfo(constants.View.VALIDATOR_IDENTITY, createValidator.description.identity)
+    @commonTextInfo(constants.View.VALIDATOR_WEBSITE, createValidator.description.website)
+    @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, createValidator.description.securityContact)
+    @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, createValidator.description.details)
+    @commonTextInfo(constants.View.COMMISSION_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.rate * 100)} %")
+    @commonTextInfo(constants.View.MAXIMUM_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.maxRate * 100)} %")
+    @commonTextInfo(constants.View.MAXIMUM_CHANGE_RATE, s"${utilities.NumericOperation.formatNumber(createValidator.commissionRates.maxChangeRate * 100)} %")
+}

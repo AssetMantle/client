@@ -1,11 +1,9 @@
 logs
 project/project
 project/target
-/conf/application.conf
 target
 tmp
 .history
-.run
 dist
 /*.iml
 /out
@@ -17,3 +15,4 @@ dist
 /.idea/
 *.css.map
 public/stylesheets/.sass-cache*
+.bsp
