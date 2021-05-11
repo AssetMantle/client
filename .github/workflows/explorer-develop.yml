@@ -3,7 +3,7 @@ name: Explorer - Develop - persistenceCore
 on:
   push:
     branches:
-      - persistenceCore/dev
+      - explorer/develop
 
 jobs:
   build:
