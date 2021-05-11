@@ -3,7 +3,7 @@ name: Explorer - Develop
 on:
   push:
     branches:
-      - explorer/develop
+      - explorer/master
 
 jobs:
   build:
