@@ -3,7 +3,7 @@ name: Check
 on:
   push:
     branches:
-      - persistenceCore/action
+      - persistenceCore/dev
 
 jobs:
   build:
