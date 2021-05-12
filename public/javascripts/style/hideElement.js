@@ -12,15 +12,15 @@ function showHide(element){
 }
 
 function showHideByID(source){
-    $('#' + source).toggle();
+    $('#' + $.escapeSelector(source)).toggle();
 }
 
 function hideElement(element) {
-    $('#' + element).hide();
+    $('#' + $.escapeSelector(element)).hide();
 }
 
 function showElement(element) {
-    $('#' + element).show();
+    $('#' + $.escapeSelector(element)).show();
 }
 
 function fetchOrShowHide(source, route, e) {
