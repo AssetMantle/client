@@ -6,6 +6,7 @@
 
 @fiatProofFile match {
     case Some(negotiationFile) => {
+        <div class="modalInfoBlock">
         @component.master.commonDocumentViewer(negotiationFile) {
             @routes.FileController.tradingFile(negotiationFile.id, negotiationFile.fileName, negotiationFile.documentType)
         } {
@@ -20,14 +21,13 @@
             }
         }
         @commonJavascriptButton(constants.View.NEXT, JavaScript(s"""getForm(jsRoutes.controllers.OrderController.buyerExecuteForm('${negotiationID}'))"""))
+        </div>
     }
     case None => {
         <div id='@Seq("UPLOAD", constants.File.Negotiation.FIAT_PROOF).mkString("_")' class="cmuk-text-left documentContainer">
             <div class="modalInfoBlock">
                 <div class="cmuk-text-center fiat-proof">
                 <p>@Messages(constants.File.Negotiation.FIAT_PROOF)</p>
-
-
                 @commonModalButton("UPLOAD", routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${constants.File.Negotiation.FIAT_PROOF}','${negotiationID}'")
                 </div>
 
