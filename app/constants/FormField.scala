@@ -7,6 +7,7 @@ import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
 import utilities.MicroNumber
+
 import scala.util.matching.Regex
 
 object FormField {
@@ -25,17 +26,15 @@ object FormField {
   val ZONE_ID = new StringFormField("ZONE_ID", 8, 24, RegularExpression.HASH)
   val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 24, RegularExpression.HASH)
   val TRADER_ID = new StringFormField("TRADER_ID", 8, 16, RegularExpression.HASH)
-  val NAME = new StringFormField("NAME", 2, 50)
-  val PERSON_FIRST_NAME = new StringFormField("PERSON_FIRST_NAME", 2, 50)
-  val PERSON_LAST_NAME = new StringFormField("PERSON_LAST_NAME", 2, 50)
+  val NAME = new StringFormField("NAME", 2, 50, RegularExpression.NAME)
+  val PERSON_FIRST_NAME = new StringFormField("PERSON_FIRST_NAME", 2, 50, RegularExpression.NAME)
+  val PERSON_LAST_NAME = new StringFormField("PERSON_LAST_NAME", 2, 50, RegularExpression.NAME)
   val ABBREVIATION = new StringFormField("ABBREVIATION", 2, 10)
-  val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
+  val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100, RegularExpression.ADDRESS)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ID = new StringFormField("ID", 32, 32)
   val ORDER_ID = new StringFormField("ORDER_ID", 32, 32)
-  val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
-  val BUYER_ACCOUNT_ID = new StringFormField("BUYER_ACCOUNT_ID", 3, 50)
-  val SELLER_ACCOUNT_ID = new StringFormField("SELLER_ACCOUNT_ID", 3, 50)
+  val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50, RegularExpression.ACCOUNT_ID)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 1, 1000)
   val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 0, 1000)
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
