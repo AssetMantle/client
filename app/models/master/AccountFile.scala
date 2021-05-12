@@ -21,7 +21,7 @@ case class AccountFile(id: String, documentType: String, fileName: String, file:
 
   def updateFile(newFile: Option[Array[Byte]]): AccountFile = copy(file = newFile)
 
-  def updateStatus(status: Option[Boolean]) = ???
+  def updateStatus(status: Option[Boolean]) = copy()
 
 }
 
