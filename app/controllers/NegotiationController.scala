@@ -582,7 +582,7 @@ class NegotiationController @Inject()(
           }
 
           def updateAssetTermsAndGetResult(validateUsernamePassword: Boolean, traderID: String, buyerAccountID: String, negotiation: Negotiation): Future[Result] = {
-            if (traderID == negotiation.sellerTraderID) {
+            if (traderID == negotiation.sellerTraderID && loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).changeSellerBid) {
               if (validateUsernamePassword) {
                 val updateDescription = if (updateAssetTermsData.description != negotiation.assetDescription) masterNegotiations.Service.updateAssetDescription(id = updateAssetTermsData.id, assetDescription = updateAssetTermsData.description, if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedAssetDescription) else Future(0)
                 val updatePrice = if (updateAssetTermsData.pricePerUnit * updateAssetTermsData.quantity != negotiation.price) {

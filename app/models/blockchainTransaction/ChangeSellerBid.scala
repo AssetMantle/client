@@ -250,7 +250,7 @@ class ChangeSellerBids @Inject()(
       def updateMasterNegotiation(negotiation: masterNegotiation, negotiationID: String, price: MicroNumber, time: Int): Future[Int] = if (negotiation.status == constants.Status.Negotiation.REQUEST_SENT) {
         masterNegotiations.Service.update(negotiation.copy(negotiationID = Option(negotiationID), price = price, time = Option(time), status = constants.Status.Negotiation.STARTED))
       } else {
-        masterNegotiations.Service.update(negotiation.copy(price = price, time = Option(time)))
+        masterNegotiations.Service.update(negotiation.copy(price = price, buyerAcceptedPrice = if (negotiation.status == constants.Status.Negotiation.STARTED) false else negotiation.buyerAcceptedPrice, time = Option(time)))
       }
 
       def sendNotifications(buyer: Trader, seller: Trader, negotiation: masterNegotiation): Future[Unit] = {
