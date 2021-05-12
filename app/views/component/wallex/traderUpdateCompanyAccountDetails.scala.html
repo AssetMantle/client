@@ -2,7 +2,7 @@
 @import views.companion.wallex.UpdateCompanyAccount
 @import views.html.base._
 
-@(updateDetailsWallexAccount: Form[UpdateCompanyAccount.Data] = UpdateCompanyAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(updateDetailsWallexAccount: Form[UpdateCompanyAccount.Data] = UpdateCompanyAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @commonForm(constants.Form.WALLEX_TRADER_ACCOUNT_UPDATE, updateDetailsWallexAccount) {
     @commonSelect(updateDetailsWallexAccount, constants.FormField.WALLEX_COUNTRY_OF_INCORPORATION)
     @commonSelect(updateDetailsWallexAccount, constants.FormField.WALLEX_COUNTRY_OF_OPERATIONS)

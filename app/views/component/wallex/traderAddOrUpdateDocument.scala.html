@@ -2,7 +2,7 @@
 @import views.companion.wallex.SubmitDocument
 @import views.html.base._
 
-@(submitDocument: Form[SubmitDocument.Data] = SubmitDocument.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(submitDocument: Form[SubmitDocument.Data] = SubmitDocument.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @commonForm(constants.Form.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE, submitDocument) {
     @commonSelect(submitDocument, constants.FormField.WALLEX_DOCUMENT_TYPE)
 }

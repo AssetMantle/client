@@ -16,9 +16,8 @@ import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDo
 import transactions.wallex._
 import utilities.{KeyStore, MicroNumber}
 import views.companion
-import views.companion.wallex.{WalletTransfer,_}
+import views.companion.wallex.{WalletTransfer, _}
 
-import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -224,10 +223,9 @@ class WallexController @Inject() (
     }
 
   def addDocumentForm(): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+    withoutLoginAction {
         implicit request =>
-          Future(Ok(views.html.component.wallex.traderAddOrUpdateDocument()))
+          Ok(views.html.component.wallex.traderAddOrUpdateDocument())
 
     }
 
@@ -252,11 +250,11 @@ class WallexController @Inject() (
 
                 (for {
                   wallexKYC <- wallexKYC
-                  result <- withUsernameToken.PartialContent(
+                  result <- Future(PartialContent(
                     views.html.component.wallex.traderUploadOrUpdateDocument(
                       wallexKYC,
                       addWallexDocumentData.documentType
-                    )
+                    ))
                   )
                 } yield result).recover {
                   case baseException: BaseException =>
@@ -269,10 +267,9 @@ class WallexController @Inject() (
     }
 
   def submitDocumentToWallexForm(documentType: String): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+    withoutLoginAction {
         implicit request =>
-          Future(Ok(views.html.component.wallex.traderSubmitDocument(documentType = documentType)))
+          Ok(views.html.component.wallex.traderSubmitDocument(documentType = documentType))
     }
 
   def submitDocumentToWallex(): Action[AnyContent] =
@@ -420,11 +417,9 @@ class WallexController @Inject() (
     }
 
   def initiatePaymentForm(negotiationID: String): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+    withoutLoginAction {
         implicit request =>
-        Future(Ok(views.html.component.wallex
-              .traderCreatePaymentQuote(negotiationID = negotiationID)))
+        Ok(views.html.component.wallex.traderCreatePaymentQuote(negotiationID = negotiationID))
     }
 
   def initiatePayment(): Action[AnyContent] =
@@ -546,10 +541,9 @@ class WallexController @Inject() (
   def acceptQuoteForm(
       quoteID: String
   ): Action[AnyContent] = {
-    withoutLoginActionAsync {
+    withoutLoginAction {
       implicit request =>
-        Future(Ok(views.html.component.wallex.
-          traderAcceptPaymentQuoteRequest(quoteID = quoteID)))
+        Ok(views.html.component.wallex.traderAcceptPaymentQuoteRequest(quoteID = quoteID))
     }
   }
 
@@ -752,10 +746,9 @@ class WallexController @Inject() (
     }
 
   def createBeneficiariesForm(): Action[AnyContent] = {
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+    withoutLoginAction {
         implicit request =>
-        Future(Ok(views.html.component.wallex.traderAddOrganizationBeneficiary()))
+        Ok(views.html.component.wallex.traderAddOrganizationBeneficiary())
     }
   }
 
@@ -1117,10 +1110,9 @@ class WallexController @Inject() (
     }
 
   def updateCompanyAccountForm(): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+     withoutLoginAction {
         implicit request =>
-        Future(Ok(views.html.component.wallex.traderUpdateCompanyAccountDetails()))
+        Ok(views.html.component.wallex.traderUpdateCompanyAccountDetails())
 
     }
 
@@ -1439,10 +1431,9 @@ class WallexController @Inject() (
     }
 
   def updateAccountForm(): Action[AnyContent] =
-    withTraderLoginAction.authenticated {
-      implicit loginState =>
+    withoutLoginAction {
         implicit request =>
-        Future(Ok(views.html.component.wallex.traderUpdateUserAccountDetails()))
+        Ok(views.html.component.wallex.traderUpdateUserAccountDetails())
 
     }
 

@@ -2,7 +2,7 @@
 @import views.companion.wallex.AddOrganizationBeneficiary
 @import views.html.base._
 
-@(addOrgWallexBeneficiaryDetails: Form[AddOrganizationBeneficiary.Data] = AddOrganizationBeneficiary.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(addOrgWallexBeneficiaryDetails: Form[AddOrganizationBeneficiary.Data] = AddOrganizationBeneficiary.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @commonForm(constants.Form.WALLEX_TRADER_BENEFICIARY_ADD, addOrgWallexBeneficiaryDetails) {
 
     @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_COUNTRY_CODE)

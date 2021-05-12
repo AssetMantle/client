@@ -2,7 +2,7 @@
 @import views.html.base._
 @import views.companion.wallex.SubmitDocument
 
-@(submitWallexDocuments: Form[SubmitDocument.Data] = SubmitDocument.form,documentType:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@(submitWallexDocuments: Form[SubmitDocument.Data] = SubmitDocument.form, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
     @commonForm(constants.Form.WALLEX_TRADER_SUBMIT_DOCUMENT, submitWallexDocuments) {
         @commonInputText(submitWallexDocuments, constants.FormField.DOCUMENT_TYPE, 'value -> documentType, 'readonly -> true ,'containerDivClass -> "hidden")
 

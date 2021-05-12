@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(addOrUpdateOrganizationWallexAccount: Form[AddOrUpdateOrganizationAccount.Data] = AddOrUpdateOrganizationAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-    @commonForm(constants.Form.WALLEX__TRADER_ACCOUNT_ADD_OR_UPDATE, addOrUpdateOrganizationWallexAccount) {
+    @commonForm(constants.Form.WALLEX_TRADER_ACCOUNT_ADD_OR_UPDATE, addOrUpdateOrganizationWallexAccount) {
     @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.FIRST_NAME)
     @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.LAST_NAME)
     @commonInputText(addOrUpdateOrganizationWallexAccount, constants.FormField.EMAIL_ADDRESS)
