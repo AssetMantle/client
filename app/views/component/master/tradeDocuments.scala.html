@@ -50,9 +50,9 @@
         <div class="modalInfoBlock">
             <p class="formNote">@Messages(constants.View.UPLOAD_ASSET_DOCUMENTS_NOTE)</p>
             <div class="cmuk-text-left title"> @Messages(constants.View.ASSET_DOCUMENTS)</div>
-            @negotiation.documentList.assetDocuments.map { assetDocuemntType =>
-                <div id='@Seq("UPLOAD", "ASSET", assetDocuemntType).mkString("_")' class="cmuk-text-left documentContainer">
-                <p>@Messages(assetDocuemntType)</p>@commonModalButton("UPLOAD", routes.javascript.FileController.uploadAssetForm, 'parameters -> s"'${assetDocuemntType}','${negotiation.id}'")
+            @negotiation.documentList.assetDocuments.map { assetDocumentType =>
+                <div id='@Seq(constants.View.UPLOAD, constants.View.ASSET, assetDocumentType).mkString("_")' class="cmuk-text-left documentContainer">
+                <p>@Messages(assetDocumentType)</p>@commonModalButton("UPLOAD", routes.javascript.FileController.uploadAssetForm, 'parameters -> s"'${assetDocumentType}','${negotiation.id}'")
                 </div>
             }
             @assetFiles.filter(assetFile => negotiation.documentList.assetDocuments.contains(assetFile.documentType)).map { assetFile =>
@@ -68,13 +68,13 @@
                         }
                         case _ => {}
                     }
-                    <script>hideElement('UPLOAD_ASSET_@assetFile.documentType')</script>
+                    <script>hideElement('@Seq(constants.View.UPLOAD, constants.View.ASSET, assetFile.documentType).mkString("_")')</script>
                 }
             }
             <div class="cmuk-text-left title">@Messages(constants.View.NEGOTIATION_DOCUMENTS)</div>
             @negotiation.documentList.negotiationDocuments.map { negotiationDocumentType =>
-                <div id='@Seq("UPLOAD_NEGOTIATION", negotiationDocumentType).mkString("_")' class="cmuk-text-left documentContainer">
-                    <p>@Messages(negotiationDocumentType)</p>@commonModalButton("UPLOAD", routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${negotiationDocumentType}','${negotiation.id}'")
+                <div id='@Seq(constants.View.UPLOAD, constants.View.NEGOTIATION, negotiationDocumentType).mkString("_")' class="cmuk-text-left documentContainer">
+                    <p>@Messages(negotiationDocumentType)</p>@commonModalButton(constants.View.UPLOAD, routes.javascript.FileController.uploadNegotiationForm, 'parameters -> s"'${negotiationDocumentType}','${negotiation.id}'")
                 </div>
             }
 
@@ -91,7 +91,7 @@
                         }
                         case _ => {}
                     }
-                    <script>hideElement('UPLOAD_NEGOTIATION_@negotiationFile.documentType')</script>
+                    <script>hideElement('@Seq(constants.View.UPLOAD, constants.View.NEGOTIATION, negotiationFile.documentType).mkString("_")')</script>
                 }
             }
             <td><a class="cmuk-button buttonPrimary cmuk-margin-top" href="@controllers.routes.ViewController.tradeRoom(negotiation.id)">@Messages(constants.View.SUBMIT)</a></td>
