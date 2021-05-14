@@ -242,10 +242,14 @@ class AssetController @Inject()(
         billOfLadingContentData => {
           val traderID = masterTraders.Service.tryGetID(loginState.username)
           val negotiation = masterNegotiations.Service.tryGet(billOfLadingContentData.negotiationID)
+          def getAssetFile(negotiation: Negotiation) = masterTransactionAssetFiles.Service.get(negotiation.assetID, constants.File.Asset.BILL_OF_LADING)
 
-          def updateAndGetResult(traderID: String, negotiation: Negotiation) = {
+          def updateAndGetResult(traderID: String, negotiation: Negotiation, assetFile: Option[AssetFile]) = {
             if (traderID == negotiation.sellerTraderID) {
-              val updateBillOfLadingContent = masterTransactionAssetFiles.Service.updateDocumentContent(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.consigneeTo, billOfLadingContentData.vesselName, billOfLadingContentData.portOfLoading, billOfLadingContentData.portOfDischarge, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetDescription, billOfLadingContentData.assetQuantity, billOfLadingContentData.quantityUnit, (billOfLadingContentData.assetPricePerUnit * billOfLadingContentData.assetQuantity)))
+              val updateBillOfLadingContent = {
+                val billOfLading= BillOfLading(billOfLadingContentData.billOfLadingNumber, billOfLadingContentData.consigneeTo, billOfLadingContentData.vesselName, billOfLadingContentData.portOfLoading, billOfLadingContentData.portOfDischarge, billOfLadingContentData.shipperName, billOfLadingContentData.shipperAddress, billOfLadingContentData.notifyPartyName, billOfLadingContentData.notifyPartyAddress, utilities.Date.utilDateToSQLDate(billOfLadingContentData.shipmentDate), billOfLadingContentData.deliveryTerm, billOfLadingContentData.assetDescription, billOfLadingContentData.assetQuantity, billOfLadingContentData.quantityUnit, (billOfLadingContentData.assetPricePerUnit * billOfLadingContentData.assetQuantity))
+                masterTransactionAssetFiles.Service.updateDocumentContentAndStatus(negotiation.assetID, constants.File.Asset.BILL_OF_LADING, billOfLading, if(assetFile.flatMap(_.documentContent).exists(x=> x.asInstanceOf[BillOfLading].equals(billOfLading))) assetFile.flatMap(_.status) else None)
+              }
               val negotiationFileList = masterTransactionNegotiationFiles.Service.getAllDocuments(billOfLadingContentData.negotiationID)
               val assetFileList = masterTransactionAssetFiles.Service.getAllDocuments(negotiation.assetID)
               val negotiationEnvelopeList = docusignEnvelopes.Service.getAll(billOfLadingContentData.negotiationID)
@@ -270,7 +274,8 @@ class AssetController @Inject()(
           (for {
             traderID <- traderID
             negotiation <- negotiation
-            result <- updateAndGetResult(traderID, negotiation)
+            assetFile <- getAssetFile(negotiation)
+            result <- updateAndGetResult(traderID, negotiation, assetFile)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))

@@ -63,7 +63,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateDocumentContentByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.documentContentJson.?).update(documentContentJson).asTry).map {
+  private def updateDocumentContentAndStatusByIDAndDocumentType(id: String, documentType: String, documentContentJson: Option[String], status: Option[Boolean]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x=>(x.documentContentJson.?, x.status.?)).update(documentContentJson, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -155,7 +155,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def tryGet(id: String, documentType: String): Future[AssetFile] = tryGetByIDAndDocumentType(id = id, documentType = documentType).map(_.deserialize)
 
-    def updateDocumentContent(id: String, documentType: String, documentContent: AssetDocumentContent): Future[Int] = updateDocumentContentByIDAndDocumentType(id = id, documentType = documentType, documentContentJson = Option(Json.toJson(documentContent).toString))
+    def updateDocumentContentAndStatus(id: String, documentType: String, documentContent: AssetDocumentContent,status: Option[Boolean]): Future[Int] = updateDocumentContentAndStatusByIDAndDocumentType(id = id, documentType = documentType, documentContentJson = Option(Json.toJson(documentContent).toString), status)
 
     def accept(id: String, documentType: String): Future[Int] = updateStatusByIDAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
