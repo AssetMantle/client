@@ -6,14 +6,15 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], asset: Asset, successiveTransactionStatus:Option[Boolean])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@import models.master.AssetProperty
+@(traderID: String, counterPartyTrader: Trader, counterPartyOrganization: Organization, negotiation: Negotiation, order: Option[Order], assetProperty: AssetProperty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 <div id='@Seq(negotiation.id, "TermsView").mkString("")'>
     <div class="tradeTerms">
         <div class="traderCommodity commodityTitleSection">
             <div class="cmuk-flex cmuk-flex-middle">
-                <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
-                <span class="tradeName">@Messages(asset.assetType) &nbsp;</span>
+                <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType + ".svg")"></span>
+                <span class="tradeName">@Messages(assetProperty.assetType) &nbsp;</span>
             </div>
             <div id='@Seq(negotiation.id, "SuccessiveTransaction").mkString("")'>
             @traderID match {
@@ -25,26 +26,13 @@
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED | constants.Status.Negotiation.COMPLETED => {
                             @order match {
                                 case Some(order) => {
-                                    @order.status match {
-                                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.ASSET_SENT_FIAT_PENDING => {
-                                            @if(asset.moderated) {
-                                                @commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")
-                                            }
-                                        }
-                                        case constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
-                                            @if(!asset.moderated) {
-                                                @commonFormButton(constants.Form.BUYER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                                            }
-                                        }
-                                        case constants.Status.Order.COMPLETED=>{
-                                            @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
-                                        }
-                                        case _=> {}
+                                    @if(order.status== Some(true)){
+                                        @commonFormButton(constants.Form.REDEEM_ASSET, 'parameters -> s"'${negotiation.assetID}'")
                                     }
                                 }
                                 case None => {
-                                    @if(asset.moderated) {
-                                        @commonFormButton(constants.Form.SEND_FIAT, 'parameters -> s"'${negotiation.id}'")
+                                    @if(!assetProperty.moderated) {
+                                        @commonFormButton(constants.Form.ORDER_MAKE, 'parameters -> s"'${negotiation.id}'")
                                     }
                                 }
                             }
@@ -60,21 +48,11 @@
                         case constants.Status.Negotiation.BOTH_PARTIES_CONFIRMED => {
                             @order match {
                                 case Some(order) => {
-                                    @order.status match {
-                                        case constants.Status.Order.ASSET_AND_FIAT_PENDING | constants.Status.Order.FIAT_SENT_ASSET_PENDING => {
-                                            @commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")
-                                        }
-                                            case constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING | constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING => {
-                                            @if(!asset.moderated) {
-                                                @commonFormButton(constants.Form.SELLER_EXECUTE_ORDER, 'parameters -> s"'${negotiation.id}'")
-                                            }
-                                        }
-                                        case _=> {}
+                                    @if(order.status.isEmpty && !assetProperty.moderated){
+                                        @commonFormButton(constants.Form.ORDER_TAKE, 'parameters -> s"'${order.id}'")
                                     }
                                 }
-                                case None=> {
-                                    @commonFormButton(constants.Form.SEND_ASSET, 'parameters -> s"'${negotiation.id}'")
-                                }
+                                case None=> {}
                             }
                         }
                         case _=> {}
@@ -82,14 +60,6 @@
                 }
             }
             </div>
-            <div class="transactionPending">
-                </div>
-            @commonSpinner("transactionPendingSpinner",spinnerClass ="transactionPending")
-            <script>
-                @if(successiveTransactionStatus.isEmpty || successiveTransactionStatus == Some(true)){
-                    transactionPending('@Seq(negotiation.id, "SuccessiveTransaction").mkString("")',"transactionPendingSpinner")
-                }
-            </script>
         </div>
 
         <div class="terms">

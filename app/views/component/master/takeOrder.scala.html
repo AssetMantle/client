@@ -1,0 +1,11 @@
+@import views.html.base._
+@import views.companion.master.TakeOrder
+
+@(takeOrderForm: Form[TakeOrder.Data] = TakeOrder.form, orderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ORDER_TAKE, takeOrderForm) {
+    @commonInputText(takeOrderForm, constants.FormField.ORDER_ID, 'value -> orderID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputMicroNumber(takeOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputPassword(takeOrderForm, constants.FormField.PASSWORD)
+}
+
+

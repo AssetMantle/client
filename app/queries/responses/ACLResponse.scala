@@ -2,7 +2,6 @@ package queries.responses
 
 import models.blockchain.ACL
 import play.api.libs.json.{Json, OWrites, Reads}
-import queries.responses.OrganizationResponse.Response
 import transactions.Abstract.BaseResponse
 
 object ACLResponse {

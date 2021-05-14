@@ -18,15 +18,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class EntityController @Inject()(
                                   masterClassifications: master.Classifications,
                                   masterProperties: master.Properties,
-                                  masterAssetsNew: master.AssetsNew,
+                                  masterAssets: master.Assets,
                                   masterSplits: master.Splits,
                                   masterIdentities: master.Identities,
-                                  masterOrdersNew: master.OrdersNew,
+                                  masterOrders: master.Orders,
                                   blockchainIdentities: blockchain.Identities,
                                   blockchainClassifications: blockchain.Classifications,
                                   blockchainMetas: blockchain.Metas,
-                                  blockchainAssetsNew: blockchain.AssetsNew,
-                                  blockchainOrdersNew: blockchain.OrdersNew,
+                                  blockchainAssets: blockchain.Assets,
+                                  blockchainOrders: blockchain.Orders,
                                   messagesControllerComponents: MessagesControllerComponents,
                                   withLoginActionAsync: WithLoginActionAsync,
                                   withUnknownLoginAction: WithUnknownLoginAction,
@@ -70,7 +70,7 @@ class EntityController @Inject()(
             case constants.Blockchain.Entity.ASSET =>
               val ownerID = masterSplits.Service.tryGetOwnerID(upsertLabelData.entityID)
 
-              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterAssetsNew.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
+              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterAssets.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
               else throw new BaseException(constants.Response.UNAUTHORIZED)
 
               for {
@@ -87,9 +87,9 @@ class EntityController @Inject()(
                 _ <- checkAndUpdate(provisionedAddresses)
               } yield ()
             case constants.Blockchain.Entity.ORDER =>
-              val makerID = masterOrdersNew.Service.tryGetMakerID(upsertLabelData.entityID)
+              val makerID = masterOrders.Service.tryGetMakerID(upsertLabelData.entityID)
 
-              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterOrdersNew.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
+              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterOrders.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
               else throw new BaseException(constants.Response.UNAUTHORIZED)
 
               for {
@@ -133,15 +133,15 @@ class EntityController @Inject()(
           } yield (provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
         case constants.Blockchain.Entity.ASSET =>
           val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
-          val asset = blockchainAssetsNew.Service.tryGet(entityID)
+          val asset = blockchainAssets.Service.tryGet(entityID)
           for {
             ownerID <- ownerID
             provisionedAddresses <- getProvisionedAddresses(ownerID)
             asset <- asset
           } yield (provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
         case constants.Blockchain.Entity.ORDER =>
-          val makerID = masterOrdersNew.Service.tryGetMakerID(entityID)
-          val order = blockchainOrdersNew.Service.tryGet(entityID)
+          val makerID = masterOrders.Service.tryGetMakerID(entityID)
+          val order = blockchainOrders.Service.tryGet(entityID)
           val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
           for {
             makerID <- makerID

@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.{Height, ID, Immutables, Mutables}
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.{Height, ID, Immutables, Mutables}
 import transactions.Abstract.BaseResponse
 
 object AssetResponse {

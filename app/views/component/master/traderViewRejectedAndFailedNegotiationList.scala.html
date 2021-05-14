@@ -5,7 +5,8 @@
 @import models.master.Organization
 @import models.master.Asset
 
-@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(rejectedReceivedNegotiationList: Seq[Negotiation], rejectedSentNegotiationList: Seq[Negotiation], failedNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetPropertyList: Seq[AssetProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
     <div class="cmuk-text-left title">@Messages(constants.View.REJECTED_RECEIVED_NEGOTIATION_LIST)</div>
@@ -17,13 +18,13 @@
 
                 </div>
                 <div class="content">
-                @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
-                    case Some(asset) => {
+                @assetPropertyList.find(_.id == rejectedReceivedNegotiation.assetID) match {
+                    case Some(assetProperty) => {
                         <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" +assetProperty.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@Messages(asset.assetType)</p>
+                            <p class="assetTitle">@Messages(assetProperty.assetType)</p>
                             <p class="assetQuantity">@Seq(rejectedReceivedNegotiation.quantity.toString, rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
@@ -32,8 +33,8 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
-                @assetList.find(_.id == rejectedReceivedNegotiation.assetID) match {
-                    case Some(asset) => {
+                @assetPropertyList.find(_.id == rejectedReceivedNegotiation.assetID) match {
+                    case Some(assetProperty) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((rejectedReceivedNegotiation.price/rejectedReceivedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), rejectedReceivedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
@@ -80,13 +81,13 @@
 
                         </div>
                         <div class="content">
-                        @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
-                            case Some(asset) => {
+                        @assetPropertyList.find(_.id == rejectedSentNegotiation.assetID) match {
+                            case Some(assetProperty) => {
                                 <div class="assetIcon">
-                                    <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                                    <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType+ ".svg")"></span>
                                 </div>
                                 <div class="assetInitialData">
-                                    <p class="assetTitle">@Messages(asset.assetType)</p>
+                                    <p class="assetTitle">@Messages(assetProperty.assetType)</p>
                                     <p class="assetQuantity">@Seq(rejectedSentNegotiation.quantity.toString, rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
                                 </div>
                             }
@@ -95,7 +96,7 @@
                         </div>
                     </div>
                     <div class="salesQuoteCardMiddle salesChild">
-                        @assetList.find(_.id == rejectedSentNegotiation.assetID) match {
+                        @assetPropertyList.find(_.id == rejectedSentNegotiation.assetID) match {
                             case Some(asset) => {
                                 <div class="assetInitialData">
                                     <p class="assetPrice">@Seq((rejectedSentNegotiation.price/rejectedSentNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), rejectedSentNegotiation.quantityUnit).mkString(" ")</p>
@@ -142,13 +143,13 @@
 
                 </div>
                 <div class="content">
-                @assetList.find(_.id == failedNegotiation.assetID) match {
-                    case Some(asset) => {
+                @assetPropertyList.find(_.id == failedNegotiation.assetID) match {
+                    case Some(assetProperty) => {
                         <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@Messages(asset.assetType)</p>
+                            <p class="assetTitle">@Messages(assetProperty.assetType)</p>
                             <p class="assetQuantity">@Seq(failedNegotiation.quantity.toString, failedNegotiation.quantityUnit).mkString(" ")</p>
                         </div>
                     }
@@ -157,7 +158,7 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
-                @assetList.find(_.id == failedNegotiation.assetID) match {
+                @assetPropertyList.find(_.id == failedNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((failedNegotiation.price/failedNegotiation.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), failedNegotiation.quantityUnit).mkString(" ")</p>

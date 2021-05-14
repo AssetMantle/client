@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.Validator
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Validator
 import transactions.Abstract.BaseResponse
 
 object ValidatorsResponse {

@@ -1,6 +1,6 @@
 function componentResource(source, route, loadingSpinnerID = 'commonSpinner', event = '') {
-    const div = $('#' + source);
-    let loadingSpinner = $('#' + loadingSpinnerID);
+    const div = $('#' + $.escapeSelector(source));
+    let loadingSpinner = $('#' + $.escapeSelector(loadingSpinnerID));
     $.ajax({
         url: route.url,
         type: route.type,

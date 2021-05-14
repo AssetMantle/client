@@ -4,17 +4,19 @@
 @import models.master.Asset
 @import models.master.Trader
 @import models.master.Organization
+@import utilities.MicroNumber
 
-@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, tradableAssetList: Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(negotiationRequestForm: Form[NegotiationRequest.Data] = NegotiationRequest.form, assetPropertyList: Seq[AssetProperty], tradableAssetList:Seq[Asset], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @commonForm(constants.Form.NEGOTIATION_REQUEST, negotiationRequestForm) {
     <div id="selectAsset">
         <div class="cmuk-text-left panelHeader">@Messages(constants.View.SELECT_ASSET)</div>
         <div class="cmuk-panel cmuk-panel-scrollable">
             <ul class="cmuk-list">
-            @tradableAssetList.map { asset =>
-                <li onclick="selectAsset('@asset.id', '@asset.description', '@Messages(asset.assetType)', '@Seq((asset.price/asset.quantity).toString, Messages(constants.View.USD), Messages(constants.View.PER), asset.quantityUnit).mkString(" ")', '@Seq(asset.price.toRoundedOffString(), Messages(constants.View.USD)).mkString(" ")', '@Seq(asset.quantity.toString, asset.quantityUnit).mkString(" ")', '@asset.otherDetails.shippingDetails.shippingPeriod','@asset.otherDetails.shippingDetails.portOfLoading','@asset.otherDetails.shippingDetails.portOfDischarge')">
-                    @asset.description | @Messages(constants.View.STATUS): @Messages(asset.status)
+            @assetPropertyList.map { assetProperty =>
+                <li onclick="selectAsset('@assetProperty.id', '@assetProperty.description', '@Messages(assetProperty.assetType)', '@Seq((assetProperty.price/assetProperty.quantity), Messages(constants.View.USD), Messages(constants.View.PER), assetProperty.quantityUnit).mkString(" ")', '@Seq(assetProperty.price, Messages(constants.View.USD)).mkString(" ")', '@Seq(assetProperty.quantity, assetProperty.quantityUnit).mkString(" ")', '@assetProperty.shippingPeriod','@assetProperty.portOfLoading','@assetProperty.portOfDischarge')">
+                    @assetProperty.description | @Messages(constants.View.STATUS): @Messages(tradableAssetList.find(x=> x.id == assetProperty.id).map(x=> x.status).getOrElse(""))
                 </li>
             }
             </ul>

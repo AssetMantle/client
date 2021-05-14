@@ -1,8 +1,8 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.Header
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
-import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
 
 object WSClientBlockResponse {

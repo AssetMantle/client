@@ -7,16 +7,26 @@
 
 @left = {
     <div class="leftContainer">
-        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+        <div id="financials" class="financial"></div>
     </div>
     <script>
-            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
-            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
+        @loginState.userType match {
+            case constants.User.TRADER => {
+                componentResource('financials', jsRoutes.controllers.ComponentViewController.traderFinancials());
+            }
+            case constants.User.ORGANIZATION => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.organizationFinancial());
+            }
+            case constants.User.ZONE => {
+            componentResource('financials', jsRoutes.controllers.ComponentViewController.zoneFinancial());
+            }
+            case constants.User.GENESIS => {}
+            case _ => {}
+        }
     </script>
 }
 
-@center = {
+    @center = {
     <div class="cmuk-container cmuk-margin-bottom profileContainer">
         <div class="cmuk-grid-small" cmuk-grid>
             <div class="cmuk-width-1-2@@m profileDetails">
@@ -25,6 +35,70 @@
             <div class="cmuk-width-1-2@@m">
                 <div id="contact" class="contactDetails"></div>
             </div>
+            @if(loginState.userType){
+                <div class="cmuk-width-1-2@@m">
+                    <div id="identification" class="identificationDetails switcherCard"></div>
+                </div>
+                <script>
+                        componentResource('identification', jsRoutes.controllers.ComponentViewController.identification());
+                </script>
+            }
+
+            @loginState.userType match {
+                case constants.User.USER => {
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="userViewPendingRequests" class="userViewRequests"></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="userViewOrganizationUBOs"></div>
+                    </div>
+                    <script>
+                        componentResource('userViewPendingRequests', jsRoutes.controllers.ComponentViewController.userViewPendingRequests());
+                        componentResource('userViewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.userViewOrganizationUBOs());
+                    </script>
+
+                }
+                case constants.User.TRADER => {
+                    <div class="cmuk-width-1-2@@m accountDetails">
+                        <div id="traderViewOrganization"></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="traderViewOrganizationBankAccount"></div>
+                    </div>
+
+                    <script>
+                        componentResource('traderViewOrganization', jsRoutes.controllers.ComponentViewController.traderViewOrganization());
+                        componentResource('traderViewOrganizationBankAccount', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccount());
+                    </script>
+                }
+                case constants.User.ORGANIZATION => {
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="organization" class="organizationDetails"></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="organizationBankAccount"></div>
+                    </div>
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="viewOrganizationUBOs" class="organizationUbos"></div>
+                    </div>
+
+                    <div class="cmuk-width-1-2@@m">
+                        <div id="organizationDeclarations" class="organizationUbos"></div>
+                    </div>
+
+                    <script>
+                        componentResource('organization', jsRoutes.controllers.ComponentViewController.organization());
+                        componentResource('organizationBankAccount', jsRoutes.controllers.ComponentViewController.organizationBankAccount());
+                        componentResource('viewOrganizationUBOs', jsRoutes.controllers.ComponentViewController.viewOrganizationUBOs());
+                        componentResource('organizationDeclarations', jsRoutes.controllers.ComponentViewController.organizationDeclarations());
+                    </script>
+                }
+                case _ => {}
+            }
         </div>
     </div>
     <script>
@@ -38,10 +112,8 @@
         <div class="recentActivityContainer">
             <div id="recentActivities"></div>
         </div>
-        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
     </script>
 }

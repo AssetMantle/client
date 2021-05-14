@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
+import blockchainTx.common.Coin
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.Coin
 import transactions.Abstract.BaseResponse
 
 object DelegatorRewardsResponse {

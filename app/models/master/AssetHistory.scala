@@ -16,16 +16,10 @@ import utilities.MicroNumber
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetHistory(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: MicroNumber, quantityUnit: String, price: MicroNumber, moderated: Boolean, takerID: Option[String] = None, otherDetails: AssetOtherDetails, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
+case class AssetHistory(id: String, label: Option[String] = None, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None, deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) extends HistoryLogged
 
 @Singleton
 class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
-
-  def serialize(assetHistory: AssetHistory): AssetHistorySerializable = AssetHistorySerializable(id = assetHistory.id, ownerID = assetHistory.ownerID, pegHash = assetHistory.pegHash, assetType = assetHistory.assetType, description = assetHistory.description, documentHash = assetHistory.documentHash, quantity = assetHistory.quantity.toMicroString, quantityUnit = assetHistory.quantityUnit, price = assetHistory.price.toMicroString, moderated = assetHistory.moderated, takerID = assetHistory.takerID, otherDetails = Json.toJson(assetHistory.otherDetails).toString(), status = assetHistory.status, createdBy = assetHistory.createdBy, createdOn = assetHistory.createdOn, createdOnTimeZone = assetHistory.createdOnTimeZone, updatedBy = assetHistory.updatedBy, updatedOn = assetHistory.updatedOn, updatedOnTimeZone = assetHistory.updatedOnTimeZone, deletedBy = assetHistory.deletedBy, deletedOn = assetHistory.deletedOn, deletedOnTimeZone = assetHistory.deletedOnTimeZone)
-
-  case class AssetHistorySerializable(id: String, ownerID: String, pegHash: Option[String] = None, assetType: String, description: String, documentHash: String, quantity: String, quantityUnit: String, price: String, moderated: Boolean, takerID: Option[String], otherDetails: String, status: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String], deletedBy: String, deletedOn: Timestamp, deletedOnTimeZone: String) {
-    def deserialize: AssetHistory = AssetHistory(id = id, ownerID = ownerID, pegHash = pegHash, assetType = assetType, description = description, documentHash = documentHash, quantity = new MicroNumber(BigInt(quantity)), quantityUnit = quantityUnit, price = new MicroNumber(BigInt(price)), moderated = moderated, takerID = takerID, otherDetails = utilities.JSON.convertJsonStringToObject[AssetOtherDetails](otherDetails), status = status, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone, deletedBy = deletedBy, deletedOn = deletedOn, deletedOnTimeZone = deletedOnTimeZone)
-  }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -39,56 +33,22 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   import databaseConfig.profile.api._
 
-  private def tryGetByID(id: String): Future[AssetHistorySerializable] = db.run(assetHistoryTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(id: String): Future[AssetHistory] = db.run(assetHistoryTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
     }
   }
 
-  private def tryGetOwnerIDByID(id: String): Future[String] = db.run(assetHistoryTable.filter(_.id === id).map(_.ownerID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+  private def findAllByIDs(ids: Seq[String]): Future[Seq[AssetHistory]] = db.run(assetHistoryTable.filter(_.id.inSet(ids)).result)
 
-  private def tryGetPegHashByID(id: String): Future[Option[String]] = db.run(assetHistoryTable.filter(_.id === id).map(_.pegHash.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
+  private[models] class AssetHistoryTable(tag: Tag) extends Table[AssetHistory](tag, "Asset_History") {
 
-  private def findAllByIDs(ids: Seq[String]): Future[Seq[AssetHistorySerializable]] = db.run(assetHistoryTable.filter(_.id.inSet(ids)).result)
-
-  private[models] class AssetHistoryTable(tag: Tag) extends Table[AssetHistorySerializable](tag, "Asset_History") {
-
-    def * = (id, ownerID, pegHash.?, assetType, description, documentHash, quantity, quantityUnit, price, moderated, takerID.?, otherDetails, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (AssetHistorySerializable.tupled, AssetHistorySerializable.unapply)
+    def * = (id, label.?, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?, deletedBy, deletedOn, deletedOnTimeZone) <> (AssetHistory.tupled, AssetHistory.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def ownerID = column[String]("ownerID")
-
-    def pegHash = column[String]("pegHash")
-
-    def assetType = column[String]("assetType")
-
-    def description = column[String]("description")
-
-    def documentHash = column[String]("documentHash")
-
-    def quantity = column[String]("quantity")
-
-    def quantityUnit = column[String]("quantityUnit")
-
-    def price = column[String]("price")
-
-    def moderated = column[Boolean]("moderated")
-
-    def takerID = column[String]("takerID")
-
-    def otherDetails = column[String]("otherDetails")
+    def label = column[String]("label")
 
     def status = column[String]("status")
 
@@ -114,13 +74,9 @@ class AssetHistories @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def tryGet(id: String): Future[AssetHistory] = tryGetByID(id).map(_.deserialize)
+    def tryGet(id: String): Future[AssetHistory] = tryGetByID(id)
 
-    def tryGetOwnerID(id: String): Future[String] = tryGetOwnerIDByID(id)
-
-    def tryGetPegHash(id: String): Future[String] = tryGetPegHashByID(id).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
-
-    def getAllAssetsByID(ids: Seq[String]): Future[Seq[AssetHistory]] = findAllByIDs(ids).map(serializedAssets => serializedAssets.map(_.deserialize))
+    def getAllAssetsByID(ids: Seq[String]): Future[Seq[AssetHistory]] = findAllByIDs(ids)
 
   }
 

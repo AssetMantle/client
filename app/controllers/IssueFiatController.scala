@@ -9,7 +9,9 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import transactions.blockchain.IssueFiat
 import utilities.MicroNumber
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -19,7 +21,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                                     blockchainAccounts: blockchain.Accounts,
                                     masterFiats: master.Fiats,
                                     masterTransactionIssueFiatRequests: FiatRequests,
-                                    transactionsIssueFiat: transactions.IssueFiat,
+                                    transactionsIssueFiat: IssueFiat,
                                     transaction: utilities.Transaction,
                                     withZoneLoginAction: WithZoneLoginAction,
                                     withoutLoginAction: WithoutLoginAction,

@@ -1,0 +1,10 @@
+@import views.html.base._
+@import views.companion.master.MakeOrder
+
+@(makeOrderForm: Form[MakeOrder.Data] = MakeOrder.form, negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ORDER_MAKE, makeOrderForm) {
+    @commonInputText(makeOrderForm, constants.FormField.NEGOTIATION_ID, 'value -> negotiationID, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(makeOrderForm, constants.FormField.FIAT_PROOF)
+    @commonInputMicroNumber(makeOrderForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+    @commonInputPassword(makeOrderForm, constants.FormField.PASSWORD)
+}

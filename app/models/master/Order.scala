@@ -1,30 +1,32 @@
 package models.master
 
-import java.sql.Timestamp
-
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import models.blockchain
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, orderID: String, status: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Order(id: String, label: Option[String] = None, makerID: String, makerOwnableID: String, takerOwnableID: String, status: Option[Boolean], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
-
-  private implicit val logger: Logger = Logger(this.getClass)
+class Orders @Inject()(
+                           configuration: Configuration,
+                           protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_ORDER
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
+
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -37,7 +39,23 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateByOrder(order: Order): Future[Int] = db.run(orderTable.filter(_.id === order.id).update(order).asTry).map {
+  private def addMultiple(orders: Seq[Order]): Future[Seq[String]] = db.run((orderTable returning orderTable.map(_.id) ++= orders).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
+  private def upsert(order: Order): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
+  private def getByID(id: String) = db.run(orderTable.filter(_.id === id).result.headOption)
+
+  private def tryGetByID(id: String) = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -45,7 +63,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateStatusByOrderID(orderID: String, status: String): Future[Int] = db.run(orderTable.filter(_.orderID === orderID).map(_.status).update(status).asTry).map {
+  private def tryGetMakerIDByID(id: String) = db.run(orderTable.filter(_.id === id).map(_.makerID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
@@ -53,43 +71,55 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def tryGetByID(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+  private def updateLabelByID(id: String, label: Option[String]): Future[Int] = db.run(orderTable.filter(x => x.id === id).map(_.label.?).update(label).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
     }
-  }
-
-  private def tryGetByOrderID(orderID: String): Future[Order] = db.run(orderTable.filter(_.orderID === orderID).result.head.asTry).map {
-    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-    }
-  }
-
-  private def getByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.orderID inSet orderIDs).result)
-
-  private def getByOrderIDsAndStatuses(orderIDs: Seq[String], statuses: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.orderID inSet orderIDs).filter(_.status inSet statuses).result)
-
-  private def getByID(id: String): Future[Option[Order]] = db.run(orderTable.filter(_.id === id).result.headOption)
-
-  private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
+
+  private def updateStatusByID(id: String, status: Option[Boolean]): Future[Int] = db.run(orderTable.filter(x => x.id === id).map(_.status.?).update(status).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
+  private def deleteByID(id: String) = db.run(orderTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+    }
+  }
+
+  private def getByOrderIDsAndStatus(orderIDs: Seq[String], status:Option[Boolean]): Future[Seq[Order]] = db.run(orderTable.filter(_.id inSet orderIDs).filter(_.status.? === status).result)
+
+  private def getByOrderIDs(ids: Seq[String]) = db.run(orderTable.filter(_.id.inSet(ids)).result)
+
+  private def getByMakerIDs(makerIDs: Seq[String]) = db.run(orderTable.filter(_.makerID.inSet(makerIDs)).result)
 
   private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order") {
 
-    def * = (id, orderID, status, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Order.tupled, Order.unapply)
+    def * = (id, label.?, makerID, makerOwnableID, takerOwnableID, status.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Order.tupled, Order.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def orderID = column[String]("orderID")
+    def label = column[String]("label")
 
-    def status = column[String]("status")
+    def makerID = column[String]("makerID")
+
+    def makerOwnableID = column[String]("makerOwnableID")
+
+    def takerOwnableID = column[String]("takerOwnableID")
+
+    def status = column[Boolean]("status")
 
     def createdBy = column[String]("createdBy")
 
@@ -109,28 +139,27 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def create(order: Order): Future[String] = add(order)
 
-    def update(order: Order): Future[Int] = updateByOrder(order)
+    def insertMultiple(orders: Seq[Order]): Future[Seq[String]] = addMultiple(orders)
 
-    def markStatusCompletedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.COMPLETED)
+    def insertOrUpdate(order: Order): Future[Int] = upsert(order)
 
-    def markStatusReversedByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.REVERSED)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def markBuyerExecuteOrderPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING)
+    def getAllByIDs(ids: Seq[String]): Future[Seq[Order]] = getByOrderIDs(ids)
 
-    def markSellerExecuteOrderPendingByBCOrderID(orderID: String): Future[Int] = updateStatusByOrderID(orderID = orderID, status = constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING)
+    def getAllByMakerIDs(makerIDs: Seq[String]): Future[Seq[Order]] = getByMakerIDs(makerIDs)
 
     def get(id: String): Future[Option[Order]] = getByID(id)
 
     def tryGet(id: String): Future[Order] = tryGetByID(id)
 
-    def tryGetOrderByOrderID(orderID: String): Future[Order] = tryGetByOrderID(orderID)
+    def tryGetMakerID(id: String): Future[String] = tryGetMakerIDByID(id)
 
-    def getOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDs(orderIDs)
+    def updateLabel(id: String, label: String): Future[Int] = updateLabelByID(id = id, label = Option(label))
 
-    def getIncompleteOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatuses(orderIDs, Seq(constants.Status.Order.ASSET_AND_FIAT_PENDING, constants.Status.Order.ASSET_AND_FIAT_PENDING, constants.Status.Order.ASSET_SENT_FIAT_PENDING,
-      constants.Status.Order.FIAT_SENT_ASSET_PENDING, constants.Status.Order.BUYER_AND_SELLER_EXECUTE_ORDER_PENDING, constants.Status.Order.BUYER_EXECUTE_ORDER_PENDING, constants.Status.Order.SELLER_EXECUTE_ORDER_PENDING))
+    def markCompleted(id:String) =  updateStatusByID(id, Some(true))
 
-    def getCompletedOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatuses(orderIDs, Seq(constants.Status.Order.COMPLETED, constants.Status.Order.REVERSED, constants.Status.Order.TIMED_OUT))
+    def getCompletedOrdersByOrderIDs(orderIDs: Seq[String]): Future[Seq[Order]] = getByOrderIDsAndStatus(orderIDs,Option(true))
 
   }
 

@@ -5,7 +5,8 @@
 @import models.master.Trader
 @import models.master.Organization
 
-@(buyNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@import models.master.AssetProperty
+@(buyNegotiationList: Seq[Negotiation], counterPartyTraderList: Seq[Trader], counterPartyOrganizationList:Seq[Organization], assetPropertyList: Seq[AssetProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
  <div class="salesQuoteCard">
     @buyNegotiationList.map { buyNegotiation =>
         @commonVerticalInfoBox(){
@@ -14,13 +15,13 @@
 
                 </div>
                 <div class="content">
-                @assetList.find(_.id == buyNegotiation.assetID) match {
-                    case Some(asset) => {
+                @assetPropertyList.find(_.id == buyNegotiation.assetID) match {
+                    case Some(assetProperty) => {
                         <div class="assetIcon">
-                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + asset.assetType + ".svg")"></span>
+                            <span class="commodityImage"><img src="@routes.Assets.versioned("images/icons/" + assetProperty.assetType + ".svg")"></span>
                         </div>
                         <div class="assetInitialData">
-                            <p class="assetTitle">@Messages(asset.assetType)</p>
+                            <p class="assetTitle">@Messages(assetProperty.assetType)</p>
                             <p class="assetQuantity">@Seq(buyNegotiation.quantity.toRoundedOffString(), buyNegotiation.quantityUnit).mkString(" ")</p>
 
                         </div>
@@ -30,7 +31,7 @@
                 </div>
             </div>
             <div class="salesQuoteCardMiddle salesChild">
-                @assetList.find(_.id == buyNegotiation.assetID) match {
+                @assetPropertyList.find(_.id == buyNegotiation.assetID) match {
                     case Some(asset) => {
                         <div class="assetInitialData">
                             <p class="assetPrice">@Seq((buyNegotiation.price/buyNegotiation.quantity).toRoundedOffString(), Messages(constants.View.USD), Messages(constants.View.PER), buyNegotiation.quantityUnit).mkString(" ")</p>

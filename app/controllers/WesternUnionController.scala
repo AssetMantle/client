@@ -11,6 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import services.SFTPScheduler
+import transactions.blockchain.IssueFiat
 import utilities.{KeyStore, MicroNumber}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +30,7 @@ class WesternUnionController @Inject()(
                                         sftpScheduler: SFTPScheduler,
                                         westernUnionFiatRequests: westernUnion.FiatRequests,
                                         westernUnionRTCBs: westernUnion.RTCBs,
-                                        transactionsIssueFiat: transactions.IssueFiat,
+                                        transactionsIssueFiat: IssueFiat,
                                         transaction: utilities.Transaction,
                                         withTraderLoginAction: WithTraderLoginAction,
                                         keyStore: KeyStore,

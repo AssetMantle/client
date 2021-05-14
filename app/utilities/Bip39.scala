@@ -1,14 +1,14 @@
 package utilities
 
+import constants.Bip39.WordList
+import scodec.bits.BitVector
+import scorex.crypto.hash.Sha256
+
 import java.security.SecureRandom
 import java.text.Normalizer.Form.NFKD
 import java.text.Normalizer.normalize
-
-import constants.Bip39.WordList
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-import scodec.bits.BitVector
-import scorex.crypto.hash.Sha256
 
 object Bip39 {
   //Taken help from https://github.com/AlanVerbner/bip39
@@ -37,7 +37,7 @@ object Bip39 {
     } mkString wordList.delimiter
   }
 
-  def check(mnemonic: String, wordList: WordList = constants.Bip39.EnglishWordList): Boolean = {
+  def validate(mnemonic: String, wordList: WordList = constants.Bip39.EnglishWordList): Boolean = {
     require(wordList.words.size == WordListSize, s"WordList should have $WordListSize words")
     val words = mnemonic.split(wordList.delimiter)
     if (words.length % 3 != 0) false

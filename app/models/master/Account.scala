@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: Option[String], language: Option[Lang], userType: String, partialMnemonic: Option[Seq[String]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(id: String, secretHash: Option[String], privateKeyEncrypted: Option[String], language: Option[Lang], userType: String, partialMnemonic: Option[Seq[String]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration, utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext) {
@@ -32,11 +32,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(id: String, secretHash: Option[String], language: Option[String], userType: String, partialMnemonic: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(id = id, secretHash = secretHash, language = language.fold[Option[Lang]](None)(x => Option(Lang(x))), userType = userType, partialMnemonic = partialMnemonic.fold[Option[Seq[String]]](None)(x => Option(utilities.JSON.convertJsonStringToObject[Seq[String]](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AccountSerialized(id: String, secretHash: Option[String], privateKeyEncrypted: Option[String], language: Option[String], userType: String, partialMnemonic: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Account = Account(id = id, secretHash = secretHash, privateKeyEncrypted = privateKeyEncrypted, language = language.fold[Option[Lang]](None)(x => Option(Lang(x))), userType = userType, partialMnemonic = partialMnemonic.fold[Option[Seq[String]]](None)(x => Option(utilities.JSON.convertJsonStringToObject[Seq[String]](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(id = account.id, secretHash = account.secretHash, language = account.language.fold[Option[String]](None)(x => Option(x.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))), userType = account.userType, partialMnemonic = account.partialMnemonic.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(id = account.id, secretHash = account.secretHash, privateKeyEncrypted = account.privateKeyEncrypted, language = account.language.fold[Option[String]](None)(x => Option(x.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))), userType = account.userType, partialMnemonic = account.partialMnemonic.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.id) += serialize(account)).asTry).map {
     case Success(result) => result
@@ -119,11 +119,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") {
 
-    def * = (id, secretHash.?, language.?, userType, partialMnemonic.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (id, secretHash.?, privateKeyEncrypted.?, language.?, userType, partialMnemonic.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
+
+    def privateKeyEncrypted = column[String]("privateKeyEncrypted")
 
     def language = column[String]("language")
 
@@ -153,9 +155,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map(!_)
 
-    def addLogin(username: String, password: String, language: Lang, mnemonics: Seq[String]): Future[String] = add(Account(id = username, secretHash = Option(util.hashing.MurmurHash3.stringHash(password).toString), partialMnemonic = Option(mnemonics), language = Option(language), userType = constants.User.WITHOUT_LOGIN))
+    def addLogin(username: String, password: String, privateKeyEncrypted: String,  language: Lang, mnemonics: Seq[String]): Future[String] = add(Account(id = username, secretHash = Option(util.hashing.MurmurHash3.stringHash(password).toString), privateKeyEncrypted= Some(privateKeyEncrypted), partialMnemonic = Option(mnemonics), language = Option(language), userType = constants.User.WITHOUT_LOGIN))
 
-    def addWithoutSignUp(username: String): Future[String] = add(Account(id = username, secretHash = None, partialMnemonic = None, language = None, userType = constants.User.WITHOUT_LOGIN))
+    def addWithoutSignUp(username: String): Future[String] = add(Account(id = username, secretHash = None, privateKeyEncrypted= None, partialMnemonic = None, language = None, userType = constants.User.WITHOUT_LOGIN))
 
     def tryGet(username: String): Future[Account] = tryGetById(username).map(_.deserialize)
 
@@ -168,6 +170,12 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def updatePartialMnemonic(id: String, partialMnemonic: Seq[String]): Future[Int] = updatePartialMnemonicById(id = id, partialMnemonic = Json.toJson(partialMnemonic).toString)
 
     def markUserTypeUser(id: String): Future[Int] = updateUserTypeById(id, constants.User.USER)
+
+    def markUserTypeTrader(id: String): Future[Int] = updateUserTypeById(id, constants.User.TRADER)
+
+    def markUserTypeZone(id: String): Future[Int] = updateUserTypeById(id, constants.User.ZONE)
+
+    def markUserTypeOrganization(id: String): Future[Int] = updateUserTypeById(id, constants.User.ORGANIZATION)
 
     def getUserType(id: String): Future[String] = getUserTypeById(id)
 
