@@ -612,6 +612,7 @@ GET         /wallex/zone/acceptTransfer                                         
 POST        /wallex/zone/acceptTransfer                                                           controllers.WallexController.zoneCreateWalletTransfer
 GET         /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreeningForm(wallexID: String)
 POST        /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreening
+GET         /wallex/termsAndConditions                                                            controllers.ViewController.wallexTermsAndConditions
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB

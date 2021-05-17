@@ -2608,4 +2608,16 @@ figure.zoom {
 .fiat-proof p {
   width: auto !important; }
 
+.wallexTermsAndConditions {
+  font-size: 0.9rem;
+  word-break: break-word;
+  line-break: auto;
+  letter-spacing: 0.01em;
+  color: #101010;
+  font-weight: bold;
+  padding: 15px;
+  margin: 20px 0;
+  align-items: center;
+}
+
 /*# sourceMappingURL=class.css.map */

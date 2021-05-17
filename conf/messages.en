@@ -1422,3 +1422,5 @@ WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE = Submit KYC
 FORM.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE.LEGEND = KYC Files
 FORM.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE.SUBMIT = Submit
 FORM.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE.BUTTON = Add KYC
+WALLEX_TERMS_AND_CONDITIONS = T&C's
+WALLEX_TERMS_AND_CONDITIONS_TEXT = Consumer advisory - Payment Services in Singapore are regulated under the Payment Services Act 2019(the "PSA"). Wallex Technologies Pte. Ltd("Wallex") is a licensed Major Payment Institution under the PSA for the provision of Crosss-border Money Transfer Services in Singapore(License No. PS20200433).Funds(that constitute "relevant moneys" (as defined under the PSA) received by Wallex shall be held on your behalf in a trust account opened with a Safegaurding Institution as required under the PSA.
