@@ -1080,7 +1080,7 @@ class WallexController @Inject() (
                   organizationID = trader.organizationID,
                   traderID = trader.id,
                   onBehalfOf = wallexTransfer.onBehalfOf,
-                  receiverAccountId = wallexTransfer.receiverAccountID,
+                  receiverAccountID = wallexTransfer.receiverAccountID,
                   amount = wallexTransfer.amount,
                   currency = wallexTransfer.currency,
                   purposeOfTransfer = wallexTransfer.purposesOfTransfer,
@@ -1537,7 +1537,7 @@ class WallexController @Inject() (
                 WalletTransfer.form.fill(
                   companion.wallex.WalletTransfer.Data(
                     onBehalfOf = transferRequest.onBehalfOf,
-                    receiverAccountID = transferRequest.receiverAccountId,
+                    receiverAccountID = transferRequest.receiverAccountID,
                     amount = transferRequest.amount,
                     currency = transferRequest.currency,
                     purposesOfTransfer = transferRequest.purposeOfTransfer,

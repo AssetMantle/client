@@ -17,7 +17,7 @@ case class WalletTransferRequest(
     organizationID: String,
     traderID: String,
     onBehalfOf: String,
-    receiverAccountId: String,
+    receiverAccountID: String,
     amount: Double,
     currency: String,
     purposeOfTransfer: String,
@@ -177,7 +177,7 @@ class WalletTransferRequests @Inject() (
         organizationID,
         traderID,
         onBehalfOf,
-        receiverAccountId,
+        receiverAccountID,
         amount,
         currency,
         purposeOfTransfer,
@@ -200,7 +200,7 @@ class WalletTransferRequests @Inject() (
 
     def onBehalfOf = column[String]("onBehalfOf")
 
-    def receiverAccountId = column[String]("receiverAccountId")
+    def receiverAccountID = column[String]("receiverAccountID")
 
     def amount = column[Double]("amount")
 
@@ -233,7 +233,7 @@ class WalletTransferRequests @Inject() (
         organizationID: String,
         traderID: String,
         onBehalfOf: String,
-        receiverAccountId: String,
+        receiverAccountID: String,
         amount: Double,
         currency: String,
         purposeOfTransfer: String,
@@ -247,7 +247,7 @@ class WalletTransferRequests @Inject() (
           organizationID = organizationID,
           traderID = traderID,
           onBehalfOf = onBehalfOf,
-          receiverAccountId = receiverAccountId,
+          receiverAccountID = receiverAccountID,
           amount = amount,
           currency = currency,
           purposeOfTransfer = purposeOfTransfer,
@@ -262,7 +262,7 @@ class WalletTransferRequests @Inject() (
         organizationID: String,
         traderID: String,
         onBehalfOf: String,
-        receiverAccountId: String,
+        receiverAccountID: String,
         amount: Double,
         currency: String,
         purposeOfTransfer: String,
@@ -276,7 +276,7 @@ class WalletTransferRequests @Inject() (
           organizationID = organizationID,
           traderID = traderID,
           onBehalfOf = onBehalfOf,
-          receiverAccountId = receiverAccountId,
+          receiverAccountID = receiverAccountID,
           amount = amount,
           currency = currency,
           purposeOfTransfer = purposeOfTransfer,
