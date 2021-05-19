@@ -568,10 +568,10 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.traderViewOrganizationWallexAccount
-GET         /component/organizationWallexPaymentApp                                               controllers.ComponentViewController.organizationWallexPaymentApp(negotiationID:String)
+GET         /component/traderWallexPaymentTransfer                                               controllers.ComponentViewController.traderWallexPaymentTransfer(negotiationID:String)
 GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.traderViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
-GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.wallexBeneficiaryPaymentApp(negotiationID: String)
+GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.traderWallexTransferToBeneficiary(negotiationID: String)
 GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount
 GET         /wallex/zone/view/transferRequest                                                     controllers.ComponentViewController.zoneViewWalletTransferRequestList
 GET         /wallex/zone/view/screeningList                                                       controllers.ComponentViewController.zoneViewWallexKYCScreeningList

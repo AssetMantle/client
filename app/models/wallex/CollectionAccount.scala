@@ -125,7 +125,7 @@ class CollectionAccounts @Inject()(
 
     def wallexID = column[String]("wallexID", O.PrimaryKey)
 
-    def accountID = column[String]("accountID", O.PrimaryKey)
+    def accountID = column[String]("accountID")
 
     def createdBy = column[String]("createdBy")
 

@@ -1313,18 +1313,21 @@ class WallexController @Inject() (
             collectionAccount => {
 
               val authToken = wallexAuthToken.Service.getToken()
+              def getCollectionsAccounts = wallexCollectionAccounts.Service.tryGetByAccountID(collectionAccount.accountID)
 
-              def getCollectionAccount(authToken: String, accountId: String)
+              def getCollectionAccount(authToken: String, accountID: String, collectionAccountID: String)
                   : Future[CreateCollectionResponse] =
                 wallexGetCollectionAccount.Service.get(
                   authToken,
-                  accountId
+                  accountID,
+                  collectionAccountID
                 )
 
               (for {
                 authToken <- authToken
+                collectionsAccount <- getCollectionsAccounts
                 collectionResponse <-
-                  getCollectionAccount(authToken, collectionAccount.accountID)
+                  getCollectionAccount(authToken, collectionAccount.accountID,collectionsAccount.id)
                 result <- withUsernameToken.PartialContent(
                   views.html.component.wallex
                     .traderGetCollectionAccountResponse(

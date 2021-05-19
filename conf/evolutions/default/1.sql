@@ -1759,7 +1759,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."CollectionAccount"
     "updatedOn"         timestamp,
     "updatedOnTimeZone" varchar,
 
-    primary key ("id", "wallexID", "accountID")
+    primary key ("id", "wallexID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."UserKYCDetail"

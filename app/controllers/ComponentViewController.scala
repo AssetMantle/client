@@ -3242,7 +3242,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def organizationWallexPaymentApp(negotiationID: String) : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderWallexPaymentTransfer(negotiationID: String) : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
@@ -3258,7 +3258,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def wallexBeneficiaryPaymentApp(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def traderWallexTransferToBeneficiary(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
@@ -3294,24 +3294,37 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewWallexCollectionAccount: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+  def traderViewWallexCollectionAccount: Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
-      def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccountDetail] =
-        wallexOrganizationAccountDetails.Service.tryGet(organizationID)
+        def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+          wallexOrganizationAccountDetails.Service.get(organizationID)
 
-      def getWallexCollectionAccount(accountId: String): Future[Option[CollectionAccount]] =
-        wallexCollectionAccountDetails.Service.get(accountId)
+        def getResult(organizationAccountDetail: Option[OrganizationAccountDetail]): Future[Result] = {
 
-      (for {
-        organizationID <- organizationID
-        organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
-        collectionWallexDetail <-  getWallexCollectionAccount(organizationWallexAccount.accountID)
-      } yield Ok(views.html.component.wallex.traderViewCollectionAccountDetails(organizationWallexAccount,collectionWallexDetail))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+          organizationAccountDetail match {
+            case Some(organizationAccountDetail) => {
+              val collectionAccounts = wallexCollectionAccountDetails.Service.getByAccountID(organizationAccountDetail.accountID)
+
+              (for {
+                collectionAccounts <- collectionAccounts
+              } yield Ok(views.html.component.wallex.traderViewCollectionAccountDetails(organizationAccountDetail, collectionAccounts)))
+            }
+            case None => {
+              Future(Ok(views.html.component.wallex.collectionAccountMessage()))
+            }
+          }
+        }
+          (for {
+            organizationID <- organizationID
+            organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+            result <- getResult(organizationWallexAccount)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
   }
 
   def zoneViewWalletTransferRequestList(): Action[AnyContent] =

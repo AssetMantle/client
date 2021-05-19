@@ -44,12 +44,16 @@ class GetCollectionAccount @Inject()(
 
   private def action(
       authToken: String,
-      accountId: String
+      accountID: String,
+      collectionAccountID: String
   ): Future[CreateCollectionResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
+    val onBehalfOf = Tuple2(constants.External.Wallex.ON_BEHALF_OF, accountID)
+
     utilities.JSON.getResponseFromJson[CreateCollectionResponse](
       wsClient
-        .url(url+accountId)
+        .url(url+collectionAccountID)
+        .withQueryStringParameters(onBehalfOf)
         .withHttpHeaders(apiKeyHeader, authTokenHeader)
         .get()
     )
@@ -59,9 +63,10 @@ class GetCollectionAccount @Inject()(
 
     def get(
         authToken: String,
-        accountId: String
+        accountID: String,
+        collectionAccountID: String
     ): Future[CreateCollectionResponse] =
-      action(authToken,accountId).recover {
+      action(authToken,accountID,collectionAccountID).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

@@ -2,6 +2,6 @@
 @import views.html.base._
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-    @commonCard(constants.View.WALLEX_COLLECTION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#bankAccount") {
+    @commonCard(constants.View.WALLEX_COLLECTION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#collectionsAccount") {
 
-        }{ @Messages("Create Wallex Details first")}
+        }{ @Messages(constants.View.WALLEX_CREATE_COLLECTION_ACCOUNT_MESSAGE)}
