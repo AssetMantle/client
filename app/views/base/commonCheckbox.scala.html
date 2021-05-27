@@ -34,7 +34,7 @@
             }
         }
     ) { field =>
-        @checkbox(field, defaultArguments ++ arguments: _*)
+        @checkbox(field, defaultArguments ++ arguments.filterNot(x=> x._1 == 'checked && x._2.toString == "false") : _*)
     }
 }
 </div>
