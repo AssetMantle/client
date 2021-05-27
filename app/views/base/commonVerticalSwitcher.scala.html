@@ -28,16 +28,18 @@
         </div>
         <div class="cmuk-width-expand@@m">
             <ul id="component-tab-left" class="cmuk-switcher">
-            @for((itemHeader, itemValue) <- items) {
+            @for(((itemHeader, itemValue), index) <- items.zipWithIndex) {
                 @itemValue match {
                     case html: Html => {
                         <li id="switcherContent@itemHeader">@itemValue</li>
                     }
                     case route: JavaScriptReverseRoute => {
                         <li id="switcherContent@itemHeader">
+                        @if(index == 0){
                             <script>
                                 loadSwitcherContent('switcherHeader@itemHeader');
                             </script>
+                        }
                         </li>
                     }
                     case _ => {

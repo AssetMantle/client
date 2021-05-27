@@ -451,16 +451,14 @@ class AccountController @Inject()(
     implicit request =>
       val identification = masterIdentifications.Service.get(loginState.username)
 
-      def getResult(identification: Option[Identification]): Future[Result] = identification match {
-        case Some(identity) => withUsernameToken.Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
-        case None => withUsernameToken.Ok(views.html.component.master.addIdentification())
-      }
-
       (for {
         identification <- identification
-        result <- getResult(identification)
-      } yield result
-        ).recover {
+      } yield {
+        identification match {
+          case Some(identity) => Ok(views.html.component.master.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
+          case None => Ok(views.html.component.master.addIdentification())
+        }
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
       }
   }
@@ -491,10 +489,12 @@ class AccountController @Inject()(
   def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-      for {
+      (for {
         accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
-      } yield result
+      } yield Ok(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def userReviewIdentificationForm: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
