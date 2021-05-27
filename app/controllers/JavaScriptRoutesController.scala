@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithoutLoginAction, WithoutLoginActionAsync}
+
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import play.api.mvc._
@@ -268,6 +269,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderViewNegotiation,
         routes.javascript.ComponentViewController.organizationViewNegotiation,
 
+        routes.javascript.ComponentViewController.traderViewOrganizationWallexAccount,
+        routes.javascript.ComponentViewController.traderWallexPaymentTransfer,
+        routes.javascript.ComponentViewController.traderViewBeneficiary,
+        routes.javascript.ComponentViewController.traderWallexTransferToBeneficiary,
+        routes.javascript.ComponentViewController.traderViewWallexCollectionAccount,
+        routes.javascript.ComponentViewController.organizationViewWallexAccount,
+
+        routes.javascript.ComponentViewController.zoneViewWalletTransferRequestList,
+        routes.javascript.ComponentViewController.zoneViewWallexKYCScreeningList,
+
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
         routes.javascript.ConfirmSellerBidController.blockchainConfirmSellerBidForm,
@@ -303,6 +314,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeAccountKYC,
         routes.javascript.FileController.updateAccountKYCForm,
         routes.javascript.FileController.updateAccountKYC,
+
+        routes.javascript.FileController.uploadWallexDocumentForm,
+        routes.javascript.FileController.uploadWallexDocument,
+        routes.javascript.FileController.storeWallexDocument,
+        routes.javascript.FileController.getWallexKYCFile,
+        routes.javascript.FileController.updateWallexKYCForm,
+        routes.javascript.FileController.updateWallexKYC,
 
 
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
@@ -397,6 +415,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ViewController.dashboard,
         routes.javascript.ViewController.trades,
         routes.javascript.ViewController.tradeRoom,
+        routes.javascript.ViewController.wallexTermsAndConditions,
 
         routes.javascript.BackgroundCheckController.memberScanForm,
         routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
@@ -410,6 +429,39 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm,
         routes.javascript.BackgroundCheckController.addAssetMemberCheckForm,
         routes.javascript.BackgroundCheckController.vesselScanResult,
+
+
+        routes.javascript.WallexController.createOrganizationAccountForm,
+        routes.javascript.WallexController.createOrganizationAccount,
+        routes.javascript.WallexController.updateCompanyAccountForm,
+        routes.javascript.WallexController.updateCompanyAccount,
+        routes.javascript.WallexController.updateAccountForm,
+        routes.javascript.WallexController.updateAccount,
+        routes.javascript.WallexController.addDocumentForm,
+        routes.javascript.WallexController.uploadOrUpdateWallexDocument,
+        routes.javascript.WallexController.addDocument,
+        routes.javascript.WallexController.initiatePaymentForm,
+        routes.javascript.WallexController.initiatePayment,
+        routes.javascript.WallexController.acceptQuoteForm,
+        routes.javascript.WallexController.acceptQuote,
+        routes.javascript.WallexController.createBeneficiariesForm,
+        routes.javascript.WallexController.createBeneficiaries,
+        routes.javascript.WallexController.deleteBeneficiaryForm,
+        routes.javascript.WallexController.deleteBeneficiary,
+        routes.javascript.WallexController.walletTransferForm,
+        routes.javascript.WallexController.walletTransfer,
+        routes.javascript.WallexController.createCollectionAccountsForm,
+        routes.javascript.WallexController.createCollectionAccounts,
+        routes.javascript.WallexController.getCollectionAccountsForm,
+        routes.javascript.WallexController.getCollectionAccounts,
+        routes.javascript.WallexController.submitDocumentToWallexForm,
+        routes.javascript.WallexController.submitDocumentToWallex,
+        routes.javascript.WallexController.getUserForm,
+        routes.javascript.WallexController.getUser,
+        routes.javascript.WallexController.zoneWalletTransferForm,
+        routes.javascript.WallexController.zoneCreateWalletTransfer,
+        routes.javascript.WallexController.sendForScreeningForm,
+        routes.javascript.WallexController.sendForScreening
 
       )
     ).as("text/javascript")

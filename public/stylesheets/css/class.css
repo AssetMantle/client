@@ -3279,8 +3279,42 @@ figure.zoom img {
   margin: 0 5px 0 0;
 }
 
+.wallexLogo{
+    height: 17px;
+    width: 60px;
+  }
+
+.wallexNote {
+  font-size: 0.9rem;
+  text-align: justify;
+  word-break: break-word;
+  line-break: auto;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 15px;
+  margin: 20px 0;
+  background: #FF2938;
+  display: flex;
+  align-items: center; }
+
+.wallexNote .wallexNoteText {
+  width: 30%; }
+
 .fiat-proof p {
   width: auto !important;
+}
+
+.wallexTermsAndConditions {
+  font-size: 0.9rem;
+  word-break: break-word;
+  line-break: auto;
+  letter-spacing: 0.01em;
+  color: #101010;
+  font-weight: bold;
+  padding: 15px;
+  margin: 20px 0;
+  align-items: center;
 }
 
 /*# sourceMappingURL=class.css.map */

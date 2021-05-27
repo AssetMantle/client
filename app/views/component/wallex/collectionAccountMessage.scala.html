@@ -1,0 +1,7 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+    @commonCard(constants.View.WALLEX_COLLECTION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#collectionsAccount") {
+
+        }{ @Messages(constants.View.WALLEX_CREATE_COLLECTION_ACCOUNT_MESSAGE)}

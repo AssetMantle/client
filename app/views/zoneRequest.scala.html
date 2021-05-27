@@ -54,4 +54,20 @@
             </div>
         </li>
     </ul>
+    <ul cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('wallexTransferRequest', jsRoutes.controllers.ComponentViewController.zoneViewWalletTransferRequestList(), this)">@Messages(constants.View.WALLEX_TRANSFER_REQUESTS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="wallexTransferRequest" class="flexContainer"></div>
+            </div>
+        </li>
+    </ul>
+    <ul cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('wallexKYCScreeningRequest', jsRoutes.controllers.ComponentViewController.zoneViewWallexKYCScreeningList(), this)">@Messages(constants.View.WALLEX_KYC_SCREENING_REQUESTS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="wallexKYCScreeningRequest" class="flexContainer"></div>
+            </div>
+        </li>
+    </ul>
 }

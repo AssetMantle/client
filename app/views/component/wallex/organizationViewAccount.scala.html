@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationAccountDetail
+@import scala.collection.immutable.ListMap
+
+@(organizationAccountDetail: Option[OrganizationAccountDetail])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+
+@commonCard(constants.View.WALLEX_ORGANIZATION_ACCOUNT, 'cardIconPath -> "images/icons/icons.svg#wallexAccount") {
+} {
+    @organizationAccountDetail match {
+        case Some(organizationWallexDetail) => {
+
+            @commonHorizontalSwitcher(ListMap(
+                constants.View.DETAILS -> views.html.component.wallex.userViewAccountInformation(organizationWallexDetail)))
+        }
+        case None => {
+            @Messages(constants.View.WALLEX_ACCOUNT_CREATE)
+        }
+    }
+}

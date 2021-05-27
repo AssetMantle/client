@@ -1,0 +1,9 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationAccountDetail
+@import models.wallex.OrganizationBeneficiary
+
+@(organizationAccountDetail: Option[OrganizationAccountDetail], wallexBeneficiary: Seq[OrganizationBeneficiary],negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(organizationAccountDetail.isDefined && !wallexBeneficiary.isEmpty) {
+    @commonFormButton(constants.Form.WALLEX_TRADER_PAYMENT_INITIATE, 'parameters -> s"'${negotiationID}'")
+}

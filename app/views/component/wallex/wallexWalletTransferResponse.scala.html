@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import transactions.responses.WallexResponse.WalletToWalletTransferResponse
+
+@(transferResponse: WalletToWalletTransferResponse)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.WALLEX_WALLET_TRANSFER)
+</legend>
+<hr>

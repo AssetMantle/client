@@ -58,6 +58,26 @@ object File {
     val IDENTIFICATION = "IDENTIFICATION"
   }
 
+  object Wallex {
+    val NATIONAL_IDENTITY = "national_identity"
+    val COMPANY_PROOF = "company_proof"
+    val COMPANY_PROOF_ADDRESS = "company_address_proof"
+    val NRIC = "nric"
+    val PASSPORT = "passport"
+    val KTP = "ktp"
+    val EMPLOYMENT_PASS = "employment_pass"
+    val S_PASS = "s_pass"
+    val WORK_PERMIT = "work_permit"
+    val PHOTO = "photo"
+    val BANK_STATEMENT = "bank_statement"
+    val UTILITY_BILL = "utility_bill"
+    val PHONE_BILL = "phone_bill"
+    val TAX_BILL = "tax_bill"
+    val FAMILY_CARD = "family_card"
+    val IDENTITY_REPORT = "identity_report"
+    val FDW = "fdw"
+  }
+
   //Seq
   val ZONE_KYC_DOCUMENT_TYPES: Seq[String] = Seq(ZoneKYC.IDENTIFICATION, ZoneKYC.BANK_ACCOUNT_DETAIL)
   val ORGANIZATION_KYC_DOCUMENT_TYPES: Seq[String] = Seq(OrganizationKYC.ACRA, OrganizationKYC.BOARD_RESOLUTION)

@@ -1,0 +1,20 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.WalletTransfer
+@import views.html.base._
+
+@(wallexWalletTransfer: Form[WalletTransfer.Data] = WalletTransfer.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@commonForm(constants.Form.WALLEX_TRADER_TRANSFER_WALLET, wallexWalletTransfer) {
+    @commonInputText(wallexWalletTransfer, constants.FormField.NEGOTIATION_ID, 'readonly -> true)
+    @commonInputText(wallexWalletTransfer, constants.FormField.WALLEX_ON_BEHALF_OF, 'readonly -> true)
+    @commonInputText(wallexWalletTransfer, constants.FormField.WALLEX_RECEIVER_ACCOUNT_ID, 'readonly -> true)
+    @commonInputDouble(wallexWalletTransfer, constants.FormField.WALLEX_AMOUNT, 'readonly -> true)
+    @commonSelect(wallexWalletTransfer, constants.FormField.WALLEX_CURRENCIES)
+    @commonSelect(wallexWalletTransfer, constants.FormField.WALLEX_PURPOSE_OF_TRANSFER)
+    @commonInputText(wallexWalletTransfer, constants.FormField.WALLEX_REFERENCE, 'readonly -> true)
+    @commonInputText(wallexWalletTransfer, constants.FormField.WALLEX_REMARKS)
+}
+
+<div id="wallexMessage">
+    @Messages(constants.View.WALLEX_POWERED_BY)
+    <span class="wallexLogo">@commonImage("wallex.png")</span>
+</div>

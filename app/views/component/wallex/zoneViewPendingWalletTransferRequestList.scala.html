@@ -1,0 +1,21 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.WalletTransferRequest
+
+@(walletTransferRequests: Seq[WalletTransferRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@walletTransferRequests.map { request =>
+    @commonVerticalInfoBox() {
+        @commonVerticalTextInfo(constants.View.NEGOTIATION_ID, request.negotiationID)
+        @commonVerticalTextInfo(constants.View.WALLEX_ON_BEHALF_OF, request.onBehalfOf)
+        @commonVerticalTextInfo(constants.View.WALLEX_RECEIVER_ACCOUNT_ID, request.receiverAccountID)
+        <div class="listItemChild">
+            <p class="listItemChildTitle">
+            @Messages(constants.View.ACTION)
+            </p>
+            <p class="listItemChildValue">
+            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.WallexController.zoneWalletTransferForm, 'parameters -> s"'${request.negotiationID}'")
+            </p>
+        </div>
+    }
+}

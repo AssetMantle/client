@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.OrganizationAccountDetail
+
+@(organizationAccountDetail: Option[OrganizationAccountDetail],negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(organizationAccountDetail.isDefined) {
+    <div class="financialCard">
+    @commonCard(constants.View.WALLEX_TRANSFER_BENEFICIARY, 'cardIconPath -> "images/icons/icons.svg#wallexTransfer") {
+    } {
+        <ul class="financialCardSection">
+            <li class="cmuk-flex">
+                <div class="cmuk-flex wallet">
+                    <span class="walletIcon">@commonIcon("wallet")</span>
+                    <div>
+                    @commonFormButton(constants.Form.WALLEX_TRADER_TRANSFER_WALLET, 'parameters -> s"'${negotiationID}'")
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+    }
+    </div>
+}

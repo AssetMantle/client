@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.AcceptPaymentQuote
+@import views.html.base._
+
+@(acceptWallexPaymentQuoteForm: Form[AcceptPaymentQuote.Data] = AcceptPaymentQuote.form, quoteID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.WALLEX_TRADER_ACCEPT_PAYMENT_QUOTE_REQUEST, acceptWallexPaymentQuoteForm) {
+
+    @commonInputText(acceptWallexPaymentQuoteForm, constants.FormField.WALLEX_QUOTE_ID, 'value -> quoteID, 'readonly -> true)
+    @commonSelect(acceptWallexPaymentQuoteForm, constants.FormField.WALLEX_FUNDING_SOURCE)
+    @commonInputText(acceptWallexPaymentQuoteForm, constants.FormField.WALLEX_PAYMENT_REFERENCE)
+    @commonSelect(acceptWallexPaymentQuoteForm, constants.FormField.WALLEX_PURPOSE_OF_TRANSFER)
+    @commonInputPassword(acceptWallexPaymentQuoteForm, constants.FormField.PASSWORD)
+    @commonInputMicroNumber(acceptWallexPaymentQuoteForm, constants.FormField.GAS, 'value -> constants.FormField.GAS.maximumValue, 'readonly -> true, 'containerDivClass -> "hidden")
+
+}

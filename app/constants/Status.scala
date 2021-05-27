@@ -54,6 +54,15 @@ object Status {
     val SENT = "SENT"
   }
 
+  object SendWalletTransfer {
+    val ZONE_APPROVAL = "ZONE_APPROVAL"
+    val ZONE_SEND_FOR_SCREENING = "ZONE_SEND_FOR_SCREENING"
+    val ZONE_APPROVED = "ZONE_APPROVED"
+    val BLOCKCHAIN_FAILURE = "BLOCKCHAIN_FAILURE"
+    val SENT = "SENT"
+    val COMPLETED = "completed"
+  }
+
   object ReceiveFiat {
     val ORDER_COMPLETION_FIAT = "ORDER_COMPLETION_FIAT"
     val ORDER_REVERSED_FIAT = "ORDER_REVERSED_FIAT"

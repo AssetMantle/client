@@ -1,0 +1,23 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import models.wallex.UserKYC
+
+@import views.html.component.master.commonDocumentViewer
+@(wallexDocuments: Seq[UserKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@commonCard(constants.View.WALLEX_KYC_DOCUMENTS, 'cardIconPath -> "images/icons/icons.svg#kycDocuments") {
+} {
+
+    @for(wallexDocument <- wallexDocuments) {
+        @commonDocumentViewer(wallexDocument) {
+            @routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType)
+        } {
+            @commonLink(wallexDocument.documentType, routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType))
+        } {
+
+        }
+    }
+        <div class="cmuk-text-center cmuk-margin-top">
+        @commonFormButton(constants.Form.WALLEX_TRADER_DOCUMENT_ADD_OR_UPDATE)
+        </div>
+}

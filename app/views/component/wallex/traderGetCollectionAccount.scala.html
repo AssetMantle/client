@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.GetCollectionAccount
+@import views.html.base._
+
+@(wallexCollectionAccount: Form[GetCollectionAccount.Data] = GetCollectionAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.WALLEX_TRADER_GET_COLLECTION_ACCOUNT, wallexCollectionAccount) {
+    @commonInputText(wallexCollectionAccount, constants.FormField.ACCOUNT_ID, 'readonly -> true)
+}

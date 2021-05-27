@@ -19,4 +19,16 @@ object External {
     }
   }
 
+  object Wallex {
+    //wallex date format
+    val DATE_FORMAT = "dd-MM-yyyy"
+    val STANDARD = "STANDARD"
+    val APPLICATION_TYPE = "application/pdf"
+    val ON_BEHALF_OF = "onBehalfOf"
+
+    object Status {
+    val APPROVED = "approved"
+    }
+  }
+
 }

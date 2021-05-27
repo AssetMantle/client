@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.DeleteBeneficiary
+@import views.html.base._
+
+@(deleteBeneficiary: Form[DeleteBeneficiary.Data] = DeleteBeneficiary.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.WALLEX_TRADER_BENEFICIARY_DELETE, deleteBeneficiary) {
+    @commonInputText(deleteBeneficiary, constants.FormField.WALLEX_BENEFICIARY_ID, 'readonly -> true)
+}

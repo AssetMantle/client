@@ -1,15 +1,16 @@
 package controllers
 
 import java.nio.file.Files
-
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+
 import javax.inject._
 import models.Abstract.{AssetDocumentContent, NegotiationDocumentContent}
 import models.common.Serializable._
 import models.master._
 import models.masterTransaction.{AssetFile, NegotiationFile}
+import models.wallex.{UserKYC, UserKYCs}
 import models.{docusign, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
@@ -45,6 +46,7 @@ class FileController @Inject()(
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
+                                wallexDocuments: UserKYCs
                               )(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -860,4 +862,103 @@ class FileController @Inject()(
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+  def uploadWallexDocumentForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadWallexDocument),
+      utilities.String.getJsRouteFunction(routes.javascript.FileController.storeWallexDocument), documentType))
+  }
+
+  def updateWallexKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit request =>
+    Ok(views.html.component.master.updateFile(
+      utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadWallexDocument),
+      utilities.String.getJsRouteFunction(routes.javascript.FileController.updateWallexKYC), documentType))
+  }
+
+  def updateWallexKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val oldDocument = wallexDocuments.Service.tryGet(id = loginState.username, documentType = documentType)
+      def updateFile(oldDocument: UserKYC): Future[Boolean] = fileResourceManager.updateFile[UserKYC](
+        name = name,
+        path = fileResourceManager.getWallexFilePath(documentType),
+        oldDocument = oldDocument,
+        updateOldDocument = wallexDocuments.Service.updateOldDocument
+      )
+
+      def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
+
+      def getResult(wallexDocument: Option[UserKYC]) =
+        withUsernameToken.PartialContent(views.html.component.wallex.traderUploadOrUpdateDocument
+      (wallexDocument, documentType))
+
+
+      (for {
+        oldDocument <- oldDocument
+        _ <- updateFile(oldDocument)
+        wallexKYC <- wallexKYC
+        result <- getResult(wallexKYC)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def uploadWallexDocument(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+    FileUpload.form.bindFromRequest.fold(
+      formWithErrors => {
+        BadRequest
+      },
+      fileUploadInfo => {
+        try {
+          request.body.file(constants.File.KEY_FILE) match {
+            case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo,
+              fileResourceManager.getWallexFilePath(documentType))
+              Ok
+          }
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        }
+      }
+    )
+  }
+
+  def storeWallexDocument(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val storeFile = fileResourceManager.storeFile[UserKYC](
+        name = name,
+        path = fileResourceManager.getWallexFilePath(documentType),
+        document = UserKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        masterCreate = wallexDocuments.Service.create
+      )
+
+      def wallexKYC = wallexDocuments.Service.get(loginState.username, documentType)
+
+      def getResult(wallexDocument: Option[UserKYC]) = withUsernameToken.
+        PartialContent(views.html.component.wallex.traderUploadOrUpdateDocument(wallexDocument, documentType))
+
+      (for {
+        _ <- storeFile
+        wallexKYC <- wallexKYC
+        result <- getResult(wallexKYC)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def getWallexKYCFile(fileName: String, documentType: String) = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val checkFileNameExists = wallexDocuments.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
+
+      (for {
+        checkFileNameExists <- checkFileNameExists
+      } yield if (checkFileNameExists) Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getWallexFilePath(documentType), fileName = fileName))
+        else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+      }
+  }
+
+
 }

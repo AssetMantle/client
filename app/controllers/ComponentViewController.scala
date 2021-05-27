@@ -3,18 +3,19 @@ package controllers
 import java.text.DecimalFormat
 import java.time.Year
 import java.util.Calendar
-
 import controllers.actions._
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models._
 import models.common.Serializable._
 import models.master._
 import models.masterTransaction.{SendFiatRequest, _}
+import models.wallex.{CollectionAccount, CollectionAccounts, OrganizationAccountDetail, OrganizationAccountDetails, OrganizationBeneficiaries, OrganizationBeneficiary, UserKYC, UserKYCs, WalletTransferRequest, WalletTransferRequests}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
-import play.api.mvc._
+import play.api.mvc.{AnyContent, _}
 import play.api.{Configuration, Logger}
 import play.twirl.api.Html
 import utilities.MicroNumber
@@ -73,6 +74,11 @@ class ComponentViewController @Inject()(
                                          withZoneLoginAction: WithZoneLoginAction,
                                          withoutLoginAction: WithoutLoginAction,
                                          withoutLoginActionAsync: WithoutLoginActionAsync,
+                                         wallexOrganizationAccountDetails : OrganizationAccountDetails,
+                                         wallexOrganizationBeneficiaries: OrganizationBeneficiaries,
+                                         wallexUserKYCs: UserKYCs,
+                                         wallexCollectionAccountDetails :CollectionAccounts,
+                                         wallexWalletTransferRequests: WalletTransferRequests
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -2392,7 +2398,8 @@ class ComponentViewController @Inject()(
         fiatsInOrder <- fiatsInOrder
         fiatPegWallet <- getFiatPegWallet(traderID)
         asset <- getAsset(negotiation.assetID)
-      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), moderated = asset.moderated))
+      } yield Ok(views.html.component.master.traderViewTradeRoomFinancial(walletBalance = fiatPegWallet.map(_.transactionAmount).sum, amountPaid = 0, amountPending = (negotiation.price - fiatsInOrder), moderated = asset.moderated,negotiationID = negotiationID))
+
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -2649,65 +2656,59 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
+  def traderViewIssueFiatRequestList: Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+
       val traderID = masterTraders.Service.tryGetID(loginState.username)
 
-      def getIssueFiatRequestList(traderID: String) = westernUnionFiatRequests.Service.getAll(traderID)
-
-      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getIssueFiatRequestList(traderID: String) =
+          wallexWalletTransferRequests.Service.getAllByTraderID(traderID)
 
       (for {
         traderID <- traderID
         issueFiatRequestList <- getIssueFiatRequestList(traderID)
-        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
-      } yield Ok(views.html.component.master.traderViewIssueFiatRequestList(issueFiatRequestList, rtcbList))
+      } yield Ok(views.html.component.wallex.traderViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
-  def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
+  def organizationViewIssueFiatRequestList: Action[AnyContent] = withOrganizationLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+
       val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
 
-      def getTraderList(organizationID: String) = masterTraders.Service.getOrganizationAcceptedTraderList(organizationID)
-
-      def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
-
-      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getIssueFiatRequestList(organizationID: String) =
+          wallexWalletTransferRequests.Service.getAllByOrganizationID(organizationID)
 
       (for {
         organizationID <- organizationID
-        traderList <- getTraderList(organizationID)
-        issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
-        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
-      } yield Ok(views.html.component.master.organizationViewIssueFiatRequestList(traderList, issueFiatRequestList, rtcbList))
+        issueFiatRequestList <- getIssueFiatRequestList(organizationID)
+      } yield Ok(views.html.component.wallex.organizationViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
-  def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
+  def zoneViewIssueFiatRequestList: Action[AnyContent] = withZoneLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
 
       val zoneID = masterZones.Service.tryGetID(loginState.username)
+      def getOrganizations(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
 
-      def getOrganizationList(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+      def getOrganizationIDs(organizations: Seq[Organization]) = organizations.map(organization => organization.id)
 
-      def getTraderList(zoneID: String) = masterTraders.Service.getZoneAcceptedTraderList(zoneID)
-
-      def getIssueFiatRequestList(traderIDs: Seq[String]) = westernUnionFiatRequests.Service.getAllByTraderIDs(traderIDs)
-
-      def getRTCBList(issueFiatRequestIDs: Seq[String]) = westernUnionRTCBs.Service.getAll(issueFiatRequestIDs)
+      def getIssueFiatRequestList(organizationIDs: Seq[String]) =
+          wallexWalletTransferRequests.Service.getAllByOrganizationIDs(organizationIDs)
 
       (for {
         zoneID <- zoneID
-        organizationList <- getOrganizationList(zoneID)
-        traderList <- getTraderList(zoneID)
-        issueFiatRequestList <- getIssueFiatRequestList(traderList.map(_.id))
-        rtcbList <- getRTCBList(issueFiatRequestList.map(_.id))
-      } yield Ok(views.html.component.master.zoneViewIssueFiatRequestList(traderList, organizationList, issueFiatRequestList, rtcbList))
+        organizations <- getOrganizations(zoneID)
+        issueFiatRequestList <- getIssueFiatRequestList(getOrganizationIDs(organizations))
+      } yield Ok(views.html.component.wallex.zoneViewIssueFiatRequestList(issueFiatRequestList))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -3205,4 +3206,175 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def traderViewOrganizationWallexAccount : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+
+      def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+        wallexOrganizationAccountDetails.Service.get(organizationID)
+
+      def getWallexKYCDocuments(organizationID: String): Future[Seq[UserKYC]] =
+        wallexUserKYCs.Service.getAllDocuments(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        wallexDocuments <-getWallexKYCDocuments(loginState.username)
+        organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+      } yield Ok(views.html.component.wallex.organizationAccount(organizationWallexAccount,wallexDocuments))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def organizationViewWallexAccount : Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+        wallexOrganizationAccountDetails.Service.get(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+      } yield Ok(views.html.component.wallex.organizationViewAccount(organizationWallexAccount))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def traderWallexPaymentTransfer(negotiationID: String) : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+
+      def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+        wallexOrganizationAccountDetails.Service.get(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+      } yield Ok(views.html.component.wallex.traderTransferWalletPayment(organizationWallexAccount,negotiationID))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def traderWallexTransferToBeneficiary(negotiationID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+
+      def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+        wallexOrganizationAccountDetails.Service.get(organizationID)
+
+      def getOrganizationWallexBeneficiary(organizationID: String): Future[Seq[OrganizationBeneficiary]] =
+        wallexOrganizationBeneficiaries.Service.get(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+        wallexBeneficiary <- getOrganizationWallexBeneficiary(organizationID)
+      } yield Ok(views.html.component.wallex.traderTransferToBeneficiary(organizationWallexAccount, wallexBeneficiary,negotiationID))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def traderViewBeneficiary : Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+
+      def getOrganizationWallexBeneficiaryAccount(organizationID: String): Future[Seq[OrganizationBeneficiary]] =
+        wallexOrganizationBeneficiaries.Service.get(organizationID)
+
+      (for {
+        organizationID <- organizationID
+        organizationWallexBeneficiary <- getOrganizationWallexBeneficiaryAccount(organizationID)
+      } yield Ok(views.html.component.wallex.traderViewOrganizationBeneficiaries(organizationWallexBeneficiary))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
+  def traderViewWallexCollectionAccount: Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+
+        def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccountDetail]] =
+          wallexOrganizationAccountDetails.Service.get(organizationID)
+
+        def getResult(organizationAccountDetail: Option[OrganizationAccountDetail]): Future[Result] = {
+
+          organizationAccountDetail match {
+            case Some(organizationAccountDetail) => {
+              val collectionAccounts = wallexCollectionAccountDetails.Service.getByAccountID(organizationAccountDetail.accountID)
+
+              (for {
+                collectionAccounts <- collectionAccounts
+              } yield Ok(views.html.component.wallex.traderViewCollectionAccountDetails(organizationAccountDetail, collectionAccounts)))
+            }
+            case None => {
+              Future(Ok(views.html.component.wallex.collectionAccountMessage()))
+            }
+          }
+        }
+          (for {
+            organizationID <- organizationID
+            organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+            result <- getResult(organizationWallexAccount)
+          } yield result
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+  }
+
+  def zoneViewWalletTransferRequestList(): Action[AnyContent] =
+    withZoneLoginAction.authenticated {
+      implicit loginState =>
+        implicit request =>
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
+          def getOrganizations(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+
+          def pendingWalletTransferRequests(organizationIDs: Seq[String]): Future[Seq[WalletTransferRequest]] =
+            wallexWalletTransferRequests.Service.tryGetPendingRequests(organizationIDs)
+
+          def getOrganizationIDs(organizations: Seq[Organization]) = organizations.map(organization => organization.id)
+
+
+          (for {
+            zoneID <- zoneID
+            organizations <- getOrganizations(zoneID)
+            pendingWalletRequests <- pendingWalletTransferRequests(getOrganizationIDs(organizations))
+          } yield Ok(
+            views.html.component.wallex
+              .zoneViewPendingWalletTransferRequestList(pendingWalletRequests)
+          )).recover {
+            case baseException: BaseException =>
+              InternalServerError(baseException.failure.message)
+          }
+    }
+
+  def zoneViewWallexKYCScreeningList(): Action[AnyContent] =
+    withZoneLoginAction.authenticated {
+      implicit loginState =>
+        implicit request =>
+          val zoneID = masterZones.Service.tryGetID(loginState.username)
+          def getOrganizations(zoneID: String) = masterOrganizations.Service.getZoneAcceptedOrganizationList(zoneID)
+
+          def pendingScreeningRequests(organizationIDs: Seq[String]): Future[Seq[OrganizationAccountDetail]] =
+            wallexOrganizationAccountDetails.Service.tryGetPendingScreening(organizationIDs)
+
+          def getOrganizationIDs(organizations: Seq[Organization]) = organizations.map(organization => organization.id)
+
+          (for {
+            zoneID <- zoneID
+            organizations <- getOrganizations(zoneID)
+            pendingKYCRequests <- pendingScreeningRequests(getOrganizationIDs(organizations))
+          } yield Ok(
+            views.html.component.wallex
+              .zoneViewPendingKYCRequestList(pendingKYCRequests)
+          )).recover {
+            case baseException: BaseException =>
+              InternalServerError(baseException.failure.message)
+          }
+    }
 }

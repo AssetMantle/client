@@ -131,4 +131,13 @@ class ViewController @Inject()(
         case baseException: BaseException => InternalServerError(views.html.trades(failures = Seq(baseException.failure)))
       }
   }
+
+  def wallexTermsAndConditions: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.component.wallex.termsAndCondition())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
 }

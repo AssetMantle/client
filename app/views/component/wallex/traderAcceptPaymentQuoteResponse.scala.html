@@ -1,0 +1,55 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@import transactions.responses.WallexResponse.CreatePaymentQuoteResponse
+@(quoteResponse: CreatePaymentQuoteResponse)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.WALLEX_QUOTE_RESPONSE)
+</legend>
+<hr>
+
+
+
+<div class="modalInfoBlock">
+@quoteResponse.data match {
+    case datas => {
+        @commonTextInfo(constants.View.WALLEX_CURRENCY_PAIR, datas.currencyPair)
+        @commonTextInfo(constants.View.WALLEX_BUY_CURRENCY, datas.buyCurrency)
+        @commonTextInfo(constants.View.WALLEX_SELL_CURRENCY, datas.sellCurrency)
+        @commonDoubleInfo(constants.View.WALLEX_BUY_AMOUNT, datas.buyAmount)
+        @commonDoubleInfo(constants.View.WALLEX_SELL_AMOUNT, datas.sellAmount)
+        @commonTextInfo(constants.View.WALLEX_FIXED_SIDE, datas.fixedSide)
+        @commonDoubleInfo(constants.View.WALLEX_RATE, datas.rate)
+        @commonDoubleInfo(constants.View.WALLEX_PARTNER_RATE, datas.partnerRate)
+        @commonDoubleInfo(constants.View.WALLEX_PARTNER_BUY_AMOUNT, datas.partnerBuyAmount)
+        @commonDoubleInfo(constants.View.WALLEX_PARTNER_SELL_AMOUNT, datas.partnerSellAmount)
+        @datas.partnerPaymentFee match {
+            case Some(ppfee) => {
+                @commonDoubleInfo(constants.View.WALLEX_PARTNER_PAYMENT_FEE, ppfee)
+            }
+            case None => {
+                @commonDoubleInfo(constants.View.WALLEX_PARTNER_PAYMENT_FEE, 0.00)
+            }
+
+        }
+        @commonTextInfo(constants.View.WALLEX_EXPIRES_AT, datas.expiresAt)
+        @commonTextInfo(constants.View.WALLEX_QUOTE_ID, datas.quoteId)
+        @commonDoubleInfo(constants.View.WALLEX_CONVERSION_FEE, datas.conversionFee)
+        @commonDoubleInfo(constants.View.WALLEX_PAYMENT_FEE, datas.paymentFee)
+        @commonDoubleInfo(constants.View.WALLEX_TOTAL_FEE, datas.totalFee)
+        @commonDoubleInfo(constants.View.WALLEX_TOTAL_AMOUNT, datas.totalAmount)
+        @commonTextInfo(constants.View.WALLEX_PAYMENT_CHANNEL, datas.paymentChannel)
+        @commonDoubleInfo(constants.View.WALLEX_BANK_CHARGE, datas.bankCharges)
+        @commonBooleanInfo(constants.View.WALLEX_SUPPORTING_DOCUMENT_REQUIRED, Some(datas.supportingDocumentsRequired))
+
+        @commonJavascriptButton(constants.Form.WALLEX_TRADER_ACCEPT_PAYMENT_QUOTE_REQUEST.button, JavaScript(s"""getForm(jsRoutes.controllers.WallexController.acceptQuoteForm('${datas.quoteId}'))"""))
+
+    }
+    case _ => {
+        @Messages(constants.View.WALLEX_QUOTE_NOT_RETURNED)
+    }
+
+}
+</div>
