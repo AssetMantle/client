@@ -6,7 +6,6 @@ function searchFunctionOnEnter(event, id) {
 }
 
 function searchFunction(id) {
-    console.log(id, "searchFunction");
     let source = $('#' + id).val();
     const route = jsRoutes.controllers.IndexController.search(source);
     $.ajax({
