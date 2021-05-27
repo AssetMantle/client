@@ -1,11 +1,10 @@
-INDEX= Native block explorer for Persistence chains
+INDEX=Persistence: Enterprise Hub of Cosmos
 USERNAME=Username
 PASSWORD=Password
 LOGIN=Login
 LOGOUT=Log Out
 SIGNUP=Sign Up
 SEARCH=Search
-META_DESCRIPTION=Native block explorer for Persistence chains. Get real time block event updates and query transactions, wallets, validator set and chain metrics.
 #//Contact
 UPDATE_CONTACT=Update
 VERIFY_MOBILE_NUMBER=Verify Mobile Number
