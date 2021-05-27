@@ -10,6 +10,8 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta content="@Messages(constants.View.META_DESCRIPTION)"
+        name="description" property="og:description"/>
         <title>@title | @Messages(constants.View.PERSISTENCE)</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
@@ -105,7 +107,7 @@
                         </div>
                         <div class="cmuk-navbar-right">
                             <div class="searchContainer hidden">
-                            @searchField()
+                            @searchField("searchInput")
                             </div>
                             <ul class="cmuk-navbar-nav top-nav-dropdown">
                                 @if(otherApps.nonEmpty) {
@@ -227,7 +229,7 @@
                             <div class="pageContent cmuk-container">
                                 <div class="leftSide sticky">
                                     <div class="mobileSearch">
-                                    @searchField()
+                                    @searchField("mobileSearchInput")
                                     </div>
                                     @left
                                 </div>
@@ -244,7 +246,7 @@
                             <div class="pageContent cmuk-container">
                                 <div class="leftSide sticky">
                                     <div class="mobileSearch">
-                                    @searchField()
+                                    @searchField("mobileSearchInput2")
                                     </div>
                                     @left
                                 </div>
