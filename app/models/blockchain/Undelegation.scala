@@ -34,6 +34,7 @@ class Undelegations @Inject()(
                                blockchainValidators: Validators,
                                blockchainDelegations: Delegations,
                                blockchainWithdrawAddresses: WithdrawAddresses,
+                               blockchainBalances: Balances,
                                utilitiesOperations: utilities.Operations,
                              )(implicit executionContext: ExecutionContext) {
 
@@ -90,6 +91,13 @@ class Undelegations @Inject()(
     }
   }
 
+  private def tryGetByAddress(delegatorAddress: String, validatorAddress: String): Future[UndelegationSerialized] = db.run(undelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.UNDELEGATION_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private[models] class UndelegationTable(tag: Tag) extends Table[UndelegationSerialized](tag, "Undelegation") {
 
     def * = (delegatorAddress, validatorAddress, entries, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (UndelegationSerialized.tupled, UndelegationSerialized.unapply)
@@ -129,6 +137,8 @@ class Undelegations @Inject()(
 
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
+    def tryGet(delegatorAddress: String, validatorAddress: String): Future[Undelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).map(_.deserialize)
+
   }
 
   object Utility {
@@ -155,15 +165,20 @@ class Undelegations @Inject()(
       }
     }
 
-    def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
-      val unbondingResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+    def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String, currentBlockTimeStamp: String): Future[Unit] = {
+      val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegatorAddress)
+      val undelegation = Service.tryGet(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
-      def checkAndDelete(unbondingResponse: ValidatorDelegatorUndelegationResponse) = if (unbondingResponse.unbond.entries.nonEmpty) Service.insertOrUpdate(unbondingResponse.unbond.toUndelegation)
-      else Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+      def updateOrDelete(undelegation: Undelegation) = {
+        val updatedEntries = undelegation.entries.filter(entry => !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTimeStamp))
+        if (updatedEntries.isEmpty) Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress)
+        else Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
+      }
 
       (for {
-        unbondingResponse <- unbondingResponse
-        _ <- checkAndDelete(unbondingResponse)
+        _ <- updateBalance
+        undelegation <- undelegation
+        _ <- updateOrDelete(undelegation)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

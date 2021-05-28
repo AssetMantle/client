@@ -8,8 +8,8 @@
         <tr>
             <th>@Messages(constants.View.VALIDATOR)</th>
             <th>@Messages(constants.View.VOTING_POWER)</th>
-            <th>@Messages(constants.View.COMMISSION_RATE)</th>
             <th>@Messages(constants.View.DELEGATIONS)</th>
+            <th>@Messages(constants.View.COMMISSION_RATE)</th>
         </tr>
     </thead>
         <tbody>
@@ -23,8 +23,8 @@
                         <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
                     </td>
                     <td>@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble) %</td>
-                    <td>@((validator.commission.commissionRates.rate*100).toString()) %</td>
                     <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(validator.tokens.toDouble))</td>
+                    <td>@((validator.commission.commissionRates.rate*100).toString()) %</td>
                 </tr>
             }
         </tbody>

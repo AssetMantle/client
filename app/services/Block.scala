@@ -420,10 +420,10 @@ class Block @Inject()(
     }
   })
 
-  def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
+  def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event], currentBlockTimeStamp: String): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
     val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
-    val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator) else Future(throw new BaseException(constants.Response.INVALID_UNBONDING_COMPLETION_EVENT))
+    val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator, currentBlockTimeStamp = currentBlockTimeStamp) else Future(throw new BaseException(constants.Response.INVALID_UNBONDING_COMPLETION_EVENT))
     (for {
       _ <- process
     } yield ()
@@ -432,12 +432,11 @@ class Block @Inject()(
     }
   })
 
-
-  def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
+  def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event], currentBlockTimeStamp: String): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
     val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value.getOrElse(""))
     val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
-    val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator) else Future(throw new BaseException(constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT))
+    val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator, currentBlockTimeStamp = currentBlockTimeStamp) else Future(throw new BaseException(constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT))
     (for {
       _ <- process
     } yield ()
@@ -473,6 +472,34 @@ class Block @Inject()(
       _ <- update(validator)
     } yield ()).recover {
       case baseException: BaseException => throw baseException
+    }
+  }
+
+  //TODO Delete this in next commit. Won't do anything even if kept other than initial delay
+  def patch(): Future[Unit] = {
+    val latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
+    val redelegations = blockchainRedelegations.Service.getAll
+    val undelegations = blockchainUndelegations.Service.getAll
+
+    def checkAndDeleteRedelegations(redelegations: Seq[Redelegation], currentTimeStamp: String) = utilitiesOperations.traverse(redelegations) { redelegation =>
+      blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = redelegation.delegatorAddress, srcValidator = redelegation.validatorSourceAddress, dstValidator = redelegation.validatorDestinationAddress, currentBlockTimeStamp = currentTimeStamp)
+    }
+
+    def checkAndDeleteUndelegations(undelegations: Seq[Undelegation], currentTimeStamp: String) = utilitiesOperations.traverse(undelegations) { undelegation =>
+      blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress, currentBlockTimeStamp = currentTimeStamp)
+    }
+
+    (for {
+      latestExplorerBlock <- latestExplorerBlock
+      redelegations <- redelegations
+      undelegations <- undelegations
+      _ <- checkAndDeleteRedelegations(redelegations, latestExplorerBlock.time)
+      _ <- checkAndDeleteUndelegations(undelegations, latestExplorerBlock.time)
+    } yield ()
+      ).recover {
+      case _: BaseException =>
+        logger.error("PATCH FAILED")
+        System.exit(0)
     }
   }
 }
