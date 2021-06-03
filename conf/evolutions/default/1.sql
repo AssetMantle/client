@@ -1634,6 +1634,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationAccountDetail"
     "accountID"         VARCHAR NOT NULL,
     "countryCode"       VARCHAR NOT NULL,
     "accountType"       VARCHAR NOT NULL,
+    "traderID"          VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1803,6 +1804,24 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransfer"
     "updatedOnTimeZone"   varchar,
     primary key ("id","organizationID")
     );
+
+CREATE TABLE IF NOT EXISTS WALLEX."FundingStatus"
+(
+    "id"                varchar not null,
+    "balanceID"         varchar not null,
+    "accountID"         varchar not null,
+    "amount"           double precision not null,
+    "reference"         varchar not null,
+    "status"            varchar not null,
+    "createdBy"         varchar,
+    "createdOn"         timestamp,
+    "createdOnTimeZone" varchar,
+    "updatedBy"         varchar,
+    "updatedOn"         timestamp,
+    "updatedOnTimeZone" varchar,
+    primary key ("id")
+);
+
 
 ALTER TABLE BLOCKCHAIN."Account_BC"
     ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
@@ -1978,6 +1997,9 @@ ALTER TABLE WALLEX."CollectionAccount"
 
 ALTER TABLE WALLEX."WalletTransfer"
     ADD CONSTRAINT WalletTransfer_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
+
+ALTER TABLE WALLEX."FundingStatus"
+    ADD CONSTRAINT FundingStatus_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
 
 /*Triggers*/
 
@@ -2443,6 +2465,12 @@ CREATE TRIGGER WALLEX_WALLET_TRANSFER_LOG
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
+CREATE TRIGGER WALLEX_FUNDING_STATUS_LOG
+    BEFORE INSERT OR UPDATE
+                         ON WALLEX."FundingStatus"
+                         FOR EACH ROW
+                         EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
 CREATE OR REPLACE FUNCTION DOCUSIGN.CREATE_ENVELOPE_HISTORY()
     RETURNS trigger
 AS
@@ -2726,6 +2754,7 @@ DROP TRIGGER IF EXISTS WALLEX_USER_KYC_DETAIL_LOG ON WALLEX."UserKYCDetail" CASC
 DROP TRIGGER IF EXISTS WALLEX_PAYMENT_FILE_LOG ON WALLEX."PaymentFile" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_WALLET_TRANSFER_LOG ON WALLEX."WalletTransfer" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_TRANSFER_REQUEST_LOG ON WALLEX."WalletTransferRequest" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_FUNDING_STATUS_LOG ON WALLEX."FundingStatus" CASCADE;
 
 
 /*Delete Triggers*/
@@ -2810,6 +2839,7 @@ DROP TABLE IF EXISTS WALLEX."PaymentFile" CASCADE;
 DROP TABLE IF EXISTS WALLEX."WalletTransfer" CASCADE;
 DROP TABLE IF EXISTS WALLEX."WalletTransferRequest" CASCADE;
 DROP TABLE IF EXISTS WALLEX."OrganizationBeneficiary" CASCADE;
+DROP TABLE IF EXISTS WALLEX."FundingStatus" CASCADE;
 
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;

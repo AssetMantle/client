@@ -22,6 +22,7 @@ case class OrganizationAccountDetail(
     status: String,
     countryCode: String,
     accountType: String,
+    traderID: String,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
     createdOnTimeZone: Option[String] = None,
@@ -164,6 +165,7 @@ class OrganizationAccountDetails @Inject() (
         status,
         countryCode,
         accountType,
+        traderID,
         createdBy.?,
         createdOn.?,
         createdOnTimeZone.?,
@@ -190,6 +192,8 @@ class OrganizationAccountDetails @Inject() (
 
     def accountType = column[String]("accountType")
 
+    def traderID = column[String]("traderID")
+
     def createdBy = column[String]("createdBy")
 
     def createdOn = column[Timestamp]("createdOn")
@@ -213,7 +217,8 @@ class OrganizationAccountDetails @Inject() (
         lastName: String,
         status: String,
         countryCode: String,
-        accountType: String
+        accountType: String,
+        traderID: String
     ): Future[String] =
       add(
         OrganizationAccountDetail(
@@ -225,7 +230,8 @@ class OrganizationAccountDetails @Inject() (
           lastName = lastName,
           status = status,
           countryCode = countryCode,
-          accountType = accountType
+          accountType = accountType,
+          traderID = traderID
         )
       )
 
@@ -238,7 +244,8 @@ class OrganizationAccountDetails @Inject() (
         lastName: String,
         status: String,
         countryCode: String,
-        accountType: String
+        accountType: String,
+        traderID: String
     ): Future[Int] =
       upsert(
         OrganizationAccountDetail(
@@ -250,7 +257,8 @@ class OrganizationAccountDetails @Inject() (
           lastName = lastName,
           status = status,
           countryCode = countryCode,
-          accountType = accountType
+          accountType = accountType,
+          traderID = traderID
         )
       )
 

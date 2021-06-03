@@ -6,7 +6,7 @@ import play.api.data.Forms.mapping
 object SubmitDocument {
   val form = Form(
     mapping(
-      constants.FormField.DOCUMENT_TYPE.name -> constants.FormField.DOCUMENT_TYPE.field
+      constants.FormField.WALLEX_DOCUMENT_TYPE.name -> constants.FormField.WALLEX_DOCUMENT_TYPE.field
     )(Data.apply)(Data.unapply)
   )
 

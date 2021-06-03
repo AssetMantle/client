@@ -568,13 +568,14 @@ GET         /chat/markChatAsRead                                                
 GET         /chat/replyToMessage                                                                  controllers.ChatController.replyToMessage(chatID: String, messageID: String)
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.traderViewOrganizationWallexAccount
-GET         /component/traderWallexPaymentTransfer                                               controllers.ComponentViewController.traderWallexPaymentTransfer(negotiationID:String)
+GET         /component/traderWallexPaymentTransfer                                                controllers.ComponentViewController.traderWallexPaymentTransfer(negotiationID:String)
 GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.traderViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.traderWallexTransferToBeneficiary(negotiationID: String)
 GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount
 GET         /wallex/zone/view/transferRequest                                                     controllers.ComponentViewController.zoneViewWalletTransferRequestList
 GET         /wallex/zone/view/screeningList                                                       controllers.ComponentViewController.zoneViewWallexKYCScreeningList
+GET         /wallex/add/funds                                                                     controllers.ComponentViewController.traderAddWallexFund
 GET         /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccountForm
 POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccount
 GET         /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccountForm
@@ -613,6 +614,7 @@ POST        /wallex/zone/acceptTransfer                                         
 GET         /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreeningForm(wallexID: String)
 POST        /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreening
 GET         /wallex/termsAndConditions                                                            controllers.ViewController.wallexTermsAndConditions
+POST        /wallex/add/fund/notification                                                         controllers.WallexController.fundingNotification
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB
