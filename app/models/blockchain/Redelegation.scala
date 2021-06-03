@@ -88,6 +88,13 @@ class Redelegations @Inject()(
     }
   }
 
+  private def tryGetByAddress(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[RedelegationSerialized] = db.run(redelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorSourceAddress === validatorSourceAddress && x.validatorDestinationAddress === validatorDestinationAddress).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.REDELEGATION_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private[models] class RedelegationTable(tag: Tag) extends Table[RedelegationSerialized](tag, "Redelegation") {
 
     def * = (delegatorAddress, validatorSourceAddress, validatorDestinationAddress, entries, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (RedelegationSerialized.tupled, RedelegationSerialized.unapply)
@@ -127,6 +134,7 @@ class Redelegations @Inject()(
 
     def delete(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = deleteByAddresses(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress)
 
+    def tryGet(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress).map(_.deserialize)
   }
 
   object Utility {
@@ -162,15 +170,18 @@ class Redelegations @Inject()(
       }
     }
 
-    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String): Future[Unit] = {
-      val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = delegator, sourceValidatorAddress = srcValidator, destinationValidatorAddress = dstValidator)
+    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String, currentBlockTimeStamp: String): Future[Unit] = {
+      val redelegation = Service.tryGet(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
 
-      def checkAndDelete(redelegationResponse: DelegatorRedelegationsResponse) = if (redelegationResponse.redelegation_responses.nonEmpty) Service.insertOrUpdate(redelegationResponse.redelegation_responses.head.toRedelegation)
-      else Service.delete(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
+      def updateOrDelete(redelegation: Redelegation) = {
+        val updatedEntries = redelegation.entries.filter(entry => !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTimeStamp))
+        if (updatedEntries.isEmpty) Service.delete(delegatorAddress = redelegation.delegatorAddress, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
+        else Service.insertOrUpdate(redelegation.copy(entries = updatedEntries))
+      }
 
       (for {
-        redelegationResponse <- redelegationResponse
-        _ <- checkAndDelete(redelegationResponse)
+        redelegation <- redelegation
+        _ <- updateOrDelete(redelegation)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

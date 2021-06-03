@@ -222,7 +222,7 @@ class Startup @Inject()(
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
       blockResultResponse <- blockResultResponse
-      _ <- actionsOnEvents(blockResultResponse)
+      _ <- actionsOnEvents(blockResultResponse = blockResultResponse, currentBlockTimeStamp = blockCommitResponse.result.signed_header.header.time)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
     } yield ()).recover {
@@ -230,18 +230,18 @@ class Startup @Inject()(
     }
   }
 
-  private def actionsOnEvents(blockResultResponse: BlockResultResponse): Future[Unit] = {
+  private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: String): Future[Unit] = {
     val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
     val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
+    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
+    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
     val proposal = blocksServices.onProposalEvents(blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(x => x.`type` == constants.Blockchain.Event.InactiveProposal || x.`type` == constants.Blockchain.Event.ActiveProposal).map(_.decode))
-    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode))
-    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode))
     (for {
       _ <- slashing
       _ <- missedBlock
-      _ <- proposal
       _ <- unbondingCompletion
       _ <- redelegationCompletion
+      _ <- proposal
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
@@ -295,6 +295,9 @@ class Startup @Inject()(
   }
 
   //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
-  def start(): Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = explorerInitialDelay, delay = explorerFixedDelay)(explorerRunnable)(schedulerExecutionContext)
+  def start(): Cancellable = {
+    Await.result(blocksServices.patch(), Duration.Inf)
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = explorerInitialDelay, delay = explorerFixedDelay)(explorerRunnable)(schedulerExecutionContext)
+  }
 
 }
