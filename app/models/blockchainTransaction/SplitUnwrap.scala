@@ -19,7 +19,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SplitUnwrap(from: String, fromID: String, ownableID: String, split: BigDecimal, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[SplitUnwrap] with Logged {
-  def mutateTicketID(newTicketID: String): SplitUnwrap = SplitUnwrap(from = from, fromID = fromID, ownableID = ownableID, split = split, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): SplitUnwrap = copy(ticketID = newTicketID)
 }
 
 @Singleton

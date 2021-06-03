@@ -18,7 +18,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IdentityProvision(from: String, to: String, identityID: String, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[IdentityProvision] with Logged {
-  def mutateTicketID(newTicketID: String): IdentityProvision = IdentityProvision(from = from, to = to, identityID = identityID, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): IdentityProvision = copy(ticketID = newTicketID)
 }
 
 @Singleton

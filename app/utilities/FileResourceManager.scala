@@ -2,7 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.Trait.Document
+import models.Trait.{Approvable, Document}
 import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
@@ -92,4 +92,31 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
+
+  def updateApprovableFile[T <: Document[T] with Approvable[T]](name: String, path: String, oldDocument: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+    val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
+      utilities.FileOperations.fileExtensionFromName(name) match {
+        case constants.File.JPEG | constants.File.JPG | constants.File.PNG | constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE => utilities.ImageProcess.convertToThumbnail(name, path)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
+      }
+    }
+
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(oldDocument.updateFileName(fileName).updateFile(encodedBase64).updateStatus(None))
+
+    (for {
+      (fileName, encodedBase64) <- getFileNameAndEncodedBase64
+      _ <- update(fileName, encodedBase64)
+    } yield {
+      utilities.FileOperations.deleteFile(path, oldDocument.fileName)
+      utilities.FileOperations.renameFile(path, name, fileName)
+    }).recover {
+      case baseException: BaseException => logger.error(baseException.failure.message)
+        utilities.FileOperations.deleteFile(path, name)
+        throw new BaseException(constants.Response.FILE_UPLOAD_ERROR)
+      case e: Exception => logger.error(e.getMessage)
+        utilities.FileOperations.deleteFile(path, name)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
 }

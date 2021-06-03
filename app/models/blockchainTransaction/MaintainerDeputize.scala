@@ -20,7 +20,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class MaintainerDeputize(from: String, fromID: String, toID: String, classificationID: String, maintainedTraits: Seq[BaseProperty], addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[MaintainerDeputize] with Logged {
-  def mutateTicketID(newTicketID: String): MaintainerDeputize = MaintainerDeputize(from = from, fromID = fromID, toID = toID, classificationID = classificationID, maintainedTraits = maintainedTraits, addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): MaintainerDeputize = copy(ticketID = newTicketID)
 }
 
 @Singleton
