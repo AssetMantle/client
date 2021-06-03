@@ -20,7 +20,7 @@
                             case Some(pictureURL)=>{@commonImageResource(pictureURL)}
                             case None=>{@commonImage("note.svg")}
                         }
-                        <span>@commonVerticalHtmlInfo(constants.View.VALIDATOR, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
+                        <span>@commonVerticalHtmlInfo(validator.description.moniker, commonLink(validator.description.moniker, routes.ViewController.validator(validator.operatorAddress)))</span>
                     </td>
                     <td>@utilities.NumericOperation.roundOff((validator.tokens * 100/totalBondedAmount).toDouble) %</td>
                     <td>@((validator.commission.commissionRates.rate*100).toString()) %</td>
