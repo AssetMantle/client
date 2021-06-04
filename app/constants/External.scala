@@ -29,6 +29,10 @@ object External {
     object Status {
     val APPROVED = "approved"
     }
+    object FundNotification{
+      val FUNDING = "funding"
+      val COMPLETED = "completed"
+    }
   }
 
 }

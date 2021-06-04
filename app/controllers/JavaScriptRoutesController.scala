@@ -278,6 +278,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ComponentViewController.zoneViewWalletTransferRequestList,
         routes.javascript.ComponentViewController.zoneViewWallexKYCScreeningList,
+        routes.javascript.ComponentViewController.traderAddWallexFund,
 
         routes.javascript.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm,
 
@@ -461,9 +462,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WallexController.zoneWalletTransferForm,
         routes.javascript.WallexController.zoneCreateWalletTransfer,
         routes.javascript.WallexController.sendForScreeningForm,
-        routes.javascript.WallexController.sendForScreening
+        routes.javascript.WallexController.sendForScreening,
+        routes.javascript.WallexController.fundingNotification
 
-      )
+    )
     ).as("text/javascript")
   }
 }

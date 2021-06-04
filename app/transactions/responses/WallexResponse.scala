@@ -353,4 +353,19 @@ object WallexResponse {
     Json.reads[WallexErrorResponse]
   implicit val ErrorResponseWrites: OWrites[WallexErrorResponse] =
     Json.writes[WallexErrorResponse]
+
+  case class GetFundingResponse(
+                              id: String,
+                              balanceId: String,
+                              accountId: String,
+                              currency: String,
+                              amount: Double,
+                              reference: String,
+                              status: String
+                            ) extends BaseResponse
+
+  implicit val fundingResponseReads: Reads[GetFundingResponse] =
+    Json.reads[GetFundingResponse]
+  implicit val fundingResponseWrites: OWrites[GetFundingResponse] =
+    Json.writes[GetFundingResponse]
 }

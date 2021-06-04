@@ -12,8 +12,9 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDocumentResponse, CreatePaymentQuoteResponse, GetBalanceResponse, GetUserResponse, PaymentFileUploadResponse, ScreeningResponse, WalletToWalletTransferResponse}
+import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDocumentResponse, CreatePaymentQuoteResponse, GetBalanceResponse, GetFundingResponse, GetUserResponse, PaymentFileUploadResponse, ScreeningResponse, WalletToWalletTransferResponse}
 import transactions.wallex._
+import utilities.JSON.convertJsonStringToObject
 import utilities.{KeyStore, MicroNumber}
 import views.companion
 import views.companion.wallex.{WalletTransfer, _}
@@ -69,7 +70,11 @@ class WallexController @Inject() (
                                    wallexCreatePaymentQuote: CreatePaymentQuote,
                                    wallexUserScreening: UserSubmitForScreening,
                                    wallexWalletTransferRequest: WalletTransferRequests,
-                                   wallexWalletTransfers: WalletTransfers
+                                   wallexWalletTransfers: WalletTransfers,
+                                   wallexFundSimplePayment: FundSimplePayment,
+                                   wallexGetFundingStatus: GetFundingStatus,
+                                   wallexFundingStatusDetails : FundingStatusDetails
+
 )(implicit
     executionContext: ExecutionContext,
     configuration: Configuration,
@@ -141,8 +146,8 @@ class WallexController @Inject() (
               },
               organizationWallexAccountData => {
 
-                def getZoneID(organizationID: String) =
-                  masterOrganizations.Service.tryGetZoneID(organizationID)
+                val getTraderID =
+                  masterTraders.Service.tryGetID(loginState.username)
 
                 val organizationID =
                   masterTraders.Service
@@ -175,7 +180,8 @@ class WallexController @Inject() (
                                     accountType: String,
                                     wallexID: String,
                                     accountID: String,
-                                    status: String
+                                    status: String,
+                                    traderID: String
                                   ): Future[Int] =
                   wallexOrganizationAccountDetails.Service.insertOrUpdate(
                     organizationID = organizationID,
@@ -186,12 +192,13 @@ class WallexController @Inject() (
                     accountType = accountType,
                     wallexID = wallexID,
                     accountID = accountID,
-                    status = status
+                    status = status,
+                    traderID = traderID
                   )
 
                 (for {
                   organizationID <- organizationID
-                  zoneID <- getZoneID(organizationID)
+                  traderID <- getTraderID
                   authToken <- authToken
                   wallexUserSignUp <- userSignUpWallex(authToken)
                   userWallexAccount <-
@@ -205,7 +212,8 @@ class WallexController @Inject() (
                     wallexUserSignUp.accountType,
                     wallexUserSignUp.userId,
                     wallexUserSignUp.accountId,
-                    userWallexAccount.status
+                    userWallexAccount.status,
+                    traderID
                   )
                   result <- withUsernameToken.Ok(
                     views.html.profile(successes =
@@ -1867,4 +1875,76 @@ class WallexController @Inject() (
               }
             )
     }
+
+  def fundingNotification() = withoutLoginActionAsync {
+    implicit request =>
+
+      implicit val requestReads = wallexFundSimplePayment.requestReads
+
+      val fundNotificationRequest = request.body.asJson.map { requestBody =>
+        convertJsonStringToObject[wallexFundSimplePayment.Request](requestBody.toString())
+      }.getOrElse(throw new BaseException(constants.Response.FAILURE))
+
+      val authToken = wallexAuthToken.Service.getToken()
+
+      def getFundingStatus(authToken: String,
+                           fundingID: String
+                                ) =
+        wallexGetFundingStatus.Service.get(
+          authToken,
+          fundingID
+        )
+
+      def getWallexAccount(accountID: String) =
+        wallexOrganizationAccountDetails.Service.tryGetByAccountId(accountID)
+
+      def traderAccountID(traderID: String) = masterTraders.Service.tryGetAccountId(traderID)
+
+      def traderAddress(traderAccountID: String) =
+        blockchainAccounts.Service.tryGetAddress(traderAccountID)
+
+      def getZoneID(traderID: String) = masterTraders.Service.tryGetZoneID(traderID)
+
+      def zoneAccountID(zoneID: String) = masterZones.Service.tryGetAccountID(zoneID)
+
+      def zoneAddress(zoneAccountID: String) =
+        blockchainAccounts.Service.tryGetAddress(zoneAccountID)
+
+      def insertOrUpdate(fundingResponse: GetFundingResponse) = wallexFundingStatusDetails.Service.insertOrUpdate(
+        id = fundingResponse.id,balanceID = fundingResponse.balanceId, accountID = fundingResponse.accountId,
+        amount = fundingResponse.amount,reference = fundingResponse.reference, status = fundingResponse.status)
+
+      def zoneAutomatedIssueFiat(
+                                  traderAddress: String,
+                                  zoneID: String,
+                                  zoneAddress: String,
+                                  fundingResponse: GetFundingResponse
+                                ) =
+          issueFiat(
+            traderAddress = traderAddress,
+            zoneID = zoneID,
+            zoneWalletAddress = zoneAddress,
+            wallexTransferReferenceID = fundingResponse.id,
+            transactionAmount =
+              new MicroNumber(fundingResponse.amount)
+          )
+
+      (for {
+        authToken <- authToken
+        fundingStatusResponse <- getFundingStatus(authToken,fundNotificationRequest.fundingId)
+        wallexAccount <- getWallexAccount(fundingStatusResponse.accountId)
+        traderAccountID <- traderAccountID(wallexAccount.traderID)
+        zoneID <- getZoneID(wallexAccount.traderID)
+        zoneAccountID <- zoneAccountID(zoneID)
+        zoneAddress <- zoneAddress(zoneAccountID)
+        traderAddress <- traderAddress(traderAccountID)
+        _ <- insertOrUpdate(fundingStatusResponse)
+        _ <- if (fundNotificationRequest.resource.equals(constants.External.Wallex.FundNotification.FUNDING)
+                  && fundingStatusResponse.status.equals(constants.External.Wallex.FundNotification.COMPLETED))
+                zoneAutomatedIssueFiat(traderAddress, zoneID, zoneAddress, fundingStatusResponse) else Future(None)
+      } yield Ok).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
+
 }

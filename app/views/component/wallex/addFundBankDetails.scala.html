@@ -1,0 +1,16 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.WALLEX_ADD_FUND_BANK_DETAILS)
+</legend>
+<hr>
+<div class="modalInfoBlock">
+    <div class = "wallexTermsAndConditions">
+        <span> @Messages(constants.View.WALLEX_ADD_FUND_BANK_DETAILS_MESSAGE) </span>
+    </div>
+
+</div>

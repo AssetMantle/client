@@ -2,13 +2,16 @@
 @import controllers.actions.LoginState
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-    @commonCard(constants.View.WALLEX_TERMS_AND_CONDITIONS, 'cardIconPath -> "images/icons/icons.svg#termsAndConditions") {
-    }{
-      <div class = "wallexTermsAndConditions">
+
+<legend class="cmuk-legend">
+    @Messages(constants.View.WALLEX_TERMS_AND_CONDITIONS)
+</legend>
+<hr>
+<div class="modalInfoBlock">
+    <div class = "wallexTermsAndConditions">
         <span> @Messages(constants.View.WALLEX_TERMS_AND_CONDITIONS_TEXT) </span>
-      </div>
+    </div>
 
 
     @commonModalButton(constants.View.BACK, routes.javascript.WallexController.createOrganizationAccountForm)
-
-}
+</div>

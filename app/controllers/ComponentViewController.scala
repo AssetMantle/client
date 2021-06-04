@@ -3377,4 +3377,12 @@ class ComponentViewController @Inject()(
               InternalServerError(baseException.failure.message)
           }
     }
+
+  def traderAddWallexFund(): Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState =>
+        implicit request =>
+          Future(Ok(views.html.component.wallex.addFundBankDetails()))
+    }
+
 }
