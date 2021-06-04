@@ -93,7 +93,7 @@ class FileController @Inject()(
     implicit request =>
       val oldDocument = masterAccountKYCs.Service.tryGet(id = loginState.username, documentType = documentType)
 
-      def updateFile(oldDocument: AccountKYC): Future[Boolean] = fileResourceManager.updateFile[AccountKYC](
+      def updateFile(oldDocument: AccountKYC): Future[Boolean] = fileResourceManager.updateApprovableFile[AccountKYC](
         name = name,
         path = fileResourceManager.getAccountKYCFilePath(documentType),
         oldDocument = oldDocument,

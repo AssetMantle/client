@@ -20,7 +20,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class AssetMutate(from: String, fromID: String, assetID: String, mutableMetaProperties: Seq[BaseProperty], mutableProperties: Seq[BaseProperty], gas: MicroNumber, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends BaseTransaction[AssetMutate] with Logged {
-  def mutateTicketID(newTicketID: String): AssetMutate = AssetMutate(from = from, fromID = fromID, assetID = assetID, mutableMetaProperties = mutableMetaProperties, mutableProperties = mutableProperties, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): AssetMutate = copy(ticketID = newTicketID)
 }
 
 @Singleton

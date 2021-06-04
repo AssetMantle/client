@@ -15,14 +15,9 @@ import scala.util.{Failure, Success}
 
 case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Document[AccountFile] with Logged {
 
-  val status: Option[Boolean] = Option(true)
-
   def updateFileName(newFileName: String): AccountFile = copy(fileName = newFileName)
 
   def updateFile(newFile: Option[Array[Byte]]): AccountFile = copy(file = newFile)
-
-  def updateStatus(status: Option[Boolean]): AccountFile = copy()
-
 }
 
 @Singleton
