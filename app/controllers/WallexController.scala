@@ -1942,7 +1942,9 @@ class WallexController @Inject() (
         _ <- if (fundNotificationRequest.resource.equals(constants.External.Wallex.FundNotification.FUNDING)
                   && fundingStatusResponse.status.equals(constants.External.Wallex.FundNotification.COMPLETED))
                 zoneAutomatedIssueFiat(traderAddress, zoneID, zoneAddress, fundingStatusResponse) else Future(None)
-      } yield Ok)
+      } yield Ok).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
 }
