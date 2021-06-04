@@ -1876,7 +1876,7 @@ class WallexController @Inject() (
             )
     }
 
-  def fundingNotification() = Action.async {
+  def fundingNotification() = withoutLoginActionAsync {
     implicit request =>
 
       implicit val requestReads = wallexFundSimplePayment.requestReads
