@@ -203,6 +203,10 @@
   .tableViewCard .infoRow .infoRowLabel {
     width: 125px;
   }
+
+  #tokensStatistics.tableViewCard .infoRow .infoRowLabel {
+    width: auto;
+  }
 }
 @media (min-width: 992px) and (max-width: 1600px) {
   .modal .modalContent {
