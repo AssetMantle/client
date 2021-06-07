@@ -1651,8 +1651,8 @@ class WallexController @Inject() (
                     id = wallexTransferResponse.id,
                     organizationID = organizationID,
                     wallexID = wallexID,
-                    senderAccountId = wallexTransferResponse.senderAccountId,
-                    receiverAccountId = wallexTransferResponse.receiverAccountId,
+                    senderAccountID = wallexTransferResponse.senderAccountId,
+                    receiverAccountID = wallexTransferResponse.receiverAccountId,
                     amount = wallexTransferResponse.amount,
                     currency = wallexTransferResponse.currency,
                     purposesOfTransfer =
