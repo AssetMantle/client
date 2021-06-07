@@ -16,8 +16,8 @@ case class WalletTransfer(
     id: String,
     wallexID: String,
     organizationID: String,
-    senderAccountId: String,
-    receiverAccountId: String,
+    senderAccountID: String,
+    receiverAccountID: String,
     amount: Double,
     currency: String,
     purposesOfTransfer: String,
@@ -113,8 +113,8 @@ class WalletTransfers @Inject()(
         id,
         wallexID,
         organizationID,
-        senderAccountId,
-        receiverAccountId,
+        senderAccountID,
+        receiverAccountID,
         amount,
         currency,
         purposesOfTransfer,
@@ -137,11 +137,9 @@ class WalletTransfers @Inject()(
 
     def organizationID = column[String]("organizationID")
 
-    def zoneID = column[String]("zoneID")
+    def senderAccountID = column[String]("senderAccountID")
 
-    def senderAccountId = column[String]("senderAccountId")
-
-    def receiverAccountId = column[String]("receiverAccountId")
+    def receiverAccountID = column[String]("receiverAccountID")
 
     def amount = column[Double]("amount")
 
@@ -176,10 +174,9 @@ class WalletTransfers @Inject()(
     def create(
         id: String,
         organizationID: String,
-        zoneID: String,
         wallexID: String,
-        senderAccountId: String,
-        receiverAccountId: String,
+        senderAccountID: String,
+        receiverAccountID: String,
         amount: Double,
         currency: String,
         purposesOfTransfer: String,
@@ -194,8 +191,8 @@ class WalletTransfers @Inject()(
           id = id,
           organizationID = organizationID,
           wallexID = wallexID,
-          senderAccountId = senderAccountId,
-          receiverAccountId = receiverAccountId,
+          senderAccountID = senderAccountID,
+          receiverAccountID = receiverAccountID,
           amount = amount,
           currency = currency,
           purposesOfTransfer = purposesOfTransfer,
@@ -211,8 +208,8 @@ class WalletTransfers @Inject()(
         id: String,
         organizationID: String,
         wallexID: String,
-        senderAccountId: String,
-        receiverAccountId: String,
+        senderAccountID: String,
+        receiverAccountID: String,
         amount: Double,
         currency: String,
         purposesOfTransfer: String,
@@ -227,8 +224,8 @@ class WalletTransfers @Inject()(
           id = id,
           organizationID = organizationID,
           wallexID = wallexID,
-          senderAccountId = senderAccountId,
-          receiverAccountId = receiverAccountId,
+          senderAccountID = senderAccountID,
+          receiverAccountID = receiverAccountID,
           amount = amount,
           currency = currency,
           purposesOfTransfer = purposesOfTransfer,
