@@ -1784,7 +1784,6 @@ CREATE TABLE IF NOT EXISTS WALLEX."WalletTransfer"
 (
     "id"                  varchar not null,
     "organizationID"      varchar not null,
-    "zoneID"              varchar not null,
     "wallexID"            varchar not null,
     "senderAccountID"     varchar not null,
     "receiverAccountID"   varchar not null,
@@ -1990,7 +1989,7 @@ ALTER TABLE WALLEX."SimplePayment"
     ADD CONSTRAINT SimplePayment_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
 
 ALTER TABLE WALLEX."WalletTransferRequest"
-    ADD CONSTRAINT WalletTransferRequest_Negotiation_id FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("negotiationID");
+    ADD CONSTRAINT WalletTransferRequest_Negotiation_id FOREIGN KEY ("negotiationID") REFERENCES MASTER."Negotiation" ("id");
 
 ALTER TABLE WALLEX."CollectionAccount"
     ADD CONSTRAINT CollectionAccount_Wallex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
