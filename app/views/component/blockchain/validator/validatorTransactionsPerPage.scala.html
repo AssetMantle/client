@@ -19,7 +19,7 @@
                 <td class="blockHeightItem">
                     @commonJavascriptLink(tx.hash, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction('${tx.hash}'))"))
                 </td>
-                <td class="blockHeightItem">
+                <td>
                 @commonJavascriptLink(tx.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${tx.height}))"))
                 </td>
                 <td>
