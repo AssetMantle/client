@@ -71,7 +71,7 @@ class SplitController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID, sendData.fromID)))
 
@@ -116,7 +116,7 @@ class SplitController @Inject()(
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -159,7 +159,7 @@ class SplitController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID, unwrapData.fromID)))
 

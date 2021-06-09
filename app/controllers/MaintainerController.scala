@@ -98,7 +98,7 @@ class MaintainerController @Inject()(
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), deputizeData.classificationID, deputizeData.fromID, deputizeData.maintainedTraits.fold(0)(_.flatten.length))))
 
@@ -107,7 +107,7 @@ class MaintainerController @Inject()(
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
           }
         }

@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[Undelegate]) { undelegate =>
-    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(undelegate.delegatorAddress, routes.ViewController.wallet(undelegate.delegatorAddress)))
-    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(undelegate.validatorAddress, routes.ViewController.validator(undelegate.validatorAddress)))
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(undelegate.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${undelegate.delegatorAddress}'))")))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(undelegate.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${undelegate.validatorAddress}'))")))
     @commonTextInfo(constants.View.AMOUNTS, undelegate.amount.getAmountWithNormalizedDenom())
 }

@@ -1366,10 +1366,11 @@ body.lightMode .notification .notificationTime {
   border-radius: 4px;
   padding-left: 10px;
 }
-.comdex table.dataTable tbody td.blockHeightItem {
+.comdex table.dataTable tbody td.blockHeightItem, .comdex table.cmuk-table tbody td.blockHeightItem {
   display: flex;
+  align-items: center;
 }
-.comdex table.dataTable tbody td.blockHeightItem img {
+.comdex table.dataTable tbody td.blockHeightItem img, .comdex table.cmuk-table tbody td.blockHeightItem img {
   width: 25px;
   height: 25px;
   float: left;
@@ -1377,7 +1378,7 @@ body.lightMode .notification .notificationTime {
   display: inline-block;
   margin-right: 5px;
 }
-.comdex table.dataTable tbody th, .comdex table.dataTable tbody td {
+.comdex table.dataTable tbody th, .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody th, .comdex table.cmuk-table tbody td {
   padding: 16px 12px;
   font-weight: 400;
   color: #272931;
@@ -1388,7 +1389,7 @@ body.lightMode .notification .notificationTime {
 .comdex table.dataTable.no-footer {
   border-bottom: 1px solid #e5e5e5;
 }
-.comdex table.dataTable thead th {
+.comdex table.dataTable thead th, .comdex table.cmuk-table thead th {
   border-bottom: 0;
   color: #8D9CB5;
   font-weight: 500;
@@ -3171,6 +3172,12 @@ header:before,
 
 .cmuk-card-body.validatorList {
   padding: 0px;
+}
+.cmuk-card-body.validatorList .cmuk-subnav {
+  padding: 15px;
+}
+.cmuk-card-body.validatorList .cmuk-switcher {
+  overflow-x: scroll;
 }
 
 #validatorList .cmuk-subnav {

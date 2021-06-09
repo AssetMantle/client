@@ -1,0 +1,24 @@
+@import views.html.base._
+@import models.blockchain.ProposalVote
+
+@(proposalVotes: Seq[ProposalVote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.PROPOSAL_VOTES) {
+} {
+    <table class="cmuk-table cmuk-table-striped tableSort">
+        <thead>
+            <tr>
+                <th>@Messages(constants.View.VOTER)</th>
+                <th>@Messages(constants.View.OPTION)</th>
+            </tr>
+        </thead>
+        <tbody>
+        @proposalVotes.map { proposalVote =>
+            <tr>
+                <td>@commonJavascriptLink(proposalVote.voter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${proposalVote.voter}'))"))</td>
+                <td>@Messages(proposalVote.option)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

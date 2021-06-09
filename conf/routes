@@ -18,16 +18,14 @@ GET         /docusign/callBack                                   controllers.Doc
 GET         /docusign/authorizationCallBack                      controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /profile                                             controllers.ViewController.profile
-GET         /dashboard                                           controllers.ViewController.dashboard
-GET         /wallet                                              controllers.ViewController.wallet(address: String)
-GET         /blocks                                              controllers.ViewController.blocks
-GET         /transactions                                        controllers.ViewController.transactions
-GET         /validators                                          controllers.ViewController.validators
-GET         /proposals                                           controllers.ViewController.proposals
-GET         /block                                               controllers.ViewController.block(height: Int)
-GET         /transaction                                         controllers.ViewController.transaction(txHash: String)
-GET         /validator                                           controllers.ViewController.validator(address: String)
-GET         /proposal                                            controllers.ViewController.proposal(id: Int)
+GET         /account                                             controllers.ViewController.account
+
+GET         /dashboard                                           controllers.ComponentViewController.dashboard
+GET         /wallet                                              controllers.ComponentViewController.wallet(address: String)
+GET         /block                                               controllers.ComponentViewController.block(height: Int)
+GET         /transaction                                         controllers.ComponentViewController.transaction(txHash: String)
+GET         /validator                                           controllers.ComponentViewController.validator(address: String)
+GET         /proposal                                            controllers.ComponentViewController.proposal(id: Int)
 GET         /identity                                            controllers.ViewController.identity
 GET         /account                                             controllers.ViewController.account
 GET         /asset                                               controllers.ViewController.asset

@@ -57,11 +57,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def search(query: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
 
-      if (query == "") Future(Ok(views.html.dashboard(failures = Seq(constants.Response.EMPTY_QUERY))))
-      else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ViewController.wallet(query)))
-      else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ViewController.validator(query)))
-      else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ViewController.transaction(query)))
-      else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ViewController.block(query.toInt)))
+      if (query == "") Future(Unauthorized(views.html.index(failures = Seq(constants.Response.EMPTY_QUERY))))
+      else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ComponentViewController.wallet(query)))
+      else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))
+      else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
+      else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
       else {
         val asset = blockchainAssets.Service.get(query)
         val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
@@ -72,18 +72,15 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         val maintainer = blockchainMaintainers.Service.get(query)
 
         def searchResult(asset: Option[models.blockchain.Asset], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.Order], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
-          if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
+          if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(Unauthorized(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
           else {
             loginState match {
               case Some(loginState) =>
                 implicit val loginStateImplicit: LoginState = loginState
-                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
-                  withUsernameToken.Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-                } else withUsernameToken.Ok(views.html.search(asset, identity, splits, order, metaList, classification, maintainer))
+                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) withUsernameToken.Ok(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+                else withUsernameToken.Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer))
               case None =>
-                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) {
-                  Future(Ok(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
-                } else Future(Ok(views.html.search(asset, identity, splits, order, metaList, classification, maintainer)))
+                Future(Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer)))
             }
           }
         }
@@ -98,7 +95,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           maintainer <- maintainer
           result <- searchResult(asset, splits, identity, order, metaList, classification, maintainer)
         } yield result).recover {
-          case _: BaseException => InternalServerError(views.html.dashboard(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+          case _: BaseException => Unauthorized(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
         }
       }
   }

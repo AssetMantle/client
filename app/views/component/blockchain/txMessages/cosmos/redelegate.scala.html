@@ -5,8 +5,8 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[Redelegate]) { redelegate =>
-    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(redelegate.delegatorAddress, routes.ViewController.wallet(redelegate.delegatorAddress)))
-    @commonHtmlInfo(constants.View.VALIDATOR_SOURCE_ADDRESS, commonLink(redelegate.validatorSrcAddress, routes.ViewController.validator(redelegate.validatorSrcAddress)))
-    @commonHtmlInfo(constants.View.VALIDATOR_DESTINATION_ADDRESS, commonLink(redelegate.validatorDstAddress, routes.ViewController.validator(redelegate.validatorDstAddress)))
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(redelegate.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${redelegate.delegatorAddress}'))")))
+    @commonHtmlInfo(constants.View.VALIDATOR_SOURCE_ADDRESS, commonJavascriptLink(redelegate.validatorSrcAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${redelegate.validatorSrcAddress}'))")))
+    @commonHtmlInfo(constants.View.VALIDATOR_DESTINATION_ADDRESS, commonJavascriptLink(redelegate.validatorDstAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${redelegate.validatorDstAddress}'))")))
     @commonTextInfo(constants.View.AMOUNTS, redelegate.amount.getAmountWithNormalizedDenom())
 }

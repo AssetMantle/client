@@ -9,6 +9,7 @@ import models.common.Parameters.{GovernanceParameter, SlashingParameter}
 import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
+import models.masterTransaction.Notification
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.MessagesControllerComponents
@@ -336,7 +337,7 @@ class Block @Inject()(
       //TODO In future if private notifications is asked for missing blocks then it needs to be done from here.
       val slashingOnMissingBlocks = slashingParameter.minSignedPerWindow * slashingParameter.signedBlocksWindow
       if ((missedBlockCounter % (slashingOnMissingBlocks * slashingNotificationFactor) == 0) && missedBlockCounter != slashingOnMissingBlocks) {
-        masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker, missedBlockCounter.toString, height.toString)(validator.operatorAddress)
+        masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_MISSED_BLOCKS, validator.description.moniker, missedBlockCounter.toString, height.toString)(s"'${validator.operatorAddress}'")
       } else Future("")
     }
 

@@ -5,5 +5,5 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[WithdrawValidatorCommission]) { withdrawValidatorCommission =>
-    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(withdrawValidatorCommission.validatorAddress, routes.ViewController.validator(withdrawValidatorCommission.validatorAddress)))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(withdrawValidatorCommission.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${withdrawValidatorCommission.validatorAddress}'))")))
 }

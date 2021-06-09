@@ -1,0 +1,37 @@
+@import views.html.base._
+@import models.blockchain.Proposal
+
+@(proposalList: Seq[Proposal])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="">
+    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+        <div class="cmuk-card-header">
+            @Messages(constants.View.PROPOSALS)
+        </div>
+        <div class="cmuk-card-body proposalList">
+            <table class="cmuk-table cmuk-table-striped tableSort">
+                <thead>
+                    <tr>
+                        <th>@Messages(constants.View.ID)</th>
+                        <th>@Messages(constants.View.TITLE)</th>
+                        <th>@Messages(constants.View.STATUS)</th>
+                        <th>@Messages(constants.View.VOTING_START)</th>
+                        <th>@Messages(constants.View.SUBMIT_TIME)</th>
+                        <th>@Messages(constants.View.TOTAL_DEPOSIT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @proposalList.map { proposal =>
+                    <tr>
+                        <td>@commonJavascriptLink(proposal.id.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(${proposal.id}))"))</td>
+                        <td>@proposal.content.title</td>
+                        <td>@Messages(proposal.status)</td>
+                        <td>@utilities.Date.bcTimestampToString(proposal.votingStartTime)</td>
+                        <td>@utilities.Date.bcTimestampToString(proposal.submitTime)</td>
+                        <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

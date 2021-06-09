@@ -1,0 +1,28 @@
+@(address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="validatorDetails" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="validatorUptime"></div>
+        </div>
+        <div class="cmuk-width-expand@@m">
+            <div id="validatorDelegations" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="validatorTransactions"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('validatorDetails', jsRoutes.controllers.ComponentViewController.validatorDetails('@address'));
+        componentResource('validatorUptime', jsRoutes.controllers.ComponentViewController.validatorUptime('@address', 100));
+        componentResource('validatorDelegations', jsRoutes.controllers.ComponentViewController.validatorDelegations('@address'));
+        componentResource('validatorTransactions', jsRoutes.controllers.ComponentViewController.validatorTransactions('@address'));
+</script>

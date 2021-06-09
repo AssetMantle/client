@@ -5,6 +5,6 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SetWithdrawAddress]) { setWithdrawAddress =>
-    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(setWithdrawAddress.delegatorAddress, routes.ViewController.wallet(setWithdrawAddress.delegatorAddress)))
-    @commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonLink(setWithdrawAddress.withdrawAddress, routes.ViewController.wallet(setWithdrawAddress.withdrawAddress)))
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(setWithdrawAddress.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${setWithdrawAddress.delegatorAddress}'))")))
+    @commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonJavascriptLink(setWithdrawAddress.withdrawAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${setWithdrawAddress.withdrawAddress}'))")))
 }

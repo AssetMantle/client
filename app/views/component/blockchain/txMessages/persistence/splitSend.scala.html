@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SplitSend]) { splitSend =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(splitSend.from, routes.ViewController.wallet(splitSend.from)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(splitSend.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${splitSend.from}'))")))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(splitSend.fromID, routes.IndexController.search(splitSend.fromID)))
     @commonHtmlInfo(constants.View.TO_ID, commonLink(splitSend.toID, routes.IndexController.search(splitSend.toID)))
     @commonHtmlInfo(constants.View.OWNABLE_ID, commonLink(splitSend.ownableID, routes.IndexController.search(splitSend.ownableID)))

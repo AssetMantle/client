@@ -91,7 +91,7 @@ class BackgroundCheckController @Inject()(
             scanID <- scanID
             result <- getResult(scanID)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -102,7 +102,7 @@ class BackgroundCheckController @Inject()(
       (for {
         result <- result
       } yield Ok(views.html.component.master.memberCheckMemberScanResult(result))).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -122,9 +122,9 @@ class BackgroundCheckController @Inject()(
           val decision = postMemberCheckMemberScanResultDecision.Service.post(memberCheckMemberScanResultDecisionData.resultID.toString, postMemberCheckMemberScanResultDecision.Request(memberCheckMemberScanResultDecisionData.matchDecision, memberCheckMemberScanResultDecisionData.assessedRisk, memberCheckMemberScanResultDecisionData.comment))
           (for {
             _ <- decision
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -151,9 +151,9 @@ class BackgroundCheckController @Inject()(
             memberScan <- memberScan
             _ <- createMemberCheckUBODecision
             _ <- updateUBOStatus
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -201,7 +201,7 @@ class BackgroundCheckController @Inject()(
             scanID <- scanID
             result <- getResult(scanID)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -212,7 +212,7 @@ class BackgroundCheckController @Inject()(
       (for {
         result <- result
       } yield Ok(views.html.component.master.memberCheckCorporateScanResult(result))).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -232,9 +232,9 @@ class BackgroundCheckController @Inject()(
           val decision = postMemberCheckCorporateScanResultDecision.Service.post(memberCheckCorporateScanResultDecisionData.resultID.toString, postMemberCheckCorporateScanResultDecision.Request(memberCheckCorporateScanResultDecisionData.matchDecision, memberCheckCorporateScanResultDecisionData.assessedRisk, memberCheckCorporateScanResultDecisionData.comment))
           (for {
             _ <- decision
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -259,9 +259,9 @@ class BackgroundCheckController @Inject()(
           (for {
             _ <- corporateScan
             _ <- createMemberCheckOrganizationDecision
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -309,7 +309,7 @@ class BackgroundCheckController @Inject()(
             scanID <- scanID
             result <- getResult(scanID)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -320,7 +320,7 @@ class BackgroundCheckController @Inject()(
       (for {
         result <- result
       } yield Ok(views.html.component.master.memberCheckVesselScanResult(result))).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -339,9 +339,9 @@ class BackgroundCheckController @Inject()(
           val decision = postMemberCheckCorporateScanResultDecision.Service.post(memberCheckVesselScanResultDecisionData.resultID.toString, postMemberCheckCorporateScanResultDecision.Request(memberCheckVesselScanResultDecisionData.matchDecision, memberCheckVesselScanResultDecisionData.assessedRisk, memberCheckVesselScanResultDecisionData.comment))
           (for {
             _ <- decision
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }
@@ -366,9 +366,9 @@ class BackgroundCheckController @Inject()(
           (for {
             _ <- corporateScan
             _ <- createMemberCheckVesselDecision
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.DECISION_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.DECISION_UPDATED)))
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }

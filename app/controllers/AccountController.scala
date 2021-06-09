@@ -99,7 +99,7 @@ class AccountController @Inject()(
         _ <- updatePartialMnemonic(mnemonics, blockchainAccountExists)
       } yield Ok(views.html.component.master.createWallet(username = username, mnemonics = mnemonics.takeRight(constants.Blockchain.MnemonicShown)))
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -130,7 +130,7 @@ class AccountController @Inject()(
             result <- createAccountAndGetResult(validateUsernamePassword, masterAccount)
           } yield result)
             .recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
         }
       )
@@ -185,14 +185,14 @@ class AccountController @Inject()(
               oldUsername <- getOldUsername(addKeyResponse)
               accountExists <- checkAccountExists(oldUsername)
               _ <- checkAndUpdate(addKeyResponse, accountExists)
-            } yield Ok(views.html.dashboard(successes = Seq(constants.Response.ACCOUNT_CREATED)))
+            } yield Ok(views.html.index(successes = Seq(constants.Response.ACCOUNT_CREATED)))
           } else if (!validMnemonics) Future(BadRequest(views.html.component.master.importWallet(ImportWallet.form.fill(importWalletData).withGlobalError(constants.Response.INVALID_MNEMONICS.message))))
           else Future(BadRequest(views.html.component.master.importWallet(ImportWallet.form.fill(importWalletData).withGlobalError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))))
 
           (for {
             result <- createAccountAndGetResult
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -274,7 +274,7 @@ class AccountController @Inject()(
             result <- checkLoginAndGetResult(validateUsernamePassword = validateUsernamePassword, bcAccountExists = bcAccountExists)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -300,9 +300,9 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield Ok(views.html.dashboard(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -340,7 +340,7 @@ class AccountController @Inject()(
             validateUsernamePassword <- validateUsernamePassword
             result <- updateAndGetResult(validateUsernamePassword)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -364,7 +364,7 @@ class AccountController @Inject()(
             _ <- utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)()
           } yield PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -396,9 +396,9 @@ class AccountController @Inject()(
                 account <- account
                 _ <- post(account.partialMnemonic)
                 _ <- updatePassword()
-              } yield Ok(views.html.dashboard(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+              } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } else {
-              Future(BadRequest(views.html.dashboard(failures = Seq(constants.Response.INVALID_PASSWORD))))
+              Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
             }
           }
 
@@ -406,7 +406,7 @@ class AccountController @Inject()(
             validOTP <- validOTP
             result <- updateAndGetResult(validOTP)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -455,7 +455,7 @@ class AccountController @Inject()(
             result <- withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -479,7 +479,7 @@ class AccountController @Inject()(
         accountKYC <- accountKYC
         result <- withUsernameToken.Ok(views.html.component.master.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -494,7 +494,7 @@ class AccountController @Inject()(
             accountKYC <- accountKYC
           } yield BadRequest(views.html.component.master.userReviewIdentification(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         userReviewAddZoneRequestData => {
@@ -525,7 +525,7 @@ class AccountController @Inject()(
             result <- markIdentificationFormCompletedAndGetResult(identificationFileExists)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

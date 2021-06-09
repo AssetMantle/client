@@ -6,5 +6,5 @@
 
 @defining(msg.asInstanceOf[UpgradeClient]) { upgradeClient =>
     @commonTextInfo(constants.View.CLIENT_ID, upgradeClient.clientID)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(upgradeClient.signer, routes.ViewController.wallet(upgradeClient.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(upgradeClient.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${upgradeClient.signer}'))")))
 }

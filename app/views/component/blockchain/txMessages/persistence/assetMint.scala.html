@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[AssetMint]) { assetMint =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(assetMint.from, routes.ViewController.wallet(assetMint.from)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetMint.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetMint.from}'))")))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(assetMint.fromID, routes.IndexController.search(assetMint.fromID)))
     @commonHtmlInfo(constants.View.TO_ID, commonLink(assetMint.toID, routes.IndexController.search(assetMint.toID)))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(assetMint.classificationID, routes.IndexController.search(assetMint.classificationID)))

@@ -1,0 +1,18 @@
+@(txHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="transactionDetails" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="transactionMessages" class="transactionMessages"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
+        componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
+</script>

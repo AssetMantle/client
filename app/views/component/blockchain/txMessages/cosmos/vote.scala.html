@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[Vote]) { vote =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(vote.voter, routes.ViewController.wallet(vote.voter)))
+    @commonHtmlInfo(constants.View.VOTER, commonJavascriptLink(vote.voter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${vote.voter}'))")))
     @commonTextInfo(constants.View.PROPOSAL_ID, vote.proposalID.toString)
     @commonTextInfo(constants.View.VOTE, vote.option)
 }

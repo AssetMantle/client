@@ -8,5 +8,5 @@
     @commonTextInfo(constants.View.PORT_ID, channelOpenConfirm.portID)
     @commonTextInfo(constants.View.CHANNEL_ID, channelOpenConfirm.channelID)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, channelOpenConfirm.proofHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelOpenConfirm.signer, routes.ViewController.wallet(channelOpenConfirm.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(channelOpenConfirm.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${channelOpenConfirm.signer}'))")))
 }

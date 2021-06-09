@@ -1,0 +1,18 @@
+@(height: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="blockDetails" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="blockTransactions"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
+        componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
+</script>

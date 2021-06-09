@@ -8,5 +8,5 @@
     @views.html.component.blockchain.txMessages.ibc.commonPacket(constants.View.PACKET, timeout.packet)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, timeout.proofHeight)
     @commonTextInfo(constants.View.NEXT_SEQUENCE_RECV, timeout.nextSequenceRecv)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(timeout.signer, routes.ViewController.wallet(timeout.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(timeout.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${timeout.signer}'))")))
 }

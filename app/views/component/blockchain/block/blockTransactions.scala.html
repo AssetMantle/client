@@ -1,0 +1,44 @@
+@import views.html.base._
+@import models.blockchain.Transaction
+
+@(height: Int, transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.BLOCK_TRANSACTIONS) {
+} {
+    @if(transactions.isEmpty) {
+        @Messages(constants.View.NO_BLOCK_TRANSACTIONS, height)
+    } else {
+        <table class="cmuk-table cmuk-table-striped">
+            <thead>
+                <tr>
+                    <th>@Messages(constants.View.TRANSACTION_HASH)</th>
+                    <th>@Messages(constants.View.STATUS)</th>
+                    <th>@Messages(constants.View.NUMBER_OF_MESSAGES)</th>
+                    <th>@Messages(constants.View.TRANSACTION_FEES)</th>
+                </tr>
+            </thead>
+            <tbody>
+            @transactions.map { tx =>
+                <tr>
+                    <td class="blockHeightItem">
+                        @commonJavascriptLink(tx.hash, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction('${tx.hash}'))"))
+                    </td>
+                    <td>
+                    @if(tx.status) {
+                        <span cmuk-icon="check" class="check hidden"></span>
+                    } else {
+                        <span cmuk-icon="close" class="close hidden"></span>
+                    }
+                    </td>
+                    <td>@tx.messages.length</td>
+                    <td>@if(tx.fee.amount.nonEmpty) {
+                        @tx.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
+                    } else {
+                        0
+                    }</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
