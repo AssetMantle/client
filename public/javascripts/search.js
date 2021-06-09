@@ -8,20 +8,5 @@ function searchFunctionOnEnter(event, id) {
 function searchFunction(id) {
     let source = $('#' + id).val();
     const route = jsRoutes.controllers.IndexController.search(source);
-    $.ajax({
-        url: route.url,
-        contentType: 'application/x-www-form-urlencoded',
-        type: route.type,
-        statusCode: {
-            200: function (data) {
-                replaceDocument(data);
-            },
-            500: function (data) {
-                replaceDocument(data.responseText);
-            },
-            308: function (data) {
-                replaceDocument(data.responseText);
-            }
-        }
-    });
+    componentResource('explorerContent', route);
 }

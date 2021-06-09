@@ -49,123 +49,12 @@ class ViewController @Inject()(
       }
   }
 
-  def wallet(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.account())
-        }
-        case None => Future(Ok(views.html.wallet(address)))
-      }
-  }
-
-  def blocks(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.blocks())
-        }
-        case None => Future(Ok(views.html.blocks()))
-      }
-
-  }
-
-  def block(height: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.block(height))
-        }
-        case None => Future(Ok(views.html.block(height)))
-      }
-  }
-
-  def transactions(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.transactions())
-        }
-        case None => Future(Ok(views.html.transactions()))
-      }
-  }
-
-  def transaction(txHash: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.transaction(txHash))
-        }
-        case None => Future(Ok(views.html.transaction(txHash)))
-      }
-  }
-
-  def validators(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.validators())
-        }
-        case None => Future(Ok(views.html.validators()))
-      }
-  }
-
-  def validator(address: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.validator(address))
-        }
-        case None => Future(Ok(views.html.validator(address)))
-      }
-  }
-
-  def proposal(id: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.proposal(id))
-        }
-        case None => Future(Ok(views.html.proposal(id)))
-      }
-  }
-
-  def proposals(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.proposals())
-        }
-        case None => Future(Ok(views.html.proposals()))
-      }
-  }
-
-  def dashboard: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      loginState match {
-        case Some(loginState) => {
-          implicit val loginStateImplicit: LoginState = loginState
-          withUsernameToken.Ok(views.html.dashboard())
-        }
-        case None => Future(Ok(views.html.dashboard()))
-      }
-  }
-
   def identity: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
         result <- withUsernameToken.Ok(views.html.identity())
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 

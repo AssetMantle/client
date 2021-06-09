@@ -6,7 +6,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[AssetMutate]) { assetMutate =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(assetMutate.from, routes.ViewController.wallet(assetMutate.from)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetMutate.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetMutate.from}'))")))
     @commonHtmlInfo(constants.View.ASSET_ID, commonLink(assetMutate.assetID, routes.IndexController.search(assetMutate.assetID)))
     @Messages(constants.View.MUTABLE_META_PROPERTIES):
     @views.html.component.blockchain.metaProperties(assetMutate.mutableMetaProperties.metaPropertyList)

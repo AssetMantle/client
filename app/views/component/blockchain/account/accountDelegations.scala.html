@@ -1,0 +1,16 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+@import models.common.Serializable.UndelegationEntry
+@import views.html.component.blockchain.account.accountDelegationsDelegated
+@import views.html.component.blockchain.account.accountDelegationsUndelegating
+@import utilities.MicroNumber
+
+@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.ACCOUNT_DELEGATIONS) {
+} {
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.DELEGATED -> accountDelegationsDelegated(delegations, validatorsMoniker),
+        constants.View.UNDELEGATING -> accountDelegationsUndelegating(undelegations, validatorsMoniker),
+    ))
+}

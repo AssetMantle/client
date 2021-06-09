@@ -102,7 +102,7 @@ class OrderController @Inject()(
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
           }
         }
@@ -179,7 +179,7 @@ class OrderController @Inject()(
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
           }
         }
@@ -222,7 +222,7 @@ class OrderController @Inject()(
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -264,7 +264,7 @@ class OrderController @Inject()(
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

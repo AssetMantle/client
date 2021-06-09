@@ -17,5 +17,5 @@
     </div>
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenTry.proofHeight)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.CONSENSUS_HEIGHT, connectionOpenTry.consensusHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenTry.signer, routes.ViewController.wallet(connectionOpenTry.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenTry.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenTry.signer}'))")))
 }

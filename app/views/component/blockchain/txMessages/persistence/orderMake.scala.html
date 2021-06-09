@@ -6,7 +6,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[OrderMake]) { orderMake =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(orderMake.from, routes.ViewController.wallet(orderMake.from)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderMake.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderMake.from}'))")))
     @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderMake.fromID, routes.IndexController.search(orderMake.fromID)))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(orderMake.classificationID, routes.IndexController.search(orderMake.classificationID)))
     @commonHtmlInfo(constants.View.MAKER_OWNABLE_ID, commonLink(orderMake.makerOwnableID, routes.IndexController.search(orderMake.makerOwnableID)))

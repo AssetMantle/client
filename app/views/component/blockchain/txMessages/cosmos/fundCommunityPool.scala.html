@@ -5,6 +5,6 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[FundCommunityPool]) { fundCommunityPool =>
-    @commonHtmlInfo(constants.View.DEPOSITOR, commonLink(fundCommunityPool.depositor, routes.ViewController.wallet(fundCommunityPool.depositor)))
+    @commonHtmlInfo(constants.View.DEPOSITOR, commonJavascriptLink(fundCommunityPool.depositor, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fundCommunityPool.depositor}'))")))
     @commonTextInfo(constants.View.AMOUNTS, fundCommunityPool.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
 }

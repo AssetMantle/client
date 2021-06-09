@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[ConnectionOpenConfirm]) { connectionOpenConfirm =>
     @commonTextInfo(constants.View.CONNECTION_ID, connectionOpenConfirm.connectionID)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenConfirm.proofHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenConfirm.signer, routes.ViewController.wallet(connectionOpenConfirm.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenConfirm.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenConfirm.signer}'))")))
 }

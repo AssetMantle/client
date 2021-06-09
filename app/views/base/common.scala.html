@@ -73,31 +73,31 @@
                             </a>
                             <ul class="cmuk-navbar-nav">
 
-                                <li id="dashBoard"><a href="@controllers.routes.ViewController.dashboard()" class="navItemRippleEffect"><span class="dashboardIcon">
+                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
                                 @commonIcon("dashBoard")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.blocks()" class="navItemRippleEffect"><span class="blocksIcon">
+                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
                                 @commonIcon("blocks")
                                 </span>
                                     @Messages(constants.View.BLOCKS)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.transactions()" class="navItemRippleEffect"><span class="transactionsIcon">
+                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList())" class="navItemRippleEffect"><span class="transactionsIcon">
                                 @commonIcon("transactions")
                                 </span>
                                     @Messages(constants.View.TRANSACTIONS)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.validators()" class="navItemRippleEffect"><span class="validatorsIcon">
+                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
                                 @commonIcon("validators")
                                 </span>
                                     @Messages(constants.View.VALIDATORS)
                                 </a>
                                 </li>
-                                <li><a href="@controllers.routes.ViewController.proposals()" class="navItemRippleEffect"><span class="proposalsIcon">
+                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
                                 @commonIcon("proposals")
                                 </span>
                                         &nbsp;&nbsp;@Messages(constants.View.PROPOSALS)

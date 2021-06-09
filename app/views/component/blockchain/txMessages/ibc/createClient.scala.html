@@ -5,5 +5,5 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[CreateClient]) { createClient =>
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(createClient.signer, routes.ViewController.wallet(createClient.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(createClient.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${createClient.signer}'))")))
 }

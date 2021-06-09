@@ -107,10 +107,10 @@ class EntityController @Inject()(
 
           (for {
             _ <- verifyAndUpdate
-            result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(constants.Response.LABEL_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.LABEL_UPDATED)))
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

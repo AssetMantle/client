@@ -1,0 +1,15 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="">
+    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+        <div class="cmuk-card-header">
+            @Messages(constants.View.PROPOSALS)
+        </div>
+        <div class="cmuk-card-body proposalList">
+            <div id="proposalList"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('proposalList', jsRoutes.controllers.ComponentViewController.proposalList());
+</script>

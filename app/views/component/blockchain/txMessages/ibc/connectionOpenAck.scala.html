@@ -12,5 +12,5 @@
     }
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenAck.proofHeight)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.CONSENSUS_HEIGHT, connectionOpenAck.consensusHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenAck.signer, routes.ViewController.wallet(connectionOpenAck.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenAck.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenAck.signer}'))")))
 }

@@ -1,0 +1,18 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="">
+    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+        <div class="cmuk-card-header">
+            @Messages(constants.View.VALIDATORS)
+        </div>
+        <div class="cmuk-card-body validatorList">
+        @commonHorizontalSwitcher(ListMap(
+            constants.View.ACTIVE_VALIDATORS -> routes.javascript.ComponentViewController.activeValidatorList,
+            constants.View.INACTIVE_VALIDATORS -> routes.javascript.ComponentViewController.inactiveValidatorList,
+        ))
+        </div>
+    </div>
+</div>

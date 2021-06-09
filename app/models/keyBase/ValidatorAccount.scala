@@ -82,6 +82,15 @@ class ValidatorAccounts @Inject()(
 
   private def findAll: Future[Seq[ValidatorAccount]] = db.run(validatorAccountTable.result)
 
+  private def deleteByAddress(operatorAddress: String): Future[Int] = db.run(validatorAccountTable.filter(_.address === operatorAddress).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      // Possibility that key base account doesn't exist
+      case _: NoSuchElementException => 0
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
   private[models] class ValidatorAccountTable(tag: Tag) extends Table[ValidatorAccount](tag, "ValidatorAccount") {
 
     def * = (address, identity, username.?, pictureURL.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorAccount.tupled, ValidatorAccount.unapply)
@@ -121,6 +130,9 @@ class ValidatorAccounts @Inject()(
     def get(address: String): Future[Option[ValidatorAccount]] = getByAddress(address)
 
     def getAll: Future[Seq[ValidatorAccount]] = findAll
+
+    def delete(operatorAddress: String): Future[Int] = deleteByAddress(operatorAddress)
+
   }
 
   object Utility {

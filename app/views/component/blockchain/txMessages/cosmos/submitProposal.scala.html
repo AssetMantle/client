@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SubmitProposal]) { submitProposal =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(submitProposal.proposer, routes.ViewController.wallet(submitProposal.proposer)))
+    @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(submitProposal.proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${submitProposal.proposer}'))")))
     @commonTextInfo(constants.View.TITLE, submitProposal.content.title)
     @commonTextInfo(constants.View.DESCRIPTION, submitProposal.content.description)
     @commonTextInfo(constants.View.TYPE, submitProposal.content.proposalContentType)

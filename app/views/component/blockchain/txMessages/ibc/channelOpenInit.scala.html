@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[ChannelOpenInit]) { channelOpenInit =>
     @commonTextInfo(constants.View.PORT_ID, channelOpenInit.portID)
     @views.html.component.blockchain.txMessages.ibc.commonChannel(constants.View.CHANNEL, channelOpenInit.channel)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelOpenInit.signer, routes.ViewController.wallet(channelOpenInit.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(channelOpenInit.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${channelOpenInit.signer}'))")))
 }

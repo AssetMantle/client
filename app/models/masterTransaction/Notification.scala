@@ -38,10 +38,10 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
   private val notificationsPerPage = configuration.get[Int]("notifications.perPage")
 
   case class NotificationSerializable(id: String, accountID: Option[String], notificationTemplateJson: String, jsRoute: Option[String], read: Boolean, createdOn: Option[Timestamp], createdBy: Option[String], createdOnTimeZone: Option[String], updatedOn: Option[Timestamp], updatedBy: Option[String], updatedOnTimeZone: Option[String]) {
-    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson),jsRoute = jsRoute,  read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize(): Notification = Notification(id = id, accountID = accountID, notificationTemplate = utilities.JSON.convertJsonStringToObject[NotificationTemplate](notificationTemplateJson), jsRoute = jsRoute, read = read, createdOn = createdOn, createdBy = createdBy, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString,jsRoute = notification.jsRoute, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimeZone = notification.createdOnTimeZone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
+  def serialize(notification: Notification): NotificationSerializable = NotificationSerializable(id = notification.id, accountID = notification.accountID, notificationTemplateJson = Json.toJson(notification.notificationTemplate).toString, jsRoute = notification.jsRoute, read = notification.read, createdOn = notification.createdOn, createdBy = notification.createdBy, createdOnTimeZone = notification.createdOnTimeZone, updatedBy = notification.updatedBy, updatedOn = notification.updatedOn, updatedOnTimeZone = notification.updatedOnTimeZone)
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
@@ -79,6 +79,8 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def findAll: Future[Seq[NotificationSerializable]] = db.run(notificationTable.result)
+
   private[models] class NotificationTable(tag: Tag) extends Table[NotificationSerializable](tag, "Notification") {
 
     def * = (id, accountID.?, notificationTemplateJson, jsRoute.?, read, createdOn.?, createdBy.?, createdOnTimeZone.?, updatedOn.?, updatedBy.?, updatedOnTimeZone.?) <> (NotificationSerializable.tupled, NotificationSerializable.unapply)
@@ -108,7 +110,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = Option(accountID), notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters),  jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.String.getJsRouteString(x, routeParameters: _*)))))
+    def create(accountID: String, notification: constants.Notification, parameters: String*)(routeParameters: String*): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = Option(accountID), notificationTemplate = NotificationTemplate(template = notification.notificationType, parameters = parameters), jsRoute = notification.route.fold[Option[String]](None)(x => Option(utilities.String.getJsRouteString(x, routeParameters: _*)))))
 
     def get(accountID: String, pageNumber: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = Option(accountID), offset = (pageNumber - 1) * notificationsPerPage, limit = notificationsPerPage).map(serializedNotifications => serializedNotifications.map(_.deserialize()))
 
@@ -120,6 +122,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getNumberOfUnread(accountID: String): Future[Int] = findNumberOfReadOnStatusByAccountId(accountID = accountID, status = false)
 
+    def getAll: Future[Seq[Notification]] = findAll.map(_.map(_.deserialize()))
   }
 
 }

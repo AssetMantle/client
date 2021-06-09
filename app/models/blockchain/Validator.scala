@@ -155,7 +155,8 @@ class Validators @Inject()(
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND, noSuchElementException)
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      // Here it can happen that validator is deleted in BC but there are some undelegations left over, so this throws foreign key constraint violation. (BC doesn't have FK constraint. Removing FK constraint here is bad idea.)
+      case _: PSQLException => 0
     }
   }
 
@@ -243,7 +244,19 @@ class Validators @Inject()(
 
     def jailValidator(operatorAddress: String): Future[Int] = updateJailedStatus(operatorAddress = operatorAddress, jailed = true)
 
-    def delete(operatorAddress: String): Future[Int] = deleteByOperatorAddress(operatorAddress)
+    def delete(operatorAddress: String): Future[Unit] = {
+      val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
+
+      def deleteValidator() = deleteByOperatorAddress(operatorAddress)
+
+      (for {
+        _ <- deleteKeyBaseAccount
+        _ <- deleteValidator()
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
 
     def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
   }

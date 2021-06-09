@@ -114,7 +114,10 @@ function onNotificationClick(route, inNewPage) {
                 }
             });
         } else {
-            getForm(route);
+            // For explorer, modals aren't required rather centre cards needs to be updated
+            // getForm(route);
+
+            componentResource('explorerContent', route);
         }
     }
 }

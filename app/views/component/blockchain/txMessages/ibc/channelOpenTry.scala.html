@@ -10,5 +10,5 @@
     @views.html.component.blockchain.txMessages.ibc.commonChannel(constants.View.CHANNEL, channelOpenTry.channel)
     @commonTextInfo(constants.View.COUNTERPARTY_VERSION, channelOpenTry.counterpartyVersion)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, channelOpenTry.proofHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(channelOpenTry.signer, routes.ViewController.wallet(channelOpenTry.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(channelOpenTry.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${channelOpenTry.signer}'))")))
 }

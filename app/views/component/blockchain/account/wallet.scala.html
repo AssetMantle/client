@@ -1,0 +1,24 @@
+@(address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="accountWallet" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="accountDelegations" class="switcherCard tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="accountTransactions"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
+        componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
+        componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
+</script>

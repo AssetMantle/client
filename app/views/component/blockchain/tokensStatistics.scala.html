@@ -1,8 +1,5 @@
 @import models.blockchain.Token
-@import play.api.data.Field
 @import views.html.base._
-@import views.html.helper.select
-@import scala.collection.immutable.ListMap
 
 @(token: Token)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -11,14 +8,11 @@
 } {
     <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
         @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
+        @commonTextInfo(constants.View.APY, s"${utilities.NumericOperation.roundOff((token.inflation.toDouble * token.totalSupply.toDouble * 100) / token.bondedAmount.toDouble)} %")
         @commonTextInfo(constants.View.BONDED_TOKENS, s"${utilities.NumericOperation.roundOff((token.bondedAmount / token.totalSupply).toDouble * 100)} %")
         @commonTextInfo(constants.View.BONDED_AMOUNT, utilities.NumericOperation.formatNumber(token.bondedAmount))
         @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
         @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
-@*        @commonHtmlInfo(constants.View.STAKING_POOL, commonPieChart("bondingTokenStatisticsChart", ListMap(*@
-@*            constants.View.BONDED_AMOUNT -> token.bondedAmount.toDouble,*@
-@*            constants.View.NOT_BONDED_AMOUNT -> token.notBondedAmount.toDouble,*@
-@*        ), showLegend = true), 'class -> "")*@
     </div>
     @* <script src="@routes.Assets.versioned("javascripts/tokensStatistics.js")" type="text/javascript"></script>*@
 }

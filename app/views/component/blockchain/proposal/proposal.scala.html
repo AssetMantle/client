@@ -1,0 +1,24 @@
+@(id: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="proposalDetails" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="proposalDeposits" class="tableViewCard"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-small" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="proposalVotes" class="tableViewCard"></div>
+        </div>
+    </div>
+</div>
+<script>
+        componentResource('proposalDetails', jsRoutes.controllers.ComponentViewController.proposalDetails(@id));
+        componentResource('proposalDeposits', jsRoutes.controllers.ComponentViewController.proposalDeposits(@id));
+        componentResource('proposalVotes', jsRoutes.controllers.ComponentViewController.proposalVotes(@id));
+</script>

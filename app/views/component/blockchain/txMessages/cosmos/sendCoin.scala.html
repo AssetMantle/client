@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SendCoin]) { sendCoin =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(sendCoin.fromAddress, routes.ViewController.wallet(sendCoin.fromAddress)))
-    @commonHtmlInfo(constants.View.TO, commonLink(sendCoin.toAddress, routes.ViewController.wallet(sendCoin.toAddress)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(sendCoin.fromAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${sendCoin.fromAddress}'))")))
+    @commonHtmlInfo(constants.View.TO, commonJavascriptLink(sendCoin.toAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${sendCoin.toAddress}'))")))
     @commonTextInfo(constants.View.AMOUNTS, sendCoin.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
 }

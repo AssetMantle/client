@@ -5,11 +5,11 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[SubmitEvidence]) { submitEvidence =>
-    @commonHtmlInfo(constants.View.SUBMITTER, commonLink(submitEvidence.submitter, routes.ViewController.wallet(submitEvidence.submitter)))
+    @commonHtmlInfo(constants.View.SUBMITTER, commonJavascriptLink(submitEvidence.submitter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${submitEvidence.submitter}'))")))
     <div>@Messages(constants.View.EVIDENCE):
         @commonTextInfo(constants.View.HEIGHT, submitEvidence.evidence.height.toString)
         @commonTextInfo(constants.View.TIME, utilities.Date.bcTimestampToString(submitEvidence.evidence.time))
         @commonTextInfo(constants.View.POWER, submitEvidence.evidence.power)
         @commonTextInfo(constants.View.CONSENSUS_ADDRESS, submitEvidence.evidence.consensusAddress)
-    </div>
+</div>
 }

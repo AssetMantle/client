@@ -67,7 +67,7 @@ class MetaController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -76,7 +76,7 @@ class MetaController @Inject()(
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

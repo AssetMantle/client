@@ -12,5 +12,5 @@
         )
     }
     @commonTextInfo(constants.View.DELAY_PERIOD, connectionOpenInit.delayPeriod)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(connectionOpenInit.signer, routes.ViewController.wallet(connectionOpenInit.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenInit.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenInit.signer}'))")))
 }

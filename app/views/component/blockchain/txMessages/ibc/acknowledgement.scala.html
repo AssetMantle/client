@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[Acknowledgement]) { acknowledgement =>
     @views.html.component.blockchain.txMessages.ibc.commonPacket(constants.View.PACKET, acknowledgement.packet)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, acknowledgement.proofHeight)
-    @commonHtmlInfo(constants.View.SIGNER, commonLink(acknowledgement.signer, routes.ViewController.wallet(acknowledgement.signer)))
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(acknowledgement.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${acknowledgement.signer}'))")))
 }

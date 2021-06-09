@@ -5,6 +5,6 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[WithdrawDelegatorReward]) { withdrawDelegatorReward =>
-    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonLink(withdrawDelegatorReward.delegatorAddress, routes.ViewController.wallet(withdrawDelegatorReward.delegatorAddress)))
-    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonLink(withdrawDelegatorReward.validatorAddress, routes.ViewController.validator(withdrawDelegatorReward.validatorAddress)))
+    @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(withdrawDelegatorReward.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${withdrawDelegatorReward.delegatorAddress}'))")))
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(withdrawDelegatorReward.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${withdrawDelegatorReward.validatorAddress}'))")))
 }

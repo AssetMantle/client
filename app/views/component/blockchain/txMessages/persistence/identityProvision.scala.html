@@ -5,7 +5,7 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[IdentityProvision]) { identityProvision =>
-    @commonHtmlInfo(constants.View.FROM, commonLink(identityProvision.from, routes.ViewController.wallet(identityProvision.from)))
-    @commonHtmlInfo(constants.View.TO, commonLink(identityProvision.to, routes.ViewController.wallet(identityProvision.to)))
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityProvision.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityProvision.from}'))")))
+    @commonHtmlInfo(constants.View.TO, commonJavascriptLink(identityProvision.to, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityProvision.to}'))")))
     @commonHtmlInfo(constants.View.IDENTITY_ID, commonLink(identityProvision.identityID, routes.IndexController.search(identityProvision.identityID)))
 }
