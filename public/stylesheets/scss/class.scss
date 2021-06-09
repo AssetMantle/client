@@ -1503,8 +1503,9 @@ body.lightMode {
       padding-left: 10px;
     }
   }
-  table.dataTable tbody td.blockHeightItem {
+  table.dataTable tbody td.blockHeightItem, table.cmuk-table tbody td.blockHeightItem  {
     display: flex;
+    align-items: center;
     img{
       width: 25px;
       height: 25px;
@@ -1515,7 +1516,7 @@ body.lightMode {
     }
 
   }
-  table.dataTable tbody th, table.dataTable tbody td{
+  table.dataTable tbody th, table.dataTable tbody td, table.cmuk-table tbody th, table.cmuk-table tbody td{
     padding: 16px 12px;
     font-weight: 400;
     color: #272931;
@@ -1526,7 +1527,7 @@ body.lightMode {
   table.dataTable.no-footer{
     border-bottom:1px solid #e5e5e5;
   }
-  table.dataTable thead th {
+  table.dataTable thead th, table.cmuk-table thead th  {
     border-bottom: 0;
     color: #8D9CB5;
     font-weight: 500;
@@ -3489,8 +3490,12 @@ header:before,
 
 .cmuk-card-body.validatorList {
   padding:0px;
-
-
+  .cmuk-subnav{
+    padding: 15px;
+  }
+  .cmuk-switcher {
+    overflow-x: scroll;
+  }
 }
 #validatorList .cmuk-subnav {
   padding: 15px;
