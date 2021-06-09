@@ -494,6 +494,9 @@ body.lightMode .notification .notificationTime {
 .cmuk-card-styles .cmuk-card-header {
   border-bottom: 1px solid #e5e5e5;
 }
+.cmuk-card-styles .cmuk-card-header p {
+  margin: 0;
+}
 
 .containerHeight {
   height: calc(50% - 20px) !important;
