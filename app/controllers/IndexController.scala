@@ -72,12 +72,12 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         val maintainer = blockchainMaintainers.Service.get(query)
 
         def searchResult(asset: Option[models.blockchain.Asset], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.Order], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
-          if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(Unauthorized(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
+          if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
           else {
             loginState match {
               case Some(loginState) =>
                 implicit val loginStateImplicit: LoginState = loginState
-                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) withUsernameToken.Ok(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+                if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) withUsernameToken.Ok(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
                 else withUsernameToken.Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer))
               case None =>
                 Future(Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer)))
@@ -95,7 +95,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           maintainer <- maintainer
           result <- searchResult(asset, splits, identity, order, metaList, classification, maintainer)
         } yield result).recover {
-          case _: BaseException => Unauthorized(views.html.index(Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
+          case _: BaseException => Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
         }
       }
   }

@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import controllers.view.OtherApp
+
+@(txHash: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+
+@if(txHash.isEmpty) {
+    @views.html.index(Option(constants.View.TRANSACTIONS))
+} else {
+    @views.html.index(Option(""))
+    <script>
+            componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction('@txHash.getOrElse("")'))
+    </script>
+}

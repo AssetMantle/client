@@ -475,32 +475,4 @@ class Block @Inject()(
       case baseException: BaseException => throw baseException
     }
   }
-
-  //TODO Delete this in next commit. Won't do anything even if kept other than initial delay
-  def patch(): Future[Unit] = {
-    val latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
-    val redelegations = blockchainRedelegations.Service.getAll
-    val undelegations = blockchainUndelegations.Service.getAll
-
-    def checkAndDeleteRedelegations(redelegations: Seq[Redelegation], currentTimeStamp: String) = utilitiesOperations.traverse(redelegations) { redelegation =>
-      blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = redelegation.delegatorAddress, srcValidator = redelegation.validatorSourceAddress, dstValidator = redelegation.validatorDestinationAddress, currentBlockTimeStamp = currentTimeStamp)
-    }
-
-    def checkAndDeleteUndelegations(undelegations: Seq[Undelegation], currentTimeStamp: String) = utilitiesOperations.traverse(undelegations) { undelegation =>
-      blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress, currentBlockTimeStamp = currentTimeStamp)
-    }
-
-    (for {
-      latestExplorerBlock <- latestExplorerBlock
-      redelegations <- redelegations
-      undelegations <- undelegations
-      _ <- checkAndDeleteRedelegations(redelegations, latestExplorerBlock.time)
-      _ <- checkAndDeleteUndelegations(undelegations, latestExplorerBlock.time)
-    } yield ()
-      ).recover {
-      case _: BaseException =>
-        logger.error("PATCH FAILED")
-        System.exit(0)
-    }
-  }
 }

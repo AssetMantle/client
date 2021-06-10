@@ -15,4 +15,5 @@
 <script>
         componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
         componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
+        window.history.pushState("", "@Messages(constants.View.INDEX)", "/transactions/@txHash");
 </script>
