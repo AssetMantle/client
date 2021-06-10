@@ -1429,3 +1429,6 @@ WALLEX_CREATE_COLLECTION_ACCOUNT_MESSAGE = Please create Wallex account to creat
 WALLEX_TERMS_AND_CONDITIONS_TEXT = Consumer advisory - Payment Services in Singapore are regulated under the Payment Services Act 2019(the "PSA"). Wallex Technologies Pte. Ltd("Wallex") is a licensed Major Payment Institution under the PSA for the provision of Crosss-border Money Transfer Services in Singapore(License No. PS20200433).Funds(that constitute "relevant moneys" (as defined under the PSA) received by Wallex shall be held on your behalf in a trust account opened with a Safegaurding Institution as required under the PSA.
 WALLEX_ADD_FUND_BANK_DETAILS = Add Funds
 WALLEX_ADD_FUND_BANK_DETAILS_MESSAGE = Please deposit the required amount to DBS bank account to fund wallet.
+WALLEX_EMPLOYMENT_INDUSTRY = Employment Industry
+WALLEX_EMPLOYMENT_STATUS = Employment Status
+WALLEX_EMPLOYMENT_POSITION = Employment Position

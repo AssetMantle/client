@@ -600,4 +600,43 @@ object SelectFieldOptions {
     "Others",
   )
 
+  val WALLEX_EMPLOYMENT_INDUSTRY: Seq[String] = Seq(
+    "Advertising/Media/Communications",
+    "Administration/Clerical/Facilities Svc",
+    "Agriculture/Manufacturing",
+    "Banking/Finance/Insurance",
+    "Construction",
+    "Government/Civil Servant",
+    "Personal Care Services",
+    "Domestic Helper/Child Care",
+    "Education/Teaching",
+    "Hotel/Restaurant",
+    "Information Technology",
+    "Transportation/Shipping",
+    "Military/Law Enforcement",
+    "Automotive Repairs and Sales",
+    "Medical & Health",
+    "Real Estate/Property",
+    "Retail/Sales",
+    "Tourism/Airlines/Maritime",
+    "Arts/Entertainment and Recreation",
+    "Mining/Oil and Gas/Energy",
+    "Water/Utilities/Waste Management",
+    "Science")
+
+  val WALLEX_EMPLOYMENT_STATUS: Seq[String] = Seq(
+    "Employed",
+    "Unemployed",
+    "Student",
+    "Self-Employed")
+
+  val WALLEX_EMPLOYMENT_POSITION: Seq[String] = Seq(
+    "Entry Level",
+    "Mid-Level/Supervisory/Management",
+    "Senior Level/Executive",
+    "Owner")
+
+  val WALLEX_COUNTRY_OF_BIRTH: Seq[String] = Seq("SG", "HK", "US")
+  val WALLEX_COUNTRY_OF_RESIDENCE: Seq[String] = Seq("SG", "HK", "US")
+
 }

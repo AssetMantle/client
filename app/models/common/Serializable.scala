@@ -213,4 +213,21 @@ object Serializable {
     Json.format[Invoice].map(x => x: NegotiationDocumentContent) or
       Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
+
+  case class EmploymentDetails(employmentIndustry: String,
+                               employmentStatus: String,
+                               employmentPosition: String)
+
+  implicit val employmentDetailsWrites: OWrites[EmploymentDetails] = Json.writes[EmploymentDetails]
+
+  implicit val employmentDetailsReads: Reads[EmploymentDetails] = Json.reads[EmploymentDetails]
+
+  case class ResidentialAddressDetails(countryOfResidence: String,
+                                residentialAddress: String,
+                                countryCode: String,
+                                postalCode: String)
+
+  implicit val residentialAddressWrites: OWrites[ResidentialAddressDetails] = Json.writes[ResidentialAddressDetails]
+
+  implicit val residentialAddressReads: Reads[ResidentialAddressDetails] = Json.reads[ResidentialAddressDetails]
 }

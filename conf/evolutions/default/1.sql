@@ -1631,7 +1631,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."OrganizationAccountDetail"
     "firstName"         VARCHAR NOT NULL,
     "lastName"          VARCHAR NOT NULL,
     "status"            VARCHAR NOT NULL,
-    "accountID"         VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL UNIQUE,
     "countryCode"       VARCHAR NOT NULL,
     "accountType"       VARCHAR NOT NULL,
     "traderID"          VARCHAR NOT NULL,
@@ -1809,7 +1809,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."FundingStatus"
     "id"                varchar not null,
     "balanceID"         varchar not null,
     "accountID"         varchar not null,
-    "amount"           double precision not null,
+    "amount"            double precision not null,
     "reference"         varchar not null,
     "status"            varchar not null,
     "createdBy"         varchar,
@@ -1821,6 +1821,53 @@ CREATE TABLE IF NOT EXISTS WALLEX."FundingStatus"
     primary key ("id")
 );
 
+CREATE TABLE IF NOT EXISTS WALLEX."AccountProfileDetail"
+(
+    "wallexID"                   VARCHAR NOT NULL,
+    "firstName"                  VARCHAR NOT NULL ,
+    "lastName"                   VARCHAR NOT NULL,
+    "mobileCountryCode"          VARCHAR NOT NULL,
+    "mobileNumber"               VARCHAR NOT NULL,
+    "gender"                     VARCHAR NOT NULL,
+    "nationality"                VARCHAR NOT NULL,
+    "countryOfBirth"             VARCHAR NOT NULL,
+    "residentialAddressDetails"  VARCHAR NOT NULL,
+    "dateOfBirth"                VARCHAR NOT NULL,
+    "identificationType"         VARCHAR NOT NULL,
+    "identificationNumber"       VARCHAR NOT NULL,
+    "issueDate"                  VARCHAR,
+    "expiryDate"                 VARCHAR,
+    "employmentDetails"          VARCHAR NOT NULL,
+    "createdBy"                  VARCHAR,
+    "createdOn"                  TIMESTAMP,
+    "createdOnTimeZone"          VARCHAR,
+    "updatedBy"                  VARCHAR,
+    "updatedOn"                  TIMESTAMP,
+    "updatedOnTimeZone"          VARCHAR,
+    PRIMARY KEY ("wallexID")
+    );
+
+CREATE TABLE IF NOT EXISTS WALLEX."AccountCompanyDetail"
+(
+    "accountID"                 VARCHAR NOT NULL,
+    "companyName"               VARCHAR NOT NULL ,
+    "countryOfIncorporation"    VARCHAR NOT NULL,
+    "countryOfOperations"       VARCHAR NOT NULL,
+    "businessType"              VARCHAR NOT NULL,
+    "companyAddress"            VARCHAR NOT NULL,
+    "postalCode"                VARCHAR NOT NULL,
+    "state"                     VARCHAR NOT NULL,
+    "city"                      VARCHAR NOT NULL,
+    "registrationNumber"        VARCHAR NOT NULL,
+    "incorporationDate"         VARCHAR NOT NULL,
+    "createdBy"                 VARCHAR,
+    "createdOn"                 TIMESTAMP,
+    "createdOnTimeZone"         VARCHAR,
+    "updatedBy"                 VARCHAR,
+    "updatedOn"                 TIMESTAMP,
+    "updatedOnTimeZone"         VARCHAR,
+    PRIMARY KEY ("accountID")
+    );
 
 ALTER TABLE BLOCKCHAIN."Account_BC"
     ADD CONSTRAINT Account_BC_Master_Account_username FOREIGN KEY ("username") REFERENCES MASTER."Account" ("id");
@@ -2000,6 +2047,11 @@ ALTER TABLE WALLEX."WalletTransfer"
 ALTER TABLE WALLEX."FundingStatus"
     ADD CONSTRAINT FundingStatus_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
 
+ALTER TABLE WALLEX."AccountProfileDetail"
+    ADD CONSTRAINT AccountProfileDetail_Walex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
+
+ALTER TABLE WALLEX."AccountCompanyDetail"
+    ADD CONSTRAINT AccountCompanyDetail_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
 /*Triggers*/
 
 CREATE OR REPLACE FUNCTION PUBLIC.INSERT_OR_UPDATE_LOG() RETURNS TRIGGER AS
@@ -2470,6 +2522,18 @@ CREATE TRIGGER WALLEX_FUNDING_STATUS_LOG
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
+CREATE TRIGGER WALLEX_ACCOUNT_PROFILE_DETAIL_LOG
+    BEFORE INSERT OR UPDATE
+                         ON WALLEX."AccountProfileDetail"
+                         FOR EACH ROW
+                         EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+CREATE TRIGGER WALLEX_ACCOUNT_COMPANY_DETAIL_LOG
+    BEFORE INSERT OR UPDATE
+                         ON WALLEX."AccountCompanyDetail"
+                         FOR EACH ROW
+                         EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
 CREATE OR REPLACE FUNCTION DOCUSIGN.CREATE_ENVELOPE_HISTORY()
     RETURNS trigger
 AS
@@ -2754,6 +2818,8 @@ DROP TRIGGER IF EXISTS WALLEX_PAYMENT_FILE_LOG ON WALLEX."PaymentFile" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_WALLET_TRANSFER_LOG ON WALLEX."WalletTransfer" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_TRANSFER_REQUEST_LOG ON WALLEX."WalletTransferRequest" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_FUNDING_STATUS_LOG ON WALLEX."FundingStatus" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_ACCOUNT_PROFILE_DETAIL_LOG ON WALLEX."AccountProfileDetail" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_ACCOUNT_COMPANY_DETAIL_LOG ON WALLEX."AccountCompanyDetail" CASCADE;
 
 
 /*Delete Triggers*/
@@ -2839,6 +2905,8 @@ DROP TABLE IF EXISTS WALLEX."WalletTransfer" CASCADE;
 DROP TABLE IF EXISTS WALLEX."WalletTransferRequest" CASCADE;
 DROP TABLE IF EXISTS WALLEX."OrganizationBeneficiary" CASCADE;
 DROP TABLE IF EXISTS WALLEX."FundingStatus" CASCADE;
+DROP TABLE IF EXISTS WALLEX."AccountProfileDetail" CASCADE;
+DROP TABLE IF EXISTS WALLEX."AccountCompanyDetail" CASCADE;
 
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
