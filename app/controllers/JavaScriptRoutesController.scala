@@ -44,6 +44,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ChatController.replyToMessage,
           routes.javascript.ChatController.markChatAsRead,
 
+          routes.javascript.ContactController.verifyEmailAddressForm,
+          routes.javascript.ContactController.verifyMobileNumberForm,
+
+          routes.javascript.ComponentViewController.dashboard,
+          routes.javascript.ComponentViewController.block,
+          routes.javascript.ComponentViewController.transaction,
+          routes.javascript.ComponentViewController.validator,
+          routes.javascript.ComponentViewController.wallet,
+          routes.javascript.ComponentViewController.proposal,
+
           routes.javascript.ComponentViewController.commonHome,
           routes.javascript.ComponentViewController.profilePicture,
           routes.javascript.ComponentViewController.identification,
@@ -142,10 +152,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
           routes.javascript.SendCoinController.sendCoinForm,
 
-          routes.javascript.ContactController.verifyEmailAddressForm,
-
-          routes.javascript.ContactController.verifyMobileNumberForm,
-
           routes.javascript.OrderController.defineForm,
           routes.javascript.OrderController.makeForm,
           routes.javascript.OrderController.takeForm,
@@ -156,16 +162,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.SplitController.unwrapForm,
 
           routes.javascript.ViewController.profile,
-          routes.javascript.ComponentViewController.dashboard,
-          routes.javascript.ComponentViewController.block,
-          routes.javascript.ComponentViewController.transaction,
-          routes.javascript.ComponentViewController.validator,
-          routes.javascript.ComponentViewController.wallet,
-          routes.javascript.ComponentViewController.proposal,
-
           routes.javascript.ViewController.identity,
           routes.javascript.ViewController.asset,
           routes.javascript.ViewController.order,
+          routes.javascript.ViewController.block,
+          routes.javascript.ViewController.validator,
+          routes.javascript.ViewController.transaction,
+          routes.javascript.ViewController.proposal,
 
           routes.javascript.BackgroundCheckController.memberScanForm,
           routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
