@@ -110,7 +110,7 @@ class Proposals @Inject()(
   private def tryGetByID(id: Int): Future[ProposalSerialized] = db.run(proposalTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.PROPOSAL_NOT_FOUND, noSuchElementException)
     }
   }
 

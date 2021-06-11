@@ -22,5 +22,6 @@
 </div>
 <script>
         componentResource('transactionListPage', jsRoutes.controllers.ComponentViewController.transactionListPage(1), 'transactionListPageChangeSpinner', 'pageChange');
+        window.history.pushState("", "@Messages(constants.View.INDEX)", "/transactions");
 </script>
 

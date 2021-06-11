@@ -1,0 +1,13 @@
+@import controllers.actions.LoginState
+@import controllers.view.OtherApp
+
+@(proposal: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+
+@if(proposal.isEmpty) {
+    @views.html.index(Option(constants.View.PROPOSALS))
+} else {
+    @views.html.index(Option(""))
+    <script>
+            componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(@proposal.getOrElse(1)))
+    </script>
+}
