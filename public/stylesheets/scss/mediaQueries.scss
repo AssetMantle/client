@@ -84,6 +84,9 @@
   .comdex .searchForm dl .cmuk-search-input{
     width: 280px;
   }
+  .pieChartContainer > div{
+    flex: none;
+  }
 }
 
 @media (min-width: 640px) {
@@ -145,20 +148,19 @@
       height: 100%;
       float: left;
       left: 0;
-      margin-right: 0.5%;
-      width: 24.5%;
+      margin-right: 15px;
+      width: calc(25% - 15px);
       margin-bottom: 5px;
     }
     .middle {
       width: 50%;
-      height: calc(100% - 128px);
       float: left;
     }
     .rightSide {
       height: 100%;
-      width: 24.5%;
+      width: calc(25% - 15px);
       float: left;
-      margin-left: 0.5%;
+      margin-left: 15px;
       right: 0;
       margin-bottom: 5px;
     }
@@ -316,7 +318,7 @@
       padding-top: 20px;
       padding-bottom: 20px;
     }
-    #accountDelegations .cmuk-height-medium {
+    #accountDelegations .cmuk-height-medium, #accountWallet .cmuk-height-medium{
       padding-top:0;
     }
     .cmuk-card-header .cmuk-button
@@ -333,6 +335,9 @@
   .switcherCard{
     .cmuk-switcher{
       height: 170px;
+    }
+    .cmuk-height-medium{
+      padding-bottom: 0 !important;
     }
   }
   .timeline {
@@ -441,6 +446,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+  .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue{
+    padding: 5px 15px;
   }
 }
 
