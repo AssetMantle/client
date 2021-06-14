@@ -392,8 +392,7 @@ body.darkMode {
     border: 1.51312px solid #838388;
   }
   .cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped>tr:nth-of-type(odd) {
-    background: #2f2d38;
-    border-color:$darkModeBorderColor;
+    border-color:$darkModeBorderColor !important;
   }
   .blockHeightItem {
     .listItemChild p, a {
@@ -502,8 +501,6 @@ body.lightMode {
   }
 
   .header {
-
-
     .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
       background: $colorSecondary;
     }
@@ -523,6 +520,7 @@ body.lightMode {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0;
   }
+
   #tokensStatistics {
     height:100%;
   }
@@ -593,7 +591,9 @@ body.lightMode {
 .containerHeight{
   height: calc(50% - 20px) !important;
 }
-
+.cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped>tr:nth-of-type(odd), table.dataTable tbody tr {
+  background: none !important;
+}
 .componentError{
   p{
     word-break: break-word;
@@ -1516,7 +1516,7 @@ body.lightMode {
     }
 
   }
-  table.dataTable tbody th, table.dataTable tbody td, table.cmuk-table tbody th, table.cmuk-table tbody td{
+  table.dataTable tbody td, table.cmuk-table tbody td{
     padding: 16px 12px;
     font-weight: 400;
     color: #272931;
@@ -1527,7 +1527,7 @@ body.lightMode {
   table.dataTable.no-footer{
     border-bottom:1px solid #e5e5e5;
   }
-  table.dataTable thead th, table.cmuk-table thead th  {
+  table.dataTable thead th, table.cmuk-table thead th, table.cmuk-table tbody th, table.dataTable tbody th,  {
     border-bottom: 0;
     color: #8D9CB5;
     font-weight: 500;

@@ -338,8 +338,7 @@ body.darkMode .commodityImage {
   border: 1.51312px solid #838388;
 }
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
-  background: #2f2d38;
-  border-color: #31323A;
+  border-color: #31323A !important;
 }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
   color: #e50913;
@@ -497,6 +496,10 @@ body.lightMode .notification .notificationTime {
 
 .containerHeight {
   height: calc(50% - 20px) !important;
+}
+
+.cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped > tr:nth-of-type(odd), table.dataTable tbody tr {
+  background: none !important;
 }
 
 .componentError p {
@@ -1375,7 +1378,7 @@ body.lightMode .notification .notificationTime {
   display: inline-block;
   margin-right: 5px;
 }
-.comdex table.dataTable tbody th, .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody th, .comdex table.cmuk-table tbody td {
+.comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
   padding: 16px 12px;
   font-weight: 400;
   color: #272931;
@@ -1386,7 +1389,7 @@ body.lightMode .notification .notificationTime {
 .comdex table.dataTable.no-footer {
   border-bottom: 1px solid #e5e5e5;
 }
-.comdex table.dataTable thead th, .comdex table.cmuk-table thead th {
+.comdex table.dataTable thead th, .comdex table.cmuk-table thead th, .comdex table.cmuk-table tbody th, .comdex table.dataTable tbody th {
   border-bottom: 0;
   color: #8D9CB5;
   font-weight: 500;
