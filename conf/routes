@@ -19,6 +19,18 @@ GET         /docusign/authorizationCallBack                      controllers.Doc
 
 GET         /profile                                             controllers.ViewController.profile
 GET         /account                                             controllers.ViewController.account
+GET         /identity                                            controllers.ViewController.identity
+GET         /asset                                               controllers.ViewController.asset
+GET         /order                                               controllers.ViewController.order
+GET         /validators                                          controllers.ViewController.validators()
+GET         /validators/:address                                 controllers.ViewController.validator(address: String)
+GET         /blocks                                              controllers.ViewController.blocks()
+GET         /blocks/:height                                      controllers.ViewController.block(height: Int)
+GET         /transactions                                        controllers.ViewController.transactions()
+GET         /transactions/:txHash                                controllers.ViewController.transaction(txHash: String)
+GET         /proposals                                           controllers.ViewController.proposals()
+GET         /proposals/:proposalID                               controllers.ViewController.proposal(proposalID: Int)
+GET         /wallet/:address                                     controllers.ViewController.wallet(address: String)
 
 GET         /dashboard                                           controllers.ComponentViewController.dashboard
 GET         /wallet                                              controllers.ComponentViewController.wallet(address: String)
@@ -26,10 +38,6 @@ GET         /block                                               controllers.Com
 GET         /transaction                                         controllers.ComponentViewController.transaction(txHash: String)
 GET         /validator                                           controllers.ComponentViewController.validator(address: String)
 GET         /proposal                                            controllers.ComponentViewController.proposal(id: Int)
-GET         /identity                                            controllers.ViewController.identity
-GET         /account                                             controllers.ViewController.account
-GET         /asset                                               controllers.ViewController.asset
-GET         /order                                               controllers.ViewController.order
 
 GET         /profilePicture                                      controllers.ComponentViewController.profilePicture
 

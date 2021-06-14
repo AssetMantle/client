@@ -209,7 +209,9 @@
   }
   .tableViewCard .infoRow .infoRowLabel{
     width: 125px;
-
+  }
+  #tokensStatistics.tableViewCard .infoRow .infoRowLabel{
+      width: auto;
   }
 }
 

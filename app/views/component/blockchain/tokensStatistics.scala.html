@@ -3,8 +3,8 @@
 
 @(token: Token)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonCard(constants.View.TOKENS_STATISTICS) {
-    @constants.Blockchain.TokenTickers.getOrElse(token.denom, token.denom)
+@commonCard(constants.View.TOKEN) {
+    <p>$@constants.Blockchain.TokenTickers.getOrElse(token.denom, token.denom)</p>
 } {
     <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
         @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")

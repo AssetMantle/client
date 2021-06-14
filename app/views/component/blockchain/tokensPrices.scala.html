@@ -7,7 +7,7 @@
 @(tokenPrices: Seq[TokenPrice], stakingDenom: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKEN_PRICE) {
-    @constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom)
+    <p>$@constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom)</p>
 } {
     @if(tokenPrices.nonEmpty) {
         @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOn.fold("")(x => utilities.Date.getTimeFromSqlTimestamp(x)) -> token.price).reverse: _*), constants.Blockchain.TokenTickers.getOrElse(stakingDenom, stakingDenom), showLegend = false)
