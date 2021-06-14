@@ -12,9 +12,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountCompanyDetail(
+case class CompanyAccount(
     accountID: String,
-    companyName: String,
+    name: String,
     countryOfIncorporation: String,
     countryOfOperations: String,
     businessType: String,
@@ -33,14 +33,14 @@ case class AccountCompanyDetail(
 ) extends Logged
 
 @Singleton
-class AccountCompanyDetails @Inject() (
+class CompanyAccounts @Inject() (
     protected val databaseConfigProvider: DatabaseConfigProvider
 )(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String =
-    constants.Module.WALLEX_ACCOUNT_COMPANY_DETAIL
+    constants.Module.WALLEX_ACCOUNT_COMPANY
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -48,15 +48,15 @@ class AccountCompanyDetails @Inject() (
 
   import databaseConfig.profile.api._
 
-  private[models] val accountCompanyDetailTable =
-    TableQuery[AccountCompanyDetailTable]
+  private[models] val companyAccountTable =
+    TableQuery[CompanyAccountTable]
 
   private def add(
-      accountCompanyDetail: AccountCompanyDetail
+      companyAccount: CompanyAccount
   ): Future[String] =
     db.run(
-        (accountCompanyDetailTable returning accountCompanyDetailTable
-          .map(_.accountID) += accountCompanyDetail).asTry
+        (companyAccountTable returning companyAccountTable
+          .map(_.accountID) += companyAccount).asTry
       )
       .map {
         case Success(result) => result
@@ -71,11 +71,11 @@ class AccountCompanyDetails @Inject() (
       }
 
   private def upsert(
-      accountCompanyDetail: AccountCompanyDetail
+      companyAccount: CompanyAccount
   ): Future[Int] =
     db.run(
-        accountCompanyDetailTable
-          .insertOrUpdate(accountCompanyDetail)
+        companyAccountTable
+          .insertOrUpdate(companyAccount)
           .asTry
       )
       .map {
@@ -90,26 +90,26 @@ class AccountCompanyDetails @Inject() (
           }
       }
 
-  private def findById(
+  private def findByID(
       accountID: String
-  ): Future[Option[AccountCompanyDetail]] =
+  ): Future[Option[CompanyAccount]] =
     db.run(
-      accountCompanyDetailTable
+      companyAccountTable
         .filter(_.accountID === accountID)
         .result
         .headOption
     )
 
-  private[models] class AccountCompanyDetailTable(tag: Tag)
-      extends Table[AccountCompanyDetail](
+  private[models] class CompanyAccountTable(tag: Tag)
+      extends Table[CompanyAccount](
         tag,
-        "AccountCompanyDetail"
+        "CompanyAccount"
       ) {
 
     override def * =
       (
         accountID,
-        companyName,
+        name,
         countryOfIncorporation,
         countryOfOperations,
         businessType,
@@ -125,11 +125,11 @@ class AccountCompanyDetails @Inject() (
         updatedBy.?,
         updatedOn.?,
         updatedOnTimeZone.?
-      ) <> (AccountCompanyDetail.tupled, AccountCompanyDetail.unapply)
+      ) <> (CompanyAccount.tupled, CompanyAccount.unapply)
 
     def accountID = column[String]("accountID", O.PrimaryKey)
 
-    def companyName = column[String]("companyName")
+    def name = column[String]("name")
 
     def countryOfIncorporation = column[String]("countryOfIncorporation")
 
@@ -165,7 +165,7 @@ class AccountCompanyDetails @Inject() (
   object Service {
     def create(
         accountID: String,
-        companyName: String,
+        name: String,
         countryOfIncorporation: String,
         countryOfOperations: String,
         businessType: String,
@@ -177,9 +177,9 @@ class AccountCompanyDetails @Inject() (
         incorporationDate: String
     ): Future[String] =
       add(
-        AccountCompanyDetail(
+        CompanyAccount(
           accountID = accountID,
-          companyName = companyName,
+          name = name,
           countryOfIncorporation = countryOfIncorporation,
           countryOfOperations = countryOfOperations,
           businessType = businessType,
@@ -194,7 +194,7 @@ class AccountCompanyDetails @Inject() (
 
     def insertOrUpdate(
         accountID: String,
-        companyName: String,
+        name: String,
         countryOfIncorporation: String,
         countryOfOperations: String,
         businessType: String,
@@ -206,9 +206,9 @@ class AccountCompanyDetails @Inject() (
         incorporationDate: String
     ): Future[Int] =
       upsert(
-        AccountCompanyDetail(
+        CompanyAccount(
           accountID,
-          companyName,
+          name,
           countryOfIncorporation,
           countryOfOperations,
           businessType,
@@ -221,15 +221,15 @@ class AccountCompanyDetails @Inject() (
         )
       )
 
-    def tryGet(accountID: String): Future[AccountCompanyDetail] =
-      findById(accountID).map { detail =>
-        detail.getOrElse(
+    def tryGet(accountID: String): Future[CompanyAccount] =
+      findByID(accountID).map { companyAccount =>
+        companyAccount.getOrElse(
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
         )
       }
 
-    def get(accountID: String): Future[Option[AccountCompanyDetail]] =
-      findById(accountID)
+    def get(accountID: String): Future[Option[CompanyAccount]] =
+      findByID(accountID)
 
   }
 

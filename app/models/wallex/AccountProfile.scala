@@ -14,11 +14,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountProfileDetail(
+case class AccountProfile(
     wallexID: String,
     firstName: String,
     lastName: String,
-    mobileCountryCode: String,
     mobileNumber: String,
     gender: String,
     nationality: String,
@@ -39,14 +38,14 @@ case class AccountProfileDetail(
 ) extends Logged
 
 @Singleton
-class AccountProfileDetails @Inject() (
+class AccountProfiles @Inject() (
     protected val databaseConfigProvider: DatabaseConfigProvider
 )(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String =
-    constants.Module.WALLEX_ACCOUNT_PROFILE_DETAIL
+    constants.Module.WALLEX_ACCOUNT_PROFILE
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -54,44 +53,43 @@ class AccountProfileDetails @Inject() (
 
   import databaseConfig.profile.api._
 
-  private[models] val accountProfileDetailTable =
-    TableQuery[AccountProfileDetailTable]
+  private[models] val accountProfileTable =
+    TableQuery[AccountProfileTable]
 
   private def serialize(
-      accountProfileDetail: AccountProfileDetail
-  ): AccountProfileDetailSerialized =
-    AccountProfileDetailSerialized(
-      wallexID = accountProfileDetail.wallexID,
-      firstName = accountProfileDetail.firstName,
-      lastName = accountProfileDetail.lastName,
-      mobileCountryCode = accountProfileDetail.mobileCountryCode,
-      mobileNumber = accountProfileDetail.mobileNumber,
-      gender = accountProfileDetail.gender,
-      nationality = accountProfileDetail.nationality,
-      countryOfBirth = accountProfileDetail.countryOfBirth,
+      accountProfile: AccountProfile
+  ): AccountProfileSerialized =
+    AccountProfileSerialized(
+      wallexID = accountProfile.wallexID,
+      firstName = accountProfile.firstName,
+      lastName = accountProfile.lastName,
+      mobileNumber = accountProfile.mobileNumber,
+      gender = accountProfile.gender,
+      nationality = accountProfile.nationality,
+      countryOfBirth = accountProfile.countryOfBirth,
       residentialAddressDetails =
-        Json.toJson(accountProfileDetail.residentialAddressDetails).toString,
-      dateOfBirth = accountProfileDetail.dateOfBirth,
-      identificationType = accountProfileDetail.identificationType,
-      identificationNumber = accountProfileDetail.identificationNumber,
-      issueDate = accountProfileDetail.issueDate,
-      expiryDate = accountProfileDetail.expiryDate,
+        Json.toJson(accountProfile.residentialAddressDetails).toString,
+      dateOfBirth = accountProfile.dateOfBirth,
+      identificationType = accountProfile.identificationType,
+      identificationNumber = accountProfile.identificationNumber,
+      issueDate = accountProfile.issueDate,
+      expiryDate = accountProfile.expiryDate,
       employmentDetails =
-        Json.toJson(accountProfileDetail.employmentDetails).toString,
-      createdBy = accountProfileDetail.createdBy,
-      createdOn = accountProfileDetail.createdOn,
-      createdOnTimeZone = accountProfileDetail.createdOnTimeZone,
-      updatedBy = accountProfileDetail.updatedBy,
-      updatedOn = accountProfileDetail.updatedOn,
-      updatedOnTimeZone = accountProfileDetail.updatedOnTimeZone
+        Json.toJson(accountProfile.employmentDetails).toString,
+      createdBy = accountProfile.createdBy,
+      createdOn = accountProfile.createdOn,
+      createdOnTimeZone = accountProfile.createdOnTimeZone,
+      updatedBy = accountProfile.updatedBy,
+      updatedOn = accountProfile.updatedOn,
+      updatedOnTimeZone = accountProfile.updatedOnTimeZone
     )
 
   private def add(
-      accountProfileDetail: AccountProfileDetailSerialized
+      accountProfile: AccountProfileSerialized
   ): Future[String] =
     db.run(
-        (accountProfileDetailTable returning accountProfileDetailTable
-          .map(_.wallexID) += accountProfileDetail).asTry
+        (accountProfileTable returning accountProfileTable
+          .map(_.wallexID) += accountProfile).asTry
       )
       .map {
         case Success(result) => result
@@ -106,11 +104,11 @@ class AccountProfileDetails @Inject() (
       }
 
   private def upsert(
-      accountProfileDetail: AccountProfileDetailSerialized
+      accountProfile: AccountProfileSerialized
   ): Future[Int] =
     db.run(
-        accountProfileDetailTable
-          .insertOrUpdate(accountProfileDetail)
+        accountProfileTable
+          .insertOrUpdate(accountProfile)
           .asTry
       )
       .map {
@@ -125,11 +123,11 @@ class AccountProfileDetails @Inject() (
           }
       }
 
-  private def findById(
+  private def findByID(
       wallexID: String
-  ): Future[AccountProfileDetailSerialized] =
+  ): Future[AccountProfileSerialized] =
     db.run(
-        accountProfileDetailTable
+        accountProfileTable
           .filter(_.wallexID === wallexID)
           .result
           .head
@@ -147,11 +145,10 @@ class AccountProfileDetails @Inject() (
           }
       }
 
-  case class AccountProfileDetailSerialized(
+  case class AccountProfileSerialized(
       wallexID: String,
       firstName: String,
       lastName: String,
-      mobileCountryCode: String,
       mobileNumber: String,
       gender: String,
       nationality: String,
@@ -171,12 +168,11 @@ class AccountProfileDetails @Inject() (
       updatedOnTimeZone: Option[String] = None
   ) {
 
-    def deserialize: AccountProfileDetail =
-      AccountProfileDetail(
+    def deserialize: AccountProfile =
+      AccountProfile(
         wallexID = wallexID,
         firstName = firstName,
         lastName = lastName,
-        mobileCountryCode = mobileCountryCode,
         mobileNumber = mobileNumber,
         gender = gender,
         nationality = nationality,
@@ -199,10 +195,10 @@ class AccountProfileDetails @Inject() (
       )
 
   }
-  private[models] class AccountProfileDetailTable(tag: Tag)
-      extends Table[AccountProfileDetailSerialized](
+  private[models] class AccountProfileTable(tag: Tag)
+      extends Table[AccountProfileSerialized](
         tag,
-        "AccountProfileDetail"
+        "AccountProfile"
       ) {
 
     override def * =
@@ -210,7 +206,6 @@ class AccountProfileDetails @Inject() (
         wallexID,
         firstName,
         lastName,
-        mobileCountryCode,
         mobileNumber,
         gender,
         nationality,
@@ -228,15 +223,13 @@ class AccountProfileDetails @Inject() (
         updatedBy.?,
         updatedOn.?,
         updatedOnTimeZone.?
-      ) <> (AccountProfileDetailSerialized.tupled, AccountProfileDetailSerialized.unapply)
+      ) <> (AccountProfileSerialized.tupled, AccountProfileSerialized.unapply)
 
     def wallexID = column[String]("wallexID", O.PrimaryKey)
 
     def firstName = column[String]("firstName")
 
     def lastName = column[String]("lastName")
-
-    def mobileCountryCode = column[String]("mobileCountryCode")
 
     def mobileNumber = column[String]("mobileNumber")
 
@@ -278,7 +271,6 @@ class AccountProfileDetails @Inject() (
         wallexID: String,
         firstName: String,
         lastName: String,
-        mobileCountryCode: String,
         mobileNumber: String,
         gender: String,
         nationality: String,
@@ -293,11 +285,10 @@ class AccountProfileDetails @Inject() (
     ): Future[String] =
       add(
         serialize(
-          AccountProfileDetail(
+          AccountProfile(
             wallexID = wallexID,
             firstName = firstName,
             lastName = lastName,
-            mobileCountryCode = mobileCountryCode,
             mobileNumber = mobileNumber,
             gender = gender,
             nationality = nationality,
@@ -317,7 +308,6 @@ class AccountProfileDetails @Inject() (
         wallexID: String,
         firstName: String,
         lastName: String,
-        mobileCountryCode: String,
         mobileNumber: String,
         gender: String,
         nationality: String,
@@ -332,11 +322,10 @@ class AccountProfileDetails @Inject() (
     ): Future[Int] =
       upsert(
         serialize(
-          AccountProfileDetail(
+          AccountProfile(
             wallexID = wallexID,
             firstName = firstName,
             lastName = lastName,
-            mobileCountryCode = mobileCountryCode,
             mobileNumber = mobileNumber,
             gender = gender,
             nationality = nationality,
@@ -352,8 +341,8 @@ class AccountProfileDetails @Inject() (
         )
       )
 
-    def tryGetByWallexID(wallexID: String): Future[AccountProfileDetail] =
-      findById(wallexID).map(_.deserialize)
+    def tryGetByWallexID(wallexID: String): Future[AccountProfile] =
+      findByID(wallexID).map(_.deserialize)
 
   }
 

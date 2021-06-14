@@ -1662,18 +1662,18 @@ CREATE TABLE IF NOT EXISTS WALLEX."UserKYC"
 
 CREATE TABLE IF NOT EXISTS WALLEX."PaymentFile"
 (
-    "quoteID"           varchar not null,
-    "wallexID"          varchar not null,
-    "fileID"            varchar not null,
-    "organizationID"    varchar not null,
-    "negotiationID"     varchar not null,
-    "fileType"          varchar not null,
-    "createdBy"         varchar,
-    "createdOn"         timestamp,
-    "createdOnTimeZone" varchar,
-    "updatedBy"         varchar,
-    "updatedOn"         timestamp,
-    "updatedOnTimeZone" varchar,
+    "quoteID"           VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
+    "fileID"            VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "negotiationID"     VARCHAR NOT NULL,
+    "fileType"          VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     PRIMARY KEY       ("fileID", "fileType","quoteID" )
     );
 
@@ -1705,7 +1705,7 @@ CREATE TABLE IF NOT EXISTS WALLEX."SimplePayment"
 (
     "wallexID"          VARCHAR NOT NULL,
     "simplePaymentID"   VARCHAR NOT NULL,
-    "organizationID"            VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
     "createdAt"         VARCHAR,
     "referenceID"       VARCHAR,
     "status"            VARCHAR NOT NULL,
@@ -1727,106 +1727,105 @@ CREATE TABLE IF NOT EXISTS WALLEX."SimplePayment"
 
 CREATE TABLE IF NOT EXISTS WALLEX."WalletTransferRequest"
 (
-    "negotiationID"       varchar not null,
-    "organizationID"      varchar not null,
-    "onBehalfOf"          varchar not null,
-    "receiverAccountID"   varchar,
-    "amount"              double precision not null,
-    "currency"            varchar,
-    "purposeOfTransfer"   varchar not null,
-    "reference"           varchar,
-    "remarks"             varchar,
-    "status"              varchar,
-    "traderID"            varchar not null,
-    "createdBy"           varchar,
-    "createdOn"           timestamp,
-    "createdOnTimeZone"   varchar,
-    "updatedBy"           varchar,
-    "updatedOn"           timestamp,
-    "updatedOnTimeZone"   varchar,
+    "negotiationID"       VARCHAR NOT NULL,
+    "organizationID"      VARCHAR NOT NULL,
+    "onBehalfOf"          VARCHAR NOT NULL,
+    "receiverAccountID"   VARCHAR,
+    "amount"              DOUBLE PRECISION NOT NULL,
+    "currency"            VARCHAR,
+    "purposeOfTransfer"   VARCHAR NOT NULL,
+    "reference"           VARCHAR,
+    "remarks"             VARCHAR,
+    "status"              VARCHAR,
+    "traderID"            VARCHAR NOT NULL,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
     PRIMARY KEY       ("negotiationID","organizationID")
 
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."CollectionAccount"
 (
-    "id"                varchar not null,
-    "wallexID"          varchar not null,
-    "accountID"         varchar not null,
-    "createdBy"         varchar,
-    "createdOn"         timestamp,
-    "createdOnTimeZone" varchar,
-    "updatedBy"         varchar,
-    "updatedOn"         timestamp,
-    "updatedOnTimeZone" varchar,
+    "id"                VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
 
     primary key ("id", "wallexID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."UserKYCDetail"
 (
-    "id"                varchar not null,
-    "documentType"      varchar not null,
-    "organizationID"    varchar not null,
-    "wallexID"          varchar not null,
-    "url"               varchar not null,
-    "documentName"      varchar not null,
-    "createdBy"         varchar,
-    "createdOn"         timestamp,
-    "createdOnTimeZone" varchar,
-    "updatedBy"         varchar,
-    "updatedOn"         timestamp,
-    "updatedOnTimeZone" varchar,
+    "id"                VARCHAR NOT NULL,
+    "documentType"      VARCHAR NOT NULL,
+    "organizationID"    VARCHAR NOT NULL,
+    "wallexID"          VARCHAR NOT NULL,
+    "url"               VARCHAR NOT NULL,
+    "documentName"      VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     primary key ("id", "documentType", "organizationID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."WalletTransfer"
 (
-    "id"                  varchar not null,
-    "organizationID"      varchar not null,
-    "wallexID"            varchar not null,
-    "senderAccountID"     varchar not null,
-    "receiverAccountID"   varchar not null,
-    "amount"              double precision not null,
-    "status"              varchar,
-    "currency"            varchar,
-    "purposesOfTransfer"  varchar,
-    "type"                varchar,
-    "createdAt"           varchar,
-    "remarks"             varchar,
-    "reference"           varchar,
-    "createdBy"           varchar,
-    "createdOn"           timestamp,
-    "createdOnTimeZone"   varchar,
-    "updatedBy"           varchar,
-    "updatedOn"           timestamp,
-    "updatedOnTimeZone"   varchar,
+    "id"                  VARCHAR NOT NULL,
+    "organizationID"      VARCHAR NOT NULL,
+    "wallexID"            VARCHAR NOT NULL,
+    "senderAccountID"     VARCHAR NOT NULL,
+    "receiverAccountID"   VARCHAR NOT NULL,
+    "amount"              DOUBLE PRECISION NOT NULL,
+    "status"              VARCHAR,
+    "currency"            VARCHAR,
+    "purposesOfTransfer"  VARCHAR,
+    "type"                VARCHAR,
+    "createdAt"           VARCHAR,
+    "remarks"             VARCHAR,
+    "reference"           VARCHAR,
+    "createdBy"           VARCHAR,
+    "createdOn"           TIMESTAMP,
+    "createdOnTimeZone"   VARCHAR,
+    "updatedBy"           VARCHAR,
+    "updatedOn"           TIMESTAMP,
+    "updatedOnTimeZone"   VARCHAR,
     primary key ("id","organizationID")
     );
 
 CREATE TABLE IF NOT EXISTS WALLEX."FundingStatus"
 (
-    "id"                varchar not null,
-    "balanceID"         varchar not null,
-    "accountID"         varchar not null,
-    "amount"            double precision not null,
-    "reference"         varchar not null,
-    "status"            varchar not null,
-    "createdBy"         varchar,
-    "createdOn"         timestamp,
-    "createdOnTimeZone" varchar,
-    "updatedBy"         varchar,
-    "updatedOn"         timestamp,
-    "updatedOnTimeZone" varchar,
+    "id"                VARCHAR NOT NULL,
+    "balanceID"         VARCHAR NOT NULL,
+    "accountID"         VARCHAR NOT NULL,
+    "amount"            DOUBLE PRECISION NOT NULL,
+    "reference"         VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
     primary key ("id")
 );
 
-CREATE TABLE IF NOT EXISTS WALLEX."AccountProfileDetail"
+CREATE TABLE IF NOT EXISTS WALLEX."AccountProfile"
 (
     "wallexID"                   VARCHAR NOT NULL,
     "firstName"                  VARCHAR NOT NULL ,
     "lastName"                   VARCHAR NOT NULL,
-    "mobileCountryCode"          VARCHAR NOT NULL,
     "mobileNumber"               VARCHAR NOT NULL,
     "gender"                     VARCHAR NOT NULL,
     "nationality"                VARCHAR NOT NULL,
@@ -1847,10 +1846,10 @@ CREATE TABLE IF NOT EXISTS WALLEX."AccountProfileDetail"
     PRIMARY KEY ("wallexID")
     );
 
-CREATE TABLE IF NOT EXISTS WALLEX."AccountCompanyDetail"
+CREATE TABLE IF NOT EXISTS WALLEX."CompanyAccount"
 (
     "accountID"                 VARCHAR NOT NULL,
-    "companyName"               VARCHAR NOT NULL ,
+    "name"                      VARCHAR NOT NULL ,
     "countryOfIncorporation"    VARCHAR NOT NULL,
     "countryOfOperations"       VARCHAR NOT NULL,
     "businessType"              VARCHAR NOT NULL,
@@ -2047,11 +2046,11 @@ ALTER TABLE WALLEX."WalletTransfer"
 ALTER TABLE WALLEX."FundingStatus"
     ADD CONSTRAINT FundingStatus_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
 
-ALTER TABLE WALLEX."AccountProfileDetail"
-    ADD CONSTRAINT AccountProfileDetail_Walex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
+ALTER TABLE WALLEX."AccountProfile"
+    ADD CONSTRAINT AccountProfile_Walex_id FOREIGN KEY ("wallexID") REFERENCES WALLEX."OrganizationAccountDetail" ("wallexID");
 
-ALTER TABLE WALLEX."AccountCompanyDetail"
-    ADD CONSTRAINT AccountCompanyDetail_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
+ALTER TABLE WALLEX."CompanyAccount"
+    ADD CONSTRAINT CompanyAccount_Account_id FOREIGN KEY ("accountID") REFERENCES WALLEX."OrganizationAccountDetail" ("accountID");
 /*Triggers*/
 
 CREATE OR REPLACE FUNCTION PUBLIC.INSERT_OR_UPDATE_LOG() RETURNS TRIGGER AS
@@ -2522,15 +2521,15 @@ CREATE TRIGGER WALLEX_FUNDING_STATUS_LOG
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_ACCOUNT_PROFILE_DETAIL_LOG
+CREATE TRIGGER WALLEX_ACCOUNT_PROFILE_LOG
     BEFORE INSERT OR UPDATE
-                         ON WALLEX."AccountProfileDetail"
+                         ON WALLEX."AccountProfile"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
-CREATE TRIGGER WALLEX_ACCOUNT_COMPANY_DETAIL_LOG
+CREATE TRIGGER WALLEX_COMPANY_ACCOUNT_LOG
     BEFORE INSERT OR UPDATE
-                         ON WALLEX."AccountCompanyDetail"
+                         ON WALLEX."CompanyAccount"
                          FOR EACH ROW
                          EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 
@@ -2818,8 +2817,8 @@ DROP TRIGGER IF EXISTS WALLEX_PAYMENT_FILE_LOG ON WALLEX."PaymentFile" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_WALLET_TRANSFER_LOG ON WALLEX."WalletTransfer" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_TRANSFER_REQUEST_LOG ON WALLEX."WalletTransferRequest" CASCADE;
 DROP TRIGGER IF EXISTS WALLEX_FUNDING_STATUS_LOG ON WALLEX."FundingStatus" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_ACCOUNT_PROFILE_DETAIL_LOG ON WALLEX."AccountProfileDetail" CASCADE;
-DROP TRIGGER IF EXISTS WALLEX_ACCOUNT_COMPANY_DETAIL_LOG ON WALLEX."AccountCompanyDetail" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_ACCOUNT_PROFILE_LOG ON WALLEX."AccountProfile" CASCADE;
+DROP TRIGGER IF EXISTS WALLEX_COMPANY_ACCOUNT_LOG ON WALLEX."CompanyAccount" CASCADE;
 
 
 /*Delete Triggers*/
@@ -2905,8 +2904,8 @@ DROP TABLE IF EXISTS WALLEX."WalletTransfer" CASCADE;
 DROP TABLE IF EXISTS WALLEX."WalletTransferRequest" CASCADE;
 DROP TABLE IF EXISTS WALLEX."OrganizationBeneficiary" CASCADE;
 DROP TABLE IF EXISTS WALLEX."FundingStatus" CASCADE;
-DROP TABLE IF EXISTS WALLEX."AccountProfileDetail" CASCADE;
-DROP TABLE IF EXISTS WALLEX."AccountCompanyDetail" CASCADE;
+DROP TABLE IF EXISTS WALLEX."AccountProfile" CASCADE;
+DROP TABLE IF EXISTS WALLEX."CompanyAccount" CASCADE;
 
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
