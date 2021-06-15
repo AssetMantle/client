@@ -15,4 +15,7 @@ object Date {
       case _: Exception => new Timestamp(System.currentTimeMillis())
     }
 
+  def parseStringToDate(date: String): java.util.Date = new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT).parse(date)
+
+  def formatDate(date: java.util.Date): String  = new SimpleDateFormat(constants.External.Wallex.DATE_FORMAT).format(date)
 }

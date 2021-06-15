@@ -83,7 +83,10 @@ class UserUpdateAccountDetails @Inject()(
       identificationType: String,
       identificationNumber: String,
       issueDate: String,
-      expiryDate: String
+      expiryDate: String,
+      employmentIndustry: String,
+      employmentStatus: String,
+      employmentPosition: String
   ) extends BaseRequest
 
   object Service {

@@ -580,8 +580,8 @@ GET         /master/wallex/user/add                                             
 POST        /master/wallex/user/add                                                               controllers.WallexController.createOrganizationAccount
 GET         /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccountForm
 POST        /master/wallex/company/update                                                         controllers.WallexController.updateCompanyAccount
-GET         /master/wallex/user/update                                                            controllers.WallexController.updateAccountForm
-POST        /master/wallex/user/update                                                            controllers.WallexController.updateAccount
+GET         /master/wallex/user/update                                                            controllers.WallexController.updateUserAccountForm
+POST        /master/wallex/user/update                                                            controllers.WallexController.updateUserAccount
 GET         /master/wallex/user                                                                   controllers.WallexController.getUserForm
 POST        /master/wallex/user                                                                   controllers.WallexController.getUser
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
