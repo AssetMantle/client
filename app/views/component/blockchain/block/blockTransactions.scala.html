@@ -6,7 +6,7 @@
 @commonCard(constants.View.BLOCK_TRANSACTIONS) {
 } {
     @if(transactions.isEmpty) {
-        @Messages(constants.View.NO_BLOCK_TRANSACTIONS, height)
+        <div class="cmuk-text-center">@Messages(constants.View.NO_BLOCK_TRANSACTIONS, height)</div>
     } else {
         <table class="cmuk-table cmuk-table-striped">
             <thead>

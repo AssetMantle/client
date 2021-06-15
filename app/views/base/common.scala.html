@@ -71,34 +71,33 @@
                             <a class="cmuk-navbar-item cmuk-logo cmuk-visible@@m" href="@controllers.routes.IndexController.index()">
                                 <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                             </a>
-                            <ul class="cmuk-navbar-nav">
-
-                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
-                                @commonIcon("dashBoard")
+                            <ul class="cmuk-navbar-nav" onclick="setActiveLink(event)">
+                                <li><a id="dashBoard" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
+                                @commonIcon("dashBoardIcon")
                                 </span>
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
-                                @commonIcon("blocks")
+                                <li><a  id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
+                                @commonIcon("blocksIcon")
                                 </span>
                                     @Messages(constants.View.BLOCKS)
                                 </a>
                                 </li>
-                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList())" class="navItemRippleEffect"><span class="transactionsIcon">
-                                @commonIcon("transactions")
+                                <li><a id="transactions" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList())" class="navItemRippleEffect"><span class="transactionsIcon">
+                                @commonIcon("transactionsIcon")
                                 </span>
                                     @Messages(constants.View.TRANSACTIONS)
                                 </a>
                                 </li>
-                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
-                                @commonIcon("validators")
+                                <li><a id="validators" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
+                                @commonIcon("validatorsIcon")
                                 </span>
                                     @Messages(constants.View.VALIDATORS)
                                 </a>
                                 </li>
-                                <li><a onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
-                                @commonIcon("proposals")
+                                <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
+                                @commonIcon("proposalsIcon")
                                 </span>
                                         &nbsp;&nbsp;@Messages(constants.View.PROPOSALS)
                                 </a>

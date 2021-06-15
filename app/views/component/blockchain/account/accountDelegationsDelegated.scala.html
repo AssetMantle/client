@@ -3,9 +3,12 @@
 @import utilities.MicroNumber
 
 @(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
+<div class="pieChartContainer">
     @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.mapValues(_.toDouble).toList: _*), showLegend = false)
+    <div>
     @delegations.map { case (validatorAddress, amount) =>
         @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")))
         @commonTextInfo(constants.View.AMOUNT_DELEGATED, utilities.NumericOperation.formatNumber(amount))
     }
+    </div>
+</div>

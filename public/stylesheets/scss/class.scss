@@ -30,6 +30,7 @@ body .block {
 body .cmuk-card-body {
   padding: 0px;
   padding-top: 20px;
+  padding-left: 20px;
 }
 body .cmuk-table td {
   font-size: .875rem;
@@ -392,8 +393,7 @@ body.darkMode {
     border: 1.51312px solid #838388;
   }
   .cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped>tr:nth-of-type(odd) {
-    background: #2f2d38;
-    border-color:$darkModeBorderColor;
+    border-color:$darkModeBorderColor !important;
   }
   .blockHeightItem {
     .listItemChild p, a {
@@ -502,8 +502,6 @@ body.lightMode {
   }
 
   .header {
-
-
     .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
       background: $colorSecondary;
     }
@@ -523,6 +521,7 @@ body.lightMode {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0;
   }
+
   #tokensStatistics {
     height:100%;
   }
@@ -596,7 +595,9 @@ body.lightMode {
 .containerHeight{
   height: calc(50% - 20px) !important;
 }
-
+.cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped>tr:nth-of-type(odd), table.dataTable tbody tr {
+  background: none !important;
+}
 .componentError{
   p{
     word-break: break-word;
@@ -881,6 +882,14 @@ body.lightMode {
   color: rgba(131, 0, 4, 0.71);
 }
 
+.padding-top-0{
+  padding-top: 0 !important;
+}
+
+.padding-left-20{
+  padding-left: 20px !important;
+}
+
 .hashCode {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -909,6 +918,7 @@ body.lightMode {
     width: 120px;
   }
   .darkModeButton{
+    outline: none !important;
     padding:3px 7px 6px 10px;
     background: $colorSecondary;
     .dayMode, .darkMode{
@@ -1519,7 +1529,7 @@ body.lightMode {
     }
 
   }
-  table.dataTable tbody th, table.dataTable tbody td, table.cmuk-table tbody th, table.cmuk-table tbody td{
+  table.dataTable tbody td, table.cmuk-table tbody td{
     padding: 16px 12px;
     font-weight: 400;
     color: #272931;
@@ -1530,7 +1540,7 @@ body.lightMode {
   table.dataTable.no-footer{
     border-bottom:1px solid #e5e5e5;
   }
-  table.dataTable thead th, table.cmuk-table thead th  {
+  table.dataTable thead th, table.cmuk-table thead th, table.cmuk-table tbody th, table.dataTable tbody th,  {
     border-bottom: 0;
     color: #8D9CB5;
     font-weight: 500;
@@ -3492,10 +3502,7 @@ header:before,
 }
 
 .cmuk-card-body.validatorList {
-  padding:0px;
-  .cmuk-subnav{
-    padding: 15px;
-  }
+  padding-right:20px;
   .cmuk-switcher {
     overflow-x: scroll;
   }
@@ -3623,7 +3630,7 @@ dl .info {
 .switcherCard{
   margin-bottom: 20px;
   .cmuk-card-body{
-    padding:0;
+    padding:0 !important;
     .cmuk-card {
       margin-bottom: 5px;
       .cmuk-card-body {
@@ -3896,11 +3903,15 @@ figure.zoom {
 }
 .transactionMessages{
   .cmuk-card-body {
+    padding-right: 10px;
+    .cmuk-card{
+      margin-bottom: 10px;
+    }
     .cmuk-card-header {
       color: #e50913;
     }
     .cmuk-card-body{
-
+      height: auto !important;
       .cmuk-card-body{
         .title{
           padding-left: 12px;
@@ -3929,5 +3940,28 @@ figure.zoom {
     margin-bottom: 5px;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.transactionsList, .blocksList{
+  .cmuk-card-body{
+    padding-top: 0px;
+    padding-right: 20px;
+    table {
+      tbody tr:first-child{
+        border-top: 0px solid;
+      }
+    }
+  }
+}
+.validatorTransactions, .blockTransactions, .accountTransactions{
+  .cmuk-card-body{
+    padding-top: 0px !important;
+    padding-right: 20px;
+    table {
+      thead tr:first-child{
+        border-top: 0px solid;
+      }
+    }
   }
 }

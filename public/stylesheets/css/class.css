@@ -32,6 +32,7 @@ body .block .full {
 body .cmuk-card-body {
   padding: 0px;
   padding-top: 20px;
+  padding-left: 20px;
 }
 
 body .cmuk-table td {
@@ -338,8 +339,7 @@ body.darkMode .commodityImage {
   border: 1.51312px solid #838388;
 }
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
-  background: #2f2d38;
-  border-color: #31323A;
+  border-color: #31323A !important;
 }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
   color: #e50913;
@@ -500,6 +500,10 @@ body.lightMode .notification .notificationTime {
 
 .containerHeight {
   height: calc(50% - 20px) !important;
+}
+
+.cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped > tr:nth-of-type(odd), table.dataTable tbody tr {
+  background: none !important;
 }
 
 .componentError p {
@@ -778,6 +782,14 @@ body.lightMode .notification .notificationTime {
   color: rgba(131, 0, 4, 0.71);
 }
 
+.padding-top-0 {
+  padding-top: 0 !important;
+}
+
+.padding-left-20 {
+  padding-left: 20px !important;
+}
+
 .hashCode {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -807,6 +819,7 @@ body.lightMode .notification .notificationTime {
   width: 120px;
 }
 .footer .darkModeButton {
+  outline: none !important;
   padding: 3px 7px 6px 10px;
   background: #272931;
 }
@@ -1058,8 +1071,9 @@ body.lightMode .notification .notificationTime {
 
 .pieChartContainer {
   display: flex;
+  flex-wrap: wrap;
 }
-.pieChartContainer div {
+.pieChartContainer > div {
   flex: 50%;
 }
 
@@ -1378,7 +1392,7 @@ body.lightMode .notification .notificationTime {
   display: inline-block;
   margin-right: 5px;
 }
-.comdex table.dataTable tbody th, .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody th, .comdex table.cmuk-table tbody td {
+.comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
   padding: 16px 12px;
   font-weight: 400;
   color: #272931;
@@ -1389,7 +1403,7 @@ body.lightMode .notification .notificationTime {
 .comdex table.dataTable.no-footer {
   border-bottom: 1px solid #e5e5e5;
 }
-.comdex table.dataTable thead th, .comdex table.cmuk-table thead th {
+.comdex table.dataTable thead th, .comdex table.cmuk-table thead th, .comdex table.cmuk-table tbody th, .comdex table.dataTable tbody th {
   border-bottom: 0;
   color: #8D9CB5;
   font-weight: 500;
@@ -3171,10 +3185,7 @@ header:before,
 }
 
 .cmuk-card-body.validatorList {
-  padding: 0px;
-}
-.cmuk-card-body.validatorList .cmuk-subnav {
-  padding: 15px;
+  padding-right: 20px;
 }
 .cmuk-card-body.validatorList .cmuk-switcher {
   overflow-x: scroll;
@@ -3303,7 +3314,7 @@ dl .info:after {
   margin-bottom: 20px;
 }
 .switcherCard .cmuk-card-body {
-  padding: 0;
+  padding: 0 !important;
 }
 .switcherCard .cmuk-card-body .cmuk-card {
   margin-bottom: 5px;
@@ -3553,8 +3564,17 @@ figure.zoom img {
   margin: 0 5px 0 0;
 }
 
+.transactionMessages .cmuk-card-body {
+  padding-right: 10px;
+}
+.transactionMessages .cmuk-card-body .cmuk-card {
+  margin-bottom: 10px;
+}
 .transactionMessages .cmuk-card-body .cmuk-card-header {
   color: #e50913;
+}
+.transactionMessages .cmuk-card-body .cmuk-card-body {
+  height: auto !important;
 }
 .transactionMessages .cmuk-card-body .cmuk-card-body .cmuk-card-body .title {
   padding-left: 12px;
@@ -3580,6 +3600,22 @@ figure.zoom img {
   margin-bottom: 5px;
   align-items: center;
   justify-content: center;
+}
+
+.transactionsList .cmuk-card-body, .blocksList .cmuk-card-body {
+  padding-top: 0px;
+  padding-right: 20px;
+}
+.transactionsList .cmuk-card-body table tbody tr:first-child, .blocksList .cmuk-card-body table tbody tr:first-child {
+  border-top: 0px solid;
+}
+
+.validatorTransactions .cmuk-card-body, .blockTransactions .cmuk-card-body, .accountTransactions .cmuk-card-body {
+  padding-top: 0px !important;
+  padding-right: 20px;
+}
+.validatorTransactions .cmuk-card-body table thead tr:first-child, .blockTransactions .cmuk-card-body table thead tr:first-child, .accountTransactions .cmuk-card-body table thead tr:first-child {
+  border-top: 0px solid;
 }
 
 /*# sourceMappingURL=class.css.map */
