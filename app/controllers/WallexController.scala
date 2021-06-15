@@ -100,7 +100,7 @@ class WallexController @Inject() (
               loginState.username
             )
 
-          def getOrganizationWallexAccountDetail(
+          def getOrganizationWallexAccount(
                                                   organizationID: String
                                                 ): Future[OrganizationAccountDetail] =
             wallexOrganizationAccountDetails.Service.tryGet(organizationID)
@@ -108,7 +108,7 @@ class WallexController @Inject() (
           (for {
             organizationID <- organizationID
             organizationWallexAccountDetail <-
-              getOrganizationWallexAccountDetail(organizationID)
+              getOrganizationWallexAccount(organizationID)
             result <- withUsernameToken.Ok(
               views.html.component.wallex.traderAddOrganizationAccount(
                 AddOrUpdateOrganizationAccount.form
@@ -1130,33 +1130,33 @@ class WallexController @Inject() (
               loginState.username
             )
 
-          def getOrganizationWallexAccountDetail(organizationID: String): Future[OrganizationAccountDetail] =
+          def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccountDetail] =
             wallexOrganizationAccountDetails.Service.tryGet(organizationID)
 
-         def getCompanyAccountDetails(accountID: String): Future[CompanyAccount] =
+         def getCompanyAccount(accountID: String): Future[CompanyAccount] =
            wallexCompanyAccounts.Service.tryGet(accountID)
 
          (for {
            organizationID <- organizationID
-           organizationWallexAccountDetail <-
-             getOrganizationWallexAccountDetail(organizationID)
-           companyAccountDetails <-
-             getCompanyAccountDetails(organizationWallexAccountDetail.accountID)
+           organizationWallexAccount <-
+             getOrganizationWallexAccount(organizationID)
+           companyAccount <-
+             getCompanyAccount(organizationWallexAccount.accountID)
          } yield Ok(
            views.html.component.wallex.traderUpdateCompanyAccountDetails(
              UpdateCompanyAccount.form
                .fill(
                  UpdateCompanyAccount
                    .Data(
-                     countryOfIncorporation = companyAccountDetails.countryOfIncorporation,
-                     countryOfOperations = companyAccountDetails.countryOfOperations,
-                     businessType = companyAccountDetails.businessType,
-                     companyAddress = companyAccountDetails.companyAddress,
-                     postalCode = companyAccountDetails.postalCode,
-                     state = companyAccountDetails.state,
-                     city = companyAccountDetails.city,
-                     registrationNumber = companyAccountDetails.registrationNumber,
-                     incorporationDate = utilities.Date.parseStringToDate(companyAccountDetails.incorporationDate)
+                     countryOfIncorporation = companyAccount.countryOfIncorporation,
+                     countryOfOperations = companyAccount.countryOfOperations,
+                     businessType = companyAccount.businessType,
+                     companyAddress = companyAccount.companyAddress,
+                     postalCode = companyAccount.postalCode,
+                     state = companyAccount.state,
+                     city = companyAccount.city,
+                     registrationNumber = companyAccount.registrationNumber,
+                     incorporationDate = utilities.Date.parseStringToDate(companyAccount.incorporationDate)
                    )
                )
            )
@@ -1971,19 +1971,19 @@ class WallexController @Inject() (
 
                 val authToken = wallexAuthToken.Service.getToken()
 
-                def sendForScreening(wallexId: String, authToken: String) =
+                def sendForScreening(wallexID: String, authToken: String) =
                   wallexUserScreening.Service
                     .post(
-                      wallexId,
+                      wallexID,
                       authToken,
-                      wallexUserScreening.Request(userId = wallexId)
+                      wallexUserScreening.Request(userId = wallexID)
                     )
 
-                def updateStatus(wallexId: String,
+                def updateStatus(wallexID: String,
                                   screeningResponse: ScreeningResponse
                                 ): Future[Int] =
                   wallexOrganizationAccountDetails.Service.updateStatus(
-                    wallexID = wallexId,
+                    wallexID = wallexID,
                     status = screeningResponse.status
                   )
 

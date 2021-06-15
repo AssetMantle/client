@@ -87,6 +87,11 @@ class CompanyAccounts @Inject() (
                 constants.Response.PSQL_EXCEPTION,
                 psqlException
               )
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException)
+
           }
       }
 

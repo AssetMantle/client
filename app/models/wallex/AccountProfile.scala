@@ -85,11 +85,11 @@ class AccountProfiles @Inject() (
     )
 
   private def add(
-      accountProfile: AccountProfileSerialized
+      accountProfileSerialized: AccountProfileSerialized
   ): Future[String] =
     db.run(
         (accountProfileTable returning accountProfileTable
-          .map(_.wallexID) += accountProfile).asTry
+          .map(_.wallexID) += accountProfileSerialized).asTry
       )
       .map {
         case Success(result) => result
@@ -104,22 +104,19 @@ class AccountProfiles @Inject() (
       }
 
   private def upsert(
-      accountProfile: AccountProfileSerialized
+      accountProfileSerialized: AccountProfileSerialized
   ): Future[Int] =
     db.run(
         accountProfileTable
-          .insertOrUpdate(accountProfile)
+          .insertOrUpdate(accountProfileSerialized)
           .asTry
       )
       .map {
         case Success(result) => result
         case Failure(exception) =>
           exception match {
-            case psqlException: PSQLException =>
-              throw new BaseException(
-                constants.Response.PSQL_EXCEPTION,
-                psqlException
-              )
+          case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+          case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
           }
       }
 
