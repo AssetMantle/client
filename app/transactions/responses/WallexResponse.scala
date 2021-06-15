@@ -314,7 +314,6 @@ object WallexResponse {
     Json.writes[GetBalanceResponse]
 
   case class ScreeningResponse(
-      id: String,
       status: String
   ) extends BaseResponse
 
@@ -329,14 +328,20 @@ object WallexResponse {
       mobileCountryCode: String,
       mobileNumber: String,
       gender: String,
+      nationality: String,
       countryOfBirth: String,
       countryOfResidence: String,
+      residentialAddress: String,
       countryCode: String,
       postalCode: String,
       dateOfBirth: String,
       identificationType: String,
+      identificationNumber: String,
       issueDate: String,
-      expiryDate: String
+      expiryDate: String,
+      employmentIndustry: String,
+      employmentStatus: String,
+      employmentPosition: String
   ) extends BaseResponse
 
   implicit val updateUserDetailsResponseReads
