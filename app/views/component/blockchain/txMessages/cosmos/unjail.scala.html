@@ -5,5 +5,5 @@
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(msg.asInstanceOf[Unjail]) { unjail =>
-    @commonTextInfo(constants.View.VALIDATOR_ADDRESS, unjail.validatorAddress)
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(unjail.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${unjail.validatorAddress}'))")))
 }
