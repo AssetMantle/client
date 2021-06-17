@@ -9,6 +9,7 @@
             <tr>
                 <th>@Messages(constants.View.TRANSACTION_HASH)</th>
                 <th>@Messages(constants.View.HEIGHT)</th>
+                <th>@Messages(constants.View.MESSAGES_TYPE)</th>
                 <th>@Messages(constants.View.STATUS)</th>
                 <th>@Messages(constants.View.TIME)</th>
             </tr>
@@ -22,6 +23,12 @@
                 <td>
                 @commonJavascriptLink(tx.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${tx.height}))"))
                 </td>
+                <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.messages.length == 1) {
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+                } else {
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+                    (+@(tx.messages.length - 1))
+                }</td>
                 <td>
                 @if(tx.status) {
                     <span cmuk-icon="check" class="check"></span>
