@@ -2,16 +2,16 @@ package controllers
 
 import controllers.actions._
 import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import models.blockchain._
 import models.masterTransaction.TokenPrice
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorSelfBondAndCommissionRewards}
 import utilities.MicroNumber
-import javax.inject.{Inject, Singleton}
-import play.api.cache.Cached
 
 import scala.collection.immutable.ListMap
 import scala.concurrent.duration.DurationInt
@@ -110,7 +110,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def latestBlockHeight(): EssentialAction = cached.apply(req=>req.path,5.seconds){
+  def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, 5.seconds) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val latestBlock = blockchainBlocks.Service.getLatestBlock
@@ -129,7 +129,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensStatistics(): EssentialAction = cached.apply(req=>req.path, 5.seconds) {
+  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, 5.seconds) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val tokens = blockchainTokens.Service.getAll
