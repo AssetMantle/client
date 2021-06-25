@@ -1,14 +1,14 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationBeneficiary
+@import models.wallex.Beneficiary
 
-@(organizationWallexBeneficiaryDetail: Seq[OrganizationBeneficiary])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
+@(beneficiary: Seq[Beneficiary])(implicit messagesProvider: MessagesProvider, loginState: LoginState)
 
     @commonCard(constants.View.WALLEX_ORGANIZATION_BENEFICIARY, 'cardIconPath -> "images/icons/icons.svg#beneficiaries") {
 
         @commonFormButton(constants.Form.WALLEX_TRADER_BENEFICIARY_ADD)
     } {
-        @organizationWallexBeneficiaryDetail.map { beneficiary =>
+        @beneficiary.map { beneficiary =>
             @commonVerticalInfoBox() {
                 <div>
                     @commonTextInfo(constants.View.WALLEX_BENEFICIARY_ID, beneficiary.beneficiaryID)

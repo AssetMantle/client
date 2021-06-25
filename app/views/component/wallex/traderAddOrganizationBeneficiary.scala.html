@@ -13,7 +13,7 @@
     @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_ENTITY_TYPE)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.COMPANY_NAME)
     @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.NICK_NAME)
-    @defining(Option(constants.FormField.WALLEX_BANK_DATA)) { implicit nestedFormField =>
+    @defining(Option(constants.FormField.WALLEX_BANK_DETAILS)) { implicit nestedFormField =>
         @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.BANK_NAME)
         @commonSelect(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_COUNTRY_CODE)
         @commonInputText(addOrgWallexBeneficiaryDetails, constants.FormField.WALLEX_BANK_ADDRESS)

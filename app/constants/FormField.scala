@@ -260,7 +260,8 @@ object FormField {
   val UBOS = new NestedFormField("UBOS")
   val DOCUMENT_LIST = new NestedFormField("DOCUMENT_LIST")
   val CREDIT = new NestedFormField("CREDIT")
-  val WALLEX_BANK_DATA = new NestedFormField("WALLEX_BANK_DETAILS")
+  val WALLEX_BANK_DETAILS = new NestedFormField("WALLEX_BANK_DETAILS")
+  val WALLEX_USER_RESIDENTIAL_ADDRESS = new NestedFormField("WALLEX_USER_RESIDENTIAL_ADDRESS")
 
   //MicroNumberFormField
   val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))

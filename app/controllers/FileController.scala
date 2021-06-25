@@ -928,7 +928,7 @@ class FileController @Inject()(
       val storeFile = fileResourceManager.storeFile[UserKYC](
         name = name,
         path = fileResourceManager.getWallexFilePath(documentType),
-        document = UserKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+        document = UserKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None, fileID = ""),
         masterCreate = wallexDocuments.Service.create
       )
 

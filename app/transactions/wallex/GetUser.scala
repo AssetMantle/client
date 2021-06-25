@@ -1,8 +1,10 @@
 package transactions.wallex
 
 import exceptions.BaseException
+import play.api.libs.json.{Json, OWrites, Reads}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import transactions.Abstract.BaseRequest
 import transactions.responses.WallexResponse.GetUserResponse
 import utilities.KeyStore
 
@@ -56,6 +58,10 @@ class GetUser @Inject()(
   }
 
   case class Request()
+
+  case class UserNotification(resource: String,status: String,resourceId: String) extends BaseRequest
+  private implicit val notificationWrites: OWrites[UserNotification] = Json.writes[UserNotification]
+  implicit val notificationReads: Reads[UserNotification] = Json.reads[UserNotification]
 
   object Service {
 

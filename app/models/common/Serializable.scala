@@ -118,7 +118,7 @@ object Serializable {
       address: String,
       bankName: String,
       bicSwift: String,
-      aba:String,
+      aba: String,
       country: String,
       currency: String,
       bankAccountHolderName: String
@@ -214,20 +214,67 @@ object Serializable {
       Json.format[Contract].map(x => x: NegotiationDocumentContent)
   }
 
-  case class EmploymentDetails(employmentIndustry: String,
-                               employmentStatus: String,
-                               employmentPosition: String)
+  case class EmploymentDetails(
+      employmentIndustry: String,
+      employmentStatus: String,
+      employmentPosition: String
+  )
 
-  implicit val employmentDetailsWrites: OWrites[EmploymentDetails] = Json.writes[EmploymentDetails]
+  implicit val employmentDetailsWrites: OWrites[EmploymentDetails] =
+    Json.writes[EmploymentDetails]
 
-  implicit val employmentDetailsReads: Reads[EmploymentDetails] = Json.reads[EmploymentDetails]
+  implicit val employmentDetailsReads: Reads[EmploymentDetails] =
+    Json.reads[EmploymentDetails]
 
-  case class ResidentialAddressDetails(countryOfResidence: String,
-                                residentialAddress: String,
-                                countryCode: String,
-                                postalCode: String)
+  case class ResidentialAddressDetails(
+      countryOfResidence: String,
+      residentialAddress: String,
+      countryCode: String,
+      postalCode: String
+  )
 
-  implicit val residentialAddressWrites: OWrites[ResidentialAddressDetails] = Json.writes[ResidentialAddressDetails]
+  implicit val residentialAddressWrites: OWrites[ResidentialAddressDetails] =
+    Json.writes[ResidentialAddressDetails]
 
-  implicit val residentialAddressReads: Reads[ResidentialAddressDetails] = Json.reads[ResidentialAddressDetails]
+  implicit val residentialAddressReads: Reads[ResidentialAddressDetails] =
+    Json.reads[ResidentialAddressDetails]
+
+  case class Company(
+      name: String,
+      countryOfIncorporation: String,
+      countryOfOperations: String,
+      businessType: String,
+      companyAddress: String,
+      postalCode: String,
+      state: String,
+      city: String,
+      registrationNumber: String,
+      incorporationDate: String
+  )
+  implicit val companyWrites: OWrites[Company] =
+    Json.writes[Company]
+
+  implicit val companyReads: Reads[Company] =
+    Json.reads[Company]
+
+  case class UserProfile(
+      firstName: String,
+      lastName: String,
+      mobileNumber: String,
+      gender: String,
+      nationality: String,
+      countryOfBirth: String,
+      residentialAddressDetails: ResidentialAddressDetails,
+      dateOfBirth: String,
+      identificationType: String,
+      identificationNumber: String,
+      issueDate: String,
+      expiryDate: String,
+      employmentDetails: EmploymentDetails
+  )
+  implicit val userProfileWrites: OWrites[UserProfile] =
+    Json.writes[UserProfile]
+
+  implicit val userProfileReads: Reads[UserProfile] =
+    Json.reads[UserProfile]
 }

@@ -615,6 +615,7 @@ GET         /wallex/zone/userScreening/send                                     
 POST        /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreening
 GET         /wallex/termsAndConditions                                                            controllers.ViewController.wallexTermsAndConditions
 POST        /wallex/add/fund/notification                                                         controllers.WallexController.fundingNotification
+POST        /wallex/user/notification                                                         controllers.WallexController.userNotification
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB

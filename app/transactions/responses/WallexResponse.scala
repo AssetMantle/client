@@ -244,7 +244,7 @@ object WallexResponse {
   implicit val paymentFileUploadWrites: OWrites[PaymentFileUploadResponse] =
     Json.writes[PaymentFileUploadResponse]
 
-  case class UpdateCompanyDetailsResponse(
+  case class UserUpdateCompanyResponse(
       accountId: String,
       companyName: String,
       countryOfIncorporation: String,
@@ -258,12 +258,12 @@ object WallexResponse {
       incorporationDate: String
   ) extends BaseResponse
 
-  implicit val updateDetailsResponseReads: Reads[UpdateCompanyDetailsResponse] =
-    Json.reads[UpdateCompanyDetailsResponse]
-  implicit val updateDetailsResponseWrites: OWrites[UpdateCompanyDetailsResponse] =
-    Json.writes[UpdateCompanyDetailsResponse]
+  implicit val userUpdateCompanyResponseReads: Reads[UserUpdateCompanyResponse] =
+    Json.reads[UserUpdateCompanyResponse]
+  implicit val userUpdateCompanyResponseWrites: OWrites[UserUpdateCompanyResponse] =
+    Json.writes[UserUpdateCompanyResponse]
 
-  case class CollectionBankDetails(
+  case class CollectionBank(
       bankName: String,
       currency: String,
       paymentType: String,
@@ -271,10 +271,10 @@ object WallexResponse {
       accountHolderName: String,
       accountNumberType: String
   )
-  implicit val collectionBankDetailsReads: Reads[CollectionBankDetails] =
-    Json.reads[CollectionBankDetails]
-  implicit val CollectionBankDetailsWrites: OWrites[CollectionBankDetails] =
-    Json.writes[CollectionBankDetails]
+  implicit val collectionBankReads: Reads[CollectionBank] =
+    Json.reads[CollectionBank]
+  implicit val CollectionBankWrites: OWrites[CollectionBank] =
+    Json.writes[CollectionBank]
 
   case class CreateCollectionResponse(
       id: String,
@@ -283,7 +283,7 @@ object WallexResponse {
       reference: String,
       purpose: String,
       createdAt: String,
-      bankDetails: Seq[CollectionBankDetails]
+      bankDetails: Seq[CollectionBank]
   ) extends BaseResponse
 
   implicit val createCollectionResponseReads: Reads[CreateCollectionResponse] =
@@ -322,7 +322,7 @@ object WallexResponse {
   implicit val screeningResponseWrites: OWrites[ScreeningResponse] =
     Json.writes[ScreeningResponse]
 
-  case class UpdateUserDetailsResponse(
+  case class UserUpdateAccountResponse(
       firstName: String,
       lastName: String,
       mobileCountryCode: String,
@@ -344,12 +344,12 @@ object WallexResponse {
       employmentPosition: String
   ) extends BaseResponse
 
-  implicit val updateUserDetailsResponseReads
-      : Reads[UpdateUserDetailsResponse] =
-    Json.reads[UpdateUserDetailsResponse]
-  implicit val updateUserDetailsResponseWrites
-      : OWrites[UpdateUserDetailsResponse] =
-    Json.writes[UpdateUserDetailsResponse]
+  implicit val userUpdateAccountResponseReads
+      : Reads[UserUpdateAccountResponse] =
+    Json.reads[UserUpdateAccountResponse]
+  implicit val userUpdateAccountResponseWrites
+      : OWrites[UserUpdateAccountResponse] =
+    Json.writes[UserUpdateAccountResponse]
 
   case class WallexErrorResponse(error_code: String, message: String)
       extends BaseResponse

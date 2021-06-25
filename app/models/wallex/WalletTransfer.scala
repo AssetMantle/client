@@ -15,10 +15,9 @@ import scala.util.{Failure, Success}
 case class WalletTransfer(
     id: String,
     wallexID: String,
-    organizationID: String,
     senderAccountID: String,
     receiverAccountID: String,
-    amount: Double,
+    amount: String,
     currency: String,
     purposesOfTransfer: String,
     reference: String,
@@ -112,7 +111,6 @@ class WalletTransfers @Inject()(
       (
         id,
         wallexID,
-        organizationID,
         senderAccountID,
         receiverAccountID,
         amount,
@@ -133,15 +131,13 @@ class WalletTransfers @Inject()(
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def wallexID = column[String]("wallexID", O.PrimaryKey)
-
-    def organizationID = column[String]("organizationID")
+    def wallexID = column[String]("wallexID")
 
     def senderAccountID = column[String]("senderAccountID")
 
     def receiverAccountID = column[String]("receiverAccountID")
 
-    def amount = column[Double]("amount")
+    def amount = column[String]("amount")
 
     def currency = column[String]("currency")
 
@@ -173,11 +169,10 @@ class WalletTransfers @Inject()(
   object Service {
     def create(
         id: String,
-        organizationID: String,
         wallexID: String,
         senderAccountID: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposesOfTransfer: String,
         reference: String,
@@ -189,7 +184,6 @@ class WalletTransfers @Inject()(
       add(
         WalletTransfer(
           id = id,
-          organizationID = organizationID,
           wallexID = wallexID,
           senderAccountID = senderAccountID,
           receiverAccountID = receiverAccountID,
@@ -206,11 +200,10 @@ class WalletTransfers @Inject()(
 
     def insertOrUpdate(
         id: String,
-        organizationID: String,
         wallexID: String,
         senderAccountID: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposesOfTransfer: String,
         reference: String,
@@ -222,7 +215,6 @@ class WalletTransfers @Inject()(
       upsert(
         WalletTransfer(
           id = id,
-          organizationID = organizationID,
           wallexID = wallexID,
           senderAccountID = senderAccountID,
           receiverAccountID = receiverAccountID,

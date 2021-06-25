@@ -14,8 +14,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationBeneficiary(
-    organizationID: String,
+case class Beneficiary(
     wallexID: String,
     beneficiaryID: String,
     address: String,
@@ -35,14 +34,14 @@ case class OrganizationBeneficiary(
 ) extends Logged
 
 @Singleton
-class OrganizationBeneficiaries @Inject()(
+class Beneficiaries @Inject()(
     protected val databaseConfigProvider: DatabaseConfigProvider
 )(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String =
-    constants.Module.ORGANIZATION_WALLEX_BENEFICIARY_DETAILS
+    constants.Module.WALLEX_BENEFICIARY
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -51,37 +50,36 @@ class OrganizationBeneficiaries @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val beneficiaryTable =
-    TableQuery[OrganizationBeneficiaryTable]
+    TableQuery[BeneficiaryTable]
 
   private def serialize(
-      organizationBeneficiary: OrganizationBeneficiary
-  ): OrganizationBeneficiarySerialized =
-    OrganizationBeneficiarySerialized(
-      organizationID = organizationBeneficiary.organizationID,
-      wallexID = organizationBeneficiary.wallexID,
-      beneficiaryID = organizationBeneficiary.beneficiaryID,
-      address = organizationBeneficiary.address,
-      country = organizationBeneficiary.country,
-      city = organizationBeneficiary.city,
-      entityType = organizationBeneficiary.entityType,
-      companyName = organizationBeneficiary.companyName,
-      nickname = organizationBeneficiary.nickname,
-      accountType = organizationBeneficiary.accountType,
-      bankAccount = Json.toJson(organizationBeneficiary.bankAccount).toString,
-      createdBy = organizationBeneficiary.createdBy,
-      createdOn = organizationBeneficiary.createdOn,
-      createdOnTimeZone = organizationBeneficiary.createdOnTimeZone,
-      updatedBy = organizationBeneficiary.updatedBy,
-      updatedOn = organizationBeneficiary.updatedOn,
-      updatedOnTimeZone = organizationBeneficiary.updatedOnTimeZone
+      beneficiary: Beneficiary
+  ): BeneficiarySerialized =
+    BeneficiarySerialized(
+      wallexID = beneficiary.wallexID,
+      beneficiaryID = beneficiary.beneficiaryID,
+      address = beneficiary.address,
+      country = beneficiary.country,
+      city = beneficiary.city,
+      entityType = beneficiary.entityType,
+      companyName = beneficiary.companyName,
+      nickname = beneficiary.nickname,
+      accountType = beneficiary.accountType,
+      bankAccount = Json.toJson(beneficiary.bankAccount).toString,
+      createdBy = beneficiary.createdBy,
+      createdOn = beneficiary.createdOn,
+      createdOnTimeZone = beneficiary.createdOnTimeZone,
+      updatedBy = beneficiary.updatedBy,
+      updatedOn = beneficiary.updatedOn,
+      updatedOnTimeZone = beneficiary.updatedOnTimeZone
     )
 
   private def add(
-      organizationBeneficiary: OrganizationBeneficiarySerialized
+     beneficiarySerialized: BeneficiarySerialized
   ): Future[String] =
     db.run(
         (beneficiaryTable returning beneficiaryTable
-          .map(_.organizationID) += organizationBeneficiary).asTry
+          .map(_.wallexID) += beneficiarySerialized).asTry
       )
       .map {
         case Success(result) => result
@@ -96,11 +94,11 @@ class OrganizationBeneficiaries @Inject()(
       }
 
   private def upsert(
-      organizationBeneficiary: OrganizationBeneficiarySerialized
+    beneficiarySerialized: BeneficiarySerialized
   ): Future[Int] =
     db.run(
         beneficiaryTable
-          .insertOrUpdate(organizationBeneficiary)
+          .insertOrUpdate(beneficiarySerialized)
           .asTry
       )
       .map {
@@ -115,21 +113,21 @@ class OrganizationBeneficiaries @Inject()(
           }
       }
 
-  private def getByOrganizationID(
-      organizationID: String
-  ): Future[Seq[OrganizationBeneficiarySerialized]] =
+  private def getByWallexID(
+      wallexID: String
+  ): Future[Seq[BeneficiarySerialized]] =
     db.run(
       beneficiaryTable
-        .filter(_.organizationID === organizationID)
+        .filter(_.wallexID === wallexID)
         .result
     )
 
-  private def tryGetByOrganizationID(
-      organizationID: String
-  ): Future[OrganizationBeneficiarySerialized] =
+  private def tryGetByWallexID(
+       wallexID: String
+  ): Future[BeneficiarySerialized] =
     db.run(
         beneficiaryTable
-          .filter(_.organizationID === organizationID)
+          .filter(_.wallexID === wallexID)
           .result
           .head
           .asTry
@@ -148,7 +146,7 @@ class OrganizationBeneficiaries @Inject()(
 
   private def tryGetByBeneficiaryId(
       beneficiaryID: String
-  ): Future[OrganizationBeneficiarySerialized] =
+  ): Future[BeneficiarySerialized] =
     db.run(
         beneficiaryTable
           .filter(_.beneficiaryID === beneficiaryID)
@@ -192,8 +190,7 @@ class OrganizationBeneficiaries @Inject()(
           }
       }
 
-  case class OrganizationBeneficiarySerialized(
-      organizationID: String,
+  case class BeneficiarySerialized(
       wallexID: String,
       beneficiaryID: String,
       address: String,
@@ -212,9 +209,8 @@ class OrganizationBeneficiaries @Inject()(
       updatedOnTimeZone: Option[String] = None
   ) {
 
-    def deserialize: OrganizationBeneficiary =
-      OrganizationBeneficiary(
-        organizationID = organizationID,
+    def deserialize: Beneficiary =
+      Beneficiary(
         wallexID = wallexID,
         beneficiaryID = beneficiaryID,
         address = address,
@@ -236,15 +232,14 @@ class OrganizationBeneficiaries @Inject()(
 
   }
 
-  private[models] class OrganizationBeneficiaryTable(tag: Tag)
-      extends Table[OrganizationBeneficiarySerialized](
+  private[models] class BeneficiaryTable(tag: Tag)
+      extends Table[BeneficiarySerialized](
         tag,
-        "OrganizationBeneficiary"
+        "Beneficiary"
       ) {
 
     override def * =
       (
-        organizationID,
         wallexID,
         beneficiaryID,
         address,
@@ -261,9 +256,7 @@ class OrganizationBeneficiaries @Inject()(
         updatedBy.?,
         updatedOn.?,
         updatedOnTimeZone.?
-      ) <> (OrganizationBeneficiarySerialized.tupled, OrganizationBeneficiarySerialized.unapply)
-
-    def organizationID = column[String]("organizationID", O.PrimaryKey)
+      ) <> (BeneficiarySerialized.tupled, BeneficiarySerialized.unapply)
 
     def wallexID = column[String]("wallexID", O.PrimaryKey)
 
@@ -300,7 +293,6 @@ class OrganizationBeneficiaries @Inject()(
 
   object Service {
     def create(
-        organizationID: String,
         wallexID: String,
         beneficiaryID: String,
         address: String,
@@ -314,8 +306,7 @@ class OrganizationBeneficiaries @Inject()(
     ): Future[String] =
       add(
         serialize(
-          OrganizationBeneficiary(
-            organizationID = organizationID,
+          Beneficiary(
             wallexID = wallexID,
             beneficiaryID = beneficiaryID,
             address = address,
@@ -331,7 +322,6 @@ class OrganizationBeneficiaries @Inject()(
       )
 
     def insertOrUpdate(
-        organizationID: String,
         wallexID: String,
         beneficiaryID: String,
         address: String,
@@ -345,8 +335,7 @@ class OrganizationBeneficiaries @Inject()(
     ): Future[Int] =
       upsert(
         serialize(
-          OrganizationBeneficiary(
-            organizationID = organizationID,
+          Beneficiary(
             wallexID = wallexID,
             beneficiaryID = beneficiaryID,
             address = address,
@@ -361,17 +350,16 @@ class OrganizationBeneficiaries @Inject()(
         )
       )
 
-    def tryGet(organizationID: String): Future[OrganizationBeneficiary] =
-      tryGetByOrganizationID(organizationID).map(_.deserialize)
+    def tryGet(wallexID: String): Future[Beneficiary] =
+      tryGetByWallexID(wallexID).map(_.deserialize)
 
-    def get(
-        organizationID: String
-    ): Future[Seq[OrganizationBeneficiary]] =
-      getByOrganizationID(organizationID).map(_.map(_.deserialize))
+    def get(wallexID: String
+    ): Future[Seq[Beneficiary]] =
+      getByWallexID(wallexID).map(_.map(_.deserialize))
 
     def getByBeneficiaryId(
         beneficiaryID: String
-    ): Future[OrganizationBeneficiary] =
+    ): Future[Beneficiary] =
       tryGetByBeneficiaryId(beneficiaryID).map(_.deserialize)
 
     def delete(beneficiaryID: String): Future[Int] =

@@ -16,7 +16,7 @@ case class FundingStatus(
     id: String,
     balanceID: String,
     accountID: String,
-    amount: Double,
+    amount: String,
     reference: String,
     status: String,
     createdBy: Option[String] = None,
@@ -107,7 +107,10 @@ class FundingStatusDetails @Inject() (
           .asTry
       )
       .map {
-        case Success(result) => result
+        case Success(result) => result match {
+          case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+          case _ => result
+        }
         case Failure(exception) =>
           exception match {
             case psqlException: PSQLException =>
@@ -151,7 +154,7 @@ class FundingStatusDetails @Inject() (
 
     def accountID = column[String]("accountID")
 
-    def amount = column[Double]("amount")
+    def amount = column[String]("amount")
 
     def reference = column[String]("reference")
 
@@ -175,7 +178,7 @@ class FundingStatusDetails @Inject() (
         id: String,
         balanceID: String,
         accountID: String,
-        amount: Double,
+        amount: String,
         reference: String,
         status: String
     ): Future[String] =
@@ -194,7 +197,7 @@ class FundingStatusDetails @Inject() (
         id: String,
         balanceID: String,
         accountID: String,
-        amount: Double,
+        amount: String,
         reference: String,
         status: String
     ): Future[Int] =

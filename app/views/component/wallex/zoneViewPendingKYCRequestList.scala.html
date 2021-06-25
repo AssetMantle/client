@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationAccountDetail
+@import models.wallex.OrganizationAccount
 
-@(wallexDetails: Seq[OrganizationAccountDetail])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(organizationAccount: Seq[OrganizationAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@wallexDetails.map { request =>
+@organizationAccount.map { request =>
     @commonVerticalInfoBox() {
         @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, request.organizationID)
         @commonVerticalTextInfo(constants.View.WALLEX_ID, request.wallexID)

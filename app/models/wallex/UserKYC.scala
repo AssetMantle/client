@@ -17,6 +17,7 @@ case class UserKYC(
     documentType: String,
     fileName: String,
     file: Option[Array[Byte]],
+    fileID: String,
     status: Option[Boolean] = None,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
@@ -38,7 +39,7 @@ case class UserKYC(
 }
 
 @Singleton
-class UserKYCs @Inject()(
+class UserKYCs @Inject() (
     protected val databaseConfigProvider: DatabaseConfigProvider,
     configuration: Configuration
 )(implicit executionContext: ExecutionContext) {
@@ -145,8 +146,36 @@ class UserKYCs @Inject()(
           }
       }
 
-  private def getAllDocumentsById(id: String): Future[Seq[UserKYC]] = db.run(userKYCTable.filter(_.id === id).result)
+  private def updateFile(
+      id: String,
+      fileID: String
+  ): Future[Int] =
+    db.run(
+        userKYCTable
+          .filter(_.id === id)
+          .map(_.fileID)
+          .update(fileID)
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
 
+  private def getAllDocumentsById(id: String): Future[Seq[UserKYC]] =
+    db.run(userKYCTable.filter(_.id === id).result)
 
   private[models] class UserKYCTable(tag: Tag)
       extends Table[UserKYC](tag, "UserKYC") {
@@ -157,6 +186,7 @@ class UserKYCs @Inject()(
         documentType,
         fileName,
         file.?,
+        fileID,
         status.?,
         createdBy.?,
         createdOn.?,
@@ -173,6 +203,8 @@ class UserKYCs @Inject()(
     def fileName = column[String]("fileName", O.Unique)
 
     def file = column[Array[Byte]]("file")
+
+    def fileID = column[String]("fileID")
 
     def status = column[Boolean]("status")
 
@@ -207,7 +239,13 @@ class UserKYCs @Inject()(
     def updateOldDocument(wallexDocument: UserKYC): Future[Int] =
       update(wallexDocument)
 
-    def getAllDocuments(id: String): Future[Seq[UserKYC]] = getAllDocumentsById(id = id)
+    def getAllDocuments(id: String): Future[Seq[UserKYC]] =
+      getAllDocumentsById(id = id)
+
+    def updateUrlAndFileID(
+        id: String,
+        fileID: String
+    ): Future[Int] = updateFile(id = id, fileID = fileID)
 
   }
 }

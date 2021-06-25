@@ -18,7 +18,7 @@ case class WalletTransferRequest(
     traderID: String,
     onBehalfOf: String,
     receiverAccountID: String,
-    amount: Double,
+    amount: String,
     currency: String,
     purposeOfTransfer: String,
     reference: String,
@@ -149,7 +149,10 @@ class WalletTransferRequests @Inject() (
           .asTry
       )
       .map {
-        case Success(result) => result
+        case Success(result) => result match {
+          case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+          case _ => result
+        }
         case Failure(exception) =>
           exception match {
             case psqlException: PSQLException =>
@@ -202,7 +205,7 @@ class WalletTransferRequests @Inject() (
 
     def receiverAccountID = column[String]("receiverAccountID")
 
-    def amount = column[Double]("amount")
+    def amount = column[String]("amount")
 
     def currency = column[String]("currency")
 
@@ -234,7 +237,7 @@ class WalletTransferRequests @Inject() (
         traderID: String,
         onBehalfOf: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposeOfTransfer: String,
         reference: String,
@@ -263,7 +266,7 @@ class WalletTransferRequests @Inject() (
         traderID: String,
         onBehalfOf: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposeOfTransfer: String,
         reference: String,

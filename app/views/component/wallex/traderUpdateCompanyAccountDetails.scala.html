@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(updateDetailsWallexAccount: Form[UpdateCompanyAccount.Data] = UpdateCompanyAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
-@commonForm(constants.Form.WALLEX_TRADER_ACCOUNT_UPDATE, updateDetailsWallexAccount) {
+@commonForm(constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE, updateDetailsWallexAccount) {
     @commonSelect(updateDetailsWallexAccount, constants.FormField.WALLEX_COUNTRY_OF_INCORPORATION)
     @commonSelect(updateDetailsWallexAccount, constants.FormField.WALLEX_COUNTRY_OF_OPERATIONS)
     @commonSelect(updateDetailsWallexAccount, constants.FormField.WALLEX_BUSINESS_TYPE)
@@ -13,4 +13,7 @@
     @commonInputText(updateDetailsWallexAccount, constants.FormField.CITY)
     @commonInputText(updateDetailsWallexAccount, constants.FormField.WALLEX_REGISTRATION_NUMBER)
     @commonInputDate(updateDetailsWallexAccount, constants.FormField.WALLEX_INCORPORATION_DATE)
+
+    @commonModalButton(constants.View.BACK, constants.Form.WALLEX_TRADER_UPDATE_USER_DETAILS.get, 'class -> "cmuk-margin-top buttonPrimary")
+
 }

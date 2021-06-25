@@ -1,5 +1,6 @@
 package views.companion.wallex
 
+import models.common.Serializable.ResidentialAddressDetails
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -13,10 +14,12 @@ object UpdateUserAccount {
       constants.FormField.MOBILE_NUMBER.name -> constants.FormField.MOBILE_NUMBER.field,
       constants.FormField.WALLEX_GENDER.name -> constants.FormField.WALLEX_GENDER.field,
       constants.FormField.WALLEX_NATIONALITY.name -> constants.FormField.WALLEX_NATIONALITY.field,
+      constants.FormField.WALLEX_USER_RESIDENTIAL_ADDRESS.name -> mapping(
       constants.FormField.WALLEX_COUNTRY_OF_RESIDENCE.name -> constants.FormField.WALLEX_COUNTRY_OF_RESIDENCE.field,
       constants.FormField.WALLEX_RESIDENTIAL_ADDRESS.name -> constants.FormField.WALLEX_RESIDENTIAL_ADDRESS.field,
       constants.FormField.WALLEX_COUNTRY_CODE.name -> constants.FormField.WALLEX_COUNTRY_CODE.field,
-      constants.FormField.WALLEX_POSTAL_ZIP_CODE.name -> constants.FormField.WALLEX_POSTAL_ZIP_CODE.field,
+      constants.FormField.WALLEX_POSTAL_ZIP_CODE.name -> constants.FormField.WALLEX_POSTAL_ZIP_CODE.field)
+      (ResidentialAddressDetails.apply)(ResidentialAddressDetails.unapply),
       constants.FormField.WALLEX_COUNTRY_OF_BIRTH.name -> constants.FormField.WALLEX_COUNTRY_OF_BIRTH.field,
       constants.FormField.DATE_OF_BIRTH.name -> constants.FormField.DATE_OF_BIRTH.field,
       constants.FormField.WALLEX_IDENTIFICATION_TYPE.name -> constants.FormField.WALLEX_IDENTIFICATION_TYPE.field,
@@ -34,10 +37,7 @@ object UpdateUserAccount {
       mobileNumber: String,
       gender: String,
       nationality: String,
-      countryOfResidence: String,
-      residentialAddress: String,
-      countryCode: String,
-      postalCode: String,
+      userResidentialAddress: ResidentialAddressDetails,
       countryOfBirth: String,
       dateOfBirth: Date,
       identificationType: String,
