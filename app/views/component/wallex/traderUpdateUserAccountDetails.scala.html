@@ -24,7 +24,7 @@
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_STATUS)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_POSITION)
 
-  @if(!updateUserDetails.get.gender.isBlank) {
+  @if(updateUserDetails.get.gender != "") {
       @commonModalButton(constants.View.NEXT, constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE.get, 'class -> "cmuk-margin-top buttonPrimary")
   }
 }
