@@ -213,7 +213,6 @@ object FormField {
   val TOTAL_AMOUNT = new DoubleFormField("TOTAL_AMOUNT", 0.0, 1000000000000000.00)
   val WALLEX_BANK_CHARGE = new DoubleFormField("WALLEX_BANK_CHARGE", 0.0, 1000000000000000.00)
   val WALLEX_CONVERSION_FEE = new DoubleFormField("WALLEX_CONVERSION_FEE", 0.0, 1000000000000000.00)
-  val WALLEX_AMOUNT = new DoubleFormField("WALLEX_AMOUNT", 0.0, 1000000000000000.00)
 
   //BooleanFormField
   val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
@@ -272,6 +271,7 @@ object FormField {
   val INVOICE_AMOUNT = new MicroNumberFormField("INVOICE_AMOUNT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))
   val GAS = new MicroNumberFormField("GAS", MicroNumber(1), MicroNumber(10), RegularExpression.GAS)
   val AMOUNT = new MicroNumberFormField("AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
+  val WALLEX_AMOUNT = new MicroNumberFormField("WALLEX_AMOUNT", MicroNumber(0.01), new MicroNumber(100000000000000.0))
 
   //TODO: Error Response through Messages
   class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

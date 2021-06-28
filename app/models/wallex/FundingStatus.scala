@@ -6,6 +6,7 @@ import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -16,7 +17,7 @@ case class FundingStatus(
     id: String,
     balanceID: String,
     accountID: String,
-    amount: String,
+    amount: MicroNumber,
     reference: String,
     status: String,
     createdBy: Option[String] = None,
@@ -46,12 +47,29 @@ class FundingStatusDetails @Inject() (
   private[models] val fundingStatusTable =
     TableQuery[FundingStatusTable]
 
-  private def add(
+  private def serialize(
       fundingStatus: FundingStatus
+  ): FundingStatusSerialized =
+    FundingStatusSerialized(
+      id = fundingStatus.id,
+      balanceID = fundingStatus.balanceID,
+      accountID = fundingStatus.accountID,
+      amount = fundingStatus.amount.toMicroString,
+      reference = fundingStatus.reference,
+      status = fundingStatus.reference,
+      createdBy = fundingStatus.createdBy,
+      createdOn = fundingStatus.createdOn,
+      createdOnTimeZone = fundingStatus.createdOnTimeZone,
+      updatedBy = fundingStatus.updatedBy,
+      updatedOn = fundingStatus.updatedOn,
+      updatedOnTimeZone = fundingStatus.updatedOnTimeZone
+    )
+  private def add(
+      fundingStatusSerialized: FundingStatusSerialized
   ): Future[String] =
     db.run(
         (fundingStatusTable returning fundingStatusTable
-          .map(_.id) += fundingStatus).asTry
+          .map(_.id) += fundingStatusSerialized).asTry
       )
       .map {
         case Success(result) => result
@@ -66,11 +84,11 @@ class FundingStatusDetails @Inject() (
       }
 
   private def upsert(
-      fundingStatus: FundingStatus
+      fundingStatusSerialized: FundingStatusSerialized
   ): Future[Int] =
     db.run(
         fundingStatusTable
-          .insertOrUpdate(fundingStatus)
+          .insertOrUpdate(fundingStatusSerialized)
           .asTry
       )
       .map {
@@ -87,13 +105,35 @@ class FundingStatusDetails @Inject() (
 
   private def findById(
       id: String
-  ): Future[Option[FundingStatus]] =
+  ): Future[Option[FundingStatusSerialized]] =
     db.run(
       fundingStatusTable
         .filter(_.id === id)
         .result
         .headOption
     )
+
+  private def tryGetById(
+      id: String
+  ): Future[FundingStatusSerialized] =
+    db.run(
+        fundingStatusTable
+          .filter(_.id === id)
+          .result
+          .head
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
 
   private def updateStatusById(
       id: String,
@@ -107,10 +147,14 @@ class FundingStatusDetails @Inject() (
           .asTry
       )
       .map {
-        case Success(result) => result match {
-          case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-          case _ => result
-        }
+        case Success(result) =>
+          result match {
+            case 0 =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION
+              )
+            case _ => result
+          }
         case Failure(exception) =>
           exception match {
             case psqlException: PSQLException =>
@@ -127,7 +171,7 @@ class FundingStatusDetails @Inject() (
       }
 
   private[models] class FundingStatusTable(tag: Tag)
-      extends Table[FundingStatus](
+      extends Table[FundingStatusSerialized](
         tag,
         "FundingStatus"
       ) {
@@ -146,7 +190,7 @@ class FundingStatusDetails @Inject() (
         updatedBy.?,
         updatedOn.?,
         updatedOnTimeZone.?
-      ) <> (FundingStatus.tupled, FundingStatus.unapply)
+      ) <> (FundingStatusSerialized.tupled, FundingStatusSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -173,6 +217,38 @@ class FundingStatusDetails @Inject() (
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
+  case class FundingStatusSerialized(
+      id: String,
+      balanceID: String,
+      accountID: String,
+      amount: String,
+      reference: String,
+      status: String,
+      createdBy: Option[String] = None,
+      createdOn: Option[Timestamp] = None,
+      createdOnTimeZone: Option[String] = None,
+      updatedBy: Option[String] = None,
+      updatedOn: Option[Timestamp] = None,
+      updatedOnTimeZone: Option[String] = None
+  ) {
+    def deserialize: FundingStatus =
+      FundingStatus(
+        id = id,
+        balanceID = balanceID,
+        accountID = accountID,
+        amount = new MicroNumber(BigInt(amount)),
+        reference = reference,
+        status = status,
+        createdBy = createdBy,
+        createdOn = createdOn,
+        createdOnTimeZone = createdOnTimeZone,
+        updatedBy = updatedBy,
+        updatedOn = updatedOn,
+        updatedOnTimeZone = updatedOnTimeZone
+      )
+
+  }
+
   object Service {
     def create(
         id: String,
@@ -183,13 +259,15 @@ class FundingStatusDetails @Inject() (
         status: String
     ): Future[String] =
       add(
-        FundingStatus(
-          id = id,
-          balanceID = balanceID,
-          accountID = accountID,
-          amount = amount,
-          reference = reference,
-          status = status
+        serialize(
+          FundingStatus(
+            id = id,
+            balanceID = balanceID,
+            accountID = accountID,
+            amount = amount,
+            reference = reference,
+            status = status
+          )
         )
       )
 
@@ -202,13 +280,15 @@ class FundingStatusDetails @Inject() (
         status: String
     ): Future[Int] =
       upsert(
-        FundingStatus(
-          id = id,
-          balanceID = balanceID,
-          accountID = accountID,
-          amount = amount,
-          reference = reference,
-          status = status
+        serialize(
+          FundingStatus(
+            id = id,
+            balanceID = balanceID,
+            accountID = accountID,
+            amount = amount,
+            reference = reference,
+            status = status
+          )
         )
       )
 
@@ -219,14 +299,10 @@ class FundingStatusDetails @Inject() (
       updateStatusById(id, status)
 
     def tryGet(id: String): Future[FundingStatus] =
-      findById(id).map { detail =>
-        detail.getOrElse(
-          throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-        )
-      }
+      tryGetById(id).map(_.deserialize)
 
     def get(id: String): Future[Option[FundingStatus]] =
-      findById(id)
+      findById(id).map(_.map(_.deserialize))
 
   }
 
