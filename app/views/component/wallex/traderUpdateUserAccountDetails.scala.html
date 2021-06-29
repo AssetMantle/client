@@ -8,12 +8,10 @@
     @commonInputText(updateUserDetails, constants.FormField.MOBILE_NUMBER)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_GENDER)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_NATIONALITY)
-    @defining(Option(constants.FormField.WALLEX_USER_RESIDENTIAL_ADDRESS)) { implicit nestedFormField =>
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_RESIDENCE)
     @commonInputText(updateUserDetails, constants.FormField.WALLEX_RESIDENTIAL_ADDRESS)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_CODE)
     @commonInputText(updateUserDetails, constants.FormField.WALLEX_POSTAL_ZIP_CODE)
-    }
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_BIRTH)
     @commonInputDate(updateUserDetails, constants.FormField.DATE_OF_BIRTH)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_IDENTIFICATION_TYPE)
@@ -24,7 +22,5 @@
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_STATUS)
     @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_POSITION)
 
-  @if(updateUserDetails.get.gender != "") {
-      @commonModalButton(constants.View.NEXT, constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE.get, 'class -> "cmuk-margin-top buttonPrimary")
-  }
+    @commonModalButton(constants.View.NEXT, constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE.get, 'class -> "cmuk-margin-top buttonPrimary")
 }

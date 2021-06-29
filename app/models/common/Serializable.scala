@@ -215,9 +215,9 @@ object Serializable {
   }
 
   case class EmploymentDetails(
-      employmentIndustry: String,
-      employmentStatus: String,
-      employmentPosition: String
+      employmentIndustry: Option[String],
+      employmentStatus: Option[String],
+      employmentPosition: Option[String]
   )
 
   implicit val employmentDetailsWrites: OWrites[EmploymentDetails] =
@@ -227,10 +227,10 @@ object Serializable {
     Json.reads[EmploymentDetails]
 
   case class ResidentialAddressDetails(
-      countryOfResidence: String,
-      residentialAddress: String,
-      countryCode: String,
-      postalCode: String
+      countryOfResidence: Option[String],
+      residentialAddress: Option[String],
+      countryCode: Option[String],
+      postalCode: Option[String]
   )
 
   implicit val residentialAddressWrites: OWrites[ResidentialAddressDetails] =
@@ -240,16 +240,16 @@ object Serializable {
     Json.reads[ResidentialAddressDetails]
 
   case class Company(
-      name: String,
-      countryOfIncorporation: String,
-      countryOfOperations: String,
-      businessType: String,
-      companyAddress: String,
-      postalCode: String,
-      state: String,
-      city: String,
-      registrationNumber: String,
-      incorporationDate: String
+      name: Option[String],
+      countryOfIncorporation: Option[String],
+      countryOfOperations: Option[String],
+      businessType: Option[String],
+      companyAddress: Option[String],
+      postalCode: Option[String],
+      state: Option[String],
+      city: Option[String],
+      registrationNumber: Option[String],
+      incorporationDate: Option[String]
   )
   implicit val companyWrites: OWrites[Company] =
     Json.writes[Company]
@@ -258,19 +258,24 @@ object Serializable {
     Json.reads[Company]
 
   case class UserProfile(
-      firstName: String,
-      lastName: String,
-      mobileNumber: String,
-      gender: String,
-      nationality: String,
-      countryOfBirth: String,
-      residentialAddressDetails: ResidentialAddressDetails,
-      dateOfBirth: String,
-      identificationType: String,
-      identificationNumber: String,
-      issueDate: String,
-      expiryDate: String,
-      employmentDetails: EmploymentDetails
+      firstName: Option[String],
+      lastName: Option[String],
+      mobileNumber: Option[String],
+      gender: Option[String],
+      nationality: Option[String],
+      countryOfBirth: Option[String],
+      countryOfResidence: Option[String],
+      residentialAddress: Option[String],
+      countryCode: Option[String],
+      postalCode: Option[String],
+      dateOfBirth: Option[String],
+      identificationType: Option[String],
+      identificationNumber: Option[String],
+      issueDate: Option[String],
+      expiryDate: Option[String],
+      employmentIndustry: Option[String],
+      employmentStatus: Option[String],
+      employmentPosition: Option[String]
   )
   implicit val userProfileWrites: OWrites[UserProfile] =
     Json.writes[UserProfile]

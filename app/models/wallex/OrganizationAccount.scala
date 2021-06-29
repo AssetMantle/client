@@ -25,8 +25,8 @@ case class OrganizationAccount(
     countryCode: String,
     accountType: String,
     traderID: String,
-    company: Company,
-    userProfile: UserProfile,
+    company: Option[Company] = None,
+    userProfile: Option[UserProfile] = None,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
     createdOnTimeZone: Option[String] = None,
@@ -68,8 +68,8 @@ class OrganizationAccounts @Inject() (
       countryCode = organizationAccount.countryCode,
       accountType = organizationAccount.accountType,
       traderID = organizationAccount.traderID,
-      company = Json.toJson(organizationAccount.company).toString,
-      userProfile = Json.toJson(organizationAccount.userProfile).toString,
+      company = (Json.toJson(organizationAccount.company).toString),
+      userProfile = (Json.toJson(organizationAccount.userProfile).toString),
       createdBy = organizationAccount.createdBy,
       createdOn = organizationAccount.createdOn,
       createdOnTimeZone = organizationAccount.createdOnTimeZone,
@@ -315,9 +315,8 @@ class OrganizationAccounts @Inject() (
         countryCode = countryCode,
         accountType = accountType,
         traderID = traderID,
-        company = utilities.JSON.convertJsonStringToObject[Company](company),
-        userProfile =
-          utilities.JSON.convertJsonStringToObject[UserProfile](userProfile),
+        company = if(company != null) Option(utilities.JSON.convertJsonStringToObject[Company](company)) else None,
+        userProfile = if(userProfile != null) Option(utilities.JSON.convertJsonStringToObject[UserProfile](userProfile)) else None,
         createdBy = createdBy,
         createdOn = createdOn,
         createdOnTimeZone = createdOnTimeZone,
@@ -355,8 +354,8 @@ class OrganizationAccounts @Inject() (
             countryCode = countryCode,
             accountType = accountType,
             traderID = traderID,
-            company = company,
-            userProfile = userProfile
+            company = Some(company),
+            userProfile = Some(userProfile)
           )
         )
       )
@@ -372,8 +371,8 @@ class OrganizationAccounts @Inject() (
         countryCode: String,
         accountType: String,
         traderID: String,
-        company: Company,
-        userProfile: UserProfile
+        company: Option[Company] = None,
+        userProfile: Option[UserProfile] = None
     ): Future[Int] =
       upsert(
         serialize(

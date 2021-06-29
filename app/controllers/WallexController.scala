@@ -3,7 +3,7 @@ package controllers
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.common.Serializable.{BankAccount, BeneficiaryPayment, Company, ConversionDetails, EmploymentDetails, ResidentialAddressDetails, UserProfile}
+import models.common.Serializable.{BankAccount, BeneficiaryPayment, Company, ConversionDetails, UserProfile}
 import models.master.{Negotiations, Trader}
 import models.masterTransaction.{NegotiationFile, NegotiationFiles}
 import models.wallex.{SimplePayments, _}
@@ -19,8 +19,6 @@ import utilities.{KeyStore, MicroNumber}
 import views.companion
 import views.companion.wallex.{WalletTransfer, _}
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -193,10 +191,8 @@ class WallexController @Inject() (
                     accountID = accountID,
                     status = status,
                     traderID = traderID,
-                    company = Company("","","","","","","","","",""),
-                    userProfile = UserProfile("","","","","","",
-                      ResidentialAddressDetails("","","",""),"","","","","",
-                      EmploymentDetails("","",""))
+                    company = Option(Company(None,None,None,None,None,None,None,None,None,None)),
+                    userProfile = Option(UserProfile(None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None))
                   )
 
                 (for {
@@ -218,11 +214,7 @@ class WallexController @Inject() (
                     userWallexAccount.status,
                     traderID
                   )
-                  result <- withUsernameToken.Ok(
-                    views.html.profile(successes =
-                      Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
-                    )
-                  )
+                  result <- withUsernameToken.PartialContent(views.html.component.wallex.traderUpdateUserAccountDetails())
                 } yield result).recover {
                   case baseException: BaseException =>
                     InternalServerError(
@@ -639,11 +631,11 @@ class WallexController @Inject() (
                 if (validateUsernamePassword) {
                   if (loginState.acl.getOrElse(throw new BaseException(constants.Response.UNAUTHORIZED)).redeemFiat) {
                     val ticketID = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
-                      entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemAmount,
+                      entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = MicroNumber(redeemAmount),
                         gas = createPaymentData.gas, ticketID = "", mode = transactionMode),
                       blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
                       request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = createPaymentData.gas), to = toAddress,
-                        password = createPaymentData.password, redeemAmount = redeemAmount, mode = transactionMode),
+                        password = createPaymentData.password, redeemAmount = MicroNumber(redeemAmount), mode = transactionMode),
                       action = transactionsRedeemFiat.Service.post,
                       onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
                       onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
@@ -651,7 +643,7 @@ class WallexController @Inject() (
                     )
                     for {
                       ticketID <- ticketID
-                      _ <- createRedeemFiatRequests(trader.id, ticketID, redeemAmount)
+                      _ <- createRedeemFiatRequests(trader.id, ticketID, MicroNumber(redeemAmount))
                       result <- withUsernameToken.Ok(views.html.trades(successes = Seq(constants.Response.FIAT_REDEEMED)))
                     } yield result
                   } else throw new BaseException(constants.Response.UNAUTHORIZED)
@@ -660,7 +652,7 @@ class WallexController @Inject() (
                   quoteID = createPaymentData.quoteID)))
               }
 
-              def createRedeemFiatRequests(traderID: String, ticketID: String, redeemAmount: Double): Future[String] =
+              def createRedeemFiatRequests(traderID: String, ticketID: String, redeemAmount: MicroNumber): Future[String] =
                 masterTransactionRedeemFiatRequests.Service.create(traderID, ticketID, redeemAmount)
 
 
@@ -1122,34 +1114,39 @@ class WallexController @Inject() (
           def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
             wallexOrganizationAccounts.Service.tryGet(organizationID)
 
+         def getResult(organizationWallexAccount : OrganizationAccount): Future[Result] = {
+
+           if(organizationWallexAccount.company.get.incorporationDate != None){
+            val company =  organizationWallexAccount.company.get
+           Future(Ok(
+             views.html.component.wallex.traderUpdateCompanyAccountDetails(
+               UpdateCompanyAccount.form
+                 .fill(
+                   UpdateCompanyAccount
+                     .Data(
+                       countryOfIncorporation = company.countryOfIncorporation.get,
+                       countryOfOperations = company.countryOfOperations.get,
+                       businessType = company.businessType.get,
+                       companyAddress = company.companyAddress.get,
+                       postalCode = company.postalCode.get,
+                       state = company.state.get,
+                       city = company.city.get,
+                       registrationNumber = company.registrationNumber.get,
+                       incorporationDate = utilities.Date.parseStringToDate(company.incorporationDate.get)
+                     )
+                 )
+             )
+           ))
+          } else {Future(Ok(views.html.component.wallex.traderUpdateCompanyAccountDetails()))}
+       }
+
          (for {
            organizationID <- organizationID
            organizationWallexAccount <-
              getOrganizationWallexAccount(organizationID)
+         result <- getResult(organizationWallexAccount)
 
-         } yield Ok(
-           views.html.component.wallex.traderUpdateCompanyAccountDetails(
-             UpdateCompanyAccount.form
-               .fill(
-                 UpdateCompanyAccount
-                   .Data(
-                     countryOfIncorporation = organizationWallexAccount.company.countryOfIncorporation,
-                     countryOfOperations = organizationWallexAccount.company.countryOfOperations,
-                     businessType = organizationWallexAccount.company.businessType,
-                     companyAddress = organizationWallexAccount.company.companyAddress,
-                     postalCode = organizationWallexAccount.company.postalCode,
-                     state = organizationWallexAccount.company.state,
-                     city = organizationWallexAccount.company.city,
-                     registrationNumber = organizationWallexAccount.company.registrationNumber,
-                     incorporationDate = if(organizationWallexAccount.company.incorporationDate.nonEmpty){
-                       utilities.Date.parseStringToDate(organizationWallexAccount.company.incorporationDate)
-                     }else{
-                       utilities.Date.parseStringToDate(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance.getTime))
-                     },
-                   )
-               )
-           )
-          )
+         } yield result
          ).recover {
            case _: BaseException =>
              Ok(views.html.component.wallex.traderUpdateCompanyAccountDetails())
@@ -1217,16 +1214,16 @@ class WallexController @Inject() (
                   countryCode = wallexAccount.countryCode,
                   accountType = wallexAccount.accountType,
                   traderID = wallexAccount.traderID,
-                  company = Company(name = userUpdateCompanyResponse.companyName,
-                    countryOfIncorporation = userUpdateCompanyResponse.countryOfIncorporation,
-                    countryOfOperations = userUpdateCompanyResponse.countryOfOperations,
-                    businessType = userUpdateCompanyResponse.businessType,
-                    companyAddress = userUpdateCompanyResponse.companyAddress,
-                    postalCode = userUpdateCompanyResponse.postalCode,
-                    state = userUpdateCompanyResponse.state,
-                    city = userUpdateCompanyResponse.city,
-                    registrationNumber = userUpdateCompanyResponse.registrationNumber,
-                    incorporationDate = userUpdateCompanyResponse.incorporationDate),
+                  company = Some(Company(name = Some(userUpdateCompanyResponse.companyName),
+                    countryOfIncorporation = Some(userUpdateCompanyResponse.countryOfIncorporation),
+                    countryOfOperations = Some(userUpdateCompanyResponse.countryOfOperations),
+                    businessType = Some(userUpdateCompanyResponse.businessType),
+                    companyAddress = Some(userUpdateCompanyResponse.companyAddress),
+                    postalCode = Some(userUpdateCompanyResponse.postalCode),
+                    state = Some(userUpdateCompanyResponse.state),
+                    city = Some(userUpdateCompanyResponse.city),
+                    registrationNumber = Some(userUpdateCompanyResponse.registrationNumber),
+                    incorporationDate = Some(userUpdateCompanyResponse.incorporationDate))),
                   userProfile = wallexAccount.userProfile
 
                 )
@@ -1509,55 +1506,46 @@ class WallexController @Inject() (
           def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
             wallexOrganizationAccounts.Service.tryGet(organizationID)
 
+          def getResult(organizationWallexAccount : OrganizationAccount): Future[Result] = {
+            if(organizationWallexAccount.userProfile.get.dateOfBirth != None){
+            val userProfile = organizationWallexAccount.userProfile.get
+                Future(Ok(
+                  views.html.component.wallex.traderUpdateUserAccountDetails(
+                    UpdateUserAccount.form
+                      .fill(
+                        UpdateUserAccount
+                          .Data(
+                            mobileCountryCode = userProfile.mobileNumber.get.split("-")(0),
+                            mobileNumber = userProfile.mobileNumber.get.split("-")(1),
+                            gender = userProfile.gender.get,
+                            nationality = userProfile.nationality.get,
+                            countryOfResidence = userProfile.countryOfResidence.get,
+                            residentialAddress = userProfile.residentialAddress.get,
+                            countryCode = userProfile.countryCode.get,
+                            postalCode = userProfile.postalCode.get,
+                            countryOfBirth = userProfile.countryOfBirth.get,
+                            identificationType = userProfile.identificationType.get,
+                            identificationNumber = userProfile.identificationNumber.get,
+                            dateOfBirth = utilities.Date.parseStringToDate(userProfile.dateOfBirth.get),
+                            issueDate = utilities.Date.parseStringToDate(userProfile.issueDate.get),
+                            expiryDate = utilities.Date.parseStringToDate(userProfile.expiryDate.get),
+                            employmentIndustry = userProfile.employmentIndustry.get,
+                            employmentStatus = userProfile.employmentStatus.get,
+                            employmentPosition = userProfile.employmentPosition.get
+                          )
+                      )
+                  )
+                ))
+              }
+              else Future(Ok(views.html.component.wallex.traderUpdateUserAccountDetails()))
+          }
+
           (for {
             organizationID <- organizationID
             organizationWallexAccount <-
               getOrganizationWallexAccount(organizationID)
-          } yield Ok(
-            views.html.component.wallex.traderUpdateUserAccountDetails(
-              UpdateUserAccount.form
-                .fill(
-                  UpdateUserAccount
-                    .Data(
-                      mobileCountryCode = if(organizationWallexAccount.userProfile.mobileNumber.nonEmpty) {
-                        organizationWallexAccount.userProfile.mobileNumber.split("-")(0)
-                      }else "",
-                      mobileNumber = if(organizationWallexAccount.userProfile.mobileNumber.nonEmpty) {
-                        organizationWallexAccount.userProfile.mobileNumber.split("-")(1)
-                      } else "",
-                      gender = organizationWallexAccount.userProfile.gender,
-                      nationality = organizationWallexAccount.userProfile.nationality,
-                      userResidentialAddress = ResidentialAddressDetails(
-                        countryOfResidence = organizationWallexAccount.userProfile.residentialAddressDetails.countryOfResidence,
-                        residentialAddress = organizationWallexAccount.userProfile.residentialAddressDetails.residentialAddress,
-                        countryCode = organizationWallexAccount.userProfile.residentialAddressDetails.countryCode,
-                        postalCode = organizationWallexAccount.userProfile.residentialAddressDetails.postalCode,
-                      ),
-                      countryOfBirth = organizationWallexAccount.userProfile.countryOfBirth,
-                      dateOfBirth =  if(organizationWallexAccount.userProfile.dateOfBirth.nonEmpty){
-                        utilities.Date.parseStringToDate(organizationWallexAccount.userProfile.dateOfBirth)
-                      }else {
-                        utilities.Date.parseStringToDate(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance.getTime))
-                      },
-                      identificationType = organizationWallexAccount.userProfile.identificationType,
-                      identificationNumber = organizationWallexAccount.userProfile.identificationNumber,
-                      issueDate = if(organizationWallexAccount.userProfile.issueDate.nonEmpty){
-                        utilities.Date.parseStringToDate(organizationWallexAccount.userProfile.issueDate)
-                      }else{
-                        utilities.Date.parseStringToDate(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance.getTime))
-                      },
-                      expiryDate = if(organizationWallexAccount.userProfile.expiryDate.nonEmpty){
-                        utilities.Date.parseStringToDate(organizationWallexAccount.userProfile.expiryDate)
-                      }else{
-                        utilities.Date.parseStringToDate(new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance.getTime))
-                      },
-                      employmentIndustry = organizationWallexAccount.userProfile.employmentDetails.employmentIndustry,
-                      employmentStatus = organizationWallexAccount.userProfile.employmentDetails.employmentStatus,
-                      employmentPosition = organizationWallexAccount.userProfile.employmentDetails.employmentPosition
-                    )
-                )
-            )
-          )
+          result <- getResult(organizationWallexAccount)
+          } yield result
         ).recover{
             case _: BaseException =>
               Ok(views.html.component.wallex.traderUpdateUserAccountDetails())
@@ -1601,30 +1589,28 @@ class WallexController @Inject() (
                   countryCode = wallexAccount.countryCode,
                   accountType = wallexAccount.accountType,
                   traderID = wallexAccount.traderID,
-                  company = wallexAccount.company,
-                  userProfile = UserProfile(
-                    firstName = updateUserResponse.firstName,
-                    lastName = updateUserResponse.lastName,
-                    mobileNumber = Seq(updateUserResponse.mobileCountryCode, updateUserResponse.mobileNumber).mkString("-"),
-                    gender = updateUserResponse.gender,
-                    nationality = updateUserResponse.nationality,
-                    countryOfBirth = updateUserResponse.countryOfBirth,
-                    residentialAddressDetails = ResidentialAddressDetails(
-                      countryOfResidence = updateUserResponse.countryOfResidence,
-                      residentialAddress = updateUserResponse.residentialAddress,
-                      countryCode = updateUserResponse.countryCode,
-                      postalCode = updateUserResponse.postalCode),
-                    dateOfBirth = updateUserResponse.dateOfBirth,
-                    identificationType = updateUserResponse.identificationType,
-                    identificationNumber = updateUserResponse.identificationNumber,
-                    issueDate = updateUserResponse.issueDate,
-                    expiryDate = updateUserResponse.expiryDate,
-                    employmentDetails = EmploymentDetails(
-                      employmentIndustry = updateUserResponse.employmentIndustry,
-                      employmentStatus = updateUserResponse.employmentStatus,
-                      employmentPosition = updateUserResponse.employmentPosition
-                    )
+                  company = if(wallexAccount.company != null) wallexAccount.company else None,
+                  userProfile = Option(UserProfile(
+                    firstName = Option(updateUserResponse.firstName),
+                    lastName = Option(updateUserResponse.lastName),
+                    mobileNumber = Option(Seq(updateUserResponse.mobileCountryCode, updateUserResponse.mobileNumber).mkString("-")),
+                    gender = Option(updateUserResponse.gender),
+                    nationality = Option(updateUserResponse.nationality),
+                    countryOfBirth = Option(updateUserResponse.countryOfBirth),
+                    countryOfResidence = Option(updateUserResponse.countryOfResidence),
+                    residentialAddress = Option(updateUserResponse.residentialAddress),
+                    countryCode = Option(updateUserResponse.countryCode),
+                    postalCode = Option(updateUserResponse.postalCode),
+                    dateOfBirth = Option(updateUserResponse.dateOfBirth),
+                    identificationType = Option(updateUserResponse.identificationType),
+                    identificationNumber = Option(updateUserResponse.identificationNumber),
+                    issueDate = Option(updateUserResponse.issueDate),
+                    expiryDate = Option(updateUserResponse.expiryDate),
+                    employmentIndustry = Option(updateUserResponse.employmentIndustry),
+                    employmentStatus = Option(updateUserResponse.employmentStatus),
+                    employmentPosition = Option(updateUserResponse.employmentPosition)
                   )
+                )
                 )
               }
               def getOrganizationWallexAccount(
@@ -1643,10 +1629,10 @@ class WallexController @Inject() (
                     gender = userUpdateAccount.gender,
                     countryOfBirth = userUpdateAccount.countryOfBirth,
                     nationality = userUpdateAccount.nationality,
-                    countryOfResidence = userUpdateAccount.userResidentialAddress.countryOfResidence,
-                    residentialAddress = userUpdateAccount.userResidentialAddress.residentialAddress,
-                    countryCode = userUpdateAccount.userResidentialAddress.countryCode,
-                    postalCode = userUpdateAccount.userResidentialAddress.postalCode,
+                    countryOfResidence = userUpdateAccount.countryOfResidence,
+                    residentialAddress = userUpdateAccount.residentialAddress,
+                    countryCode = userUpdateAccount.countryCode,
+                    postalCode = userUpdateAccount.postalCode,
                     dateOfBirth = utilities.Date.formatDate(userUpdateAccount.dateOfBirth),
                     identificationType = userUpdateAccount.identificationType,
                     identificationNumber = userUpdateAccount.identificationNumber,
