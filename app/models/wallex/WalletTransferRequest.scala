@@ -6,6 +6,7 @@ import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import utilities.MicroNumber
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -18,7 +19,7 @@ case class WalletTransferRequest(
     traderID: String,
     onBehalfOf: String,
     receiverAccountID: String,
-    amount: Double,
+    amount: MicroNumber,
     currency: String,
     purposeOfTransfer: String,
     reference: String,
@@ -48,15 +49,37 @@ class WalletTransferRequests @Inject() (
 
   import databaseConfig.profile.api._
 
-  private[models] val walletTranfserRequestTable =
+  private[models] val walletTransferRequestTable =
     TableQuery[WalletTransferRequestTable]
 
-  private def add(
+  private def serialize(
       walletTransferRequest: WalletTransferRequest
+  ): WalletTransferRequestSerialized =
+    WalletTransferRequestSerialized(
+      negotiationID = walletTransferRequest.negotiationID,
+      organizationID = walletTransferRequest.organizationID,
+      traderID = walletTransferRequest.traderID,
+      onBehalfOf = walletTransferRequest.onBehalfOf,
+      receiverAccountID = walletTransferRequest.receiverAccountID,
+      amount = walletTransferRequest.amount.toMicroString,
+      currency = walletTransferRequest.currency,
+      purposeOfTransfer = walletTransferRequest.purposeOfTransfer,
+      reference = walletTransferRequest.reference,
+      remarks = walletTransferRequest.remarks,
+      status = walletTransferRequest.status,
+      createdBy = walletTransferRequest.createdBy,
+      createdOn = walletTransferRequest.createdOn,
+      createdOnTimeZone = walletTransferRequest.createdOnTimeZone,
+      updatedBy = walletTransferRequest.updatedBy,
+      updatedOn = walletTransferRequest.updatedOn,
+      updatedOnTimeZone = walletTransferRequest.updatedOnTimeZone
+    )
+  private def add(
+      walletTransferRequestSerialized: WalletTransferRequestSerialized
   ): Future[String] =
     db.run(
-        (walletTranfserRequestTable returning walletTranfserRequestTable
-          .map(_.negotiationID) += walletTransferRequest).asTry
+        (walletTransferRequestTable returning walletTransferRequestTable
+          .map(_.negotiationID) += walletTransferRequestSerialized).asTry
       )
       .map {
         case Success(result) => result
@@ -71,11 +94,11 @@ class WalletTransferRequests @Inject() (
       }
 
   private def upsert(
-      walletTransferRequest: WalletTransferRequest
+      walletTransferRequestSerialized: WalletTransferRequestSerialized
   ): Future[Int] =
     db.run(
-        walletTranfserRequestTable
-          .insertOrUpdate(walletTransferRequest)
+        walletTransferRequestTable
+          .insertOrUpdate(walletTransferRequestSerialized)
           .asTry
       )
       .map {
@@ -92,36 +115,58 @@ class WalletTransferRequests @Inject() (
 
   private def findById(
       negotiationID: String
-  ): Future[Option[WalletTransferRequest]] =
+  ): Future[Option[WalletTransferRequestSerialized]] =
     db.run(
-      walletTranfserRequestTable
+      walletTransferRequestTable
         .filter(_.negotiationID === negotiationID)
         .result
         .headOption
     )
 
+  private def tryGetById(
+      negotiationID: String
+  ): Future[WalletTransferRequestSerialized] =
+    db.run(
+      walletTransferRequestTable
+          .filter(_.negotiationID === negotiationID)
+          .result
+          .head
+          .asTry
+      )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+          }
+      }
+
   private def findAllByOrganizationID(
       organizationID: String
-  ): Future[Seq[WalletTransferRequest]] =
+  ): Future[Seq[WalletTransferRequestSerialized]] =
     db.run(
-      walletTranfserRequestTable
+      walletTransferRequestTable
         .filter(_.organizationID === organizationID)
         .result
     )
 
   private def findAllByOrganizationIDs(
       organizationIDs: Seq[String]
-  ): Future[Seq[WalletTransferRequest]] =
+  ): Future[Seq[WalletTransferRequestSerialized]] =
     db.run(
-      walletTranfserRequestTable
+      walletTransferRequestTable
         .filter(_.organizationID inSet organizationIDs)
         .result
     )
   private def findAllByTraderID(
       traderID: String
-  ): Future[Seq[WalletTransferRequest]] =
+  ): Future[Seq[WalletTransferRequestSerialized]] =
     db.run(
-      walletTranfserRequestTable
+      walletTransferRequestTable
         .filter(_.traderID === traderID)
         .result
     )
@@ -129,9 +174,9 @@ class WalletTransferRequests @Inject() (
   private def findPendingRequests(
       organizationIDs: Seq[String],
       status: String
-  ): Future[Seq[WalletTransferRequest]] =
+  ): Future[Seq[WalletTransferRequestSerialized]] =
     db.run(
-      walletTranfserRequestTable
+      walletTransferRequestTable
         .filter(_.organizationID inSet organizationIDs)
         .filter(_.status === status)
         .result
@@ -142,14 +187,21 @@ class WalletTransferRequests @Inject() (
       status: String
   ): Future[Int] =
     db.run(
-        walletTranfserRequestTable
+        walletTransferRequestTable
           .filter(_.negotiationID === negotiationID)
           .map(_.status)
           .update(status)
           .asTry
       )
       .map {
-        case Success(result) => result
+        case Success(result) =>
+          result match {
+            case 0 =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION
+              )
+            case _ => result
+          }
         case Failure(exception) =>
           exception match {
             case psqlException: PSQLException =>
@@ -166,7 +218,7 @@ class WalletTransferRequests @Inject() (
       }
 
   private[models] class WalletTransferRequestTable(tag: Tag)
-      extends Table[WalletTransferRequest](
+      extends Table[WalletTransferRequestSerialized](
         tag,
         "WalletTransferRequest"
       ) {
@@ -190,7 +242,7 @@ class WalletTransferRequests @Inject() (
         updatedBy.?,
         updatedOn.?,
         updatedOnTimeZone.?
-      ) <> (WalletTransferRequest.tupled, WalletTransferRequest.unapply)
+      ) <> (WalletTransferRequestSerialized.tupled, WalletTransferRequestSerialized.unapply)
 
     def negotiationID = column[String]("negotiationID", O.PrimaryKey)
 
@@ -202,7 +254,7 @@ class WalletTransferRequests @Inject() (
 
     def receiverAccountID = column[String]("receiverAccountID")
 
-    def amount = column[Double]("amount")
+    def amount = column[String]("amount")
 
     def currency = column[String]("currency")
 
@@ -227,6 +279,47 @@ class WalletTransferRequests @Inject() (
     def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
+  case class WalletTransferRequestSerialized(
+      negotiationID: String,
+      organizationID: String,
+      traderID: String,
+      onBehalfOf: String,
+      receiverAccountID: String,
+      amount: String,
+      currency: String,
+      purposeOfTransfer: String,
+      reference: String,
+      remarks: String,
+      status: String,
+      createdBy: Option[String] = None,
+      createdOn: Option[Timestamp] = None,
+      createdOnTimeZone: Option[String] = None,
+      updatedBy: Option[String] = None,
+      updatedOn: Option[Timestamp] = None,
+      updatedOnTimeZone: Option[String] = None
+  ) {
+    def deserialize: WalletTransferRequest =
+      WalletTransferRequest(
+        negotiationID = negotiationID,
+        organizationID = organizationID,
+        traderID = traderID,
+        onBehalfOf = onBehalfOf,
+        receiverAccountID = receiverAccountID,
+        amount = new MicroNumber(BigInt(amount)),
+        currency = currency,
+        purposeOfTransfer = purposeOfTransfer,
+        reference = reference,
+        remarks = remarks,
+        status = status,
+        createdBy = createdBy,
+        createdOn = createdOn,
+        createdOnTimeZone = createdOnTimeZone,
+        updatedBy = updatedBy,
+        updatedOn = updatedOn,
+        updatedOnTimeZone = updatedOnTimeZone
+      )
+  }
+
   object Service {
     def create(
         negotiationID: String,
@@ -234,7 +327,7 @@ class WalletTransferRequests @Inject() (
         traderID: String,
         onBehalfOf: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposeOfTransfer: String,
         reference: String,
@@ -242,18 +335,20 @@ class WalletTransferRequests @Inject() (
         status: String
     ): Future[String] =
       add(
-        WalletTransferRequest(
-          negotiationID = negotiationID,
-          organizationID = organizationID,
-          traderID = traderID,
-          onBehalfOf = onBehalfOf,
-          receiverAccountID = receiverAccountID,
-          amount = amount,
-          currency = currency,
-          purposeOfTransfer = purposeOfTransfer,
-          reference = reference,
-          remarks = remarks,
-          status = status
+        serialize(
+          WalletTransferRequest(
+            negotiationID = negotiationID,
+            organizationID = organizationID,
+            traderID = traderID,
+            onBehalfOf = onBehalfOf,
+            receiverAccountID = receiverAccountID,
+            amount = amount,
+            currency = currency,
+            purposeOfTransfer = purposeOfTransfer,
+            reference = reference,
+            remarks = remarks,
+            status = status
+          )
         )
       )
 
@@ -263,7 +358,7 @@ class WalletTransferRequests @Inject() (
         traderID: String,
         onBehalfOf: String,
         receiverAccountID: String,
-        amount: Double,
+        amount: String,
         currency: String,
         purposeOfTransfer: String,
         reference: String,
@@ -271,30 +366,28 @@ class WalletTransferRequests @Inject() (
         status: String
     ): Future[Int] =
       upsert(
-        WalletTransferRequest(
-          negotiationID = negotiationID,
-          organizationID = organizationID,
-          traderID = traderID,
-          onBehalfOf = onBehalfOf,
-          receiverAccountID = receiverAccountID,
-          amount = amount,
-          currency = currency,
-          purposeOfTransfer = purposeOfTransfer,
-          reference = reference,
-          remarks = remarks,
-          status = status
+        serialize(
+          WalletTransferRequest(
+            negotiationID = negotiationID,
+            organizationID = organizationID,
+            traderID = traderID,
+            onBehalfOf = onBehalfOf,
+            receiverAccountID = receiverAccountID,
+            amount = amount,
+            currency = currency,
+            purposeOfTransfer = purposeOfTransfer,
+            reference = reference,
+            remarks = remarks,
+            status = status
+          )
         )
       )
 
     def tryGet(negotiationID: String): Future[WalletTransferRequest] =
-      findById(negotiationID).map { detail =>
-        detail.getOrElse(
-          throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-        )
-      }
+      tryGetById(negotiationID).map(_.deserialize)
 
     def get(negotiationID: String): Future[Option[WalletTransferRequest]] =
-      findById(negotiationID)
+      findById(negotiationID).map(_.map(_.deserialize))
 
     def tryGetPendingRequests(
         organizationIDs: Seq[String]
@@ -302,7 +395,7 @@ class WalletTransferRequests @Inject() (
       findPendingRequests(
         organizationIDs,
         constants.Status.SendWalletTransfer.ZONE_APPROVAL
-      )
+      ).map(_.map(_.deserialize))
 
     def updateZoneApprovalStatus(
         negotiationID: String,
@@ -311,17 +404,17 @@ class WalletTransferRequests @Inject() (
       updateStatusById(negotiationID, status)
 
     def getAllByTraderID(traderID: String): Future[Seq[WalletTransferRequest]] =
-      findAllByTraderID(traderID)
+      findAllByTraderID(traderID).map(_.map(_.deserialize))
 
     def getAllByOrganizationID(
         organizationID: String
     ): Future[Seq[WalletTransferRequest]] =
-      findAllByOrganizationID(organizationID)
+      findAllByOrganizationID(organizationID).map(_.map(_.deserialize))
 
     def getAllByOrganizationIDs(
         organizationIDs: Seq[String]
     ): Future[Seq[WalletTransferRequest]] =
-      findAllByOrganizationIDs(organizationIDs)
+      findAllByOrganizationIDs(organizationIDs).map(_.map(_.deserialize))
   }
 
 }

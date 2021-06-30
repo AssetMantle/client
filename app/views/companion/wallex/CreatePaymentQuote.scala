@@ -2,6 +2,7 @@ package views.companion.wallex
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroNumber
 
 object CreatePaymentQuote {
   val form = Form(
@@ -17,7 +18,7 @@ object CreatePaymentQuote {
   case class Data(
       sellCurrency: String,
       buyCurrency: String,
-      amount: Double,
+      amount: MicroNumber,
       beneficiaryID: String,
       negotiationID: String
   )

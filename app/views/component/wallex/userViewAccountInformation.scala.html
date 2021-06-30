@@ -1,24 +1,14 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationAccountDetail
+@import models.wallex.OrganizationAccount
 
-@(organizationAccountDetail: OrganizationAccountDetail)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(organizationAccount: OrganizationAccount)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div>
-    @commonTextInfo(constants.View.WALLEX_ID, organizationAccountDetail.wallexID)
-    @commonTextInfo(constants.View.STATUS, organizationAccountDetail.status)
-    @commonTextInfo(constants.View.EMAIL_ADDRESS, organizationAccountDetail.email)
-    @commonTextInfo(constants.View.FIRST_NAME, organizationAccountDetail.firstName)
-    @commonTextInfo(constants.View.LAST_NAME, organizationAccountDetail.lastName)
-    @commonTextInfo(constants.View.ACCOUNT_ID, organizationAccountDetail.accountID)
+    @commonTextInfo(constants.View.WALLEX_ID, organizationAccount.wallexID)
+    @commonTextInfo(constants.View.STATUS, organizationAccount.status)
+    @commonTextInfo(constants.View.EMAIL_ADDRESS, organizationAccount.email)
+    @commonTextInfo(constants.View.FIRST_NAME, organizationAccount.firstName)
+    @commonTextInfo(constants.View.LAST_NAME, organizationAccount.lastName)
+    @commonTextInfo(constants.View.ACCOUNT_ID, organizationAccount.accountID)
 </div>
-
-<div class="cmuk-text-center cmuk-margin-top">
-@commonFormButton(constants.Form.WALLEX_TRADER_UPDATE_USER_DETAILS)
-</div>
-
-@if(organizationAccountDetail.status != constants.Status.SendWalletTransfer.ZONE_SEND_FOR_SCREENING || organizationAccountDetail.status != constants.External.Wallex.Status.APPROVED) {
-    <div class="cmuk-text-center cmuk-margin-top">
-    @commonFormButton(constants.Form.WALLEX_TRADER_GET_USER, 'class -> "cmuk-button buttonPrimary")
-    </div>
-}

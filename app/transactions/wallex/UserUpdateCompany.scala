@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
-import transactions.responses.WallexResponse.UpdateUserDetailsResponse
+import transactions.responses.WallexResponse.UserUpdateCompanyResponse
 import utilities.KeyStore
 
 import java.net.ConnectException
@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UserUpdateAccountDetails @Inject()(
+class UserUpdateCompany @Inject()(
     wsClient: WSClient,
     keyStore: KeyStore
 )(implicit
@@ -22,7 +22,7 @@ class UserUpdateAccountDetails @Inject()(
 ) {
 
   private implicit val module: String =
-    constants.Module.TRANSACTIONS_WALLEX_DETAILS_UPDATE
+    constants.Module.TRANSACTIONS_WALLEX_USER_UPDATE_COMPANY
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -40,7 +40,7 @@ class UserUpdateAccountDetails @Inject()(
   private val baseURL = configuration.get[String]("wallex.url")
 
   private val endpoint =
-    configuration.get[String]("wallex.endpoints.updateUserDetails")
+    configuration.get[String]("wallex.endpoints.updateCompany")
 
   private val url = baseURL + endpoint
 
@@ -48,10 +48,10 @@ class UserUpdateAccountDetails @Inject()(
       request: Request,
       authToken: String,
       userId: String
-  ): Future[UpdateUserDetailsResponse] = {
+  ): Future[UserUpdateCompanyResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
     utilities.JSON
-      .getResponseFromJson[UpdateUserDetailsResponse](
+      .getResponseFromJson[UserUpdateCompanyResponse](
         wsClient
           .url(url.replace("userId", userId))
           .withHttpHeaders(apiKeyHeader, authTokenHeader)
@@ -64,29 +64,20 @@ class UserUpdateAccountDetails @Inject()(
           )
           throw new BaseException(constants.Response.WALLEX_EXCEPTION)
       }
-
   }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   case class Request(
-      mobileCountryCode: String,
-      mobileNumber: String,
-      gender: String,
-      countryOfBirth: String,
-      nationality: String,
-      countryOfResidence: String,
-      residentialAddress: String,
-      countryCode: String,
+      countryOfIncorporation: String,
+      countryOfOperations: String,
+      businessType: String,
+      companyAddress: String,
       postalCode: String,
-      dateOfBirth: String,
-      identificationType: String,
-      identificationNumber: String,
-      issueDate: String,
-      expiryDate: String,
-      employmentIndustry: String,
-      employmentStatus: String,
-      employmentPosition: String
+      state: String,
+      city: String,
+      registrationNumber: String,
+      incorporationDate: String
   ) extends BaseRequest
 
   object Service {
@@ -95,7 +86,7 @@ class UserUpdateAccountDetails @Inject()(
         authToken: String,
         request: Request,
         userId: String
-    ): Future[UpdateUserDetailsResponse] =
+    ): Future[UserUpdateCompanyResponse] =
       action(request, authToken, userId).recover {
         case connectException: ConnectException =>
           logger.error(

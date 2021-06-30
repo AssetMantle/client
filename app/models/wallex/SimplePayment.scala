@@ -17,7 +17,6 @@ import scala.util.{Failure, Success}
 case class SimplePayment(
     simplePaymentID: String,
     wallexID: String,
-    organizationID: String,
     status: String,
     createdAt: String,
     referenceID: String,
@@ -61,7 +60,6 @@ class SimplePayments @Inject() (
     SimplePaymentSerialized(
       simplePaymentID = simplePaymentDetail.simplePaymentID,
       wallexID = simplePaymentDetail.wallexID,
-      organizationID = simplePaymentDetail.organizationID,
       status = simplePaymentDetail.status,
       createdAt = simplePaymentDetail.createdAt,
       referenceID = simplePaymentDetail.referenceID,
@@ -164,7 +162,6 @@ class SimplePayments @Inject() (
   case class SimplePaymentSerialized(
       simplePaymentID: String,
       wallexID: String,
-      organizationID: String,
       status: String,
       createdAt: String,
       referenceID: String,
@@ -187,7 +184,6 @@ class SimplePayments @Inject() (
       SimplePayment(
         simplePaymentID = simplePaymentID,
         wallexID = wallexID,
-        organizationID = organizationID,
         status = status,
         createdAt = createdAt,
         referenceID = referenceID,
@@ -220,7 +216,6 @@ class SimplePayments @Inject() (
       (
         simplePaymentID,
         wallexID,
-        organizationID,
         status,
         createdAt,
         referenceID,
@@ -242,8 +237,6 @@ class SimplePayments @Inject() (
     def simplePaymentID = column[String]("simplePaymentID", O.PrimaryKey)
 
     def wallexID = column[String]("wallexID", O.PrimaryKey)
-
-    def organizationID = column[String]("organizationID")
 
     def status = column[String]("status")
 
@@ -282,7 +275,6 @@ class SimplePayments @Inject() (
     def create(
         simplePaymentID: String,
         wallexID: String,
-        organizationID: String,
         status: String,
         createdAt: String,
         referenceID: String,
@@ -299,7 +291,6 @@ class SimplePayments @Inject() (
           SimplePayment(
             simplePaymentID = simplePaymentID,
             wallexID = wallexID,
-            organizationID = organizationID,
             status = status,
             createdAt = createdAt,
             referenceID = referenceID,
@@ -317,7 +308,6 @@ class SimplePayments @Inject() (
     def insertOrUpdate(
         simplePaymentID: String,
         wallexID: String,
-        organizationID: String,
         status: String,
         createdAt: String,
         referenceID: String,
@@ -334,7 +324,6 @@ class SimplePayments @Inject() (
           SimplePayment(
             simplePaymentID = simplePaymentID,
             wallexID = wallexID,
-            organizationID = organizationID,
             status = status,
             createdAt = createdAt,
             referenceID = referenceID,

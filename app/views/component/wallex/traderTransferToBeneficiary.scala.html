@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationAccountDetail
-@import models.wallex.OrganizationBeneficiary
+@import models.wallex.OrganizationAccount
+@import models.wallex.Beneficiary
 
-@(organizationAccountDetail: Option[OrganizationAccountDetail], wallexBeneficiary: Seq[OrganizationBeneficiary],negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@if(organizationAccountDetail.isDefined && !wallexBeneficiary.isEmpty) {
+@(organizationAccount: OrganizationAccount, beneficiary: Seq[Beneficiary],negotiationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(!beneficiary.isEmpty) {
     @commonFormButton(constants.Form.WALLEX_TRADER_PAYMENT_INITIATE, 'parameters -> s"'${negotiationID}'")
 }
