@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationAccountDetail
+@import models.wallex.OrganizationAccount
 
-@(organizationAccountDetail: Option[OrganizationAccountDetail],negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@if(organizationAccountDetail.isDefined) {
+@(organizationAccount: Option[OrganizationAccount],negotiationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@if(organizationAccount.isDefined) {
     <div class="financialCard">
     @commonCard(constants.View.WALLEX_TRANSFER_BENEFICIARY, 'cardIconPath -> "images/icons/icons.svg#wallexTransfer") {
     } {

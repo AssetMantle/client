@@ -2,6 +2,7 @@ package views.companion.wallex
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import utilities.MicroNumber
 
 object WalletTransfer {
   val form = Form(
@@ -20,7 +21,7 @@ object WalletTransfer {
   case class Data(
       onBehalfOf: String,
       receiverAccountID: String,
-      amount: Double,
+      amount: MicroNumber,
       currency: String,
       purposesOfTransfer: String,
       reference: String,

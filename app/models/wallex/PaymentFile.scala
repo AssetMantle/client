@@ -16,7 +16,6 @@ case class PaymentFile(
     quoteID: String,
     fileID: String,
     fileType: String,
-    organizationID: String,
     negotiationID: String,
     wallexID: String,
     createdBy: Option[String] = None,
@@ -106,7 +105,6 @@ class PaymentFiles @Inject()(
         quoteID,
         fileID,
         fileType,
-        organizationID,
         negotiationID,
         wallexID,
         createdBy.?,
@@ -121,9 +119,7 @@ class PaymentFiles @Inject()(
 
     def fileID = column[String]("fileID", O.PrimaryKey)
 
-    def fileType = column[String]("fileType", O.PrimaryKey)
-
-    def organizationID = column[String]("organizationID")
+    def fileType = column[String]("fileType")
 
     def negotiationID = column[String]("negotiationID")
 
@@ -144,7 +140,6 @@ class PaymentFiles @Inject()(
 
   object Service {
     def create(
-        organizationID: String,
         negotiationID: String,
         quoteID: String,
         wallexID: String,
@@ -153,7 +148,6 @@ class PaymentFiles @Inject()(
     ): Future[String] =
       add(
         PaymentFile(
-          organizationID = organizationID,
           quoteID = quoteID,
           negotiationID = negotiationID,
           wallexID = wallexID,
@@ -172,7 +166,6 @@ class PaymentFiles @Inject()(
     ): Future[String] =
       add(
         PaymentFile(
-          organizationID = organizationID,
           quoteID = quoteID,
           negotiationID = negotiationID,
           wallexID = wallexID,

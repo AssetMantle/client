@@ -1,5 +1,6 @@
 package views.companion.wallex
 
+import models.common.Serializable.ResidentialAddressDetails
 import play.api.data.Form
 import play.api.data.Forms.mapping
 

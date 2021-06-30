@@ -1,20 +1,20 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import models.wallex.OrganizationAccountDetail
+@import models.wallex.OrganizationAccount
 
-@(wallexDetails: Seq[OrganizationAccountDetail])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(organizationAccountList: Seq[OrganizationAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@wallexDetails.map { request =>
+@organizationAccountList.map { organizationAccount =>
     @commonVerticalInfoBox() {
-        @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, request.organizationID)
-        @commonVerticalTextInfo(constants.View.WALLEX_ID, request.wallexID)
-        @commonVerticalTextInfo(constants.View.STATUS, request.status)
+        @commonVerticalTextInfo(constants.View.ORGANIZATION_ID, organizationAccount.organizationID)
+        @commonVerticalTextInfo(constants.View.WALLEX_ID, organizationAccount.wallexID)
+        @commonVerticalTextInfo(constants.View.STATUS, organizationAccount.status)
         <div class="listItemChild">
             <p class="listItemChildTitle">
             @Messages(constants.View.ACTION)
             </p>
             <p class="listItemChildValue">
-            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.WallexController.sendForScreeningForm, 'parameters -> s"'${request.wallexID}'")
+            @commonModalButton(constants.View.VIEW_REQUEST, routes.javascript.WallexController.sendForScreeningForm, 'parameters -> s"'${organizationAccount.wallexID}'")
             </p>
         </div>
     }

@@ -14,7 +14,6 @@ import scala.util.{Failure, Success}
 
 case class CollectionAccount(
     id: String,
-    wallexID: String,
     accountID: String,
     createdBy: Option[String] = None,
     createdOn: Option[Timestamp] = None,
@@ -32,7 +31,7 @@ class CollectionAccounts @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String =
-    constants.Module.WALLEX_COLLECTION_ACCOUNT_DETAIL
+    constants.Module.WALLEX_COLLECTION_ACCOUNT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -111,7 +110,6 @@ class CollectionAccounts @Inject()(
     override def * =
       (
         id,
-        wallexID,
         accountID,
         createdBy.?,
         createdOn.?,
@@ -122,8 +120,6 @@ class CollectionAccounts @Inject()(
       ) <> (CollectionAccount.tupled, CollectionAccount.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
-
-    def wallexID = column[String]("wallexID", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
@@ -143,26 +139,22 @@ class CollectionAccounts @Inject()(
   object Service {
     def create(
         id: String,
-        wallexID: String,
         accountID: String
     ): Future[String] =
       add(
         CollectionAccount(
           id = id,
-          wallexID = wallexID,
           accountID = accountID
         )
       )
 
     def insertOrUpdate(
         id: String,
-        wallexID: String,
         accountID: String
     ): Future[String] =
       add(
         CollectionAccount(
           id = id,
-          wallexID = wallexID,
           accountID = accountID
         )
       )
