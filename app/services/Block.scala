@@ -1,24 +1,18 @@
 package services
 
 import actors.{Message => actorsMessage}
-import constants.Log.Messages
 import exceptions.BaseException
-import models.Abstract.PublicKey
 import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
-import models.common.Parameters.{GovernanceParameter, SlashingParameter}
+import models.common.Parameters.{SlashingParameter}
 import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
-import models.masterTransaction.Notification
 import models.{blockchain, keyBase, masterTransaction}
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.MessagesControllerComponents
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
-import queries.Abstract.TendermintEvidence
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
-import queries.responses.blockchain.ProposalResponse.{Response => ProposalResponse}
+import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
-import queries.responses.blockchain.TransactionResponse.{AuthInfo, Response => TransactionResponse}
 import queries.responses.common.{Event, Header}
 import queries.blockchain.{GetBlock, GetBlockCommit, GetProposal, GetTransaction, GetTransactionsByHeight}
 import queries.responses.common.ProposalContents.CommunityPoolSpend
@@ -84,7 +78,27 @@ class Block @Inject()(
   }
 
   def insertTransactionsOnBlock(header: Header): Future[Seq[blockchainTransaction]] = {
-    val transactionsByHeightResponse = getTransactionsByHeight.Service.get(header.height)
+    val transactionHashes = {
+      val transactionsByHeightResponse = getTransactionsByHeight.Service.get(header.height)
+
+      def getAllTxHashes(transactionsByHeightResponse: TransactionByHeightResponse): Future[Seq[String]] = {
+        val restTxHashes = utilitiesOperations.traverse(Range(2, math.ceil(transactionsByHeightResponse.result.total_count.toInt / 100).toInt)) { page =>
+          val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, page = page)
+          for {
+            transactionsByHeightResponse <- transactionsByHeightResponse
+          } yield transactionsByHeightResponse.result.txs.map(_.hash)
+        }
+        for {
+          restTxHashes <- restTxHashes
+        } yield transactionsByHeightResponse.result.txs.map(_.hash) ++ restTxHashes.flatten
+      }
+
+      for {
+        transactionsByHeightResponse <- transactionsByHeightResponse
+        txHashes <- getAllTxHashes(transactionsByHeightResponse)
+      } yield txHashes
+
+    }
 
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
@@ -99,8 +113,8 @@ class Block @Inject()(
     } else Future(Seq.empty)
 
     (for {
-      transactionsByHeightResponse <- transactionsByHeightResponse
-      transactions <- insertTransactions(transactionsByHeightResponse.result.txs.map(_.hash))
+      transactionHashes <- transactionHashes
+      transactions <- insertTransactions(transactionHashes)
     } yield transactions
       ).recover {
       case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR || baseException.failure == constants.Response.JSON_PARSE_EXCEPTION) {
