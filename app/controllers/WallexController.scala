@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions._
+import controllers.requests.WallexNotification
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models.common.Serializable.{BankAccount, BeneficiaryPayment, Company, ConversionDetails, UserProfile}
@@ -36,6 +37,7 @@ class WallexController @Inject() (
                                    messagesControllerComponents: MessagesControllerComponents,
                                    negotiations: Negotiations,
                                    negotiationFiles: NegotiationFiles,
+                                   requestsWallexNotification: WallexNotification,
                                    transactionsIssueFiat: transactions.IssueFiat,
                                    transactionsRedeemFiat: transactions.RedeemFiat,
                                    transaction: utilities.Transaction,
@@ -57,7 +59,6 @@ class WallexController @Inject() (
                                    transactionsWallexCreatePaymentQuote: CreatePaymentQuote,
                                    transactionsWallexUserScreening: UserSubmitForScreening,
                                    transactionsWallexGetFundingStatus: GetFundingStatus,
-                                   transactionsWallexNotification: Notification,
                                    wallexPaymentFiles: PaymentFiles,
                                    wallexOrganizationAccounts: OrganizationAccounts,
                                    wallexBeneficiaries: Beneficiaries,
@@ -2010,17 +2011,18 @@ class WallexController @Inject() (
   def notifications() = withoutLoginActionAsync {
     implicit request =>
 
-      implicit val requestReads = transactionsWallexNotification.requestReads
+      implicit val requestReads = requestsWallexNotification.requestReads
 
       val notificationRequest = request.body.asJson.map { requestBody =>
-        convertJsonStringToObject[transactionsWallexNotification.Request](requestBody.toString())
+        convertJsonStringToObject[requestsWallexNotification.Request](requestBody.toString())
       }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
       val authToken = transactionsWallexAuthToken.Service.getToken()
 
       def getResult(authToken: String):Future[Result] = {
 
-        if(notificationRequest.resource.equals(constants.External.Wallex.Notification.USER)){
+        notificationRequest.resource match {
+        case constants.External.Wallex.Notification.USER =>{
 
           def userGetWallexAccount(authToken: String) =
             transactionsWallexGetUserRequest.Service.get(notificationRequest.resourceId, authToken)
@@ -2034,7 +2036,8 @@ class WallexController @Inject() (
             userResponse <- userGetWallexAccount(authToken)
             _ <- updateStatus(userResponse)
           } yield Ok)
-        }else if (notificationRequest.resource.equals(constants.External.Wallex.Notification.FUNDING)){
+        }
+        case constants.External.Wallex.Notification.FUNDING =>{
 
           def getFundingStatus(fundingID: String) =
             transactionsWallexGetFundingStatus.Service.get(
@@ -2088,13 +2091,15 @@ class WallexController @Inject() (
             _ <- if (fundingStatusResponse.status.equals(constants.External.Wallex.Notification.COMPLETED))
               zoneAutomatedIssueFiat(traderAddress, zoneID, zoneAddress, fundingStatusResponse) else Future(None)
           } yield Ok)
-        }else Future(Ok)
+        }
+        case _ => Future(NotAcceptable)
      }
+    }
 
       (for {
         authToken <- authToken
-        _ <- getResult(authToken)
-      } yield Ok).recover {
+        result <- getResult(authToken)
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
