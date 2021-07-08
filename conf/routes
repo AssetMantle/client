@@ -569,7 +569,7 @@ GET         /chat/replyToMessage                                                
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.traderViewOrganizationWallexAccount
 GET         /component/traderWallexPaymentTransfer                                                controllers.ComponentViewController.traderWallexPaymentTransfer(negotiationID:String)
-GET         /component/beneficiary/Details                                                        controllers.ComponentViewController.traderViewBeneficiary
+GET         /component/beneficiary/details                                                        controllers.ComponentViewController.traderViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.traderWallexTransferToBeneficiary(negotiationID: String)
 GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount
@@ -614,8 +614,7 @@ POST        /wallex/zone/acceptTransfer                                         
 GET         /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreeningForm(wallexID: String)
 POST        /wallex/zone/userScreening/send                                                       controllers.WallexController.sendForScreening
 GET         /wallex/termsAndConditions                                                            controllers.ViewController.wallexTermsAndConditions
-POST        /wallex/add/fund/notification                                                         controllers.WallexController.fundingNotification
-POST        /wallex/user/notification                                                         controllers.WallexController.userNotification
+POST        /wallex/notifications                                                                 controllers.WallexController.notifications
 
 #DO NOT CHANGE /wurtcb ENDPOINT
 POST        /wurtcb                                                                               controllers.WesternUnionController.westernUnionRTCB
