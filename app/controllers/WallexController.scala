@@ -37,7 +37,6 @@ class WallexController @Inject() (
                                    messagesControllerComponents: MessagesControllerComponents,
                                    negotiations: Negotiations,
                                    negotiationFiles: NegotiationFiles,
-                                   requestsWallexNotification: WallexNotification,
                                    transactionsIssueFiat: transactions.IssueFiat,
                                    transactionsRedeemFiat: transactions.RedeemFiat,
                                    transaction: utilities.Transaction,
@@ -219,7 +218,7 @@ class WallexController @Inject() (
                 } yield result).recover {
                   case baseException: BaseException =>
                     InternalServerError(
-                      views.html.index(failures = Seq(baseException.failure))
+                      views.html.profile(failures = Seq(baseException.failure))
                     )
                 }
               }
@@ -263,7 +262,7 @@ class WallexController @Inject() (
                 } yield result).recover {
                   case baseException: BaseException =>
                     InternalServerError(
-                      views.html.index(failures = Seq(baseException.failure))
+                      views.html.profile(failures = Seq(baseException.failure))
                     )
                 }
               }
@@ -383,7 +382,7 @@ class WallexController @Inject() (
                 } yield result).recover {
                   case baseException: BaseException =>
                     InternalServerError(
-                      views.html.index(failures = Seq(baseException.failure))
+                      views.html.profile(failures = Seq(baseException.failure))
                     )
                 }
 
@@ -409,7 +408,7 @@ class WallexController @Inject() (
         } yield result).recover {
         case baseException: BaseException =>
           InternalServerError(
-            views.html.index(failures = Seq(baseException.failure))
+            views.html.profile(failures = Seq(baseException.failure))
           )
       }
     }
@@ -865,7 +864,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
             }
@@ -1245,7 +1244,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
 
@@ -1330,7 +1329,7 @@ class WallexController @Inject() (
                   wallexAccount.accountID
                 )
                 result <- withUsernameToken.Ok(
-                  views.html.index(successes =
+                  views.html.profile(successes =
                     Seq(constants.Response.WALLEX_ACCOUNT_DETAILS_UPDATED)
                   )
                 )
@@ -1338,7 +1337,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
 
@@ -1398,7 +1397,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
 
@@ -1487,7 +1486,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
             }
@@ -1658,7 +1657,7 @@ class WallexController @Inject() (
               } yield result).recover {
                 case baseException: BaseException =>
                   InternalServerError(
-                    views.html.index(failures = Seq(baseException.failure))
+                    views.html.profile(failures = Seq(baseException.failure))
                   )
               }
 
@@ -2001,7 +2000,7 @@ class WallexController @Inject() (
                 } yield result).recover {
                   case baseException: BaseException =>
                     InternalServerError(
-                      views.html.index(failures = Seq(baseException.failure))
+                      views.html.profile(failures = Seq(baseException.failure))
                     )
                 }
               }
@@ -2011,10 +2010,10 @@ class WallexController @Inject() (
   def notifications() = withoutLoginActionAsync {
     implicit request =>
 
-      implicit val requestReads = requestsWallexNotification.requestReads
+      implicit val requestReads = WallexNotification.requestReads
 
       val notificationRequest = request.body.asJson.map { requestBody =>
-        convertJsonStringToObject[requestsWallexNotification.Request](requestBody.toString())
+        convertJsonStringToObject[WallexNotification.Request](requestBody.toString())
       }.getOrElse(throw new BaseException(constants.Response.FAILURE))
 
       val authToken = transactionsWallexAuthToken.Service.getToken()
