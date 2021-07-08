@@ -10,9 +10,9 @@
 
     @for(wallexDocument <- wallexDocuments) {
         @commonDocumentViewer(wallexDocument) {
-            @routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType)
+            @routes.FileController.getWallexKYCFile(wallexDocument.fileName, wallexDocument.documentType)
         } {
-            @commonLink(wallexDocument.documentType, routes.FileController.file(wallexDocument.fileName, wallexDocument.documentType))
+            @commonLink(wallexDocument.documentType, routes.FileController.getWallexKYCFile(wallexDocument.fileName, wallexDocument.documentType))
         } {
 
         }
