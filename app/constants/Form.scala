@@ -189,6 +189,7 @@ object Form {
   val WALLEX_TRADER_GET_USER = new Form("WALLEX_TRADER_GET_USER", routes.WallexController.getUser(), routes.javascript.WallexController.getUserForm)
   val WALLEX_ZONE_SEND_USER_FOR_SCREENING = new Form("WALLEX_ZONE_SEND_USER_FOR_SCREENING", routes.WallexController.sendForScreening(), routes.javascript.WallexController.sendForScreeningForm)
   val WALLEX_TRADER_UPDATE_USER_DETAILS = new Form("WALLEX_TRADER_UPDATE_USER_DETAILS", routes.WallexController.updateUserAccount(), routes.javascript.WallexController.updateUserAccountForm)
+  val WALLEX_TRADER_KYC_DELETE = new Form("WALLEX_TRADER_KYC_DELETE", routes.WallexController.deleteKYC(), routes.javascript.WallexController.deleteKYCForm)
 
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"

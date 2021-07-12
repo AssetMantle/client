@@ -587,6 +587,8 @@ POST        /master/wallex/user                                                 
 GET         /wallex/kyc/uploadOrUpdateWallexDocument                                              controllers.WallexController.uploadOrUpdateWallexDocument(documentType: String)
 GET         /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.addDocumentForm
 POST        /wallex/kyc/add/wallexDocument                                                        controllers.WallexController.addDocument
+GET         /wallex/kyc/delete/wallexDocument                                                     controllers.WallexController.deleteKYCForm(fileID: String,documentType: String)
+POST        /wallex/kyc/delete/wallexDocument                                                     controllers.WallexController.deleteKYC
 GET         /wallex/payment/create/quote                                                          controllers.WallexController.initiatePaymentForm(negotiationID: String)
 POST        /wallex/payment/create/quote                                                          controllers.WallexController.initiatePayment
 GET         /wallex/payment/accept/quote                                                          controllers.WallexController.acceptQuoteForm(quoteId: String)

@@ -110,6 +110,7 @@ object Response {
   val WALLEX_SIMPLE_PAYMENT_CREATED = new Success("WALLEX_SIMPLE_PAYMENT_CREATED")
   val WALLEX_TRANSFER_REQUEST_SENT = new Success("WALLEX_TRANSFER_REQUEST_SENT")
   val WALLEX_COLLECTION_ACCOUNT_CREATED = new Success("WALLEX_COLLECTION_ACCOUNT_CREATED")
+  val WALLEX_KYC_DOCUMENT_DELETED = new Success("WALLEX_KYC_DOCUMENT_DELETED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.ContactController.verifyMobileNumberForm)

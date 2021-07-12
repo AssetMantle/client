@@ -11,7 +11,7 @@
         @beneficiaries.map { beneficiary =>
             @commonVerticalInfoBox() {
                 <div>
-                    @commonTextInfo(constants.View.WALLEX_BENEFICIARY_ID, beneficiary.beneficiaryID)
+                    @commonTextInfo(constants.View.WALLEX_BENEFICIARY_ID, beneficiary.beneficiaryID)@commonCopyText("beneficiaryID", beneficiary.beneficiaryID)
                     @commonTextInfo(constants.View.COMPANY_NAME, beneficiary.companyName)
                     @commonTextInfo(constants.View.NICK_NAME, beneficiary.nickname)
                     @commonTextInfo(constants.View.WALLEX_ACCOUNT_TYPE, beneficiary.accountType)

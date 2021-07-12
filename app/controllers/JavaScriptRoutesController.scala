@@ -463,7 +463,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.WallexController.zoneCreateWalletTransfer,
         routes.javascript.WallexController.sendForScreeningForm,
         routes.javascript.WallexController.sendForScreening,
-        routes.javascript.WallexController.notifications
+        routes.javascript.WallexController.notifications,
+        routes.javascript.WallexController.deleteKYCForm,
+        routes.javascript.WallexController.deleteKYC
 
     )
     ).as("text/javascript")

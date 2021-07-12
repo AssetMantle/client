@@ -68,13 +68,10 @@
                     </div>
 
                     <div class="cmuk-width-1-2@@m">
-                        <div id="organizationAccount"></div>
+                        <div id="organizationAccount" class="identificationDetails switcherCard"></div>
                     </div>
                     <div class="cmuk-width-1-2@@m">
                         <div id="beneficiaryDetails" ></div>
-                    </div>
-                    <div class="cmuk-width-1-2@@m">
-                        <div id="collectionAccountDetails" ></div>
                     </div>
 
                     <div class="cmuk-width-1-2@@m">
@@ -86,7 +83,7 @@
                         componentResource('traderViewOrganizationBankAccount', jsRoutes.controllers.ComponentViewController.traderViewOrganizationBankAccount());
                         componentResource('organizationAccount', jsRoutes.controllers.ComponentViewController.traderViewOrganizationWallexAccount());
                         componentResource('beneficiaryDetails', jsRoutes.controllers.ComponentViewController.traderViewBeneficiary());
-                        componentResource('collectionAccountDetails', jsRoutes.controllers.ComponentViewController.traderViewWallexCollectionAccount());
+                        //componentResource('collectionAccountDetails', jsRoutes.controllers.ComponentViewController.traderViewWallexCollectionAccount());
                     </script>
                 }
                 case constants.User.ORGANIZATION => {

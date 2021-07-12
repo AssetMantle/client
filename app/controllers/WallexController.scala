@@ -54,6 +54,7 @@ class WallexController @Inject() (
                                    transactionsWallexUserSignUpRequest: UserSignUp,
                                    transactionsWallexGetUserRequest: GetUser,
                                    transactionsWallexCreateDocument: CreateDocument,
+                                   transactionsWallexDeleteDocument: DeleteDocument,
                                    transactionsWallexAuthToken: GenerateAuthToken,
                                    transactionsWallexCreatePaymentQuote: CreatePaymentQuote,
                                    transactionsWallexUserScreening: UserSubmitForScreening,
@@ -325,15 +326,13 @@ class WallexController @Inject() (
                     )
                   )
 
-                def uploadDocument(
-                                    authToken: String,
-                                    uploadUrl: String,
+                def uploadDocument(uploadUrl: String,
                                     userKYC: UserKYC
                                   ) = {
                   val fileArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations
                                  .fetchFile(fileResourceManager.getWallexFilePath(userKYC.documentType), userKYC.fileName))
 
-                  transactionsWallexCreateDocument.Service.put(authToken, uploadUrl, fileArray)
+                  transactionsWallexCreateDocument.Service.put(uploadUrl, fileArray)
                 }
 
                 def insertDocumentDetails(
@@ -367,7 +366,7 @@ class WallexController @Inject() (
                     wallexDocument.documentType
                   )
                   _ <-
-                    uploadDocument(authToken, createDocument.uploadURL, wallexDocument)
+                    uploadDocument(createDocument.uploadURL, wallexDocument)
                   _ <- insertDocumentDetails(
                     loginState.username,
                     createDocument
@@ -1521,7 +1520,6 @@ class WallexController @Inject() (
                             nationality = userProfile.nationality.get,
                             countryOfResidence = userProfile.countryOfResidence.get,
                             residentialAddress = userProfile.residentialAddress.get,
-                            countryCode = userProfile.countryCode.get,
                             postalCode = userProfile.postalCode.get,
                             countryOfBirth = userProfile.countryOfBirth.get,
                             identificationType = userProfile.identificationType.get,
@@ -1631,7 +1629,7 @@ class WallexController @Inject() (
                     nationality = userUpdateAccount.nationality,
                     countryOfResidence = userUpdateAccount.countryOfResidence,
                     residentialAddress = userUpdateAccount.residentialAddress,
-                    countryCode = userUpdateAccount.countryCode,
+                    countryCode = userUpdateAccount.countryOfResidence,
                     postalCode = userUpdateAccount.postalCode,
                     dateOfBirth = utilities.Date.formatDate(userUpdateAccount.dateOfBirth),
                     identificationType = userUpdateAccount.identificationType,
@@ -2103,6 +2101,67 @@ class WallexController @Inject() (
       }
   }
 
+  def deleteKYCForm(fileID: String,documentType: String): Action[AnyContent] =
+    withoutLoginAction {
+      implicit request =>
+        Ok(views.html.component.wallex.traderDeleteKYC(
+          DeleteKYC.form.fill(DeleteKYC.Data(documentType = documentType,fileID = fileID))))
+    }
 
+  def deleteKYC(): Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState =>
+        implicit request =>
+          companion.wallex.DeleteKYC.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => {
+                Future(
+                  BadRequest(
+                    views.html.component.wallex.traderDeleteKYC(formWithErrors)
+                  )
+                )
+              },
+              deleteKYCData => {
+
+                val organizationID =
+                  masterTraders.Service.getOrganizationIDByAccountID(
+                    loginState.username
+                  )
+
+                def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
+                  wallexOrganizationAccounts.Service.tryGet(organizationID)
+
+                val authToken = transactionsWallexAuthToken.Service.getToken()
+
+                def deleteKYCFromWallex(authToken: String,wallexID: String) = {
+                  transactionsWallexDeleteDocument.Service
+                    .delete(authToken, wallexID = wallexID, fileID = deleteKYCData.fileID)
+                }
+
+                def deleteUserKYC(fileID: String): Future[Int] =
+                  wallexUserKYCs.Service.delete(deleteKYCData.documentType,fileID)
+
+                (for {
+                  organizationID <- organizationID
+                  organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+                  authToken <- authToken
+                  deleteResponse <- deleteKYCFromWallex(authToken, organizationWallexAccount.wallexID)
+                  _ <- deleteUserKYC(deleteResponse.documentId)
+                  result <- withUsernameToken.Ok(
+                    views.html
+                      .profile(successes =
+                        Seq(constants.Response.WALLEX_KYC_DOCUMENT_DELETED)
+                      )
+                  )
+                } yield result).recover {
+                  case baseException: BaseException =>
+                    InternalServerError(
+                      views.html.profile(failures = Seq(baseException.failure))
+                    )
+                }
+              }
+            )
+    }
 
 }

@@ -13,7 +13,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateDocument @Inject()(
+class DeleteDocument @Inject()(
     wsClient: WSClient,
     keyStore: KeyStore
 )(implicit
@@ -22,7 +22,7 @@ class CreateDocument @Inject()(
 ) {
 
   private implicit val module: String =
-    constants.Module.TRANSACTIONS_WALLEX_CREATE_DOCUMENT
+    constants.Module.TRANSACTIONS_WALLEX_DELETE_DOCUMENT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -34,23 +34,10 @@ class CreateDocument @Inject()(
 
   private val apiKeyHeader = Tuple2(apiKeyHeaderName, apiKeyHeaderValue)
 
-  private val storageClassHeaderName =
-    configuration.get[String]("wallex.storageClassHeader")
-
-  private val storageClassValue = constants.External.Wallex.STANDARD
-  private val storageHeader = Tuple2(storageClassHeaderName, storageClassValue)
-
-  private val contentTypeHeaderName =
-    configuration.get[String]("wallex.contentType")
-
-  private val contentTypeHeaderValue = constants.External.Wallex.APPLICATION_TYPE
-
-  private val contentTypeHeader = Tuple2(contentTypeHeaderName, contentTypeHeaderValue)
-
   private val baseURL = configuration.get[String]("wallex.url")
 
   private val endpoint =
-    configuration.get[String]("wallex.endpoints.createDocument")
+    configuration.get[String]("wallex.endpoints.deleteDocument")
 
   val apiTokenHeaderName =
     configuration.get[String]("wallex.apiTokenHeaderName")
@@ -59,18 +46,18 @@ class CreateDocument @Inject()(
 
   private def action(
       authToken: String,
-      wallexUserID: String,
-      request: Request
-  ): Future[CreateDocumentResponse] = {
+      wallexID: String,
+      fileID: String
+  ) : Future[DeleteKYCResponse] = {
 
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
 
     utilities.JSON
-      .getResponseFromJson[CreateDocumentResponse](
+      .getResponseFromJson[DeleteKYCResponse](
         wsClient
-          .url(url.replace("userId", wallexUserID))
+          .url(url.replace("userId", wallexID).replace("documentId",fileID))
           .withHttpHeaders(apiKeyHeader, authTokenHeader)
-          .post(Json.toJson(request))
+          .delete()
       )
       .recover {
         case baseException: BaseException =>
@@ -82,19 +69,6 @@ class CreateDocument @Inject()(
       }
   }
 
-  private def putAction(
-      docUrl: String,
-      file: Array[Byte]
-  ) = {
-    val apiTokenHeaderName =
-      configuration.get[String]("wallex.apiTokenHeaderName")
-
-      wsClient
-        .url(docUrl)
-        .withHttpHeaders(storageHeader, contentTypeHeader)
-        .put(file)
-  }
-
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   case class Request(
@@ -104,22 +78,8 @@ class CreateDocument @Inject()(
 
   object Service {
 
-    def post(
-        authToken: String,
-        wallexUserID: String,
-        request: Request
-    ): Future[CreateDocumentResponse] =
-      action(authToken, wallexUserID, request).recover {
-        case connectException: ConnectException =>
-          logger.error(
-            constants.Response.CONNECT_EXCEPTION.message,
-            connectException
-          )
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
-
-    def put(docUrl: String, file: Array[Byte]) =
-      putAction(docUrl, file).recover {
+    def delete(authToken: String, wallexID: String, fileID: String) =
+      action(authToken, wallexID, fileID).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

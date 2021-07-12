@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.companion.wallex.DeleteBeneficiary
+@import views.html.base._
+
+@import views.companion.wallex.DeleteKYC
+
+@(deleteKYC: Form[DeleteKYC.Data] = DeleteKYC.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.WALLEX_TRADER_KYC_DELETE, deleteKYC) {
+    @commonInputText(deleteKYC, constants.FormField.DOCUMENT_TYPE, 'readonly -> true)
+    @commonInputText(deleteKYC, constants.FormField.FILE_ID, 'readonly -> true,'containerDivClass -> "hidden")
+}

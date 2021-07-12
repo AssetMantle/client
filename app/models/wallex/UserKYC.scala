@@ -177,6 +177,31 @@ class UserKYCs @Inject() (
   private def getAllDocumentsById(id: String): Future[Seq[UserKYC]] =
     db.run(userKYCTable.filter(_.id === id).result)
 
+  private def deleteFile(documentType: String, fileID: String) =
+    db.run(
+      userKYCTable
+        .filter(_.documentType === documentType)
+        .filter(_.fileID === fileID)
+        .delete
+        .asTry
+    )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+          }
+      }
+
   private[models] class UserKYCTable(tag: Tag)
       extends Table[UserKYC](tag, "UserKYC") {
 
@@ -247,5 +272,7 @@ class UserKYCs @Inject() (
         fileID: String
     ): Future[Int] = updateFile(id = id, fileID = fileID)
 
+    def delete(deleteKYCData: String, fileID: String): Future[Int] =
+      deleteFile(deleteKYCData, fileID)
   }
 }
