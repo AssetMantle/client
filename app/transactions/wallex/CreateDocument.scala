@@ -83,14 +83,14 @@ class CreateDocument @Inject()(
   }
 
   private def putAction(
-      docUrl: String,
+      documentUrl: String,
       file: Array[Byte]
   ) = {
     val apiTokenHeaderName =
       configuration.get[String]("wallex.apiTokenHeaderName")
 
       wsClient
-        .url(docUrl)
+        .url(documentUrl)
         .withHttpHeaders(storageHeader, contentTypeHeader)
         .put(file)
   }
@@ -118,8 +118,8 @@ class CreateDocument @Inject()(
           throw new BaseException(constants.Response.CONNECT_EXCEPTION)
       }
 
-    def put(docUrl: String, file: Array[Byte]) =
-      putAction(docUrl, file).recover {
+    def put(documentUrl: String, file: Array[Byte]) =
+      putAction(documentUrl, file).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,

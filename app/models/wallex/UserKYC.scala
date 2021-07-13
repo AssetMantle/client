@@ -79,8 +79,7 @@ class UserKYCs @Inject() (
   ): Future[Option[UserKYC]] =
     db.run(
       userKYCTable
-        .filter(_.id === id)
-        .filter(_.documentType === documentType)
+        .filter(x => x.id === id && x.documentType === documentType)
         .result
         .headOption
     )
@@ -91,8 +90,7 @@ class UserKYCs @Inject() (
   ): Future[Boolean] =
     db.run(
       userKYCTable
-        .filter(_.id === id)
-        .filter(_.fileName === fileName)
+        .filter(x => x.id === id && x.fileName === fileName)
         .exists
         .result
     )
@@ -103,8 +101,7 @@ class UserKYCs @Inject() (
   ): Future[UserKYC] =
     db.run(
         userKYCTable
-          .filter(_.id === id)
-          .filter(_.documentType === documentType)
+          .filter(x => x.id === id && x.documentType === documentType)
           .result
           .head
           .asTry
@@ -124,8 +121,7 @@ class UserKYCs @Inject() (
   private def update(userKYC: UserKYC): Future[Int] =
     db.run(
         userKYCTable
-          .filter(_.id === userKYC.id)
-          .filter(_.documentType === userKYC.documentType)
+          .filter(x => x.id === userKYC.id && x.documentType === userKYC.documentType)
           .update(userKYC)
           .asTry
       )
@@ -180,8 +176,7 @@ class UserKYCs @Inject() (
   private def deleteFile(documentType: String, fileID: String) =
     db.run(
       userKYCTable
-        .filter(_.documentType === documentType)
-        .filter(_.fileID === fileID)
+        .filter(x => x.documentType === documentType && x.fileID === fileID)
         .delete
         .asTry
     )

@@ -1,4 +1,4 @@
-package transactions.wallex
+package queries.wallex
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
