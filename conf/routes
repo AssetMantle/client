@@ -569,7 +569,8 @@ GET         /chat/replyToMessage                                                
 
 GET         /component/organizationWallexAccount                                                  controllers.ComponentViewController.traderViewOrganizationWallexAccount
 GET         /component/traderWallexPaymentTransfer                                                controllers.ComponentViewController.traderWallexPaymentTransfer(negotiationID:String)
-GET         /component/beneficiary/details                                                        controllers.ComponentViewController.traderViewBeneficiary
+GET         /component/trader/beneficiary/details                                                 controllers.ComponentViewController.traderViewBeneficiary
+GET         /component/organization/beneficiary/details                                           controllers.ComponentViewController.organizationViewBeneficiary
 GET         /component/org/view/wallexDetails                                                     controllers.ComponentViewController.organizationViewWallexAccount
 GET         /component/beneficiary/payment                                                        controllers.ComponentViewController.traderWallexTransferToBeneficiary(negotiationID: String)
 GET         /component/collection/account                                                         controllers.ComponentViewController.traderViewWallexCollectionAccount

@@ -275,6 +275,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.traderWallexTransferToBeneficiary,
         routes.javascript.ComponentViewController.traderViewWallexCollectionAccount,
         routes.javascript.ComponentViewController.organizationViewWallexAccount,
+        routes.javascript.ComponentViewController.organizationViewBeneficiary,
 
         routes.javascript.ComponentViewController.zoneViewWalletTransferRequestList,
         routes.javascript.ComponentViewController.zoneViewWallexKYCScreeningList,

@@ -3213,12 +3213,12 @@ class ComponentViewController @Inject()(
       def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccount]] =
         wallexOrganizationAccounts.Service.get(organizationID)
 
-      def getWallexKYCDocuments(organizationID: String): Future[Seq[UserKYC]] =
-        wallexUserKYCs.Service.getAllDocuments(organizationID)
+      def getWallexKYCDocuments(accountID: String): Future[Seq[UserKYC]] =
+        wallexUserKYCs.Service.getAllDocuments(accountID)
 
       (for {
         organizationID <- organizationID
-        wallexDocuments <-getWallexKYCDocuments(loginState.username)
+        wallexDocuments <- getWallexKYCDocuments(loginState.username)
         organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
       } yield Ok(views.html.component.wallex.organizationAccount(organizationWallexAccount,wallexDocuments))
         ).recover {
@@ -3403,4 +3403,37 @@ class ComponentViewController @Inject()(
           Future(Ok(views.html.component.wallex.addFundBankDetails()))
     }
 
+  def organizationViewBeneficiary : Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      val organizationID = masterOrganizations.Service.tryGetID(loginState.username)
+
+      def getOrganizationWallexAccount(organizationID: String): Future[Option[OrganizationAccount]] =
+        wallexOrganizationAccounts.Service.get(organizationID)
+
+      def getResult(organizationAccount: Option[OrganizationAccount]): Future[Result] = {
+
+        organizationAccount match {
+          case Some(organizationAccount) => {
+            def getOrganizationWallexBeneficiary(organizationID: String): Future[Seq[Beneficiary]] =
+              wallexBeneficiaries.Service.get(organizationID)
+
+            (for {
+              beneficiary <- getOrganizationWallexBeneficiary(organizationAccount.wallexID)
+            } yield Ok(views.html.component.wallex.traderViewOrganizationBeneficiaries(beneficiary)))
+          }
+          case None => {
+            Future(Ok(views.html.component.wallex.beneficiaryAccountMessage()))
+          }
+        }
+      }
+
+      (for {
+        organizationID <- organizationID
+        organizationAccount <- getOrganizationWallexAccount(organizationID)
+        result <- getResult(organizationAccount)
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
+  }
 }
