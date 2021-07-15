@@ -43,8 +43,8 @@ class GetFundingStatus @Inject()(
 
 
   private def action(
-      fundingID: String,
-      authToken: String
+      authToken: String,
+      fundingID: String
   ): Future[GetFundingResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
     utilities.JSON.getResponseFromJson[GetFundingResponse](
@@ -59,8 +59,8 @@ class GetFundingStatus @Inject()(
 
   object Service {
 
-    def get(fundingID: String, authToken: String): Future[GetFundingResponse] =
-      action(fundingID, authToken).recover {
+    def get(authToken: String, fundingID: String): Future[GetFundingResponse] =
+      action(authToken, fundingID).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,
