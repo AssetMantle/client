@@ -177,7 +177,6 @@ object FormField {
   val WALLEX_COUNTRY_OF_BIRTH = new SelectFormField("WALLEX_COUNTRY_OF_BIRTH", constants.SelectFieldOptions.WALLEX_COUNTRY_OF_BIRTH)
   val WALLEX_COUNTRY_OF_RESIDENCE = new SelectFormField("WALLEX_COUNTRY_OF_RESIDENCE", constants.SelectFieldOptions.WALLEX_COUNTRY_OF_RESIDENCE)
 
-
   //IntFormField
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
@@ -261,6 +260,8 @@ object FormField {
   val CREDIT = new NestedFormField("CREDIT")
   val WALLEX_BANK_DETAILS = new NestedFormField("WALLEX_BANK_DETAILS")
   val WALLEX_USER_RESIDENTIAL_ADDRESS = new NestedFormField("WALLEX_USER_RESIDENTIAL_ADDRESS")
+  val WALLEX_USER_IDENTIFICATION_DETAILS = new NestedFormField("WALLEX_USER_IDENTIFICATION_DETAILS")
+  val WALLEX_USER_EMPLOYMENT_DETAILS = new NestedFormField("WALLEX_USER_EMPLOYMENT_DETAILS")
 
   //MicroNumberFormField
   val ASSET_PRICE_PER_UNIT = new MicroNumberFormField("ASSET_PRICE_PER_UNIT", new MicroNumber(0.01), new MicroNumber(100000000000000.0))

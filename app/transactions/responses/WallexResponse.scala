@@ -87,7 +87,7 @@ object WallexResponse {
       bankAccountHolderName: String,
       bankName: String,
       bicSwift: String,
-      aba:String,
+      aba: String,
       country: String,
       currency: String
   )
@@ -258,9 +258,11 @@ object WallexResponse {
       incorporationDate: String
   ) extends BaseResponse
 
-  implicit val userUpdateCompanyResponseReads: Reads[UserUpdateCompanyResponse] =
+  implicit val userUpdateCompanyResponseReads
+      : Reads[UserUpdateCompanyResponse] =
     Json.reads[UserUpdateCompanyResponse]
-  implicit val userUpdateCompanyResponseWrites: OWrites[UserUpdateCompanyResponse] =
+  implicit val userUpdateCompanyResponseWrites
+      : OWrites[UserUpdateCompanyResponse] =
     Json.writes[UserUpdateCompanyResponse]
 
   case class CollectionBank(
@@ -360,17 +362,28 @@ object WallexResponse {
     Json.writes[WallexErrorResponse]
 
   case class GetFundingResponse(
-                              id: String,
-                              balanceId: String,
-                              accountId: String,
-                              currency: String,
-                              amount: Double,
-                              reference: String,
-                              status: String
-                            ) extends BaseResponse
+      id: String,
+      balanceId: String,
+      accountId: String,
+      currency: String,
+      amount: Double,
+      reference: String,
+      status: String
+  ) extends BaseResponse
 
   implicit val fundingResponseReads: Reads[GetFundingResponse] =
     Json.reads[GetFundingResponse]
   implicit val fundingResponseWrites: OWrites[GetFundingResponse] =
     Json.writes[GetFundingResponse]
+
+  case class DeleteKYCResponse(
+      documentId: String,
+      documentType: String,
+      documentName: String
+  ) extends BaseResponse
+
+  implicit val deleteKYCResponseReads: Reads[DeleteKYCResponse] =
+    Json.reads[DeleteKYCResponse]
+  implicit val deleteKYCResponseWrites: OWrites[DeleteKYCResponse] =
+    Json.writes[DeleteKYCResponse]
 }

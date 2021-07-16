@@ -13,6 +13,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import queries.wallex.{GetCollectionAccount, GetFundingStatus, GetUser, GetWalletBalance}
 import transactions.responses.WallexResponse.{CreateCollectionResponse, CreateDocumentResponse, CreatePaymentQuoteResponse, GetBalanceResponse, GetFundingResponse, GetUserResponse, PaymentFileUploadResponse, ScreeningResponse, UserUpdateAccountResponse, UserUpdateCompanyResponse, WalletToWalletTransferResponse}
 import transactions.wallex._
 import utilities.JSON.convertJsonStringToObject
@@ -37,6 +38,10 @@ class WallexController @Inject() (
                                    messagesControllerComponents: MessagesControllerComponents,
                                    negotiations: Negotiations,
                                    negotiationFiles: NegotiationFiles,
+                                   queriesWallexGetUserRequest: GetUser,
+                                   queriesWallexGetFundingStatus: GetFundingStatus,
+                                   queriesWallexGetCollectionAccount: GetCollectionAccount,
+                                   queriesWallexGetWalletBalance: GetWalletBalance,
                                    transactionsIssueFiat: transactions.IssueFiat,
                                    transactionsRedeemFiat: transactions.RedeemFiat,
                                    transaction: utilities.Transaction,
@@ -49,15 +54,12 @@ class WallexController @Inject() (
                                    transactionsWallexSimplePayments: SimplePayments,
                                    transactionsWallexUploadPaymentFile: UploadPaymentFile,
                                    transactionsWallexCreateCollectionAccount: CreateCollectionAccount,
-                                   transactionsWallexGetCollectionAccount: GetCollectionAccount,
-                                   transactionsWallexGetWalletBalance: GetWalletBalance,
                                    transactionsWallexUserSignUpRequest: UserSignUp,
-                                   transactionsWallexGetUserRequest: GetUser,
                                    transactionsWallexCreateDocument: CreateDocument,
+                                   transactionsWallexDeleteDocument: DeleteDocument,
                                    transactionsWallexAuthToken: GenerateAuthToken,
                                    transactionsWallexCreatePaymentQuote: CreatePaymentQuote,
                                    transactionsWallexUserScreening: UserSubmitForScreening,
-                                   transactionsWallexGetFundingStatus: GetFundingStatus,
                                    wallexPaymentFiles: PaymentFiles,
                                    wallexOrganizationAccounts: OrganizationAccounts,
                                    wallexBeneficiaries: Beneficiaries,
@@ -98,7 +100,7 @@ class WallexController @Inject() (
           def getOrganizationWallexAccount(
                                                   organizationID: String
                                                 ): Future[OrganizationAccount] =
-            wallexOrganizationAccounts.Service.tryGet(organizationID)
+            wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
           (for {
             organizationID <- organizationID
@@ -166,7 +168,7 @@ class WallexController @Inject() (
                 }
 
                 def userGetWallexAccount(wallexID: String, authToken: String) =
-                  transactionsWallexGetUserRequest.Service.get(wallexID, authToken)
+                  queriesWallexGetUserRequest.Service.get(wallexID, authToken)
 
                 def insertOrUpdate(
                                     organizationID: String,
@@ -297,7 +299,7 @@ class WallexController @Inject() (
                   .getOrganizationIDByAccountID(loginState.username)
 
                 def getWallexAccount(organizationID: String) =
-                  wallexOrganizationAccounts.Service.tryGet(organizationID)
+                  wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
                 def getWallexDocument(
                                        documentType: String
@@ -325,15 +327,13 @@ class WallexController @Inject() (
                     )
                   )
 
-                def uploadDocument(
-                                    authToken: String,
-                                    uploadUrl: String,
+                def uploadDocument(uploadUrl: String,
                                     userKYC: UserKYC
                                   ) = {
                   val fileArray = utilities.FileOperations.convertToByteArray(utilities.FileOperations
                                  .fetchFile(fileResourceManager.getWallexFilePath(userKYC.documentType), userKYC.fileName))
 
-                  transactionsWallexCreateDocument.Service.put(authToken, uploadUrl, fileArray)
+                  transactionsWallexCreateDocument.Service.put(uploadUrl, fileArray)
                 }
 
                 def insertDocumentDetails(
@@ -367,7 +367,7 @@ class WallexController @Inject() (
                     wallexDocument.documentType
                   )
                   _ <-
-                    uploadDocument(authToken, createDocument.uploadURL, wallexDocument)
+                    uploadDocument(createDocument.uploadURL, wallexDocument)
                   _ <- insertDocumentDetails(
                     loginState.username,
                     createDocument
@@ -445,7 +445,7 @@ class WallexController @Inject() (
               val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
               def getWallexAccount(organizationID: String) =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -576,7 +576,7 @@ class WallexController @Inject() (
               def zoneAddress(zoneAccountID: String): Future[String] = blockchainAccounts.Service.tryGetAddress(zoneAccountID)
 
               def getWallexAccount(organizationID: String) =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val file =
                 wallexPaymentFiles.Service.tryGet(createPaymentData.quoteID)
@@ -771,7 +771,7 @@ class WallexController @Inject() (
               def getOrganizationWallexAccount(
                   organizationID: String
               ): Future[OrganizationAccount] =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -942,7 +942,7 @@ class WallexController @Inject() (
         implicit request =>
 
         def getWallexAccount(organizationID: String) =
-          wallexOrganizationAccounts.Service.tryGet(organizationID)
+          wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
         val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -953,8 +953,8 @@ class WallexController @Inject() (
             authToken: String,
             userId: String
         ): Future[GetBalanceResponse] =
-          transactionsWallexGetWalletBalance.Service
-            .post(
+          queriesWallexGetWalletBalance.Service
+            .get(
               authToken,
               userId
             )
@@ -1112,7 +1112,7 @@ class WallexController @Inject() (
             )
 
           def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
-            wallexOrganizationAccounts.Service.tryGet(organizationID)
+            wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
          def getResult(organizationWallexAccount : OrganizationAccount): Future[Result] = {
 
@@ -1178,7 +1178,7 @@ class WallexController @Inject() (
               def getOrganizationWallexAccount(
                   organizationID: String
               ): Future[OrganizationAccount] =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -1293,7 +1293,7 @@ class WallexController @Inject() (
                 .getOrganizationIDByAccountID(loginState.username)
 
               def getWallexAccount(organizationID: String) =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -1377,7 +1377,7 @@ class WallexController @Inject() (
 
               def getCollectionAccount(authToken: String, accountID: String, collectionAccountID: String)
                   : Future[CreateCollectionResponse] =
-                transactionsWallexGetCollectionAccount.Service.get(
+                queriesWallexGetCollectionAccount.Service.get(
                   authToken,
                   accountID,
                   collectionAccountID
@@ -1417,7 +1417,7 @@ class WallexController @Inject() (
         def getOrganizationWallexAccount(
             organizationID: String
         ): Future[OrganizationAccount] =
-          wallexOrganizationAccounts.Service.tryGet(organizationID)
+          wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
         (for {
           organizationID <- organizationID
@@ -1456,12 +1456,12 @@ class WallexController @Inject() (
                   .getOrganizationIDByAccountID(loginState.username)
 
               def getWallexAccount(organizationID: String) =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
               def wallexGetUser(wallexId: String, authToken: String) =
-                transactionsWallexGetUserRequest.Service.get(wallexId, authToken)
+                queriesWallexGetUserRequest.Service.get(wallexId, authToken)
 
               def updateStatus(
                   wallexGetUserResponse: GetUserResponse
@@ -1504,7 +1504,7 @@ class WallexController @Inject() (
             )
 
           def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
-            wallexOrganizationAccounts.Service.tryGet(organizationID)
+            wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
           def getResult(organizationWallexAccount : OrganizationAccount): Future[Result] = {
             if(organizationWallexAccount.userProfile.get.dateOfBirth != None){
@@ -1521,7 +1521,6 @@ class WallexController @Inject() (
                             nationality = userProfile.nationality.get,
                             countryOfResidence = userProfile.countryOfResidence.get,
                             residentialAddress = userProfile.residentialAddress.get,
-                            countryCode = userProfile.countryCode.get,
                             postalCode = userProfile.postalCode.get,
                             countryOfBirth = userProfile.countryOfBirth.get,
                             identificationType = userProfile.identificationType.get,
@@ -1616,7 +1615,7 @@ class WallexController @Inject() (
               def getOrganizationWallexAccount(
                   organizationID: String
               ): Future[OrganizationAccount] =
-                wallexOrganizationAccounts.Service.tryGet(organizationID)
+                wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
 
               val authToken = transactionsWallexAuthToken.Service.getToken()
 
@@ -1631,7 +1630,7 @@ class WallexController @Inject() (
                     nationality = userUpdateAccount.nationality,
                     countryOfResidence = userUpdateAccount.countryOfResidence,
                     residentialAddress = userUpdateAccount.residentialAddress,
-                    countryCode = userUpdateAccount.countryCode,
+                    countryCode = userUpdateAccount.countryOfResidence,
                     postalCode = userUpdateAccount.postalCode,
                     dateOfBirth = utilities.Date.formatDate(userUpdateAccount.dateOfBirth),
                     identificationType = userUpdateAccount.identificationType,
@@ -2024,7 +2023,7 @@ class WallexController @Inject() (
         case constants.External.Wallex.Notification.USER =>{
 
           def userGetWallexAccount(authToken: String) =
-            transactionsWallexGetUserRequest.Service.get(notificationRequest.resourceId, authToken)
+            queriesWallexGetUserRequest.Service.get(notificationRequest.resourceId, authToken)
 
           def updateStatus(wallexAccount: GetUserResponse) = wallexOrganizationAccounts.Service.updateStatus(
             wallexID = wallexAccount.id,
@@ -2039,7 +2038,7 @@ class WallexController @Inject() (
         case constants.External.Wallex.Notification.FUNDING =>{
 
           def getFundingStatus(fundingID: String) =
-            transactionsWallexGetFundingStatus.Service.get(
+            queriesWallexGetFundingStatus.Service.get(
               authToken,
               fundingID
             )
@@ -2103,6 +2102,67 @@ class WallexController @Inject() (
       }
   }
 
+  def deleteKYCForm(fileID: String,documentType: String): Action[AnyContent] =
+    withoutLoginAction {
+      implicit request =>
+        Ok(views.html.component.wallex.traderDeleteKYC(
+          DeleteKYC.form.fill(DeleteKYC.Data(documentType = documentType, fileID = fileID))))
+    }
 
+  def deleteKYC(): Action[AnyContent] =
+    withTraderLoginAction.authenticated {
+      implicit loginState =>
+        implicit request =>
+          companion.wallex.DeleteKYC.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => {
+                Future(
+                  BadRequest(
+                    views.html.component.wallex.traderDeleteKYC(formWithErrors)
+                  )
+                )
+              },
+              deleteKYCData => {
+
+                val organizationID =
+                  masterTraders.Service.getOrganizationIDByAccountID(
+                    loginState.username
+                  )
+
+                def getOrganizationWallexAccount(organizationID: String): Future[OrganizationAccount] =
+                  wallexOrganizationAccounts.Service.tryGetByOrganizationID(organizationID)
+
+                val authToken = transactionsWallexAuthToken.Service.getToken()
+
+                def deleteKYCFromWallex(authToken: String,wallexID: String) = {
+                  transactionsWallexDeleteDocument.Service
+                    .delete(authToken, wallexID = wallexID, fileID = deleteKYCData.fileID)
+                }
+
+                def deleteUserKYC(fileID: String): Future[Int] =
+                  wallexUserKYCs.Service.delete(deleteKYCData.documentType, fileID)
+
+                (for {
+                  organizationID <- organizationID
+                  organizationWallexAccount <- getOrganizationWallexAccount(organizationID)
+                  authToken <- authToken
+                  deleteResponse <- deleteKYCFromWallex(authToken, organizationWallexAccount.wallexID)
+                  _ <- deleteUserKYC(deleteResponse.documentId)
+                  result <- withUsernameToken.Ok(
+                    views.html
+                      .profile(successes =
+                        Seq(constants.Response.WALLEX_KYC_DOCUMENT_DELETED)
+                      )
+                  )
+                } yield result).recover {
+                  case baseException: BaseException =>
+                    InternalServerError(
+                      views.html.profile(failures = Seq(baseException.failure))
+                    )
+                }
+              }
+            )
+    }
 
 }

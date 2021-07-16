@@ -79,8 +79,7 @@ class UserKYCs @Inject() (
   ): Future[Option[UserKYC]] =
     db.run(
       userKYCTable
-        .filter(_.id === id)
-        .filter(_.documentType === documentType)
+        .filter(x => x.id === id && x.documentType === documentType)
         .result
         .headOption
     )
@@ -91,8 +90,7 @@ class UserKYCs @Inject() (
   ): Future[Boolean] =
     db.run(
       userKYCTable
-        .filter(_.id === id)
-        .filter(_.fileName === fileName)
+        .filter(x => x.id === id && x.fileName === fileName)
         .exists
         .result
     )
@@ -103,8 +101,7 @@ class UserKYCs @Inject() (
   ): Future[UserKYC] =
     db.run(
         userKYCTable
-          .filter(_.id === id)
-          .filter(_.documentType === documentType)
+          .filter(x => x.id === id && x.documentType === documentType)
           .result
           .head
           .asTry
@@ -124,8 +121,7 @@ class UserKYCs @Inject() (
   private def update(userKYC: UserKYC): Future[Int] =
     db.run(
         userKYCTable
-          .filter(_.id === userKYC.id)
-          .filter(_.documentType === userKYC.documentType)
+          .filter(x => x.id === userKYC.id && x.documentType === userKYC.documentType)
           .update(userKYC)
           .asTry
       )
@@ -176,6 +172,30 @@ class UserKYCs @Inject() (
 
   private def getAllDocumentsById(id: String): Future[Seq[UserKYC]] =
     db.run(userKYCTable.filter(_.id === id).result)
+
+  private def deleteFile(documentType: String, fileID: String) =
+    db.run(
+      userKYCTable
+        .filter(x => x.documentType === documentType && x.fileID === fileID)
+        .delete
+        .asTry
+    )
+      .map {
+        case Success(result) => result
+        case Failure(exception) =>
+          exception match {
+            case noSuchElementException: NoSuchElementException =>
+              throw new BaseException(
+                constants.Response.NO_SUCH_ELEMENT_EXCEPTION,
+                noSuchElementException
+              )
+            case psqlException: PSQLException =>
+              throw new BaseException(
+                constants.Response.PSQL_EXCEPTION,
+                psqlException
+              )
+          }
+      }
 
   private[models] class UserKYCTable(tag: Tag)
       extends Table[UserKYC](tag, "UserKYC") {
@@ -247,5 +267,7 @@ class UserKYCs @Inject() (
         fileID: String
     ): Future[Int] = updateFile(id = id, fileID = fileID)
 
+    def delete(deleteKYCData: String, fileID: String): Future[Int] =
+      deleteFile(deleteKYCData, fileID)
   }
 }

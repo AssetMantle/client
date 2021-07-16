@@ -3,24 +3,37 @@
 @import views.html.base._
 
 @(updateUserDetails: Form[UpdateUserAccount.Data] = UpdateUserAccount.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@commonForm(constants.Form.WALLEX_TRADER_UPDATE_USER_DETAILS, updateUserDetails) {
-    @commonSelect(updateUserDetails, constants.FormField.COUNTRY_CODE)
-    @commonInputText(updateUserDetails, constants.FormField.MOBILE_NUMBER)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_GENDER)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_NATIONALITY)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_RESIDENCE)
-    @commonInputText(updateUserDetails, constants.FormField.WALLEX_RESIDENTIAL_ADDRESS)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_CODE)
-    @commonInputText(updateUserDetails, constants.FormField.WALLEX_POSTAL_ZIP_CODE)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_BIRTH)
-    @commonInputDate(updateUserDetails, constants.FormField.DATE_OF_BIRTH)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_IDENTIFICATION_TYPE)
-    @commonInputText(updateUserDetails, constants.FormField.WALLEX_IDENTIFICATION_NUMBER)
-    @commonInputDate(updateUserDetails, constants.FormField.WALLEX_ISSUE_DATE)
-    @commonInputDate(updateUserDetails, constants.FormField.WALLEX_EXPIRY_DATE)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_INDUSTRY)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_STATUS)
-    @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_POSITION)
+    @commonForm(constants.Form.WALLEX_TRADER_UPDATE_USER_DETAILS, updateUserDetails) {
 
-    @commonModalButton(constants.View.NEXT, constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE.get, 'class -> "cmuk-margin-top buttonPrimary")
-}
+        <div class="mobileNumberUpdate cmuk-flex">
+            <div class="countryCode hiddenLabel">
+            @commonSelect(updateUserDetails, constants.FormField.COUNTRY_CODE)
+            </div>
+            <div class="mobileNumber">
+            @commonInputText(updateUserDetails, constants.FormField.MOBILE_NUMBER)
+            </div>
+        </div>
+
+        <div class="cmuk-text-left title">@Messages(constants.FormField.WALLEX_USER_RESIDENTIAL_ADDRESS.name):</div>
+        @commonInputText(updateUserDetails, constants.FormField.WALLEX_RESIDENTIAL_ADDRESS)
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_RESIDENCE)
+        @commonInputText(updateUserDetails, constants.FormField.WALLEX_POSTAL_ZIP_CODE)
+
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_NATIONALITY)
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_COUNTRY_OF_BIRTH)
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_GENDER)
+        @commonInputDate(updateUserDetails, constants.FormField.DATE_OF_BIRTH)
+
+        <div class="cmuk-text-left title">@Messages(constants.FormField.WALLEX_USER_IDENTIFICATION_DETAILS.name):</div>
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_IDENTIFICATION_TYPE)
+        @commonInputText(updateUserDetails, constants.FormField.WALLEX_IDENTIFICATION_NUMBER)
+        @commonInputDate(updateUserDetails, constants.FormField.WALLEX_ISSUE_DATE)
+        @commonInputDate(updateUserDetails, constants.FormField.WALLEX_EXPIRY_DATE)
+
+        <div class="cmuk-text-left title">@Messages(constants.FormField.WALLEX_USER_EMPLOYMENT_DETAILS.name):</div>
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_INDUSTRY)
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_STATUS)
+        @commonSelect(updateUserDetails, constants.FormField.WALLEX_EMPLOYMENT_POSITION)
+
+        @commonModalButton(constants.View.NEXT, constants.Form.WALLEX_TRADER_COMPANY_ACCOUNT_UPDATE.get, 'class -> "cmuk-margin-top buttonPrimary")
+    }
