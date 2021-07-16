@@ -13,7 +13,7 @@ object AddOrganizationBeneficiary {
       constants.FormField.WALLEX_US_POSTAL_CODE.name -> constants.FormField.WALLEX_US_POSTAL_CODE.field,
       constants.FormField.WALLEX_STATE_OR_PROVINCE.name -> constants.FormField.WALLEX_STATE_OR_PROVINCE.field,
       constants.FormField.NICK_NAME.name -> constants.FormField.NICK_NAME.field,
-      constants.FormField.WALLEX_ENTITY_TYPE.name -> constants.FormField.WALLEX_ENTITY_TYPE.field,
+      constants.FormField.WALLEX_ACCOUNT_TYPE.name -> constants.FormField.WALLEX_ACCOUNT_TYPE.field,
       constants.FormField.COMPANY_NAME.name -> constants.FormField.COMPANY_NAME.field,
       constants.FormField.WALLEX_BANK_DETAILS.name -> mapping(
         constants.FormField.BANK_NAME.name -> constants.FormField.BANK_NAME.field,

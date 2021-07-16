@@ -195,7 +195,7 @@ class OrganizationAccounts @Inject() (
         .result
     )
 
-  private def tryGetByOrganizationID(
+  private def findByOrganizationID(
       organizationID: String
   ): Future[OrganizationAccountSerialized] =
     db.run(
@@ -399,10 +399,10 @@ class OrganizationAccounts @Inject() (
     ): Future[Int] =
       updateStatusById(wallexID, status)
 
-    def tryGet(organizationID: String): Future[OrganizationAccount] =
-      tryGetByOrganizationID(organizationID).map(_.deserialize)
+    def tryGetByOrganizationID(organizationID: String): Future[OrganizationAccount] =
+      findByOrganizationID(organizationID).map(_.deserialize)
 
-    def get(organizationID: String): Future[Option[OrganizationAccount]] =
+    def getByOrganizationID(organizationID: String): Future[Option[OrganizationAccount]] =
       findById(organizationID).map(_.map(_.deserialize))
 
     def tryGetByAccountId(

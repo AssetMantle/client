@@ -1,9 +1,9 @@
-package transactions.wallex
+package queries.wallex
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.WallexResponse.GetFundingResponse
+import transactions.responses.WallexResponse.GetBalanceResponse
 import utilities.KeyStore
 
 import java.net.ConnectException
@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetFundingStatus @Inject()(
+class GetWalletBalance @Inject()(
     wsClient: WSClient,
     keyStore: KeyStore,
 )(implicit
@@ -20,7 +20,7 @@ class GetFundingStatus @Inject()(
 ) {
 
   private implicit val module: String =
-    constants.Module.TRANSACTIONS_WALLEX_GET_FUNDING
+    constants.Module.TRANSACTIONS_WALLEX_WALLET_BALANCE
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -34,23 +34,27 @@ class GetFundingStatus @Inject()(
   private val apiTokenHeaderName =
     configuration.get[String]("wallex.apiTokenHeaderName")
 
+  private val userIdHeaderName =
+    configuration.get[String]("wallex.userIdHeaderName")
+
   private val baseURL = configuration.get[String]("wallex.url")
 
   private val endpoint =
-    configuration.get[String]("wallex.endpoints.getFunding")
+    configuration.get[String]("wallex.endpoints.getBalance")
 
   private val url = baseURL + endpoint
 
-
   private def action(
-      fundingID: String,
-      authToken: String
-  ): Future[GetFundingResponse] = {
+      authToken: String,
+      userId:String
+  ): Future[GetBalanceResponse] = {
     val authTokenHeader = Tuple2(apiTokenHeaderName, authToken)
-    utilities.JSON.getResponseFromJson[GetFundingResponse](
+    val userIdHeader = Tuple2(userIdHeaderName, userId)
+
+    utilities.JSON.getResponseFromJson[GetBalanceResponse](
       wsClient
-        .url(url + fundingID)
-        .withHttpHeaders(apiKeyHeader, authTokenHeader)
+        .url(url)
+        .withHttpHeaders(apiKeyHeader, authTokenHeader,userIdHeader)
         .get()
     )
   }
@@ -59,8 +63,8 @@ class GetFundingStatus @Inject()(
 
   object Service {
 
-    def get(fundingID: String, authToken: String): Future[GetFundingResponse] =
-      action(fundingID, authToken).recover {
+    def get(authToken: String,userId: String): Future[GetBalanceResponse] =
+      action(authToken,userId).recover {
         case connectException: ConnectException =>
           logger.error(
             constants.Response.CONNECT_EXCEPTION.message,
