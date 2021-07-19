@@ -63,6 +63,8 @@ class Block @Inject()(
 
   private val slashingNotificationFactor: BigDecimal = BigDecimal(configuration.get[String]("blockchain.explorer.slashingNotificationFactor"))
 
+  private val txPerPage = 100
+
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
 
@@ -79,11 +81,11 @@ class Block @Inject()(
 
   def insertTransactionsOnBlock(header: Header): Future[Seq[blockchainTransaction]] = {
     val transactionHashes = {
-      val transactionsByHeightResponse = getTransactionsByHeight.Service.get(header.height)
+      val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, perPage = txPerPage, page = 1)
 
-      def getAllTxHashes(transactionsByHeightResponse: TransactionByHeightResponse): Future[Seq[String]] = {
-        val restTxHashes = utilitiesOperations.traverse(Range(2, math.ceil(transactionsByHeightResponse.result.total_count.toInt / 100).toInt)) { page =>
-          val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, page = page)
+      def getAllTxHashes(transactionsByHeightResponse: TransactionByHeightResponse): Future[Seq[String]] = if (transactionsByHeightResponse.result.total_count.toInt > txPerPage) {
+        val restTxHashes = utilitiesOperations.traverse(Range.inclusive(2, math.ceil(transactionsByHeightResponse.result.total_count.toDouble / txPerPage).toInt)) { page =>
+          val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, perPage = txPerPage, page = page)
           for {
             transactionsByHeightResponse <- transactionsByHeightResponse
           } yield transactionsByHeightResponse.result.txs.map(_.hash)
@@ -91,7 +93,7 @@ class Block @Inject()(
         for {
           restTxHashes <- restTxHashes
         } yield transactionsByHeightResponse.result.txs.map(_.hash) ++ restTxHashes.flatten
-      }
+      } else Future(transactionsByHeightResponse.result.txs.map(_.hash))
 
       for {
         transactionsByHeightResponse <- transactionsByHeightResponse
