@@ -27,7 +27,7 @@ class ViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
-  private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").seconds
+  private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
