@@ -14,6 +14,8 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import utilities.MicroNumber
+import play.api.cache.Cached
+import scala.concurrent.duration.DurationInt
 
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
@@ -52,6 +54,7 @@ class ComponentViewController @Inject()(
                                          blockchainProposalDeposits: blockchain.ProposalDeposits,
                                          blockchainProposalVotes: blockchain.ProposalVotes,
                                          blockchainValidators: blockchain.Validators,
+                                         cached: Cached,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
@@ -186,33 +189,35 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def latestBlockHeight(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val latestBlock = blockchainBlocks.Service.getLatestBlock
+  def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, 5.seconds) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val latestBlock = blockchainBlocks.Service.getLatestBlock
 
-      def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
+        def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
-      def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
+        def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
 
-      (for {
-        latestBlock <- latestBlock
-        averageBlockTime <- getAverageBlockTime(latestBlock)
-        proposer <- getProposer(latestBlock.proposerAddress)
-      } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+        (for {
+          latestBlock <- latestBlock
+          averageBlockTime <- getAverageBlockTime(latestBlock)
+          proposer <- getProposer(latestBlock.proposerAddress)
+        } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
   }
 
-  def tokensStatistics(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val token = blockchainTokens.Service.getStakingToken
-      (for {
-        token <- token
-      } yield Ok(views.html.component.blockchain.tokensStatistics(token = token))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
+  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, 5.seconds) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val token = blockchainTokens.Service.getStakingToken
+        (for {
+          token <- token
+        } yield Ok(views.html.component.blockchain.tokensStatistics(token = token))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
   }
 
   def votingPowers(): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
