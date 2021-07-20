@@ -6,27 +6,28 @@ import controllers.view.OtherApp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
-import models.blockchain
+import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{Json, Reads}
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, PathBindable}
-import play.api.{ConfigLoader, Configuration, Logger}
+import play.api.mvc.{AbstractController, Action, AnyContent, EssentialAction, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ViewController @Inject()(
-                                blockchainAccounts: blockchain.Accounts,
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginActionAsync: WithLoginActionAsync,
                                 withUsernameToken: WithUsernameToken,
-                                withoutLoginActionAsync: WithoutLoginActionAsync,
-                                withoutLoginAction: WithoutLoginAction
+                                withoutLoginAction: WithoutLoginAction,
+                                cached: Cached
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
+
+  private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").seconds
 
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
@@ -77,49 +78,66 @@ class ViewController @Inject()(
       }
   }
 
-  def validators(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.validators(None))
+  def validators(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.validators(None))
+    }
   }
 
-  def validator(address: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.validators(Option(address)))
+  def validator(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.validators(Option(address)))
+    }
   }
 
-  def blocks(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.blocks(None))
+  def blocks(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.blocks(None))
+    }
   }
 
-  def block(height: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.blocks(Option(height)))
+  def block(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.blocks(Option(height)))
+    }
   }
 
-  def transactions(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.transactions(None))
+  def transactions(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.transactions(None))
+    }
   }
 
-  def transaction(txHash: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.transactions(Option(txHash)))
+  def transaction(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.transactions(Option(txHash)))
+    }
   }
 
-  def proposals(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.proposals(None))
+  def proposals(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.proposals(None))
+    }
   }
 
-  def proposal(proposalID: Int): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.proposals(Option(proposalID)))
+  def proposal(proposalID: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.proposals(Option(proposalID)))
+    }
   }
 
-  def wallet(address: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(views.html.wallet(address))
+  def wallet(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.wallet(address))
+    }
   }
-
 }
