@@ -22,7 +22,7 @@ resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
 
 scalaVersion := "2.12.11"
 
-libraryDependencies ++= Seq(ehcache, ws, specs2 % Test, guice)
+libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
 
