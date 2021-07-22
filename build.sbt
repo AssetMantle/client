@@ -67,5 +67,3 @@ libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
 libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
 
 libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
-
-enablePlugins(JavaServerAppPackaging)
