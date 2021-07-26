@@ -3,7 +3,7 @@
 
 @(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<div class="cmuk-text-left title"@Messages(key):</div>
+<div class="cmuk-text-left title">@Messages(key):</div>
 <div>
     @commonTextInfo(constants.View.SEQUENCE, packet.sequence)
     @commonTextInfo(constants.View.SOURCE_PORT, packet.sourcePort)
