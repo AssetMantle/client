@@ -22,10 +22,10 @@ class GetTransactionsByHeight @Inject()()(implicit wsClient: WSClient, configura
 
   private val url = ip + ":" + port + "/"
 
-  private def action(height: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + s"""tx_search?query="tx.height=$height"""").get)
+  private def action(height: Int, page: Int, perPage: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + s"""tx_search?query="tx.height=${height}"&page=${page}&per_page=${perPage}""").get)
 
   object Service {
-    def get(height: Int): Future[Response] = action(height).recover {
+    def get(height: Int, perPage: Int, page: Int): Future[Response] = action(height = height, page = page, perPage = perPage).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
       case baseException: BaseException => logger.error(constants.Response.TRANSACTION_BY_HEIGHT_QUERY_FAILED.logMessage + ": " + height)
         throw baseException
