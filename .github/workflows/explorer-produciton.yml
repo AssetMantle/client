@@ -12,10 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v11
+      - name: Setup Tools
+        uses: actions/setup-java@v2
         with:
-          java-version: adopt@1.11
-      - name: Compile
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Run Build
         run: sbt dist
       - uses: actions/upload-artifact@v2
         with:
