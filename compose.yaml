@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    image: explorer:test
+    ports:
+      - '9001:9000'
+    depends_on:
+      - psql
+    environment:
+      HTTP_FORWARDED_COUNT: 1
+      PLAY_SECRET: "nfimrvrwErut8V:b2YZcq;l6r[TbAM78e_uyPe<rDJwhjdnkES34jx`_apmH2RRf"
+      APPLICATION_FILE: "/var/log/application.log"
+  psql:
+    image: psql:explorer
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: "persistence"
+      POSTGRES_PASSWORD: "persistence"
+      POSTGRES_DB: "persistence"
+      PGDATA: "/data/db"
+    volumes:
+      - /Users/rohitaggarwal/Audit/persistenceClient/pdata/db:/data/db
+
+volumes:
+  data:

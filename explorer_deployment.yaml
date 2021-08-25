@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: explorer-testnet-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: explorer-testnet
+  serviceName: "explorer-service"
+  template:
+    metadata:
+      labels:
+        app: explorer-testnet
+    spec:
+      initContainers:
+        - name: prep-db-directory
+          command: [ "mkdir" ]
+          args: [ "/data/db" ]
+          image: busybox
+          volumeMounts:
+            - name: psql-volume
+              mountPath: /data
+      containers:
+        - name: explorer-sql
+          image: persistenceone/explorer-psql:v0.0.3
+          env:
+            - name: "PGDATA"
+              value: "/data/db"
+          ports:
+            - containerPort: 5432
+              name: sql-port
+          volumeMounts:
+            - name: psql-volume
+              mountPath: /data
+        - name: explorer
+          image: persistenceone/explorer:v0.0.2
+          env:
+            - name: "PLAY_SECRET"
+              value: "nfimrvrwErut8V:b2YZcq;l6r[TbAM78e_uyPe<rDJwhjdnkES34jx`_apmH2RRf"
+            - name: "APPLICATION_FILE"
+              value: "/var/log/application.log"
+          ports:
+            - containerPort: 9000
+              name: http-web
+      imagePullSecrets:
+        - name: docker-k8-secret
+  volumeClaimTemplates:
+    - metadata:
+        name: psql-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Gi

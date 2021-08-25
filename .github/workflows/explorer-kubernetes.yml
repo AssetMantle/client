@@ -1,0 +1,93 @@
+name: deploy to kubernetes
+
+on:
+  push:
+    branches: [ explorer/kubernetes ]
+  pull_request:
+    branches: [ explorer/kubernetes ]
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: gke-staging
+  GKE_REGION: us-west2
+  IMAGE: explorer
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+#      - name: Set env
+#        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    # docker setup for pushing the image
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_ID }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: create dockerfiles
+        run: sbt docker:stage
+      - name: copy the genesis file
+        run: curl -K https://github.com/persistenceOne/genesisTransactions/blob/master/test-core-1/final_genesis.json -o target/docker/stage/opt/docker/genesis.json
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          platforms: linux/amd64
+          tags: persistenceone/explorer:${{ github.sha }}
+          build-args: |
+            POSTGRES_HOST=${{ secrets.POSTGRES_HOST}}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER}}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD}}
+            WEB_APP_URL=${{ secrets.WEB_APP_URL}}
+            BLOCKCHAIN_HOST=${{ secrets.BLOCKCHAIN_HOST}}
+            BLOCKCHAIN_REST_PORT=${{ secrets.BLOCKCHAIN_REST_PORT}}
+            BLOCKCHAIN_ABCI_PORT=${{ secrets.BLOCKCHAIN_ABCI_PORT}}
+            MAILGUN_USER=${{ secrets.MAILGUN_USER}}
+            MAILGUN_PASSWORD=${{ secrets.MAILGUN_PASSWORD}}
+            KEY_STORE_FILE_PATH=${{ secrets.KEY_STORE_FILE_PATH}}
+            KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD}}
+
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '303.0.0'
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          export_default_credentials: true
+
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: |-
+          gcloud --quiet auth configure-docker
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - name: get-credentials
+        uses: google-github-actions/get-gke-credentials@main
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_REGION }}
+
+           Set up kustomize
+      - name: Set up Kustomize
+        run: |-
+          curl --location https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.2.0/kustomize_v4.2.0_linux_amd64.tar.gz | tar xz
+          chmod u+x ./kustomize
+
+      # Deploy the Docker image to the GKE cluster
+      - name: Deploy to GKE
+        run: |-
+          ./kustomize edit set image DOCKER_ID/IMAGE:TAG=${{ secrets.DOCKER_ID }}/${{ env.IMAGE }}:${{ github.sha }}
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment/$DEPLOYMENT_NAME
