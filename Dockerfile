@@ -1,6 +1,6 @@
 FROM openjdk:11
 WORKDIR /opt/docker
-COPY target/docker/stage/opt /opt
+COPY ./target/docker/stage/opt /opt
 ARG POSTGRES_HOST
 ARG POSTGRES_USER
 ARG POSTGRES_PASSWORD
