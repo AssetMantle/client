@@ -39,7 +39,7 @@ jobs:
       - name: create dockerfiles
         run: sbt docker:stage
       - name: copy the genesis file
-        run: curl -K https://raw.githubusercontent.com/persistenceOne/genesisTransactions/master/test-core-1/final_genesis.json -o target/docker/stage/opt/docker/genesis.json
+        run: curl https://raw.githubusercontent.com/persistenceOne/genesisTransactions/master/test-core-1/final_genesis.json -o target/docker/stage/opt/docker/genesis.json
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
