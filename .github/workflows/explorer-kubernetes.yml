@@ -81,15 +81,8 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_REGION }}
 
-#           Set up kustomize
-      - name: Set up Kustomize
-        run: |-
-          curl --location https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.2.0/kustomize_v4.2.0_linux_amd64.tar.gz | tar xz
-          chmod u+x ./kustomize
-
       # Deploy the Docker image to the GKE cluster
       - name: Deploy to GKE
         run: |-
-          ./kustomize edit set image DOCKER_ID/IMAGE:TAG=${{ secrets.DOCKER_ID }}/${{ env.IMAGE }}:${{ github.sha }}
-          ./kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment/$DEPLOYMENT_NAME
+          kubectl patch statefulset explorer-testnet-deployment --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/1/image", "value":"${{ secrets.DOCKER_ID }}/explorer:${{ github.sha }}"}]'
+          kubectl rollout status sts/explorer-testnet-deployment
