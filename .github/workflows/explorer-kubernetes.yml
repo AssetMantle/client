@@ -36,12 +36,35 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_ID }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '303.0.0'
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          export_default_credentials: true
+
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: |-
+          gcloud --quiet auth configure-docker
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - name: get-credentials
+        uses: google-github-actions/get-gke-credentials@main
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_REGION }}
+
       - name: create dockerfiles
         run: sbt docker:stage
+
       - name: copy the genesis file
         run: curl https://raw.githubusercontent.com/persistenceOne/genesisTransactions/master/test-core-1/final_genesis.json -o target/docker/stage/opt/docker/genesis.json
+
       - name: download keystore file
         run: gsutil cp gs://github_ci_cd_persistence/comdexKeyStore.uu target/docker/stage/opt/docker/comdexKeyStore.uu
+
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
@@ -64,25 +87,6 @@ jobs:
             MAILGUN_PASSWORD=${{ secrets.MAILGUN_PASSWORD}}
             KEY_STORE_FILE_PATH=${{ secrets.KEY_STORE_FILE_PATH}}
             KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD}}
-
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@master
-        with:
-          version: '303.0.0'
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-          export_default_credentials: true
-
-      # Configure docker to use the gcloud command-line tool as a credential helper
-      - run: |-
-          gcloud --quiet auth configure-docker
-
-      # Get the GKE credentials so we can deploy to the cluster
-      - name: get-credentials
-        uses: google-github-actions/get-gke-credentials@main
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_REGION }}
 
       # Deploy the Docker image to the GKE cluster
       - name: Deploy to GKE
