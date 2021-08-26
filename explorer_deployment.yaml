@@ -13,6 +13,14 @@ spec:
       labels:
         app: explorer-testnet
     spec:
+      initContainers:
+        - name: prep-db-directory
+          command: [ "mkdir" ]
+          args: [ "-p","/data/db" ]
+          image: busybox
+          volumeMounts:
+            - name: psql-volume
+              mountPath: /data
       containers:
         - name: explorer-sql
           image: persistenceone/explorer-psql:v0.0.3
