@@ -77,6 +77,7 @@ jobs:
           build-args: |
             POSTGRES_HOST=${{ secrets.POSTGRES_HOST}}
             POSTGRES_USER=${{ secrets.POSTGRES_USER}}
+            ASCENDEX_URL=${{ secrets.ASCENDEX_URL}}
             POSTGRES_DB=${{ secrets.POSTGRES_DB}}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD}}
             WEB_APP_URL=${{ secrets.WEB_APP_URL}}
