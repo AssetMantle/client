@@ -57,6 +57,9 @@ jobs:
       - name: create dockerfiles
         run: sbt docker:stage
 
+      - name: copy the public folder
+        run: cp -r public target/docker/stage/opt/docker
+
       - name: copy the genesis file
         run: curl https://raw.githubusercontent.com/persistenceOne/genesisTransactions/master/test-core-1/final_genesis.json -o target/docker/stage/opt/docker/genesis.json
 

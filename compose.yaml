@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: explorer:test
+    image: persistenceone/explorer:v0.1.2
     ports:
       - '9001:9000'
     depends_on:
@@ -11,6 +11,27 @@ services:
       HTTP_FORWARDED_COUNT: 1
       PLAY_SECRET: "nfimrvrwErut8V:b2YZcq;l6r[TbAM78e_uyPe<rDJwhjdnkES34jx`_apmH2RRf"
       APPLICATION_FILE: "/var/log/application.log"
+      POSTGRES_USER: "persistence"
+      POSTGRES_DB: "persistence"
+      POSTGRES_HOST: "psql"
+      POSTGRES_PASSWORD: "persistence"
+      ROOT_FILE_PATH: "/opt/docker"
+      ASCENDEX_URL: "https://ascendex.com/api/pro/v1"
+      BAND_CHAIN_URL: "guanyu-devnet.bandchain.org"
+      BLOCKCHAIN_ABCI_PORT: "26657"
+      BLOCKCHAIN_HOST: "http://34.219.91.105"
+      BLOCKCHAIN_REST_PORT: "1317"
+      WEB_APP_URL: "http://0.0.0.0:9000"
+      DOCU_SIGN_BASE_PATH: "https://demo.docusign.net/restapi"
+      DOCU_SIGN_OAUTH_BASE_PATH: "https://account-d.docusign.com/oauth/token"
+      GENESIS_FILE_PATH: "/opt/docker/genesis.json"
+      KEY_STORE_FILE_PATH: "/opt/docker/comdexKeyStore.uu"
+      KEY_STORE_PASSWORD: "123123123"
+      MAILGUN_PASSWORD: "dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs"
+      MAILGUN_USER: "postmaster@dev.comdex.sg"
+      MEMBER_CHECK_URL: "https://demo.membercheck.com"
+      PLAY_HTTP_SECRET: "d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&gt;x"
+      TRULIOO_URL: "https://api.globalgateway.io"
   psql:
     image: psql:explorer
     ports:
