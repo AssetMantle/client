@@ -1,10 +1,8 @@
 name: deploy to kubernetes
 
 on:
-  push:
-    branches: [ explorer/kubernetes ]
-  pull_request:
-    branches: [ explorer/kubernetes ]
+  release:
+    types: [created]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -73,7 +71,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           platforms: linux/amd64
-          tags: ${{ secrets.DOCKER_ID }}/explorer:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_ID }}/explorer:${{ github.event.release.tag_name }}
           build-args: |
             POSTGRES_HOST=${{ secrets.POSTGRES_HOST}}
             POSTGRES_USER=${{ secrets.POSTGRES_USER}}
@@ -93,5 +91,5 @@ jobs:
       # Deploy the Docker image to the GKE cluster
       - name: Deploy to GKE
         run: |-
-          kubectl patch statefulset explorer-testnet-deployment --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/1/image", "value":"${{ secrets.DOCKER_ID }}/explorer:${{ github.sha }}"}]'
+          kubectl patch statefulset explorer-testnet-deployment --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/1/image", "value":"${{ secrets.DOCKER_ID }}/explorer:${{ github.event.release.tag_name }}"}]'
           kubectl rollout status sts/explorer-testnet-deployment
