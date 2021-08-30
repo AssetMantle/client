@@ -21,6 +21,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/dataTables.min.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
+        <script src="@routes.Assets.versioned("javascripts/pageReloadOnChange.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
@@ -78,7 +79,7 @@
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a  id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
+                                <li><a id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
                                 @commonIcon("blocksIcon")
                                 </span>
                                     @Messages(constants.View.BLOCKS)
