@@ -99,6 +99,7 @@ object Blockchain {
     val WithdrawRewards = "withdraw_rewards"
     val WithdrawCommission = "withdraw_commission"
     val ProposerReward = "proposer_reward"
+    val Amount = "amount"
     //evidence
     val SubmitEvidence = "submit_evidence"
     //governance

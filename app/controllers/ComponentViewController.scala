@@ -1,11 +1,12 @@
 package controllers
 
+import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
 import exceptions.BaseException
 import models.blockchain._
-import models.common.Serializable.Coin
+import models.common.Serializable.{Coin, coinApply}
 import models.keyBase
 import models.keyBase.ValidatorAccount
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
@@ -15,11 +16,16 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import utilities.MicroNumber
 import play.api.cache.Cached
-import scala.concurrent.duration.DurationInt
+import play.api.libs.json.{JsLookupResult, Json, Reads}
+import play.api.mvc.Results.Ok
+import queries.responses.common.Event
+import utilities.Date.logger
 
+import scala.concurrent.duration.DurationInt
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.pow
 
 @Singleton
 class ComponentViewController @Inject()(
@@ -67,6 +73,8 @@ class ComponentViewController @Inject()(
                                          masterIdentifications: master.Identifications,
                                          withLoginActionAsync: WithLoginActionAsync,
                                          withUsernameToken: WithUsernameToken,
+                                         utilitiesOperations: utilities.Operations,
+
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -448,10 +456,51 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
-
         (for {
           transaction <- transaction
-        } yield Ok(views.html.component.blockchain.transaction.transactionDetails(transaction))
+        }
+        yield Ok(views.html.component.blockchain.transaction.transactionDetails(transaction))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+
+  def transactionDetailsRawLog(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val transaction = blockchainTransactions.Service.tryGet(txHash)
+        (for {
+          transaction <- transaction
+        } yield {
+          if (transaction.status) {
+            implicit val eventWrapperReads: Reads[EventWrapper] = Json.reads[EventWrapper]
+
+            val amounts = Json.parse(transaction.rawLog).as[Seq[EventWrapper]]
+              .flatMap {
+                _.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards)
+                  .flatMap(_.attributes)
+                  .filter(_.key == constants.Blockchain.Event.Amount)
+                  .map(_.value.getOrElse(""))
+              }
+            val coin = amounts.head.split(constants.RegularExpression.STRING_SEPARATOR).filter(_.nonEmpty).toList
+            var denom = ""
+            var amount = ""
+            print(coin.tail.head(0))
+            if(coin.tail.head(0).equals('u')){
+              denom =  coin.tail.head.split("u")(1).toUpperCase()
+               amount = Coin(denom = denom, amount = MicroNumber(coin.head.toDouble/1000000)).getAmountWithNormalizedDenom()
+            }else{
+              denom =  coin.tail.head.toUpperCase()
+               amount = Coin(denom = denom, amount = MicroNumber(coin.head)).getAmountWithNormalizedDenom()
+            }
+              Ok (amount)
+
+        } else{
+             Ok("Transaction not successful")
+          }
+        }
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -934,3 +983,5 @@ class ComponentViewController @Inject()(
   }
 
 }
+
+case class EventWrapper(events: Seq[Event])

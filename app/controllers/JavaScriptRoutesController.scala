@@ -80,6 +80,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionListPage,
           routes.javascript.ComponentViewController.transactionDetails,
           routes.javascript.ComponentViewController.transactionMessages,
+          routes.javascript.ComponentViewController.transactionDetailsRawLog,
+
 
           routes.javascript.ComponentViewController.proposalList,
           routes.javascript.ComponentViewController.proposalDetails,
