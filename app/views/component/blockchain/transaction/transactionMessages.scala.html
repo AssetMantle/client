@@ -26,7 +26,7 @@
                     @views.html.component.blockchain.txMessages.cosmos.setWithdrawAddress(msg.message)
                 }
                 case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => {
-                    @views.html.component.blockchain.txMessages.cosmos.withdrawDelegationReward(msg.message)
+                    @views.html.component.blockchain.txMessages.cosmos.withdrawDelegationReward(msg.message, txHash)
                 }
                 case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => {
                     @views.html.component.blockchain.txMessages.cosmos.withdrawValidatorCommission(msg.message)
