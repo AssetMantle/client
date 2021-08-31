@@ -4,11 +4,24 @@ object Test {
   val NUMBER_OF_USERS = 1500
 
   val BASE_URL = "http://localhost:9000"
+  val REQUEST_DELAY = 2
+  val BLOCKCHAIN_TRANSACTION_DELAY = 40
+  val LOOP_DELAY = 1
+
+
+  // View Controller
+  val BLOCK_HEIGHT=9999
+  val TRANSACTION_HASH="69CA8D2C93750175A22DA6FD58A59A34D4760B310BC8F6F20322FE6C5B58BFEF"
+  val TEST_PROPOSAL_ID=1
+  val TEST_VALIDATOR_ADDRESS="persistencevaloper1aepmuldh8j05y57zh5tje3fuzk63mc2mjd6v94"
+
+
+
+
 
   val IMAGE_FILE_FEED = "/home/persistence-3/testImages/"
   val TEST_NAME = "TEST_NAME"
   val TEST_MNEMONIC = "TEST_MNEMONIC"
-
   val TEST_ZONE_ID = "TEST_ZONE_ID"
   val TEST_TRADER_ID = "TEST_TRADER_ID"
   val TEST_ADDRESS = "TEST_ADDRESS"
