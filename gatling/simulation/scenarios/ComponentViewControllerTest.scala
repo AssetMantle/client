@@ -8,6 +8,7 @@ import io.gatling.http.Predef._
 
 
 object ComponentViewControllerTest{
+
   val recentActivitiesScenario: ScenarioBuilder = scenario("Recent Activities Scenario")
     .exec(http("Recent_Activities_Scenario_GET")
       .get(routes.ComponentViewController.recentActivities().url)
@@ -26,17 +27,21 @@ object ComponentViewControllerTest{
     .exec(http("Block_Height_Scenario_GET")
       .get(routes.ComponentViewController.block(height = Test.BLOCK_HEIGHT).url)
       .check(status.is(200))
+    )
+      .pause(Test.REQUEST_DELAY)
+    .exec(http("Block_Fail_Scenario_GET")
+      .get(routes.ComponentViewController.block(height =9999).url)
+      .check(substring("RESPONSE.FAILURE.BLOCK_NOT_FOUND").exists)
+      .check(status.is(500))
     ).pause(Test.REQUEST_DELAY)
+
+/*
     .exec(http("Latest_Block_Height_GET")
       .get(routes.ComponentViewController.latestBlockHeight().url)
       .check(status.is(200))
     ).pause(Test.REQUEST_DELAY)
+*/
 
-  val transactionScenario: ScenarioBuilder = scenario("Transaction Hash Scenario")
-    .exec(http("Transaction_Hash_Scenario_GET")
-      .get(routes.ComponentViewController.transaction(txHash = Test.TRANSACTION_HASH).url)
-      .check(status.is(200))
-    ).pause(Test.REQUEST_DELAY)
 
  val validatorScenario: ScenarioBuilder = scenario("Validator Scenario")
      .exec(http("Validators_Address_Scenario_GET")
@@ -73,16 +78,54 @@ object ComponentViewControllerTest{
       .check(status.is(200))
     ).pause(Test.REQUEST_DELAY)
 
+  val blockDetailsScenario: ScenarioBuilder = scenario("Block Details Scenario")
+      .exec(http("BLOCK_DETAILS_GET")
+      .get(routes.ComponentViewController.blockDetails(height = Test.BLOCK_HEIGHT).url)
+      .check(status.is(200))
+    ).pause(Test.REQUEST_DELAY)
+    .exec(http("BLOCK_NOT_FOUND_FAILURE_GET")
+      .get(routes.ComponentViewController.blockDetails(height = 99999999).url)
+      .check(bodyString.saveAs("BODY2"))
+      .check(substring("RESPONSE.FAILURE.BLOCK_NOT_FOUND").exists)
+      .check(status.is(500))
+    ).pause(Test.REQUEST_DELAY)
+    .exec(session => {
+     // val response1 = session("BODY1").as[String]
+      val response2 = session("BODY2").as[String]
+     // println(s"Response body: \n$response1")
+      println(s"Response body: \n$response2")
+      session
+    })
+
+  val blockTransactionsScenario: ScenarioBuilder = scenario("Block Transactions Scenario")
+    .exec(http("BLOCK_TRANSACTIONS_GET")
+      .get(routes.ComponentViewController.blockTransactions(height = Test.BLOCK_HEIGHT).url)
+      .check(status.is(200))
+    ).pause(Test.REQUEST_DELAY)
+  val transactionScenario: ScenarioBuilder = scenario("Transaction Details Scenario")
+    .exec(http("Transaction_Hash_Scenario_GET")
+      .get(routes.ComponentViewController.transaction(txHash = Test.TRANSACTION_HASH).url)
+      .check(status.is(200))
+    ).pause(Test.REQUEST_DELAY)
+    .exec(http("TRANSACTION_DETAILS_GET")
+      .get(routes.ComponentViewController.transactionDetails(txHash = Test.TRANSACTION_HASH).url)
+      .check(status.is(200))
+    ).pause(Test.REQUEST_DELAY)
+    .exec(http("TRANSACTION_HASH_FAILURE_GET")
+      .get(routes.ComponentViewController.transactionMessages(txHash = Test.TEST_FAILEDTRANSACTION_HASH).url)
+      .check(bodyString.saveAs("BODY2"))
+      .check(substring("RESPONSE.FAILURE.TRANSACTION_NOT_FOUND").exists)
+      .check(status.is(500))
+    ).pause(Test.REQUEST_DELAY)
+    .exec(session => {
+      // val response1 = session("BODY1").as[String]
+      val response2 = session("BODY2").as[String]
+      // println(s"Response body: \n$response1")
+      println(s"Response body: \n$response2")
+      session
+    })
 
 
 
-
-  /*
-  .exec(http("Validators_Scenario_GET")
-     .get(routes.ViewController.validators().url)
-     .check(status.is(200))
-   ).pause(Test.REQUEST_DELAY)
-
-*/
 
 }
