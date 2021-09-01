@@ -1,8 +1,7 @@
 package scenarios
 
-import constants.{Form, Test}
+import constants.Test
 import controllers.routes
-import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._

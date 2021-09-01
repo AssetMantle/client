@@ -15,7 +15,7 @@ class ViewControllerTest extends Simulation {
     ViewControllerTest.blockScenario.inject(atOnceUsers(1)),
     ViewControllerTest.transactionsScenario.inject(atOnceUsers(1)),
     ViewControllerTest.proposalsScenario.inject(atOnceUsers(1)),
-    ViewControllerTest.validatorsScenario.inject(atOnceUsers(1))
+    ViewControllerTest.validatorsScenario.inject(atOnceUsers(1)),
   ).protocols(http.baseUrl(Test.BASE_URL))
 
 
