@@ -18,7 +18,7 @@ import utilities.MicroNumber
 import play.api.cache.Cached
 import play.api.libs.json.{JsLookupResult, Json, Reads}
 import play.api.mvc.Results.Ok
-import queries.responses.common.Event
+import queries.responses.common.{Event, EventWrapper}
 import utilities.Date.logger
 
 import scala.concurrent.duration.DurationInt
@@ -467,7 +467,7 @@ class ComponentViewController @Inject()(
   }
 
 
-  def transactionDetailsRawLog(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionDetailsRawLog(txHash: String, validatorAddress: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
@@ -475,30 +475,19 @@ class ComponentViewController @Inject()(
           transaction <- transaction
         } yield {
           if (transaction.status) {
-            implicit val eventWrapperReads: Reads[EventWrapper] = Json.reads[EventWrapper]
 
-            val amounts = Json.parse(transaction.rawLog).as[Seq[EventWrapper]]
-              .flatMap {
-                _.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards)
-                  .flatMap(_.attributes)
-                  .filter(_.key == constants.Blockchain.Event.Amount)
-                  .map(_.value.getOrElse(""))
-              }
-            val coin = amounts.head.split(constants.RegularExpression.STRING_SEPARATOR).filter(_.nonEmpty).toList
-            var denom = ""
-            var amount = ""
-            print(coin.tail.head(0))
-            if(coin.tail.head(0).equals('u')){
-              denom =  coin.tail.head.split("u")(1).toUpperCase()
-               amount = Coin(denom = denom, amount = MicroNumber(coin.head.toDouble/1000000)).getAmountWithNormalizedDenom()
+            val eventWrappers = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
+            val eventWrapper = eventWrappers.find(eventWrapper => eventWrapper.events.exists(event => event.attributes.exists(_.value.getOrElse("") == validatorAddress)))
+            val amount = eventWrapper.fold("")(e => e.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards).map(_.attributes.filter(_.key == constants.Blockchain.Event.Amount)).flatten.map(_.value.getOrElse("")).toList.head)
+            if(amount.equals("")){
+              Ok("0")
             }else{
-              denom =  coin.tail.head.toUpperCase()
-               amount = Coin(denom = denom, amount = MicroNumber(coin.head)).getAmountWithNormalizedDenom()
+              val coinString = amount.split(constants.RegularExpression.STRING_SEPARATOR).filter(_.nonEmpty).toList
+              val coin = Coin.apply(coinString.tail.head, coinString.head.toDouble/1000000)
+              Ok(coin.getAmountWithNormalizedDenom())
             }
-              Ok (amount)
-
-        } else{
-             Ok("Transaction not successful")
+          } else {
+            Ok("0")
           }
         }
           ).recover {
@@ -983,5 +972,3 @@ class ComponentViewController @Inject()(
   }
 
 }
-
-case class EventWrapper(events: Seq[Event])

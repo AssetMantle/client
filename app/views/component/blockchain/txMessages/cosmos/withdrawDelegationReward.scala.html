@@ -9,9 +9,9 @@
 
 @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(withdrawDelegatorReward.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${withdrawDelegatorReward.delegatorAddress}'))")))
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(withdrawDelegatorReward.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${withdrawDelegatorReward.validatorAddress}'))")))
-    @commonTextInfo(constants.View.AMOUNT, "", 'id -> "withDrawRewardAmount")
+    @commonTextInfo(constants.View.AMOUNT, "", 'id -> s"""withDrawRewardAmount_${withdrawDelegatorReward.validatorAddress}""")
     <script>
-            componentResource('withDrawRewardAmount', jsRoutes.controllers.ComponentViewController.transactionDetailsRawLog(`@txHash`))
+            componentResource('withDrawRewardAmount_@withdrawDelegatorReward.validatorAddress', jsRoutes.controllers.ComponentViewController.transactionDetailsRawLog('@txHash', '@withdrawDelegatorReward.validatorAddress'))
     </script>
 
 }
