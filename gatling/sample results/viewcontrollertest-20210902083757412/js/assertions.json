@@ -1,0 +1,10 @@
+{
+  "simulation": "controllersTest.ViewControllerTest",
+  "simulationId": "viewcontrollertest",
+  "start": 1630571877412,
+  "description": "",
+  "scenarios": ["Blocks Scenario", "Validators Scenario", "Transactions Scenario", "Proposals Scenario"],
+  "assertions": [
+
+  ]
+}

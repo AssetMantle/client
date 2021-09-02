@@ -1,0 +1,10 @@
+{
+  "simulation": "controllersTest.ComponentViewControllerTest",
+  "simulationId": "componentviewcontrollertest",
+  "start": 1630571888373,
+  "description": "",
+  "scenarios": ["Component View Controller"],
+  "assertions": [
+
+  ]
+}
