@@ -73,8 +73,6 @@ class ComponentViewController @Inject()(
                                          masterIdentifications: master.Identifications,
                                          withLoginActionAsync: WithLoginActionAsync,
                                          withUsernameToken: WithUsernameToken,
-                                         utilitiesOperations: utilities.Operations,
-
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -466,8 +464,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-
-  def transactionDetailsRawLog(txHash: String, validatorAddress: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def getWithdrawDelegationRewardsAmount(txHash: String, validatorAddress: String, delegatorAddress: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
@@ -475,19 +472,15 @@ class ComponentViewController @Inject()(
           transaction <- transaction
         } yield {
           if (transaction.status) {
-
-            val eventWrappers = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
-            val eventWrapper = eventWrappers.find(eventWrapper => eventWrapper.events.exists(event => event.attributes.exists(_.value.getOrElse("") == validatorAddress)))
-            val amount = eventWrapper.fold("")(e => e.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards).map(_.attributes.filter(_.key == constants.Blockchain.Event.Amount)).flatten.map(_.value.getOrElse("")).toList.head)
-            if(amount.equals("")){
-              Ok("0")
-            }else{
-              val coinArray = amount.split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
-              val coin = Coin.apply(coinArray.tail.head, coinArray.head.toDouble/1000000)
-              Ok(coin.getAmountWithNormalizedDenom())
-            }
+            val eventsWrapper = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
+            val eventsWrapperDelegator = eventsWrapper.filter(_.events.exists(_.attributes.exists(_.value.getOrElse("") == delegatorAddress)))
+            val eventWrapper = eventsWrapperDelegator.find(_.events.exists(event => event.attributes.exists(_.value.getOrElse("") == validatorAddress)))
+            val amount = eventWrapper.fold(MicroNumber.zero + stakingDenom)(e => e.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards).flatMap(_.attributes.filter(_.key == constants.Blockchain.Event.Attribute.Amount)).map(_.value.getOrElse(MicroNumber.zero + stakingDenom)).toList.head)
+            val coinArray = amount.split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
+            val coin = Coin(coinArray.tail.head, coinArray.head.toDouble/1000000)
+            Ok(coin.getAmountWithNormalizedDenom())
           } else {
-            Ok("0")
+            Ok(Coin(stakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
           }
         }
           ).recover {

@@ -168,8 +168,7 @@ GET         /component/transactionList                           controllers.Com
 GET         /component/transactionListPage                       controllers.ComponentViewController.transactionListPage(pageNumber: Int)
 GET         /component/transactionDetails                        controllers.ComponentViewController.transactionDetails(txHash: String)
 GET         /component/transactionMessages                       controllers.ComponentViewController.transactionMessages(txHash: String)
-GET         /component/transactionDetailsRawLog                  controllers.ComponentViewController.transactionDetailsRawLog(txHash: String, validatorAddress: String)
-
+GET         /component/getWithdrawDelegationRewardsAmount        controllers.ComponentViewController.getWithdrawDelegationRewardsAmount(txHash: String, validatorAddress: String, delegatorAddress: String)
 
 GET         /component/validatorList                             controllers.ComponentViewController.validatorList
 GET         /component/activeValidatorList                       controllers.ComponentViewController.activeValidatorList
