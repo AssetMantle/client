@@ -19,8 +19,9 @@ class ComponentViewControllerTest extends Simulation {
     .exec(ComponentViewControllerTest.VotingPowersScenario)
     .exec(ComponentViewControllerTest.accountScenario)
     .exec(ComponentViewControllerTest.blockDetailsScenario)
-    .exec(ComponentViewControllerTest.blockTransactionsScenario)
     .exec(ComponentViewControllerTest.transactionScenario)
+    .exec(ComponentViewControllerTest.blockTransactionsScenario)
+    .exec(ComponentViewControllerTest.failblockDetailsScenario)
   setUp(
     componentViewControllerTest.inject(atOnceUsers(1)),
   ).protocols(http.baseUrl(Test.BASE_URL))
