@@ -482,8 +482,8 @@ class ComponentViewController @Inject()(
             if(amount.equals("")){
               Ok("0")
             }else{
-              val coinString = amount.split(constants.RegularExpression.STRING_SEPARATOR).filter(_.nonEmpty).toList
-              val coin = Coin.apply(coinString.tail.head, coinString.head.toDouble/1000000)
+              val coinArray = amount.split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
+              val coin = Coin.apply(coinArray.tail.head, coinArray.head.toDouble/1000000)
               Ok(coin.getAmountWithNormalizedDenom())
             }
           } else {
