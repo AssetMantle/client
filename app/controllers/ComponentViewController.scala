@@ -464,7 +464,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def getWithdrawDelegationRewardsAmount(txHash: String, validatorAddress: String, delegatorAddress: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def withdrawRewardAmount(txHash: String, validatorAddress: String, delegatorAddress: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
@@ -472,13 +472,12 @@ class ComponentViewController @Inject()(
           transaction <- transaction
         } yield {
           if (transaction.status) {
-            val eventsWrapper = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
-            val eventsWrapperDelegator = eventsWrapper.filter(_.events.exists(_.attributes.exists(_.value.getOrElse("") == delegatorAddress)))
-            val eventWrapper = eventsWrapperDelegator.find(_.events.exists(event => event.attributes.exists(_.value.getOrElse("") == validatorAddress)))
-            val amount = eventWrapper.fold(MicroNumber.zero + stakingDenom)(e => e.events.filter(_.`type` == constants.Blockchain.Event.WithdrawRewards).flatMap(_.attributes.filter(_.key == constants.Blockchain.Event.Attribute.Amount)).map(_.value.getOrElse(MicroNumber.zero + stakingDenom)).toList.head)
-            val coinArray = amount.split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
-            val coin = Coin(coinArray.tail.head, coinArray.head.toDouble/1000000)
-            Ok(coin.getAmountWithNormalizedDenom())
+            val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
+              .filter(_.events.exists(_.attributes.exists(_.value.getOrElse("") == delegatorAddress)))
+              .find(_.events.exists(event => event.attributes.exists(_.value.getOrElse("") == validatorAddress)))
+              .fold(MicroNumber.zero + stakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + stakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + stakingDenom)(_.value.getOrElse(MicroNumber.zero + stakingDenom))))
+              .split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
+            Ok(Coin(coinArray.tail.head, coinArray.head.toDouble / 1000000).getAmountWithNormalizedDenom())
           } else {
             Ok(Coin(stakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
           }

@@ -80,7 +80,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionListPage,
           routes.javascript.ComponentViewController.transactionDetails,
           routes.javascript.ComponentViewController.transactionMessages,
-          routes.javascript.ComponentViewController.getWithdrawDelegationRewardsAmount,
+          routes.javascript.ComponentViewController.withdrawRewardAmount,
 
           routes.javascript.ComponentViewController.proposalList,
           routes.javascript.ComponentViewController.proposalDetails,
