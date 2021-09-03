@@ -11,7 +11,7 @@
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(withdrawDelegatorReward.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${withdrawDelegatorReward.validatorAddress}'))")))
     @commonTextInfo(constants.View.AMOUNT, "", 'id -> s"""withDrawRewardAmount_${index}""")
     <script>
-            componentResource('withDrawRewardAmount_@index', jsRoutes.controllers.ComponentViewController.withdrawRewardAmount('@txHash', '@withdrawDelegatorReward.validatorAddress', '@withdrawDelegatorReward.delegatorAddress'))
+            componentResource('withDrawRewardAmount_@index', jsRoutes.controllers.ComponentViewController.withdrawRewardAmount('@txHash', @index))
     </script>
 
 }
