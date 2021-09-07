@@ -25,5 +25,5 @@
         componentResource('validatorUptime', jsRoutes.controllers.ComponentViewController.validatorUptime('@address', 100));
         componentResource('validatorDelegations', jsRoutes.controllers.ComponentViewController.validatorDelegations('@address'));
         componentResource('validatorTransactions', jsRoutes.controllers.ComponentViewController.validatorTransactions('@address'));
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/validators/@address");
+        pushStateChecker("validators", '@address');
 </script>

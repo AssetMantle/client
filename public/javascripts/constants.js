@@ -12,3 +12,4 @@ const ws = {
     url: 'wss://' + $(location).attr('host') + '/websocket',
     start: 'START',
 };
+let addState = true

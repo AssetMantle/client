@@ -3,26 +3,26 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="cmuk-card cmuk-card-default cmuk-animation-fade blocksList">
-        <div class="cmuk-overflow-auto">
-            <div class="cmuk-card-header">
-                <p class="leftText"> @Messages(constants.View.BLOCKS)</p>
-            </div>
-            <div class="cmuk-card-body">
+    <div class="cmuk-overflow-auto">
+        <div class="cmuk-card-header">
+            <p class="leftText"> @Messages(constants.View.BLOCKS)</p>
+        </div>
+        <div class="cmuk-card-body">
             <div class="productTable">
                 <table class="cmuk-table cmuk-table-striped">
                     <tbody id="blockListPage">
                     </tbody>
                 </table>
             </div>
-            </div>
         </div>
-        @commonSpinner("blockListPageChangeSpinner")
-        @commonJavascriptButton(constants.View.BACK, JavaScript("getBlockList(-1)"), 'id -> "blockList_BACK")
-        @commonJavascriptButton(constants.View.NEXT, JavaScript("getBlockList(1)"), 'id -> "blockList_NEXT")
+    </div>
+    @commonSpinner("blockListPageChangeSpinner")
+    @commonJavascriptButton(constants.View.BACK, JavaScript("getBlockList(-1)"), 'id -> "blockList_BACK")
+    @commonJavascriptButton(constants.View.NEXT, JavaScript("getBlockList(1)"), 'id -> "blockList_NEXT")
 </div>
 
 <script>
         componentResource('blockListPage', jsRoutes.controllers.ComponentViewController.blockListPage(1), 'blockListPageChangeSpinner', 'pageChange');
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/blocks");
+        pushStateChecker("blocks", "");
 </script>
 
