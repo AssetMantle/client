@@ -14,7 +14,7 @@
 </div>
 
 <script>
-        componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
-        componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
-        pushStateChecker("blocks", @height, "blockHeight");
+    componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
+    componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
+    checkAndPushState(jsRoutes.controllers.ViewController.block().url, @height , "blockHeight");
 </script>

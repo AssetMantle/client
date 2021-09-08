@@ -1,16 +1,12 @@
-function pushStateChecker(part1, part2) {
-    console.log(part1, part2);
+function checkAndPushState(route, parameter, functionName) {
     if (addState === true) {
-        if (part1 == "" && part2 == "") {
-            console.log("dashboard")
-            window.history.pushState("persistence", "persistence", "http://localhost:9000/");
+        if (route === "" && parameter === "") {
+            window.history.pushState(functionName, "persistence", "http://localhost:9000/");
         } else {
-            let address = "/" + part1 + "/" + part2.toString()
-            window.history.pushState("persistence", "persistence", address);
-            console.log("THIS IS ADDED   " + address)
+            address = "/" + route.split('/')[1] + "/" + parameter.toString()
+            window.history.pushState(functionName, "persistence", address);
         }
     } else {
-        console.log("back state")
         addState = true
     }
 

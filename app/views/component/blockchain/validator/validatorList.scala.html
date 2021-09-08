@@ -17,5 +17,6 @@
     </div>
 </div>
 <script>
-        pushStateChecker("validators", "", "validator");
+        part1 = jsRoutes.controllers.ViewController.blocks().url.split('/')
+        checkAndPushState(jsRoutes.controllers.ViewController.validators().url, "", "validator");
 </script>

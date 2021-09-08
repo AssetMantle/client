@@ -23,6 +23,6 @@
 
 <script>
         componentResource('blockListPage', jsRoutes.controllers.ComponentViewController.blockListPage(1), 'blockListPageChangeSpinner', 'pageChange');
-        pushStateChecker("blocks", "", "block");
+        checkAndPushState(jsRoutes.controllers.ViewController.blocks().url, "" , "block");
 </script>
 

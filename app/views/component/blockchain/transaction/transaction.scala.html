@@ -13,7 +13,7 @@
     </div>
 </div>
 <script>
-        componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
-        componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
-        pushStateChecker("transactions", '@txHash', "transactionHash");
+    componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
+    componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
+    checkAndPushState(jsRoutes.controllers.ViewController.transaction().url, '@txHash', "transactionHash");
 </script>

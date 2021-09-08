@@ -18,8 +18,8 @@
     </div>
 </div>
 <script>
-     componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
-     componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
-     componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
-     pushStateChecker("wallet", '@address', "wallet");
+    componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
+    componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
+    componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
+    checkAndPushState(jsRoutes.controllers.ViewController.wallet().url, '@address', "wallet");
 </script>

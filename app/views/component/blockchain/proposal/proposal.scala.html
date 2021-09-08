@@ -21,5 +21,5 @@
     componentResource('proposalDetails', jsRoutes.controllers.ComponentViewController.proposalDetails(@id));
     componentResource('proposalDeposits', jsRoutes.controllers.ComponentViewController.proposalDeposits(@id));
     componentResource('proposalVotes', jsRoutes.controllers.ComponentViewController.proposalVotes(@id));
-    pushStateChecker("proposals", '@id', "proposalID");
+    checkAndPushState(jsRoutes.controllers.ViewController.proposal().url, '@id', "proposalID");
 </script>

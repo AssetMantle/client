@@ -22,6 +22,6 @@
 </div>
 <script>
         componentResource('transactionListPage', jsRoutes.controllers.ComponentViewController.transactionListPage(1), 'transactionListPageChangeSpinner', 'pageChange');
-        pushStateChecker("transactions", "", "transaction");
+        checkAndPushState(jsRoutes.controllers.ViewController.transactions().url, "", "transaction");
 </script>
 
