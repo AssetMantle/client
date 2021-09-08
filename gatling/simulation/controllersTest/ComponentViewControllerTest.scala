@@ -3,25 +3,27 @@ package controllersTest
 import constants.Test
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import scenarios.{ComponentViewControllerTest, ViewControllerTest}
+import scenarios.{ComponentViewControllerTest}
 
 
 class ComponentViewControllerTest extends Simulation {
 
   val componentViewControllerTest=scenario("Component View Controller")
-    .exec(ComponentViewControllerTest.recentActivitiesScenario)
     .exec(ComponentViewControllerTest.walletsScenario)
     .exec(ComponentViewControllerTest.blockScenario)
-    .exec(ComponentViewControllerTest.transactionScenario)
     .exec(ComponentViewControllerTest.validatorScenario)
-    .exec(ComponentViewControllerTest.proposalScenario)
+    .exec(ComponentViewControllerTest.blockDetailsScenario)
     .exec(ComponentViewControllerTest.tokensScenario)
+    .exec(ComponentViewControllerTest.failblockTransactionsScenario)
+    .exec(ComponentViewControllerTest.recentActivitiesScenario)
+    .exec(ComponentViewControllerTest.proposalScenario)
+    .exec(ComponentViewControllerTest.transactionScenario)
     .exec(ComponentViewControllerTest.VotingPowersScenario)
     .exec(ComponentViewControllerTest.accountScenario)
-    .exec(ComponentViewControllerTest.blockDetailsScenario)
-    .exec(ComponentViewControllerTest.transactionScenario)
     .exec(ComponentViewControllerTest.blockTransactionsScenario)
+    .exec(ComponentViewControllerTest.transactionScenario)
     .exec(ComponentViewControllerTest.failblockDetailsScenario)
+
   setUp(
     componentViewControllerTest.inject(atOnceUsers(1)),
   ).protocols(http.baseUrl(Test.BASE_URL))

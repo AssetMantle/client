@@ -19,13 +19,5 @@ object IndexControllerTest{
       .check(bodyString.saveAs("BODY"))
       .check(status.is(303))
     ).pause(Test.REQUEST_DELAY)
-    .exec(session => {
-      // val response1 = session("BODY1").as[String]
-      val response2 = session("BODY").as[String]
-      // println(s"Response body: \n$response1")
-      println(s"Response body: \n$response2")
-      session
-    })
-
      */
 }
