@@ -15,5 +15,5 @@
 <script>
         componentResource('transactionDetails', jsRoutes.controllers.ComponentViewController.transactionDetails('@txHash'));
         componentResource('transactionMessages', jsRoutes.controllers.ComponentViewController.transactionMessages('@txHash'));
-        pushStateChecker("transactions", '@txHash');
+        pushStateChecker("transactions", '@txHash', "transactionHash");
 </script>

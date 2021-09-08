@@ -16,5 +16,5 @@
 <script>
         componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
         componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
-        pushStateChecker("blocks", @height);
+        pushStateChecker("blocks", @height, "blockHeight");
 </script>

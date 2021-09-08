@@ -16,3 +16,6 @@ dist
 *.css.map
 public/stylesheets/.sass-cache*
 .bsp
+.DS_Store
+public/.DS_Store
+

@@ -1,34 +1,41 @@
-window.addEventListener('popstate', (event) => {
-        addState = false
-        const reg = new RegExp('^[0-9]+$');
+window.addEventListener('popstate', e => {
+    addState = false
+    //The last part of URL -> eg. "409925" in http://localhost:9000/blocks/409925
+    var lastPart = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
 
-        //The last part of URL -> eg. "409925" in http://localhost:9000/blocks/409925
-        var lastPart = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
-
-        //The first last part of URL URL after domain/port name -> eg. "blocks" in http://localhost:9000/blocks/409925
-        secondLastPart = window.location.href.split('/').splice(3, 3).join('/').split('/').shift();
-
-        if (reg.test(lastPart) && secondLastPart === "blocks") {
+    let controller = jsRoutes.controllers.ViewController;
+    console.log(this.history.state)
+    switch (this.history.state) {
+        case "blockHeight":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(parseInt(lastPart)))
-        } else if (secondLastPart === "blocks") {
+            break;
+        case "block":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList());
-        } else if (lastPart != "validators" && secondLastPart === "validators" && lastPart != "") {
+            break;
+        case "validatorHeight":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator(lastPart))
-        } else if (secondLastPart === "validators") {
+            break;
+        case "validator":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList());
-        } else if (lastPart != "transactions" && secondLastPart === "transactions" && lastPart != "") {
+            break;
+        case "transactionHash":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction(lastPart))
-        } else if (secondLastPart === "transactions") {
+            break;
+        case "transaction":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList());
-        } else if (lastPart != "proposals" && secondLastPart === "proposals" && lastPart != "") {
+            break;
+        case "proposalID":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(parseInt(lastPart)))
-        } else if (secondLastPart === "proposals") {
+            break;
+        case "proposal":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList());
-        } else if (lastPart != "wallet" && secondLastPart === "wallet" && lastPart != "" && lastPart != "") {
-            console.log("Wallet second last part -> " + lastPart + "last part " + secondLastPart)
+            break;
+        case "wallet":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet(lastPart));
-        } else {
+            break;
+        default:
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard());
-        }
+            break;
     }
-)
+})
+
