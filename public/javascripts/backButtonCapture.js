@@ -3,8 +3,6 @@ window.addEventListener('popstate', e => {
     //The last part of URL -> eg. "409925" in http://localhost:9000/blocks/409925
     var lastPart = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
 
-    let controller = jsRoutes.controllers.ViewController;
-    console.log(this.history.state)
     switch (this.history.state) {
         case "blockHeight":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(parseInt(lastPart)))
