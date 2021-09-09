@@ -4,28 +4,28 @@ window.addEventListener('popstate', e => {
     var lastPart = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
 
     switch (this.history.state) {
-        case "blockHeight":
+        case "block":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(parseInt(lastPart)))
             break;
-        case "block":
+        case "blockList":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList());
             break;
-        case "validatorHeight":
+        case "validator":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator(lastPart))
             break;
-        case "validator":
+        case "validatorList":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList());
             break;
-        case "transactionHash":
+        case "transaction":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction(lastPart))
             break;
-        case "transaction":
+        case "transactionList":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList());
             break;
-        case "proposalID":
+        case "proposal":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(parseInt(lastPart)))
             break;
-        case "proposal":
+        case "proposalList":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList());
             break;
         case "wallet":

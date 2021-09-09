@@ -9,5 +9,4 @@ function checkAndPushState(route, parameter, functionName) {
     } else {
         addState = true
     }
-
 }
