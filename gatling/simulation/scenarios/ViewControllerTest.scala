@@ -7,17 +7,18 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
 
-object ViewControllerTest{
+object ViewControllerTest {
   val blockScenario: ScenarioBuilder = scenario("Blocks Scenario")
     .exec(http("Block_Scenario_GET")
       .get(routes.ViewController.blocks().url)
-      .check(status.is(200))
-    ).pause(Test.REQUEST_DELAY)
-    .exec(http("Block_Height_Scenario_GET")
-      .get(routes.ViewController.block(height = Test.BLOCK_HEIGHT).url)
-      .check(status.is(200))
-    ).pause(Test.REQUEST_DELAY)
-
+      .check(
+        status.is(200),
+        bodyString.saveAs("blocks"),
+      )
+    ).exec(http("Block_Height_Scenario_GET")
+    .get(routes.ViewController.block(height = Test.BLOCK_HEIGHT).url)
+    .check(status.is(200))
+  ).pause(Test.REQUEST_DELAY)
 
   val transactionsScenario: ScenarioBuilder = scenario("Transactions Scenario")
     .exec(http("Block_Scenario_GET")

@@ -14,7 +14,6 @@ object ComponentViewControllerTest {
       .check(status.is(200))
     ).pause(Test.REQUEST_DELAY)
 
-
   val walletsScenario: ScenarioBuilder = scenario("Wallets Scenario")
     .exec(http("Wallet_Scenario_GET")
       .get(routes.ComponentViewController.wallet(address = Test.TEST_BLOCKCHAIN_ADDRESS).url)
@@ -23,7 +22,6 @@ object ComponentViewControllerTest {
         css("div[id =accountDelegations]").exists,
         css("div[id =accountWallet]").exists,
         status.is(200),
-        bodyString.saveAs("wallet")
       )
     ).pause(Test.REQUEST_DELAY)
 
@@ -32,22 +30,15 @@ object ComponentViewControllerTest {
       .get(routes.ComponentViewController.block(height = Test.BLOCK_HEIGHT).url)
       .check(
         substring(Test.BLOCK_HEIGHT.toString()).exists,
-        bodyString.saveAs("blockHeight"),
         status.is(200),
       )
     ).pause(Test.REQUEST_DELAY)
-  /*
-      .exec(http("Latest_Block_Height_GET")
-        .get(routes.ComponentViewController.latestBlockHeight().url)
-        .check(status.is(200))
-      ).pause(Test.REQUEST_DELAY)
-  */
+
   val validatorScenario: ScenarioBuilder = scenario("Validator Scenario")
     .exec(http("Validators_Address_Scenario_GET")
       .get(routes.ComponentViewController.validator(address = Test.TEST_VALIDATOR_ADDRESS).url)
       .check(
         css("div[id =validatorDetails]").exists,
-        bodyString.saveAs("Validator"),
         status.is(200),
       )
     ).pause(Test.REQUEST_DELAY)
@@ -71,7 +62,6 @@ object ComponentViewControllerTest {
       .get(routes.ComponentViewController.tokensPrices().url)
       .check(status.is(200))
     ).pause(Test.REQUEST_DELAY)
-
 
   val VotingPowersScenario: ScenarioBuilder = scenario("Voting Powers Scenario")
     .exec(http("VotingPowers_Scenario_GET")
@@ -115,14 +105,6 @@ object ComponentViewControllerTest {
         status.is(500),
       )
     ).pause(Test.REQUEST_DELAY)
-  /*
-    .exec(session => {
-      // val response1 = session("BODY1").as[String]
-      println(s"Response body: \n$response2")
-      session
-    })
-  */
-
 
   val blockTransactionsScenario: ScenarioBuilder = scenario("Block Transactions Scenario")
     .exec(http("BLOCK_TRANSACTIONS_GET")
@@ -148,6 +130,7 @@ object ComponentViewControllerTest {
       println(session("Validator").as[String])
       session
     })
+
   val transactionScenario: ScenarioBuilder = scenario("Transaction Details Scenario")
     .exec(http("Transaction_Hash_Scenario_GET")
       .get(routes.ComponentViewController.transaction(txHash = Test.TRANSACTION_HASH).url)
@@ -164,6 +147,4 @@ object ComponentViewControllerTest {
         status.is(500)
       )
     ).pause(Test.REQUEST_DELAY)
-
-
 }
