@@ -7,7 +7,7 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
 
-object ComponentViewControllerTest{
+object ComponentViewControllerTest {
   val recentActivitiesScenario: ScenarioBuilder = scenario("Recent Activities Scenario")
     .exec(http("Recent_Activities_Scenario_GET")
       .get(routes.ComponentViewController.recentActivities().url)
@@ -36,14 +36,14 @@ object ComponentViewControllerTest{
         status.is(200),
       )
     ).pause(Test.REQUEST_DELAY)
-/*
-    .exec(http("Latest_Block_Height_GET")
-      .get(routes.ComponentViewController.latestBlockHeight().url)
-      .check(status.is(200))
-    ).pause(Test.REQUEST_DELAY)
-*/
- val validatorScenario: ScenarioBuilder = scenario("Validator Scenario")
-     .exec(http("Validators_Address_Scenario_GET")
+  /*
+      .exec(http("Latest_Block_Height_GET")
+        .get(routes.ComponentViewController.latestBlockHeight().url)
+        .check(status.is(200))
+      ).pause(Test.REQUEST_DELAY)
+  */
+  val validatorScenario: ScenarioBuilder = scenario("Validator Scenario")
+    .exec(http("Validators_Address_Scenario_GET")
       .get(routes.ComponentViewController.validator(address = Test.TEST_VALIDATOR_ADDRESS).url)
       .check(
         css("div[id =validatorDetails]").exists,
@@ -94,7 +94,7 @@ object ComponentViewControllerTest{
     ).pause(Test.REQUEST_DELAY)
 
   val blockDetailsScenario: ScenarioBuilder = scenario("Block Details Scenario")
-      .exec(http("BLOCK_DETAILS_GET")
+    .exec(http("BLOCK_DETAILS_GET")
       .get(routes.ComponentViewController.blockDetails(height = Test.BLOCK_HEIGHT).url)
       .check(
         substring(Test.BLOCK_HEIGHT.toString()).exists,
@@ -125,14 +125,14 @@ object ComponentViewControllerTest{
 
 
   val blockTransactionsScenario: ScenarioBuilder = scenario("Block Transactions Scenario")
-      .exec(http("BLOCK_TRANSACTIONS_GET")
-        .get(routes.ComponentViewController.blockTransactions(height = 14196).url)
-        .check(
-          status.is(200),
-          substring(Test.TRANSACTION_HASH).exists,
-          regex("""<td class="blockHeightItem">""").exists,
-          regex("""<div class="hidden cmuk-position-center" id="BLOCK_TRANSACTIONS_LOADING" >""").exists,
-        )
+    .exec(http("BLOCK_TRANSACTIONS_GET")
+      .get(routes.ComponentViewController.blockTransactions(height = 14196).url)
+      .check(
+        status.is(200),
+        substring(Test.TRANSACTION_HASH).exists,
+        regex("""<td class="blockHeightItem">""").exists,
+        regex("""<div class="hidden cmuk-position-center" id="BLOCK_TRANSACTIONS_LOADING" >""").exists,
+      )
     ).pause(Test.REQUEST_DELAY)
 
   val failblockTransactionsScenario: ScenarioBuilder = scenario("Failed Block Transactions Scenario")
@@ -144,13 +144,10 @@ object ComponentViewControllerTest{
         status.is(200)
       )
     ).pause(Test.REQUEST_DELAY)
-    .exec(session=>
-    {
-      println(session( "Validator" ).as[String])
+    .exec(session => {
+      println(session("Validator").as[String])
       session
-  })
-
-
+    })
   val transactionScenario: ScenarioBuilder = scenario("Transaction Details Scenario")
     .exec(http("Transaction_Hash_Scenario_GET")
       .get(routes.ComponentViewController.transaction(txHash = Test.TRANSACTION_HASH).url)
@@ -167,7 +164,6 @@ object ComponentViewControllerTest{
         status.is(500)
       )
     ).pause(Test.REQUEST_DELAY)
-
 
 
 }

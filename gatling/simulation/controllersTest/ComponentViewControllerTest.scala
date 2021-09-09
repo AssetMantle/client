@@ -3,12 +3,12 @@ package controllersTest
 import constants.Test
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import scenarios.{ComponentViewControllerTest}
+import scenarios.ComponentViewControllerTest
 
 
 class ComponentViewControllerTest extends Simulation {
 
-  val componentViewControllerTest=scenario("Component View Controller")
+  val componentViewControllerTest = scenario("Component View Controller")
     .exec(ComponentViewControllerTest.walletsScenario)
     .exec(ComponentViewControllerTest.blockScenario)
     .exec(ComponentViewControllerTest.validatorScenario)
@@ -27,8 +27,6 @@ class ComponentViewControllerTest extends Simulation {
   setUp(
     componentViewControllerTest.inject(atOnceUsers(1)),
   ).protocols(http.baseUrl(Test.BASE_URL))
-
-
 
 
 }
