@@ -6,5 +6,5 @@
     @views.html.index(Option(""))
     <script>
         componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('@address'));
-        checkAndPushState("wallet", '@address')
-</script>
+        checkAndPushState(jsRoutes.controllers.ViewController.wallet().url, '@address', "wallet")
+    </script>
