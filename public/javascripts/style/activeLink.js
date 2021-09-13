@@ -40,7 +40,7 @@ function setActiveLink(e) {
 }
 
 $(document).ready(function () {
-    console.log("hey")
+    checkAndPushState("", "", "");
     navBar()
 })
 
