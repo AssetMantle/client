@@ -23,7 +23,7 @@ object ViewControllerTest {
         // Right Containers
         css("div[id=recentActivities]").exists,
         css("div[id=votingPowers]").exists,
-        bodyString.saveAs("block"))
+        )
     ).pause(Test.REQUEST_DELAY)
     .exec(http("Block_Scenario_GET")
       .get(routes.ViewController.blocks().url)
@@ -31,20 +31,26 @@ object ViewControllerTest {
         regex("jsRoutes.controllers.ComponentViewController.*").count.is(10),
         css("div[id=explorerContent]").notNull,
         regex("jsRoutes.controllers.ComponentViewController.blockList()").count.is(1),
+        // Left Containers
         css("div[id=latestBlockHeight]").exists,
         css("div[id=tokensStatistics]").exists,
+        // Right Containers
         css("div[id=recentActivities]").exists,
         css("div[id=votingPowers]").exists,
         status.is(200),
-        bodyString.saveAs("blocks"),
+        // Print the Response
+        //  bodyString.saveAs("blocks"),
       )
-    )
+    ).pause(Test.REQUEST_DELAY)
+    /*
+    // Print the Response using session
     .exec(session => {
       val response = session("blocks").as[String]
       val response2 = session("block").as[String]
       println(s"Response body block:\n $response2")
       session
     })
+     */
 
   val transactionsScenario: ScenarioBuilder = scenario("Transactions Scenario")
     .exec(http("Block_Scenario_GET")
@@ -60,7 +66,6 @@ object ViewControllerTest {
         css("div[id=recentActivities]").exists,
         css("div[id=votingPowers]").exists,
         status.is(200),
-        bodyString.saveAs("transactions"),
       )
     ).pause(Test.REQUEST_DELAY)
     .exec(http("Transaction_Hash_Scenario_GET")
@@ -77,12 +82,6 @@ object ViewControllerTest {
         css("div[id=votingPowers]").exists,
         status.is(200))
     ).pause(Test.REQUEST_DELAY)
-    .exec(session => {
-      val response1 = session("transactions").as[String]
-      println(s"Response Body for Transactions:\n$response1")
-      session
-    })
-
 
   val proposalsScenario: ScenarioBuilder = scenario("Proposals Scenario")
     .exec(http("Proposals_Scenario_GET")
@@ -97,7 +96,6 @@ object ViewControllerTest {
         // Right Containers
         css("div[id=recentActivities]").exists,
         css("div[id=votingPowers]").exists,
-        bodyString.saveAs("proposals"),
         status.is(200),
       )
     ).pause(Test.REQUEST_DELAY)
@@ -113,16 +111,9 @@ object ViewControllerTest {
         // Right Containers
         css("div[id=recentActivities]").exists,
         css("div[id=votingPowers]").exists,
-        bodyString.saveAs("proposal"),
         status.is(200),
       )
     ).pause(Test.REQUEST_DELAY)
-    .exec(session => {
-      val response = session("proposals").as[String]
-      val response2 = session("proposal").as[String]
-      println(s"Response body proposals:\n$response2")
-      session
-    })
 
   val validatorsScenario: ScenarioBuilder = scenario("Validators Scenario")
     .exec(http("Validators_Scenario_GET")
