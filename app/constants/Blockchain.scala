@@ -129,6 +129,7 @@ object Blockchain {
       val Route = "route"
       //distribution
       val WithdrawAddress = "withdraw_address"
+      val Amount = "amount"
       //evidence
       val EvidenceHash = "evidence_hash"
       //governance
