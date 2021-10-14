@@ -111,6 +111,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  val master = createNode(2551, "master", Props[Master], "master")
+  val master = createNode(2552, "master", Props[Master], "master")
+
+  master ! "Hi!"
 
 }

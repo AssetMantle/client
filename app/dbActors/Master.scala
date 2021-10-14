@@ -13,7 +13,7 @@ class Master extends Actor with ActorLogging {
   import context.dispatcher
   implicit val timeout = Timeout(3 seconds)
 
-  val cluster = Cluster(context.system)
+  val cluster = Cluster(dbActors.Service.actorSystem)
 
   var workers: Map[Address, ActorRef] = Map()
   var pendingRemoval: Map[Address, ActorRef] = Map()
@@ -38,6 +38,7 @@ class Master extends Actor with ActorLogging {
   def handleClusterEvents: Receive = {
     case MemberUp(member) if member.hasRole("worker") =>
       log.info(s"Member is up: ${member.address}")
+      println(s"Member is up: ${member.address}")
       if (pendingRemoval.contains(member.address)) {
         pendingRemoval = pendingRemoval - member.address
       } else {
@@ -58,6 +59,7 @@ class Master extends Actor with ActorLogging {
 
     case m: MemberEvent =>
       log.info(s"Another member event I don't care about: $m")
+    case "Hi!" => println("Master started")
   }
 
   def handleWorkerRegistration: Receive = {

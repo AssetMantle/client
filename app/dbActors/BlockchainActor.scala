@@ -24,23 +24,6 @@ class BlockchainActor @Inject()(
                                  blockchainBalance: models.blockchain.Balances
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
-  import context.dispatcher
-  implicit val timeout = Timeout(3 seconds)
-
-  val cluster = Cluster(context.system)
-
-  override def preStart(): Unit = {
-    cluster.subscribe(
-      self,
-      initialStateMode = InitialStateAsEvents,
-      classOf[MemberEvent],
-      classOf[UnreachableMember]
-    )
-  }
-
-  override def postStop(): Unit = {
-    cluster.unsubscribe(self)
-  }
 
   override def receive: Receive = {
     case TryGet(address) => {

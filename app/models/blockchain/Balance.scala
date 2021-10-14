@@ -105,10 +105,7 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
 
-    private val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
-
-    createNode(2552, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
-
+    private val blockchainActor = createNode(2551, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
