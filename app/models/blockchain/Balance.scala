@@ -16,8 +16,15 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import akka.pattern.{ask, pipe}
+import akka.util.{Timeout => akkaTimeout}
+import dbActors.BlockchainActor
+
+import scala.concurrent.duration.DurationInt
+
+
 
 case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
@@ -26,7 +33,7 @@ class Balances @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getBalance: GetBalance,
                           configuration: Configuration,
-                          utilitiesOperations: utilities.Operations
+                          utilitiesOperations: utilities.Operations,
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -94,14 +101,21 @@ class Balances @Inject()(
   }
 
   object Service {
+    implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
+
+    val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
+
+    def tryGetWithActor(address: String): Future[Option[Balance]] = (blockchainActor ? dbActors.TryGet(address)).mapTo[Option[Balance]]
 
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)
 
     def get(address: String): Future[Option[Balance]] = getByAddress(address).map(_.map(_.deserialize))
+
+    def get2(address: String): Option[Balance] = Await.result(getByAddress(address).map(_.map(_.deserialize)), timeout.duration)
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 

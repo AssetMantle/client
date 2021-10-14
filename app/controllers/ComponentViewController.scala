@@ -273,7 +273,7 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val operatorAddress = Future(utilities.Bech32.convertAccountAddressToOperatorAddress(address))
-        val balances = blockchainBalances.Service.get(address)
+        val balances = blockchainBalances.Service.tryGetWithActor(address)
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
         val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
         val allDenoms = blockchainTokens.Service.getAllDenoms

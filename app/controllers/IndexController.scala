@@ -40,6 +40,9 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
+  private val startAkka = configuration.get[Boolean]("akka.start")
+
+
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
@@ -104,5 +107,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  startup.start()
+  if (startAkka) startup.start()
+
+
 }

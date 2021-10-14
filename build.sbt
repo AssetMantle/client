@@ -16,6 +16,9 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
+lazy val akkaVersion = "2.6.3"
+
+
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
@@ -67,5 +70,15 @@ libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
 libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
 
 libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % akkaVersion
+
+libraryDependencies += "com.typesafe.akka" %% "akka-remote" % akkaVersion
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
 
 enablePlugins(JavaServerAppPackaging)

@@ -13,8 +13,8 @@
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
-        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/export.json" />
-        <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/comdexKeyStore" />
+        <entry key="GENESIS_FILE_PATH" value="$PROJECT_DIR$/../test-core1-genesis.json" />
+        <entry key="KEY_STORE_FILE_PATH" value="$PROJECT_DIR$/../comdexKeyStore.uu" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
         <entry key="MAILGUN_USER" value="postmaster@dev.comdex.sg" />
@@ -27,6 +27,7 @@
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
         <entry key="TRULIOO_URL" value="https://api.globalgateway.io" />
         <entry key="WEB_APP_URL" value="http://localhost:9000" />
+        <entry key="START_AKKA" value="false" />
       </map>
     </option>
     <option name="play2IsNonDefaultInstallDirUsed" value="false" />

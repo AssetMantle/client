@@ -1,5 +1,6 @@
 package models.blockchain
 
+import akka.actor.{ActorSystem, Props}
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
@@ -20,6 +21,10 @@ import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import akka.pattern.{ask, pipe}
+import akka.util.Timeout
+
+import scala.concurrent.duration.DurationInt
 
 case class Account(address: String, username: String, accountType: String, publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
@@ -51,7 +56,7 @@ class Accounts @Inject()(
 
   def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, accountType = account.accountType, publicKey = account.publicKey.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
-  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
+  private def add( account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
@@ -142,6 +147,8 @@ class Accounts @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
     def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
@@ -223,3 +230,6 @@ class Accounts @Inject()(
   }
 
 }
+
+case class Create(address: String, username: String, accountType: String, publicKey: Option[PublicKey])
+case class Get(address: String)
