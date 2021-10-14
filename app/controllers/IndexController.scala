@@ -1,11 +1,14 @@
 package controllers
 
+import akka.actor.Props
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
+import dbActors.{BlockchainActor, Master}
+import dbActors.Service.{createNode, startCluster}
 import exceptions.BaseException
 import models.blockchain
-import models.blockchain.{Maintainer, Meta}
+import models.blockchain.{Balances, Maintainer, Meta}
 import models.master._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -32,6 +35,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 cached: Cached,
+                                balances: Balances
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -107,7 +111,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  if (startAkka) startup.start()
-
+  val master = createNode(2551, "master", Props[Master], "master")
 
 }

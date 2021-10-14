@@ -81,4 +81,10 @@ libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVers
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
 
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
+
+libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
+
+libraryDependencies += "io.aeron" % "aeron-client" % "1.32.0"
+
 enablePlugins(JavaServerAppPackaging)

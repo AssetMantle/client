@@ -1,5 +1,6 @@
 package models.blockchain
 
+import akka.actor.Props
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.Coin
@@ -21,6 +22,7 @@ import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
 import dbActors.BlockchainActor
+import dbActors.Service.createNode
 
 import scala.concurrent.duration.DurationInt
 
@@ -103,7 +105,10 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
 
-    val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+    private val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+
+    createNode(2552, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
+
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
