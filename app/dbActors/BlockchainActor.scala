@@ -1,19 +1,13 @@
 package dbActors
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Address, Props}
-import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberEvent, UnreachableMember}
-import akka.stream.Materializer
-import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
+import actors.Service.actorSystem.dispatcher
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.pattern.pipe
 import models.Abstract.PublicKey
-import models.blockchain.Account
 import play.api.Logger
-import models.blockchain.Account
-import models.master
+
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 
 object BlockchainActor {
   def props(blockchainBalance: models.blockchain.Balances) = Props(new BlockchainActor(blockchainBalance))
@@ -28,7 +22,7 @@ class BlockchainActor @Inject()(
   override def receive: Receive = {
     case TryGet(address) => {
       println(s"address is fetched $address")
-      sender() ! blockchainBalance.Service.get2(address)
+      blockchainBalance.Service.get(address) pipeTo sender()
       println(self.path)
     }
   }

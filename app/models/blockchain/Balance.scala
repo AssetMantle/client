@@ -105,7 +105,7 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
 
-    private val blockchainActor = createNode(2551, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
+    private val blockchainActor = createNode(0, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
@@ -116,8 +116,6 @@ class Balances @Inject()(
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)
 
     def get(address: String): Future[Option[Balance]] = getByAddress(address).map(_.map(_.deserialize))
-
-    def get2(address: String): Option[Balance] = Await.result(getByAddress(address).map(_.map(_.deserialize)), timeout.duration)
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
