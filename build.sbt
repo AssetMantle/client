@@ -1,5 +1,6 @@
 import _root_.io.gatling.sbt.GatlingPlugin
 import _root_.sbt.Keys._
+import com.typesafe.sbt.packager.MappingsHelper.directory
 
 name := "persistenceClient"
 
@@ -88,3 +89,11 @@ libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
 libraryDependencies += "io.aeron" % "aeron-client" % "1.32.0"
 
 enablePlugins(JavaServerAppPackaging)
+
+enablePlugins(DockerPlugin)
+
+dockerBaseImage := "openjdk:11"
+dockerExposedPorts ++= Seq(9000, 9001, 9002)
+version in Docker := "latest"
+dockerRepository := Some("persistence")
+enablePlugins(DockerSpotifyClientPlugin)
