@@ -20,7 +20,7 @@ function lineChart(chartID, keys, values, label, showLegend) {
         type: 'line',
         data: chartData,
         options: {
-            maintainAspectRatio:false,
+            maintainAspectRatio: false,
         }
     });
 }

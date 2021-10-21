@@ -20,7 +20,7 @@ function barChart(chartID, keys, values, label, showLegend) {
         type: 'bar',
         data: chartData,
         options: {
-            maintainAspectRatio:false,
+            maintainAspectRatio: false
         }
     });
 }

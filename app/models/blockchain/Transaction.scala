@@ -209,8 +209,8 @@ class Transactions @Inject()(
 
     def getTransactionStatisticsData(latestHeight: Int, binWidth: Int = 10000, numBins: Int = 10): Future[ListMap[String, Int]] = {
       val end = if (latestHeight % binWidth == 0) latestHeight else ((latestHeight / binWidth) + 1) * binWidth
-      val start = if (end - numBins * binWidth > blockchainStartHeight) end - numBins * binWidth else blockchainStartHeight
-      val maxBins = (end - start) / binWidth
+      val start = if (end - numBins * binWidth > blockchainStartHeight) end - numBins * binWidth else blockchainStartHeight - 1
+      val maxBins = (end - start + 1) / binWidth
       val totalBins = if (maxBins == numBins) numBins else maxBins
       val result = utilitiesOperations.traverse(0 until totalBins) { index =>
         val s = start + index * binWidth + 1
