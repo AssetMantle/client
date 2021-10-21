@@ -21,7 +21,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
-import dbActors.BlockchainActor
+import dbActors.{BlockchainActor, RouterActor}
 import dbActors.Service.createNode
 
 import scala.concurrent.duration.DurationInt
@@ -103,14 +103,26 @@ class Balances @Inject()(
   }
 
   object Service {
-    implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
+    implicit val timeout = akkaTimeout(20 seconds) // needed for `?` below
 
-    private val blockchainActor = createNode(0, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
+
+    val routerActor = dbActors.Service.system.actorOf(Props[RouterActor](), "routerActor")
+
+    val blockchainActor = dbActors.Service.system.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+    val blockchainActor2 = dbActors.Service.system.actorOf(BlockchainActor.props(Balances.this), "blockchainActor2")
+    val blockchainActor3 = dbActors.Service.system.actorOf(BlockchainActor.props(Balances.this), "blockchainActor3")
+    val blockchainActor4 = dbActors.Service.system.actorOf(BlockchainActor.props(Balances.this), "blockchainActor4")
+    val blockchainActor5 = dbActors.Service.system.actorOf(BlockchainActor.props(Balances.this), "blockchainActor5")
+
+    routerActor ! dbActors.AddActor(None, blockchainActor.actorRef)
+    routerActor ! dbActors.AddActor(None, blockchainActor2.actorRef)
+    routerActor ! dbActors.AddActor(None, blockchainActor3.actorRef)
+    routerActor ! dbActors.AddActor(None, blockchainActor4.actorRef)
+    routerActor ! dbActors.AddActor(None, blockchainActor5.actorRef)
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
-    def tryGetWithActor(address: String): Future[Option[Balance]] = (blockchainActor ? dbActors.TryGet(address)).mapTo[Option[Balance]]
-
+    def tryGetWithActor(address: String): Future[Option[Balance]] = (routerActor ? dbActors.TryGet(address)).mapTo[Option[Balance]]
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)

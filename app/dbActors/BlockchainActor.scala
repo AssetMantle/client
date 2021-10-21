@@ -20,7 +20,7 @@ class BlockchainActor @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
-    case TryGet(address) => {
+    case Get(address) => {
       println(s"address is fetched $address")
       blockchainBalance.Service.get(address) pipeTo sender()
       println(self.path)
@@ -32,4 +32,3 @@ class BlockchainActor @Inject()(
 
 case class Create(address: String, username: String, accountType: String, publicKey: Option[PublicKey])
 case class Get(address: String)
-case class TryGet(address: String)

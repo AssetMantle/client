@@ -33,15 +33,52 @@ services:
       ASCENDEX_URL: https://ascendex.com/api/pro/v1
       DOCU_SIGN_OAUTH_BASE_PATH: https://account-d.docusign.com/oauth/token
       KEY_STORE_FILE_PATH: conf/clustering/comdexKeyStore
+
+
+#  Uncomment following if it fails
+
   c1:
     image: persistence/persistenceclient:latest
     ports:
-      - '9001:9001'
+      - '9001:9000'
     shm_size: '2gb'
     environment:
       CLUSTER_PORT: 9001
       CLUSTER_IP: c1
-      SEED_PORT_9000_TCP_ADDR: c2
+      SEED_PORT_9000_TCP_ADDR: seed
+      POSTGRES_USER: persistence
+      BLOCKCHAIN_ABCI_PORT: 26657
+      MEMBER_CHECK_URL: https://demo.membercheck.com
+      PLAY_HTTP_SECRET: d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&gt;x
+      START_AKKA: false
+      WEB_APP_URL: http://localhost:9000
+      MAILGUN_USER: postmaster@dev.comdex.sg
+      POSTGRES_HOST: host.docker.internal
+      BLOCKCHAIN_REST_PORT: 1317
+      BAND_CHAIN_URL: guanyu-devnet.bandchain.org
+      POSTGRES_PASSWORD: persistence
+      BLOCKCHAIN_HOST: 128.199.29.15
+      POSTGRES_DB: persistence
+      GENESIS_FILE_PATH: conf/clustering/final-genesis.json
+      ROOT_FILE_PATH: /
+      MAILGUN_PASSWORD: dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs
+      DOCU_SIGN_BASE_PATH: https://demo.docusign.net/restapi
+      COMDEX_URL: http://localhost:9000
+      TRULIOO_URL: https://api.globalgateway.io
+      KEY_STORE_PASSWORD: 123123123
+      ASCENDEX_URL: https://ascendex.com/api/pro/v1
+      DOCU_SIGN_OAUTH_BASE_PATH: https://account-d.docusign.com/oauth/token
+      KEY_STORE_FILE_PATH: conf/clustering/comdexKeyStore
+
+  c2:
+    image: persistence/persistenceclient:latest
+    shm_size: '2gb'
+    ports:
+      - '9002:9000'
+    environment:
+      CLUSTER_PORT: 9002
+      CLUSTER_IP: c2
+      SEED_PORT_9000_TCP_ADDR: seed
       POSTGRES_USER: persistence
       BLOCKCHAIN_ABCI_PORT: 26657
       MEMBER_CHECK_URL: https://demo.membercheck.com
@@ -65,36 +102,4 @@ services:
       ASCENDEX_URL: https://ascendex.com/api/pro/v1
       DOCU_SIGN_OAUTH_BASE_PATH: https://account-d.docusign.com/oauth/token
       KEY_STORE_FILE_PATH: conf/clustering/comdexKeyStore
-
-#  c2:
-#    image: persistence/persistenceclient:latest
-#    ports:
-#      - '9002:9002'
-#    environment:
-#      CLUSTER_PORT: 9002
-#      CLUSTER_IP: c2
-#      SEED_PORT_9000_TCP_ADDR: seed
-#      POSTGRES_USER: persistence
-#      BLOCKCHAIN_ABCI_PORT: 26657
-#      MEMBER_CHECK_URL: https://demo.membercheck.com
-#      PLAY_HTTP_SECRET: d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&gt;x
-#      START_AKKA: false
-#      WEB_APP_URL: http://localhost:9000
-#      MAILGUN_USER: postmaster@dev.comdex.sg
-#      POSTGRES_HOST: host.docker.internal
-#      BLOCKCHAIN_REST_PORT: 1317
-#      BAND_CHAIN_URL: guanyu-devnet.bandchain.org
-#      POSTGRES_PASSWORD: persistence
-#      BLOCKCHAIN_HOST: 128.199.29.15
-#      POSTGRES_DB: persistence
-#      GENESIS_FILE_PATH: conf/clustering/final-genesis.json
-#      ROOT_FILE_PATH: /Users/ankitkumar/
-#      MAILGUN_PASSWORD: dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs
-#      DOCU_SIGN_BASE_PATH: https://demo.docusign.net/restapi
-#      COMDEX_URL: http://localhost:9000
-#      TRULIOO_URL: https://api.globalgateway.io
-#      KEY_STORE_PASSWORD: 123123123
-#      ASCENDEX_URL: https://ascendex.com/api/pro/v1
-#      DOCU_SIGN_OAUTH_BASE_PATH: https://account-d.docusign.com/oauth/token
-#      KEY_STORE_FILE_PATH: conf/clustering/comdexKeyStore
 
