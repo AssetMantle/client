@@ -72,6 +72,8 @@ class Accounts @Inject()(
     }
   }
 
+  private def getTotalAccountNumber(): Future[Int] = db.run(accountTable.length.result)
+
   private def getByAddress(address: String): Future[Option[AccountSerialized]] = db.run(accountTable.filter(_.address === address).result.headOption)
 
   private def getListByAddress(addresses: Seq[String]): Future[Seq[AccountSerialized]] = db.run(accountTable.filter(_.address.inSet(addresses)).result)
@@ -161,6 +163,8 @@ class Accounts @Inject()(
     def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
+
+    def getTotalAccounts: Future[Int] = getTotalAccountNumber()
 
   }
 

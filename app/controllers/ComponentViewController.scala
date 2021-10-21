@@ -1,6 +1,5 @@
 package controllers
 
-import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
@@ -16,19 +15,17 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import utilities.MicroNumber
 import play.api.cache.Cached
-import play.api.libs.json.{JsLookupResult, Json, Reads}
-import play.api.mvc.Results.Ok
+import queries.responses.blockchain.DelegatorRewardsResponse.{Response => DelegatorRewardsResponse}
 import queries.responses.common.{Event, EventWrapper}
-import utilities.Date.logger
 
 import scala.concurrent.duration.DurationInt
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
-import scala.math.pow
 
 @Singleton
 class ComponentViewController @Inject()(
+                                         blockchainAccounts: blockchain.Accounts,
                                          blockchainBalances: blockchain.Balances,
                                          blockchainDelegations: blockchain.Delegations,
                                          blockchainIdentities: blockchain.Identities,
@@ -36,6 +33,7 @@ class ComponentViewController @Inject()(
                                          blockchainSplits: blockchain.Splits,
                                          blockchainUndelegations: blockchain.Undelegations,
                                          blockchainBlocks: blockchain.Blocks,
+                                         blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
                                          blockchainTransactions: blockchain.Transactions,
                                          blockchainTransactionsIdentityDefines: blockchainTransaction.IdentityDefines,
                                          blockchainTransactionsIdentityNubs: blockchainTransaction.IdentityNubs,
@@ -269,6 +267,27 @@ class ComponentViewController @Inject()(
     }
   }
 
+  def chainStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val totalAccounts = blockchainAccounts.Service.getTotalAccounts
+        val totalTxs = blockchainTransactions.Service.getTotalTransactions
+        val latestHeight = blockchainBlocks.Service.getLatestBlockHeight
+
+        def getTxData(latestHeight: Int) = blockchainTransactions.Service.getTransactionStatisticsData(latestHeight)
+
+        (for {
+          totalAccounts <- totalAccounts
+          totalTxs <- totalTxs
+          latestHeight <- latestHeight
+          txData <- getTxData(latestHeight)
+        } yield Ok(views.html.component.blockchain.chainStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
   def accountWallet(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
@@ -277,14 +296,14 @@ class ComponentViewController @Inject()(
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
         val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
         val allDenoms = blockchainTokens.Service.getAllDenoms
+        val delegationRewards = getDelegatorRewards.Service.get(address)
+        val withdrawAddress = blockchainWithdrawAddresses.Service.get(address)
 
         def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
 
         def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[Coin] = if (isValidator) {
           getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
         } else Future(Coin(stakingDenom, MicroNumber.zero))
-
-        def getDelegationRewards(delegatorAddress: String): Future[Coin] = getDelegatorRewards.Service.get(delegatorAddress).map(_.total.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
 
         def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 
@@ -296,13 +315,27 @@ class ComponentViewController @Inject()(
           operatorAddress <- operatorAddress
           isValidator <- isValidator(operatorAddress)
           balances <- balances
-          delegationRewards <- getDelegationRewards(address)
+          delegationRewards <- delegationRewards
+          withdrawAddress <- withdrawAddress
           commissionRewards <- getValidatorCommissionRewards(operatorAddress, isValidator)
           delegations <- delegations
           undelegations <- undelegations
           validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))
           allDenoms <- allDenoms
-        } yield Ok(views.html.component.blockchain.account.accountWallet(address = address, accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins), delegated = getDelegatedAmount(delegations, validators), undelegating = getUndelegatingAmount(undelegations), delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards, stakingDenom = stakingDenom, totalTokens = allDenoms.length))
+        } yield Ok(views.html.component.blockchain.account.accountWallet(
+          address = address,
+          accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins),
+          delegated = getDelegatedAmount(delegations, validators),
+          undelegating = getUndelegatingAmount(undelegations),
+          delegationTotalRewards = delegationRewards.total.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin),
+          isValidator = isValidator,
+          commissionRewards = commissionRewards,
+          stakingDenom = stakingDenom,
+          totalTokens = allDenoms.length,
+          validatorRewards = ListMap(delegationRewards.rewards.map(reward => reward.validator_address -> reward.reward.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin)): _*),
+          validatorsMap = validators.map(x => x.operatorAddress -> x.description.moniker).toMap,
+          withdrawAddress = withdrawAddress
+        ))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

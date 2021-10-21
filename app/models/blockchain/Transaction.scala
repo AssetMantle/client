@@ -11,6 +11,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -38,7 +39,8 @@ case class Transaction(hash: String, height: Int, code: Int, rawLog: String, sta
 @Singleton
 class Transactions @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
-                              configuration: Configuration
+                              configuration: Configuration,
+                              utilitiesOperations: utilities.Operations,
                             )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -50,6 +52,8 @@ class Transactions @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
+
+  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
 
   private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
 
@@ -84,6 +88,8 @@ class Transactions @Inject()(
     }
   }
 
+  private def getTotalTransactionsNumber(): Future[Int] = db.run(transactionTable.length.result)
+
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
   private def findTransactionsPerPageForAddress(address: String, offset: Int, limit: Int): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).drop(offset).take(limit).result)
@@ -96,6 +102,8 @@ class Transactions @Inject()(
   }
 
   private def getTransactionsByHeightList(heights: Seq[Int]): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.height.inSet(heights)).result)
+
+  private def getTransactionsNumberByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).length.result)
 
   private def getNumberOfTransactionsByHeight(height: Int): Future[Int] = db.run(transactionTable.filter(_.height === height).length.result)
 
@@ -196,6 +204,25 @@ class Transactions @Inject()(
     }
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
-  }
 
+    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber()
+
+    def getTransactionStatisticsData(latestHeight: Int, binWidth: Int = 1000, numBins: Int = 10): Future[ListMap[String, Int]] = {
+      val end = if (latestHeight % binWidth == 0) latestHeight else ((latestHeight / binWidth) + 1) * binWidth
+      val start = if (end - numBins * binWidth > blockchainStartHeight) end - numBins * binWidth else blockchainStartHeight
+      val maxBins = (end - start) / binWidth
+      val totalBins = if (maxBins == numBins) numBins else maxBins
+      val result = utilitiesOperations.traverse(0 until totalBins) { index =>
+        val s = start + index * binWidth + 1
+        val e = start + (index + 1) * binWidth
+        val numTxs = getTransactionsNumberByHeightRange(s, e)
+        for {
+          numTxs <- numTxs
+        } yield s"""$s - $e""" -> numTxs
+      }
+      for {
+        result <- result
+      } yield ListMap(result.toList: _*)
+    }
+  }
 }

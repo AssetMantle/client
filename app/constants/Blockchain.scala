@@ -33,7 +33,8 @@ object Blockchain {
     new ChildNumber(0, false)
   )
 
-  val TokenTickers: Map[String, String] = Map("uxprt" -> "XPRT")
+  // Adding "stake" -> "XPRT" for default case
+  val TokenTickers: Map[String, String] = Map("uxprt" -> "XPRT", "stake" -> "XPRT")
 
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"

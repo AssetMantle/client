@@ -3,7 +3,7 @@
 @import scala.collection.immutable.ListMap
 
 @(accountBalances: Seq[Coin])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="pieChartContainer">
+<div>
     @if(accountBalances.nonEmpty) {
         <div>
         @accountBalances.map { coin =>

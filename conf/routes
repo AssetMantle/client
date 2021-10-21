@@ -147,6 +147,7 @@ GET         /component/tokensStatistics                          controllers.Com
 GET         /component/votingPowers                              controllers.ComponentViewController.votingPowers
 
 GET         /component/tokensPrices                              controllers.ComponentViewController.tokensPrices
+GET         /component/chainStatistics                           controllers.ComponentViewController.chainStatistics
 
 GET         /component/accountWallet                             controllers.ComponentViewController.accountWallet(address: String)
 GET         /component/accountDelegations                        controllers.ComponentViewController.accountDelegations(address: String)
