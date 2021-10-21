@@ -88,7 +88,7 @@ class Transactions @Inject()(
     }
   }
 
-  private def getTotalTransactionsNumber(): Future[Int] = db.run(transactionTable.length.result)
+  private def getTotalTransactionsNumber: Future[Int] = db.run(transactionTable.length.result)
 
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
@@ -205,9 +205,9 @@ class Transactions @Inject()(
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
 
-    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber()
+    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
 
-    def getTransactionStatisticsData(latestHeight: Int, binWidth: Int = 1000, numBins: Int = 10): Future[ListMap[String, Int]] = {
+    def getTransactionStatisticsData(latestHeight: Int, binWidth: Int = 10000, numBins: Int = 10): Future[ListMap[String, Int]] = {
       val end = if (latestHeight % binWidth == 0) latestHeight else ((latestHeight / binWidth) + 1) * binWidth
       val start = if (end - numBins * binWidth > blockchainStartHeight) end - numBins * binWidth else blockchainStartHeight
       val maxBins = (end - start) / binWidth
