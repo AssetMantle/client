@@ -1,20 +1,16 @@
 package controllers
 
-import akka.actor.Props
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
-import dbActors.{BlockchainActor, Master}
-import dbActors.Service.{createNode, routerActor, startCluster}
+import dbActors.Service.{ routerActor}
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Balances, Maintainer, Meta}
-import models.master._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import queries.blockchain.GetAccount
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
