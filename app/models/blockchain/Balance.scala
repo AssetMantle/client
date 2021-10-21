@@ -21,8 +21,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
-import dbActors.BlockchainActor
-import dbActors.Service.createNode
+import dbActors.{AddActor, BlockchainActor}
+import dbActors.Service.{actorSystem, routerActor}
 
 import scala.concurrent.duration.DurationInt
 
@@ -105,11 +105,13 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
 
-    private val blockchainActor = createNode(0, "worker", BlockchainActor.props(Balances.this), "blockchainActor")
+    private val blockchainActor = actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+
+    routerActor ! AddActor(None, blockchainActor.actorRef)
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
-    def tryGetWithActor(address: String): Future[Option[Balance]] = (blockchainActor ? dbActors.TryGet(address)).mapTo[Option[Balance]]
+    def tryGetWithActor(address: String): Future[Option[Balance]] = (routerActor ? dbActors.TryGet(address)).mapTo[Option[Balance]]
 
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 

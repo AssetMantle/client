@@ -5,7 +5,7 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
 import dbActors.{BlockchainActor, Master}
-import dbActors.Service.{createNode, startCluster}
+import dbActors.Service.{createNode, routerActor, startCluster}
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Balances, Maintainer, Meta}
@@ -111,8 +111,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  val master = createNode(2552, "master", Props[Master], "master")
 
-  master ! "Hi!"
+  routerActor ! "Start"
 
 }
