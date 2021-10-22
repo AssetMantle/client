@@ -18,8 +18,7 @@
     </div>
 </div>
 <script>
-        componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
-        componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
-        componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/wallet/@address");
+    componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
+    componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
+    componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
 </script>
