@@ -9,6 +9,6 @@
     @commonTextInfo(constants.View.TOTAL_REWARDS, totalRewards.getAmountWithNormalizedDenom())
     <div class="cmuk-text-left title">@Messages(constants.View.VALIDATORS)</div>
     @validatorRewards.map { case (validatorAddress, amount) =>
-    @commonHtmltoHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
+    @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
     }
 </div>
