@@ -1,11 +1,12 @@
 package controllers
 
+import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
 import exceptions.BaseException
 import models.blockchain._
-import models.common.Serializable.Coin
+import models.common.Serializable.{Coin, coinApply}
 import models.keyBase
 import models.keyBase.ValidatorAccount
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
@@ -15,11 +16,16 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import utilities.MicroNumber
 import play.api.cache.Cached
-import scala.concurrent.duration.DurationInt
+import play.api.libs.json.{JsLookupResult, Json, Reads}
+import play.api.mvc.Results.Ok
+import queries.responses.common.{Event, EventWrapper}
+import utilities.Date.logger
 
+import scala.concurrent.duration.DurationInt
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.pow
 
 @Singleton
 class ComponentViewController @Inject()(
@@ -448,10 +454,33 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
-
         (for {
           transaction <- transaction
-        } yield Ok(views.html.component.blockchain.transaction.transactionDetails(transaction))
+        }
+        yield Ok(views.html.component.blockchain.transaction.transactionDetails(transaction))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val transaction = blockchainTransactions.Service.tryGet(txHash)
+        (for {
+          transaction <- transaction
+        } yield {
+          if (transaction.status) {
+            val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
+              .find(_.msg_index.getOrElse(0) == msgIndex)
+              .fold(MicroNumber.zero + stakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + stakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + stakingDenom)(_.value.getOrElse(MicroNumber.zero + stakingDenom))))
+              .split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
+            Ok(Coin(coinArray.tail.head, coinArray.head.toDouble / 1000000).getAmountWithNormalizedDenom())
+          } else {
+            Ok(Coin(stakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
+          }
+        }
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
