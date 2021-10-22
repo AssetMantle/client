@@ -35,7 +35,6 @@ window.addEventListener('popstate', e => {
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard());
             break;
     }
-
     var elems = document.querySelectorAll(".active");
     [].forEach.call(elems, function (el) {
         el.classList.remove("active");
