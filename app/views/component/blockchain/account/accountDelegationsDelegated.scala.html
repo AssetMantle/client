@@ -4,7 +4,7 @@
 
 @(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
-    @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.mapValues(_.toDouble).toList: _*), showLegend = false)
+    @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.map{case (operator, amount) => validatorsMoniker.getOrElse(operator, operator) -> amount.toDouble}.toList: _*), showLegend = false)
     <div>
     @delegations.map { case (validatorAddress, amount) =>
         @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")))
