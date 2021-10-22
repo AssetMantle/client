@@ -64,6 +64,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.votingPowers,
 
           routes.javascript.ComponentViewController.tokensPrices,
+          routes.javascript.ComponentViewController.transactionStatistics,
 
           routes.javascript.ComponentViewController.accountWallet,
           routes.javascript.ComponentViewController.accountDelegations,

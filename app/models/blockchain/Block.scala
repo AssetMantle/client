@@ -34,6 +34,8 @@ class Blocks @Inject()(
 
   private val numBlocksAvgBlockTimes = configuration.get[Int]("blockchain.avgBlockTimes")
 
+  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
+
   import databaseConfig.profile.api._
 
   private[models] val blockTable = TableQuery[BlockTable]
@@ -157,7 +159,7 @@ class Blocks @Inject()(
       val lastBlock = fromBlock.fold(Service.getLatestBlock)(height => Service.tryGet(height))
 
       // Should not use block height 1 since time difference between block 1 and block 2 can be very high
-      def getFirstBlock(lastBlock: Block) = if (lastBlock.height == 1) Future(lastBlock) else if (lastBlock.height <= numBlocks) Service.tryGet(2) else Service.tryGet(lastBlock.height - numBlocks)
+      def getFirstBlock(lastBlock: Block) = if (lastBlock.height == blockchainStartHeight) Future(lastBlock) else if (numBlocks >= (lastBlock.height - blockchainStartHeight)) Service.tryGet(blockchainStartHeight + 1) else Service.tryGet(lastBlock.height - numBlocks)
 
       (for {
         lastBlock <- lastBlock

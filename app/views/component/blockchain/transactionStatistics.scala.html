@@ -1,0 +1,9 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(totalAccounts: Int, totalTxs: Int, txData: ListMap[String, Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonCard(constants.View.TX_STATISTICS) {
+    @Messages(constants.View.TOTAL_ACCOUNTS): @utilities.NumericOperation.formatNumber(totalAccounts) / @Messages(constants.View.TOTAL_TRANSACTIONS): @utilities.NumericOperation.formatNumber(totalTxs)
+} {
+    @commonBarChart("txStatistics", txData, "", showLegend = false, constants.View.BLOCKS, constants.View.NUMBER_OF_TRANSACTIONS)
+}
