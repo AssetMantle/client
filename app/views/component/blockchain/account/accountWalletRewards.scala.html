@@ -1,7 +1,7 @@
-@import views.html.base._
 @import models.common.Serializable.Coin
+@import views.html.base._
+
 @import scala.collection.immutable.ListMap
-@import utilities.MicroNumber
 
 @(withdrawAddress: String, stakingDenom: String, totalRewards: Coin, validatorRewards: ListMap[String, Coin], validatorsMap: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div>
@@ -9,13 +9,6 @@
     @commonTextInfo(constants.View.TOTAL_REWARDS, totalRewards.getAmountWithNormalizedDenom())
     <div class="cmuk-text-left title">@Messages(constants.View.VALIDATORS)</div>
     @validatorRewards.map { case (validatorAddress, amount) =>
-    <div class="cmuk-flex infoRow">
-        <div class="infoRowLabel">
-        @commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"""))
-        </div>
-        <div class='infoRowValue'>
-        @amount.getAmountWithNormalizedDenom()
-        </div>
-    </div>
+    @commonHtmltoHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
     }
 </div>
