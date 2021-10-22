@@ -1,4 +1,4 @@
-function barChart(chartID, keys, values, label, showLegend) {
+function barChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
 
     let nameList = keys.replace('Set(', '').replace(')', '').split(', ');
     let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
@@ -20,7 +20,25 @@ function barChart(chartID, keys, values, label, showLegend) {
         type: 'bar',
         data: chartData,
         options: {
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: xLabel
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    ticks: {
+                        suggestedMin: 0,
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: yLabel
+                    }
+                }]
+            }
         }
     });
 }

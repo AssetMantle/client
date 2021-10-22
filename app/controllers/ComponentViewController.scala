@@ -4,23 +4,21 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
 import exceptions.BaseException
+import models._
 import models.blockchain._
-import models.common.Serializable.{Coin, coinApply}
-import models.keyBase
+import models.common.Serializable.Coin
 import models.keyBase.ValidatorAccount
-import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
+import queries.responses.common.EventWrapper
 import utilities.MicroNumber
-import play.api.cache.Cached
-import queries.responses.blockchain.DelegatorRewardsResponse.{Response => DelegatorRewardsResponse}
-import queries.responses.common.{Event, EventWrapper}
 
-import scala.concurrent.duration.DurationInt
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -267,7 +265,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def chainStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalAccounts = blockchainAccounts.Service.getTotalAccounts
@@ -281,7 +279,7 @@ class ComponentViewController @Inject()(
           totalTxs <- totalTxs
           latestHeight <- latestHeight
           txData <- getTxData(latestHeight)
-        } yield Ok(views.html.component.blockchain.chainStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData))
+        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -320,7 +318,7 @@ class ComponentViewController @Inject()(
           commissionRewards <- getValidatorCommissionRewards(operatorAddress, isValidator)
           delegations <- delegations
           undelegations <- undelegations
-          validators <- getValidatorsDelegated(delegations.map(_.validatorAddress))
+          validators <- getValidatorsDelegated((delegations.map(_.validatorAddress) ++ delegationRewards.rewards.map(_.validator_address)).distinct)
           allDenoms <- allDenoms
         } yield Ok(views.html.component.blockchain.account.accountWallet(
           address = address,
@@ -713,7 +711,7 @@ class ComponentViewController @Inject()(
 
         (for {
           transactions <- transactions
-        } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions))
+        } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.filter(_.messages.map(_.messageType).distinct != Seq(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD))))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

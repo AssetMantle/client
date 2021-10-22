@@ -8,12 +8,12 @@
     </div>
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
-            <div id="chainStatistics"></div>
+            <div id="transactionStatistics" class="cardSelectHeader cmuk-card-styles"></div>
         </div>
     </div>
 </div>
 <script>
         componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
-        componentResource('chainStatistics', jsRoutes.controllers.ComponentViewController.chainStatistics());
+        componentResource('transactionStatistics', jsRoutes.controllers.ComponentViewController.transactionStatistics());
         window.history.pushState("", "@Messages(constants.View.INDEX)", "/");
 </script>
