@@ -1,22 +1,20 @@
 package models.masterTransaction
 
-import java.sql.Timestamp
-import java.util.TimeZone
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.blockchain
-import queries.ascendex.GetTicker
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.ascendex.GetTicker
 import slick.jdbc.JdbcProfile
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class TokenPrice(serial: Int = 0, denom: String, price: Double, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
@@ -46,9 +44,13 @@ class TokenPrices @Inject()(
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
-  private val tokenPriceIntialDelay = configuration.get[Int]("blockchain.token.priceInitialDelay")
+  private val tokenPriceInitialDelay = configuration.get[Int]("blockchain.token.priceInitialDelay")
 
   private val tokenPriceUpdateRate = configuration.get[Int]("blockchain.token.priceUpdateRate")
+
+  private implicit val tokenTickers: Seq[utilities.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
+    utilities.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
+  }
 
   private def add(tokenPrice: TokenPrice): Future[Int] = db.run((tokenPriceTable returning tokenPriceTable.map(_.serial) += tokenPrice).asTry).map {
     case Success(result) => result
@@ -122,16 +124,19 @@ class TokenPrices @Inject()(
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val denomTicker = constants.Blockchain.TokenTickers.get(stakingDenom)
-      if (denomTicker.isDefined) {
-        val price = getAscendexTicker.Service.get(denomTicker.get).map(_.data.close.toDouble)
+      val tokenTicker = tokenTickers.find(_.denom == stakingDenom)
+      if (tokenTicker.isDefined) {
+        val price = getAscendexTicker.Service.get(tokenTicker.get.ticker).map(_.data.close.toDouble)
         (for {
           price <- price
           _ <- Service.create(denom = stakingDenom, price = price)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
-      } else Future()
+      } else {
+        logger.error(constants.Response.CRYPTO_TOKEN_TICKER_NOT_FOUND.logMessage)
+        Future()
+      }
     }
   }
 
@@ -139,6 +144,6 @@ class TokenPrices @Inject()(
     def run(): Unit = Utility.insertPrice()
   }
 
-  actorSystem.scheduler.scheduleAtFixedRate(tokenPriceIntialDelay.milliseconds, ((24 * 60 * 60) / tokenPriceUpdateRate).seconds)(runnable)(schedulerExecutionContext)
+  actorSystem.scheduler.scheduleAtFixedRate(tokenPriceInitialDelay.milliseconds, ((24 * 60 * 60) / tokenPriceUpdateRate).seconds)(runnable)(schedulerExecutionContext)
 
 }

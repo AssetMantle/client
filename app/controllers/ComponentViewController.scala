@@ -83,6 +83,10 @@ class ComponentViewController @Inject()(
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
+  private implicit val tokenTickers: Seq[utilities.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
+    utilities.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
+  }
+
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
@@ -227,7 +231,7 @@ class ComponentViewController @Inject()(
         val token = blockchainTokens.Service.getStakingToken
         (for {
           token <- token
-        } yield Ok(views.html.component.blockchain.tokensStatistics(token = token))
+        } yield Ok(views.html.component.blockchain.tokensStatistics(token = token, tokenTickers = tokenTickers))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -258,7 +262,7 @@ class ComponentViewController @Inject()(
 
         (for {
           tokenPrices <- getTokenPrices
-        } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, stakingDenom))
+        } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, stakingDenom, tokenTickers))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
