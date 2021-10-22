@@ -80,6 +80,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionListPage,
           routes.javascript.ComponentViewController.transactionDetails,
           routes.javascript.ComponentViewController.transactionMessages,
+          routes.javascript.ComponentViewController.withdrawRewardAmount,
 
           routes.javascript.ComponentViewController.proposalList,
           routes.javascript.ComponentViewController.proposalDetails,
@@ -169,6 +170,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.validator,
           routes.javascript.ViewController.transaction,
           routes.javascript.ViewController.proposal,
+          routes.javascript.ViewController.blocks,
+          routes.javascript.ViewController.transactions,
+          routes.javascript.ViewController.validators,
+          routes.javascript.ViewController.proposals,
+          routes.javascript.ViewController.wallet,
 
           routes.javascript.BackgroundCheckController.memberScanForm,
           routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,

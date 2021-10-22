@@ -16,3 +16,8 @@ dist
 *.css.map
 public/stylesheets/.sass-cache*
 .bsp
+.DS_Store
+public/.DS_Store
+pdata
+persistenceclient-1.0
+public/.DS_Store

@@ -18,8 +18,8 @@
     </div>
 </div>
 <script>
-        componentResource('proposalDetails', jsRoutes.controllers.ComponentViewController.proposalDetails(@id));
-        componentResource('proposalDeposits', jsRoutes.controllers.ComponentViewController.proposalDeposits(@id));
-        componentResource('proposalVotes', jsRoutes.controllers.ComponentViewController.proposalVotes(@id));
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/proposals/@id");
+    componentResource('proposalDetails', jsRoutes.controllers.ComponentViewController.proposalDetails(@id));
+    componentResource('proposalDeposits', jsRoutes.controllers.ComponentViewController.proposalDeposits(@id));
+    componentResource('proposalVotes', jsRoutes.controllers.ComponentViewController.proposalVotes(@id));
+    checkAndPushState(jsRoutes.controllers.ViewController.proposal().url, '@id', "proposal");
 </script>
