@@ -53,6 +53,10 @@ class Transactions @Inject()(
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
 
+  private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
+
+  private val transactionsStatisticsTotalBins = configuration.get[Int]("statistics.transactions.totalBins")
+
   private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
 
   private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
@@ -207,14 +211,14 @@ class Transactions @Inject()(
 
     def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
 
-    def getTransactionStatisticsData(latestHeight: Int, binWidth: Int = 10000, numBins: Int = 10): Future[ListMap[String, Int]] = {
-      val end = if (latestHeight % binWidth == 0) latestHeight else ((latestHeight / binWidth) + 1) * binWidth
-      val start = if (end - numBins * binWidth > blockchainStartHeight) end - numBins * binWidth else blockchainStartHeight - 1
-      val maxBins = (end - start + 1) / binWidth
-      val totalBins = if (maxBins == numBins) numBins else maxBins
+    def getTransactionStatisticsData(latestHeight: Int): Future[ListMap[String, Int]] = {
+      val end = if (latestHeight % transactionsStatisticsBinWidth == 0) latestHeight else ((latestHeight / transactionsStatisticsBinWidth) + 1) * transactionsStatisticsBinWidth
+      val start = if (end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth > blockchainStartHeight) end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth else blockchainStartHeight - 1
+      val maxBins = (end - start + 1) / transactionsStatisticsBinWidth
+      val totalBins = if (maxBins == transactionsStatisticsTotalBins) transactionsStatisticsTotalBins else maxBins
       val result = utilitiesOperations.traverse(0 until totalBins) { index =>
-        val s = start + index * binWidth + 1
-        val e = start + (index + 1) * binWidth
+        val s = start + index * transactionsStatisticsBinWidth + 1
+        val e = start + (index + 1) * transactionsStatisticsBinWidth
         val numTxs = getTransactionsNumberByHeightRange(s, e)
         for {
           numTxs <- numTxs
