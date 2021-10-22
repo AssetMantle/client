@@ -15,5 +15,5 @@
 <script>
         componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
         componentResource('transactionStatistics', jsRoutes.controllers.ComponentViewController.transactionStatistics());
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/");
+        checkAndPushState("", "", "");
 </script>
