@@ -83,6 +83,8 @@ class ComponentViewController @Inject()(
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
+  private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
+
   private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
     utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
   }
@@ -283,7 +285,7 @@ class ComponentViewController @Inject()(
           totalTxs <- totalTxs
           latestHeight <- latestHeight
           txData <- getTxData(latestHeight)
-        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData))
+        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData, binWidth = transactionsStatisticsBinWidth))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
