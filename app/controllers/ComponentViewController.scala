@@ -274,7 +274,7 @@ class ComponentViewController @Inject()(
   def transactionStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val totalAccounts = blockchainAccounts.Service.getTotalAccounts
+        val totalAccounts = blockchainBalances.Service.getTotalAccounts
         val totalTxs = blockchainTransactions.Service.getTotalTransactions
         val latestHeight = blockchainBlocks.Service.getLatestBlockHeight
 
