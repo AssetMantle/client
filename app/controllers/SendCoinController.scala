@@ -3,7 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}

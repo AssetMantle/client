@@ -5,10 +5,10 @@
 
 @(withdrawAddress: String, stakingDenom: String, totalRewards: Coin, validatorRewards: ListMap[String, Coin], validatorsMap: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div>
-    @commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonJavascriptLink(withdrawAddress, JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${withdrawAddress}'))""")))
     @commonTextInfo(constants.View.TOTAL_REWARDS, totalRewards.getAmountWithNormalizedDenom())
+    @commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonJavascriptLink(withdrawAddress, JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${withdrawAddress}'))""")))
     <div class="cmuk-text-left title">@Messages(constants.View.VALIDATORS)</div>
     @validatorRewards.map { case (validatorAddress, amount) =>
-    @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
+        @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
     }
 </div>

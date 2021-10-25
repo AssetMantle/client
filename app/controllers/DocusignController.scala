@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
-import controllers.view.OtherApp
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.master.{AccountKYC, Email}
 import models.{blockchain, docusign, master}

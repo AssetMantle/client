@@ -2,7 +2,6 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
 import exceptions.BaseException
 
 import javax.inject._
@@ -44,8 +43,8 @@ class BackgroundCheckController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_BACKGROUND_CHECK
 
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  private implicit val otherApps: Seq[utilities.Configuration.OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    utilities.Configuration.OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
 
   //UBO CHECKS

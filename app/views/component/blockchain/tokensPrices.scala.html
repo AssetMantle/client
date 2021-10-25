@@ -4,7 +4,7 @@
 @import scala.collection.immutable.ListMap
 @import models.masterTransaction.TokenPrice
 
-@(tokenPrices: Seq[TokenPrice], stakingDenom: String, tokenTickers: Seq[utilities.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(tokenPrices: Seq[TokenPrice], stakingDenom: String, tokenTickers: Seq[utilities.Configuration.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKEN_PRICE) {
     <p>$@tokenTickers.find(_.denom == stakingDenom).fold(stakingDenom)(_.normalizedDenom)</p>

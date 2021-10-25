@@ -2,7 +2,6 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
 import exceptions.BaseException
 import models._
 import models.blockchain._
@@ -14,6 +13,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
+import utilities.Configuration.OtherApp
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -83,8 +83,8 @@ class ComponentViewController @Inject()(
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
-  private implicit val tokenTickers: Seq[utilities.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
-    utilities.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
+  private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
+    utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
   }
 
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>

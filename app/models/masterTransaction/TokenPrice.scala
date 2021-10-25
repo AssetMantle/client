@@ -48,8 +48,8 @@ class TokenPrices @Inject()(
 
   private val tokenPriceUpdateRate = configuration.get[Int]("blockchain.token.priceUpdateRate")
 
-  private implicit val tokenTickers: Seq[utilities.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
-    utilities.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
+  private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
+    utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
   }
 
   private def add(tokenPrice: TokenPrice): Future[Int] = db.run((tokenPriceTable returning tokenPriceTable.map(_.serial) += tokenPrice).asTry).map {

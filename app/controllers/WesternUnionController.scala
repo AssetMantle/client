@@ -3,7 +3,6 @@ package controllers
 
 import constants.Form
 import controllers.actions.WithLoginActionAsync
-import controllers.view.OtherApp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -43,8 +42,8 @@ class WesternUnionController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  private implicit val otherApps: Seq[utilities.Configuration.OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    utilities.Configuration.OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
 
   def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
