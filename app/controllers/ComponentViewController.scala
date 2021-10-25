@@ -377,17 +377,15 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountTransactionsPerPage(address: String, page: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
-        (for {
-          transactions <- transactions
-        } yield Ok(views.html.component.blockchain.account.accountTransactionsPerPage(transactions))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+  def accountTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
+      (for {
+        transactions <- transactions
+      } yield Ok(views.html.component.blockchain.account.accountTransactionsPerPage(transactions))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def blockList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
@@ -397,38 +395,35 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def blockListPage(pageNumber: Int = 1): EssentialAction = cached.apply(req => req.path, cacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
+  def blockListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val result = if (pageNumber <= 0) Future(BadRequest) else {
+        val blocks = blockchainBlocks.Service.getBlocksPerPage(pageNumber)
+        val validators = blockchainValidators.Service.getAll
 
-        val result = if (pageNumber <= 0) Future(BadRequest) else {
-          val blocks = blockchainBlocks.Service.getBlocksPerPage(pageNumber)
-          val validators = blockchainValidators.Service.getAll
+        def getNumberOfTransactions(blockHeights: Seq[Int]) = blockchainTransactions.Service.getNumberOfTransactions(blockHeights)
 
-          def getNumberOfTransactions(blockHeights: Seq[Int]) = blockchainTransactions.Service.getNumberOfTransactions(blockHeights)
-
-          def getProposers(blocks: Seq[Block], validators: Seq[Validator]): Future[Map[Int, String]] = Future {
-            blocks.map { block =>
-              val validator = validators.find(_.hexAddress == block.proposerAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))
-              block.height -> validator.description.moniker
-            }(collection.breakOut)
-          }
-
-          for {
-            blocks <- blocks
-            validators <- validators
-            proposers <- getProposers(blocks, validators)
-            numberOfTxs <- getNumberOfTransactions(blocks.map(_.height))
-          } yield Ok(views.html.component.blockchain.block.blockListPage(blocks, numberOfTxs, proposers))
+        def getProposers(blocks: Seq[Block], validators: Seq[Validator]): Future[Map[Int, String]] = Future {
+          blocks.map { block =>
+            val validator = validators.find(_.hexAddress == block.proposerAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))
+            block.height -> validator.description.moniker
+          }(collection.breakOut)
         }
 
-        (for {
-          result <- result
-        } yield result
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+        for {
+          blocks <- blocks
+          validators <- validators
+          proposers <- getProposers(blocks, validators)
+          numberOfTxs <- getNumberOfTransactions(blocks.map(_.height))
+        } yield Ok(views.html.component.blockchain.block.blockListPage(blocks, numberOfTxs, proposers))
+      }
+
+      (for {
+        result <- result
+      } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def blockDetails(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
@@ -471,20 +466,18 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionListPage(pageNumber: Int = 1): EssentialAction = cached.apply(req => req.path, cacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
+  def transactionListPage(pageNumber: Int = 1): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
 
-        (if (pageNumber <= 0) Future(BadRequest)
-        else {
-          val transactions = blockchainTransactions.Service.getTransactionsPerPage(pageNumber)
-          for {
-            transactions <- transactions
-          } yield Ok(views.html.component.blockchain.transaction.transactionListPage(transactions))
-        }).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      (if (pageNumber <= 0) Future(BadRequest)
+      else {
+        val transactions = blockchainTransactions.Service.getTransactionsPerPage(pageNumber)
+        for {
+          transactions <- transactions
+        } yield Ok(views.html.component.blockchain.transaction.transactionListPage(transactions))
+      }).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def transactionDetails(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
@@ -710,18 +703,16 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorTransactionsPerPage(address: String, page: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
+  def validatorTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
 
-        (for {
-          transactions <- transactions
-        } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.filter(_.messages.map(_.messageType).distinct != Seq(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD))))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
+      (for {
+        transactions <- transactions
+      } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.filter(_.messages.map(_.messageType).distinct != Seq(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD))))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def identitiesDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
