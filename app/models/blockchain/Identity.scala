@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, AddProvisionAddressIdentity, AddUnprovisionedAddressIdentity, CheckExistsIdentity, CreateIdentity, DelegationActor, DeleteIdentity, DeleteProvisionAddressIdentity, DeleteUnprovisionedAddressIdentity, GetAllIDsByProvisionedIdentity, GetAllIDsByUnProvisionedIdentity, GetAllProvisionAddressesIdentity, GetAllUnprovisionedAddressesIdentity, GetIdentity, IdentityActor, InsertMultipleIdentity, TryGetIdentity}
+import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.DataValue.IDDataValue
@@ -16,6 +20,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -219,6 +224,14 @@ class Identities @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val identityActor = dbActors.Service.actorSystem.actorOf(IdentityActor.props(Identities.this), "identityActor")
+
+    routerActor ! AddActor(None, identityActor.actorRef)
+
+    def createIdentityWithActor(identity: Identity): Future[String] = (masterActor ? CreateIdentity(identity)).mapTo[String]
+
     def create(identity: Identity): Future[String] = {
       val insertProperties = upsertProperty(identity)
 
@@ -244,6 +257,8 @@ class Identities @Inject()(
       }
     }
 
+    def tryGetIdentityWithActor(id: String): Future[Identity] = (masterActor ? TryGetIdentity(id)).mapTo[Identity]
+
     def tryGet(id: String): Future[Identity] = {
       val property = tryGetPropertiesByID(id)
       val provisionedAddresses = getAllProvisionAddresses(id)
@@ -257,6 +272,8 @@ class Identities @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
+
+    def getIdentityWithActor(id: String): Future[Option[Identity]] = (masterActor ? GetIdentity(id)).mapTo[Option[Identity]]
 
     def get(id: String): Future[Option[Identity]] = {
       val property = getPropertiesByID(id)
@@ -272,6 +289,8 @@ class Identities @Inject()(
       }
     }
 
+    def insertMultipleIdentitiesWithActor(identities: Seq[Identity]): Future[Seq[String]] = (masterActor ? InsertMultipleIdentity(identities)).mapTo[Seq[String]]
+
     def insertMultiple(identities: Seq[Identity]): Future[Seq[String]] = {
       utilitiesOperations.traverse(identities) { identity =>
         (for {
@@ -282,6 +301,8 @@ class Identities @Inject()(
         }
       }
     }
+
+    def deleteIdentityWithActor(id: String): Future[Int] = (masterActor ? DeleteIdentity(id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = {
       val deleteProvisioned = deleteAllProvisionedAddressesByID(id)
@@ -297,21 +318,39 @@ class Identities @Inject()(
       } yield 1
     }
 
+    def getAllIDsByProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (masterActor ? GetAllIDsByProvisionedIdentity(address)).mapTo[Seq[String]]
+
     def getAllIDsByProvisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByProvisionedAddress(address)
+
+    def getAllIDsByUnProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (masterActor ? GetAllIDsByUnProvisionedIdentity(address)).mapTo[Seq[String]]
 
     def getAllIDsByUnprovisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByUnprovisionedAddress(address)
 
+    def checkExistsIdentityWithActor(id: String): Future[Boolean] = (masterActor ? CheckExistsIdentity(id)).mapTo[Boolean]
+
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
+
+    def getAllProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (masterActor ? GetAllProvisionAddressesIdentity(id)).mapTo[Seq[String]]
 
     def getAllProvisionAddresses(id: String): Future[Seq[String]] = getAllProvisionedAddressByID(id)
 
+    def getAllUnProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (masterActor ? GetAllUnprovisionedAddressesIdentity(id)).mapTo[Seq[String]]
+
     def getAllUnprovisionAddresses(id: String): Future[Seq[String]] = getAllUnprovisionedAddressByID(id)
+
+    def addProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (masterActor ? AddProvisionAddressIdentity(id, address)).mapTo[String]
 
     def addProvisionAddress(id: String, address: String): Future[String] = addProvisionedAddressByID(id = id, address = address)
 
+    def deleteProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (masterActor ? DeleteProvisionAddressIdentity(id, address)).mapTo[String]
+
     def deleteProvisionAddress(id: String, address: String): Future[Int] = deleteProvisionedAddressByIDAndAddress(id = id, address = address)
 
+    def addUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (masterActor ? AddUnprovisionedAddressIdentity(id, address)).mapTo[String]
+
     def addUnprovisionAddress(id: String, address: String): Future[String] = addUnprovisionedAddressByID(id = id, address = address)
+
+    def deleteUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (masterActor ? DeleteUnprovisionedAddressIdentity(id, address)).mapTo[String]
 
     def deleteUnprovisionAddress(id: String, address: String): Future[Int] = deleteUnprovisionedAddressByIDAndAddress(id = id, address = address)
   }
