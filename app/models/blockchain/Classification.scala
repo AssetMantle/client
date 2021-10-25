@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, BlockActor, CheckExistsClassification, ClassificationActor, CreateClassification, DeleteClassification, GetAllClassification, GetClassification, InsertMultipleClassification, InsertOrUpdateClassification, TryGetClassification}
+import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable._
@@ -11,6 +15,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -111,19 +116,41 @@ class Classifications @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val classificationActor = dbActors.Service.actorSystem.actorOf(ClassificationActor.props(Classifications.this), "classificationActor")
+
+    routerActor ! AddActor(None, classificationActor.actorRef)
+
+    def createClassificationWithActor(classification: Classification): Future[String] = (masterActor ? CreateClassification(classification)).mapTo[String]
+
     def create(classification: Classification): Future[String] = add(classification)
+
+    def tryGetClassificationWithActor(id: String): Future[Classification] = (masterActor ? TryGetClassification(id)).mapTo[Classification]
 
     def tryGet(id: String): Future[Classification] = tryGetByID(id).map(_.deserialize)
 
+    def getClassificationWithActor(id: String): Future[Option[Classification]] = (masterActor ? GetClassification(id)).mapTo[Option[Classification]]
+
     def get(id: String): Future[Option[Classification]] = getByID(id).map(_.map(_.deserialize))
+
+    def getAllClassificationWithActor: Future[Seq[Classification]] = (masterActor ? GetAllClassification()).mapTo[Seq[Classification]]
 
     def getAll: Future[Seq[Classification]] = getAllClassifications.map(_.map(_.deserialize))
 
+    def insertMultipleClassificationWithActor(classifications: Seq[Classification]): Future[Seq[String]] = (masterActor ? InsertMultipleClassification(classifications)).mapTo[Seq[String]]
+
     def insertMultiple(classifications: Seq[Classification]): Future[Seq[String]] = addMultiple(classifications)
+
+    def insertOrUpdateClassificationWithActor(classification: Classification): Future[Int] = (masterActor ? InsertOrUpdateClassification(classification)).mapTo[Int]
 
     def insertOrUpdate(classification: Classification): Future[Int] = upsert(classification)
 
+    def deleteClassificationWithActor(id: String): Future[Int] = (masterActor ? DeleteClassification(id)).mapTo[Int]
+
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def checkExistsClassificationWithActor(id: String): Future[Boolean] = (masterActor ? CheckExistsClassification(id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }

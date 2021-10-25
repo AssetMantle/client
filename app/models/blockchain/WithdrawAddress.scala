@@ -1,5 +1,10 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, CreateWithdrawAddress, GetAllWithdrawAddresses, GetWithdrawAddress, InsertMultipleWithdrawAddress, InsertOrUpdateWithdrawAddress, ProposalVoteActor, WithdrawAddressActor}
+import dbActors.Service.{masterActor, routerActor}
+
 import java.sql.Timestamp
 import exceptions.BaseException
 
@@ -12,6 +17,7 @@ import play.api.{Configuration, Logger}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -91,13 +97,29 @@ class WithdrawAddresses @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val withdrawAddressActor = dbActors.Service.actorSystem.actorOf(WithdrawAddressActor.props(WithdrawAddresses.this), "withdrawAddressActor")
+
+    routerActor ! AddActor(None, withdrawAddressActor.actorRef)
+
+    def createWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[String] = (masterActor ? CreateWithdrawAddress(withdrawAddress)).mapTo[String]
+
     def create(withdrawAddress: WithdrawAddress): Future[String] = add(withdrawAddress)
+
+    def insertMultipleWithdrawAddressWithActor(withdrawAddress: Seq[WithdrawAddress]): Future[Seq[String]] = (masterActor ? InsertMultipleWithdrawAddress(withdrawAddress)).mapTo[Seq[String]]
 
     def insertMultiple(withdrawAddress: Seq[WithdrawAddress]): Future[Seq[String]] = addMultiple(withdrawAddress)
 
+    def insertOrUpdateWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[Int] = (masterActor ? InsertOrUpdateWithdrawAddress(withdrawAddress)).mapTo[Int]
+
     def insertOrUpdate(withdrawAddress: WithdrawAddress): Future[Int] = upsert(withdrawAddress)
 
+    def getAllWithdrawAddressesWithActor: Future[Seq[WithdrawAddress]] = (masterActor ? GetAllWithdrawAddresses()).mapTo[Seq[WithdrawAddress]]
+
     def getAll: Future[Seq[WithdrawAddress]] = findAll
+
+    def getWithdrawAddressWithActor(delegatorAddress: String): Future[String] = (masterActor ? GetWithdrawAddress(delegatorAddress)).mapTo[String]
 
     def get(delegatorAddress: String): Future[String] = getByDelegatorAddress(delegatorAddress).map(_.getOrElse(delegatorAddress))
 

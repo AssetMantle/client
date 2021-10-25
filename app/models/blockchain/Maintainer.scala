@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, BlockActor, CreateMaintainer, DeleteMaintainer, GetAllMaintainer, GetMaintainer, InsertMultipleMaintainer, InsertOrUpdateMaintainer, MaintainerActor, TryGetMaintainer}
+import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable._
@@ -14,6 +18,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -117,17 +122,37 @@ class Maintainers @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val maintainerActor = dbActors.Service.actorSystem.actorOf(MaintainerActor.props(Maintainers.this), "maintainerActor")
+
+    routerActor ! AddActor(None, maintainerActor.actorRef)
+
+    def createMaintainerWithActor(maintainer: Maintainer): Future[String] = (masterActor ? CreateMaintainer(maintainer)).mapTo[String]
+
     def create(maintainer: Maintainer): Future[String] = add(maintainer)
+
+    def tryGetWithActor(id: String): Future[Maintainer] = (masterActor ? TryGetMaintainer(id)).mapTo[Maintainer]
 
     def tryGet(id: String): Future[Maintainer] = tryGetByID(id).map(_.deserialize)
 
+    def getMaintainerWithActor(id: String): Future[Option[Maintainer]] = (masterActor ? GetMaintainer(id)).mapTo[Option[Maintainer]]
+
     def get(id: String): Future[Option[Maintainer]] = getByID(id).map(_.map(_.deserialize))
+
+    def getAllMaintainerWithActor: Future[Seq[Maintainer]] = (masterActor ? GetAllMaintainer()).mapTo[Seq[Maintainer]]
 
     def getAll: Future[Seq[Maintainer]] = getAllMaintainers.map(_.map(_.deserialize))
 
+    def insertMultipleMaintainersWithActor(maintainers: Seq[Maintainer]): Future[Seq[String]] = (masterActor ? InsertMultipleMaintainer(maintainers)).mapTo[Seq[String]]
+
     def insertMultiple(maintainers: Seq[Maintainer]): Future[Seq[String]] = addMultiple(maintainers)
 
+    def insertOrUpdateMaintainerWithActor(maintainer: Maintainer): Future[Seq[String]] = (masterActor ? InsertOrUpdateMaintainer(maintainer)).mapTo[Seq[String]]
+
     def insertOrUpdate(maintainer: Maintainer): Future[Int] = upsert(maintainer)
+
+    def deleteMaintainer(id: String): Future[Int] = (masterActor ? DeleteMaintainer(id)).mapTo[Seq[String]]
 
     def delete(id: String): Future[Int] = deleteByID(id)
   }

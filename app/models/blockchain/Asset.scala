@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AccountActor, AddActor, AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
+import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable._
@@ -15,6 +19,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -121,20 +126,41 @@ class Assets @Inject()(
   }
 
   object Service {
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val assetActor = dbActors.Service.actorSystem.actorOf(AssetActor.props(Assets.this), "assetActor")
+
+    routerActor ! AddActor(None, assetActor.actorRef)
+
+    def createAssetWithActor(asset: Asset): Future[String] = (masterActor ? CreateAsset(asset)).mapTo[String]
 
     def create(asset: Asset): Future[String] = add(asset)
 
+    def tryGetAssetWithActor(id: String): Future[Asset] = (masterActor ? TryGetAsset(id)).mapTo[Asset]
+
     def tryGet(id: String): Future[Asset] = tryGetByID(id).map(_.deserialize)
+
+    def getAssetWithActor(id: String): Future[Option[Asset]] = (masterActor ? GetAsset(id)).mapTo[Option[Asset]]
 
     def get(id: String): Future[Option[Asset]] = getByID(id).map(_.map(_.deserialize))
 
+    def getAllAssetWithActor: Future[Seq[Asset]] = (masterActor ? GetAllAsset()).mapTo[Seq[Asset]]
+
     def getAll: Future[Seq[Asset]] = getAllAssets.map(_.map(_.deserialize))
+
+    def insertMultipleAssetWithActor(assets: Seq[Asset]): Future[Seq[String]] = (masterActor ? InsertMultipleAssets(assets)).mapTo[Seq[String]]
 
     def insertMultiple(assets: Seq[Asset]): Future[Seq[String]] = addMultiple(assets)
 
+    def insertOrUpdateAssetWithActor(asset: Asset): Future[Int] = (masterActor ? InsertOrUpdateAsset(asset)).mapTo[Int]
+
     def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
 
+    def deleteAssetWithActor(id: String): Future[Int] = (masterActor ? DeleteAsset(id)).mapTo[Int]
+
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def checkExistsAssetWithActor(id: String): Future[Boolean] = (masterActor ? CheckExistsAsset(id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }

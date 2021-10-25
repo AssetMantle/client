@@ -3,9 +3,9 @@ package dbActors
 import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.pipe
-import models.Abstract.PublicKey
+import models.blockchain.Balance
+import models.common.Serializable.Coin
 import play.api.Logger
-
 
 import javax.inject.{Inject, Singleton}
 
@@ -20,9 +20,25 @@ class BlockchainActor @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
-    case TryGet(address) => {
+    case Get(address) => {
       println(s"address is fetched $address")
       blockchainBalance.Service.get(address) pipeTo sender()
+      println(self.path)
+    }
+    case Create(address, coins) => {
+      blockchainBalance.Service.create(address, coins) pipeTo sender()
+      println(self.path)
+    }
+    case TryGet(address) => {
+      blockchainBalance.Service.tryGet(address) pipeTo sender()
+      println(self.path)
+    }
+    case InsertOrUpdate(balance) => {
+      blockchainBalance.Service.insertOrUpdate(balance) pipeTo sender()
+      println(self.path)
+    }
+    case GetList(addresses) => {
+      blockchainBalance.Service.getList(addresses) pipeTo sender()
       println(self.path)
     }
   }
@@ -30,6 +46,8 @@ class BlockchainActor @Inject()(
 }
 
 
-case class Create(address: String, username: String, accountType: String, publicKey: Option[PublicKey])
 case class Get(address: String)
 case class TryGet(address: String)
+case class Create(address: String, coins: Seq[Coin])
+case class InsertOrUpdate(balance: Balance)
+case class GetList(addresses: Seq[String])

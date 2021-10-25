@@ -1,23 +1,23 @@
 package dbActors
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.routing.{ RoundRobinRoutingLogic, Router}
+import akka.actor.{Actor, ActorRef}
+import akka.routing.{BroadcastRoutingLogic, Router}
 
-
-
-class Master extends Actor with ActorLogging {
+class RouterActor extends Actor{
   private var privateActorMap = Map[String, ActorRef]()
 
   private var router: Router = {
     val routees = Vector.empty
-    Router(RoundRobinRoutingLogic(), routees)
+    Router(BroadcastRoutingLogic(), routees)
   }
 
   override def receive: Receive = {
-    case "Start" => println("Master Starting")
-    case Get(address) => {
-      router.route(TryGet(address), sender())
+    case "Start" => {
+      println("Starting")
+      println(self)
     }
+    case TryGet(address) =>
+      router.route(Get(address), sender())
     case addActor: AddActor => {
       router = router.addRoutee(addActor.actorRef)
       addActor.username.map(username => privateActorMap += (username -> addActor.actorRef))
@@ -29,3 +29,7 @@ class Master extends Actor with ActorLogging {
   }
 
 }
+
+case class AddActor(username: Option[String], actorRef: ActorRef)
+
+case class RemoveActor(username: Option[String], actorRef: ActorRef)

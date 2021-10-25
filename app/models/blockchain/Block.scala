@@ -1,7 +1,13 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AccountActor, AddActor, BlockActor}
+import dbActors.Service.{masterActor, routerActor}
+
 import java.sql.Timestamp
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
@@ -11,6 +17,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import java.time.Duration
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -115,15 +122,33 @@ class Blocks @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val blockActor = dbActors.Service.actorSystem.actorOf(BlockActor.props(Blocks.this), "blockActor")
+
+    routerActor ! AddActor(None, blockActor.actorRef)
+
+    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (masterActor ? dbActors.CreateBlock(height, time, proposerAddress, validators)).mapTo[String]
+
     def create(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
+
+    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (masterActor ? dbActors.InsertOrUpdateBlock(height, time, proposerAddress, validators)).mapTo[Int]
 
     def insertOrUpdate(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
+    def tryGetBlockWithActor(height: Int): Future[Block] = (masterActor ? dbActors.TryGetBlock(height)).mapTo[Block]
+
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
+
+    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (masterActor ? dbActors.TryGetProposerAddressBlock(height)).mapTo[String]
 
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
+    def getLatestBlockHeightWithActor: Future[Int] = (masterActor ? dbActors.GetLatestBlockHeight()).mapTo[Int]
+
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
+
+    def getLatestBlockWithActor: Future[Block] = (masterActor ? dbActors.GetLatestBlock()).mapTo[Block]
 
     def getLatestBlock: Future[Block] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -133,6 +158,8 @@ class Blocks @Inject()(
       } yield block
     }
 
+    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (masterActor ? dbActors.GetBlocksPerPage(pageNumber)).mapTo[Seq[Block]]
+
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
       for {
@@ -140,6 +167,8 @@ class Blocks @Inject()(
         blockList <- getBlocksByHeightRange(latestBlockHeight - pageNumber * blocksPerPage + 1 to latestBlockHeight - (pageNumber - 1) * blocksPerPage).map(_.map(_.deserialize))
       } yield blockList
     }
+
+    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (masterActor ? dbActors.GetLastNBlocks(n)).mapTo[Seq[Block]]
 
     def getLastNBlocks(n: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
