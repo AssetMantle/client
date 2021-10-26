@@ -105,27 +105,25 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
 
-    private val blockchainActor = dbActors.Service.actorSystem2.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+    private val blockchainActor = dbActors.Service.actorSystem1.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
 
-    routerActor ! AddActor(None, blockchainActor.actorRef)
-
-    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (masterActor ? dbActors.Create(address, coins)).mapTo[String]
+    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (blockchainActor ? dbActors.Create(address, coins)).mapTo[String]
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
-    def tryGetWithActor(address: String): Future[Balance] = (masterActor ? dbActors.TryGet(address)).mapTo[Balance]
+    def tryGetWithActor(address: String): Future[Balance] = (blockchainActor ? dbActors.TryGet(address)).mapTo[Balance]
 
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 
-    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (masterActor ? dbActors.InsertOrUpdate(balance)).mapTo[Int]
+    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (blockchainActor ? dbActors.InsertOrUpdate(balance)).mapTo[Int]
 
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)
 
-    def getWithActor(address: String): Future[Option[Balance]] = (masterActor ? dbActors.Get(address)).mapTo[Option[Balance]]
+    def getWithActor(address: String): Future[Option[Balance]] = (blockchainActor ? dbActors.Get(address)).mapTo[Option[Balance]]
 
     def get(address: String): Future[Option[Balance]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (masterActor ? dbActors.GetList(addresses)).mapTo[Seq[Balance]]
+    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (blockchainActor ? dbActors.GetList(addresses)).mapTo[Seq[Balance]]
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 

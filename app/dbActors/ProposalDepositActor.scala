@@ -30,7 +30,7 @@ class ProposalDepositActor @Inject()(
       blockchainProposalDeposit.Service.tryGet(proposalID) pipeTo sender()
       println(self.path)
     }
-    case GetProposalDeposit(proposalID, depositor) => {
+    case GetProposalDepositWithActor(proposalID, depositor) => {
       blockchainProposalDeposit.Service.get(proposalID, depositor) pipeTo sender()
       println(self.path)
     }
@@ -50,7 +50,7 @@ class ProposalDepositActor @Inject()(
 
 case class TryGetProposalDeposit(proposalID: Int)
 case class InsertOrUpdateProposalDeposit(proposalDeposit: ProposalDeposit)
-case class GetProposalDeposit(proposalID: Int, depositor: String)
+case class GetProposalDepositWithActor(proposalID: Int, depositor: String)
 case class DeleteByProposalDepositId(id: Int)
 case class GetByProposalDepositId(id: Int)
 

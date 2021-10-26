@@ -1,30 +1,29 @@
 package dbActors
 
 import akka.actor.{ActorSystem, Props}
+import akka.management.cluster.bootstrap.ClusterBootstrap
+import akka.management.scaladsl.AkkaManagement
 import com.typesafe.config.ConfigFactory
 
 object Service {
 
-  val config1 = ConfigFactory.parseString(
-    s"""
-       |akka.remote.artery.canonical.port = 2551
-       |""".stripMargin)
-    .withFallback(ConfigFactory.load("clustering/clustering.conf"))
-  val config2 = ConfigFactory.parseString(
-    s"""
-       |akka.remote.artery.canonical.port = 2552
-       |""".stripMargin)
-    .withFallback(ConfigFactory.load("clustering/clustering.conf"))
 
-  implicit val actorSystem1: ActorSystem = ActorSystem("blockChainActorSystem",config1)
-  implicit val actorSystem: ActorSystem = ActorSystem("blockChainActorSystem",config1)
+  implicit val actorSystem: ActorSystem = ActorSystem("client",ConfigFactory.load("clustering/clustering.conf"))
 
-  implicit val actorSystem2: ActorSystem = ActorSystem("blockChainActorSystem",config2)
+  implicit val actorSystem1: ActorSystem = ActorSystem("client",ConfigFactory.load("clustering/clustering.conf"))
+
+  implicit val actorSystem2: ActorSystem = ActorSystem("client",ConfigFactory.load("clustering/clustering.conf"))
 
 
-  val routerActor = actorSystem2.actorOf(Props[RouterActor](), "routerActor")
+  val routerActor = actorSystem1.actorOf(Props[RouterActor](), "routerActor")
 
   val masterActor = actorSystem1.actorOf(Props[Master](), "master")
+
+  def startAkka() = {
+    AkkaManagement(actorSystem1).start()
+    ClusterBootstrap(actorSystem1).start()
+  }
+
 
 
 }

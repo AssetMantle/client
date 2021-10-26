@@ -19,6 +19,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 lazy val akkaVersion = "2.6.3"
 
+lazy val AkkaManagementVersion = "1.1.1"
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
@@ -87,6 +88,14 @@ libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
 libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
 
 libraryDependencies += "io.aeron" % "aeron-client" % "1.32.0"
+
+libraryDependencies += "com.lightbend.akka.management" %% "akka-management-cluster-http" % AkkaManagementVersion
+
+libraryDependencies += "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % AkkaManagementVersion
+
+libraryDependencies += "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % AkkaManagementVersion
+
+
 
 enablePlugins(JavaServerAppPackaging)
 

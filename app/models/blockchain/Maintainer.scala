@@ -152,7 +152,7 @@ class Maintainers @Inject()(
 
     def insertOrUpdate(maintainer: Maintainer): Future[Int] = upsert(maintainer)
 
-    def deleteMaintainer(id: String): Future[Int] = (masterActor ? DeleteMaintainer(id)).mapTo[Seq[String]]
+    def deleteMaintainer(id: String): Future[Int] = (masterActor ? DeleteMaintainer(id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
   }

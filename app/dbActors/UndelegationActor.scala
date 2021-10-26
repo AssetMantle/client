@@ -34,10 +34,6 @@ class UndelegationActor @Inject()(
       blockchainUndelegation.Service.insertOrUpdate(undelegation) pipeTo sender()
       println(self.path)
     }
-    case InsertMultipleUndelegation(undelegations) => {
-      blockchainUndelegation.Service.insertMultiple(undelegations) pipeTo sender()
-      println(self.path)
-    }
     case GetAllUndelegationByDelegator(address) => {
       blockchainUndelegation.Service.getAllByDelegator(address) pipeTo sender()
       println(self.path)

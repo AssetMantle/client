@@ -30,7 +30,7 @@ class ProposalActor @Inject()(
       blockchainProposal.Service.tryGet(id) pipeTo sender()
       println(self.path)
     }
-    case GetProposal(id) => {
+    case GetProposalWithActor(id) => {
       blockchainProposal.Service.get(id) pipeTo sender()
       println(self.path)
     }
@@ -61,7 +61,7 @@ class ProposalActor @Inject()(
 case class TryGetProposal(id: Int)
 case class InsertOrUpdateProposal(proposal: Proposal)
 case class GetAllProposal()
-case class GetProposal(id: Int)
+case class GetProposalWithActor(id: Int)
 case class GetLatestProposalID()
 case class GetAllActiveProposals(time: String)
 case class GetAllInActiveProposals(time: String)

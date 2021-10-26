@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.Service.{masterActor, routerActor}
+import dbActors.{AddActor, CheckIfExistsMeta, CreateData, CreateMeta, GetData, GetDataList, GetList, GetMeta, GetMetaList, GetMetas, InsertMultipleData, InsertMultipleMetas, InsertOrUpdateData, InsertOrUpdateMeta, MaintainerActor, MetaActor, TryGetData, TryGetMeta}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.DataValue
@@ -13,6 +17,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -96,31 +101,65 @@ class Metas @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val metaActor = dbActors.Service.actorSystem.actorOf(MetaActor.props(Metas.this), "metaActor")
+
+    routerActor ! AddActor(None, metaActor.actorRef)
+
+    def createDataWithActor(data: Data): Future[String] = (masterActor ? CreateData(data)).mapTo[String]
+
     def create(data: Data): Future[String] = add(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
+
+    def createMetaWithActor(meta: Meta): Future[String] = (masterActor ? CreateMeta(meta)).mapTo[String]
 
     def create(meta: Meta): Future[String] = add(meta)
 
+    def tryGetMetaWithActor(id: String, dataType: String): Future[Meta] = (masterActor ? TryGetMeta(id, dataType)).mapTo[Meta]
+
     def tryGet(id: String, dataType: String): Future[Meta] = tryGetByIDAndDataType(id = id, dataType = dataType)
+
+    def tryGetDataWithActor(id: String, dataType: String): Future[Data] = (masterActor ? TryGetData(id, dataType)).mapTo[Data]
 
     def tryGetData(id: String, dataType: String): Future[Data] = tryGetByIDAndDataType(id = id, dataType = dataType).map(x => DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))
 
+    def getMetaWithActor(id: String, dataType: String): Future[Option[Meta]] = (masterActor ? GetMeta(id, dataType)).mapTo[Option[Meta]]
+
     def get(id: String, dataType: String): Future[Option[Meta]] = getByIDAndDataType(id = id, dataType = dataType)
+
+    def getDataWithActor(id: String, dataType: String): Future[Option[Data]] = (masterActor ? GetData(id, dataType)).mapTo[Option[Data]]
 
     def getData(id: String, dataType: String): Future[Option[Data]] = getByIDAndDataType(id = id, dataType = dataType).map(metaOption => metaOption.fold[Option[Data]](None)(x => Option(DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))))
 
+    def getMetasWithActor(ids: Seq[String]): Future[Seq[Meta]] = (masterActor ? GetMetas(ids)).mapTo[Seq[Meta]]
+
     def get(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
+
+    def getDataListWithActor(ids: Seq[String]): Future[Seq[Data]] = (masterActor ? GetDataList(ids)).mapTo[Seq[Data]]
 
     def getDataList(ids: Seq[String]): Future[Seq[Data]] = getByIDs(ids.filter(x => x != "")).map(_.map(meta => DataValue.getData(dataType = meta.dataType, dataValue = Option(meta.dataValue))))
 
+    def getListWithActor(ids: Seq[String]): Future[Seq[Meta]] = (masterActor ? GetMetaList(ids)).mapTo[Seq[Meta]]
+
     def getList(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
+
+    def insertMultipleMetasWithActor(metaList: Seq[Meta]): Future[Seq[String]] = (masterActor ? InsertMultipleMetas(metaList)).mapTo[Seq[String]]
 
     def insertMultiple(metaList: Seq[Meta]): Future[Seq[String]] = addMultiple(metaList)
 
+    def insertMultipleDataWithActor(dataList: Seq[Data]): Future[Seq[String]] = (masterActor ? InsertMultipleData(dataList)).mapTo[Seq[String]]
+
     def insertMultipleData(dataList: Seq[Data]): Future[Seq[String]] = addMultiple(dataList.map(x => Meta(id = x.value.generateHash, dataType = x.dataType, dataValue = x.value.asString)))
+
+    def insertOrUpdateMetaWithActor(meta: Meta): Future[Int] = (masterActor ? InsertOrUpdateMeta(meta)).mapTo[Int]
 
     def insertOrUpdate(meta: Meta): Future[Int] = upsert(meta)
 
+    def insertOrUpdateDataWithActor(data: Data): Future[Int] = (masterActor ? InsertOrUpdateData(data)).mapTo[Int]
+
     def insertOrUpdate(data: Data): Future[Int] = upsert(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
+
+    def checkIfExistsMetaWithActor(id: String, dataType: String): Future[Boolean] = (masterActor ? CheckIfExistsMeta(id, dataType)).mapTo[Boolean]
 
     def checkIfExists(id: String, dataType: String): Future[Boolean] = checkIfExistsByIDAndDataType(id = id, dataType = dataType)
 

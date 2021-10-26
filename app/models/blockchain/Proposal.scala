@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, DelegationActor, DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposal, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
+import dbActors.{AddActor, DelegationActor, DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
 import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Abstract.ProposalContent
@@ -183,7 +183,7 @@ class Proposals @Inject()(
 
     def insertOrUpdate(proposal: Proposal): Future[Int] = upsert(proposal)
 
-    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (masterActor ? GetProposal(id)).mapTo[Option[Proposal]]
+    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (masterActor ? GetProposalWithActor(id)).mapTo[Option[Proposal]]
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 

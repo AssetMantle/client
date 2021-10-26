@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, TryGetUndelegation}
+import dbActors.{AddActor, CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, TryGetUndelegation, UndelegationActor}
 import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 
@@ -130,7 +130,7 @@ class Undelegations @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val undelegationActor = dbActors.Service.actorSystem.actorOf(RedelegationActor.props(Undelegations.this), "undelegationActor")
+    private val undelegationActor = dbActors.Service.actorSystem.actorOf(UndelegationActor.props(Undelegations.this), "undelegationActor")
 
     routerActor ! AddActor(None, undelegationActor.actorRef)
 

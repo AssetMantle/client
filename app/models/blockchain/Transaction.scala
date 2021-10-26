@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
+import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.{Fee, StdMsg}
@@ -11,6 +15,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -165,27 +170,57 @@ class Transactions @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val transactionActor = dbActors.Service.actorSystem.actorOf(TransactionActor.props(Transactions.this), "transactionActor")
+
+    routerActor ! AddActor(None, transactionActor.actorRef)
+
+    def createTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (masterActor ? CreateTransaction(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
+
     def create(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
+
+    def insertMultipleTransactionWithActor(transactions: Seq[Transaction]): Future[Seq[Int]] = (masterActor ? InsertMultipleTransaction(transactions)).mapTo[Seq[Int]]
 
     def insertMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
 
+    def insertOrUpdateTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (masterActor ? InsertOrUpdateTransaction(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
+
     def insertOrUpdate(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
+
+    def tryGetTransactionWithActor(hash: String): Future[Transaction] = (masterActor ? TryGetTransaction(hash)).mapTo[Transaction]
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash).map(_.deserialize)
 
+    def tryGetMessagesTransactionWithActor(hash: String): Future[Transaction] = (masterActor ? TryGetMessages(hash)).mapTo[Transaction]
+
     def tryGetMessages(hash: String): Future[Seq[StdMsg]] = tryGetMessagesByHash(hash).map(x => utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](x))
+
+    def tryGetStatusTransactionWithActor(hash: String): Future[Transaction] = (masterActor ? TryGetStatus(hash)).mapTo[Transaction]
 
     def tryGetStatus(hash: String): Future[Boolean] = tryGetStatusByHash(hash)
 
+    def tryGetHeightTransactionWithActor(hash: String): Future[Transaction] = (masterActor ? TryGetHeight(hash)).mapTo[Transaction]
+
     def tryGetHeight(hash: String): Future[Int] = tryGetHeightByHash(hash)
+
+    def getTransactionsWithActor(height: Int): Future[Seq[Transaction]] = (masterActor ? GetTransactions(height)).mapTo[Seq[Transaction]]
 
     def getTransactions(height: Int): Future[Seq[Transaction]] = getTransactionsByHeight(height).map(x => x.map(_.deserialize))
 
+    def getTransactionsByAddressWithActor(address: String): Future[Seq[Transaction]] = (masterActor ? GetTransactionsByAddress(address)).mapTo[Seq[Transaction]]
+
     def getTransactionsByAddress(address: String): Future[Seq[Transaction]] = findTransactionsForAddress(address).map(x => x.map(_.deserialize))
+
+    def getTransactionsPerPageByAddressWithActor(address: String, pageNumber: Int): Future[Seq[Transaction]] = (masterActor ? GetTransactionsPerPageByAddress(address, pageNumber)).mapTo[Seq[Transaction]]
 
     def getTransactionsPerPageByAddress(address: String, pageNumber: Int): Future[Seq[Transaction]] = findTransactionsPerPageForAddress(address = address, offset = (pageNumber - 1) * accountTransactionsPerPage, limit = accountTransactionsPerPage).map(x => x.map(_.deserialize))
 
+    def getNumberOfTransactionsWithActor(height: Int): Future[Int] = (masterActor ? GetNumberOfTransactions(height)).mapTo[Int]
+
     def getNumberOfTransactions(height: Int): Future[Int] = getNumberOfTransactionsByHeight(height)
+
+    def getNumberOfBlockTransactionsWithActor(blockHeights: Seq[Int]): Future[Int] = (masterActor ? GetNumberOfBlockTransactions(blockHeights)).mapTo[Int]
 
     def getNumberOfTransactions(blockHeights: Seq[Int]): Future[Map[Int, Int]] = {
       val transactions = getTransactionsByHeightList(blockHeights).map(_.map(_.deserialize))
@@ -194,6 +229,8 @@ class Transactions @Inject()(
         transactions <- transactions
       } yield blockHeights.map(height => height -> transactions.count(_.height == height)).toMap
     }
+
+    def getTransactionsPerPageWithActor(pageNumber: Int): Future[Seq[Transaction]] = (masterActor ? GetTransactionsPerPage(pageNumber)).mapTo[Seq[Transaction]]
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
   }
