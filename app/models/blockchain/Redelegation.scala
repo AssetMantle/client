@@ -1,5 +1,10 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.{AddActor, CreateRedelegation, DeleteRedelegation, GetAllRedelegation, GetAllRedelegationBySourceValidator, InsertMultipleRedelegation, InsertOrUpdateRedelegation, ParameterActor, RedelegationActor, TryGetRedelegation}
+import dbActors.Service.{masterActor, routerActor}
+
 import java.sql.Timestamp
 import exceptions.BaseException
 
@@ -19,6 +24,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -122,17 +128,37 @@ class Redelegations @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val redelegationActor = dbActors.Service.actorSystem.actorOf(RedelegationActor.props(Redelegations.this), "redelegationActor")
+
+    routerActor ! AddActor(None, redelegationActor.actorRef)
+
+    def createRedelegationWithActor(redelegation: Redelegation): Future[String] = (masterActor ? CreateRedelegation(redelegation)).mapTo[String]
+
     def create(redelegation: Redelegation): Future[String] = add(redelegation)
+
+    def insertMultipleRedelegationWithActor(redelegations: Seq[Redelegation]): Future[Seq[String]] = (masterActor ? InsertMultipleRedelegation(redelegations)).mapTo[Seq[String]]
 
     def insertMultiple(redelegations: Seq[Redelegation]): Future[Seq[String]] = addMultiple(redelegations)
 
+    def insertOrUpdateRedelegationWithActor(redelegation: Redelegation): Future[Int] = (masterActor ? InsertOrUpdateRedelegation(redelegation)).mapTo[Int]
+
     def insertOrUpdate(redelegation: Redelegation): Future[Int] = upsert(redelegation)
+
+    def getAllBySourceValidatorRedelegationWithActor(address: String): Future[Seq[Redelegation]] = (masterActor ? GetAllRedelegationBySourceValidator(address)).mapTo[Seq[Redelegation]]
 
     def getAllBySourceValidator(address: String): Future[Seq[Redelegation]] = findAllByValidatorSource(address).map(_.map(_.deserialize))
 
+    def getAllRedelegationWithActor: Future[Seq[Redelegation]] = (masterActor ? GetAllRedelegation).mapTo[Seq[Redelegation]]
+
     def getAll: Future[Seq[Redelegation]] = findAll.map(_.map(_.deserialize))
 
+    def deleteRedelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = (masterActor ? DeleteRedelegation(delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Int]
+
     def delete(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = deleteByAddresses(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress)
+
+    def tryGetDelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = (masterActor ? TryGetRedelegation(delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Redelegation]
 
     def tryGet(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress).map(_.deserialize)
   }

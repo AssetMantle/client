@@ -1,5 +1,9 @@
 package models.blockchain
 
+import akka.pattern.ask
+import akka.util.Timeout
+import dbActors.Service.{masterActor, routerActor}
+import dbActors.{AddActor, CheckExistsOrder, CreateOrder, DeleteOrder, GetAllOrder, GetAllPrivateOrderIDs, GetAllPublicOrderIDs, GetOrder, InsertMultipleOrder, InsertOrUpdateOrder, MaintainerActor, OrderActor, TryGetOrder}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.DataValue._
@@ -15,6 +19,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -139,23 +144,49 @@ class Orders @Inject()(
 
   object Service {
 
+    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+
+    private val orderActor = dbActors.Service.actorSystem.actorOf(OrderActor.props(Orders.this), "orderActor")
+
+    routerActor ! AddActor(None, orderActor.actorRef)
+
+    def createOrderWithActor(order: Order): Future[String] = (masterActor ? CreateOrder(order)).mapTo[String]
+
     def create(order: Order): Future[String] = add(order)
+
+    def tryGetOrderWithActor(id: String): Future[Order] = (masterActor ? TryGetOrder(id)).mapTo[Order]
 
     def tryGet(id: String): Future[Order] = tryGetByID(id).map(_.deserialize)
 
+    def getOrderWithActor(id: String): Future[Option[Order]] = (masterActor ? GetOrder(id)).mapTo[Option[Order]]
+
     def get(id: String): Future[Option[Order]] = getByID(id).map(_.map(_.deserialize))
+
+    def getAllOrderWithActor: Future[Seq[Order]] = (masterActor ? GetAllOrder()).mapTo[Seq[Order]]
 
     def getAll: Future[Seq[Order]] = getAllOrders.map(_.map(_.deserialize))
 
+    def insertMultipleOrderWithActor(orders: Seq[Order]): Future[Seq[String]] = (masterActor ? InsertMultipleOrder(orders)).mapTo[Seq[String]]
+
     def insertMultiple(orders: Seq[Order]): Future[Seq[String]] = addMultiple(orders)
+
+    def insertOrUpdateOrderWithActor(order: Order): Future[Int] = (masterActor ? InsertOrUpdateOrder(order)).mapTo[Int]
 
     def insertOrUpdate(order: Order): Future[Int] = upsert(order)
 
+    def deleteOrderWithActor(id: String): Future[Int] = (masterActor ? DeleteOrder(id)).mapTo[Int]
+
     def delete(id: String): Future[Int] = deleteByID(id)
+
+    def checkExistsOrderWithActor(id: String): Future[Boolean] = (masterActor ? CheckExistsOrder(id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
 
+    def getAllPublicOrderIDsOrderWithActor: Future[Seq[String]] = (masterActor ? GetAllPublicOrderIDs()).mapTo[Seq[String]]
+
     def getAllPublicOrderIDs: Future[Seq[String]] = getAllOrders.map(_.map(_.deserialize).filter(_.getTakerID.fact.hash == "").map(_.id))
+
+    def getAllPrivateOrderIDsOrderWithActor(identityIDs: Seq[String]): Future[Seq[String]] = (masterActor ? GetAllPrivateOrderIDs(identityIDs)).mapTo[Seq[String]]
 
     def getAllPrivateOrderIDs(identityIDs: Seq[String]): Future[Seq[String]] = {
       val hashedIdentityIDs = identityIDs.map(utilities.Hash.getHash(_))
