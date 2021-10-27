@@ -709,7 +709,7 @@ class ComponentViewController @Inject()(
 
       (for {
         transactions <- transactions
-      } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.filter(_.messages.map(_.messageType).distinct != Seq(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD))))
+      } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
