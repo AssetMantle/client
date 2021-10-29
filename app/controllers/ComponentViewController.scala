@@ -208,11 +208,11 @@ class ComponentViewController @Inject()(
   def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val latestBlock = blockchainBlocks.Service.getLatestBlockWithActor
 
         def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
-        def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerName(proposerAddress)
+        def getProposer(proposerAddress: String) = blockchainValidators.Service.tryGetProposerNameWithActor(proposerAddress)
 
         (for {
           latestBlock <- latestBlock
@@ -228,7 +228,7 @@ class ComponentViewController @Inject()(
   def tokensStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val token = blockchainTokens.Service.getStakingToken
+        val token = blockchainTokens.Service.getStakingTokenWithActor
         (for {
           token <- token
         } yield Ok(views.html.component.blockchain.tokensStatistics(token = token))
@@ -241,7 +241,7 @@ class ComponentViewController @Inject()(
   def votingPowers(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
+        val allSortedValidators = blockchainValidators.Service.getAllValidatorsWithActor.map(_.sortBy(_.tokens).reverse)
 
         def getVotingPowerMap(sortedBondedValidators: Seq[Validator]): ListMap[String, Double] = sortedBondedValidators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
 
@@ -274,11 +274,11 @@ class ComponentViewController @Inject()(
       implicit request =>
         val operatorAddress = Future(utilities.Bech32.convertAccountAddressToOperatorAddress(address))
         val balances = blockchainBalances.Service.getWithActor(address)
-        val delegations = blockchainDelegations.Service.getAllForDelegator(address)
-        val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
-        val allDenoms = blockchainTokens.Service.getAllDenoms
+        val delegations = blockchainDelegations.Service.getAllDelegationForDelegatorWithActor(address)
+        val undelegations = blockchainUndelegations.Service.getAllUndelegationByDelegatorWithActor(address)
+        val allDenoms = blockchainTokens.Service.getAllDenomsWithActor
 
-        def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
+        def isValidator(operatorAddress: String) = blockchainValidators.Service.existsValidatorWithActor(operatorAddress)
 
         def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[Coin] = if (isValidator) {
           getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
@@ -286,7 +286,7 @@ class ComponentViewController @Inject()(
 
         def getDelegationRewards(delegatorAddress: String): Future[Coin] = getDelegatorRewards.Service.get(delegatorAddress).map(_.total.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
 
-        def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
+        def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddressesWithActor(operatorAddresses)
 
         def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(stakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum)
 
@@ -312,9 +312,9 @@ class ComponentViewController @Inject()(
   def accountDelegations(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val delegations = blockchainDelegations.Service.getAllForDelegator(address)
-        val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
-        val validators = blockchainValidators.Service.getAll
+        val delegations = blockchainDelegations.Service.getAllDelegationForDelegatorWithActor(address)
+        val undelegations = blockchainUndelegations.Service.getAllUndelegationByDelegatorWithActor(address)
+        val validators = blockchainValidators.Service.getAllValidatorsWithActor
 
         def getDelegationsMap(delegations: Seq[Delegation], validators: Seq[Validator]) = ListMap(delegations.map(delegation => delegation.validatorAddress -> validators.find(_.operatorAddress == delegation.validatorAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND)).getTokensFromShares(delegation.shares)): _*)
 
@@ -343,7 +343,7 @@ class ComponentViewController @Inject()(
   def accountTransactionsPerPage(address: String, page: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
+        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddressWithActor(address, page)
         (for {
           transactions <- transactions
         } yield Ok(views.html.component.blockchain.account.accountTransactionsPerPage(transactions))
@@ -365,10 +365,10 @@ class ComponentViewController @Inject()(
       implicit request =>
 
         val result = if (pageNumber <= 0) Future(BadRequest) else {
-          val blocks = blockchainBlocks.Service.getBlocksPerPage(pageNumber)
-          val validators = blockchainValidators.Service.getAll
+          val blocks = blockchainBlocks.Service.getBlocksPerPageWithActor(pageNumber)
+          val validators = blockchainValidators.Service.getAllValidatorsWithActor
 
-          def getNumberOfTransactions(blockHeights: Seq[Int]) = blockchainTransactions.Service.getNumberOfTransactions(blockHeights)
+          def getNumberOfTransactions(blockHeights: Seq[Int]) = blockchainTransactions.Service.getNumberOfBlockTransactionsWithActor(blockHeights)
 
           def getProposers(blocks: Seq[Block], validators: Seq[Validator]): Future[Map[Int, String]] = Future {
             blocks.map { block =>
@@ -397,10 +397,10 @@ class ComponentViewController @Inject()(
   def blockDetails(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val block = blockchainBlocks.Service.tryGet(height)
-        val numTxs = blockchainTransactions.Service.getNumberOfTransactions(height)
+        val block = blockchainBlocks.Service.tryGetBlockWithActor(height)
+        val numTxs = blockchainTransactions.Service.getNumberOfTransactionsWithActor(height)
 
-        def getProposer(hexAddress: String) = blockchainValidators.Service.tryGetProposerName(hexAddress)
+        def getProposer(hexAddress: String) = blockchainValidators.Service.tryGetProposerNameWithActor(hexAddress)
 
         (for {
           block <- block
@@ -416,7 +416,7 @@ class ComponentViewController @Inject()(
   def blockTransactions(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transactions = blockchainTransactions.Service.getTransactions(height)
+        val transactions = blockchainTransactions.Service.getTransactionsWithActor(height)
 
         (for {
           transactions <- transactions
@@ -440,7 +440,7 @@ class ComponentViewController @Inject()(
 
         (if (pageNumber <= 0) Future(BadRequest)
         else {
-          val transactions = blockchainTransactions.Service.getTransactionsPerPage(pageNumber)
+          val transactions = blockchainTransactions.Service.getTransactionsPerPageWithActor(pageNumber)
           for {
             transactions <- transactions
           } yield Ok(views.html.component.blockchain.transaction.transactionListPage(transactions))
@@ -453,7 +453,7 @@ class ComponentViewController @Inject()(
   def transactionDetails(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transaction = blockchainTransactions.Service.tryGet(txHash)
+        val transaction = blockchainTransactions.Service.tryGetTransactionWithActor(txHash)
         (for {
           transaction <- transaction
         }
@@ -467,7 +467,7 @@ class ComponentViewController @Inject()(
   def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transaction = blockchainTransactions.Service.tryGet(txHash)
+        val transaction = blockchainTransactions.Service.tryGetTransactionWithActor(txHash)
         (for {
           transaction <- transaction
         } yield {
@@ -490,7 +490,7 @@ class ComponentViewController @Inject()(
   def transactionMessages(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val messages = blockchainTransactions.Service.tryGetMessages(txHash)
+        val messages = blockchainTransactions.Service.tryGetMessagesTransactionWithActor(txHash)
 
         (for {
           messages <- messages
@@ -504,7 +504,7 @@ class ComponentViewController @Inject()(
   def proposalList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposals = blockchainProposals.Service.get()
+        val proposals = blockchainProposals.Service.getProposalsWithActor()
         (for {
           proposals <- proposals
         } yield Ok(views.html.component.blockchain.proposal.proposalList(proposals))
@@ -517,7 +517,7 @@ class ComponentViewController @Inject()(
   def proposalDetails(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposal = blockchainProposals.Service.tryGet(id)
+        val proposal = blockchainProposals.Service.tryGetProposalWithActor(id)
         (for {
           proposal <- proposal
         } yield Ok(views.html.component.blockchain.proposal.proposalDetails(proposal))
@@ -530,7 +530,7 @@ class ComponentViewController @Inject()(
   def proposalDeposits(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposalDeposits = blockchainProposalDeposits.Service.getByProposalID(id)
+        val proposalDeposits = blockchainProposalDeposits.Service.getByProposalIDWithActor(id)
         (for {
           proposalDeposits <- proposalDeposits
         } yield Ok(views.html.component.blockchain.proposal.proposalDeposits(proposalDeposits))
@@ -543,7 +543,7 @@ class ComponentViewController @Inject()(
   def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
+        val proposalVotes = blockchainProposalVotes.Service.getAllProposalVoteByIDWithActor(id)
         (for {
           proposalVotes <- proposalVotes
         } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes))
@@ -563,7 +563,7 @@ class ComponentViewController @Inject()(
   def activeValidatorList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val validators = blockchainValidators.Service.getAllActiveValidatorList
+        val validators = blockchainValidators.Service.getAllActiveValidatorListWithActor
 
         def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
 
@@ -580,7 +580,7 @@ class ComponentViewController @Inject()(
   def inactiveValidatorList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val validators = blockchainValidators.Service.getAllInactiveValidatorList
+        val validators = blockchainValidators.Service.getAllInActiveValidatorListWithActor
 
         def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
 
@@ -597,8 +597,8 @@ class ComponentViewController @Inject()(
   def validatorDetails(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val validator = blockchainValidators.Service.tryGet(address)
-        val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
+        val validator = blockchainValidators.Service.tryGetValidatorWithActor(address)
+        val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmountWithActor
 
         def keyBaseValidator(address: String): Future[Option[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(address)
 
@@ -616,8 +616,8 @@ class ComponentViewController @Inject()(
   def validatorUptime(address: String, n: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetHexAddress(address)
-        val lastNBlocks = blockchainBlocks.Service.getLastNBlocks(n)
+        val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetValidatorHexAddressWithActor(address)
+        val lastNBlocks = blockchainBlocks.Service.getLastNBlocksWithActor(n)
 
         def getUptime(lastNBlocks: Seq[Block], validatorHexAddress: String): Double = (lastNBlocks.count(block => block.validators.contains(validatorHexAddress)) * 100.0) / n
 
@@ -636,10 +636,10 @@ class ComponentViewController @Inject()(
   def validatorDelegations(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
-        val validator = blockchainValidators.Service.tryGet(address)
+        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetValidatorOperatorAddressWithActor(address) else Future(address)
+        val validator = blockchainValidators.Service.tryGetValidatorWithActor(address)
 
-        def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllForValidator(operatorAddress)
+        def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllDelegationForValidatorWithActor(operatorAddress)
 
         def getDelegationsMap(delegations: Seq[Delegation], validator: Validator) = Future {
           val selfDelegated = delegations.find(x => x.delegatorAddress == utilities.Bech32.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
@@ -663,7 +663,7 @@ class ComponentViewController @Inject()(
   def validatorTransactions(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
+        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetValidatorOperatorAddressWithActor(address) else Future(address)
         (for {
           operatorAddress <- operatorAddress
         } yield Ok(views.html.component.blockchain.validator.validatorTransactions(operatorAddress))
@@ -676,7 +676,7 @@ class ComponentViewController @Inject()(
   def validatorTransactionsPerPage(address: String, page: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddress(address, page)
+        val transactions = blockchainTransactions.Service.getTransactionsPerPageByAddressWithActor(address, page)
 
         (for {
           transactions <- transactions
@@ -802,7 +802,7 @@ class ComponentViewController @Inject()(
 
   def ordersTakePublic(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDs
+      val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDsOrderWithActor
 
       def getPublicOrders(publicOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(publicOrderIDs)
 
@@ -819,7 +819,7 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
 
-      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs)
+      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDsOrderWithActor(identityIDs)
 
       def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
 
@@ -836,9 +836,9 @@ class ComponentViewController @Inject()(
   def accountSplits(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
-      val allDenoms = blockchainTokens.Service.getAllDenoms
+      val allDenoms = blockchainTokens.Service.getAllDenomsWithActor
 
-      def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getByOwnerIDs(identityIDs)
+      def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getSplitByOwnerIDsWithActo(identityIDs)
 
       def getAssets(splitIDs: Seq[String]) = masterAssets.Service.getAllByIDs(splitIDs)
 
@@ -856,7 +856,7 @@ class ComponentViewController @Inject()(
   def provisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val provisionedAddresses = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+        val provisionedAddresses = blockchainIdentities.Service.getAllProvisionAddressesByIdentityWithActor(identityID)
         (for (
           provisionedAddresses <- provisionedAddresses
         ) yield Ok(views.html.component.blockchain.identity.provisionedAddresses(identityID, provisionedAddresses))
@@ -869,7 +869,7 @@ class ComponentViewController @Inject()(
   def unprovisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val unprovisionedAddresses = blockchainIdentities.Service.getAllUnprovisionAddresses(identityID)
+        val unprovisionedAddresses = blockchainIdentities.Service.getAllUnProvisionAddressesByIdentityWithActor(identityID)
         (for (
           unprovisionedAddresses <- unprovisionedAddresses
         ) yield Ok(views.html.component.blockchain.identity.unprovisionedAddresses(identityID, unprovisionedAddresses))

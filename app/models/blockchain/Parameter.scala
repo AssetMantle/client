@@ -3,8 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AddActor, CreateParameter, GetAllParameter, InsertOrUpdateParameter, OrderActor, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
-import dbActors.Service.{masterActor, routerActor}
-
 import java.sql.Timestamp
 import exceptions.BaseException
 
@@ -115,54 +113,52 @@ class Parameters @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val parameterActor = dbActors.Service.actorSystem.actorOf(ParameterActor.props(Parameters.this), "parameterActor")
-
-    routerActor ! AddActor(None, parameterActor.actorRef)
-
-    def createParameterWithActor(parameter: Parameter): Future[String] = (masterActor ? CreateParameter(parameter)).mapTo[String]
+    
+    def createParameterWithActor(parameter: Parameter): Future[String] = (parameterActor ? CreateParameter(parameter)).mapTo[String]
 
     def create(parameter: Parameter): Future[String] = add(parameter)
 
-    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (masterActor ? InsertOrUpdateParameter(parameter)).mapTo[Int]
+    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (parameterActor ? InsertOrUpdateParameter(parameter)).mapTo[Int]
 
     def insertOrUpdate(parameter: Parameter): Future[Int] = upsert(parameter)
 
-    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (masterActor ? TryGetParameter(parameterType)).mapTo[Parameter]
+    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (parameterActor ? TryGetParameter(parameterType)).mapTo[Parameter]
 
     def tryGet(parameterType: String): Future[Parameter] = tryGetByType(parameterType).map(_.deserialize)
 
-    def tryGetAuthParameterWithActor: Future[AuthParameter] = (masterActor ? TryGetAuthParameter).mapTo[AuthParameter]
+    def tryGetAuthParameterWithActor: Future[AuthParameter] = (parameterActor ? TryGetAuthParameter).mapTo[AuthParameter]
 
     def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(constants.Blockchain.ParameterType.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
 
-    def tryGetBankParameterWithActor: Future[BankParameter] = (masterActor ? TryGetBankParameter).mapTo[BankParameter]
+    def tryGetBankParameterWithActor: Future[BankParameter] = (parameterActor ? TryGetBankParameter).mapTo[BankParameter]
 
     def tryGetBankParameter: Future[BankParameter] = tryGetByType(constants.Blockchain.ParameterType.BANK).map(_.deserialize).map(_.value.asBankParameter)
 
-    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (masterActor ? TryGetDistributionParameter).mapTo[DistributionParameter]
+    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (parameterActor ? TryGetDistributionParameter).mapTo[DistributionParameter]
 
     def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(constants.Blockchain.ParameterType.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
 
-    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (masterActor ? TryGetGovernanceParameter).mapTo[GovernanceParameter]
+    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (parameterActor ? TryGetGovernanceParameter).mapTo[GovernanceParameter]
 
     def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(constants.Blockchain.ParameterType.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
 
-    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (masterActor ? TryGetHalvingParameter).mapTo[HalvingParameter]
+    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (parameterActor ? TryGetHalvingParameter).mapTo[HalvingParameter]
 
     def tryGetHalvingParameter: Future[HalvingParameter] = tryGetByType(constants.Blockchain.ParameterType.HALVING).map(_.deserialize).map(_.value.asHalvingParameter)
 
-    def tryGetMintingParameterWithActor: Future[MintingParameter] = (masterActor ? TryGetMintingParameter).mapTo[MintingParameter]
+    def tryGetMintingParameterWithActor: Future[MintingParameter] = (parameterActor ? TryGetMintingParameter).mapTo[MintingParameter]
 
     def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(constants.Blockchain.ParameterType.MINT).map(_.deserialize).map(_.value.asMintingParameter)
 
-    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (masterActor ? TryGetSlashingParameter).mapTo[SlashingParameter]
+    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (parameterActor ? TryGetSlashingParameter).mapTo[SlashingParameter]
 
     def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(constants.Blockchain.ParameterType.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
 
-    def tryGetStakingParameterWithActor: Future[StakingParameter] = (masterActor ? TryGetStakingParameter).mapTo[StakingParameter]
+    def tryGetStakingParameterWithActor: Future[StakingParameter] = (parameterActor ? TryGetStakingParameter).mapTo[StakingParameter]
 
     def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
-    def getAllParameterWithActor: Future[Seq[Parameter]] = (masterActor ? GetAllParameter).mapTo[Seq[Parameter]]
+    def getAllParameterWithActor: Future[Seq[Parameter]] = (parameterActor ? GetAllParameter).mapTo[Seq[Parameter]]
 
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 

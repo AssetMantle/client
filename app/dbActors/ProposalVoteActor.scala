@@ -24,17 +24,13 @@ class ProposalVoteActor @Inject()(
   override def receive: Receive = {
     case InsertOrUpdateProposalVote(proposal) => {
       blockchainProposalVote.Service.insertOrUpdate(proposal) pipeTo sender()
-      println(self.path)
     }
     case TryGetProposalVote(proposalID) => {
       blockchainProposalVote.Service.tryGet(proposalID) pipeTo sender()
-      println(self.path)
     }
     case GetAllByProposalVoteId(id) => {
       blockchainProposalVote.Service.getAllByID(id) pipeTo sender()
-      println(self.path)
     }
-
   }
 
 }

@@ -3,7 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AccountActor, AddActor, BlockActor}
-import dbActors.Service.{masterActor, routerActor}
 
 import java.sql.Timestamp
 import exceptions.BaseException
@@ -125,30 +124,28 @@ class Blocks @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val blockActor = dbActors.Service.actorSystem.actorOf(BlockActor.props(Blocks.this), "blockActor")
-
-    routerActor ! AddActor(None, blockActor.actorRef)
-
-    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (masterActor ? dbActors.CreateBlock(height, time, proposerAddress, validators)).mapTo[String]
+    
+    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (blockActor ? dbActors.CreateBlock(height, time, proposerAddress, validators)).mapTo[String]
 
     def create(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (masterActor ? dbActors.InsertOrUpdateBlock(height, time, proposerAddress, validators)).mapTo[Int]
+    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (blockActor ? dbActors.InsertOrUpdateBlock(height, time, proposerAddress, validators)).mapTo[Int]
 
     def insertOrUpdate(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def tryGetBlockWithActor(height: Int): Future[Block] = (masterActor ? dbActors.TryGetBlock(height)).mapTo[Block]
+    def tryGetBlockWithActor(height: Int): Future[Block] = (blockActor ? dbActors.TryGetBlock(height)).mapTo[Block]
 
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
-    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (masterActor ? dbActors.TryGetProposerAddressBlock(height)).mapTo[String]
+    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (blockActor ? dbActors.TryGetProposerAddressBlock(height)).mapTo[String]
 
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
-    def getLatestBlockHeightWithActor: Future[Int] = (masterActor ? dbActors.GetLatestBlockHeight()).mapTo[Int]
+    def getLatestBlockHeightWithActor: Future[Int] = (blockActor ? dbActors.GetLatestBlockHeight()).mapTo[Int]
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
-    def getLatestBlockWithActor: Future[Block] = (masterActor ? dbActors.GetLatestBlock()).mapTo[Block]
+    def getLatestBlockWithActor: Future[Block] = (blockActor ? dbActors.GetLatestBlock()).mapTo[Block]
 
     def getLatestBlock: Future[Block] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -158,7 +155,7 @@ class Blocks @Inject()(
       } yield block
     }
 
-    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (masterActor ? dbActors.GetBlocksPerPage(pageNumber)).mapTo[Seq[Block]]
+    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (blockActor ? dbActors.GetBlocksPerPage(pageNumber)).mapTo[Seq[Block]]
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -168,7 +165,7 @@ class Blocks @Inject()(
       } yield blockList
     }
 
-    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (masterActor ? dbActors.GetLastNBlocks(n)).mapTo[Seq[Block]]
+    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (blockActor ? dbActors.GetLastNBlocks(n)).mapTo[Seq[Block]]
 
     def getLastNBlocks(n: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight

@@ -19,10 +19,6 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 lazy val akkaVersion = "2.6.3"
 
-lazy val AkkaManagementVersion = "1.1.1"
-
-lazy val AkkaHttpVersion = "10.2.6"
-
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
@@ -86,34 +82,11 @@ libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVers
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
 
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % "2.6.14"
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
 
 libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
 
 libraryDependencies += "io.aeron" % "aeron-client" % "1.32.0"
-
-libraryDependencies += "com.lightbend.akka.management" %% "akka-management-cluster-http" % AkkaManagementVersion
-
-libraryDependencies += "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % AkkaManagementVersion
-
-libraryDependencies += "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % AkkaManagementVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test
-
-libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.6.14"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-protobuf-v3" % akkaVersion % Test
-
-libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.6.14"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % akkaVersion % Test
-
-libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % "2.6.14"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
-
-
-
 
 enablePlugins(JavaServerAppPackaging)
 

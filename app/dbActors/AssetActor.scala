@@ -24,36 +24,27 @@ class AssetActor @Inject()(
   override def receive: Receive = {
     case CreateAsset(asset) => {
       blockchainAsset.Service.create(asset) pipeTo sender()
-      println(self.path)
     }
     case TryGetAsset(id) => {
       blockchainAsset.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
-
     case GetAsset(id) => {
       blockchainAsset.Service.get(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllAsset() => {
       blockchainAsset.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleAssets(assets) => {
       blockchainAsset.Service.insertMultiple(assets) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateAsset(asset) => {
       blockchainAsset.Service.insertOrUpdate(asset) pipeTo sender()
-      println(self.path)
     }
     case DeleteAsset(id) => {
       blockchainAsset.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
     case CheckExistsAsset(id) => {
       blockchainAsset.Service.checkExistsAssetWithActor(id) pipeTo sender()
-      println(self.path)
     }
   }
 

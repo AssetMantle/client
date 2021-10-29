@@ -24,60 +24,46 @@ class IdentityActor @Inject()(
   override def receive: Receive = {
     case CreateIdentity(identity) => {
       blockchainIdentity.Service.create(identity) pipeTo sender()
-      println(self.path)
     }
     case TryGetIdentity(id) => {
       blockchainIdentity.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetIdentity(id) => {
       blockchainIdentity.Service.get(id) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleIdentity(identities) => {
       blockchainIdentity.Service.insertMultiple(identities) pipeTo sender()
-      println(self.path)
     }
 
     case DeleteIdentity(id) => {
       blockchainIdentity.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllIDsByProvisionedIdentity(address) => {
       blockchainIdentity.Service.getAllIDsByProvisioned(address) pipeTo sender()
-      println(self.path)
     }
     case GetAllIDsByUnProvisionedIdentity(address) => {
-      blockchainIdentity.Service.delete(address) pipeTo sender()
-      println(self.path)
+      blockchainIdentity.Service.getAllIDsByUnprovisioned(address) pipeTo sender()
     }
     case CheckExistsIdentity(id) => {
       blockchainIdentity.Service.checkExists(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllProvisionAddressesIdentity(id) => {
       blockchainIdentity.Service.getAllProvisionAddresses(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllUnprovisionedAddressesIdentity(id) => {
       blockchainIdentity.Service.getAllUnprovisionAddresses(id) pipeTo sender()
-      println(self.path)
     }
     case AddProvisionAddressIdentity(id, address) => {
       blockchainIdentity.Service.addProvisionAddress(id, address) pipeTo sender()
-      println(self.path)
     }
     case DeleteProvisionAddressIdentity(id, address) => {
       blockchainIdentity.Service.deleteProvisionAddress(id, address) pipeTo sender()
-      println(self.path)
     }
     case AddUnprovisionedAddressIdentity(id, address) => {
       blockchainIdentity.Service.addUnprovisionAddress(id, address) pipeTo sender()
-      println(self.path)
     }
     case DeleteUnprovisionedAddressIdentity(id, address) => {
       blockchainIdentity.Service.deleteUnprovisionAddress(id, address) pipeTo sender()
-      println(self.path)
     }
   }
 

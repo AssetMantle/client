@@ -24,32 +24,25 @@ class DelegationActor @Inject()(
   override def receive: Receive = {
     case CreateDelegation(delegation) => {
       blockchainDelegation.Service.create(delegation) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleDelegation(delegations) => {
       blockchainDelegation.Service.insertMultiple(delegations) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateDelegation(delegation) => {
       blockchainDelegation.Service.insertOrUpdate(delegation) pipeTo sender()
-      println(self.path)
     }
     case GetDelegation(delegatorAddress, operatorAddress) => {
       blockchainDelegation.Service.get(delegatorAddress, operatorAddress) pipeTo sender()
-      println(self.path)
     }
 
     case GetAllDelegationForDelegator(address) => {
       blockchainDelegation.Service.getAllForDelegator(address) pipeTo sender()
-      println(self.path)
     }
     case GetAllDelegationForValidator(operatorAddress) => {
       blockchainDelegation.Service.getAllForValidator(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case DeleteDelegation(delegatorAddress, operatorAddress) => {
       blockchainDelegation.Service.delete(delegatorAddress, operatorAddress) pipeTo sender()
-      println(self.path)
     }
   }
 

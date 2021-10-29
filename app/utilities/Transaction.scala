@@ -85,7 +85,7 @@ class Transaction @Inject()(getTransaction: GetTransaction, getResponse: GetResp
       }
     }
 
-    def getTransaction(txHash: String): Future[models.blockchain.Transaction] = blockchainTransactions.Service.tryGet(txHash)
+    def getTransaction(txHash: String): Future[models.blockchain.Transaction] = blockchainTransactions.Service.tryGetTransactionWithActor(txHash)
 
     def executeSuccessOrFailure(tx: bcTransaction, ticketID: String): Future[Unit] = if (tx.status) onSuccess(ticketID, tx.hash) else onFailure(ticketID, tx.code.toString)
 

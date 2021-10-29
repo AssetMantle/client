@@ -24,86 +24,65 @@ class ValidatorActor @Inject()(
   override def receive: Receive = {
     case CreateValidatorWithActor(validator) => {
       blockchainValidator.Service.create(validator) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleValidators(validators) => {
       blockchainValidator.Service.insertMultiple(validators) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateValidator(validator) => {
       blockchainValidator.Service.insertOrUpdate(validator) pipeTo sender()
-      println(self.path)
     }
     case TryGetValidator(id) => {
       blockchainValidator.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllValidatorByHexAddresses(hexAddresses) => {
       blockchainValidator.Service.getAllByHexAddresses(hexAddresses) pipeTo sender()
-      println(self.path)
     }
     case TryGetValidatorByOperatorAddress(operatorAddress) => {
       blockchainValidator.Service.tryGetByOperatorAddress(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case TryGetValidatorByHexAddress(hexAddress) => {
-      blockchainValidator.Service.tryGetHexAddress(hexAddress) pipeTo sender()
-      println(self.path)
+      blockchainValidator.Service.tryGetByHexAddress(hexAddress) pipeTo sender()
     }
     case TryGetValidatorOperatorAddress(hexAddress) => {
       blockchainValidator.Service.tryGetOperatorAddress(hexAddress) pipeTo sender()
-      println(self.path)
     }
     case TryGetValidatorHexAddress(operatorAddress) => {
       blockchainValidator.Service.tryGetHexAddress(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case TryGetValidatorProposerName(hexAddress) => {
       blockchainValidator.Service.tryGetProposerName(hexAddress) pipeTo sender()
-      println(self.path)
     }
     case GetAllValidators() => {
       blockchainValidator.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case GetAllActiveValidatorList() => {
       blockchainValidator.Service.getAllActiveValidatorList pipeTo sender()
-      println(self.path)
     }
     case GetAllInactiveValidatorList() => {
       blockchainValidator.Service.getAllInactiveValidatorList pipeTo sender()
-      println(self.path)
     }
     case GetAllUnbondingValidatorList() => {
       blockchainValidator.Service.getAllUnbondingValidatorList pipeTo sender()
-      println(self.path)
     }
     case GetAllUnbondedValidatorList() => {
       blockchainValidator.Service.getAllUnbondedValidatorList pipeTo sender()
-      println(self.path)
     }
     case GetValidatorByOperatorAddresses(operatorAddresses) => {
       blockchainValidator.Service.getByOperatorAddresses(operatorAddresses) pipeTo sender()
-      println(self.path)
     }
     case ValidatorExists(operatorAddress) => {
       blockchainValidator.Service.exists(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case JailValidator(operatorAddress) => {
       blockchainValidator.Service.jailValidator(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case DeleteValidatorWithOpAddress(operatorAddress)  => {
       blockchainValidator.Service.delete(operatorAddress) pipeTo sender()
-      println(self.path)
     }
     case GetTotalVotingPower() => {
       blockchainValidator.Service.getTotalVotingPower pipeTo sender()
-      println(self.path)
     }
   }
-
 }
 
 case class CreateValidatorWithActor(validator: Validator)

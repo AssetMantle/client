@@ -24,36 +24,28 @@ class ClassificationActor @Inject()(
   override def receive: Receive = {
     case CreateClassification(classification) => {
       blockchainClassification.Service.create(classification) pipeTo sender()
-      println(self.path)
     }
     case TryGetClassification(id) => {
       blockchainClassification.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetClassification(id) => {
       blockchainClassification.Service.get(id) pipeTo sender()
-      println(self.path)
     }
 
     case GetAllClassification() => {
       blockchainClassification.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleClassification(classifications) => {
       blockchainClassification.Service.insertMultiple(classifications) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateClassification(classification) => {
       blockchainClassification.Service.insertOrUpdate(classification) pipeTo sender()
-      println(self.path)
     }
     case DeleteClassification(id) => {
       blockchainClassification.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
     case CheckExistsClassification(id) => {
       blockchainClassification.Service.checkExists(id) pipeTo sender()
-      println(self.path)
     }
   }
 

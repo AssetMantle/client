@@ -24,47 +24,34 @@ class OrderActor @Inject()(
   override def receive: Receive = {
     case CreateOrder(order) => {
       blockchainOrder.Service.create(order) pipeTo sender()
-      println(self.path)
     }
     case TryGetOrder(id) => {
       blockchainOrder.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetOrder(id) => {
       blockchainOrder.Service.get(id) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleOrder(orders) => {
       blockchainOrder.Service.insertMultiple(orders) pipeTo sender()
-      println(self.path)
     }
-
     case DeleteOrder(id) => {
       blockchainOrder.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
-
     case GetAllOrder() => {
       blockchainOrder.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case CheckExistsOrder(id) => {
       blockchainOrder.Service.checkExists(id) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateOrder(order) => {
       blockchainOrder.Service.insertOrUpdate(order) pipeTo sender()
-      println(self.path)
     }
     case GetAllPublicOrderIDs() => {
       blockchainOrder.Service.getAllPublicOrderIDs pipeTo sender()
-      println(self.path)
     }
     case GetAllPrivateOrderIDs(identityIDs) => {
       blockchainOrder.Service.getAllPrivateOrderIDs(identityIDs) pipeTo sender()
-      println(self.path)
     }
-
   }
 
 }

@@ -22,7 +22,6 @@ import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
 import dbActors.{AddActor, BlockchainActor, Master}
-import dbActors.Service.{ masterActor, routerActor}
 
 import scala.concurrent.duration.DurationInt
 
@@ -103,9 +102,9 @@ class Balances @Inject()(
   }
 
   object Service {
-    implicit val timeout = akkaTimeout(5 seconds) // needed for `?` below
+    implicit val timeout = akkaTimeout(10 seconds) // needed for `?` below
 
-    private val blockchainActor = dbActors.Service.actorSystem1.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+    private val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
 
     def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (blockchainActor ? dbActors.Create(address, coins)).mapTo[String]
 

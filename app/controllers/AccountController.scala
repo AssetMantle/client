@@ -85,7 +85,7 @@ class AccountController @Inject()(
 
   def createWalletForm(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val blockchainAccountExists = blockchainAccounts.Service.checkAccountExists(username)
+      val blockchainAccountExists = blockchainAccounts.Service.checkAccountExistsWithAccountActor(username)
 
       def getMnemonics(blockchainAccountExists: Boolean): Future[Seq[String]] = if (!blockchainAccountExists) Future(utilities.Bip39.getMnemonics()) else throw new BaseException(constants.Response.UNAUTHORIZED)
 
@@ -116,7 +116,7 @@ class AccountController @Inject()(
           def createAccountAndGetResult(validateUsernamePassword: Boolean, masterAccount: Account): Future[Result] = if (validateUsernamePassword) {
             val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = createWalletData.username, mnemonic = Seq(masterAccount.partialMnemonic.getOrElse(throw new BaseException(constants.Response.MNEMONIC_NOT_FOUND)).mkString(" "), createWalletData.mnemonics).mkString(" ")))
 
-            def createAccount(addKeyResponse: KeyResponse.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.result.keyOutput.address, username = createWalletData.username, accountType = constants.Blockchain.Account.BASE, publicKey = None)
+            def createAccount(addKeyResponse: KeyResponse.Response): Future[String] = blockchainAccounts.Service.createWithAccountActor(address = addKeyResponse.result.keyOutput.address, username = createWalletData.username, accountType = constants.Blockchain.Account.BASE, publicKey = None)
 
             for {
               addKeyResponse <- addKeyResponse
@@ -160,12 +160,12 @@ class AccountController @Inject()(
             //TODO Possible Solution: 1. Generate address locally and check, 2. Blockchain should prohibit addition of keys with same address and different name
             val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(name = importWalletData.username, mnemonic = importWalletData.mnemonics))
 
-            def getOldUsername(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Service.getUsername(addKeyResponse.result.keyOutput.address)
+            def getOldUsername(addKeyResponse: KeyResponse.Response) = blockchainAccounts.Service.getUsernameWithAccountActor(addKeyResponse.result.keyOutput.address)
 
             def checkAccountExists(oldUsername: Option[String]) = oldUsername.fold(Future(false))(username => masterAccounts.Service.checkAccountExists(username))
 
             def checkAndUpdate(addKeyResponse: KeyResponse.Response, accountExists: Boolean) = if (!accountExists) {
-              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdate(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = None, accountType = constants.Blockchain.Account.BASE, accountNumber = -1, sequence = 0, vestingParameters = None))
+              val createBCAccount: Future[Int] = blockchainAccounts.Service.insertOrUpdateWithAccountActor(blockchain.Account(address = addKeyResponse.result.keyOutput.address, username = importWalletData.username, publicKey = None, accountType = constants.Blockchain.Account.BASE, accountNumber = -1, sequence = 0, vestingParameters = None))
               val createMasterAccount = {
                 val mnemonicList = importWalletData.mnemonics.split(constants.Bip39.EnglishWordList.delimiter)
                 masterAccounts.Service.addLogin(username = importWalletData.username, password = importWalletData.password, language = request.lang, mnemonics = mnemonicList.take(mnemonicList.length - constants.Blockchain.MnemonicShown))
@@ -211,11 +211,11 @@ class AccountController @Inject()(
         },
         loginData => {
           val validateUsernamePassword = masterAccounts.Service.validateUsernamePassword(username = loginData.username, password = loginData.password)
-          val bcAccountExists = blockchainAccounts.Service.checkAccountExists(loginData.username)
+          val bcAccountExists = blockchainAccounts.Service.checkAccountExistsWithAccountActor(loginData.username)
 
           def getAccount: Future[Account] = masterAccounts.Service.tryGet(loginData.username)
 
-          def getAddress: Future[String] = blockchainAccounts.Service.tryGetAddress(loginData.username)
+          def getAddress: Future[String] = blockchainAccounts.Service.tryGetAddressWithAccountActor(loginData.username)
 
           def firstLoginUserTypeUpdate(oldUserType: String): Future[String] = if (oldUserType == constants.User.WITHOUT_LOGIN) {
             val markUserTypeUser = masterAccounts.Service.markUserTypeUser(id = loginData.username)

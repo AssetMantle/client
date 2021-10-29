@@ -24,53 +24,40 @@ class ParameterActor @Inject()(
   override def receive: Receive = {
     case CreateParameter(parameter) => {
       blockchainParameter.Service.create(parameter) pipeTo sender()
-      println(self.path)
     }
     case TryGetParameter(parameterType) => {
       blockchainParameter.Service.tryGet(parameterType) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateParameter(parameter) => {
       blockchainParameter.Service.insertOrUpdate(parameter) pipeTo sender()
-      println(self.path)
     }
     case TryGetAuthParameter() => {
       blockchainParameter.Service.tryGetAuthParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetBankParameter() => {
       blockchainParameter.Service.tryGetBankParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetDistributionParameter() => {
       blockchainParameter.Service.tryGetDistributionParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetGovernanceParameter() => {
       blockchainParameter.Service.tryGetGovernanceParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetHalvingParameter() => {
       blockchainParameter.Service.tryGetHalvingParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetMintingParameter() => {
       blockchainParameter.Service.tryGetMintingParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetSlashingParameter() => {
       blockchainParameter.Service.tryGetSlashingParameter pipeTo sender()
-      println(self.path)
     }
     case TryGetStakingParameter() => {
       blockchainParameter.Service.tryGetStakingParameter pipeTo sender()
-      println(self.path)
     }
     case GetAllParameter() => {
       blockchainParameter.Service.getAll pipeTo sender()
-      println(self.path)
     }
-
   }
 
 }

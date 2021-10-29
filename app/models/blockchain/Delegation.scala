@@ -3,7 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AddActor, BlockActor, CreateDelegation, DelegationActor, DeleteDelegation, GetAllDelegationForDelegator, GetAllDelegationForValidator, GetDelegation, InsertMultipleDelegation, InsertOrUpdateDelegation}
-import dbActors.Service.{masterActor, routerActor}
 
 import java.sql.Timestamp
 import exceptions.BaseException
@@ -107,34 +106,32 @@ class Delegations @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val delegationActor = dbActors.Service.actorSystem.actorOf(DelegationActor.props(Delegations.this), "delegationActor")
-
-    routerActor ! AddActor(None, delegationActor.actorRef)
-
-    def createDelegationWithActor(delegation: Delegation): Future[String] = (masterActor ? CreateDelegation(delegation)).mapTo[String]
+    
+    def createDelegationWithActor(delegation: Delegation): Future[String] = (delegationActor ? CreateDelegation(delegation)).mapTo[String]
 
     def create(delegation: Delegation): Future[String] = add(delegation)
 
-    def insertMultipleDelegationWithActor(delegations: Seq[Delegation]): Future[String] = (masterActor ? InsertMultipleDelegation(delegations)).mapTo[String]
+    def insertMultipleDelegationWithActor(delegations: Seq[Delegation]): Future[String] = (delegationActor ? InsertMultipleDelegation(delegations)).mapTo[String]
 
     def insertMultiple(delegations: Seq[Delegation]): Future[Seq[String]] = addMultiple(delegations)
 
-    def insertOrUpdateDelegationWithActor(delegation: Delegation): Future[String] = (masterActor ? InsertOrUpdateDelegation(delegation)).mapTo[String]
+    def insertOrUpdateDelegationWithActor(delegation: Delegation): Future[String] = (delegationActor ? InsertOrUpdateDelegation(delegation)).mapTo[String]
 
     def insertOrUpdate(delegation: Delegation): Future[Int] = upsert(delegation)
 
-    def getAllDelegationForDelegatorWithActor(address: String): Future[Seq[Delegation]] = (masterActor ? GetAllDelegationForDelegator(address)).mapTo[Seq[Delegation]]
+    def getAllDelegationForDelegatorWithActor(address: String): Future[Seq[Delegation]] = (delegationActor ? GetAllDelegationForDelegator(address)).mapTo[Seq[Delegation]]
 
     def getAllForDelegator(address: String): Future[Seq[Delegation]] = getAllByDelegatorAddress(address)
 
-    def getAllDelegationForValidatorWithActor(address: String): Future[Seq[Delegation]] = (masterActor ? GetAllDelegationForValidator(address)).mapTo[Seq[Delegation]]
+    def getAllDelegationForValidatorWithActor(address: String): Future[Seq[Delegation]] = (delegationActor ? GetAllDelegationForValidator(address)).mapTo[Seq[Delegation]]
 
     def getAllForValidator(operatorAddress: String): Future[Seq[Delegation]] = getAllByValidatorAddress(operatorAddress)
 
-    def getDelegationWithActor(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = (masterActor ? GetDelegation(delegatorAddress, operatorAddress)).mapTo[Option[Delegation]]
+    def getDelegationWithActor(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = (delegationActor ? GetDelegation(delegatorAddress, operatorAddress)).mapTo[Option[Delegation]]
 
     def get(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = getByDelegatorAndValidatorAddress(delegatorAddress = delegatorAddress, validatorAddress = operatorAddress)
 
-    def deleteDelegationWithActor(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = (masterActor ? DeleteDelegation(delegatorAddress, operatorAddress)).mapTo[Option[Delegation]]
+    def deleteDelegationWithActor(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = (delegationActor ? DeleteDelegation(delegatorAddress, operatorAddress)).mapTo[Option[Delegation]]
 
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 

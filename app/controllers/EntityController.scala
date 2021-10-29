@@ -57,7 +57,7 @@ class EntityController @Inject()(
           Future(BadRequest(masterComponent.upsertEntityLabel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.ENTITY_TYPE.name, ""))))
         },
         upsertLabelData => {
-          def getProvisionedAddress(maintainer: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainer)
+          def getProvisionedAddress(maintainer: String) = blockchainIdentities.Service.getAllProvisionAddressesByIdentityWithActor(maintainer)
 
           val verifyAndUpdate = upsertLabelData.entityType match {
             case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
@@ -118,27 +118,27 @@ class EntityController @Inject()(
 
   def properties(entityID: String, entityType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddressesByIdentityWithActor(identityID)
 
       val checkAndGet: Future[(Boolean, Immutables, Mutables)] = entityType match {
         case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
           val maintainerIDs = masterClassifications.Service.getMaintainerIDs(id = entityID)
           val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
-          val classification = blockchainClassifications.Service.tryGet(entityID)
+          val classification = blockchainClassifications.Service.tryGetClassificationWithActor(entityID)
           for {
             maintainerIDs <- maintainerIDs
             identityIDs <- identityIDs
             classification <- classification
           } yield (identityIDs.intersect(maintainerIDs).nonEmpty, classification.immutableTraits, classification.mutableTraits)
         case constants.Blockchain.Entity.IDENTITY =>
-          val identity = blockchainIdentities.Service.tryGet(entityID)
+          val identity = blockchainIdentities.Service.tryGetIdentityWithActor(entityID)
           for {
             provisionedAddresses <- getProvisionedAddresses(entityID)
             identity <- identity
           } yield (provisionedAddresses.contains(loginState.address), identity.immutables, identity.mutables)
         case constants.Blockchain.Entity.ASSET =>
           val ownerID = masterSplits.Service.tryGetOwnerID(ownableID = entityID)
-          val asset = blockchainAssets.Service.tryGet(entityID)
+          val asset = blockchainAssets.Service.tryGetAssetWithActor(entityID)
           for {
             ownerID <- ownerID
             provisionedAddresses <- getProvisionedAddresses(ownerID)
@@ -146,7 +146,7 @@ class EntityController @Inject()(
           } yield (provisionedAddresses.contains(loginState.address), asset.immutables, asset.mutables)
         case constants.Blockchain.Entity.ORDER =>
           val makerID = masterOrders.Service.tryGetMakerID(entityID)
-          val order = blockchainOrders.Service.tryGet(entityID)
+          val order = blockchainOrders.Service.tryGetOrderWithActor(entityID)
           val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
           for {
             makerID <- makerID
@@ -157,7 +157,7 @@ class EntityController @Inject()(
       }
       val properties = masterProperties.Service.getAll(entityID = entityID, entityType = entityType)
 
-      def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getList(hashIDs)
+      def getBlockchainMetas(hashIDs: Seq[String]) = blockchainMetas.Service.getListWithActor(hashIDs)
 
       (for {
         (isOwner, immutables, mutables) <- checkAndGet

@@ -24,33 +24,25 @@ class RedelegationActor @Inject()(
   override def receive: Receive = {
     case CreateRedelegation(redelegation) => {
       blockchainRedelegation.Service.create(redelegation) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleRedelegation(redelegations) => {
       blockchainRedelegation.Service.insertMultiple(redelegations) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateRedelegation(redelegation) => {
       blockchainRedelegation.Service.insertOrUpdate(redelegation) pipeTo sender()
-      println(self.path)
     }
     case GetAllRedelegationBySourceValidator(address) => {
       blockchainRedelegation.Service.getAllBySourceValidator(address) pipeTo sender()
-      println(self.path)
     }
     case GetAllRedelegation() => {
       blockchainRedelegation.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case DeleteRedelegation(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
       blockchainRedelegation.Service.delete(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
-      println(self.path)
     }
     case TryGetRedelegation(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
       blockchainRedelegation.Service.tryGet(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
-      println(self.path)
     }
-
   }
 
 }

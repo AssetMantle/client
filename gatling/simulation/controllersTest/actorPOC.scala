@@ -27,13 +27,13 @@ class ActorPoc extends Simulation {
 
   val AcountScenario: ScenarioBuilder = scenario("Accounts Scenario")
     .exec(http("Account_Scenario_GET")
-      .get(routes.ComponentViewController.accountWallet("persistence1n60ttuv05jv8cg8aa8e694f42a3l86d5qmkkxy").url)
+      .get(routes.ComponentViewController.accountWallet("persistence1ntmnu2aqtxwms06nvv2m80hm5dxvtyeskzu48x").url)
       .check(
         css("div[id =ACCOUNT_WALLET_LOADING]").exists,
         status.is(200),
       )
-    ).pause(6)
+    ).pause(10)
 
-  setUp(AcountScenario.inject(atOnceUsers(2000))).protocols(http.baseUrl("http://localhost:9000"))
+  setUp(AcountScenario.inject(atOnceUsers(1))).protocols(http.baseUrl("http://localhost:9000"))
 
 }

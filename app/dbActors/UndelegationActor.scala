@@ -24,39 +24,29 @@ class UndelegationActor @Inject()(
   override def receive: Receive = {
     case CreateUndelegation(undelegation) => {
       blockchainUndelegation.Service.create(undelegation) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleUndelegation(undelegations) => {
       blockchainUndelegation.Service.insertMultiple(undelegations) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateUndelegation(undelegation) => {
       blockchainUndelegation.Service.insertOrUpdate(undelegation) pipeTo sender()
-      println(self.path)
     }
     case GetAllUndelegationByDelegator(address) => {
       blockchainUndelegation.Service.getAllByDelegator(address) pipeTo sender()
-      println(self.path)
     }
     case GetAllUndelegationByValidator(address) => {
       blockchainUndelegation.Service.getAllByValidator(address) pipeTo sender()
-      println(self.path)
     }
     case GetAllUndelegation() => {
       blockchainUndelegation.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case DeleteUndelegation(delegatorAddress, validatorAddress) => {
       blockchainUndelegation.Service.delete(delegatorAddress, validatorAddress) pipeTo sender()
-      println(self.path)
     }
     case TryGetUndelegation(delegatorAddress, validatorAddress) => {
       blockchainUndelegation.Service.tryGet(delegatorAddress, validatorAddress) pipeTo sender()
-      println(self.path)
     }
-
   }
-
 }
 
 case class CreateUndelegation(undelegation: Undelegation)

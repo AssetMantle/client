@@ -24,47 +24,36 @@ class SplitActor @Inject()(
   override def receive: Receive = {
     case CreateSplit(split) => {
       blockchainSplit.Service.create(split) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleSplit(splits) => {
       blockchainSplit.Service.insertMultiple(splits) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateSplit(split) => {
       blockchainSplit.Service.insertOrUpdate(split) pipeTo sender()
-      println(self.path)
     }
     case GetByOwner(ownerID) => {
       blockchainSplit.Service.getByOwner(ownerID) pipeTo sender()
-      println(self.path)
     }
     case GetByOwnerIDs(ownerIDs) => {
       blockchainSplit.Service.getByOwnerIDs(ownerIDs) pipeTo sender()
-      println(self.path)
     }
     case GetByOwnable(ownableID) => {
       blockchainSplit.Service.getByOwnable(ownableID) pipeTo sender()
-      println(self.path)
     }
     case GetByOwnerOrOwnable(id) => {
       blockchainSplit.Service.getByOwnerOrOwnable(id) pipeTo sender()
-      println(self.path)
     }
     case GetAllSplit() => {
       blockchainSplit.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case DeleteSplit(ownerID, ownableID) => {
       blockchainSplit.Service.delete(ownerID, ownableID) pipeTo sender()
-      println(self.path)
     }
     case TryGetSplit(ownerID, ownableID) => {
       blockchainSplit.Service.tryGet(ownerID, ownableID) pipeTo sender()
-      println(self.path)
     }
     case GetSplit(ownerID, ownableID) => {
       blockchainSplit.Service.get(ownerID, ownableID) pipeTo sender()
-      println(self.path)
     }
 
   }

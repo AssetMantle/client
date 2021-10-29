@@ -2,7 +2,6 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.Service.{masterActor, routerActor}
 import dbActors.{AddActor, GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalDepositActor, ProposalVoteActor, TryGetProposalVote}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -94,18 +93,16 @@ class ProposalVotes @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val proposalVoteActor = dbActors.Service.actorSystem.actorOf(ProposalVoteActor.props(ProposalVotes.this), "proposalVoteActor")
-
-    routerActor ! AddActor(None, proposalVoteActor.actorRef)
-
-    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (masterActor ? TryGetProposalVote(proposalID)).mapTo[ProposalVote]
+    
+    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (proposalVoteActor ? TryGetProposalVote(proposalID)).mapTo[ProposalVote]
 
     def tryGet(proposalID: Int): Future[ProposalVote] = tryGetByID(proposalID)
 
-    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (masterActor ? InsertOrUpdateProposalVote(proposalVote)).mapTo[ProposalVote]
+    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (proposalVoteActor ? InsertOrUpdateProposalVote(proposalVote)).mapTo[ProposalVote]
 
     def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
 
-    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[ProposalVote] = (masterActor ? GetAllByProposalVoteId(proposalID)).mapTo[ProposalVote]
+    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[Seq[ProposalVote]] = (proposalVoteActor ? GetAllByProposalVoteId(proposalID)).mapTo[Seq[ProposalVote]]
 
     def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
   }

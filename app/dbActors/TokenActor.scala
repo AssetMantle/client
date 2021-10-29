@@ -22,47 +22,35 @@ class TokenActor @Inject()(
   override def receive: Receive = {
     case CreateToken(token) => {
       blockchainToken.Service.create(token) pipeTo sender()
-      println(self.path)
     }
     case GetToken(denom) => {
       blockchainToken.Service.get(denom) pipeTo sender()
-      println(self.path)
     }
     case GetAllToken() => {
       blockchainToken.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case GetAllDenoms() => {
       blockchainToken.Service.getAllDenoms pipeTo sender()
-      println(self.path)
     }
     case GetStakingToken() => {
       blockchainToken.Service.getStakingToken pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleToken(tokens) => {
       blockchainToken.Service.insertMultiple(tokens) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateToken(token) => {
       blockchainToken.Service.insertOrUpdate(token) pipeTo sender()
-      println(self.path)
     }
-
     case UpdateStakingAmounts(denom, bondedAmount, notBondedAmount) => {
       blockchainToken.Service.updateStakingAmounts(denom, bondedAmount, notBondedAmount) pipeTo sender()
-      println(self.path)
     }
     case UpdateTotalSupplyAndInflation(denom, totalSupply, inflation) => {
       blockchainToken.Service.updateTotalSupplyAndInflation(denom, totalSupply, inflation) pipeTo sender()
-      println(self.path)
     }
     case GetTotalBondedAmount() => {
       blockchainToken.Service.getTotalBondedAmount pipeTo sender()
-      println(self.path)
     }
   }
-
 }
 
 case class CreateToken(Token: Token)

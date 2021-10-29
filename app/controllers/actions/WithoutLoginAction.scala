@@ -37,7 +37,7 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
             val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken.getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
             val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
             val userType = masterAccounts.Service.getUserType(username)
-            val address = blockchainAccounts.Service.tryGetAddress(username)
+            val address = blockchainAccounts.Service.tryGetAddressWithAccountActor(username)
             for {
               _ <- sessionTokenVerify
               _ <- tokenTimeVerify

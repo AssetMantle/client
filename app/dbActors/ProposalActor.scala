@@ -24,35 +24,27 @@ class ProposalActor @Inject()(
   override def receive: Receive = {
     case InsertOrUpdateProposal(proposal) => {
       blockchainProposal.Service.insertOrUpdate(proposal) pipeTo sender()
-      println(self.path)
     }
     case TryGetProposal(id) => {
       blockchainProposal.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetProposalWithActor(id) => {
       blockchainProposal.Service.get(id) pipeTo sender()
-      println(self.path)
     }
     case GetLatestProposalID() => {
       blockchainProposal.Service.getLatestProposalID pipeTo sender()
-      println(self.path)
     }
     case GetAllActiveProposals(time) => {
       blockchainProposal.Service.getAllActiveProposals(time) pipeTo sender()
-      println(self.path)
     }
     case GetAllInActiveProposals(time) => {
       blockchainProposal.Service.getAllInactiveProposals(time) pipeTo sender()
-      println(self.path)
     }
     case DeleteProposal(id) => {
       blockchainProposal.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
     case GetProposals() => {
       blockchainProposal.Service.get() pipeTo sender()
-      println(self.path)
     }
   }
 

@@ -113,12 +113,12 @@ class Startup @Inject()(
   }
 
   private def updateStakingOnStart(staking: Staking.Module): Future[Unit] = {
-    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
+    val insertAllValidators = blockchainValidators.Service.insertMultipleValidatorsWithActor(staking.validators.map(_.toValidator))
 
     def updateDelegations(): Future[Unit] = {
-      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
-      val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.map(_.toRedelegation))
-      val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.map(_.toUndelegation))
+      val insertAllDelegations = blockchainDelegations.Service.insertMultipleDelegationWithActor(staking.delegations.map(_.toDelegation))
+      val insertAllRedelegations = blockchainRedelegations.Service.insertMultipleRedelegationWithActor(staking.redelegations.map(_.toRedelegation))
+      val insertAllUndelegations = blockchainUndelegations.Service.insertMultipleUndelegationWithActor(staking.unbonding_delegations.map(_.toUndelegation))
 
       for {
         _ <- insertAllDelegations
@@ -136,7 +136,7 @@ class Startup @Inject()(
   }
 
   private def updateDistributionOnStart(distribution: Distribution.Module): Future[Unit] = {
-    val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.map(_.toWithdrawAddress))
+    val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultipleWithdrawAddressWithActor(distribution.delegator_withdraw_infos.map(_.toWithdrawAddress))
     (for {
       _ <- insertAllWithdrawAddresses
     } yield ()).recover {
@@ -174,7 +174,7 @@ class Startup @Inject()(
     val communityPoolResponse = getCommunityPool.Service.get
 
     def insert(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = {
-      blockchainTokens.Service.insertMultiple(totalSupplyResponse.supply.map(x => Token(denom = x.denom, totalSupply = x.amount,
+      blockchainTokens.Service.insertMultipleTokenWithActor(totalSupplyResponse.supply.map(x => Token(denom = x.denom, totalSupply = x.amount,
         bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
         notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
         communityPool = communityPoolResponse.pool.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
@@ -195,7 +195,7 @@ class Startup @Inject()(
   }
 
   private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
-    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.`type`, value = parameter))
+    val insert = blockchainParameters.Service.insertOrUpdateParameterWithActor(blockchain.Parameter(parameterType = parameter.`type`, value = parameter))
 
     (for {
       _ <- insert
@@ -258,7 +258,7 @@ class Startup @Inject()(
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
       val abciInfo = getABCIInfo.Service.get()
 
-      def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
+      def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeightWithActor
 
       def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerHeight: Int) = if (latestExplorerHeight == 0) {
         for {
@@ -280,7 +280,7 @@ class Startup @Inject()(
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
           actors.Service.appWebSocketActor ! actors.Message.WebSocket.BlockchainConnectionLost(true)
         } else {
-          val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
+          val latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeightWithActor
           for {
             latestExplorerHeight <- latestExplorerHeight
           } yield {

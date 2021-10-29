@@ -24,32 +24,24 @@ class MaintainerActor @Inject()(
   override def receive: Receive = {
     case CreateMaintainer(maintainer) => {
       blockchainMaintainer.Service.create(maintainer) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleMaintainer(maintainers) => {
       blockchainMaintainer.Service.insertMultiple(maintainers) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateMaintainer(maintainer) => {
       blockchainMaintainer.Service.insertOrUpdate(maintainer) pipeTo sender()
-      println(self.path)
     }
     case TryGetMaintainer(id) => {
       blockchainMaintainer.Service.tryGet(id) pipeTo sender()
-      println(self.path)
     }
     case GetMaintainer(id) => {
       blockchainMaintainer.Service.get(id) pipeTo sender()
-      println(self.path)
     }
-
     case GetAllMaintainer() => {
       blockchainMaintainer.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case DeleteMaintainer(id) => {
       blockchainMaintainer.Service.delete(id) pipeTo sender()
-      println(self.path)
     }
   }
 

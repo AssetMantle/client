@@ -21,25 +21,19 @@ class BlockchainActor @Inject()(
 
   override def receive: Receive = {
     case Get(address) => {
-      println(s"address is fetched $address")
       blockchainBalance.Service.get(address) pipeTo sender()
-      println(self.path)
     }
     case Create(address, coins) => {
       blockchainBalance.Service.create(address, coins) pipeTo sender()
-      println(self.path)
     }
     case TryGet(address) => {
       blockchainBalance.Service.tryGet(address) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdate(balance) => {
       blockchainBalance.Service.insertOrUpdate(balance) pipeTo sender()
-      println(self.path)
     }
     case GetList(addresses) => {
       blockchainBalance.Service.getList(addresses) pipeTo sender()
-      println(self.path)
     }
   }
 

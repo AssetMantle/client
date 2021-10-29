@@ -3,7 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AccountActor, AddActor, CreateValidatorWithActor, DeleteValidatorWithOpAddress, GetAllActiveValidatorList, GetAllInactiveValidatorList, GetAllUnbondedValidatorList, GetAllUnbondingValidatorList, GetAllValidatorByHexAddresses, GetAllValidators, GetTotalVotingPower, GetValidatorByOperatorAddresses, InsertMultipleValidators, InsertOrUpdateValidator, JailValidator, TryGetValidator, TryGetValidatorByHexAddress, TryGetValidatorByOperatorAddress, TryGetValidatorHexAddress, TryGetValidatorOperatorAddress, TryGetValidatorProposerName, ValidatorActor, ValidatorExists}
-import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
@@ -213,85 +212,83 @@ class Validators @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val validatorActor = dbActors.Service.actorSystem.actorOf(ValidatorActor.props(Validators.this), "validatorActor")
-
-    routerActor ! AddActor(None, validatorActor.actorRef)
-
-    def createValidatorWithActor(validator: Validator): Future[String] = (masterActor ? CreateValidatorWithActor(validator)).mapTo[String]
+    
+    def createValidatorWithActor(validator: Validator): Future[String] = (validatorActor ? CreateValidatorWithActor(validator)).mapTo[String]
 
     def create(validator: Validator): Future[String] = add(validator)
 
-    def insertMultipleValidatorsWithActor(validators: Seq[Validator]): Future[Seq[String]] = (masterActor ? InsertMultipleValidators(validators)).mapTo[Seq[String]]
+    def insertMultipleValidatorsWithActor(validators: Seq[Validator]): Future[Seq[String]] = (validatorActor ? InsertMultipleValidators(validators)).mapTo[Seq[String]]
 
     def insertMultiple(validators: Seq[Validator]): Future[Seq[String]] = addMultiple(validators)
 
-    def insertOrUpdateValidatorWithActor(validator: Validator): Future[Int] = (masterActor ? InsertOrUpdateValidator(validator)).mapTo[Int]
+    def insertOrUpdateValidatorWithActor(validator: Validator): Future[Int] = (validatorActor ? InsertOrUpdateValidator(validator)).mapTo[Int]
 
     def insertOrUpdate(validator: Validator): Future[Int] = upsert(validator)
 
-    def tryGetValidatorWithActor(address: String): Future[Validator] = (masterActor ? TryGetValidator(address)).mapTo[Validator]
+    def tryGetValidatorWithActor(address: String): Future[Validator] = (validatorActor ? TryGetValidator(address)).mapTo[Validator]
 
     def tryGet(address: String): Future[Validator] = tryGetValidatorByOperatorOrHexAddress(address).map(_.deserialize)
 
-    def getAllValidatorByHexAddressesWithActor(hexAddresses: Seq[String]): Future[Seq[Validator]] = (masterActor ? GetAllValidatorByHexAddresses(hexAddresses)).mapTo[Seq[Validator]]
+    def getAllValidatorByHexAddressesWithActor(hexAddresses: Seq[String]): Future[Seq[Validator]] = (validatorActor ? GetAllValidatorByHexAddresses(hexAddresses)).mapTo[Seq[Validator]]
 
     def getAllByHexAddresses(hexAddresses: Seq[String]): Future[Seq[Validator]] = tryGetValidatorsByHexAddresses(hexAddresses).map(_.map(_.deserialize))
 
-    def tryGetValidatorByOperatorAddressWithActor(operatorAddress: String): Future[Seq[Validator]] = (masterActor ? TryGetValidatorByOperatorAddress(operatorAddress)).mapTo[Seq[Validator]]
+    def tryGetValidatorByOperatorAddressWithActor(operatorAddress: String): Future[Seq[Validator]] = (validatorActor ? TryGetValidatorByOperatorAddress(operatorAddress)).mapTo[Seq[Validator]]
 
     def tryGetByOperatorAddress(operatorAddress: String): Future[Validator] = tryGetValidatorByOperatorAddress(operatorAddress).map(_.deserialize)
 
-    def tryGetValidatorByHexAddressWithActor(hexAddress: String): Future[Seq[Validator]] = (masterActor ? TryGetValidatorByHexAddress(hexAddress)).mapTo[Seq[Validator]]
+    def tryGetValidatorByHexAddressWithActor(hexAddress: String): Future[Validator] = (validatorActor ? TryGetValidatorByHexAddress(hexAddress)).mapTo[Validator]
 
     def tryGetByHexAddress(hexAddress: String): Future[Validator] = tryGetValidatorByHexAddress(hexAddress).map(_.deserialize)
 
-    def tryGetValidatorOperatorAddressWithActor(hexAddress: String): Future[Seq[Validator]] = (masterActor ? TryGetValidatorOperatorAddress(hexAddress)).mapTo[Seq[Validator]]
+    def tryGetValidatorOperatorAddressWithActor(hexAddress: String): Future[String] = (validatorActor ? TryGetValidatorOperatorAddress(hexAddress)).mapTo[String]
 
     def tryGetOperatorAddress(hexAddress: String): Future[String] = tryGetOperatorAddressByHexAddress(hexAddress)
 
-    def tryGetValidatorHexAddressWithActor(operatorAddress: String): Future[Seq[Validator]] = (masterActor ? TryGetValidatorHexAddress(operatorAddress)).mapTo[Seq[Validator]]
+    def tryGetValidatorHexAddressWithActor(operatorAddress: String): Future[String] = (validatorActor ? TryGetValidatorHexAddress(operatorAddress)).mapTo[String]
 
     def tryGetHexAddress(operatorAddress: String): Future[String] = tryGethexAddressByOperatorAddress(operatorAddress)
 
-    def tryGetProposerNameWithActor(hexAddress: String): Future[String] = (masterActor ? TryGetValidatorProposerName(hexAddress)).mapTo[String]
+    def tryGetProposerNameWithActor(hexAddress: String): Future[String] = (validatorActor ? TryGetValidatorProposerName(hexAddress)).mapTo[String]
 
     def tryGetProposerName(hexAddress: String): Future[String] = tryGetValidatorByHexAddress(hexAddress).map { x =>
       val validator = x.deserialize
       validator.description.moniker
     }
 
-    def getAllValidatorsWithActor: Future[Seq[Validator]] = (masterActor ? GetAllValidators()).mapTo[Seq[Validator]]
+    def getAllValidatorsWithActor: Future[Seq[Validator]] = (validatorActor ? GetAllValidators()).mapTo[Seq[Validator]]
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
 
-    def getAllActiveValidatorListWithActor: Future[Seq[Validator]] = (masterActor ? GetAllActiveValidatorList()).mapTo[Seq[Validator]]
+    def getAllActiveValidatorListWithActor: Future[Seq[Validator]] = (validatorActor ? GetAllActiveValidatorList()).mapTo[Seq[Validator]]
 
     def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONED).map(_.map(_.deserialize))
 
-    def getAllInActiveValidatorListWithActor: Future[Seq[Validator]] = (masterActor ? GetAllInactiveValidatorList()).mapTo[Seq[Validator]]
+    def getAllInActiveValidatorListWithActor: Future[Seq[Validator]] = (validatorActor ? GetAllInactiveValidatorList()).mapTo[Seq[Validator]]
 
     def getAllInactiveValidatorList: Future[Seq[Validator]] = getAllInactiveValidators.map(_.map(_.deserialize))
 
-    def getAllUnbondingValidatorListWithActor: Future[Seq[Validator]] = (masterActor ? GetAllUnbondingValidatorList()).mapTo[Seq[Validator]]
+    def getAllUnbondingValidatorListWithActor: Future[Seq[Validator]] = (validatorActor ? GetAllUnbondingValidatorList()).mapTo[Seq[Validator]]
 
     def getAllUnbondingValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDING).map(_.map(_.deserialize))
 
-    def getAllUnbondedValidatorListWithActor: Future[Seq[Validator]] = (masterActor ? GetAllUnbondedValidatorList()).mapTo[Seq[Validator]]
+    def getAllUnbondedValidatorListWithActor: Future[Seq[Validator]] = (validatorActor ? GetAllUnbondedValidatorList()).mapTo[Seq[Validator]]
 
     def getAllUnbondedValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDED).map(_.map(_.deserialize))
 
-    def getByOperatorAddressesWithActor(operatorAddresses: Seq[String]): Future[Seq[Validator]] = (masterActor ? GetValidatorByOperatorAddresses(operatorAddresses)).mapTo[Seq[Validator]]
+    def getByOperatorAddressesWithActor(operatorAddresses: Seq[String]): Future[Seq[Validator]] = (validatorActor ? GetValidatorByOperatorAddresses(operatorAddresses)).mapTo[Seq[Validator]]
 
     def getByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[Validator]] = getValidatorsByOperatorAddresses(operatorAddresses).map(_.map(_.deserialize))
 
-    def existsValidatorWithActor(operatorAddress: String): Future[Boolean] = (masterActor ? ValidatorExists(operatorAddress)).mapTo[Boolean]
+    def existsValidatorWithActor(operatorAddress: String): Future[Boolean] = (validatorActor ? ValidatorExists(operatorAddress)).mapTo[Boolean]
 
     def exists(operatorAddress: String): Future[Boolean] = checkExistsByOperatorAddress(operatorAddress)
 
-    def jailValidatorWithActor(operatorAddress: String): Future[Int] = (masterActor ? JailValidator(operatorAddress)).mapTo[Int]
+    def jailValidatorWithActor(operatorAddress: String): Future[Int] = (validatorActor ? JailValidator(operatorAddress)).mapTo[Int]
 
     def jailValidator(operatorAddress: String): Future[Int] = updateJailedStatus(operatorAddress = operatorAddress, jailed = true)
 
-    def deleteValidator(operatorAddress: String): Future[Unit] = (masterActor ? DeleteValidatorWithOpAddress(operatorAddress)).mapTo[Unit]
+    def deleteValidator(operatorAddress: String): Future[Unit] = (validatorActor ? DeleteValidatorWithOpAddress(operatorAddress)).mapTo[Unit]
 
       def delete(operatorAddress: String): Future[Unit] = {
       val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
@@ -307,7 +304,7 @@ class Validators @Inject()(
       }
     }
 
-    def getTotalVotingPowerWithActor: Future[MicroNumber] = (masterActor ? GetTotalVotingPower()).mapTo[MicroNumber]
+    def getTotalVotingPowerWithActor: Future[MicroNumber] = (validatorActor ? GetTotalVotingPower()).mapTo[MicroNumber]
 
     def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
   }

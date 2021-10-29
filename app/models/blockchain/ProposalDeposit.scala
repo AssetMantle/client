@@ -2,7 +2,6 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.Service.{masterActor, routerActor}
 import dbActors.{AddActor, DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposal, InsertOrUpdateProposalDeposit, ProposalActor, ProposalDepositActor, TryGetProposalDeposit}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -110,26 +109,24 @@ class ProposalDeposits @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val proposalDepositActor = dbActors.Service.actorSystem.actorOf(ProposalDepositActor.props(ProposalDeposits.this), "proposalDepositActor")
-
-    routerActor ! AddActor(None, proposalDepositActor.actorRef)
-
-    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (masterActor ? TryGetProposalDeposit(proposalID)).mapTo[ProposalDeposit]
+    
+    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (proposalDepositActor ? TryGetProposalDeposit(proposalID)).mapTo[ProposalDeposit]
 
     def tryGet(proposalID: Int): Future[ProposalDeposit] = tryGetByID(proposalID).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (masterActor ? InsertOrUpdateProposalDeposit(proposalDeposit)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (proposalDepositActor ? InsertOrUpdateProposalDeposit(proposalDeposit)).mapTo[Int]
 
     def insertOrUpdate(proposalDeposit: ProposalDeposit): Future[Int] = upsert(proposalDeposit)
 
-    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (masterActor ? GetProposalDepositWithActor(proposalID, depositor)).mapTo[Option[ProposalDeposit]]
+    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (proposalDepositActor ? GetProposalDepositWithActor(proposalID, depositor)).mapTo[Option[ProposalDeposit]]
 
     def get(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = getByIDAndDepositor(proposalID = proposalID, depositor = depositor).map(_.map(_.deserialize))
 
-    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (masterActor ? GetByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
+    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActor ? GetByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def getByProposalID(proposalID: Int): Future[Seq[ProposalDeposit]] = getByID(proposalID).map(_.map(_.deserialize))
 
-    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (masterActor ? DeleteByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
+    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActor ? DeleteByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def deleteByProposalID(proposalID: Int): Future[Int] = deleteByID(proposalID)
 

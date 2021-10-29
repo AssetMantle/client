@@ -4,7 +4,6 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.Service.{masterActor, routerActor}
 import dbActors.{AddActor, CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, SplitActor, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
 import exceptions.BaseException
 
@@ -161,46 +160,44 @@ class Tokens @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val tokenActor = dbActors.Service.actorSystem.actorOf(TokenActor.props(Tokens.this), "tokenActor")
-
-    routerActor ! AddActor(None, tokenActor.actorRef)
-
-    def createTokenWithActor(token: Token): Future[String] = (masterActor ? CreateToken(token)).mapTo[String]
+    
+    def createTokenWithActor(token: Token): Future[String] = (tokenActor ? CreateToken(token)).mapTo[String]
 
     def create(token: Token): Future[String] = add(token)
 
-    def getTokenWithActor(denom: String): Future[Token] = (masterActor ? GetToken(denom)).mapTo[Token]
+    def getTokenWithActor(denom: String): Future[Token] = (tokenActor ? GetToken(denom)).mapTo[Token]
 
     def get(denom: String): Future[Token] = findByDenom(denom).map(_.deserialize)
 
-    def getAllTokenWithActor: Future[Seq[Token]] = (masterActor ? GetAllToken()).mapTo[Seq[Token]]
+    def getAllTokenWithActor: Future[Seq[Token]] = (tokenActor ? GetAllToken()).mapTo[Seq[Token]]
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
 
-    def getAllDenomsWithActor: Future[Seq[String]] = (masterActor ? GetAllDenoms()).mapTo[Seq[String]]
+    def getAllDenomsWithActor: Future[Seq[String]] = (tokenActor ? GetAllDenoms()).mapTo[Seq[String]]
 
     def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
 
-    def getStakingTokenWithActor: Future[Token] = (masterActor ? GetStakingToken()).mapTo[Token]
+    def getStakingTokenWithActor: Future[Token] = (tokenActor ? GetStakingToken()).mapTo[Token]
 
     def getStakingToken: Future[Token] = findByDenom(stakingDenom).map(_.deserialize)
 
-    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (masterActor ? InsertMultipleToken(tokens)).mapTo[Seq[String]]
+    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (tokenActor ? InsertMultipleToken(tokens)).mapTo[Seq[String]]
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
-    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (masterActor ? InsertOrUpdateToken(token)).mapTo[Int]
+    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (tokenActor ? InsertOrUpdateToken(token)).mapTo[Int]
 
     def insertOrUpdate(token: Token): Future[Int] = upsert(token)
 
-    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (masterActor ? UpdateStakingAmounts(denom, bondedAmount, notBondedAmount)).mapTo[Int]
+    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (tokenActor ? UpdateStakingAmounts(denom, bondedAmount, notBondedAmount)).mapTo[Int]
 
     def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (masterActor ? UpdateTotalSupplyAndInflation(denom, totalSupply, inflation)).mapTo[Int]
+    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (tokenActor ? UpdateTotalSupplyAndInflation(denom, totalSupply, inflation)).mapTo[Int]
 
     def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationByDenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
 
-    def getTotalBondedAmountWithActor: Future[MicroNumber] = (masterActor ? GetTotalBondedAmount()).mapTo[MicroNumber]
+    def getTotalBondedAmountWithActor: Future[MicroNumber] = (tokenActor ? GetTotalBondedAmount()).mapTo[MicroNumber]
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }

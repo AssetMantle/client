@@ -3,7 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AddActor, DelegationActor, DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
-import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Abstract.ProposalContent
 import models.Trait.Logged
@@ -172,38 +171,36 @@ class Proposals @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val proposalActor = dbActors.Service.actorSystem.actorOf(ProposalActor.props(Proposals.this), "proposalActor")
-
-    routerActor ! AddActor(None, proposalActor.actorRef)
-
-    def tryGetProposalWithActor(id: Int): Future[Proposal] = (masterActor ? TryGetProposal(id)).mapTo[Proposal]
+    
+    def tryGetProposalWithActor(id: Int): Future[Proposal] = (proposalActor ? TryGetProposal(id)).mapTo[Proposal]
 
     def tryGet(id: Int): Future[Proposal] = tryGetByID(id).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (masterActor ? InsertOrUpdateProposal(proposal)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (proposalActor ? InsertOrUpdateProposal(proposal)).mapTo[Int]
 
     def insertOrUpdate(proposal: Proposal): Future[Int] = upsert(proposal)
 
-    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (masterActor ? GetProposalWithActor(id)).mapTo[Option[Proposal]]
+    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (proposalActor ? GetProposalWithActor(id)).mapTo[Option[Proposal]]
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 
-    def getLatestProposalIDWithActor: Future[Int] = (masterActor ? GetLatestProposalID).mapTo[Int]
+    def getLatestProposalIDWithActor: Future[Int] = (proposalActor ? GetLatestProposalID).mapTo[Int]
 
     def getLatestProposalID: Future[Int] = getMaxProposalID
 
-    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (masterActor ? GetAllActiveProposals(time)).mapTo[Seq[Proposal]]
+    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActor ? GetAllActiveProposals(time)).mapTo[Seq[Proposal]]
 
     def getAllActiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.votingEndTime != "" && utilities.Date.isMature(completionTimestamp = x.votingEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (masterActor ? GetAllInActiveProposals(time)).mapTo[Seq[Proposal]]
+    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActor ? GetAllInActiveProposals(time)).mapTo[Seq[Proposal]]
 
     def getAllInactiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.depositEndTime != "" && utilities.Date.isMature(completionTimestamp = x.depositEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def deleteProposalsWithActor(id: Int): Future[Int] = (masterActor ? DeleteProposal(id)).mapTo[Int]
+    def deleteProposalsWithActor(id: Int): Future[Int] = (proposalActor ? DeleteProposal(id)).mapTo[Int]
 
     def delete(id: Int): Future[Int] = deleteByID(id)
 
-    def getProposalsWithActor(): Future[Seq[Proposal]] = (masterActor ? GetProposals).mapTo[Seq[Proposal]]
+    def getProposalsWithActor(): Future[Seq[Proposal]] = (proposalActor ? GetProposals).mapTo[Seq[Proposal]]
 
     def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 

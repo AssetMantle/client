@@ -3,7 +3,6 @@ package models.blockchain
 import akka.pattern.ask
 import akka.util.Timeout
 import dbActors.{AddActor, CreateSplit, DeleteSplit, GetAllSplit, GetByOwnable, GetByOwner, GetByOwnerIDs, GetByOwnerOrOwnable, GetSplit, InsertMultipleSplit, InsertOrUpdateSplit, RedelegationActor, SplitActor, TryGetSplit}
-import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.TransactionMessages.{SplitSend, SplitUnwrap, SplitWrap}
@@ -119,50 +118,48 @@ class Splits @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val splitActor = dbActors.Service.actorSystem.actorOf(SplitActor.props(Splits.this), "splitActor")
-
-    routerActor ! AddActor(None, splitActor.actorRef)
-
-    def createSplitWithActor(split: Split): Future[String] = (masterActor ? CreateSplit(split)).mapTo[String]
+    
+    def createSplitWithActor(split: Split): Future[String] = (splitActor ? CreateSplit(split)).mapTo[String]
 
     def create(split: Split): Future[String] = add(split)
 
-    def getSplitByOwnerWithActor(ownerID: String): Future[Seq[Split]] = (masterActor ? GetByOwner(ownerID)).mapTo[Seq[Split]]
+    def getSplitByOwnerWithActor(ownerID: String): Future[Seq[Split]] = (splitActor ? GetByOwner(ownerID)).mapTo[Seq[Split]]
 
     def getByOwner(ownerID: String): Future[Seq[Split]] = getByOwnerID(ownerID)
 
-    def getSplitByOwnerIDsWithActo(ownerIDs: Seq[String]): Future[Seq[Split]] = (masterActor ? GetByOwnerIDs(ownerIDs)).mapTo[Seq[Split]]
+    def getSplitByOwnerIDsWithActo(ownerIDs: Seq[String]): Future[Seq[Split]] = (splitActor ? GetByOwnerIDs(ownerIDs)).mapTo[Seq[Split]]
 
     def getByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[Split]] = getAllByOwnerIDs(ownerIDs)
 
-    def getSplitByOwnableWithActo(ownableID: String): Future[Seq[Split]] = (masterActor ? GetByOwnable(ownableID)).mapTo[Seq[Split]]
+    def getSplitByOwnableWithActo(ownableID: String): Future[Seq[Split]] = (splitActor ? GetByOwnable(ownableID)).mapTo[Seq[Split]]
 
     def getByOwnable(ownableID: String): Future[Seq[Split]] = getByOwnableID(ownableID)
 
-    def getSplitByOwnerOrOwnableWithActo(id: String): Future[Seq[Split]] = (masterActor ? GetByOwnerOrOwnable(id)).mapTo[Seq[Split]]
+    def getSplitByOwnerOrOwnableWithActo(id: String): Future[Seq[Split]] = (splitActor ? GetByOwnerOrOwnable(id)).mapTo[Seq[Split]]
 
     def getByOwnerOrOwnable(id: String): Future[Seq[Split]] = getByOwnerOrOwnableID(id)
 
-    def getSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (masterActor ? GetSplit(ownerID, ownableID)).mapTo[Option[Split]]
+    def getSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (splitActor ? GetSplit(ownerID, ownableID)).mapTo[Option[Split]]
 
     def get(ownerID: String, ownableID: String): Future[Option[Split]] = getByOwnerAndOwnableID(ownerID = ownerID, ownableID = ownableID)
 
-    def tryGetSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (masterActor ? TryGetSplit(ownerID, ownableID)).mapTo[Option[Split]]
+    def tryGetSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (splitActor ? TryGetSplit(ownerID, ownableID)).mapTo[Option[Split]]
 
     def tryGet(ownerID: String, ownableID: String): Future[Split] = tryGetByOwnerAndOwnableID(ownerID = ownerID, ownableID = ownableID)
 
-    def getAllSplitWithActor: Future[Seq[Split]] = (masterActor ? GetAllSplit()).mapTo[Seq[Split]]
+    def getAllSplitWithActor: Future[Seq[Split]] = (splitActor ? GetAllSplit()).mapTo[Seq[Split]]
 
     def getAll: Future[Seq[Split]] = getAllSplits
 
-    def insertMultipleSplitWithActor(splits: Seq[Split]): Future[Seq[String]] = (masterActor ? InsertMultipleSplit(splits)).mapTo[Seq[String]]
+    def insertMultipleSplitWithActor(splits: Seq[Split]): Future[Seq[String]] = (splitActor ? InsertMultipleSplit(splits)).mapTo[Seq[String]]
 
     def insertMultiple(splits: Seq[Split]): Future[Seq[String]] = addMultiple(splits)
 
-    def insertOrUpdateSplitWithActor(split: Split): Future[Int] = (masterActor ? InsertOrUpdateSplit(split)).mapTo[Int]
+    def insertOrUpdateSplitWithActor(split: Split): Future[Int] = (splitActor ? InsertOrUpdateSplit(split)).mapTo[Int]
 
     def insertOrUpdate(split: Split): Future[Int] = upsert(split)
 
-    def deleteSplitWithActor(ownerID: String, ownableID: String): Future[Int] = (masterActor ? DeleteSplit(ownerID, ownableID)).mapTo[Int]
+    def deleteSplitWithActor(ownerID: String, ownableID: String): Future[Int] = (splitActor ? DeleteSplit(ownerID, ownableID)).mapTo[Int]
 
     def delete(ownerID: String, ownableID: String): Future[Int] = deleteByIDs(ownerID = ownerID, ownableID = ownableID)
 

@@ -24,37 +24,28 @@ class BlockActor @Inject()(
   override def receive: Receive = {
     case CreateBlock(height, time, proposerAddress, validators) => {
       blockchainBlock.Service.create(height, time, proposerAddress, validators) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateBlock(height, time, proposerAddress, validators) => {
       blockchainBlock.Service.insertOrUpdate(height, time, proposerAddress, validators) pipeTo sender()
-      println(self.path)
     }
     case TryGetBlock(height) => {
       blockchainBlock.Service.tryGet(height) pipeTo sender()
-      println(self.path)
     }
 
     case TryGetProposerAddressBlock(height) => {
       blockchainBlock.Service.tryGetProposerAddress(height) pipeTo sender()
-      println(self.path)
     }
     case GetLatestBlockHeight() => {
       blockchainBlock.Service.getLatestBlockHeight pipeTo sender()
-      println(self.path)
     }
     case GetLatestBlock() => {
       blockchainBlock.Service.getLatestBlock pipeTo sender()
-      println(self.path)
     }
     case GetBlocksPerPage(pageNumber) => {
       blockchainBlock.Service.getBlocksPerPage(pageNumber) pipeTo sender()
-      println(self.path)
     }
-
     case GetLastNBlocks(n) => {
       blockchainBlock.Service.getLastNBlocks(n) pipeTo sender()
-      println(self.path)
     }
   }
 

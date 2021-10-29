@@ -6,7 +6,6 @@ import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
 import dbActors.{AddActor, BlockchainActor, Master}
-import dbActors.Service.{masterActor, routerActor}
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Balances, Maintainer, Meta}
@@ -45,9 +44,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
-  private val startAkka = configuration.get[Boolean]("akka.start")
-
-
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
@@ -74,13 +70,13 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
         else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
         else {
-          val asset = blockchainAssets.Service.get(query)
-          val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
-          val identity = blockchainIdentities.Service.get(query)
-          val order = blockchainOrders.Service.get(query)
-          val metaList = blockchainMetas.Service.get(Seq(query))
-          val classification = blockchainClassifications.Service.get(query)
-          val maintainer = blockchainMaintainers.Service.get(query)
+          val asset = blockchainAssets.Service.getAssetWithActor(query)
+          val splits = blockchainSplits.Service.getSplitByOwnerOrOwnableWithActo(query)
+          val identity = blockchainIdentities.Service.getIdentityWithActor(query)
+          val order = blockchainOrders.Service.getOrderWithActor(query)
+          val metaList = blockchainMetas.Service.getMetasWithActor(Seq(query))
+          val classification = blockchainClassifications.Service.getClassificationWithActor(query)
+          val maintainer = blockchainMaintainers.Service.getMaintainerWithActor(query)
 
           def searchResult(asset: Option[models.blockchain.Asset], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.Order], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
             if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
@@ -111,12 +107,4 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         }
     }
   }
-
-
-  masterActor ! "Start"
-
-  routerActor ! "Start"
-  masterActor ! AddActor(None, routerActor.actorRef)
-
-
 }

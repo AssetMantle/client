@@ -188,7 +188,7 @@ class AssetController @Inject()(
       val properties = masterProperties.Service.getAll(entityID = assetID, entityType = constants.Blockchain.Entity.ASSET)
       val ownerID = masterSplits.Service.tryGetOwnerID(assetID)
 
-      def getProvisionedAddresses(ownerID: String) = blockchainIdentities.Service.getAllProvisionAddresses(ownerID)
+      def getProvisionedAddresses(ownerID: String) = blockchainIdentities.Service.getAllProvisionAddressesByIdentityWithActor(ownerID)
 
       (for {
         properties <- properties

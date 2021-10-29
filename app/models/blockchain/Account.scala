@@ -23,7 +23,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import dbActors.Service.{masterActor, routerActor}
 import dbActors.{AccountActor, AddActor}
 
 import scala.concurrent.duration.DurationInt
@@ -152,46 +151,44 @@ class Accounts @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val accountActor = dbActors.Service.actorSystem.actorOf(AccountActor.props(Accounts.this), "accountActor")
-
-    routerActor ! AddActor(None, accountActor.actorRef)
-
-    def createWithAccountActor(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = (masterActor ? dbActors.CreateAccount(address, username, accountType, publicKey)).mapTo[String]
+    
+    def createWithAccountActor(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = (accountActor ? dbActors.CreateAccount(address, username, accountType, publicKey)).mapTo[String]
 
     def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
-    def tryGetWithAccountActor(address: String): Future[Account] = (masterActor ? dbActors.TryGetAccount(address)).mapTo[Account]
+    def tryGetWithAccountActor(address: String): Future[Account] = (accountActor ? dbActors.TryGetAccount(address)).mapTo[Account]
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
-    def insertOrUpdateWithAccountActor(account: Account): Future[Int] = (masterActor ? dbActors.InsertOrUpdateAccount(account)).mapTo[Int]
+    def insertOrUpdateWithAccountActor(account: Account): Future[Int] = (accountActor ? dbActors.InsertOrUpdateAccount(account)).mapTo[Int]
 
     def insertOrUpdate(account: Account): Future[Int] = upsert(account)
 
-    def getWithAccountActor(address: String): Future[Option[Account]] = (masterActor ? dbActors.GetAccount(address)).mapTo[Option[Account]]
+    def getWithAccountActor(address: String): Future[Option[Account]] = (accountActor ? dbActors.GetAccount(address)).mapTo[Option[Account]]
 
     def get(address: String): Future[Option[Account]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def getListWithAccountActor(addresses: Seq[String]): Future[Seq[Account]] = (masterActor ? dbActors.GetListAccount(addresses)).mapTo[Seq[Account]]
+    def getListWithAccountActor(addresses: Seq[String]): Future[Seq[Account]] = (accountActor ? dbActors.GetListAccount(addresses)).mapTo[Seq[Account]]
 
     def getList(addresses: Seq[String]): Future[Seq[Account]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
-    def tryGetByUsernameWithAccountActor(username: String): Future[Account] = (masterActor ? dbActors.TryGetByUsernameAccount(username)).mapTo[Account]
+    def tryGetByUsernameWithAccountActor(username: String): Future[Account] = (accountActor ? dbActors.TryGetByUsernameAccount(username)).mapTo[Account]
 1
     def tryGetByUsername(username: String): Future[Account] = findByUsername(username).map(_.deserialize)
 
-    def tryGetUsernameWithAccountActor(address: String): Future[String] = (masterActor ? dbActors.TryGetUsernameAccount(address)).mapTo[String]
+    def tryGetUsernameWithAccountActor(address: String): Future[String] = (accountActor ? dbActors.TryGetUsernameAccount(address)).mapTo[String]
 
     def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
 
-    def getUsernameWithAccountActor(address: String): Future[Option[String]] = (masterActor ? dbActors.GetUsernameAccount(address)).mapTo[Option[String]]
+    def getUsernameWithAccountActor(address: String): Future[Option[String]] = (accountActor ? dbActors.GetUsernameAccount(address)).mapTo[Option[String]]
 
     def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
 
-    def tryGetAddressWithAccountActor(username: String): Future[String] = findAddressByID(username)
+    def tryGetAddressWithAccountActor(username: String): Future[String] = (accountActor ? dbActors.TryGetAddressAccount(username)).mapTo[String]
 
-    def tryGetAddress(username: String): Future[String] = (masterActor ? dbActors.TryGetAddressAccount(username)).mapTo[String]
+    def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
-    def checkAccountExistsWithAccountActor(username: String): Future[Boolean] = (masterActor ? dbActors.CheckAccountExists(username)).mapTo[Boolean]
+    def checkAccountExistsWithAccountActor(username: String): Future[Boolean] = (accountActor ? dbActors.CheckAccountExists(username)).mapTo[Boolean]
 
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
 

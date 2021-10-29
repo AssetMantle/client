@@ -24,27 +24,20 @@ class WithdrawAddressActor @Inject()(
   override def receive: Receive = {
     case CreateWithdrawAddress(withdrawAddress) => {
       blockchainWithdrawAddress.Service.create(withdrawAddress) pipeTo sender()
-      println(self.path)
     }
     case InsertMultipleWithdrawAddress(withdrawAddresses) => {
       blockchainWithdrawAddress.Service.insertMultiple(withdrawAddresses) pipeTo sender()
-      println(self.path)
     }
     case InsertOrUpdateWithdrawAddress(withdrawAddress) => {
       blockchainWithdrawAddress.Service.insertOrUpdate(withdrawAddress) pipeTo sender()
-      println(self.path)
     }
     case GetAllWithdrawAddresses() => {
       blockchainWithdrawAddress.Service.getAll pipeTo sender()
-      println(self.path)
     }
     case GetWithdrawAddress(delegatorAddress) => {
       blockchainWithdrawAddress.Service.get(delegatorAddress) pipeTo sender()
-      println(self.path)
     }
-
   }
-
 }
 
 case class CreateWithdrawAddress(withdrawAddress: WithdrawAddress)
