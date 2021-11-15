@@ -1,6 +1,7 @@
 package controllers
 
 import akka.actor.Props
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import akka.pattern.ask
 import controllers.actions._
 import controllers.results.WithUsernameToken
@@ -107,4 +108,14 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         }
     }
   }
+  startup.start()
+
+  ClusterSharding(dbActors.Service.actorSystem).start(
+    typeName = "blockchainCluster",
+    entityProps = BlockchainActor.props(balances),
+    settings = ClusterShardingSettings(dbActors.Service.actorSystem),
+    extractEntityId = dbActors.ShardSettings.extractEntityId,
+    extractShardId = dbActors.ShardSettings.extractShardId
+
+  )
 }
