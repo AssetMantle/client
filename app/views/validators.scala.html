@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import controllers.view.OtherApp
+@import utilities.Configuration.OtherApp
 
 @(validatorAddress: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 

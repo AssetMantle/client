@@ -7,8 +7,7 @@
     @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.map{case (operator, amount) => validatorsMoniker.getOrElse(operator, operator) -> amount.toDouble}.toList: _*), showLegend = false)
     <div>
     @delegations.map { case (validatorAddress, amount) =>
-        @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")))
-        @commonTextInfo(constants.View.AMOUNT_DELEGATED, utilities.NumericOperation.formatNumber(amount))
+        @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(utilities.NumericOperation.formatNumber(amount)))
     }
     </div>
 </div>

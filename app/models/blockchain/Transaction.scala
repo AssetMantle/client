@@ -222,7 +222,7 @@ class Transactions @Inject()(
         val numTxs = getTransactionsNumberByHeightRange(s, e)
         for {
           numTxs <- numTxs
-        } yield s"""$s - $e""" -> numTxs
+        } yield s"""${s/transactionsStatisticsBinWidth} - ${e/transactionsStatisticsBinWidth}""" -> numTxs
       }
       for {
         result <- result
