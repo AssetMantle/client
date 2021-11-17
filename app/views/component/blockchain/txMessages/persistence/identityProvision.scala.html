@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[IdentityProvision]) { identityProvision =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityProvision.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityProvision.from}'))")))
     @commonHtmlInfo(constants.View.TO, commonJavascriptLink(identityProvision.to, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityProvision.to}'))")))
-    @commonHtmlInfo(constants.View.IDENTITY_ID, commonLink(identityProvision.identityID, routes.IndexController.search(identityProvision.identityID)))
+    @commonHtmlInfo(constants.View.IDENTITY_ID, commonJavascriptLink(identityProvision.identityID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${identityProvision.identityID}'))")))
 }

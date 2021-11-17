@@ -8,8 +8,8 @@
 @defining(msg.asInstanceOf[IdentityIssue]) { identityIssue =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityIssue.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityIssue.from}'))")))
     @commonHtmlInfo(constants.View.TO, commonJavascriptLink(identityIssue.to, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityIssue.to}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(identityIssue.fromID, routes.IndexController.search(identityIssue.fromID)))
-    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(identityIssue.classificationID, routes.IndexController.search(identityIssue.classificationID)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(identityIssue.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${identityIssue.fromID}'))")))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(identityIssue.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${identityIssue.classificationID}'))")))
     @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
     @views.html.component.blockchain.metaProperties(identityIssue.immutableMetaProperties.metaPropertyList)
     @Messages(constants.View.MUTABLE_META_PROPERTIES):

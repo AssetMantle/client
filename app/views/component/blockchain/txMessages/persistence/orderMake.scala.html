@@ -7,10 +7,10 @@
 
 @defining(msg.asInstanceOf[OrderMake]) { orderMake =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderMake.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderMake.from}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderMake.fromID, routes.IndexController.search(orderMake.fromID)))
-    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(orderMake.classificationID, routes.IndexController.search(orderMake.classificationID)))
-    @commonHtmlInfo(constants.View.MAKER_OWNABLE_ID, commonLink(orderMake.makerOwnableID, routes.IndexController.search(orderMake.makerOwnableID)))
-    @commonHtmlInfo(constants.View.TAKER_OWNABLE_ID, commonLink(orderMake.takerOwnableID, routes.IndexController.search(orderMake.takerOwnableID)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(orderMake.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.fromID}'))")))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(orderMake.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.classificationID}'))")))
+    @commonHtmlInfo(constants.View.MAKER_OWNABLE_ID, commonJavascriptLink(orderMake.makerOwnableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.makerOwnableID}'))")))
+    @commonHtmlInfo(constants.View.TAKER_OWNABLE_ID, commonJavascriptLink(orderMake.takerOwnableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.takerOwnableID}'))")))
     @commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, orderMake.makerOwnableSplit.toString)
     @commonIntInfo(constants.View.EXPIRES_IN, orderMake.expiresIn)
     @Messages(constants.View.IMMUTABLE_META_PROPERTIES):

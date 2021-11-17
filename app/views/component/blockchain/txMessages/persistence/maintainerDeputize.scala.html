@@ -6,9 +6,9 @@
 
 @defining(msg.asInstanceOf[MaintainerDeputize]) { maintainerDeputize =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(maintainerDeputize.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${maintainerDeputize.from}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(maintainerDeputize.fromID, routes.IndexController.search(maintainerDeputize.fromID)))
-    @commonHtmlInfo(constants.View.TO_ID, commonLink(maintainerDeputize.toID, routes.IndexController.search(maintainerDeputize.toID)))
-    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonLink(maintainerDeputize.classificationID, routes.IndexController.search(maintainerDeputize.classificationID)))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(maintainerDeputize.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${maintainerDeputize.fromID}'))")))
+    @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(maintainerDeputize.toID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${maintainerDeputize.toID}'))")))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(maintainerDeputize.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${maintainerDeputize.classificationID}'))")))
     @Messages(constants.View.MAINTAINED_TRAITS):
     @views.html.component.blockchain.properties(maintainerDeputize.maintainedTraits.propertyList)
     @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(maintainerDeputize.addMaintainer))
