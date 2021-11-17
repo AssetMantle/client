@@ -554,6 +554,25 @@ object View {
     constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
     constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
     constants.Blockchain.TransactionMessage.TRANSFER -> "MESSAGE_IBC_TRANSFER",
+    constants.Blockchain.TransactionMessage.ASSET_DEFINE -> "MESSAGE_ASSET_DEFINE",
+    constants.Blockchain.TransactionMessage.ASSET_MINT -> "MESSAGE_ASSET_MINT",
+    constants.Blockchain.TransactionMessage.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
+    constants.Blockchain.TransactionMessage.ASSET_BURN -> "MESSAGE_ASSET_BURN",
+    constants.Blockchain.TransactionMessage.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
+    constants.Blockchain.TransactionMessage.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
+    constants.Blockchain.TransactionMessage.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
+    constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
+    constants.Blockchain.TransactionMessage.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    constants.Blockchain.TransactionMessage.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
+    constants.Blockchain.TransactionMessage.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
+    constants.Blockchain.TransactionMessage.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
+    constants.Blockchain.TransactionMessage.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
+    constants.Blockchain.TransactionMessage.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
+    constants.Blockchain.TransactionMessage.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    constants.Blockchain.TransactionMessage.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
+    constants.Blockchain.TransactionMessage.META_REVEAL -> "MESSAGE_META_REVEAL",
+    constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE -> "MESSAGE_MAINTAINER_DEPUTIZE",
+
   )
 
 }
