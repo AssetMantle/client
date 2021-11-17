@@ -13,7 +13,7 @@ object ProposalDepositResponse {
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
-  case class Response(deposit: Deposit) extends BaseResponse
+  case class Response(result: Deposit) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

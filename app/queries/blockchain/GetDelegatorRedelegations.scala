@@ -4,6 +4,7 @@ import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.DelegatorRedelegationsResponse.Response
+
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,34 +20,30 @@ class GetDelegatorRedelegations @Inject()()(implicit wsClient: WSClient, configu
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "cosmos/staking/v1beta1/delegators"
+  private val path = "staking/redelegations"
 
-  private val path2 = "/redelegations"
+  private val url = ip + ":" + port + "/" + path
 
-  private val path3 = "src_validator_addr="
-
-  private val path4 = "dst_validator_addr="
-
-  private val url = ip + ":" + port + "/" + path1 + "/"
-
-  private def action(url: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
+  private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 
   object Service {
 
-    def getAll(delegatorAddress: String): Future[Response] = action(url + delegatorAddress + path2).recover {
+    def getAll(delegatorAddress: String): Future[Response] = action.map(x => Response(result = x.result.filter(_.delegator_address == delegatorAddress))).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
 
-    def getWithSourceValidator(delegatorAddress: String, sourceValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path3 + sourceValidatorAddress).recover {
+    def getWithSourceValidator(delegatorAddress: String, sourceValidatorAddress: String): Future[Response] = action.map(x => Response(result = x.result.filter(y => y.delegator_address == delegatorAddress && y.validator_src_address == sourceValidatorAddress))).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
 
-    def getWithDestinationValidator(delegatorAddress: String, destinationValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path4 + destinationValidatorAddress).recover {
+    def getWithDestinationValidator(delegatorAddress: String, destinationValidatorAddress: String): Future[Response] = action.map(x => Response(result = x.result.filter(y => y.delegator_address == delegatorAddress && y.validator_dst_address == destinationValidatorAddress))).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
     }
 
-    def getWithSourceAndDestinationValidator(delegatorAddress: String, sourceValidatorAddress: String, destinationValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path3 + sourceValidatorAddress + "&" + path4 + destinationValidatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+    def getWithSourceAndDestinationValidator(delegatorAddress: String, sourceValidatorAddress: String, destinationValidatorAddress: String): Future[Response] = {
+      action.map(x => Response(result = x.result.filter(y => y.delegator_address == delegatorAddress && y.validator_src_address == sourceValidatorAddress && y.validator_dst_address == destinationValidatorAddress))).recover {
+        case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      }
     }
   }
 

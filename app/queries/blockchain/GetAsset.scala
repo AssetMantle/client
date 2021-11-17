@@ -20,7 +20,7 @@ class GetAsset @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "assets/assets"
+  private val path = "xprt/assets/assets"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

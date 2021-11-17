@@ -20,7 +20,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/auth/v1beta1/accounts"
+  private val path = "auth/accounts"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

@@ -12,7 +12,7 @@ object ProposalVoteResponse {
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
-  case class Response(vote: Vote) extends BaseResponse
+  case class Response(result: Vote) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

@@ -73,10 +73,10 @@ object ProposalContents {
     case _ => throw new BaseException(constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE)
   }
 
-  // Cannot do simply as interface with member `@type` because structure of TextProposal and CancelSoftwareUpgrade is exactly same.
+  // Cannot do simply as interface with member `type` because structure of TextProposal and CancelSoftwareUpgrade is exactly same.
   // Though TextProposal seems to be part of legacy
   implicit val proposalContentReads: Reads[ProposalContent] = (
-    (JsPath \ "@type").read[String] and
+    (JsPath \ "type").read[String] and
       JsPath.read[JsObject]
     ) (proposalContentApply _)
 

@@ -20,7 +20,7 @@ class GetIdentity @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "identities/identities"
+  private val path = "xprt/identities/identities"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

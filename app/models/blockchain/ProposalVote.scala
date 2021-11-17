@@ -108,7 +108,7 @@ class ProposalVotes @Inject()(
     def insertOrUpdateProposal(proposalID: String, address: String): Future[Unit] = {
       val proposalVoteResponse = getProposalVote.Service.get(id = proposalID, address = address)
 
-      def upsert(proposalVoteResponse: ProposalVoteResponse) = Service.insertOrUpdate(proposalVoteResponse.vote.toSerializableProposalVote)
+      def upsert(proposalVoteResponse: ProposalVoteResponse) = Service.insertOrUpdate(proposalVoteResponse.result.toSerializableProposalVote)
 
       (for {
         proposalVoteResponse <- proposalVoteResponse

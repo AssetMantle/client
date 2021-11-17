@@ -1,7 +1,6 @@
 package models.blockchain
 
 import exceptions.BaseException
-import models.Abstract.PublicKey
 import models.Trait.Logged
 import models.common.Serializable.Validator.{Commission, Description}
 import models.common.TransactionMessages._
@@ -10,7 +9,6 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import models.common.PublicKeys._
 import queries.blockchain.{GetBondedValidators, GetValidator}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -21,7 +19,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: Description, unbondingHeight: Int, unbondingTime: String, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: Description, unbondingHeight: Int, unbondingTime: String, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
   def getTokensFromShares(shares: BigDecimal): MicroNumber = MicroNumber(((shares * BigDecimal(tokens.value)) / delegatorShares).toBigInt())
 
@@ -39,7 +37,7 @@ case class Validator(operatorAddress: String, hexAddress: String, consensusPubli
 
   def isUnbonding: Boolean = status == constants.Blockchain.ValidatorStatus.UNBONDING
 
-  def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONED
+  def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONDED
 
 }
 
@@ -70,10 +68,10 @@ class Validators @Inject()(
   private[models] val validatorTable = TableQuery[ValidatorTable]
 
   case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: Int, unbondingTime: String, commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = utilities.JSON.convertJsonStringToObject[PublicKey](consensusPublicKey), status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[Description](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = consensusPublicKey, status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[Description](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(validator: Validator): ValidatorSerialized = ValidatorSerialized(operatorAddress = validator.operatorAddress, hexAddress = validator.hexAddress, consensusPublicKey = Json.toJson(validator.consensusPublicKey).toString, status = validator.status, jailed = validator.jailed, tokens = validator.tokens.toString, delegatorShares = validator.delegatorShares, description = Json.toJson(validator.description).toString, unbondingHeight = validator.unbondingHeight, unbondingTime = validator.unbondingTime, commission = Json.toJson(validator.commission).toString, minimumSelfDelegation = validator.minimumSelfDelegation.toString, createdBy = validator.createdBy, createdOn = validator.createdOn, createdOnTimeZone = validator.createdOnTimeZone, updatedBy = validator.updatedBy, updatedOn = validator.updatedOn, updatedOnTimeZone = validator.updatedOnTimeZone)
+  def serialize(validator: Validator): ValidatorSerialized = ValidatorSerialized(operatorAddress = validator.operatorAddress, hexAddress = validator.hexAddress, consensusPublicKey = validator.consensusPublicKey, status = validator.status, jailed = validator.jailed, tokens = validator.tokens.toString, delegatorShares = validator.delegatorShares, description = Json.toJson(validator.description).toString, unbondingHeight = validator.unbondingHeight, unbondingTime = validator.unbondingTime, commission = Json.toJson(validator.commission).toString, minimumSelfDelegation = validator.minimumSelfDelegation.toString, createdBy = validator.createdBy, createdOn = validator.createdOn, createdOnTimeZone = validator.createdOnTimeZone, updatedBy = validator.updatedBy, updatedOn = validator.updatedOn, updatedOnTimeZone = validator.updatedOnTimeZone)
 
   private def add(validator: Validator): Future[String] = db.run((validatorTable returning validatorTable.map(_.operatorAddress) += serialize(validator)).asTry).map {
     case Success(result) => result
@@ -145,7 +143,7 @@ class Validators @Inject()(
 
   private def getValidatorsByStatus(status: String): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === status).result)
 
-  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
+  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONDED).result)
 
   private def getValidatorsByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.operatorAddress.inSet(operatorAddresses)).result)
 
@@ -160,7 +158,7 @@ class Validators @Inject()(
     }
   }
 
-  private def getAllVotingPowers: Future[Seq[String]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONED).map(_.tokens).result)
+  private def getAllVotingPowers: Future[Seq[String]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONDED).map(_.tokens).result)
 
   private[models] class ValidatorTable(tag: Tag) extends Table[ValidatorSerialized](tag, "Validator") {
 
@@ -230,7 +228,7 @@ class Validators @Inject()(
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
 
-    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONED).map(_.map(_.deserialize))
+    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONDED).map(_.map(_.deserialize))
 
     def getAllInactiveValidatorList: Future[Seq[Validator]] = getAllInactiveValidators.map(_.map(_.deserialize))
 
@@ -362,8 +360,8 @@ class Validators @Inject()(
 
       (for {
         validatorResponse <- validatorResponse
-        _ <- insertValidator(validatorResponse.validator.toValidator)
-      } yield validatorResponse.validator.toValidator
+        _ <- insertValidator(validatorResponse.result.toValidator)
+      } yield validatorResponse.result.toValidator
         ).recover {
         case baseException: BaseException => throw baseException
       }
@@ -399,7 +397,7 @@ class Validators @Inject()(
     //TODO Can be optimized whenever called?
     def updateActiveValidatorSet(): Future[Unit] = {
       val explorerAllActiveValidators = Service.getAllActiveValidatorList.map(_.map(_.operatorAddress))
-      val bcAllActiveValidators = getBondedValidators.Service.get().map(_.validators.map(_.operator_address))
+      val bcAllActiveValidators = getBondedValidators.Service.get().map(_.result.map(_.operator_address))
 
       def checkAndUpdate(explorerAllActiveValidators: Seq[String], bcAllActiveValidators: Seq[String]) = utilitiesOperations.traverse(explorerAllActiveValidators.diff(bcAllActiveValidators) ++ bcAllActiveValidators.diff(explorerAllActiveValidators))(operatorAddress => insertOrUpdateValidator(operatorAddress))
 

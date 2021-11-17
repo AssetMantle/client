@@ -149,7 +149,7 @@ class Undelegations @Inject()(
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.validatorAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(undelegate.delegatorAddress)
 
-      def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationResponse) = Service.insertOrUpdate(undelegationsResponse.unbond.toUndelegation)
+      def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationResponse) = Service.insertOrUpdate(undelegationsResponse.result.toUndelegation)
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 

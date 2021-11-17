@@ -20,7 +20,7 @@ class GetUnbondingValidators @Inject()()(implicit wsClient: WSClient, configurat
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/staking/v1beta1/validators?status=BOND_STATUS_UNBONDING"
+  private val path = "staking/validators?status=unbonding"
 
   private val url = ip + ":" + port + "/" + path
 

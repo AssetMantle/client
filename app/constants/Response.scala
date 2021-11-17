@@ -345,6 +345,7 @@ object Response {
   val ACCOUNT_INSERT_FAILED = new Failure("ACCOUNT_INSERT_FAILED")
   val PROPOSAL_NOT_FOUND = new Failure("PROPOSAL_NOT_FOUND")
   val CRYPTO_TOKEN_TICKER_NOT_FOUND = new Failure("CRYPTO_TOKEN_TICKER_NOT_FOUND")
+  val VALIDATOR_STATUS_NOT_FOUND = new Failure("VALIDATOR_STATUS_NOT_FOUND")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

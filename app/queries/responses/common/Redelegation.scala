@@ -13,7 +13,7 @@ object Redelegation {
   implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
   case class RedelegationEntry(creation_height: Int, completion_time: String, initial_balance: MicroNumber, shares_dst: String) {
-    def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = initial_balance, sharesDestination = BigDecimal(shares_dst))
+    def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height, completionTime = completion_time, initialBalance = initial_balance, sharesDestination = BigDecimal(shares_dst))
   }
 
   def redelegationEntryApply(creation_height: Int, completion_time: String, initial_balance: String, shares_dst: String): RedelegationEntry = RedelegationEntry(creation_height = creation_height, completion_time = completion_time, initial_balance = new MicroNumber(BigDecimal(initial_balance).toBigInt), shares_dst = shares_dst)
@@ -29,8 +29,8 @@ object Redelegation {
 
   implicit val entryReads: Reads[Entry] = Json.reads[Entry]
 
-  case class Result(redelegation: Redelegation, entries: Seq[Entry]) {
-    def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = redelegation.delegator_address, validatorSourceAddress = redelegation.validator_src_address, validatorDestinationAddress = redelegation.validator_dst_address, entries = entries.map(_.redelegation_entry.toRedelegationEntry))
+  case class Result(delegator_address: String, validator_src_address: String, validator_dst_address: String, entries: Seq[RedelegationEntry]) {
+    def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = delegator_address, validatorSourceAddress = validator_src_address, validatorDestinationAddress = validator_dst_address, entries = entries.map(_.toRedelegationEntry))
   }
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]

@@ -20,7 +20,7 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "orders/orders"
+  private val path = "xprt/orders/orders"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

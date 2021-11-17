@@ -5,7 +5,7 @@ import transactions.Abstract.BaseResponse
 
 object MintingInflationResponse {
 
-  case class Response(inflation: String) extends BaseResponse
+  case class Response(result: String) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

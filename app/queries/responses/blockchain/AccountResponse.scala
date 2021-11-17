@@ -8,7 +8,7 @@ object AccountResponse {
 
   import queries.responses.common.Accounts.accountReads
 
-  case class Response(account: Account) extends BaseResponse
+  case class Response(result: Account) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

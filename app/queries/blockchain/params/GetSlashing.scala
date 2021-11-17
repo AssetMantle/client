@@ -20,7 +20,7 @@ class GetSlashing @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/slashing/v1beta1/params"
+  private val path = "slashing/parameters"
 
   private val url = ip + ":" + port + "/" + path
 

@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
-import queries.responses.common.ID
+import queries.responses.common.{ID, Immutables, Mutables}
 import transactions.Abstract.BaseResponse
 
 object ClassificationResponse {
@@ -14,7 +14,7 @@ object ClassificationResponse {
 
   implicit val classificationIDReads: Reads[ClassificationID] = Json.reads[ClassificationID]
 
-  case class Classification(id: ClassificationID)
+  case class Classification(id: ClassificationID, immutableTraits: Immutables, mutableTraits: Mutables)
 
   implicit val classificationReads: Reads[Classification] = Json.reads[Classification]
 

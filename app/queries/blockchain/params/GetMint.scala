@@ -20,7 +20,7 @@ class GetMint @Inject()()(implicit wsClient: WSClient, configuration: Configurat
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/mint/v1beta1/params"
+  private val path = "minting/parameters"
 
   private val url = ip + ":" + port + "/" + path
 

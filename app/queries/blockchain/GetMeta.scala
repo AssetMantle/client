@@ -20,7 +20,7 @@ class GetMeta @Inject()()(implicit wsClient: WSClient, configuration: Configurat
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "metas/metas"
+  private val path = "xprt/metas/metas"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

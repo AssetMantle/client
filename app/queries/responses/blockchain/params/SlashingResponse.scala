@@ -13,7 +13,7 @@ object SlashingResponse {
 
   implicit val paramsReads: Reads[Params] = Json.reads[Params]
 
-  case class Response(params: Params) extends BaseResponse
+  case class Response(result: Params) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

@@ -527,6 +527,7 @@ MUTATE_MAINTAINER=Mutate Maintainer
 META_PROPERTY_ID=Meta Property ID
 META_FACT_HASH=Meta Fact Hash
 DATA_TYPE=Data Type
+DATE_VALUE=Data Value
 DATA=Data
 IMMUTABLE_TRAITS=Immutable Traits
 MUTABLE_TRAITS=Mutable Traits

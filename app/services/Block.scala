@@ -103,7 +103,7 @@ class Block @Inject()(
     }
 
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
-      val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
+      val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.toTransaction))
 
       def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
@@ -128,7 +128,7 @@ class Block @Inject()(
 
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnNewBlock(header: Header): Future[Unit] = {
-    val halving = blockchainParameters.Utility.onNewBlock(header)
+//    val halving = blockchainParameters.Utility.onNewBlock(header)
     val tokens = blockchainTokens.Utility.updateAll()
     val validators = blockchainValidators.Utility.onNewBlock(header)
     // Evidence BeginBlocker is handled via Events
@@ -137,7 +137,7 @@ class Block @Inject()(
     // Staking Unbonding and Redelegation Completion EndBlocker is handled via Events
 
     (for {
-      _ <- halving
+//      _ <- halving
       _ <- tokens
       _ <- validators
     } yield ()
@@ -292,7 +292,7 @@ class Block @Inject()(
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
           def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
-          else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
+          else Future(blockResponse.result.block.evidence.evidence.getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
 
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {

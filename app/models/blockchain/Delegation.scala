@@ -125,7 +125,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
+        _ <- insertDelegation(delegationResponse.result.toDelegation)
       } yield ()).recover {
         // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
         case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorDelegationNotFound)) throw baseException else logger.info(baseException.failure.logMessage)
@@ -139,7 +139,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
+        _ <- insertDelegation(delegationResponse.result.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => if (baseException.failure.message.matches(responseErrorDelegationNotFound)) {
           val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)

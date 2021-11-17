@@ -20,7 +20,7 @@ class GetClassification @Inject()()(implicit wsClient: WSClient, configuration: 
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "classifications/classifications"
+  private val path = "xprt/classifications/classifications"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

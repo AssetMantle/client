@@ -20,7 +20,7 @@ class GetDistribution @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/distribution/v1beta1/params"
+  private val path = "distribution/parameters"
 
   private val url = ip + ":" + port + "/" + path
 

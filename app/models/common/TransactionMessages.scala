@@ -144,7 +144,7 @@ object TransactionMessages {
   implicit val unjailWrites: OWrites[Unjail] = Json.writes[Unjail]
 
   //staking
-  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: PublicKey, value: Coin, minSelfDelegation: MicroNumber, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage {
+  case class CreateValidator(delegatorAddress: String, validatorAddress: String, publicKey: String, value: Coin, minSelfDelegation: MicroNumber, commissionRates: Serializable.Validator.CommissionRates, description: Serializable.Validator.Description) extends TransactionMessage {
     def getSigners: Seq[String] = {
       val validatorAccountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(validatorAddress)
       if (validatorAddress == delegatorAddress) Seq(delegatorAddress) else Seq(delegatorAddress, validatorAccountAddress)

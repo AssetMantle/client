@@ -12,16 +12,14 @@ object PublicKeys {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  case class SinglePublicKey(publicKeyType: String, key: String) extends PublicKey {
-    val value: String = key
-  }
+  case class SinglePublicKey(publicKeyType: String, value: String) extends PublicKey
 
   implicit val singlePublicKeyReads: Reads[SinglePublicKey] = Json.reads[SinglePublicKey]
 
   implicit val singlePublicKeyWrites: OWrites[SinglePublicKey] = Json.writes[SinglePublicKey]
 
   case class MultiSigPublicKey(publicKeyType: String, threshold: Int, publicKeys: Seq[SinglePublicKey]) extends PublicKey {
-    val value: String = publicKeys.map(_.key).mkString("")
+    val value: String = publicKeys.map(_.value).mkString("")
   }
 
   implicit val multiSigPublicKeyReads: Reads[MultiSigPublicKey] = Json.reads[MultiSigPublicKey]

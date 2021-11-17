@@ -20,6 +20,18 @@ object GovResponse {
 
   implicit val tallyParamsReads: Reads[TallyParams] = Json.reads[TallyParams]
 
+  case class VotingResponse(result: VotingParams) extends BaseResponse
+
+  implicit val votingResponseReads: Reads[VotingResponse] = Json.reads[VotingResponse]
+
+  case class DepositResponse(result: DepositParams) extends BaseResponse
+
+  implicit val depositResponseReads: Reads[DepositResponse] = Json.reads[DepositResponse]
+
+  case class TallyResponse(result: TallyParams) extends BaseResponse
+
+  implicit val tallyResponseReads: Reads[TallyResponse] = Json.reads[TallyResponse]
+
   case class Response(voting_params: VotingParams, deposit_params: DepositParams, tally_params: TallyParams) extends BaseResponse {
     def toParameter: Parameter = GovernanceParameter(minDeposit = deposit_params.min_deposit.map(_.toCoin), maxDepositPeriod = deposit_params.max_deposit_period.split("s")(0).toLong, votingPeriod = voting_params.voting_period.split("s")(0).toLong, quorum = BigDecimal(tally_params.quorum), threshold = BigDecimal(tally_params.threshold), vetoThreshold = BigDecimal(tally_params.veto_threshold))
   }

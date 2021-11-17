@@ -173,7 +173,7 @@ class Parameters @Inject()(
             val distributionResponse = getDistributionParams.Service.get()
             for {
               distributionResponse <- distributionResponse
-            } yield distributionResponse.params.toParameter
+            } yield distributionResponse.result.toParameter
           case constants.Blockchain.ParameterType.GOVERNANCE =>
             val govResponse = getGovParams.Service.get()
             for {
@@ -188,17 +188,17 @@ class Parameters @Inject()(
             val mintResponse = getMintParams.Service.get()
             for {
               mintResponse <- mintResponse
-            } yield mintResponse.params.toParameter
+            } yield mintResponse.result.toParameter
           case constants.Blockchain.ParameterType.SLASHING =>
             val slashingResponse = getSlashingParams.Service.get()
             for {
               slashingResponse <- slashingResponse
-            } yield slashingResponse.params.toParameter
+            } yield slashingResponse.result.toParameter
           case constants.Blockchain.ParameterType.STAKING =>
             val stakingResponse = getStakingParams.Service.get()
             for {
               stakingResponse <- stakingResponse
-            } yield stakingResponse.params.toParameter
+            } yield stakingResponse.result.toParameter
           case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
           case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
           case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))

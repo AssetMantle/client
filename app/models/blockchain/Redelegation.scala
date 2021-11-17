@@ -153,7 +153,7 @@ class Redelegations @Inject()(
         } yield ()
       }
 
-      def upsertRedelegation(redelegationResponse: DelegatorRedelegationsResponse) = redelegationResponse.redelegation_responses.headOption.map(x => Service.insertOrUpdate(x.toRedelegation)).getOrElse(Future(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)))
+      def upsertRedelegation(redelegationResponse: DelegatorRedelegationsResponse) = redelegationResponse.result.headOption.map(x => Service.insertOrUpdate(x.toRedelegation)).getOrElse(Future(throw new BaseException(constants.Response.REDELEGATION_RESPONSE_NOT_FOUND)))
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 

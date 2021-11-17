@@ -20,7 +20,7 @@ class GetProposalVote @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "cosmos/gov/v1beta1/votes"
+  private val path1 = "gov/votes"
 
   private val path2 = "/deposits/"
 

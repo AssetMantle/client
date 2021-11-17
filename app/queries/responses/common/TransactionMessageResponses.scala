@@ -116,8 +116,8 @@ object TransactionMessageResponses {
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
   //slashing
-  case class Unjail(validator_addr: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.Unjail(validatorAddress = validator_addr)
+  case class Unjail(address: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.Unjail(validatorAddress = address)
   }
 
   implicit val unjailReads: Reads[Unjail] = Json.reads[Unjail]
@@ -141,14 +141,14 @@ object TransactionMessageResponses {
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
 
-  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: PublicKey, value: Coin, commission: CommissionRates, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey.toSerializablePublicKey, value = value.toCoin, commissionRates = commission.toCommissionRates, description = description.toDescription, minSelfDelegation = MicroNumber(min_self_delegation))
+  case class CreateValidator(delegator_address: String, validator_address: String, pubkey: String, value: Coin, commission: CommissionRates, description: Description, min_self_delegation: String) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.CreateValidator(delegatorAddress = delegator_address, validatorAddress = validator_address, publicKey = pubkey, value = value.toCoin, commissionRates = commission.toCommissionRates, description = description.toDescription, minSelfDelegation = MicroNumber(min_self_delegation))
   }
 
   implicit val createValidatorReads: Reads[CreateValidator] = Json.reads[CreateValidator]
 
-  case class EditValidator(validator_address: String, commission_rate: Option[String], description: Description, min_self_delegation: Option[String]) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = validator_address, commissionRate = commission_rate.fold[Option[BigDecimal]](None)(x => Some(BigDecimal(x))), description = description.toDescription, minSelfDelegation = min_self_delegation.fold[Option[MicroNumber]](None)(x => Some(MicroNumber(x))))
+  case class EditValidator(address: String, commission_rate: Option[String], description: Option[Description], min_self_delegation: Option[String]) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.EditValidator(validatorAddress = address, commissionRate = commission_rate.fold[Option[BigDecimal]](None)(x => Some(BigDecimal(x))), description = description.fold(Description(moniker = "[do-not-modify]", identity = "[do-not-modify]", website = "[do-not-modify]", security_contact = "[do-not-modify]", details = "[do-not-modify]").toDescription)(_.toDescription), minSelfDelegation = min_self_delegation.fold[Option[MicroNumber]](None)(x => Some(MicroNumber(x))))
   }
 
   implicit val editValidatorReads: Reads[EditValidator] = Json.reads[EditValidator]
@@ -284,7 +284,7 @@ object TransactionMessageResponses {
   implicit val acknowledgementReads: Reads[Acknowledgement] = Json.reads[Acknowledgement]
 
   //ibc-transfer
-    case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
+  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
   }
 

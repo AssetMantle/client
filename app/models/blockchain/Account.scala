@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, accountType: String, publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -46,10 +46,10 @@ class Accounts @Inject()(
   private[models] val accountTable = TableQuery[AccountTable]
 
   case class AccountSerialized(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey.fold[Option[PublicKey]](None)(x => Option(utilities.JSON.convertJsonStringToObject[PublicKey](x))), accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, accountType = account.accountType, publicKey = account.publicKey.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, username = account.username, accountType = account.accountType, publicKey = account.publicKey, accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOn = account.createdOn, createdOnTimeZone = account.createdOnTimeZone, updatedBy = account.updatedBy, updatedOn = account.updatedOn, updatedOnTimeZone = account.updatedOnTimeZone)
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
     case Success(result) => result
@@ -144,7 +144,7 @@ class Accounts @Inject()(
 
   object Service {
 
-    def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
+    def create(address: String, username: String, accountType: String, publicKey: Option[String]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
@@ -189,13 +189,13 @@ class Accounts @Inject()(
         val accountResponse = getAccount.Service.get(address)
         for {
           accountResponse <- accountResponse
-        } yield accountResponse.account.toSerializableAccount(address).copy(sequence = 1)
+        } yield accountResponse.result.toSerializableAccount(address).copy(sequence = 1)
       }(account => {
         if (account.accountNumber == -1) {
           val accountResponse = getAccount.Service.get(address)
           for {
             accountResponse <- accountResponse
-          } yield accountResponse.account.toSerializableAccount(account.username)
+          } yield accountResponse.result.toSerializableAccount(account.username)
         } else Future(account.copy(sequence = account.sequence + 1))
       })
 
@@ -214,7 +214,7 @@ class Accounts @Inject()(
       val accountResponse = getAccount.Service.get(address)
       val bcAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(accountResponse.account.toSerializableAccount(bcAccount.fold(address)(_.username)).copy(sequence = 0))
+      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(accountResponse.result.toSerializableAccount(bcAccount.fold(address)(_.username)).copy(sequence = 0))
 
       (for {
         accountResponse <- accountResponse

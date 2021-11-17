@@ -20,7 +20,7 @@ class GetStakingPool @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val url = ip + ":" + port + "/cosmos/staking/v1beta1/pool"
+  private val url = ip + ":" + port + "/staking/pool"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

@@ -7,7 +7,7 @@
 @defining(msg.asInstanceOf[CreateValidator]) { createValidator =>
     @commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(createValidator.delegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${createValidator.delegatorAddress}'))")))
     @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(createValidator.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${createValidator.validatorAddress}'))")))
-    @commonTextInfo(constants.View.PUBLIC_KEY, createValidator.publicKey.value)
+    @commonTextInfo(constants.View.PUBLIC_KEY, createValidator.publicKey)
     @commonTextInfo(constants.View.AMOUNT, createValidator.value.getAmountWithNormalizedDenom())
     @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(createValidator.minSelfDelegation.doubleValue))
     @commonTextInfo(constants.View.VALIDATOR_MONIKER, createValidator.description.moniker)

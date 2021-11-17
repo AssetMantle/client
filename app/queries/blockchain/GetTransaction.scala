@@ -20,7 +20,7 @@ class GetTransaction @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "cosmos/tx/v1beta1/txs"
+  private val path = "txs"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

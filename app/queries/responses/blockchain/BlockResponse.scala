@@ -50,7 +50,7 @@ object BlockResponse {
       (JsPath \ "value").read[JsObject]
     ) (tendermintEvidenceApply _)
 
-  case class Evidence(evidence: Seq[TendermintEvidence])
+  case class Evidence(evidence: Option[Seq[TendermintEvidence]])
 
   implicit val evidenceReads: Reads[Evidence] = Json.reads[Evidence]
 

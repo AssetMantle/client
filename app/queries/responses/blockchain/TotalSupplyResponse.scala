@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object TotalSupplyResponse {
 
-  case class Response(supply: Seq[Coin]) extends BaseResponse
+  case class Response(result: Seq[Coin]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

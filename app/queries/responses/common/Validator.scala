@@ -4,8 +4,6 @@ import models.blockchain.{Validator => BlockchainValidator}
 import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
-import queries.Abstract.PublicKey
-import queries.responses.common.PublicKeys.publicKeyReads
 import utilities.MicroNumber
 
 object Validator {
@@ -28,13 +26,13 @@ object Validator {
 
   implicit val descriptionReads: Reads[Description] = Json.reads[Description]
 
-  case class Result(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String) {
+  case class Result(operator_address: String, consensus_pubkey: String, jailed: Boolean, status: Int, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String) {
     def toValidator: BlockchainValidator = BlockchainValidator(
       operatorAddress = operator_address,
-      hexAddress = utilities.Bech32.convertValidatorPublicKeyToHexAddress(consensus_pubkey.toSerializablePublicKey.value),
-      consensusPublicKey = consensus_pubkey.toSerializablePublicKey,
+      hexAddress = utilities.Bech32.convertConsensusPubKeyToHexAddress(consensus_pubkey),
+      consensusPublicKey = consensus_pubkey,
       jailed = jailed,
-      status = status,
+      status = constants.Blockchain.ValidatorStatus.mapping.getOrElse(status, "UNKNOWN"),
       tokens = tokens,
       delegatorShares = delegator_shares,
       description = description.toValidatorDescription,
@@ -44,14 +42,14 @@ object Validator {
       minimumSelfDelegation = MicroNumber(min_self_delegation))
   }
 
-  def resultApply(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: String, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String): Result = Result(
+  def resultApply(operator_address: String, consensus_pubkey: String, jailed: Boolean, status: Int, tokens: String, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String): Result = Result(
     operator_address = operator_address, consensus_pubkey = consensus_pubkey, jailed = jailed, status = status, tokens = new MicroNumber(BigInt(tokens)), delegator_shares = delegator_shares, description = description, unbonding_height = unbonding_height, unbonding_time = unbonding_time, commission = commission, min_self_delegation = min_self_delegation)
 
   implicit val resultReads: Reads[Result] = (
     (JsPath \ "operator_address").read[String] and
-      (JsPath \ "consensus_pubkey").read[PublicKey] and
+      (JsPath \ "consensus_pubkey").read[String] and
       (JsPath \ "jailed").read[Boolean] and
-      (JsPath \ "status").read[String] and
+      (JsPath \ "status").read[Int] and
       (JsPath \ "tokens").read[String] and
       (JsPath \ "delegator_shares").read[BigDecimal] and
       (JsPath \ "description").read[Description] and

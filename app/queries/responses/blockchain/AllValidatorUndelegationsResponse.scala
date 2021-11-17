@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object AllValidatorUndelegationsResponse {
 
-  case class Response(unbonding_responses: Seq[Undelegation.Result]) extends BaseResponse
+  case class Response(result: Seq[Undelegation.Result]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

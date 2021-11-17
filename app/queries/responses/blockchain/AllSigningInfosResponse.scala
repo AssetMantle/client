@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object AllSigningInfosResponse {
 
-  case class Response(info: Seq[SigningInfo.Result]) extends BaseResponse
+  case class Response(result: Seq[SigningInfo.Result]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

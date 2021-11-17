@@ -18,7 +18,7 @@ object StakingPoolResponse {
       (JsPath \ "bonded_tokens").read[String]
     ) (Pool.apply _)
 
-  case class Response(pool: Pool) extends BaseResponse
+  case class Response(result: Pool) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

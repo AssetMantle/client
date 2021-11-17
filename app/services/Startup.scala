@@ -3,17 +3,16 @@ package services
 import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
-import models.blockchain.{Token, Transaction => blockchainTransaction}
-import models.common.Parameters._
+import models.blockchain.{Delegation, Redelegation, Token, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.{blockchain, keyBase}
+import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
-import queries.blockchain.{GetABCIInfo, GetBlockResults, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
+import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
-import queries.responses.blockchain.GenesisResponse.Bank.BankBalance
 import queries.responses.blockchain.GenesisResponse._
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
@@ -75,11 +74,11 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.halving.params.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
+      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
-      _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
+      _ <- insertBalancesOnStart(genesis.app_state.auth.accounts)
       _ <- updateStakingOnStart(genesis.app_state.staking)
-      _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gen_txs, chainID = genesis.chain_id, initialHeight = genesis.initial_height.toInt, genesisTime = genesis.genesis_time)
+      _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gentxs, chainID = genesis.chain_id, initialHeight = 0, genesisTime = genesis.genesis_time)
       _ <- updateDistributionOnStart(genesis.app_state.distribution)
       _ <- insertAllTokensOnStart()
     } yield ()
@@ -100,9 +99,9 @@ class Startup @Inject()(
     }
   }
 
-  private def insertBalancesOnStart(balances: Seq[BankBalance]): Future[Seq[Unit]] = {
-    utilitiesOperations.traverse(balances) { balance =>
-      val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(balance.address)
+  private def insertBalancesOnStart(accounts: Seq[Account]): Future[Seq[Unit]] = {
+    utilitiesOperations.traverse(accounts) { account =>
+      val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(account.address)
       (for {
         _ <- upsertAccount
       } yield ()
@@ -113,12 +112,12 @@ class Startup @Inject()(
   }
 
   private def updateStakingOnStart(staking: Staking.Module): Future[Unit] = {
-    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.map(_.toValidator))
+    val insertAllValidators = blockchainValidators.Service.insertMultiple(staking.validators.fold[Seq[Validator]](Seq())(_.map(_.toValidator)))
 
     def updateDelegations(): Future[Unit] = {
-      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.map(_.toDelegation))
-      val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.map(_.toRedelegation))
-      val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.map(_.toUndelegation))
+      val insertAllDelegations = blockchainDelegations.Service.insertMultiple(staking.delegations.fold[Seq[Delegation]](Seq())(_.map(_.toDelegation)))
+      val insertAllRedelegations = blockchainRedelegations.Service.insertMultiple(staking.redelegations.fold[Seq[Redelegation]](Seq())(_.map(_.toRedelegation)))
+      val insertAllUndelegations = blockchainUndelegations.Service.insertMultiple(staking.unbonding_delegations.fold[Seq[Undelegation]](Seq())(_.map(_.toUndelegation)))
 
       for {
         _ <- insertAllDelegations
@@ -147,7 +146,7 @@ class Startup @Inject()(
   // IMPORTANT: Assuming all GenTxs are valid txs and successfully goes through
   private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: String): Future[Unit] = {
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
-      val updateTx = utilitiesOperations.traverse(genTx.body.messages)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
+      val updateTx = utilitiesOperations.traverse(genTx.value.msg)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
       val updateAccount = utilitiesOperations.traverse(genTx.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
       // Should always be called after messages are processed, otherwise can create conflict
@@ -174,11 +173,11 @@ class Startup @Inject()(
     val communityPoolResponse = getCommunityPool.Service.get
 
     def insert(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = {
-      blockchainTokens.Service.insertMultiple(totalSupplyResponse.supply.map(x => Token(denom = x.denom, totalSupply = x.amount,
-        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
-        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
-        communityPool = communityPoolResponse.pool.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
-        inflation = if (x.denom == stakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
+      blockchainTokens.Service.insertMultiple(totalSupplyResponse.result.map(x => Token(denom = x.denom, totalSupply = x.amount,
+        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
+        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
+        communityPool = communityPoolResponse.result.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
+        inflation = if (x.denom == stakingDenom) BigDecimal(mintingInflationResponse.result) else BigDecimal(0.0)
       )))
     }
 

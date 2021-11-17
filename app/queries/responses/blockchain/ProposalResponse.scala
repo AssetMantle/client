@@ -17,13 +17,13 @@ object ProposalResponse {
 
   implicit val finalTallyResultReads: Reads[FinalTallyResult] = Json.reads[FinalTallyResult]
 
-  case class Proposal(proposal_id: String, content: ProposalContent, status: String, final_tally_result: FinalTallyResult, submit_time: String, deposit_end_time: String, total_deposit: Seq[Coin], voting_start_time: String, voting_end_time: String) {
-    def toSerializableProposal: BlockchainProposal = BlockchainProposal(id = proposal_id.toInt, content = content.toSerializableProposalContent, status = status, finalTallyResult = final_tally_result.toSerializableFinalTallyResult, submitTime = submit_time, depositEndTime = deposit_end_time, totalDeposit = total_deposit.map(_.toCoin), votingStartTime = voting_start_time, votingEndTime = voting_end_time)
+  case class Proposal(proposal_id: String, content: ProposalContent, proposal_status: String, final_tally_result: FinalTallyResult, submit_time: String, deposit_end_time: String, total_deposit: Seq[Coin], voting_start_time: String, voting_end_time: String) {
+    def toSerializableProposal: BlockchainProposal = BlockchainProposal(id = proposal_id.toInt, content = content.toSerializableProposalContent, status = proposal_status, finalTallyResult = final_tally_result.toSerializableFinalTallyResult, submitTime = submit_time, depositEndTime = deposit_end_time, totalDeposit = total_deposit.map(_.toCoin), votingStartTime = voting_start_time, votingEndTime = voting_end_time)
   }
 
   implicit val proposalReads: Reads[Proposal] = Json.reads[Proposal]
 
-  case class Response(proposal: Proposal) extends BaseResponse
+  case class Response(result: Proposal) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

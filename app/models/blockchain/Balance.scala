@@ -9,8 +9,8 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.blockchain.GetBalance
-import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
+import queries.blockchain.{GetAccount, GetBalance}
+import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
@@ -24,7 +24,7 @@ case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] 
 @Singleton
 class Balances @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
-                          getBalance: GetBalance,
+                          getAccount: GetAccount,
                           configuration: Configuration,
                           utilitiesOperations: utilities.Operations
                         )(implicit executionContext: ExecutionContext) {
@@ -243,13 +243,13 @@ class Balances @Inject()(
     //    }
 
     def insertOrUpdateBalance(address: String): Future[Unit] = {
-      val balanceResponse = getBalance.Service.get(address)
+      val accountResponse = getAccount.Service.get(address)
 
-      def upsert(balanceResponse: BalanceResponse) = Service.insertOrUpdate(Balance(address = address, coins = balanceResponse.balances.map(_.toCoin)))
+      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(Balance(address = address, coins = accountResponse.result.tokens))
 
       (for {
-        balanceResponse <- balanceResponse
-        _ <- upsert(balanceResponse)
+        accountResponse <- accountResponse
+        _ <- upsert(accountResponse)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

@@ -20,7 +20,7 @@ class GetValidatorOutstandingRewards @Inject()()(implicit wsClient: WSClient, co
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path1 = "cosmos/distribution/v1beta1/validators"
+  private val path1 = "distribution/validators"
 
   private val path2 = "/outstanding_rewards"
 

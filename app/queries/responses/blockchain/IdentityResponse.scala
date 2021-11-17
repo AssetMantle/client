@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object IdentityResponse {
 
-  case class IdentityIDValue(chainID: ID, maintainersID: ID, classificationID: ID, hashID: ID)
+  case class IdentityIDValue(classificationID: ID, hashID: ID)
 
   implicit val identityIDValueValueReads: Reads[IdentityIDValue] = Json.reads[IdentityIDValue]
 

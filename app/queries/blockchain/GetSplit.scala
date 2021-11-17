@@ -20,7 +20,7 @@ class GetSplit @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "splits/splits"
+  private val path = "xprt/splits/splits"
 
   private val url = ip + ":" + port + "/" + path + "/"
 

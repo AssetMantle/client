@@ -12,56 +12,48 @@ import transactions.Abstract.BaseResponse
 
 object TransactionResponse {
 
-  case class Fee(amount: Seq[Coin], gas_limit: String, payer: String, granter: String) {
-    def toFee: Serializable.Fee = Serializable.Fee(amount = amount.map(_.toCoin), gasLimit = gas_limit, payer = payer, granter = granter)
+  case class Fee(amount: Seq[Coin], gas: String) {
+    def toFee: Serializable.Fee = Serializable.Fee(amount = amount.map(_.toCoin), gas = gas.toInt)
   }
 
   implicit val feeReads: Reads[Fee] = Json.reads[Fee]
 
-  case class SignerInfo(public_key: PublicKey, sequence: String)
+  case class Signature(pub_key: PublicKey, signature: String)
 
-  implicit val signerInfoReads: Reads[SignerInfo] = Json.reads[SignerInfo]
-
-  case class AuthInfo(fee: Fee, signer_infos: Seq[SignerInfo])
-
-  implicit val authInfoReads: Reads[AuthInfo] = Json.reads[AuthInfo]
+  implicit val signatureInfoReads: Reads[Signature] = Json.reads[Signature]
 
   case class Msg(msgType: String, value: TransactionMessageResponse) {
     def toStdMsg: Serializable.StdMsg = Serializable.StdMsg(msgType, value.toTxMsg)
   }
 
   implicit val msgReads: Reads[Msg] = (
-    (JsPath \ "@type").read[String] and
-      JsPath.read[JsObject]
+    (JsPath \ "type").read[String] and
+      (JsPath \ "value").read[JsObject]
     ) (msgApply _)
 
-  case class TxBody(messages: Seq[Msg], memo: String, timeout_height: String)
+  case class TxBody(msg: Seq[Msg], fee: Fee, signatures: Seq[Signature], memo: String)
 
   implicit val txBodyReads: Reads[TxBody] = Json.reads[TxBody]
 
-  case class Tx(body: TxBody, auth_info: AuthInfo, signatures: Seq[String])
+  case class Tx(value: TxBody)
 
   implicit val txReads: Reads[Tx] = Json.reads[Tx]
 
-  case class TxResponse(height: String, txhash: String, code: Int, raw_log: String, gas_wanted: String, gas_used: String, tx: Tx, timestamp: String) {
+  case class Response(height: String, txhash: String, code: Option[Int], raw_log: String, gas_wanted: String, gas_used: String, tx: Tx, timestamp: String) extends BaseResponse {
     def toTransaction: Transaction = Transaction(
       hash = txhash,
       height = height.toInt,
-      code = code,
+      code = code.getOrElse(0),
       rawLog = raw_log,
       gasWanted = gas_wanted,
       gasUsed = gas_used,
-      status = code == 0,
-      messages = tx.body.messages.map(_.toStdMsg),
-      fee = tx.auth_info.fee.toFee,
-      memo = tx.body.memo,
+      status = code.getOrElse(0) == 0,
+      messages = tx.value.msg.map(_.toStdMsg),
+      fee = tx.value.fee.toFee,
+      memo = tx.value.memo,
       timestamp = timestamp
     )
   }
-
-  implicit val txResponseReads: Reads[TxResponse] = Json.reads[TxResponse]
-
-  case class Response(tx_response: TxResponse) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

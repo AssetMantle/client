@@ -62,7 +62,7 @@ object Serializable {
     "amount" -> coin.amount.toMicroString
   )
 
-  case class Fee(amount: Seq[Coin], gasLimit: String, payer: String, granter: String)
+  case class Fee(amount: Seq[Coin], gas: Int)
 
   implicit val feeReads: Reads[Fee] = Json.reads[Fee]
 
@@ -170,7 +170,7 @@ object Serializable {
 
   implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
 
-  case class StdMsg(messageType: String, message: TransactionMessage) {
+  case class  StdMsg(messageType: String, message: TransactionMessage) {
     def getSigners: Seq[String] = message.getSigners
   }
 

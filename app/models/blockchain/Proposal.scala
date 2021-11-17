@@ -200,12 +200,12 @@ class Proposals @Inject()(
     def insertOrUpdateProposal(id: Int): Future[Proposal] = {
       val proposalResponse = getProposal.Service.get(id)
 
-      def upsert(proposalResponse: ProposalResponse) = Service.insertOrUpdate(proposalResponse.proposal.toSerializableProposal)
+      def upsert(proposalResponse: ProposalResponse) = Service.insertOrUpdate(proposalResponse.result.toSerializableProposal)
 
       (for {
         proposalResponse <- proposalResponse
         _ <- upsert(proposalResponse)
-      } yield proposalResponse.proposal.toSerializableProposal).recover {
+      } yield proposalResponse.result.toSerializableProposal).recover {
         case baseException: BaseException => throw baseException
       }
     }

@@ -20,7 +20,7 @@ class GetTotalSupply @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val url = ip + ":" + port + "/cosmos/bank/v1beta1/supply"
+  private val url = ip + ":" + port + "/supply/total"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

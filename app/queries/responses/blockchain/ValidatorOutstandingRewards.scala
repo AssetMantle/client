@@ -10,7 +10,7 @@ object ValidatorOutstandingRewards {
 
   implicit val rewardsReads: Reads[Rewards] = Json.reads[Rewards]
 
-  case class Response(rewards: Rewards) extends BaseResponse
+  case class Response(result: Seq[Coin]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 
