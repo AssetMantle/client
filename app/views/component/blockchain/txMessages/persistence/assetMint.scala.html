@@ -9,12 +9,6 @@
     @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(assetMint.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.fromID}'))")))
     @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(assetMint.toID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.toID}'))")))
     @commonHtmlInfo(constants.View.CLASSIFICATION_ID,commonJavascriptLink(assetMint.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.classificationID}'))")))
-    @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
-    @views.html.component.blockchain.metaProperties(assetMint.immutableMetaProperties.metaPropertyList)
-    @Messages(constants.View.MUTABLE_META_PROPERTIES):
-    @views.html.component.blockchain.metaProperties(assetMint.mutableMetaProperties.metaPropertyList)
-    @Messages(constants.View.IMMUTABLE_PROPERTIES):
-    @views.html.component.blockchain.properties(assetMint.immutableProperties.propertyList)
-    @Messages(constants.View.MUTABLE_PROPERTIES):
-    @views.html.component.blockchain.properties(assetMint.mutableProperties.propertyList)
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = assetMint.mutableMetaProperties.metaPropertyList, immutableMetaProperties = assetMint.immutableMetaProperties.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = assetMint.mutableProperties.propertyList, immutableProperties = assetMint.immutableProperties.propertyList)
 }

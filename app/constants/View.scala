@@ -348,6 +348,8 @@ object View {
   val BURN = "BURN"
   val IMMUTABLE_PROPERTIES = "IMMUTABLE_PROPERTIES"
   val MUTABLE_PROPERTIES = "MUTABLE_PROPERTIES"
+  val MUTABLES = "MUTABLES"
+  val IMMUTABLES = "IMMUTABLES"
   val IMMUTABLE_META_PROPERTIES = "IMMUTABLE_META_PROPERTIES"
   val MUTABLE_META_PROPERTIES = "MUTABLE_META_PROPERTIES"
   val PROPERTY_ID = "PROPERTY_ID"
@@ -400,6 +402,7 @@ object View {
   val META_PROPERTY_ID = "META_PROPERTY_ID"
   val DATA = "DATA"
   val DATA_TYPE = "DATA_TYPE"
+  val DATA_VALUE = "DATA_VALUE"
   val MUTABLE_TRAITS = "MUTABLE_TRAITS"
   val IMMUTABLE_TRAITS = "IMMUTABLE_TRAITS"
   val IMMUTABLE_META_TRAITS = "IMMUTABLE_META_TRAITS"
@@ -572,7 +575,20 @@ object View {
     constants.Blockchain.TransactionMessage.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
     constants.Blockchain.TransactionMessage.META_REVEAL -> "MESSAGE_META_REVEAL",
     constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE -> "MESSAGE_MAINTAINER_DEPUTIZE",
+  )
 
+  val DataTypesMap: Map[String, String] = Map(
+    constants.Blockchain.DataType.STRING_DATA -> "STRING_DATA",
+    constants.Blockchain.DataType.DEC_DATA -> "DECIMAL_DATA",
+    constants.Blockchain.DataType.ID_DATA -> "ID_DATA",
+    constants.Blockchain.DataType.HEIGHT_DATA -> "HEIGHT_DATA",
+  )
+
+  val FactTypesMap: Map[String, String] = Map(
+    constants.Blockchain.FactType.STRING -> "STRING_FACT",
+    constants.Blockchain.FactType.DEC -> "DECIMAL_FACT",
+    constants.Blockchain.FactType.ID -> "ID_FACT",
+    constants.Blockchain.FactType.HEIGHT -> "HEIGHT_FACT",
   )
 
 }

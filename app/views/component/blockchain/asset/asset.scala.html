@@ -1,13 +1,10 @@
-@import views.html.component.blockchain.immutables
-@import views.html.component.blockchain.mutables
-@import views.html.base._
 @import models.blockchain.Asset
+@import views.html.base._
 
 @(asset: Asset)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.ASSET) {
+    <span class="stringEllipse" title="@asset.id">@asset.id</span>
 } {
-    @commonTextInfo(constants.View.ASSET_ID, asset.id)
-    @immutables(asset.immutables)
-    @mutables(asset.mutables)
+    @views.html.component.blockchain.properties(mutableProperties = asset.mutables.properties.propertyList, immutableProperties = asset.immutables.properties.propertyList)
 }

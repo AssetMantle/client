@@ -4,11 +4,10 @@
 @(maintainer: Maintainer)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.MAINTAINER) {
+    <span class="stringEllipse" title="@maintainer.id">@maintainer.id</span>
 } {
-    @commonTextInfo(constants.View.MAINTAINERS_ID, maintainer.id)
     @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(maintainer.addMaintainer))
     @commonBooleanInfo(constants.View.REMOVE_MAINTAINER, Option(maintainer.removeMaintainer))
     @commonBooleanInfo(constants.View.MUTATE_MAINTAINER, Option(maintainer.mutateMaintainer))
-    @Messages(constants.View.MAINTAINED_TRAITS):
-    @views.html.component.blockchain.mutables(maintainer.maintainedTraits)
+    @views.html.component.blockchain.properties(mutableProperties = maintainer.maintainedTraits.properties.propertyList, immutableProperties = Seq())
 }

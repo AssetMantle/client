@@ -9,5 +9,5 @@
     @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(splitSend.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.fromID}'))")))
     @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(splitSend.toID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.toID}'))")))
     @commonHtmlInfo(constants.View.OWNABLE_ID, commonJavascriptLink(splitSend.ownableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.ownableID}'))")))
-    @commonTextInfo(constants.View.SPLIT, splitSend.split.toString)
+    @commonTextInfo(constants.View.SPLIT, utilities.NumericOperation.formatNumber(splitSend.split))
 }

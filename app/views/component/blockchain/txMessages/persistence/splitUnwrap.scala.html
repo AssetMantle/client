@@ -8,5 +8,5 @@
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(splitUnwrap.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${splitUnwrap.from}'))")))
     @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(splitUnwrap.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitUnwrap.fromID}'))")))
     @commonHtmlInfo(constants.View.OWNABLE_ID, commonJavascriptLink(splitUnwrap.ownableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitUnwrap.ownableID}'))")))
-    @commonTextInfo(constants.View.SPLIT, splitUnwrap.split.toString)
+    @commonTextInfo(constants.View.SPLIT, utilities.NumericOperation.formatNumber(splitUnwrap.split))
 }

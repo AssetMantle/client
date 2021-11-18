@@ -3,9 +3,7 @@
 
 @(identityID: String, unprovisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 @commonModalInfo(constants.View.UNPROVISIONED_ADDRESS_LIST) {
-    @commonTextInfo(constants.View.IDENTITY_ID, identityID)
     @unprovisionedAddresses.map { address =>
-        @address
-        <br>
+        @address<br>
     }
 }
