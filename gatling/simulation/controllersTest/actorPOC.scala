@@ -34,6 +34,6 @@ class ActorPoc extends Simulation {
       )
     ).pause(10)
 
-  setUp(AcountScenario.inject(atOnceUsers(1))).protocols(http.baseUrl("http://localhost:9000"))
+  setUp(AcountScenario.inject(atOnceUsers(1000))).protocols(http.baseUrl("http://localhost:9000"))
 
 }

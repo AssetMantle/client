@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, BlockActor, CheckExistsClassification, ClassificationActor, CreateClassification, DeleteClassification, GetAllClassification, GetClassification, InsertMultipleClassification, InsertOrUpdateClassification, TryGetClassification}
+import actors.models.{BlockActor, CheckExistsClassification, ClassificationActor, CreateClassification, DeleteClassification, GetAllClassification, GetClassification, InsertMultipleClassification, InsertOrUpdateClassification, TryGetClassification}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable._
@@ -13,6 +14,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +39,8 @@ class Classifications @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   import databaseConfig.profile.api._
 
@@ -117,37 +121,45 @@ class Classifications @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val classificationActor = dbActors.Service.actorSystem.actorOf(ClassificationActor.props(Classifications.this), "classificationActor")
-    
-    def createClassificationWithActor(classification: Classification): Future[String] = (classificationActor ? CreateClassification(classification)).mapTo[String]
+    private val classificationActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "classificationRegion",
+        entityProps = ClassificationActor.props(Classifications.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = ClassificationActor.idExtractor,
+        extractShardId = ClassificationActor.shardResolver
+      )
+    }
+
+    def createClassificationWithActor(classification: Classification): Future[String] = (classificationActorRegion ? CreateClassification(uniqueId, classification)).mapTo[String]
 
     def create(classification: Classification): Future[String] = add(classification)
 
-    def tryGetClassificationWithActor(id: String): Future[Classification] = (classificationActor ? TryGetClassification(id)).mapTo[Classification]
+    def tryGetClassificationWithActor(id: String): Future[Classification] = (classificationActorRegion ? TryGetClassification(uniqueId, id)).mapTo[Classification]
 
     def tryGet(id: String): Future[Classification] = tryGetByID(id).map(_.deserialize)
 
-    def getClassificationWithActor(id: String): Future[Option[Classification]] = (classificationActor ? GetClassification(id)).mapTo[Option[Classification]]
+    def getClassificationWithActor(id: String): Future[Option[Classification]] = (classificationActorRegion ? GetClassification(uniqueId, id)).mapTo[Option[Classification]]
 
     def get(id: String): Future[Option[Classification]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAllClassificationWithActor: Future[Seq[Classification]] = (classificationActor ? GetAllClassification()).mapTo[Seq[Classification]]
+    def getAllClassificationWithActor: Future[Seq[Classification]] = (classificationActorRegion ? GetAllClassification(uniqueId)).mapTo[Seq[Classification]]
 
     def getAll: Future[Seq[Classification]] = getAllClassifications.map(_.map(_.deserialize))
 
-    def insertMultipleClassificationWithActor(classifications: Seq[Classification]): Future[Seq[String]] = (classificationActor ? InsertMultipleClassification(classifications)).mapTo[Seq[String]]
+    def insertMultipleClassificationWithActor(classifications: Seq[Classification]): Future[Seq[String]] = (classificationActorRegion ? InsertMultipleClassification(uniqueId, classifications)).mapTo[Seq[String]]
 
     def insertMultiple(classifications: Seq[Classification]): Future[Seq[String]] = addMultiple(classifications)
 
-    def insertOrUpdateClassificationWithActor(classification: Classification): Future[Int] = (classificationActor ? InsertOrUpdateClassification(classification)).mapTo[Int]
+    def insertOrUpdateClassificationWithActor(classification: Classification): Future[Int] = (classificationActorRegion ? InsertOrUpdateClassification(uniqueId, classification)).mapTo[Int]
 
     def insertOrUpdate(classification: Classification): Future[Int] = upsert(classification)
 
-    def deleteClassificationWithActor(id: String): Future[Int] = (classificationActor ? DeleteClassification(id)).mapTo[Int]
+    def deleteClassificationWithActor(id: String): Future[Int] = (classificationActorRegion ? DeleteClassification(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def checkExistsClassificationWithActor(id: String): Future[Boolean] = (classificationActor ? CheckExistsClassification(id)).mapTo[Boolean]
+    def checkExistsClassificationWithActor(id: String): Future[Boolean] = (classificationActorRegion ? CheckExistsClassification(uniqueId, id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }

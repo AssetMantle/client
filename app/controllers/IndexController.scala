@@ -6,7 +6,7 @@ import akka.pattern.ask
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import controllers.view.OtherApp
-import dbActors.{AddActor, BlockchainActor, Master}
+import actors.models.{ BalanceActor}
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Balances, Maintainer, Meta}
@@ -110,12 +110,4 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   }
   startup.start()
 
-  ClusterSharding(dbActors.Service.actorSystem).start(
-    typeName = "blockchainCluster",
-    entityProps = BlockchainActor.props(balances),
-    settings = ClusterShardingSettings(dbActors.Service.actorSystem),
-    extractEntityId = dbActors.ShardSettings.extractEntityId,
-    extractShardId = dbActors.ShardSettings.extractShardId
-
-  )
 }

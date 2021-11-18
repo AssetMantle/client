@@ -1,7 +1,9 @@
-package dbActors
+package actors.models
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+
+case class StartActor(actorRef: ActorRef)
 
 object Service {
 

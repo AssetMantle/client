@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AccountActor, AddActor, AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
+import actors.models.{AccountActor, AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable._
@@ -17,6 +18,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,6 +50,8 @@ class Assets @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   import databaseConfig.profile.api._
 
@@ -127,37 +131,46 @@ class Assets @Inject()(
   object Service {
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val assetActor = dbActors.Service.actorSystem.actorOf(AssetActor.props(Assets.this), "assetActor")
-    
-    def createAssetWithActor(asset: Asset): Future[String] = (assetActor ? CreateAsset(asset)).mapTo[String]
+    private val assetActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "assetRegion",
+        entityProps = AssetActor.props(Assets.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = AssetActor.idExtractor,
+        extractShardId = AssetActor.shardResolver
+      )
+    }
+
+
+    def createAssetWithActor(asset: Asset): Future[String] = (assetActorRegion ? CreateAsset(uniqueId, asset)).mapTo[String]
 
     def create(asset: Asset): Future[String] = add(asset)
 
-    def tryGetAssetWithActor(id: String): Future[Asset] = (assetActor ? TryGetAsset(id)).mapTo[Asset]
+    def tryGetAssetWithActor(id: String): Future[Asset] = (assetActorRegion ? TryGetAsset(uniqueId, id)).mapTo[Asset]
 
     def tryGet(id: String): Future[Asset] = tryGetByID(id).map(_.deserialize)
 
-    def getAssetWithActor(id: String): Future[Option[Asset]] = (assetActor ? GetAsset(id)).mapTo[Option[Asset]]
+    def getAssetWithActor(id: String): Future[Option[Asset]] = (assetActorRegion ? GetAsset(uniqueId, id)).mapTo[Option[Asset]]
 
     def get(id: String): Future[Option[Asset]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAllAssetWithActor: Future[Seq[Asset]] = (assetActor ? GetAllAsset()).mapTo[Seq[Asset]]
+    def getAllAssetWithActor: Future[Seq[Asset]] = (assetActorRegion ? GetAllAsset(uniqueId)).mapTo[Seq[Asset]]
 
     def getAll: Future[Seq[Asset]] = getAllAssets.map(_.map(_.deserialize))
 
-    def insertMultipleAssetWithActor(assets: Seq[Asset]): Future[Seq[String]] = (assetActor ? InsertMultipleAssets(assets)).mapTo[Seq[String]]
+    def insertMultipleAssetWithActor(assets: Seq[Asset]): Future[Seq[String]] = (assetActorRegion ? InsertMultipleAssets(uniqueId, assets)).mapTo[Seq[String]]
 
     def insertMultiple(assets: Seq[Asset]): Future[Seq[String]] = addMultiple(assets)
 
-    def insertOrUpdateAssetWithActor(asset: Asset): Future[Int] = (assetActor ? InsertOrUpdateAsset(asset)).mapTo[Int]
+    def insertOrUpdateAssetWithActor(asset: Asset): Future[Int] = (assetActorRegion ? InsertOrUpdateAsset(uniqueId, asset)).mapTo[Int]
 
     def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
 
-    def deleteAssetWithActor(id: String): Future[Int] = (assetActor ? DeleteAsset(id)).mapTo[Int]
+    def deleteAssetWithActor(id: String): Future[Int] = (assetActorRegion ? DeleteAsset(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def checkExistsAssetWithActor(id: String): Future[Boolean] = (assetActor ? CheckExistsAsset(id)).mapTo[Boolean]
+    def checkExistsAssetWithActor(id: String): Future[Boolean] = (assetActorRegion ? CheckExistsAsset(uniqueId, id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }

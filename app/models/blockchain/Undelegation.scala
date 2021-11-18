@@ -4,7 +4,8 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, TryGetUndelegation, UndelegationActor}
+import actors.models.{CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, StartActor, TransactionActor, TryGetUndelegation, UndelegationActor}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -22,6 +23,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -53,6 +55,8 @@ class Undelegations @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val undelegationTable = TableQuery[UndelegationTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   case class UndelegationSerialized(delegatorAddress: String, validatorAddress: String, entries: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Undelegation = Undelegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress, entries = utilities.JSON.convertJsonStringToObject[Seq[UndelegationEntry]](entries), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -129,37 +133,45 @@ class Undelegations @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val undelegationActor = dbActors.Service.actorSystem.actorOf(UndelegationActor.props(Undelegations.this), "undelegationActor")
-    
-    def createUndelegationWithActor(undelegation: Undelegation): Future[String] = (undelegationActor ? CreateUndelegation(undelegation)).mapTo[String]
+    private val undelegationActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "undelegationRegion",
+        entityProps = UndelegationActor.props(Undelegations.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = UndelegationActor.idExtractor,
+        extractShardId = UndelegationActor.shardResolver
+      )
+    }
+
+    def createUndelegationWithActor(undelegation: Undelegation): Future[String] = (undelegationActorRegion ? CreateUndelegation(uniqueId, undelegation)).mapTo[String]
 
     def create(undelegation: Undelegation): Future[String] = add(undelegation)
 
-    def insertMultipleUndelegationWithActor(undelegations: Seq[Undelegation]): Future[Seq[String]] = (undelegationActor ? InsertMultipleUndelegation(undelegations)).mapTo[Seq[String]]
+    def insertMultipleUndelegationWithActor(undelegations: Seq[Undelegation]): Future[Seq[String]] = (undelegationActorRegion ? InsertMultipleUndelegation(uniqueId, undelegations)).mapTo[Seq[String]]
 
     def insertMultiple(undelegations: Seq[Undelegation]): Future[Seq[String]] = addMultiple(undelegations)
 
-    def insertOrUpdateUndelegationWithActor(undelegation: Undelegation): Future[Int] = (undelegationActor ? InsertOrUpdateUndelegation(undelegation)).mapTo[Int]
+    def insertOrUpdateUndelegationWithActor(undelegation: Undelegation): Future[Int] = (undelegationActorRegion ? InsertOrUpdateUndelegation(uniqueId, undelegation)).mapTo[Int]
 
     def insertOrUpdate(undelegation: Undelegation): Future[Int] = upsert(undelegation)
 
-    def getAllUndelegationByDelegatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActor ? GetAllUndelegationByDelegator(address)).mapTo[Seq[Undelegation]]
+    def getAllUndelegationByDelegatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegationByDelegator(uniqueId, address)).mapTo[Seq[Undelegation]]
 
     def getAllByDelegator(address: String): Future[Seq[Undelegation]] = findAllByDelegator(address).map(_.map(_.deserialize))
 
-    def getAllUndelegationByValidatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActor ? GetAllUndelegationByValidator(address)).mapTo[Seq[Undelegation]]
+    def getAllUndelegationByValidatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegationByValidator(uniqueId, address)).mapTo[Seq[Undelegation]]
 
     def getAllByValidator(address: String): Future[Seq[Undelegation]] = findAllByValidator(address).map(_.map(_.deserialize))
 
-    def getAllUndelegationWithActor: Future[Seq[Undelegation]] = (undelegationActor ? GetAllUndelegation()).mapTo[Seq[Undelegation]]
+    def getAllUndelegationWithActor: Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegation(uniqueId)).mapTo[Seq[Undelegation]]
 
     def getAll: Future[Seq[Undelegation]] = findAll.map(_.map(_.deserialize))
 
-    def deleteUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActor ? DeleteUndelegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)).mapTo[Int]
+    def deleteUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActorRegion ? DeleteUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
 
-    def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+    def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress, validatorAddress)
 
-    def tryGetUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActor ? TryGetUndelegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)).mapTo[Int]
+    def tryGetUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActorRegion ? TryGetUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
 
     def tryGet(delegatorAddress: String, validatorAddress: String): Future[Undelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).map(_.deserialize)
 

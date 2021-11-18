@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposal, InsertOrUpdateProposalDeposit, ProposalActor, ProposalDepositActor, TryGetProposalDeposit}
+import actors.models.{DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposal, InsertOrUpdateProposalDeposit, ProposalActor, ProposalDepositActor, TryGetProposalDeposit}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Parameters.GovernanceParameter
@@ -18,6 +19,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +49,8 @@ class ProposalDeposits @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val proposalTable = TableQuery[ProposalDepositTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   case class ProposalDepositSerialized(proposalID: Int, depositor: String, amount: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: ProposalDeposit = ProposalDeposit(proposalID = proposalID, depositor = depositor, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -108,25 +112,33 @@ class ProposalDeposits @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val proposalDepositActor = dbActors.Service.actorSystem.actorOf(ProposalDepositActor.props(ProposalDeposits.this), "proposalDepositActor")
-    
-    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (proposalDepositActor ? TryGetProposalDeposit(proposalID)).mapTo[ProposalDeposit]
+    private val proposalDepositActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "proposalDepositRegion",
+        entityProps = ProposalDepositActor.props(ProposalDeposits.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = ProposalDepositActor.idExtractor,
+        extractShardId = ProposalDepositActor.shardResolver
+      )
+    }
+
+    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (proposalDepositActorRegion ? TryGetProposalDeposit(uniqueId, proposalID)).mapTo[ProposalDeposit]
 
     def tryGet(proposalID: Int): Future[ProposalDeposit] = tryGetByID(proposalID).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (proposalDepositActor ? InsertOrUpdateProposalDeposit(proposalDeposit)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (proposalDepositActorRegion ? InsertOrUpdateProposalDeposit(uniqueId, proposalDeposit)).mapTo[Int]
 
     def insertOrUpdate(proposalDeposit: ProposalDeposit): Future[Int] = upsert(proposalDeposit)
 
-    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (proposalDepositActor ? GetProposalDepositWithActor(proposalID, depositor)).mapTo[Option[ProposalDeposit]]
+    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (proposalDepositActorRegion ? GetProposalDepositWithActor(uniqueId, proposalID, depositor)).mapTo[Option[ProposalDeposit]]
 
     def get(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = getByIDAndDepositor(proposalID = proposalID, depositor = depositor).map(_.map(_.deserialize))
 
-    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActor ? GetByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
+    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActorRegion ? GetByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def getByProposalID(proposalID: Int): Future[Seq[ProposalDeposit]] = getByID(proposalID).map(_.map(_.deserialize))
 
-    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActor ? DeleteByProposalDepositId(proposalID)).mapTo[Seq[ProposalDeposit]]
+    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActorRegion ? DeleteByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def deleteByProposalID(proposalID: Int): Future[Int] = deleteByID(proposalID)
 

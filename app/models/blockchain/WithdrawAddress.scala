@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateWithdrawAddress, GetAllWithdrawAddresses, GetWithdrawAddress, InsertMultipleWithdrawAddress, InsertOrUpdateWithdrawAddress, ProposalVoteActor, WithdrawAddressActor}
+import actors.models.{CreateWithdrawAddress, GetAllWithdrawAddresses, GetWithdrawAddress, InsertMultipleWithdrawAddress, InsertOrUpdateWithdrawAddress, ProposalVoteActor, StartActor, ValidatorActor, WithdrawAddressActor}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
 import exceptions.BaseException
@@ -16,6 +17,7 @@ import play.api.{Configuration, Logger}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -40,6 +42,8 @@ class WithdrawAddresses @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val withdrawAddressTable = TableQuery[WithdrawAddressTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   private def add(withdrawAddress: WithdrawAddress): Future[String] = db.run((withdrawAddressTable returning withdrawAddressTable.map(_.withdrawAddress) += withdrawAddress).asTry).map {
     case Success(result) => result
@@ -98,25 +102,33 @@ class WithdrawAddresses @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val withdrawAddressActor = dbActors.Service.actorSystem.actorOf(WithdrawAddressActor.props(WithdrawAddresses.this), "withdrawAddressActor")
-    
-    def createWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[String] = (withdrawAddressActor ? CreateWithdrawAddress(withdrawAddress)).mapTo[String]
+    private val withdrawAddressActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "withdrawAddressRegion",
+        entityProps = WithdrawAddressActor.props(WithdrawAddresses.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = WithdrawAddressActor.idExtractor,
+        extractShardId = WithdrawAddressActor.shardResolver
+      )
+    }
+
+    def createWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[String] = (withdrawAddressActorRegion ? CreateWithdrawAddress(uniqueId, withdrawAddress)).mapTo[String]
 
     def create(withdrawAddress: WithdrawAddress): Future[String] = add(withdrawAddress)
 
-    def insertMultipleWithdrawAddressWithActor(withdrawAddress: Seq[WithdrawAddress]): Future[Seq[String]] = (withdrawAddressActor ? InsertMultipleWithdrawAddress(withdrawAddress)).mapTo[Seq[String]]
+    def insertMultipleWithdrawAddressWithActor(withdrawAddress: Seq[WithdrawAddress]): Future[Seq[String]] = (withdrawAddressActorRegion ? InsertMultipleWithdrawAddress(uniqueId, withdrawAddress)).mapTo[Seq[String]]
 
     def insertMultiple(withdrawAddress: Seq[WithdrawAddress]): Future[Seq[String]] = addMultiple(withdrawAddress)
 
-    def insertOrUpdateWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[Int] = (withdrawAddressActor ? InsertOrUpdateWithdrawAddress(withdrawAddress)).mapTo[Int]
+    def insertOrUpdateWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[Int] = (withdrawAddressActorRegion ? InsertOrUpdateWithdrawAddress(uniqueId, withdrawAddress)).mapTo[Int]
 
     def insertOrUpdate(withdrawAddress: WithdrawAddress): Future[Int] = upsert(withdrawAddress)
 
-    def getAllWithdrawAddressesWithActor: Future[Seq[WithdrawAddress]] = (withdrawAddressActor ? GetAllWithdrawAddresses()).mapTo[Seq[WithdrawAddress]]
+    def getAllWithdrawAddressesWithActor: Future[Seq[WithdrawAddress]] = (withdrawAddressActorRegion ? GetAllWithdrawAddresses(uniqueId)).mapTo[Seq[WithdrawAddress]]
 
     def getAll: Future[Seq[WithdrawAddress]] = findAll
 
-    def getWithdrawAddressWithActor(delegatorAddress: String): Future[String] = (withdrawAddressActor ? GetWithdrawAddress(delegatorAddress)).mapTo[String]
+    def getWithdrawAddressWithActor(delegatorAddress: String): Future[String] = (withdrawAddressActorRegion ? GetWithdrawAddress(uniqueId, delegatorAddress)).mapTo[String]
 
     def get(delegatorAddress: String): Future[String] = getByDelegatorAddress(delegatorAddress).map(_.getOrElse(delegatorAddress))
 

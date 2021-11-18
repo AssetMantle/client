@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, DelegationActor, DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
+import actors.models.{DelegationActor, DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ParameterActor, ProposalActor, TryGetProposal}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Abstract.ProposalContent
 import models.Trait.Logged
@@ -20,6 +21,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -90,6 +92,8 @@ class Proposals @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val proposalTable = TableQuery[ProposalTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   case class ProposalSerialized(id: Int, content: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = submitTime, depositEndTime = depositEndTime, totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = votingStartTime, votingEndTime = votingEndTime, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -170,37 +174,45 @@ class Proposals @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val proposalActor = dbActors.Service.actorSystem.actorOf(ProposalActor.props(Proposals.this), "proposalActor")
-    
-    def tryGetProposalWithActor(id: Int): Future[Proposal] = (proposalActor ? TryGetProposal(id)).mapTo[Proposal]
+    private val proposalActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "proposalRegion",
+        entityProps = ProposalActor.props(Proposals.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = ProposalActor.idExtractor,
+        extractShardId = ProposalActor.shardResolver
+      )
+    }
+
+    def tryGetProposalWithActor(id: Int): Future[Proposal] = (proposalActorRegion ? TryGetProposal(uniqueId, id)).mapTo[Proposal]
 
     def tryGet(id: Int): Future[Proposal] = tryGetByID(id).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (proposalActor ? InsertOrUpdateProposal(proposal)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (proposalActorRegion ? InsertOrUpdateProposal(uniqueId, proposal)).mapTo[Int]
 
     def insertOrUpdate(proposal: Proposal): Future[Int] = upsert(proposal)
 
-    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (proposalActor ? GetProposalWithActor(id)).mapTo[Option[Proposal]]
+    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (proposalActorRegion ? GetProposalWithActor(uniqueId, id)).mapTo[Option[Proposal]]
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 
-    def getLatestProposalIDWithActor: Future[Int] = (proposalActor ? GetLatestProposalID).mapTo[Int]
+    def getLatestProposalIDWithActor: Future[Int] = (proposalActorRegion ? GetLatestProposalID(uniqueId)).mapTo[Int]
 
     def getLatestProposalID: Future[Int] = getMaxProposalID
 
-    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActor ? GetAllActiveProposals(time)).mapTo[Seq[Proposal]]
+    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActorRegion ? GetAllActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
 
     def getAllActiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.votingEndTime != "" && utilities.Date.isMature(completionTimestamp = x.votingEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActor ? GetAllInActiveProposals(time)).mapTo[Seq[Proposal]]
+    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActorRegion ? GetAllInActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
 
     def getAllInactiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.depositEndTime != "" && utilities.Date.isMature(completionTimestamp = x.depositEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def deleteProposalsWithActor(id: Int): Future[Int] = (proposalActor ? DeleteProposal(id)).mapTo[Int]
+    def deleteProposalsWithActor(id: Int): Future[Int] = (proposalActorRegion ? DeleteProposal(uniqueId, id)).mapTo[Int]
 
     def delete(id: Int): Future[Int] = deleteByID(id)
 
-    def getProposalsWithActor(): Future[Seq[Proposal]] = (proposalActor ? GetProposals).mapTo[Seq[Proposal]]
+    def getProposalsWithActor(): Future[Seq[Proposal]] = (proposalActorRegion ? GetProposals(uniqueId)).mapTo[Seq[Proposal]]
 
     def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 

@@ -2,7 +2,9 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateParameter, GetAllParameter, InsertOrUpdateParameter, OrderActor, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
+import actors.models.{CreateParameter, GetAllParameter, InsertOrUpdateParameter, OrderActor, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+
 import java.sql.Timestamp
 import exceptions.BaseException
 
@@ -24,6 +26,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -57,6 +60,8 @@ class Parameters @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val parameterTable = TableQuery[ParameterTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -110,55 +115,63 @@ class Parameters @Inject()(
 
   object Service {
 
-    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+    implicit val timeout = Timeout(10 seconds) // needed for `?` below
 
-    private val parameterActor = dbActors.Service.actorSystem.actorOf(ParameterActor.props(Parameters.this), "parameterActor")
-    
-    def createParameterWithActor(parameter: Parameter): Future[String] = (parameterActor ? CreateParameter(parameter)).mapTo[String]
+    private val parameterActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "parameterRegion",
+        entityProps = ParameterActor.props(Parameters.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = ParameterActor.idExtractor,
+        extractShardId = ParameterActor.shardResolver
+      )
+    }
+
+    def createParameterWithActor(parameter: Parameter): Future[String] = (parameterActorRegion ? CreateParameter(uniqueId, parameter)).mapTo[String]
 
     def create(parameter: Parameter): Future[String] = add(parameter)
 
-    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (parameterActor ? InsertOrUpdateParameter(parameter)).mapTo[Int]
+    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (parameterActorRegion ? InsertOrUpdateParameter(uniqueId, parameter)).mapTo[Int]
 
     def insertOrUpdate(parameter: Parameter): Future[Int] = upsert(parameter)
 
-    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (parameterActor ? TryGetParameter(parameterType)).mapTo[Parameter]
+    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (parameterActorRegion ? TryGetParameter(uniqueId, parameterType)).mapTo[Parameter]
 
     def tryGet(parameterType: String): Future[Parameter] = tryGetByType(parameterType).map(_.deserialize)
 
-    def tryGetAuthParameterWithActor: Future[AuthParameter] = (parameterActor ? TryGetAuthParameter).mapTo[AuthParameter]
+    def tryGetAuthParameterWithActor: Future[AuthParameter] = (parameterActorRegion ? TryGetAuthParameter(uniqueId)).mapTo[AuthParameter]
 
     def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(constants.Blockchain.ParameterType.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
 
-    def tryGetBankParameterWithActor: Future[BankParameter] = (parameterActor ? TryGetBankParameter).mapTo[BankParameter]
+    def tryGetBankParameterWithActor: Future[BankParameter] = (parameterActorRegion ? TryGetBankParameter(uniqueId)).mapTo[BankParameter]
 
     def tryGetBankParameter: Future[BankParameter] = tryGetByType(constants.Blockchain.ParameterType.BANK).map(_.deserialize).map(_.value.asBankParameter)
 
-    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (parameterActor ? TryGetDistributionParameter).mapTo[DistributionParameter]
+    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (parameterActorRegion ? TryGetDistributionParameter(uniqueId)).mapTo[DistributionParameter]
 
     def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(constants.Blockchain.ParameterType.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
 
-    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (parameterActor ? TryGetGovernanceParameter).mapTo[GovernanceParameter]
+    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (parameterActorRegion ? TryGetGovernanceParameter(uniqueId)).mapTo[GovernanceParameter]
 
     def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(constants.Blockchain.ParameterType.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
 
-    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (parameterActor ? TryGetHalvingParameter).mapTo[HalvingParameter]
+    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (parameterActorRegion ? TryGetHalvingParameter(uniqueId)).mapTo[HalvingParameter]
 
     def tryGetHalvingParameter: Future[HalvingParameter] = tryGetByType(constants.Blockchain.ParameterType.HALVING).map(_.deserialize).map(_.value.asHalvingParameter)
 
-    def tryGetMintingParameterWithActor: Future[MintingParameter] = (parameterActor ? TryGetMintingParameter).mapTo[MintingParameter]
+    def tryGetMintingParameterWithActor: Future[MintingParameter] = (parameterActorRegion ? TryGetMintingParameter(uniqueId)).mapTo[MintingParameter]
 
     def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(constants.Blockchain.ParameterType.MINT).map(_.deserialize).map(_.value.asMintingParameter)
 
-    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (parameterActor ? TryGetSlashingParameter).mapTo[SlashingParameter]
+    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (parameterActorRegion ? TryGetSlashingParameter(uniqueId)).mapTo[SlashingParameter]
 
     def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(constants.Blockchain.ParameterType.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
 
-    def tryGetStakingParameterWithActor: Future[StakingParameter] = (parameterActor ? TryGetStakingParameter).mapTo[StakingParameter]
+    def tryGetStakingParameterWithActor: Future[StakingParameter] = (parameterActorRegion ? TryGetStakingParameter(uniqueId)).mapTo[StakingParameter]
 
     def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
-    def getAllParameterWithActor: Future[Seq[Parameter]] = (parameterActor ? GetAllParameter).mapTo[Seq[Parameter]]
+    def getAllParameterWithActor: Future[Seq[Parameter]] = (parameterActorRegion ? GetAllParameter).mapTo[Seq[Parameter]]
 
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 
@@ -170,7 +183,7 @@ class Parameters @Inject()(
       val halvingParameter = Service.tryGetHalvingParameter
 
       def checkAndUpdate(halvingParameter: HalvingParameter) = if ((header.height % halvingParameter.blockHeight) == 0) {
-        val mintingParameter = Service.tryGetMintingParameter
+        val mintingParameter = Service.tryGetMintingParameterWithActor
 
         def updateMintingParameter(mintingParameter: MintingParameter) = Service.insertOrUpdate(Parameter(parameterType = mintingParameter.`type`, value = mintingParameter.copy(inflationMax = mintingParameter.inflationMax / 2, inflationMin = mintingParameter.inflationMin / 2, inflationRateChange = (mintingParameter.inflationMax / 2) - (mintingParameter.inflationMin / 2))))
 

@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalDepositActor, ProposalVoteActor, TryGetProposalVote}
+import actors.models.{GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalDepositActor, ProposalVoteActor, TryGetProposalVote}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.TransactionMessages.Vote
@@ -15,6 +16,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +43,8 @@ class ProposalVotes @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val proposalVoteTable = TableQuery[ProposalVoteTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   private def add(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
     case Success(result) => result
@@ -92,17 +96,25 @@ class ProposalVotes @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val proposalVoteActor = dbActors.Service.actorSystem.actorOf(ProposalVoteActor.props(ProposalVotes.this), "proposalVoteActor")
-    
-    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (proposalVoteActor ? TryGetProposalVote(proposalID)).mapTo[ProposalVote]
+    private val proposalVoteActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "proposalVoteRegion",
+        entityProps = ProposalVoteActor.props(ProposalVotes.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = ProposalVoteActor.idExtractor,
+        extractShardId = ProposalVoteActor.shardResolver
+      )
+    }
+
+    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (proposalVoteActorRegion ? TryGetProposalVote(uniqueId, proposalID)).mapTo[ProposalVote]
 
     def tryGet(proposalID: Int): Future[ProposalVote] = tryGetByID(proposalID)
 
-    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (proposalVoteActor ? InsertOrUpdateProposalVote(proposalVote)).mapTo[ProposalVote]
+    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (proposalVoteActorRegion ? InsertOrUpdateProposalVote(uniqueId, proposalVote)).mapTo[ProposalVote]
 
     def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
 
-    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[Seq[ProposalVote]] = (proposalVoteActor ? GetAllByProposalVoteId(proposalID)).mapTo[Seq[ProposalVote]]
+    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[Seq[ProposalVote]] = (proposalVoteActorRegion ? GetAllByProposalVoteId(uniqueId, proposalID)).mapTo[Seq[ProposalVote]]
 
     def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
   }

@@ -1,6 +1,7 @@
 package models.blockchain
 
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.Coin
@@ -21,8 +22,9 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
-import dbActors.{AddActor, BlockchainActor, Master}
+import actors.models.{ BalanceActor}
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 
@@ -44,6 +46,8 @@ class Balances @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   import databaseConfig.profile.api._
 
@@ -104,25 +108,33 @@ class Balances @Inject()(
   object Service {
     implicit val timeout = akkaTimeout(10 seconds) // needed for `?` below
 
-    private val blockchainActor = dbActors.Service.actorSystem.actorOf(BlockchainActor.props(Balances.this), "blockchainActor")
+    private val balanceActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "balanceRegion",
+        entityProps = BalanceActor.props(Balances.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = BalanceActor.idExtractor,
+        extractShardId = BalanceActor.shardResolver
+      )
+    }
 
-    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (blockchainActor ? dbActors.Create(address, coins)).mapTo[String]
+    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (balanceActorRegion ? actors.models.Create(uniqueId, address, coins)).mapTo[String]
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
-    def tryGetWithActor(address: String): Future[Balance] = (blockchainActor ? dbActors.TryGet(address)).mapTo[Balance]
+    def tryGetWithActor(address: String): Future[Balance] = (balanceActorRegion ? actors.models.TryGet(uniqueId, address)).mapTo[Balance]
 
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 
-    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (blockchainActor ? dbActors.InsertOrUpdate(balance)).mapTo[Int]
+    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (balanceActorRegion ? actors.models.InsertOrUpdate(uniqueId, balance)).mapTo[Int]
 
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)
 
-    def getWithActor(address: String): Future[Option[Balance]] = (blockchainActor ? dbActors.Get(address)).mapTo[Option[Balance]]
+    def getWithActor(address: String): Future[Option[Balance]] = (balanceActorRegion ? actors.models.Get(uniqueId, address)).mapTo[Option[Balance]]
 
     def get(address: String): Future[Option[Balance]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (blockchainActor ? dbActors.GetList(addresses)).mapTo[Seq[Balance]]
+    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (balanceActorRegion ? actors.models.GetList(uniqueId, addresses)).mapTo[Seq[Balance]]
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 

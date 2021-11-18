@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CheckIfExistsMeta, CreateData, CreateMeta, GetData, GetDataList, GetList, GetMeta, GetMetaList, GetMetas, InsertMultipleData, InsertMultipleMetas, InsertOrUpdateData, InsertOrUpdateMeta, MaintainerActor, MetaActor, TryGetData, TryGetMeta}
+import actors.models.{CheckIfExistsMeta, CreateData, CreateMeta, GetData, GetDataList, GetList, GetMeta, GetMetaList, GetMetas, InsertMultipleData, InsertMultipleMetas, InsertOrUpdateData, InsertOrUpdateMeta, MaintainerActor, MetaActor, TryGetData, TryGetMeta}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.DataValue
@@ -15,6 +16,7 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +42,8 @@ class Metas @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val metaTable = TableQuery[MetaTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   private def add(meta: Meta): Future[String] = db.run((metaTable returning metaTable.map(_.id) += meta).asTry).map {
     case Success(result) => result
@@ -102,61 +106,69 @@ class Metas @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val metaActor = dbActors.Service.actorSystem.actorOf(MetaActor.props(Metas.this), "metaActor")
-    
-    def createDataWithActor(data: Data): Future[String] = (metaActor ? CreateData(data)).mapTo[String]
+    private val metaActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "metaRegion",
+        entityProps = MetaActor.props(Metas.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = MetaActor.idExtractor,
+        extractShardId = MetaActor.shardResolver
+      )
+    }
+
+    def createDataWithActor(data: Data): Future[String] = (metaActorRegion ? CreateData(uniqueId, data)).mapTo[String]
 
     def create(data: Data): Future[String] = add(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
 
-    def createMetaWithActor(meta: Meta): Future[String] = (metaActor ? CreateMeta(meta)).mapTo[String]
+    def createMetaWithActor(meta: Meta): Future[String] = (metaActorRegion ? CreateMeta(uniqueId, meta)).mapTo[String]
 
     def create(meta: Meta): Future[String] = add(meta)
 
-    def tryGetMetaWithActor(id: String, dataType: String): Future[Meta] = (metaActor ? TryGetMeta(id, dataType)).mapTo[Meta]
+    def tryGetMetaWithActor(id: String, dataType: String): Future[Meta] = (metaActorRegion ? TryGetMeta(uniqueId, id, dataType)).mapTo[Meta]
 
     def tryGet(id: String, dataType: String): Future[Meta] = tryGetByIDAndDataType(id = id, dataType = dataType)
 
-    def tryGetDataWithActor(id: String, dataType: String): Future[Data] = (metaActor ? TryGetData(id, dataType)).mapTo[Data]
+    def tryGetDataWithActor(id: String, dataType: String): Future[Data] = (metaActorRegion ? TryGetData(uniqueId, id, dataType)).mapTo[Data]
 
     def tryGetData(id: String, dataType: String): Future[Data] = tryGetByIDAndDataType(id = id, dataType = dataType).map(x => DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))
 
-    def getMetaWithActor(id: String, dataType: String): Future[Option[Meta]] = (metaActor ? GetMeta(id, dataType)).mapTo[Option[Meta]]
+    def getMetaWithActor(id: String, dataType: String): Future[Option[Meta]] = (metaActorRegion ? GetMeta(uniqueId, id, dataType)).mapTo[Option[Meta]]
 
     def get(id: String, dataType: String): Future[Option[Meta]] = getByIDAndDataType(id = id, dataType = dataType)
 
-    def getDataWithActor(id: String, dataType: String): Future[Option[Data]] = (metaActor ? GetData(id, dataType)).mapTo[Option[Data]]
+    def getDataWithActor(id: String, dataType: String): Future[Option[Data]] = (metaActorRegion ? GetData(uniqueId, id, dataType)).mapTo[Option[Data]]
 
     def getData(id: String, dataType: String): Future[Option[Data]] = getByIDAndDataType(id = id, dataType = dataType).map(metaOption => metaOption.fold[Option[Data]](None)(x => Option(DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))))
 
-    def getMetasWithActor(ids: Seq[String]): Future[Seq[Meta]] = (metaActor ? GetMetas(ids)).mapTo[Seq[Meta]]
+    def getMetasWithActor(ids: Seq[String]): Future[Seq[Meta]] = (metaActorRegion ? GetMetas(uniqueId, ids)).mapTo[Seq[Meta]]
 
     def get(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
 
-    def getDataListWithActor(ids: Seq[String]): Future[Seq[Data]] = (metaActor ? GetDataList(ids)).mapTo[Seq[Data]]
+    def getDataListWithActor(ids: Seq[String]): Future[Seq[Data]] = (metaActorRegion ? GetDataList(uniqueId, ids)).mapTo[Seq[Data]]
 
     def getDataList(ids: Seq[String]): Future[Seq[Data]] = getByIDs(ids.filter(x => x != "")).map(_.map(meta => DataValue.getData(dataType = meta.dataType, dataValue = Option(meta.dataValue))))
 
-    def getListWithActor(ids: Seq[String]): Future[Seq[Meta]] = (metaActor ? GetMetaList(ids)).mapTo[Seq[Meta]]
+    def getListWithActor(ids: Seq[String]): Future[Seq[Meta]] = (metaActorRegion ? GetMetaList(uniqueId, ids)).mapTo[Seq[Meta]]
 
     def getList(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
 
-    def insertMultipleMetasWithActor(metaList: Seq[Meta]): Future[Seq[String]] = (metaActor ? InsertMultipleMetas(metaList)).mapTo[Seq[String]]
+    def insertMultipleMetasWithActor(metaList: Seq[Meta]): Future[Seq[String]] = (metaActorRegion ? InsertMultipleMetas(uniqueId, metaList)).mapTo[Seq[String]]
 
     def insertMultiple(metaList: Seq[Meta]): Future[Seq[String]] = addMultiple(metaList)
 
-    def insertMultipleDataWithActor(dataList: Seq[Data]): Future[Seq[String]] = (metaActor ? InsertMultipleData(dataList)).mapTo[Seq[String]]
+    def insertMultipleDataWithActor(dataList: Seq[Data]): Future[Seq[String]] = (metaActorRegion ? InsertMultipleData(uniqueId, dataList)).mapTo[Seq[String]]
 
     def insertMultipleData(dataList: Seq[Data]): Future[Seq[String]] = addMultiple(dataList.map(x => Meta(id = x.value.generateHash, dataType = x.dataType, dataValue = x.value.asString)))
 
-    def insertOrUpdateMetaWithActor(meta: Meta): Future[Int] = (metaActor ? InsertOrUpdateMeta(meta)).mapTo[Int]
+    def insertOrUpdateMetaWithActor(meta: Meta): Future[Int] = (metaActorRegion ? InsertOrUpdateMeta(uniqueId, meta)).mapTo[Int]
 
     def insertOrUpdate(meta: Meta): Future[Int] = upsert(meta)
 
-    def insertOrUpdateDataWithActor(data: Data): Future[Int] = (metaActor ? InsertOrUpdateData(data)).mapTo[Int]
+    def insertOrUpdateDataWithActor(data: Data): Future[Int] = (metaActorRegion ? InsertOrUpdateData(uniqueId, data)).mapTo[Int]
 
     def insertOrUpdate(data: Data): Future[Int] = upsert(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
 
-    def checkIfExistsMetaWithActor(id: String, dataType: String): Future[Boolean] = (metaActor ? CheckIfExistsMeta(id, dataType)).mapTo[Boolean]
+    def checkIfExistsMetaWithActor(id: String, dataType: String): Future[Boolean] = (metaActorRegion ? CheckIfExistsMeta(uniqueId, id, dataType)).mapTo[Boolean]
 
     def checkIfExists(id: String, dataType: String): Future[Boolean] = checkIfExistsByIDAndDataType(id = id, dataType = dataType)
 

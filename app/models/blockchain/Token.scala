@@ -4,7 +4,8 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, SplitActor, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
+import actors.models.{CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, SplitActor, StartActor, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -21,6 +22,7 @@ import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupply
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -46,6 +48,8 @@ class Tokens @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TOKEN
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   import databaseConfig.profile.api._
 
@@ -159,45 +163,53 @@ class Tokens @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val tokenActor = dbActors.Service.actorSystem.actorOf(TokenActor.props(Tokens.this), "tokenActor")
-    
-    def createTokenWithActor(token: Token): Future[String] = (tokenActor ? CreateToken(token)).mapTo[String]
+    private val tokenActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "tokenRegion",
+        entityProps = TokenActor.props(Tokens.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = TokenActor.idExtractor,
+        extractShardId = TokenActor.shardResolver
+      )
+    }
+
+    def createTokenWithActor(token: Token): Future[String] = (tokenActorRegion ? CreateToken(uniqueId, token)).mapTo[String]
 
     def create(token: Token): Future[String] = add(token)
 
-    def getTokenWithActor(denom: String): Future[Token] = (tokenActor ? GetToken(denom)).mapTo[Token]
+    def getTokenWithActor(denom: String): Future[Token] = (tokenActorRegion ? GetToken(uniqueId, denom)).mapTo[Token]
 
     def get(denom: String): Future[Token] = findByDenom(denom).map(_.deserialize)
 
-    def getAllTokenWithActor: Future[Seq[Token]] = (tokenActor ? GetAllToken()).mapTo[Seq[Token]]
+    def getAllTokenWithActor: Future[Seq[Token]] = (tokenActorRegion ? GetAllToken(uniqueId)).mapTo[Seq[Token]]
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
 
-    def getAllDenomsWithActor: Future[Seq[String]] = (tokenActor ? GetAllDenoms()).mapTo[Seq[String]]
+    def getAllDenomsWithActor: Future[Seq[String]] = (tokenActorRegion ? GetAllDenoms(uniqueId)).mapTo[Seq[String]]
 
     def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
 
-    def getStakingTokenWithActor: Future[Token] = (tokenActor ? GetStakingToken()).mapTo[Token]
+    def getStakingTokenWithActor: Future[Token] = (tokenActorRegion ? GetStakingToken(uniqueId)).mapTo[Token]
 
     def getStakingToken: Future[Token] = findByDenom(stakingDenom).map(_.deserialize)
 
-    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (tokenActor ? InsertMultipleToken(tokens)).mapTo[Seq[String]]
+    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (tokenActorRegion ? InsertMultipleToken(uniqueId, tokens)).mapTo[Seq[String]]
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
-    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (tokenActor ? InsertOrUpdateToken(token)).mapTo[Int]
+    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (tokenActorRegion ? InsertOrUpdateToken(uniqueId, token)).mapTo[Int]
 
     def insertOrUpdate(token: Token): Future[Int] = upsert(token)
 
-    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (tokenActor ? UpdateStakingAmounts(denom, bondedAmount, notBondedAmount)).mapTo[Int]
+    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (tokenActorRegion ? UpdateStakingAmounts(uniqueId, denom, bondedAmount, notBondedAmount)).mapTo[Int]
 
     def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (tokenActor ? UpdateTotalSupplyAndInflation(denom, totalSupply, inflation)).mapTo[Int]
+    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (tokenActorRegion ? UpdateTotalSupplyAndInflation(uniqueId, denom, totalSupply, inflation)).mapTo[Int]
 
     def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationByDenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
 
-    def getTotalBondedAmountWithActor: Future[MicroNumber] = (tokenActor ? GetTotalBondedAmount()).mapTo[MicroNumber]
+    def getTotalBondedAmountWithActor: Future[MicroNumber] = (tokenActorRegion ? GetTotalBondedAmount(uniqueId)).mapTo[MicroNumber]
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }

@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import dbActors.{AddActor, CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
+import actors.models.{CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, StartActor, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.{Fee, StdMsg}
@@ -13,6 +14,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,6 +62,8 @@ class Transactions @Inject()(
   import databaseConfig.profile.api._
 
   private[models] val transactionTable = TableQuery[TransactionTable]
+
+  private val uniqueId: String = UUID.randomUUID().toString
 
   case class TransactionSerialized(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: String, fee: String, memo: String, timestamp: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), memo = memo, timestamp = timestamp, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -171,53 +175,61 @@ class Transactions @Inject()(
 
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
-    private val transactionActor = dbActors.Service.actorSystem.actorOf(TransactionActor.props(Transactions.this), "transactionActor")
-    
-    def createTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (transactionActor ? CreateTransaction(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
+    private val transactionActorRegion = {
+      ClusterSharding(actors.models.Service.actorSystem).start(
+        typeName = "transactionRegion",
+        entityProps = TransactionActor.props(Transactions.this),
+        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        extractEntityId = TransactionActor.idExtractor,
+        extractShardId = TransactionActor.shardResolver
+      )
+    }
+
+    def createTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (transactionActorRegion ? CreateTransaction(uniqueId, hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
 
     def create(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
 
-    def insertMultipleTransactionWithActor(transactions: Seq[Transaction]): Future[Seq[Int]] = (transactionActor ? InsertMultipleTransaction(transactions)).mapTo[Seq[Int]]
+    def insertMultipleTransactionWithActor(transactions: Seq[Transaction]): Future[Seq[Int]] = (transactionActorRegion ? InsertMultipleTransaction(uniqueId, transactions)).mapTo[Seq[Int]]
 
     def insertMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
 
-    def insertOrUpdateTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (transactionActor ? InsertOrUpdateTransaction(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
+    def insertOrUpdateTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (transactionActorRegion ? InsertOrUpdateTransaction(uniqueId, hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
 
     def insertOrUpdate(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
 
-    def tryGetTransactionWithActor(hash: String): Future[Transaction] = (transactionActor ? TryGetTransaction(hash)).mapTo[Transaction]
+    def tryGetTransactionWithActor(hash: String): Future[Transaction] = (transactionActorRegion ? TryGetTransaction(uniqueId, hash)).mapTo[Transaction]
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash).map(_.deserialize)
 
-    def tryGetMessagesTransactionWithActor(hash: String): Future[Seq[StdMsg]] = (transactionActor ? TryGetMessages(hash)).mapTo[Seq[StdMsg]]
+    def tryGetMessagesTransactionWithActor(hash: String): Future[Seq[StdMsg]] = (transactionActorRegion ? TryGetMessages(uniqueId, hash)).mapTo[Seq[StdMsg]]
 
     def tryGetMessages(hash: String): Future[Seq[StdMsg]] = tryGetMessagesByHash(hash).map(x => utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](x))
 
-    def tryGetStatusTransactionWithActor(hash: String): Future[Transaction] = (transactionActor ? TryGetStatus(hash)).mapTo[Transaction]
+    def tryGetStatusTransactionWithActor(hash: String): Future[Transaction] = (transactionActorRegion ? TryGetStatus(uniqueId, hash)).mapTo[Transaction]
 
     def tryGetStatus(hash: String): Future[Boolean] = tryGetStatusByHash(hash)
 
-    def tryGetHeightTransactionWithActor(hash: String): Future[Transaction] = (transactionActor ? TryGetHeight(hash)).mapTo[Transaction]
+    def tryGetHeightTransactionWithActor(hash: String): Future[Transaction] = (transactionActorRegion ? TryGetHeight(uniqueId, hash)).mapTo[Transaction]
 
     def tryGetHeight(hash: String): Future[Int] = tryGetHeightByHash(hash)
 
-    def getTransactionsWithActor(height: Int): Future[Seq[Transaction]] = (transactionActor ? GetTransactions(height)).mapTo[Seq[Transaction]]
+    def getTransactionsWithActor(height: Int): Future[Seq[Transaction]] = (transactionActorRegion ? GetTransactions(uniqueId, height)).mapTo[Seq[Transaction]]
 
     def getTransactions(height: Int): Future[Seq[Transaction]] = getTransactionsByHeight(height).map(x => x.map(_.deserialize))
 
-    def getTransactionsByAddressWithActor(address: String): Future[Seq[Transaction]] = (transactionActor ? GetTransactionsByAddress(address)).mapTo[Seq[Transaction]]
+    def getTransactionsByAddressWithActor(address: String): Future[Seq[Transaction]] = (transactionActorRegion ? GetTransactionsByAddress(uniqueId, address)).mapTo[Seq[Transaction]]
 
     def getTransactionsByAddress(address: String): Future[Seq[Transaction]] = findTransactionsForAddress(address).map(x => x.map(_.deserialize))
 
-    def getTransactionsPerPageByAddressWithActor(address: String, pageNumber: Int): Future[Seq[Transaction]] = (transactionActor ? GetTransactionsPerPageByAddress(address, pageNumber)).mapTo[Seq[Transaction]]
+    def getTransactionsPerPageByAddressWithActor(address: String, pageNumber: Int): Future[Seq[Transaction]] = (transactionActorRegion ? GetTransactionsPerPageByAddress(uniqueId, address, pageNumber)).mapTo[Seq[Transaction]]
 
     def getTransactionsPerPageByAddress(address: String, pageNumber: Int): Future[Seq[Transaction]] = findTransactionsPerPageForAddress(address = address, offset = (pageNumber - 1) * accountTransactionsPerPage, limit = accountTransactionsPerPage).map(x => x.map(_.deserialize))
 
-    def getNumberOfTransactionsWithActor(height: Int): Future[Int] = (transactionActor ? GetNumberOfTransactions(height)).mapTo[Int]
+    def getNumberOfTransactionsWithActor(height: Int): Future[Int] = (transactionActorRegion ? GetNumberOfTransactions(uniqueId, height)).mapTo[Int]
 
     def getNumberOfTransactions(height: Int): Future[Int] = getNumberOfTransactionsByHeight(height)
 
-    def getNumberOfBlockTransactionsWithActor(blockHeights: Seq[Int]): Future[Map[Int, Int]] = (transactionActor ? GetNumberOfBlockTransactions(blockHeights)).mapTo[Map[Int, Int]]
+    def getNumberOfBlockTransactionsWithActor(blockHeights: Seq[Int]): Future[Map[Int, Int]] = (transactionActorRegion ? GetNumberOfBlockTransactions(uniqueId, blockHeights)).mapTo[Map[Int, Int]]
 
     def getNumberOfTransactions(blockHeights: Seq[Int]): Future[Map[Int, Int]] = {
       val transactions = getTransactionsByHeightList(blockHeights).map(_.map(_.deserialize))
@@ -227,7 +239,7 @@ class Transactions @Inject()(
       } yield blockHeights.map(height => height -> transactions.count(_.height == height)).toMap
     }
 
-    def getTransactionsPerPageWithActor(pageNumber: Int): Future[Seq[Transaction]] = (transactionActor ? GetTransactionsPerPage(pageNumber)).mapTo[Seq[Transaction]]
+    def getTransactionsPerPageWithActor(pageNumber: Int): Future[Seq[Transaction]] = (transactionActorRegion ? GetTransactionsPerPage(uniqueId, pageNumber)).mapTo[Seq[Transaction]]
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
   }
