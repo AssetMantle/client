@@ -12,8 +12,9 @@
         </div>
     </div>
 </div>
+
 <script>
-        componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
-        componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/blocks/@height");
+    componentResource('blockDetails', jsRoutes.controllers.ComponentViewController.blockDetails(@height));
+    componentResource('blockTransactions', jsRoutes.controllers.ComponentViewController.blockTransactions(@height));
+    checkAndPushState(jsRoutes.controllers.ViewController.block().url, @height , "block");
 </script>

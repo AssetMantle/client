@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import views.html.component.blockchain._
-@import controllers.view.OtherApp
+@import utilities.Configuration.OtherApp
 
 @(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 <!DOCTYPE html>
@@ -39,6 +39,8 @@
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/dataTables/dataTables.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/checkAndPushState.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/backButtonCapture.js")" type="text/javascript"></script>
         <style>
                 html {
                     background: #20212A !important;
@@ -78,7 +80,7 @@
                                     @Messages(constants.View.DASHBOARD)
                                 </a>
                                 </li>
-                                <li><a  id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
+                                <li><a id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
                                 @commonIcon("blocksIcon")
                                 </span>
                                     @Messages(constants.View.BLOCKS)

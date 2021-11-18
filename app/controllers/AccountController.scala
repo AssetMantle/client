@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.common.Serializable.Address
 import models.master.{Account, Identification}

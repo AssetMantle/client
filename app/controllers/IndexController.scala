@@ -5,7 +5,7 @@ import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import akka.pattern.ask
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
+import utilities.Configuration.OtherApp
 import actors.models.{ BalanceActor}
 import exceptions.BaseException
 import models.blockchain

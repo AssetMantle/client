@@ -3,7 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import controllers.view.OtherApp
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -39,7 +39,7 @@ class SendCoinController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val denom = configuration.get[String]("blockchain.denom")
+  private val denom = configuration.get[String]("blockchain.stakingDenom")
 
   private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
     OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))

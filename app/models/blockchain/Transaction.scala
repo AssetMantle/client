@@ -17,6 +17,7 @@ import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -44,7 +45,8 @@ case class Transaction(hash: String, height: Int, code: Int, rawLog: String, sta
 @Singleton
 class Transactions @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
-                              configuration: Configuration
+                              configuration: Configuration,
+                              utilitiesOperations: utilities.Operations,
                             )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -56,6 +58,12 @@ class Transactions @Inject()(
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
+
+  private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
+
+  private val transactionsStatisticsTotalBins = configuration.get[Int]("statistics.transactions.totalBins")
+
+  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
 
   private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
 
@@ -92,6 +100,8 @@ class Transactions @Inject()(
     }
   }
 
+  private def getTotalTransactionsNumber: Future[Int] = db.run(transactionTable.length.result)
+
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
   private def findTransactionsPerPageForAddress(address: String, offset: Int, limit: Int): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).drop(offset).take(limit).result)
@@ -104,6 +114,8 @@ class Transactions @Inject()(
   }
 
   private def getTransactionsByHeightList(heights: Seq[Int]): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.height.inSet(heights)).result)
+
+  private def getTransactionsNumberByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).length.result)
 
   private def getNumberOfTransactionsByHeight(height: Int): Future[Int] = db.run(transactionTable.filter(_.height === height).length.result)
 
@@ -242,6 +254,25 @@ class Transactions @Inject()(
     def getTransactionsPerPageWithActor(pageNumber: Int): Future[Seq[Transaction]] = (transactionActorRegion ? GetTransactionsPerPage(uniqueId, pageNumber)).mapTo[Seq[Transaction]]
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
-  }
 
+    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
+
+    def getTransactionStatisticsData(latestHeight: Int): Future[ListMap[String, Int]] = {
+      val end = if (latestHeight % transactionsStatisticsBinWidth == 0) latestHeight else ((latestHeight / transactionsStatisticsBinWidth) + 1) * transactionsStatisticsBinWidth
+      val start = if (end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth > blockchainStartHeight) end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth else blockchainStartHeight - 1
+      val maxBins = (end - start + 1) / transactionsStatisticsBinWidth
+      val totalBins = if (maxBins == transactionsStatisticsTotalBins) transactionsStatisticsTotalBins else maxBins
+      val result = utilitiesOperations.traverse(0 until totalBins) { index =>
+        val s = start + index * transactionsStatisticsBinWidth + 1
+        val e = start + (index + 1) * transactionsStatisticsBinWidth
+        val numTxs = getTransactionsNumberByHeightRange(s, e)
+        for {
+          numTxs <- numTxs
+        } yield s"""${s/transactionsStatisticsBinWidth} - ${e/transactionsStatisticsBinWidth}""" -> numTxs
+      }
+      for {
+        result <- result
+      } yield ListMap(result.toList: _*)
+    }
+  }
 }

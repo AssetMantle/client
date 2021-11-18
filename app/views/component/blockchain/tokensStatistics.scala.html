@@ -1,10 +1,10 @@
 @import models.blockchain.Token
 @import views.html.base._
 
-@(token: Token)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(token: Token, tokenTickers: Seq[utilities.Configuration.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKEN) {
-    <p>$@constants.Blockchain.TokenTickers.getOrElse(token.denom, token.denom)</p>
+    <p>$@tokenTickers.find(_.denom == token.denom).fold(token.denom)(_.normalizedDenom)</p>
 } {
     <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
         @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")

@@ -25,7 +25,7 @@ function pieChart(chartID, keys, values, showLegend) {
     };
     let ctx = $('#' + chartID);
     let chart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: chartData,
         options: {
             tooltips: {

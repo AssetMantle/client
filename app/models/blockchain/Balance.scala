@@ -82,6 +82,8 @@ class Balances @Inject()(
 
   private def getByAddress(address: String): Future[Option[BalanceSerialized]] = db.run(balanceTable.filter(_.address === address).result.headOption)
 
+  private def getTotalAccountNumber: Future[Int] = db.run(balanceTable.length.result)
+
   private def getListByAddress(addresses: Seq[String]): Future[Seq[BalanceSerialized]] = db.run(balanceTable.filter(_.address.inSet(addresses)).result)
 
   private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance_BC") {
@@ -138,6 +140,7 @@ class Balances @Inject()(
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
+    def getTotalAccounts: Future[Int] = getTotalAccountNumber
   }
 
   object Utility {

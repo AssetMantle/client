@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import controllers.view.OtherApp
+@import utilities.Configuration.OtherApp
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState = null)
 

@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import controllers.view.OtherApp
+@import utilities.Configuration.OtherApp
 
 @(blockHeight: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
@@ -11,3 +11,5 @@
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(@blockHeight.getOrElse(1)))
     </script>
 }
+
+

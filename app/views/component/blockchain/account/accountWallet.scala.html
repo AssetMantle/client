@@ -1,21 +1,16 @@
 @import models.common.Serializable.Coin
 @import utilities.MicroNumber
 @import views.html.base._
-@import views.html.component.blockchain.account.{accountWalletAllTokens, accountWalletStakingToken}
+@import views.html.component.blockchain.account.{accountWalletAllTokens, accountWalletStakingToken, accountWalletRewards}
 @import scala.collection.immutable.ListMap
 
-@(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@commonCard(constants.View.ACCOUNT_WALLET) {
-    @address
-} {
-    @if(totalTokens > 1) {
+@(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int, validatorRewards: ListMap[String, Coin], withdrawAddress: String, validatorsMap: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+    @commonCard(constants.View.ACCOUNT_WALLET) {
+        @address
+    } {
         @commonHorizontalSwitcher(ListMap(
-            constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards),
-            constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances))
+            constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationTotalRewards = delegationTotalRewards, isValidator = isValidator, commissionRewards = commissionRewards),
+            constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap),
+            constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances)),
         )
-    } else {
-        @accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationRewards = delegationRewards, isValidator = isValidator, commissionRewards = commissionRewards)
     }
-
-}

@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
-@import controllers.view.OtherApp
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[utilities.Configuration.OtherApp], loginState: LoginState)
 
 @views.html.base.common(Messages(constants.View.ACCOUNT), failures, warnings, successes, infos)(left)(center)(right)
 

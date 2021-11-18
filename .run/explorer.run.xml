@@ -10,6 +10,7 @@
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
         <entry key="BLOCKCHAIN_HOST" value="128.199.29.15" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
+        <entry key="CHAIN_ID" value="test-core-1" />
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
@@ -25,7 +26,7 @@
         <entry key="POSTGRES_PASSWORD" value="persistence" />
         <entry key="POSTGRES_USER" value="persistence" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
-        <entry key="START_AKKA" value="false" />
+        <entry key="STAKING_DENOM" value="uxprt" />
         <entry key="TRULIOO_URL" value="https://api.globalgateway.io" />
         <entry key="WEB_APP_URL" value="http://localhost:9000" />
       </map>

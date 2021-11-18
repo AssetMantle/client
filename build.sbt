@@ -88,6 +88,7 @@ libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
 
 libraryDependencies += "io.aeron" % "aeron-client" % "1.32.0"
 
+
 enablePlugins(JavaServerAppPackaging)
 
 enablePlugins(DockerPlugin)

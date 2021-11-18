@@ -1071,9 +1071,8 @@ body.lightMode .notification .notificationTime {
 
 .pieChartContainer {
   display: flex;
-  flex-wrap: wrap;
 }
-.pieChartContainer > div {
+.pieChartContainer div {
   flex: 50%;
 }
 
@@ -3616,6 +3615,10 @@ figure.zoom img {
 }
 .validatorTransactions .cmuk-card-body table thead tr:first-child, .blockTransactions .cmuk-card-body table thead tr:first-child, .accountTransactions .cmuk-card-body table thead tr:first-child {
   border-top: 0px solid;
+}
+
+.tableViewCard .cmuk-flex.infoRow:last-child {
+  display: table-row;
 }
 
 /*# sourceMappingURL=class.css.map */

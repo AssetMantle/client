@@ -6,8 +6,14 @@
             <div id="tokensPrices" class="cardSelectHeader cmuk-card-styles"></div>
         </div>
     </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="transactionStatistics" class="cardSelectHeader cmuk-card-styles"></div>
+        </div>
+    </div>
 </div>
 <script>
         componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
-        window.history.pushState("", "@Messages(constants.View.INDEX)", "/");
+        componentResource('transactionStatistics', jsRoutes.controllers.ComponentViewController.transactionStatistics());
+        checkAndPushState("", "", "");
 </script>
