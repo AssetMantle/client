@@ -15,9 +15,11 @@
         </thead>
         <tbody>
         @metaList.map { meta =>
+            <tr>
             <td>@meta.id</td>
             <td>@Messages(constants.View.DataTypesMap.getOrElse(meta.dataType, meta.dataType))</td>
             <td>@meta.dataValue</td>
+            </tr>
         }
         </tbody>
     </table>

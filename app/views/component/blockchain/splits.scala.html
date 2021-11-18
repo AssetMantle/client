@@ -15,9 +15,11 @@
         </thead>
         <tbody>
             @splits.map { split =>
+                <tr>
                 <td><span class="stringEllipse" title="@split.ownerID">@split.ownerID</span></td>
                 <td><span class="stringEllipse" title="@split.ownableID">@split.ownableID</span></td>
                 <td>@utilities.NumericOperation.formatNumber(split.split)</td>
+                </tr>
             }
         </tbody>
     </table>
