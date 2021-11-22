@@ -5,11 +5,9 @@ import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
 import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance}
-import models.common.Serializable.Coin
+import models.blockchain.{Account}
 import play.api.Logger
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
-
 import javax.inject.{Inject, Singleton}
 
 object AccountActor {

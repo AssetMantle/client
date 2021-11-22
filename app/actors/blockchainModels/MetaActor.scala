@@ -4,54 +4,47 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Meta}
-import models.common.Serializable.{Coin, Data}
+import models.blockchain.{Meta}
+import models.common.Serializable.{Data}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object MetaActor {
   def props(blockchainMeta: models.blockchain.Metas) = Props(new MetaActor(blockchainMeta))
-
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
+  
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateData(id, _) => (id, attempt)
-    case attempt@CreateMeta(id, _) => (id, attempt)
-    case attempt@TryGetMeta(id, _, _) => (id, attempt)
-    case attempt@TryGetData(id, _, _) => (id, attempt)
-    case attempt@GetMeta(id, _, _) => (id, attempt)
-    case attempt@GetData(id, _, _) => (id, attempt)
-    case attempt@GetMetas(id, _) => (id, attempt)
-    case attempt@GetDataList(id, _) => (id, attempt)
-    case attempt@GetMetaList(id, _) => (id, attempt)
-    case attempt@InsertMultipleMetas(id, _) => (id, attempt)
-    case attempt@InsertMultipleData(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateMeta(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateData(id, _) => (id, attempt)
-    case attempt@CheckIfExistsMeta(id, _, _) => (id, attempt)
-
+    case attempt@CreateData(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CreateMeta(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetMeta(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetData(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetMeta(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetData(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetMetas(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetDataList(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetMetaList(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleMetas(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleData(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateMeta(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateData(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckIfExistsMeta(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateData(id, _) => (id.hashCode % numberOfShards).toString
-    case CreateMeta(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetMeta(id, _, _) => (id.hashCode % numberOfShards).toString
-    case TryGetData(id, _, _) => (id.hashCode % numberOfShards).toString
-    case GetMeta(id, _, _) => (id.hashCode % numberOfShards).toString
-    case GetData(id, _, _) => (id.hashCode % numberOfShards).toString
-    case GetMetas(id, _) => (id.hashCode % numberOfShards).toString
-    case GetDataList(id, _) => (id.hashCode % numberOfShards).toString
-    case GetMetaList(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleMetas(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleData(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateMeta(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateData(id, _) => (id.hashCode % numberOfShards).toString
-    case CheckIfExistsMeta(id, _, _) => (id.hashCode % numberOfShards).toString
-
+    case CreateData(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CreateMeta(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetMeta(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetData(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetMeta(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetData(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetMetas(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetDataList(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetMetaList(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleMetas(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleData(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateMeta(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateData(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckIfExistsMeta(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -105,7 +98,6 @@ class MetaActor @Inject()(
       blockchainMeta.Service.checkIfExists(id, dataType) pipeTo sender()
     }
   }
-
 }
 
 case class CreateData(uid: String, data: Data)

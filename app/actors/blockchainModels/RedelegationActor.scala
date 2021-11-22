@@ -4,38 +4,32 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Redelegation}
-import models.common.Serializable.Coin
+import models.blockchain.{Redelegation}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object RedelegationActor {
   def props(blockchainRedelegation: models.blockchain.Redelegations) = Props(new RedelegationActor(blockchainRedelegation))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateRedelegation(id, _) => (id, attempt)
-    case attempt@InsertMultipleRedelegation(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateRedelegation(id, _) => (id, attempt)
-    case attempt@GetAllRedelegationBySourceValidator(id, _) => (id, attempt)
+    case attempt@CreateRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllRedelegationBySourceValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@GetAllRedelegation(id) => (id, attempt)
-    case attempt@DeleteRedelegation(id, _, _, _) => (id, attempt)
-    case attempt@TryGetRedelegation(id, _, _, _) => (id, attempt)
+    case attempt@DeleteRedelegation(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetRedelegation(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateRedelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleRedelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateRedelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllRedelegationBySourceValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllRedelegation(id) => (id.hashCode % numberOfShards).toString
-    case DeleteRedelegation(id, _, _, _) => (id.hashCode % numberOfShards).toString
-    case TryGetRedelegation(id, _, _, _) => (id.hashCode % numberOfShards).toString
+    case CreateRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllRedelegationBySourceValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllRedelegation(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteRedelegation(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetRedelegation(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -68,7 +62,6 @@ class RedelegationActor @Inject()(
       blockchainRedelegation.Service.tryGet(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
     }
   }
-
 }
 
 case class CreateRedelegation(uid: String, redelegation: Redelegation)

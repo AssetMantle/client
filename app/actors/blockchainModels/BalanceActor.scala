@@ -8,6 +8,7 @@ import akka.util.Timeout
 import models.blockchain.Balance
 import models.common.Serializable.Coin
 import play.api.Logger
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 import java.util.Date
 import javax.inject.{Inject, Singleton}
@@ -16,23 +17,20 @@ import javax.inject.{Inject, Singleton}
 object BalanceActor {
   def props(blockchainBalance: models.blockchain.Balances) = Props(new BalanceActor(blockchainBalance))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@Get(id, _) => (id, attempt)
-    case attempt@TryGet(id, _) => (id, attempt)
-    case attempt@Create(id, _, _) => (id, attempt)
-    case attempt@InsertOrUpdate(id, _) => (id, attempt)
-    case attempt@GetList(id, _) => (id, attempt)
+    case attempt@Get(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGet(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@Create(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdate(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetList(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case Get(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGet(id, _) => (id.hashCode % numberOfShards).toString
-    case Create(id, _, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdate(id, _) => (id.hashCode % numberOfShards).toString
-    case GetList(id, _) => (id.hashCode % numberOfShards).toString
+    case Get(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGet(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case Create(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdate(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetList(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -62,7 +60,6 @@ class BalanceActor @Inject()(
   }
 
 }
-
 
 case class Get(id: String, address: String)
 case class TryGet(id: String, address: String)

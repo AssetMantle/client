@@ -4,40 +4,32 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Maintainer}
-import models.common.Serializable.Coin
+import models.blockchain.{Maintainer}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object MaintainerActor {
   def props(blockchainMaintainer: models.blockchain.Maintainers) = Props(new MaintainerActor(blockchainMaintainer))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-
-    case attempt@CreateMaintainer(uid, _) => (uid, attempt)
-    case attempt@TryGetMaintainer(uid, _) => (uid, attempt)
-    case attempt@InsertMultipleMaintainer(uid, _) => (uid, attempt)
-    case attempt@InsertOrUpdateMaintainer(uid, _) => (uid, attempt)
-    case attempt@GetAllMaintainer(uid) => (uid, attempt)
-    case attempt@GetMaintainer(uid, _) => (uid, attempt)
-    case attempt@DeleteMaintainer(uid, _) => (uid, attempt)
+    case attempt@CreateMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllMaintainer(uid) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllMaintainer(id) => (id.hashCode % numberOfShards).toString
-    case GetMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteMaintainer(id, _) => (id.hashCode % numberOfShards).toString
-
+    case CreateMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllMaintainer(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -70,7 +62,6 @@ class MaintainerActor @Inject()(
       blockchainMaintainer.Service.delete(id) pipeTo sender()
     }
   }
-
 }
 
 case class CreateMaintainer(uid: String, maintainer: Maintainer)

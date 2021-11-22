@@ -4,40 +4,32 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Delegation}
-import models.common.Serializable.Coin
+import models.blockchain.{Delegation}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object DelegationActor {
   def props(blockchainDelegation: models.blockchain.Delegations) = Props(new DelegationActor(blockchainDelegation))
-
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
-
+  
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateDelegation(uid, _) => (uid, attempt)
-    case attempt@InsertMultipleDelegation(uid, _) => (uid, attempt)
-    case attempt@InsertOrUpdateDelegation(uid, _) => (uid, attempt)
-    case attempt@GetAllDelegationForDelegator(uid, _) => (uid, attempt)
-    case attempt@GetAllDelegationForValidator(uid, _) => (uid, attempt)
-    case attempt@GetDelegation(uid, _, _) => (uid, attempt)
-    case attempt@DeleteDelegation(uid, _, _) => (uid, attempt)
-
+    case attempt@CreateDelegation(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleDelegation(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateDelegation(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllDelegationForDelegator(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllDelegationForValidator(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetDelegation(uid, _, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteDelegation(uid, _, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateDelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleDelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateDelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllDelegationForDelegator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllDelegationForValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetDelegation(id, _, _) => (id.hashCode % numberOfShards).toString
-    case DeleteDelegation(id, _, _) => (id.hashCode % numberOfShards).toString
+    case CreateDelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleDelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateDelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllDelegationForDelegator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllDelegationForValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetDelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteDelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -60,7 +52,6 @@ class DelegationActor @Inject()(
     case GetDelegation(_, delegatorAddress, operatorAddress) => {
       blockchainDelegation.Service.get(delegatorAddress, operatorAddress) pipeTo sender()
     }
-
     case GetAllDelegationForDelegator(_, address) => {
       blockchainDelegation.Service.getAllForDelegator(address) pipeTo sender()
     }
@@ -71,7 +62,6 @@ class DelegationActor @Inject()(
       blockchainDelegation.Service.delete(delegatorAddress, operatorAddress) pipeTo sender()
     }
   }
-
 }
 
 case class CreateDelegation(id: String, delegation: Delegation)

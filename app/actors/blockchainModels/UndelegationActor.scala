@@ -4,40 +4,34 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Undelegation}
-import models.common.Serializable.Coin
+import models.blockchain.{Undelegation}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object UndelegationActor {
   def props(blockchainUndelegation: models.blockchain.Undelegations) = Props(new UndelegationActor(blockchainUndelegation))
 
-  val  numberOfShards = 10
-  val numberOfEntities = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateUndelegation(id, _) => (id, attempt)
-    case attempt@InsertMultipleUndelegation(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateUndelegation(id, _) => (id, attempt)
-    case attempt@GetAllUndelegationByDelegator(id, _) => (id, attempt)
-    case attempt@GetAllUndelegationByValidator(id, _) => (id, attempt)
-    case attempt@GetAllUndelegation(id) => (id, attempt)
-    case attempt@DeleteUndelegation(id, _, _) => (id, attempt)
-    case attempt@TryGetUndelegation(id, _, _) => (id, attempt)
+    case attempt@CreateUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegationByDelegator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegationByValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegation(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteUndelegation(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetUndelegation(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateUndelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleUndelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateUndelegation(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllUndelegationByDelegator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllUndelegationByValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllUndelegation(id) => (id.hashCode % numberOfShards).toString
-    case DeleteUndelegation(id, _, _) => (id.hashCode % numberOfShards).toString
-    case TryGetUndelegation(id, _, _) => (id.hashCode % numberOfShards).toString
+    case CreateUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegationByDelegator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegationByValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegation(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteUndelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetUndelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 

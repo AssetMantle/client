@@ -4,10 +4,9 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.blockchain.{Account, Asset, Balance}
+import models.blockchain.{Asset}
 import play.api.Logger
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
-
 import javax.inject.{Inject, Singleton}
 
 object AssetActor {
@@ -22,7 +21,6 @@ object AssetActor {
     case attempt@InsertOrUpdateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@DeleteAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@CheckExistsAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
-
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
@@ -34,7 +32,6 @@ object AssetActor {
     case InsertOrUpdateAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
     case DeleteAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
     case CheckExistsAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
-
   }
 }
 

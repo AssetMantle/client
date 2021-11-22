@@ -4,29 +4,23 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Proposal, ProposalVote}
-import models.common.Serializable.Coin
+import models.blockchain.{ProposalVote}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ProposalVoteActor {
   def props(blockchainProposalVote: models.blockchain.ProposalVotes) = Props(new ProposalVoteActor(blockchainProposalVote))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@TryGetProposalVote(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateProposalVote(id, _) => (id, attempt)
-    case attempt@GetAllByProposalVoteId(id, _) => (id, attempt)
+    case attempt@TryGetProposalVote(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateProposalVote(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllByProposalVoteId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
   val shardResolver: ShardRegion.ExtractShardId = {
-    case TryGetProposalVote(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateProposalVote(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllByProposalVoteId(id, _) => (id.hashCode % numberOfShards).toString
+    case TryGetProposalVote(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateProposalVote(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllByProposalVoteId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -47,7 +41,6 @@ class ProposalVoteActor @Inject()(
       blockchainProposalVote.Service.getAllByID(id) pipeTo sender()
     }
   }
-
 }
 
 case class TryGetProposalVote(uid: String, proposalID: Int)

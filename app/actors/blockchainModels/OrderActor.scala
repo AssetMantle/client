@@ -4,44 +4,38 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Order}
-import models.common.Serializable.Coin
+import models.blockchain.{Order}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object OrderActor {
   def props(blockchainOrder: models.blockchain.Orders) = Props(new OrderActor(blockchainOrder))
-
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
+  
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateOrder(id, _) => (id, attempt)
-    case attempt@TryGetOrder(id, _) => (id, attempt)
-    case attempt@GetOrder(id, _) => (id, attempt)
-    case attempt@InsertMultipleOrder(id, _) => (id, attempt)
-    case attempt@DeleteOrder(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateOrder(id, _) => (id, attempt)
-    case attempt@CheckExistsOrder(id, _) => (id, attempt)
-    case attempt@GetAllOrder(id) => (id, attempt)
-    case attempt@GetAllPublicOrderIDs(id) => (id, attempt)
-    case attempt@GetAllPrivateOrderIDs(id, _) => (id, attempt)
+    case attempt@CreateOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllOrder(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllPublicOrderIDs(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllPrivateOrderIDs(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case GetOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case CheckExistsOrder(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllOrder(id) => (id.hashCode % numberOfShards).toString
-    case GetAllPublicOrderIDs(id) => (id.hashCode % numberOfShards).toString
-    case GetAllPrivateOrderIDs(id, _) => (id.hashCode % numberOfShards).toString
+    case CreateOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllOrder(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllPublicOrderIDs(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllPrivateOrderIDs(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -83,7 +77,6 @@ class OrderActor @Inject()(
       blockchainOrder.Service.getAllPrivateOrderIDs(identityIDs) pipeTo sender()
     }
   }
-
 }
 
 case class CreateOrder(uid: String, order: Order)

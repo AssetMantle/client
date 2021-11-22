@@ -4,34 +4,28 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Proposal, ProposalDeposit}
-import models.common.Serializable.Coin
+import models.blockchain.{ProposalDeposit}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ProposalDepositActor {
   def props(blockchainProposalDeposit: models.blockchain.ProposalDeposits) = Props(new ProposalDepositActor(blockchainProposalDeposit))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@TryGetProposalDeposit(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateProposalDeposit(id, _) => (id, attempt)
-    case attempt@GetProposalDepositWithActor(id, _, _) => (id, attempt)
-    case attempt@DeleteByProposalDepositId(id, _) => (id, attempt)
-    case attempt@GetByProposalDepositId(id, _) => (id, attempt)
+    case attempt@TryGetProposalDeposit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateProposalDeposit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetProposalDepositWithActor(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteByProposalDepositId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByProposalDepositId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case TryGetProposalDeposit(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateProposalDeposit(id, _) => (id.hashCode % numberOfShards).toString
-    case GetProposalDepositWithActor(id, _, _) => (id.hashCode % numberOfShards).toString
-    case DeleteByProposalDepositId(id, _) => (id.hashCode % numberOfShards).toString
-    case GetByProposalDepositId(id, _) => (id.hashCode % numberOfShards).toString
+    case TryGetProposalDeposit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateProposalDeposit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetProposalDepositWithActor(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteByProposalDepositId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByProposalDepositId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 

@@ -4,65 +4,58 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Validator}
-import models.common.Serializable.Coin
+import models.blockchain.{Validator}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ValidatorActor {
-  val  numberOfShards = 10
-  val numberOfEntities = 100
-
   def props(blockchainValidator: models.blockchain.Validators) = Props(new ValidatorActor(blockchainValidator))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
-
-    case attempt@CreateValidatorWithActor(id, _) => (id, attempt)
-    case attempt@InsertMultipleValidators(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateValidator(id, _) => (id, attempt)
-    case attempt@TryGetValidator(id, _) => (id, attempt)
-    case attempt@GetAllValidatorByHexAddresses(id, _) => (id, attempt)
-    case attempt@TryGetValidatorByOperatorAddress(id, _) => (id, attempt)
-    case attempt@TryGetValidatorByHexAddress(id, _) => (id, attempt)
-    case attempt@TryGetValidatorOperatorAddress(id, _) => (id, attempt)
-    case attempt@TryGetValidatorHexAddress(id, _) => (id, attempt)
-    case attempt@TryGetValidatorProposerName(id, _) => (id, attempt)
-    case attempt@GetAllValidators(id) => (id, attempt)
-    case attempt@GetAllActiveValidatorList(id) => (id, attempt)
-    case attempt@GetAllInactiveValidatorList(id) => (id, attempt)
-    case attempt@GetAllUnbondingValidatorList(id) => (id, attempt)
-    case attempt@GetAllUnbondedValidatorList(id) => (id, attempt)
-    case attempt@GetValidatorByOperatorAddresses(id, _) => (id, attempt)
-    case attempt@ValidatorExists(id, _) => (id, attempt)
-    case attempt@JailValidator(id, _) => (id, attempt)
-    case attempt@DeleteValidatorWithOpAddress(id, _)  => (id, attempt)
-    case attempt@GetTotalVotingPower(id) => (id, attempt)
+    case attempt@CreateValidatorWithActor(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleValidators(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllValidatorByHexAddresses(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidatorByOperatorAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidatorByHexAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidatorOperatorAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidatorHexAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetValidatorProposerName(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllValidators(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllActiveValidatorList(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllInactiveValidatorList(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUnbondingValidatorList(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUnbondedValidatorList(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetValidatorByOperatorAddresses(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@ValidatorExists(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@JailValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteValidatorWithOpAddress(id, _)  => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTotalVotingPower(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateValidatorWithActor(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleValidators(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllValidatorByHexAddresses(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidatorByOperatorAddress(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidatorByHexAddress(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidatorOperatorAddress(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidatorHexAddress(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetValidatorProposerName(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllValidators(id) => (id.hashCode % numberOfShards).toString
-    case GetAllActiveValidatorList(id) => (id.hashCode % numberOfShards).toString
-    case GetAllInactiveValidatorList(id) => (id.hashCode % numberOfShards).toString
-    case GetAllUnbondingValidatorList(id) => (id.hashCode % numberOfShards).toString
-    case GetAllUnbondedValidatorList(id) => (id.hashCode % numberOfShards).toString
-    case GetValidatorByOperatorAddresses(id, _) => (id.hashCode % numberOfShards).toString
-    case ValidatorExists(id, _) => (id.hashCode % numberOfShards).toString
-    case JailValidator(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteValidatorWithOpAddress(id, _)  => (id.hashCode % numberOfShards).toString
-    case GetTotalVotingPower(id) => (id.hashCode % numberOfShards).toString
+    case CreateValidatorWithActor(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleValidators(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllValidatorByHexAddresses(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidatorByOperatorAddress(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidatorByHexAddress(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidatorOperatorAddress(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidatorHexAddress(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetValidatorProposerName(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllValidators(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllActiveValidatorList(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllInactiveValidatorList(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUnbondingValidatorList(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUnbondedValidatorList(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetValidatorByOperatorAddresses(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case ValidatorExists(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case JailValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteValidatorWithOpAddress(id, _)  => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTotalVotingPower(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -73,9 +66,6 @@ class ValidatorActor @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
-    case StartActor(actorRef) => {
-      logger.info("Actor Started")
-    }
     case CreateValidatorWithActor(_, validator) => {
       blockchainValidator.Service.create(validator) pipeTo sender()
     }

@@ -4,55 +4,46 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Identity}
-import models.common.Serializable.Coin
+import models.blockchain.Identity
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object IdentityActor {
   def props(blockchainIdentity: models.blockchain.Identities) = Props(new IdentityActor(blockchainIdentity))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-
-    case attempt@CreateIdentity(id, _) => (id, attempt)
-    case attempt@TryGetIdentity(id, _) => (id, attempt)
-    case attempt@GetIdentity(id, _) => (id, attempt)
-    case attempt@InsertMultipleIdentity(id, _) => (id, attempt)
-    case attempt@DeleteIdentity(id, _) => (id, attempt)
-    case attempt@GetAllIDsByProvisionedIdentity(id, _) => (id, attempt)
-    case attempt@GetAllIDsByUnProvisionedIdentity(id, _) => (id, attempt)
-    case attempt@CheckExistsIdentity(id, _) => (id, attempt)
-    case attempt@GetAllProvisionAddressesIdentity(id, _) => (id, attempt)
-    case attempt@GetAllUnprovisionedAddressesIdentity(id, _) => (id, attempt)
-    case attempt@AddProvisionAddressIdentity(id, _, _) => (id, attempt)
-    case attempt@DeleteProvisionAddressIdentity(id, _, _) => (id, attempt)
-    case attempt@AddUnprovisionedAddressIdentity(id, _, _) => (id, attempt)
-    case attempt@DeleteUnprovisionedAddressIdentity(id, _, _) => (id, attempt)
-
+    case attempt@CreateIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllIDsByProvisionedIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllIDsByUnProvisionedIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllProvisionAddressesIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUnprovisionedAddressesIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@AddProvisionAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteProvisionAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@AddUnprovisionedAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteUnprovisionedAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case GetIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllIDsByProvisionedIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllIDsByUnProvisionedIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case CheckExistsIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllProvisionAddressesIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllUnprovisionedAddressesIdentity(id, _) => (id.hashCode % numberOfShards).toString
-    case AddProvisionAddressIdentity(id, _, _) => (id.hashCode % numberOfShards).toString
-    case DeleteProvisionAddressIdentity(id, _, _) => (id.hashCode % numberOfShards).toString
-    case AddUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % numberOfShards).toString
-    case DeleteUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % numberOfShards).toString
-
+    case CreateIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllIDsByProvisionedIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllIDsByUnProvisionedIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllProvisionAddressesIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUnprovisionedAddressesIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case AddProvisionAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteProvisionAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case AddUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -75,7 +66,6 @@ class IdentityActor @Inject()(
     case InsertMultipleIdentity(_, identities) => {
       blockchainIdentity.Service.insertMultiple(identities) pipeTo sender()
     }
-
     case DeleteIdentity(_, id) => {
       blockchainIdentity.Service.delete(id) pipeTo sender()
     }
@@ -107,7 +97,6 @@ class IdentityActor @Inject()(
       blockchainIdentity.Service.deleteUnprovisionAddress(id, address) pipeTo sender()
     }
   }
-
 }
 
 case class CreateIdentity(uid: String, identity: Identity)

@@ -1,6 +1,6 @@
 package actors.blockchainModels
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 
 case class StartActor(actorRef: ActorRef)

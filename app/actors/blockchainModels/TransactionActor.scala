@@ -7,45 +7,42 @@ import akka.pattern.pipe
 import models.blockchain.Transaction
 import models.common.Serializable.{Fee, StdMsg}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object TransactionActor {
   def props(blockchainTransaction: models.blockchain.Transactions) = Props(new TransactionActor(blockchainTransaction))
 
-  val  numberOfShards = 10
-  val numberOfEntities = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id, attempt)
-    case attempt@InsertMultipleTransaction(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id, attempt)
-    case attempt@TryGetTransaction(id, _) => (id, attempt)
-    case attempt@TryGetMessages(id, _) => (id, attempt)
-    case attempt@TryGetStatus(id, _) => (id, attempt)
-    case attempt@TryGetHeight(id, _) => (id, attempt)
-    case attempt@GetTransactions(id, _) => (id, attempt)
-    case attempt@GetTransactionsByAddress(id, _) => (id, attempt)
-    case attempt@GetTransactionsPerPageByAddress(id, _, _) => (id, attempt)
-    case attempt@GetNumberOfTransactions(id, _) => (id, attempt)
-    case attempt@GetNumberOfBlockTransactions(id, _) => (id, attempt)
-    case attempt@GetTransactionsPerPage(id, _) => (id, attempt)
+    case attempt@CreateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleTransaction(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetTransaction(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetMessages(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetStatus(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetHeight(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTransactions(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTransactionsByAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTransactionsPerPageByAddress(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetNumberOfTransactions(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetNumberOfBlockTransactions(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTransactionsPerPage(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleTransaction(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id.hashCode % numberOfShards).toString
-    case TryGetTransaction(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetMessages(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetStatus(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetHeight(id, _) => (id.hashCode % numberOfShards).toString
-    case GetTransactions(id, _) => (id.hashCode % numberOfShards).toString
-    case GetTransactionsByAddress(id, _) => (id.hashCode % numberOfShards).toString
-    case GetTransactionsPerPageByAddress(id, _, _) => (id.hashCode % numberOfShards).toString
-    case GetNumberOfTransactions(id, _) => (id.hashCode % numberOfShards).toString
-    case GetNumberOfBlockTransactions(id, _) => (id.hashCode % numberOfShards).toString
-    case GetTransactionsPerPage(id, _) => (id.hashCode % numberOfShards).toString
+    case CreateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleTransaction(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetTransaction(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetMessages(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetStatus(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetHeight(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTransactions(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTransactionsByAddress(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTransactionsPerPageByAddress(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetNumberOfTransactions(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetNumberOfBlockTransactions(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTransactionsPerPage(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 

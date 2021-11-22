@@ -4,42 +4,34 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Classification}
-import models.common.Serializable.Coin
+import models.blockchain.{Classification}
 import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ClassificationActor {
   def props(blockchainClassification: models.blockchain.Classifications) = Props(new ClassificationActor(blockchainClassification))
-
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateClassification(uid, _) => (uid, attempt)
-    case attempt@TryGetClassification(uid, _) => (uid, attempt)
-    case attempt@GetClassification(uid, _) => (uid, attempt)
-    case attempt@GetAllClassification(uid) => (uid, attempt)
-    case attempt@InsertMultipleClassification(uid, _) => (uid, attempt)
-    case attempt@InsertOrUpdateClassification(uid, _) => (uid, attempt)
-    case attempt@DeleteClassification(uid, _) => (uid, attempt)
-    case attempt@CheckExistsClassification(uid, _) => (uid, attempt)
-
+    case attempt@CreateClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllClassification(uid) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case GetClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllClassification(id) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteClassification(id, _) => (id.hashCode % numberOfShards).toString
-    case CheckExistsClassification(id, _) => (id.hashCode % numberOfShards).toString
-
+    case CreateClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllClassification(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsClassification(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 }
 
@@ -59,7 +51,6 @@ class ClassificationActor @Inject()(
     case GetClassification(_, id) => {
       blockchainClassification.Service.get(id) pipeTo sender()
     }
-
     case GetAllClassification(_) => {
       blockchainClassification.Service.getAll pipeTo sender()
     }
@@ -76,7 +67,6 @@ class ClassificationActor @Inject()(
       blockchainClassification.Service.checkExists(id) pipeTo sender()
     }
   }
-
 }
 
 case class CreateClassification(uid: String, classification: Classification)

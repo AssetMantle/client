@@ -4,55 +4,49 @@ import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
-import models.blockchain.{Account, Balance, Block, Split}
-import models.common.Serializable.Coin
+import models.blockchain.{Split}
 import play.api.Logger
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object SplitActor {
   def props(blockchainSplit: models.blockchain.Splits) = Props(new SplitActor(blockchainSplit))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateSplit(id, _) => (id, attempt)
-    case attempt@GetByOwner(id, _) => (id, attempt)
-    case attempt@GetByOwnerIDs(id, _) => (id, attempt)
-    case attempt@GetByOwnable(id, _) => (id, attempt)
-    case attempt@GetByOwnerOrOwnable(id, _) => (id, attempt)
-    case attempt@GetAllSplit(id) => (id, attempt)
-    case attempt@GetSplit(id, _, _) => (id, attempt)
-    case attempt@TryGetSplit(id, _, _) => (id, attempt)
-    case attempt@InsertMultipleSplit(id, _) => (id, attempt)
-    case attempt@InsertOrUpdateSplit(id, _) => (id, attempt)
-    case attempt@DeleteSplit(id, _, _) => (id, attempt)
+    case attempt@CreateSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwner(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnerIDs(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnable(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnerOrOwnable(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllSplit(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
 
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateSplit(id, _) => (id.hashCode % numberOfShards).toString
-    case GetByOwner(id, _) => (id.hashCode % numberOfShards).toString
-    case GetByOwnerIDs(id, _) => (id.hashCode % numberOfShards).toString
-    case GetByOwnable(id, _) => (id.hashCode % numberOfShards).toString
-    case GetByOwnerOrOwnable(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllSplit(id) => (id.hashCode % numberOfShards).toString
-    case GetSplit(id, _, _) => (id.hashCode % numberOfShards).toString
-    case TryGetSplit(id, _, _) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleSplit(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateSplit(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteSplit(id, _, _) => (id.hashCode % numberOfShards).toString
+    case CreateSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwner(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnerIDs(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnable(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnerOrOwnable(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllSplit(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
 
   }
 }
 
 @Singleton
 class SplitActor @Inject()(
-                                   blockchainSplit: models.blockchain.Splits
-                                 )extends Actor with ActorLogging {
+                            blockchainSplit: models.blockchain.Splits
+                          )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
@@ -89,7 +83,6 @@ class SplitActor @Inject()(
     case GetSplit(_, ownerID, ownableID) => {
       blockchainSplit.Service.get(ownerID, ownableID) pipeTo sender()
     }
-
   }
 
 }
