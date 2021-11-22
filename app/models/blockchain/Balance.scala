@@ -21,8 +21,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
-import akka.util.{Timeout => akkaTimeout}
-import actors.blockchainModels.{ BalanceActor}
+import akka.util.{Timeout, Timeout => akkaTimeout}
+import actors.blockchainModels.BalanceActor
 
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
@@ -108,8 +108,7 @@ class Balances @Inject()(
   }
 
   object Service {
-    implicit val timeout = akkaTimeout(10 seconds) // needed for `?` below
-
+    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val balanceActorRegion = {
       ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "balanceRegion",

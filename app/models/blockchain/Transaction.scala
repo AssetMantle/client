@@ -184,9 +184,7 @@ class Transactions @Inject()(
   }
 
   object Service {
-
-    implicit val timeout = Timeout(5 seconds) // needed for `?` below
-
+    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val transactionActorRegion = {
       ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "transactionRegion",

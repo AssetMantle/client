@@ -114,9 +114,7 @@ class Parameters @Inject()(
   }
 
   object Service {
-
-    implicit val timeout = Timeout(10 seconds) // needed for `?` below
-
+    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val parameterActorRegion = {
       ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "parameterRegion",
