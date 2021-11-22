@@ -1,4 +1,4 @@
-package actors.models
+package actors.blockchainModels
 
 import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props, Status}

@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposal, InsertOrUpdateProposalDeposit, ProposalActor, ProposalDepositActor, TryGetProposalDeposit}
+import actors.blockchainModels.{DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposal, InsertOrUpdateProposalDeposit, ProposalActor, ProposalDepositActor, TryGetProposalDeposit}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -113,10 +113,10 @@ class ProposalDeposits @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val proposalDepositActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "proposalDepositRegion",
         entityProps = ProposalDepositActor.props(ProposalDeposits.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = ProposalDepositActor.idExtractor,
         extractShardId = ProposalDepositActor.shardResolver
       )

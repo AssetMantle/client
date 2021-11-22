@@ -1,4 +1,4 @@
-package actors.models
+package actors.blockchainModels
 
 import akka.cluster.sharding.ShardRegion
 import akka.cluster.sharding.external.ExternalShardAllocationStrategy.ShardRegion

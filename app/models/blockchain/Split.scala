@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CreateSplit, DeleteSplit, GetAllSplit, GetByOwnable, GetByOwner, GetByOwnerIDs, GetByOwnerOrOwnable, GetSplit, InsertMultipleSplit, InsertOrUpdateSplit, RedelegationActor, SplitActor, TryGetSplit}
+import actors.blockchainModels.{CreateSplit, DeleteSplit, GetAllSplit, GetByOwnable, GetByOwner, GetByOwnerIDs, GetByOwnerOrOwnable, GetSplit, InsertMultipleSplit, InsertOrUpdateSplit, RedelegationActor, SplitActor, TryGetSplit}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -122,10 +122,10 @@ class Splits @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val splitActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "splitClusterRegion",
         entityProps = SplitActor.props(Splits.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = SplitActor.idExtractor,
         extractShardId = SplitActor.shardResolver
       )

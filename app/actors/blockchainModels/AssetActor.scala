@@ -1,44 +1,39 @@
-package actors.models
+package actors.blockchainModels
 
 import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
 import akka.pattern.pipe
-import models.Abstract.PublicKey
 import models.blockchain.{Account, Asset, Balance}
-import models.common.Serializable.Coin
 import play.api.Logger
+import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
 
 object AssetActor {
   def props(blockchainAsset: models.blockchain.Assets) = Props(new AssetActor(blockchainAsset))
 
-  val numberOfEntities = 10
-  val numberOfShards = 100
-
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@CreateAsset(uid, _) => (uid, attempt)
-    case attempt@TryGetAsset(uid, _) => (uid, attempt)
-    case attempt@GetAsset(uid, _) => (uid, attempt)
-    case attempt@GetAllAsset(uid) => (uid, attempt)
-    case attempt@InsertMultipleAssets(uid, _) => (uid, attempt)
-    case attempt@InsertOrUpdateAsset(uid, _) => (uid, attempt)
-    case attempt@DeleteAsset(uid, _) => (uid, attempt)
-    case attempt@CheckExistsAsset(uid, _) => (uid, attempt)
+    case attempt@CreateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllAsset(uid) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleAssets(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
 
   }
 
   val shardResolver: ShardRegion.ExtractShardId = {
-    case CreateAsset(id, _) => (id.hashCode % numberOfShards).toString
-    case TryGetAsset(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAsset(id, _) => (id.hashCode % numberOfShards).toString
-    case GetAllAsset(id) => (id.hashCode % numberOfShards).toString
-    case InsertMultipleAssets(id, _) => (id.hashCode % numberOfShards).toString
-    case InsertOrUpdateAsset(id, _) => (id.hashCode % numberOfShards).toString
-    case DeleteAsset(id, _) => (id.hashCode % numberOfShards).toString
-    case CheckExistsAsset(id, _) => (id.hashCode % numberOfShards).toString
+    case CreateAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllAsset(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleAssets(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
 
   }
 }

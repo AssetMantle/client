@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, StartActor, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
+import actors.blockchainModels.{CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, StartActor, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -188,10 +188,10 @@ class Transactions @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val transactionActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "transactionRegion",
         entityProps = TransactionActor.props(Transactions.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = TransactionActor.idExtractor,
         extractShardId = TransactionActor.shardResolver
       )

@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CreateValidatorWithActor, DeleteValidatorWithOpAddress, GetAllActiveValidatorList, GetAllInactiveValidatorList, GetAllUnbondedValidatorList, GetAllUnbondingValidatorList, GetAllValidatorByHexAddresses, GetAllValidators, GetTotalVotingPower, GetValidatorByOperatorAddresses, InsertMultipleValidators, InsertOrUpdateValidator, JailValidator, StartActor, TryGetValidator, TryGetValidatorByHexAddress, TryGetValidatorByOperatorAddress, TryGetValidatorHexAddress, TryGetValidatorOperatorAddress, TryGetValidatorProposerName, UndelegationActor, ValidatorActor, ValidatorExists}
+import actors.blockchainModels.{CreateValidatorWithActor, DeleteValidatorWithOpAddress, GetAllActiveValidatorList, GetAllInactiveValidatorList, GetAllUnbondedValidatorList, GetAllUnbondingValidatorList, GetAllValidatorByHexAddresses, GetAllValidators, GetTotalVotingPower, GetValidatorByOperatorAddresses, InsertMultipleValidators, InsertOrUpdateValidator, JailValidator, StartActor, TryGetValidator, TryGetValidatorByHexAddress, TryGetValidatorByOperatorAddress, TryGetValidatorHexAddress, TryGetValidatorOperatorAddress, TryGetValidatorProposerName, UndelegationActor, ValidatorActor, ValidatorExists}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Abstract.PublicKey
@@ -216,10 +216,10 @@ class Validators @Inject()(
     implicit val timeout = Timeout(10 seconds) // needed for `?` below
 
     private val validatorActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "validatorRegion",
         entityProps = ValidatorActor.props(Validators.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = ValidatorActor.idExtractor,
         extractShardId = ValidatorActor.shardResolver
       )

@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CheckIfExistsMeta, CreateData, CreateMeta, GetData, GetDataList, GetList, GetMeta, GetMetaList, GetMetas, InsertMultipleData, InsertMultipleMetas, InsertOrUpdateData, InsertOrUpdateMeta, MaintainerActor, MetaActor, TryGetData, TryGetMeta}
+import actors.blockchainModels.{CheckIfExistsMeta, CreateData, CreateMeta, GetData, GetDataList, GetList, GetMeta, GetMetaList, GetMetas, InsertMultipleData, InsertMultipleMetas, InsertOrUpdateData, InsertOrUpdateMeta, MaintainerActor, MetaActor, TryGetData, TryGetMeta}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -107,10 +107,10 @@ class Metas @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val metaActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "metaRegion",
         entityProps = MetaActor.props(Metas.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = MetaActor.idExtractor,
         extractShardId = MetaActor.shardResolver
       )

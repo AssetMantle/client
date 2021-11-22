@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CreateRedelegation, DeleteRedelegation, GetAllRedelegation, GetAllRedelegationBySourceValidator, InsertMultipleRedelegation, InsertOrUpdateRedelegation, ParameterActor, ProposalVoteActor, RedelegationActor, TryGetRedelegation}
+import actors.blockchainModels.{CreateRedelegation, DeleteRedelegation, GetAllRedelegation, GetAllRedelegationBySourceValidator, InsertMultipleRedelegation, InsertOrUpdateRedelegation, ParameterActor, ProposalVoteActor, RedelegationActor, TryGetRedelegation}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -134,10 +134,10 @@ class Redelegations @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val redelegationActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "redelegationRegion",
         entityProps = RedelegationActor.props(Redelegations.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = RedelegationActor.idExtractor,
         extractShardId = RedelegationActor.shardResolver
       )

@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{AddProvisionAddressIdentity, AddUnprovisionedAddressIdentity, CheckExistsIdentity, CreateIdentity, DelegationActor, DeleteIdentity, DeleteProvisionAddressIdentity, DeleteUnprovisionedAddressIdentity, GetAllIDsByProvisionedIdentity, GetAllIDsByUnProvisionedIdentity, GetAllProvisionAddressesIdentity, GetAllUnprovisionedAddressesIdentity, GetIdentity, IdentityActor, InsertMultipleIdentity, TryGetIdentity}
+import actors.blockchainModels.{AddProvisionAddressIdentity, AddUnprovisionedAddressIdentity, CheckExistsIdentity, CreateIdentity, DelegationActor, DeleteIdentity, DeleteProvisionAddressIdentity, DeleteUnprovisionedAddressIdentity, GetAllIDsByProvisionedIdentity, GetAllIDsByUnProvisionedIdentity, GetAllProvisionAddressesIdentity, GetAllUnprovisionedAddressesIdentity, GetIdentity, IdentityActor, InsertMultipleIdentity, TryGetIdentity}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -230,10 +230,10 @@ class Identities @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val identityActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "identityRegion",
         entityProps = IdentityActor.props(Identities.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = IdentityActor.idExtractor,
         extractShardId = IdentityActor.shardResolver
       )

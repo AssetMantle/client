@@ -1,4 +1,4 @@
-package actors.models
+package actors.blockchainModels
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory

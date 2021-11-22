@@ -1,5 +1,7 @@
 package constants
 
+import scala.concurrent.duration.DurationInt
+
 object Actor {
 
   val ACTOR_NOT_FOUND = "ACTOR_NOT_FOUND"
@@ -10,6 +12,11 @@ object Actor {
   val ACTOR_SMS = "ACTOR_SMS"
   val ACTOR_APP_WEB_SOCKET = "ACTOR_APP_WEB_SOCKET"
   val ACTOR_PUSH_NOTIFICATION = "ACTOR_PUSH_NOTIFICATION"
+
+  val ACTOR_ASK_TIMEOUT = 5 seconds
+
+  val NUMBER_OF_ENTITIES = 100
+  val NUMBER_OF_SHARDS = 10
 
   object MessageType {
     val NEW_BLOCK = "NEW_BLOCK"

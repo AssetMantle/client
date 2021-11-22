@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, StartActor, TransactionActor, TryGetUndelegation, UndelegationActor}
+import actors.blockchainModels.{CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, RedelegationActor, StartActor, TransactionActor, TryGetUndelegation, UndelegationActor}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 
@@ -134,10 +134,10 @@ class Undelegations @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val undelegationActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "undelegationRegion",
         entityProps = UndelegationActor.props(Undelegations.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = UndelegationActor.idExtractor,
         extractShardId = UndelegationActor.shardResolver
       )

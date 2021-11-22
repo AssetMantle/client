@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{ BlockActor, ClassificationActor, CreateDelegation, DelegationActor, DeleteDelegation, GetAllDelegationForDelegator, GetAllDelegationForValidator, GetDelegation, InsertMultipleDelegation, InsertOrUpdateDelegation}
+import actors.blockchainModels.{ BlockActor, ClassificationActor, CreateDelegation, DelegationActor, DeleteDelegation, GetAllDelegationForDelegator, GetAllDelegationForValidator, GetDelegation, InsertMultipleDelegation, InsertOrUpdateDelegation}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -110,10 +110,10 @@ class Delegations @Inject()(
     implicit val timeout = Timeout(5 seconds) // needed for `?` below
 
     private val delegationActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "delegationRegion",
         entityProps = DelegationActor.props(Delegations.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = DelegationActor.idExtractor,
         extractShardId = DelegationActor.shardResolver
       )

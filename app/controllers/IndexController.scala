@@ -6,7 +6,7 @@ import akka.pattern.ask
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import utilities.Configuration.OtherApp
-import actors.models.{ BalanceActor}
+import actors.blockchainModels.{ BalanceActor}
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Balances, Maintainer, Meta}

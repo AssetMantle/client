@@ -2,7 +2,7 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.models.{AccountActor, BalanceActor, BlockActor, StartActor}
+import actors.blockchainModels.{AccountActor, BalanceActor, BlockActor, StartActor}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -130,36 +130,36 @@ class Blocks @Inject()(
     implicit val timeout = Timeout(10 seconds) // needed for `?` below
 
     private val blockActorRegion = {
-      ClusterSharding(actors.models.Service.actorSystem).start(
+      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
         typeName = "blockRegion",
         entityProps = BlockActor.props(Blocks.this),
-        settings = ClusterShardingSettings(actors.models.Service.actorSystem),
+        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
         extractEntityId = BlockActor.idExtractor,
         extractShardId = BlockActor.shardResolver
       )
     }
 
-    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (blockActorRegion ? actors.models.CreateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[String]
+    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (blockActorRegion ? actors.blockchainModels.CreateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[String]
 
     def create(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (blockActorRegion ? actors.models.InsertOrUpdateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[Int]
+    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (blockActorRegion ? actors.blockchainModels.InsertOrUpdateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[Int]
 
     def insertOrUpdate(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def tryGetBlockWithActor(height: Int): Future[Block] = (blockActorRegion ? actors.models.TryGetBlock(uniqueId, height)).mapTo[Block]
+    def tryGetBlockWithActor(height: Int): Future[Block] = (blockActorRegion ? actors.blockchainModels.TryGetBlock(uniqueId, height)).mapTo[Block]
 
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
-    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (blockActorRegion ? actors.models.TryGetProposerAddressBlock(uniqueId, height)).mapTo[String]
+    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (blockActorRegion ? actors.blockchainModels.TryGetProposerAddressBlock(uniqueId, height)).mapTo[String]
 
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
-    def getLatestBlockHeightWithActor: Future[Int] = (blockActorRegion ? actors.models.GetLatestBlockHeight(uniqueId)).mapTo[Int]
+    def getLatestBlockHeightWithActor: Future[Int] = (blockActorRegion ? actors.blockchainModels.GetLatestBlockHeight(uniqueId)).mapTo[Int]
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
-    def getLatestBlockWithActor: Future[Block] = (blockActorRegion ? actors.models.GetLatestBlock(uniqueId)).mapTo[Block]
+    def getLatestBlockWithActor: Future[Block] = (blockActorRegion ? actors.blockchainModels.GetLatestBlock(uniqueId)).mapTo[Block]
 
     def getLatestBlock: Future[Block] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -169,7 +169,7 @@ class Blocks @Inject()(
       } yield block
     }
 
-    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (blockActorRegion ? actors.models.GetBlocksPerPage(uniqueId, pageNumber)).mapTo[Seq[Block]]
+    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (blockActorRegion ? actors.blockchainModels.GetBlocksPerPage(uniqueId, pageNumber)).mapTo[Seq[Block]]
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -179,7 +179,7 @@ class Blocks @Inject()(
       } yield blockList
     }
 
-    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (blockActorRegion ? actors.models.GetLastNBlocks(uniqueId, n)).mapTo[Seq[Block]]
+    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (blockActorRegion ? actors.blockchainModels.GetLastNBlocks(uniqueId, n)).mapTo[Seq[Block]]
 
     def getLastNBlocks(n: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight

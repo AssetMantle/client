@@ -74,15 +74,15 @@ libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % akkaVersion
 
-libraryDependencies += "com.typesafe.akka" %% "akka-remote" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-remote" % "2.6.10"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % "2.6.10"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % "2.6.10"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % "2.6.10"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-typed" % "2.6.10"
 
 libraryDependencies += "io.aeron" % "aeron-driver" % "1.32.0"
 
