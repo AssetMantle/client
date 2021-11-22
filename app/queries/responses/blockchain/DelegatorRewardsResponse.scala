@@ -10,7 +10,7 @@ object DelegatorRewardsResponse {
 
   implicit val rewardReads: Reads[Reward] = Json.reads[Reward]
 
-  case class Result(rewards: Option[Seq[Reward]], total: Seq[Coin])
+  case class Result(rewards: Option[Seq[Reward]], total: Option[Seq[Coin]])
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 

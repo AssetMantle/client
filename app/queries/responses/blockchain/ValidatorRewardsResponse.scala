@@ -6,7 +6,7 @@ import transactions.Abstract.BaseResponse
 
 object ValidatorRewardsResponse {
 
-  case class Result(operator_address: String, self_bond_rewards: Seq[Coin], val_commission: Seq[Coin])
+  case class Result(operator_address: String, self_bond_rewards: Option[Seq[Coin]], val_commission: Option[Seq[Coin]])
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 

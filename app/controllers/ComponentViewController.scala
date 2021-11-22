@@ -306,7 +306,7 @@ class ComponentViewController @Inject()(
         def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
 
         def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[Coin] = if (isValidator) {
-          getValidatorRewards.Service.get(operatorAddress).map(x => x.result.val_commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
+          getValidatorRewards.Service.get(operatorAddress).map(x => x.result.val_commission.fold(MicroNumber.zero)(_.headOption.fold(MicroNumber.zero)(_.toCoin.amount))).map(x => Coin(stakingDenom, x))
         } else Future(Coin(stakingDenom, MicroNumber.zero))
 
         def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
@@ -331,7 +331,7 @@ class ComponentViewController @Inject()(
           accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins),
           delegated = getDelegatedAmount(delegations, validators),
           undelegating = getUndelegatingAmount(undelegations),
-          delegationTotalRewards = delegationRewards.result.total.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin),
+          delegationTotalRewards = delegationRewards.result.total.fold(Coin(stakingDenom, MicroNumber.zero))(_.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin)),
           isValidator = isValidator,
           commissionRewards = commissionRewards,
           stakingDenom = stakingDenom,
