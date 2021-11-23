@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ProposalDepositActor {
-  def props(blockchainProposalDeposit: models.blockchain.ProposalDeposits) = Props(new ProposalDepositActor(blockchainProposalDeposit))
+  def props(blockchainProposalDeposits: models.blockchain.ProposalDeposits) = Props(new ProposalDepositActor(blockchainProposalDeposits))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@TryGetProposalDeposit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -31,25 +31,25 @@ object ProposalDepositActor {
 
 @Singleton
 class ProposalDepositActor @Inject()(
-                                      blockchainProposalDeposit: models.blockchain.ProposalDeposits
+                                      blockchainProposalDeposits: models.blockchain.ProposalDeposits
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case InsertOrUpdateProposalDeposit(_, proposal) => {
-      blockchainProposalDeposit.Service.insertOrUpdate(proposal) pipeTo sender()
+      blockchainProposalDeposits.Service.insertOrUpdate(proposal) pipeTo sender()
     }
     case TryGetProposalDeposit(_, proposalID) => {
-      blockchainProposalDeposit.Service.tryGet(proposalID) pipeTo sender()
+      blockchainProposalDeposits.Service.tryGet(proposalID) pipeTo sender()
     }
     case GetProposalDepositWithActor(_, proposalID, depositor) => {
-      blockchainProposalDeposit.Service.get(proposalID, depositor) pipeTo sender()
+      blockchainProposalDeposits.Service.get(proposalID, depositor) pipeTo sender()
     }
     case DeleteByProposalDepositId(_, id) => {
-      blockchainProposalDeposit.Service.deleteByProposalID(id) pipeTo sender()
+      blockchainProposalDeposits.Service.deleteByProposalID(id) pipeTo sender()
     }
     case GetByProposalDepositId(_, id) => {
-      blockchainProposalDeposit.Service.getByProposalID(id) pipeTo sender()
+      blockchainProposalDeposits.Service.getByProposalID(id) pipeTo sender()
     }
   }
 

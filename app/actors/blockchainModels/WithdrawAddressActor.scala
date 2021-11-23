@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object WithdrawAddressActor {
-  def props(blockchainWithdrawAddress: models.blockchain.WithdrawAddresses) = Props(new WithdrawAddressActor(blockchainWithdrawAddress))
+  def props(blockchainWithdrawAddresses: models.blockchain.WithdrawAddresses) = Props(new WithdrawAddressActor(blockchainWithdrawAddresses))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateWithdrawAddress(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -31,25 +31,25 @@ object WithdrawAddressActor {
 
 @Singleton
 class WithdrawAddressActor @Inject()(
-                               blockchainWithdrawAddress: models.blockchain.WithdrawAddresses
+                               blockchainWithdrawAddresses: models.blockchain.WithdrawAddresses
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateWithdrawAddress(_, withdrawAddress) => {
-      blockchainWithdrawAddress.Service.create(withdrawAddress) pipeTo sender()
+      blockchainWithdrawAddresses.Service.create(withdrawAddress) pipeTo sender()
     }
     case InsertMultipleWithdrawAddress(_, withdrawAddresses) => {
-      blockchainWithdrawAddress.Service.insertMultiple(withdrawAddresses) pipeTo sender()
+      blockchainWithdrawAddresses.Service.insertMultiple(withdrawAddresses) pipeTo sender()
     }
     case InsertOrUpdateWithdrawAddress(_, withdrawAddress) => {
-      blockchainWithdrawAddress.Service.insertOrUpdate(withdrawAddress) pipeTo sender()
+      blockchainWithdrawAddresses.Service.insertOrUpdate(withdrawAddress) pipeTo sender()
     }
     case GetAllWithdrawAddresses(_) => {
-      blockchainWithdrawAddress.Service.getAll pipeTo sender()
+      blockchainWithdrawAddresses.Service.getAll pipeTo sender()
     }
     case GetWithdrawAddress(_, delegatorAddress) => {
-      blockchainWithdrawAddress.Service.get(delegatorAddress) pipeTo sender()
+      blockchainWithdrawAddresses.Service.get(delegatorAddress) pipeTo sender()
     }
   }
 }

@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ClassificationActor {
-  def props(blockchainClassification: models.blockchain.Classifications) = Props(new ClassificationActor(blockchainClassification))
+  def props(blockchainClassifications: models.blockchain.Classifications) = Props(new ClassificationActor(blockchainClassifications))
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@TryGetClassification(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -37,34 +37,34 @@ object ClassificationActor {
 
 @Singleton
 class ClassificationActor @Inject()(
-                            blockchainClassification: models.blockchain.Classifications
+                            blockchainClassifications: models.blockchain.Classifications
                           )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateClassification(_, classification) => {
-      blockchainClassification.Service.create(classification) pipeTo sender()
+      blockchainClassifications.Service.create(classification) pipeTo sender()
     }
     case TryGetClassification(_, id) => {
-      blockchainClassification.Service.tryGet(id) pipeTo sender()
+      blockchainClassifications.Service.tryGet(id) pipeTo sender()
     }
     case GetClassification(_, id) => {
-      blockchainClassification.Service.get(id) pipeTo sender()
+      blockchainClassifications.Service.get(id) pipeTo sender()
     }
     case GetAllClassification(_) => {
-      blockchainClassification.Service.getAll pipeTo sender()
+      blockchainClassifications.Service.getAll pipeTo sender()
     }
     case InsertMultipleClassification(_, classifications) => {
-      blockchainClassification.Service.insertMultiple(classifications) pipeTo sender()
+      blockchainClassifications.Service.insertMultiple(classifications) pipeTo sender()
     }
     case InsertOrUpdateClassification(_, classification) => {
-      blockchainClassification.Service.insertOrUpdate(classification) pipeTo sender()
+      blockchainClassifications.Service.insertOrUpdate(classification) pipeTo sender()
     }
     case DeleteClassification(_, id) => {
-      blockchainClassification.Service.delete(id) pipeTo sender()
+      blockchainClassifications.Service.delete(id) pipeTo sender()
     }
     case CheckExistsClassification(_, id) => {
-      blockchainClassification.Service.checkExists(id) pipeTo sender()
+      blockchainClassifications.Service.checkExists(id) pipeTo sender()
     }
   }
 }

@@ -15,7 +15,7 @@ import javax.inject.{Inject, Singleton}
 
 
 object BalanceActor {
-  def props(blockchainBalance: models.blockchain.Balances) = Props(new BalanceActor(blockchainBalance))
+  def props(blockchainBalances: models.blockchain.Balances) = Props(new BalanceActor(blockchainBalances))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@Get(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -36,26 +36,26 @@ object BalanceActor {
 
 @Singleton
 class BalanceActor @Inject()(
-                                 blockchainBalance: models.blockchain.Balances
+                                 blockchainBalances: models.blockchain.Balances
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case Get(_, address) => {
-      blockchainBalance.Service.get(address) pipeTo sender()
+      blockchainBalances.Service.get(address) pipeTo sender()
       logger.info( s"Im the actor $self")
     }
     case Create(_, address, coins) => {
-      blockchainBalance.Service.create(address, coins) pipeTo sender()
+      blockchainBalances.Service.create(address, coins) pipeTo sender()
     }
     case TryGet(_, address) => {
-      blockchainBalance.Service.tryGet(address) pipeTo sender()
+      blockchainBalances.Service.tryGet(address) pipeTo sender()
     }
     case InsertOrUpdate(_, balance) => {
-      blockchainBalance.Service.insertOrUpdate(balance) pipeTo sender()
+      blockchainBalances.Service.insertOrUpdate(balance) pipeTo sender()
     }
     case GetList(_, addresses) => {
-      blockchainBalance.Service.getList(addresses) pipeTo sender()
+      blockchainBalances.Service.getList(addresses) pipeTo sender()
     }
   }
 

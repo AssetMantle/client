@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object OrderActor {
-  def props(blockchainOrder: models.blockchain.Orders) = Props(new OrderActor(blockchainOrder))
+  def props(blockchainOrders: models.blockchain.Orders) = Props(new OrderActor(blockchainOrders))
   
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -41,40 +41,40 @@ object OrderActor {
 
 @Singleton
 class OrderActor @Inject()(
-                               blockchainOrder: models.blockchain.Orders
+                               blockchainOrders: models.blockchain.Orders
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateOrder(_, order) => {
-      blockchainOrder.Service.create(order) pipeTo sender()
+      blockchainOrders.Service.create(order) pipeTo sender()
     }
     case TryGetOrder(_, id) => {
-      blockchainOrder.Service.tryGet(id) pipeTo sender()
+      blockchainOrders.Service.tryGet(id) pipeTo sender()
     }
     case GetOrder(_, id) => {
-      blockchainOrder.Service.get(id) pipeTo sender()
+      blockchainOrders.Service.get(id) pipeTo sender()
     }
     case InsertMultipleOrder(_, orders) => {
-      blockchainOrder.Service.insertMultiple(orders) pipeTo sender()
+      blockchainOrders.Service.insertMultiple(orders) pipeTo sender()
     }
     case DeleteOrder(_, id) => {
-      blockchainOrder.Service.delete(id) pipeTo sender()
+      blockchainOrders.Service.delete(id) pipeTo sender()
     }
     case GetAllOrder(_) => {
-      blockchainOrder.Service.getAll pipeTo sender()
+      blockchainOrders.Service.getAll pipeTo sender()
     }
     case CheckExistsOrder(_, id) => {
-      blockchainOrder.Service.checkExists(id) pipeTo sender()
+      blockchainOrders.Service.checkExists(id) pipeTo sender()
     }
     case InsertOrUpdateOrder(_, order) => {
-      blockchainOrder.Service.insertOrUpdate(order) pipeTo sender()
+      blockchainOrders.Service.insertOrUpdate(order) pipeTo sender()
     }
     case GetAllPublicOrderIDs(_) => {
-      blockchainOrder.Service.getAllPublicOrderIDs pipeTo sender()
+      blockchainOrders.Service.getAllPublicOrderIDs pipeTo sender()
     }
     case GetAllPrivateOrderIDs(_, identityIDs) => {
-      blockchainOrder.Service.getAllPrivateOrderIDs(identityIDs) pipeTo sender()
+      blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs) pipeTo sender()
     }
   }
 }

@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ProposalVoteActor {
-  def props(blockchainProposalVote: models.blockchain.ProposalVotes) = Props(new ProposalVoteActor(blockchainProposalVote))
+  def props(blockchainProposalVotes: models.blockchain.ProposalVotes) = Props(new ProposalVoteActor(blockchainProposalVotes))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@TryGetProposalVote(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -26,19 +26,19 @@ object ProposalVoteActor {
 
 @Singleton
 class ProposalVoteActor @Inject()(
-                                      blockchainProposalVote: models.blockchain.ProposalVotes
+                                      blockchainProposalVotes: models.blockchain.ProposalVotes
                                     )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case InsertOrUpdateProposalVote(_, proposal) => {
-      blockchainProposalVote.Service.insertOrUpdate(proposal) pipeTo sender()
+      blockchainProposalVotes.Service.insertOrUpdate(proposal) pipeTo sender()
     }
     case TryGetProposalVote(_, proposalID) => {
-      blockchainProposalVote.Service.tryGet(proposalID) pipeTo sender()
+      blockchainProposalVotes.Service.tryGet(proposalID) pipeTo sender()
     }
     case GetAllByProposalVoteId(_, id) => {
-      blockchainProposalVote.Service.getAllByID(id) pipeTo sender()
+      blockchainProposalVotes.Service.getAllByID(id) pipeTo sender()
     }
   }
 }

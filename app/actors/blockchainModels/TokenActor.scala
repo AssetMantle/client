@@ -12,7 +12,7 @@ import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object TokenActor {
 
-  def props(blockchainToken: models.blockchain.Tokens) = Props(new TokenActor(blockchainToken))
+  def props(blockchainTokens: models.blockchain.Tokens) = Props(new TokenActor(blockchainTokens))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateToken(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -44,40 +44,40 @@ object TokenActor {
 
 @Singleton
 class TokenActor @Inject()(
-                            blockchainToken: models.blockchain.Tokens
+                            blockchainTokens: models.blockchain.Tokens
                           )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateToken(_, token) => {
-      blockchainToken.Service.create(token) pipeTo sender()
+      blockchainTokens.Service.create(token) pipeTo sender()
     }
     case GetToken(_, denom) => {
-      blockchainToken.Service.get(denom) pipeTo sender()
+      blockchainTokens.Service.get(denom) pipeTo sender()
     }
     case GetAllToken(_) => {
-      blockchainToken.Service.getAll pipeTo sender()
+      blockchainTokens.Service.getAll pipeTo sender()
     }
     case GetAllDenoms(_) => {
-      blockchainToken.Service.getAllDenoms pipeTo sender()
+      blockchainTokens.Service.getAllDenoms pipeTo sender()
     }
     case GetStakingToken(_) => {
-      blockchainToken.Service.getStakingToken pipeTo sender()
+      blockchainTokens.Service.getStakingToken pipeTo sender()
     }
     case InsertMultipleToken(_, tokens) => {
-      blockchainToken.Service.insertMultiple(tokens) pipeTo sender()
+      blockchainTokens.Service.insertMultiple(tokens) pipeTo sender()
     }
     case InsertOrUpdateToken(_, token) => {
-      blockchainToken.Service.insertOrUpdate(token) pipeTo sender()
+      blockchainTokens.Service.insertOrUpdate(token) pipeTo sender()
     }
     case UpdateStakingAmounts(_, denom, bondedAmount, notBondedAmount) => {
-      blockchainToken.Service.updateStakingAmounts(denom, bondedAmount, notBondedAmount) pipeTo sender()
+      blockchainTokens.Service.updateStakingAmounts(denom, bondedAmount, notBondedAmount) pipeTo sender()
     }
     case UpdateTotalSupplyAndInflation(_, denom, totalSupply, inflation) => {
-      blockchainToken.Service.updateTotalSupplyAndInflation(denom, totalSupply, inflation) pipeTo sender()
+      blockchainTokens.Service.updateTotalSupplyAndInflation(denom, totalSupply, inflation) pipeTo sender()
     }
     case GetTotalBondedAmount(_) => {
-      blockchainToken.Service.getTotalBondedAmount pipeTo sender()
+      blockchainTokens.Service.getTotalBondedAmount pipeTo sender()
     }
   }
 }

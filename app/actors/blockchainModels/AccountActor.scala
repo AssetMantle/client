@@ -11,7 +11,7 @@ import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 import javax.inject.{Inject, Singleton}
 
 object AccountActor {
-  def props(blockchainAccount: models.blockchain.Accounts) = Props(new AccountActor(blockchainAccount))
+  def props(blockchainAccounts: models.blockchain.Accounts) = Props(new AccountActor(blockchainAccounts))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@GetAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -41,40 +41,40 @@ object AccountActor {
 
 @Singleton
 class AccountActor @Inject()(
-                              blockchainAccount: models.blockchain.Accounts
+                              blockchainAccounts: models.blockchain.Accounts
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case GetAccount(_, address) => {
-      blockchainAccount.Service.get(address) pipeTo sender()
+      blockchainAccounts.Service.get(address) pipeTo sender()
     }
     case CreateAccount(_, address, username, accountType, publicKey) => {
-      blockchainAccount.Service.create(address, username, accountType, publicKey) pipeTo sender()
+      blockchainAccounts.Service.create(address, username, accountType, publicKey) pipeTo sender()
     }
     case TryGetAccount(_, address) => {
-      blockchainAccount.Service.tryGet(address) pipeTo sender()
+      blockchainAccounts.Service.tryGet(address) pipeTo sender()
     }
     case InsertOrUpdateAccount(_, account) => {
-      blockchainAccount.Service.insertOrUpdate(account) pipeTo sender()
+      blockchainAccounts.Service.insertOrUpdate(account) pipeTo sender()
     }
     case GetListAccount(_, addresses) => {
-      blockchainAccount.Service.getList(addresses) pipeTo sender()
+      blockchainAccounts.Service.getList(addresses) pipeTo sender()
     }
     case TryGetByUsernameAccount(_, username) => {
-      blockchainAccount.Service.tryGetByUsername(username) pipeTo sender()
+      blockchainAccounts.Service.tryGetByUsername(username) pipeTo sender()
     }
     case TryGetUsernameAccount(_, username) => {
-      blockchainAccount.Service.tryGetUsername(username) pipeTo sender()
+      blockchainAccounts.Service.tryGetUsername(username) pipeTo sender()
     }
     case GetUsernameAccount(_, address) => {
-      blockchainAccount.Service.getUsername(address) pipeTo sender()
+      blockchainAccounts.Service.getUsername(address) pipeTo sender()
     }
     case TryGetAddressAccount(_, address) => {
-      blockchainAccount.Service.tryGetAddress(address) pipeTo sender()
+      blockchainAccounts.Service.tryGetAddress(address) pipeTo sender()
     }
     case CheckAccountExists(_, address) => {
-      blockchainAccount.Service.checkAccountExists(address) pipeTo sender()
+      blockchainAccounts.Service.checkAccountExists(address) pipeTo sender()
     }
   }
 

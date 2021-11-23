@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object SplitActor {
-  def props(blockchainSplit: models.blockchain.Splits) = Props(new SplitActor(blockchainSplit))
+  def props(blockchainSplits: models.blockchain.Splits) = Props(new SplitActor(blockchainSplits))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -45,43 +45,43 @@ object SplitActor {
 
 @Singleton
 class SplitActor @Inject()(
-                            blockchainSplit: models.blockchain.Splits
+                            blockchainSplits: models.blockchain.Splits
                           )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateSplit(_, split) => {
-      blockchainSplit.Service.create(split) pipeTo sender()
+      blockchainSplits.Service.create(split) pipeTo sender()
     }
     case InsertMultipleSplit(_, splits) => {
-      blockchainSplit.Service.insertMultiple(splits) pipeTo sender()
+      blockchainSplits.Service.insertMultiple(splits) pipeTo sender()
     }
     case InsertOrUpdateSplit(_, split) => {
-      blockchainSplit.Service.insertOrUpdate(split) pipeTo sender()
+      blockchainSplits.Service.insertOrUpdate(split) pipeTo sender()
     }
     case GetByOwner(_, ownerID) => {
-      blockchainSplit.Service.getByOwner(ownerID) pipeTo sender()
+      blockchainSplits.Service.getByOwner(ownerID) pipeTo sender()
     }
     case GetByOwnerIDs(_, ownerIDs) => {
-      blockchainSplit.Service.getByOwnerIDs(ownerIDs) pipeTo sender()
+      blockchainSplits.Service.getByOwnerIDs(ownerIDs) pipeTo sender()
     }
     case GetByOwnable(_, ownableID) => {
-      blockchainSplit.Service.getByOwnable(ownableID) pipeTo sender()
+      blockchainSplits.Service.getByOwnable(ownableID) pipeTo sender()
     }
     case GetByOwnerOrOwnable(_, id) => {
-      blockchainSplit.Service.getByOwnerOrOwnable(id) pipeTo sender()
+      blockchainSplits.Service.getByOwnerOrOwnable(id) pipeTo sender()
     }
     case GetAllSplit(_) => {
-      blockchainSplit.Service.getAll pipeTo sender()
+      blockchainSplits.Service.getAll pipeTo sender()
     }
     case DeleteSplit(_, ownerID, ownableID) => {
-      blockchainSplit.Service.delete(ownerID, ownableID) pipeTo sender()
+      blockchainSplits.Service.delete(ownerID, ownableID) pipeTo sender()
     }
     case TryGetSplit(_, ownerID, ownableID) => {
-      blockchainSplit.Service.tryGet(ownerID, ownableID) pipeTo sender()
+      blockchainSplits.Service.tryGet(ownerID, ownableID) pipeTo sender()
     }
     case GetSplit(_, ownerID, ownableID) => {
-      blockchainSplit.Service.get(ownerID, ownableID) pipeTo sender()
+      blockchainSplits.Service.get(ownerID, ownableID) pipeTo sender()
     }
   }
 

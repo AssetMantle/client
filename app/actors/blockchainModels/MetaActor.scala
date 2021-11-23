@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object MetaActor {
-  def props(blockchainMeta: models.blockchain.Metas) = Props(new MetaActor(blockchainMeta))
+  def props(blockchainMetas: models.blockchain.Metas) = Props(new MetaActor(blockchainMetas))
   
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateData(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -50,52 +50,52 @@ object MetaActor {
 
 @Singleton
 class MetaActor @Inject()(
-                               blockchainMeta: models.blockchain.Metas
+                               blockchainMetas: models.blockchain.Metas
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateMeta(_, meta) => {
-      blockchainMeta.Service.create(meta) pipeTo sender()
+      blockchainMetas.Service.create(meta) pipeTo sender()
     }
     case CreateData(_, data) => {
-      blockchainMeta.Service.create(data) pipeTo sender()
+      blockchainMetas.Service.create(data) pipeTo sender()
     }
     case TryGetMeta(_, id, dataType) => {
-      blockchainMeta.Service.tryGet(id, dataType) pipeTo sender()
+      blockchainMetas.Service.tryGet(id, dataType) pipeTo sender()
     }
     case TryGetData(_, id, dataType) => {
-      blockchainMeta.Service.tryGetData(id, dataType) pipeTo sender()
+      blockchainMetas.Service.tryGetData(id, dataType) pipeTo sender()
     }
     case GetMeta(_, id, dataType) => {
-      blockchainMeta.Service.get(id, dataType) pipeTo sender()
+      blockchainMetas.Service.get(id, dataType) pipeTo sender()
     }
     case GetData(_, id, dataType) => {
-      blockchainMeta.Service.getData(id, dataType) pipeTo sender()
+      blockchainMetas.Service.getData(id, dataType) pipeTo sender()
     }
     case GetMetas(_, ids) => {
-      blockchainMeta.Service.get(ids) pipeTo sender()
+      blockchainMetas.Service.get(ids) pipeTo sender()
     }
     case GetDataList(_, ids) => {
-      blockchainMeta.Service.getDataList(ids) pipeTo sender()
+      blockchainMetas.Service.getDataList(ids) pipeTo sender()
     }
     case GetMetaList(_, ids) => {
-      blockchainMeta.Service.getList(ids) pipeTo sender()
+      blockchainMetas.Service.getList(ids) pipeTo sender()
     }
     case InsertMultipleMetas(_, metaList) => {
-      blockchainMeta.Service.insertMultiple(metaList) pipeTo sender()
+      blockchainMetas.Service.insertMultiple(metaList) pipeTo sender()
     }
     case InsertMultipleData(_, dataList) => {
-      blockchainMeta.Service.insertMultipleData(dataList) pipeTo sender()
+      blockchainMetas.Service.insertMultipleData(dataList) pipeTo sender()
     }
     case InsertOrUpdateMeta(_, meta) => {
-      blockchainMeta.Service.insertOrUpdate(meta) pipeTo sender()
+      blockchainMetas.Service.insertOrUpdate(meta) pipeTo sender()
     }
     case InsertOrUpdateData(_, data) => {
-      blockchainMeta.Service.insertOrUpdate(data) pipeTo sender()
+      blockchainMetas.Service.insertOrUpdate(data) pipeTo sender()
     }
     case CheckIfExistsMeta(_, id, dataType) => {
-      blockchainMeta.Service.checkIfExists(id, dataType) pipeTo sender()
+      blockchainMetas.Service.checkIfExists(id, dataType) pipeTo sender()
     }
   }
 }

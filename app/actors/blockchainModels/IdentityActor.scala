@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object IdentityActor {
-  def props(blockchainIdentity: models.blockchain.Identities) = Props(new IdentityActor(blockchainIdentity))
+  def props(blockchainIdentities: models.blockchain.Identities) = Props(new IdentityActor(blockchainIdentities))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -49,52 +49,52 @@ object IdentityActor {
 
 @Singleton
 class IdentityActor @Inject()(
-                                 blockchainIdentity: models.blockchain.Identities
+                                 blockchainIdentities: models.blockchain.Identities
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateIdentity(_, identity) => {
-      blockchainIdentity.Service.create(identity) pipeTo sender()
+      blockchainIdentities.Service.create(identity) pipeTo sender()
     }
     case TryGetIdentity(_, id) => {
-      blockchainIdentity.Service.tryGet(id) pipeTo sender()
+      blockchainIdentities.Service.tryGet(id) pipeTo sender()
     }
     case GetIdentity(_, id) => {
-      blockchainIdentity.Service.get(id) pipeTo sender()
+      blockchainIdentities.Service.get(id) pipeTo sender()
     }
     case InsertMultipleIdentity(_, identities) => {
-      blockchainIdentity.Service.insertMultiple(identities) pipeTo sender()
+      blockchainIdentities.Service.insertMultiple(identities) pipeTo sender()
     }
     case DeleteIdentity(_, id) => {
-      blockchainIdentity.Service.delete(id) pipeTo sender()
+      blockchainIdentities.Service.delete(id) pipeTo sender()
     }
     case GetAllIDsByProvisionedIdentity(_, address) => {
-      blockchainIdentity.Service.getAllIDsByProvisioned(address) pipeTo sender()
+      blockchainIdentities.Service.getAllIDsByProvisioned(address) pipeTo sender()
     }
     case GetAllIDsByUnProvisionedIdentity(_, address) => {
-      blockchainIdentity.Service.getAllIDsByUnprovisioned(address) pipeTo sender()
+      blockchainIdentities.Service.getAllIDsByUnprovisioned(address) pipeTo sender()
     }
     case CheckExistsIdentity(_, id) => {
-      blockchainIdentity.Service.checkExists(id) pipeTo sender()
+      blockchainIdentities.Service.checkExists(id) pipeTo sender()
     }
     case GetAllProvisionAddressesIdentity(_, id) => {
-      blockchainIdentity.Service.getAllProvisionAddresses(id) pipeTo sender()
+      blockchainIdentities.Service.getAllProvisionAddresses(id) pipeTo sender()
     }
     case GetAllUnprovisionedAddressesIdentity(_, id) => {
-      blockchainIdentity.Service.getAllUnprovisionAddresses(id) pipeTo sender()
+      blockchainIdentities.Service.getAllUnprovisionAddresses(id) pipeTo sender()
     }
     case AddProvisionAddressIdentity(_, id, address) => {
-      blockchainIdentity.Service.addProvisionAddress(id, address) pipeTo sender()
+      blockchainIdentities.Service.addProvisionAddress(id, address) pipeTo sender()
     }
     case DeleteProvisionAddressIdentity(_, id, address) => {
-      blockchainIdentity.Service.deleteProvisionAddress(id, address) pipeTo sender()
+      blockchainIdentities.Service.deleteProvisionAddress(id, address) pipeTo sender()
     }
     case AddUnprovisionedAddressIdentity(_, id, address) => {
-      blockchainIdentity.Service.addUnprovisionAddress(id, address) pipeTo sender()
+      blockchainIdentities.Service.addUnprovisionAddress(id, address) pipeTo sender()
     }
     case DeleteUnprovisionedAddressIdentity(_, id, address) => {
-      blockchainIdentity.Service.deleteUnprovisionAddress(id, address) pipeTo sender()
+      blockchainIdentities.Service.deleteUnprovisionAddress(id, address) pipeTo sender()
     }
   }
 }

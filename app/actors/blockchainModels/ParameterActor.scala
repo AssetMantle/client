@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ParameterActor {
-  def props(blockchainParameter: models.blockchain.Parameters) = Props(new ParameterActor(blockchainParameter))
+  def props(blockchainParameters: models.blockchain.Parameters) = Props(new ParameterActor(blockchainParameters))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateParameter(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -45,46 +45,46 @@ object ParameterActor {
 
 @Singleton
 class ParameterActor @Inject()(
-                               blockchainParameter: models.blockchain.Parameters
+                               blockchainParameters: models.blockchain.Parameters
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateParameter(_, parameter) => {
-      blockchainParameter.Service.create(parameter) pipeTo sender()
+      blockchainParameters.Service.create(parameter) pipeTo sender()
     }
     case TryGetParameter(_, parameterType) => {
-      blockchainParameter.Service.tryGet(parameterType) pipeTo sender()
+      blockchainParameters.Service.tryGet(parameterType) pipeTo sender()
     }
     case InsertOrUpdateParameter(_, parameter) => {
-      blockchainParameter.Service.insertOrUpdate(parameter) pipeTo sender()
+      blockchainParameters.Service.insertOrUpdate(parameter) pipeTo sender()
     }
     case TryGetAuthParameter(_) => {
-      blockchainParameter.Service.tryGetAuthParameter pipeTo sender()
+      blockchainParameters.Service.tryGetAuthParameter pipeTo sender()
     }
     case TryGetBankParameter(_) => {
-      blockchainParameter.Service.tryGetBankParameter pipeTo sender()
+      blockchainParameters.Service.tryGetBankParameter pipeTo sender()
     }
     case TryGetDistributionParameter(_) => {
-      blockchainParameter.Service.tryGetDistributionParameter pipeTo sender()
+      blockchainParameters.Service.tryGetDistributionParameter pipeTo sender()
     }
     case TryGetGovernanceParameter(_) => {
-      blockchainParameter.Service.tryGetGovernanceParameter pipeTo sender()
+      blockchainParameters.Service.tryGetGovernanceParameter pipeTo sender()
     }
     case TryGetHalvingParameter(_) => {
-      blockchainParameter.Service.tryGetHalvingParameter pipeTo sender()
+      blockchainParameters.Service.tryGetHalvingParameter pipeTo sender()
     }
     case TryGetMintingParameter(_) => {
-      blockchainParameter.Service.tryGetMintingParameter pipeTo sender()
+      blockchainParameters.Service.tryGetMintingParameter pipeTo sender()
     }
     case TryGetSlashingParameter(_) => {
-      blockchainParameter.Service.tryGetSlashingParameter pipeTo sender()
+      blockchainParameters.Service.tryGetSlashingParameter pipeTo sender()
     }
     case TryGetStakingParameter(_) => {
-      blockchainParameter.Service.tryGetStakingParameter pipeTo sender()
+      blockchainParameters.Service.tryGetStakingParameter pipeTo sender()
     }
     case GetAllParameter(_) => {
-      blockchainParameter.Service.getAll pipeTo sender()
+      blockchainParameters.Service.getAll pipeTo sender()
     }
   }
 }

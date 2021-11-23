@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object RedelegationActor {
-  def props(blockchainRedelegation: models.blockchain.Redelegations) = Props(new RedelegationActor(blockchainRedelegation))
+  def props(blockchainRedelegations: models.blockchain.Redelegations) = Props(new RedelegationActor(blockchainRedelegations))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -35,31 +35,31 @@ object RedelegationActor {
 
 @Singleton
 class RedelegationActor @Inject()(
-                               blockchainRedelegation: models.blockchain.Redelegations
+                               blockchainRedelegations: models.blockchain.Redelegations
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateRedelegation(_, redelegation) => {
-      blockchainRedelegation.Service.create(redelegation) pipeTo sender()
+      blockchainRedelegations.Service.create(redelegation) pipeTo sender()
     }
     case InsertMultipleRedelegation(_, redelegations) => {
-      blockchainRedelegation.Service.insertMultiple(redelegations) pipeTo sender()
+      blockchainRedelegations.Service.insertMultiple(redelegations) pipeTo sender()
     }
     case InsertOrUpdateRedelegation(_, redelegation) => {
-      blockchainRedelegation.Service.insertOrUpdate(redelegation) pipeTo sender()
+      blockchainRedelegations.Service.insertOrUpdate(redelegation) pipeTo sender()
     }
     case GetAllRedelegationBySourceValidator(_, address) => {
-      blockchainRedelegation.Service.getAllBySourceValidator(address) pipeTo sender()
+      blockchainRedelegations.Service.getAllBySourceValidator(address) pipeTo sender()
     }
     case GetAllRedelegation(_) => {
-      blockchainRedelegation.Service.getAll pipeTo sender()
+      blockchainRedelegations.Service.getAll pipeTo sender()
     }
     case DeleteRedelegation(_, delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
-      blockchainRedelegation.Service.delete(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
+      blockchainRedelegations.Service.delete(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
     }
     case TryGetRedelegation(_, delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
-      blockchainRedelegation.Service.tryGet(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
+      blockchainRedelegations.Service.tryGet(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
     }
   }
 }

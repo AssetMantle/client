@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object BlockActor {
-  def props(blockchainBlock: models.blockchain.Blocks) = Props(new BlockActor(blockchainBlock))
+  def props(blockchainBlocks: models.blockchain.Blocks) = Props(new BlockActor(blockchainBlocks))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateBlock(id, _, _, _, _ ) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -37,37 +37,34 @@ object BlockActor {
 
 @Singleton
 class BlockActor @Inject()(
-                            blockchainBlock: models.blockchain.Blocks
+                            blockchainBlocks: models.blockchain.Blocks
                           )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
-    case StartActor(actorRef) => {
-      logger.info("Actor Started")
-    }
     case CreateBlock(_, height, time, proposerAddress, validators) => {
-      blockchainBlock.Service.create(height, time, proposerAddress, validators) pipeTo sender()
+      blockchainBlocks.Service.create(height, time, proposerAddress, validators) pipeTo sender()
     }
     case InsertOrUpdateBlock(_, height, time, proposerAddress, validators) => {
-      blockchainBlock.Service.insertOrUpdate(height, time, proposerAddress, validators) pipeTo sender()
+      blockchainBlocks.Service.insertOrUpdate(height, time, proposerAddress, validators) pipeTo sender()
     }
     case TryGetBlock(_, height) => {
-      blockchainBlock.Service.tryGet(height) pipeTo sender()
+      blockchainBlocks.Service.tryGet(height) pipeTo sender()
     }
     case TryGetProposerAddressBlock(_, height) => {
-      blockchainBlock.Service.tryGetProposerAddress(height) pipeTo sender()
+      blockchainBlocks.Service.tryGetProposerAddress(height) pipeTo sender()
     }
     case GetLatestBlockHeight(_) => {
-      blockchainBlock.Service.getLatestBlockHeight pipeTo sender()
+      blockchainBlocks.Service.getLatestBlockHeight pipeTo sender()
     }
     case GetLatestBlock(_) => {
-      blockchainBlock.Service.getLatestBlock pipeTo sender()
+      blockchainBlocks.Service.getLatestBlock pipeTo sender()
     }
     case GetBlocksPerPage(_, pageNumber) => {
-      blockchainBlock.Service.getBlocksPerPage(pageNumber) pipeTo sender()
+      blockchainBlocks.Service.getBlocksPerPage(pageNumber) pipeTo sender()
     }
     case GetLastNBlocks(_, n) => {
-      blockchainBlock.Service.getLastNBlocks(n) pipeTo sender()
+      blockchainBlocks.Service.getLastNBlocks(n) pipeTo sender()
     }
   }
 }

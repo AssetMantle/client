@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ValidatorActor {
-  def props(blockchainValidator: models.blockchain.Validators) = Props(new ValidatorActor(blockchainValidator))
+  def props(blockchainValidators: models.blockchain.Validators) = Props(new ValidatorActor(blockchainValidators))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateValidatorWithActor(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -61,70 +61,70 @@ object ValidatorActor {
 
 @Singleton
 class ValidatorActor @Inject()(
-                               blockchainValidator: models.blockchain.Validators
+                               blockchainValidators: models.blockchain.Validators
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateValidatorWithActor(_, validator) => {
-      blockchainValidator.Service.create(validator) pipeTo sender()
+      blockchainValidators.Service.create(validator) pipeTo sender()
     }
     case InsertMultipleValidators(_, validators) => {
-      blockchainValidator.Service.insertMultiple(validators) pipeTo sender()
+      blockchainValidators.Service.insertMultiple(validators) pipeTo sender()
     }
     case InsertOrUpdateValidator(_, validator) => {
-      blockchainValidator.Service.insertOrUpdate(validator) pipeTo sender()
+      blockchainValidators.Service.insertOrUpdate(validator) pipeTo sender()
     }
     case TryGetValidator(_, id) => {
-      blockchainValidator.Service.tryGet(id) pipeTo sender()
+      blockchainValidators.Service.tryGet(id) pipeTo sender()
     }
     case GetAllValidatorByHexAddresses(_, hexAddresses) => {
-      blockchainValidator.Service.getAllByHexAddresses(hexAddresses) pipeTo sender()
+      blockchainValidators.Service.getAllByHexAddresses(hexAddresses) pipeTo sender()
     }
     case TryGetValidatorByOperatorAddress(_, operatorAddress) => {
-      blockchainValidator.Service.tryGetByOperatorAddress(operatorAddress) pipeTo sender()
+      blockchainValidators.Service.tryGetByOperatorAddress(operatorAddress) pipeTo sender()
     }
     case TryGetValidatorByHexAddress(_, hexAddress) => {
-      blockchainValidator.Service.tryGetByHexAddress(hexAddress) pipeTo sender()
+      blockchainValidators.Service.tryGetByHexAddress(hexAddress) pipeTo sender()
     }
     case TryGetValidatorOperatorAddress(_, hexAddress) => {
-      blockchainValidator.Service.tryGetOperatorAddress(hexAddress) pipeTo sender()
+      blockchainValidators.Service.tryGetOperatorAddress(hexAddress) pipeTo sender()
     }
     case TryGetValidatorHexAddress(_, operatorAddress) => {
-      blockchainValidator.Service.tryGetHexAddress(operatorAddress) pipeTo sender()
+      blockchainValidators.Service.tryGetHexAddress(operatorAddress) pipeTo sender()
     }
     case TryGetValidatorProposerName(_, hexAddress) => {
-      blockchainValidator.Service.tryGetProposerName(hexAddress) pipeTo sender()
+      blockchainValidators.Service.tryGetProposerName(hexAddress) pipeTo sender()
     }
     case GetAllValidators(_) => {
-      blockchainValidator.Service.getAll pipeTo sender()
+      blockchainValidators.Service.getAll pipeTo sender()
     }
     case GetAllActiveValidatorList(_) => {
-      blockchainValidator.Service.getAllActiveValidatorList pipeTo sender()
+      blockchainValidators.Service.getAllActiveValidatorList pipeTo sender()
     }
     case GetAllInactiveValidatorList(_) => {
-      blockchainValidator.Service.getAllInactiveValidatorList pipeTo sender()
+      blockchainValidators.Service.getAllInactiveValidatorList pipeTo sender()
     }
     case GetAllUnbondingValidatorList(_) => {
-      blockchainValidator.Service.getAllUnbondingValidatorList pipeTo sender()
+      blockchainValidators.Service.getAllUnbondingValidatorList pipeTo sender()
     }
     case GetAllUnbondedValidatorList(_) => {
-      blockchainValidator.Service.getAllUnbondedValidatorList pipeTo sender()
+      blockchainValidators.Service.getAllUnbondedValidatorList pipeTo sender()
     }
     case GetValidatorByOperatorAddresses(_, operatorAddresses) => {
-      blockchainValidator.Service.getByOperatorAddresses(operatorAddresses) pipeTo sender()
+      blockchainValidators.Service.getByOperatorAddresses(operatorAddresses) pipeTo sender()
     }
     case ValidatorExists(_, operatorAddress) => {
-      blockchainValidator.Service.exists(operatorAddress) pipeTo sender()
+      blockchainValidators.Service.exists(operatorAddress) pipeTo sender()
     }
     case JailValidator(_, operatorAddress) => {
-      blockchainValidator.Service.jailValidator(operatorAddress) pipeTo sender()
+      blockchainValidators.Service.jailValidator(operatorAddress) pipeTo sender()
     }
     case DeleteValidatorWithOpAddress(_, operatorAddress)  => {
-      blockchainValidator.Service.delete(operatorAddress) pipeTo sender()
+      blockchainValidators.Service.delete(operatorAddress) pipeTo sender()
     }
     case GetTotalVotingPower(_) => {
-      blockchainValidator.Service.getTotalVotingPower pipeTo sender()
+      blockchainValidators.Service.getTotalVotingPower pipeTo sender()
     }
   }
 }

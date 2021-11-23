@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object MaintainerActor {
-  def props(blockchainMaintainer: models.blockchain.Maintainers) = Props(new MaintainerActor(blockchainMaintainer))
+  def props(blockchainMaintainers: models.blockchain.Maintainers) = Props(new MaintainerActor(blockchainMaintainers))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -35,31 +35,31 @@ object MaintainerActor {
 
 @Singleton
 class MaintainerActor @Inject()(
-                                 blockchainMaintainer: models.blockchain.Maintainers
+                                 blockchainMaintainers: models.blockchain.Maintainers
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateMaintainer(_, maintainer) => {
-      blockchainMaintainer.Service.create(maintainer) pipeTo sender()
+      blockchainMaintainers.Service.create(maintainer) pipeTo sender()
     }
     case InsertMultipleMaintainer(_, maintainers) => {
-      blockchainMaintainer.Service.insertMultiple(maintainers) pipeTo sender()
+      blockchainMaintainers.Service.insertMultiple(maintainers) pipeTo sender()
     }
     case InsertOrUpdateMaintainer(_, maintainer) => {
-      blockchainMaintainer.Service.insertOrUpdate(maintainer) pipeTo sender()
+      blockchainMaintainers.Service.insertOrUpdate(maintainer) pipeTo sender()
     }
     case TryGetMaintainer(_, id) => {
-      blockchainMaintainer.Service.tryGet(id) pipeTo sender()
+      blockchainMaintainers.Service.tryGet(id) pipeTo sender()
     }
     case GetMaintainer(_, id) => {
-      blockchainMaintainer.Service.get(id) pipeTo sender()
+      blockchainMaintainers.Service.get(id) pipeTo sender()
     }
     case GetAllMaintainer(_) => {
-      blockchainMaintainer.Service.getAll pipeTo sender()
+      blockchainMaintainers.Service.getAll pipeTo sender()
     }
     case DeleteMaintainer(_, id) => {
-      blockchainMaintainer.Service.delete(id) pipeTo sender()
+      blockchainMaintainers.Service.delete(id) pipeTo sender()
     }
   }
 }

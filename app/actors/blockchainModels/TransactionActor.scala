@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object TransactionActor {
-  def props(blockchainTransaction: models.blockchain.Transactions) = Props(new TransactionActor(blockchainTransaction))
+  def props(blockchainTransactions: models.blockchain.Transactions) = Props(new TransactionActor(blockchainTransactions))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateTransaction(id, _, _, _, _, _, _, _, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -48,50 +48,50 @@ object TransactionActor {
 
 @Singleton
 class TransactionActor @Inject()(
-                               blockchainTransaction: models.blockchain.Transactions
+                               blockchainTransactions: models.blockchain.Transactions
                              )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
 
     case CreateTransaction(_, hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) => {
-      blockchainTransaction.Service.create(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) pipeTo sender()
+      blockchainTransactions.Service.create(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) pipeTo sender()
     }
     case InsertMultipleTransaction(_, transactions) => {
-      blockchainTransaction.Service.insertMultiple(transactions) pipeTo sender()
+      blockchainTransactions.Service.insertMultiple(transactions) pipeTo sender()
     }
     case InsertOrUpdateTransaction(_, hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) => {
-      blockchainTransaction.Service.insertOrUpdate(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) pipeTo sender()
+      blockchainTransactions.Service.insertOrUpdate(hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp) pipeTo sender()
     }
     case TryGetTransaction(_, hash) => {
-      blockchainTransaction.Service.tryGet(hash) pipeTo sender()
+      blockchainTransactions.Service.tryGet(hash) pipeTo sender()
     }
     case TryGetMessages(_, hash) => {
-      blockchainTransaction.Service.tryGetMessages(hash) pipeTo sender()
+      blockchainTransactions.Service.tryGetMessages(hash) pipeTo sender()
     }
     case TryGetStatus(_, hash) => {
-      blockchainTransaction.Service.tryGetStatus(hash) pipeTo sender()
+      blockchainTransactions.Service.tryGetStatus(hash) pipeTo sender()
     }
     case TryGetHeight(_, hash) => {
-      blockchainTransaction.Service.tryGetHeight(hash) pipeTo sender()
+      blockchainTransactions.Service.tryGetHeight(hash) pipeTo sender()
     }
     case GetTransactions(_, height) => {
-      blockchainTransaction.Service.getTransactions(height) pipeTo sender()
+      blockchainTransactions.Service.getTransactions(height) pipeTo sender()
     }
     case GetTransactionsByAddress(_, address) => {
-      blockchainTransaction.Service.getTransactionsByAddress(address) pipeTo sender()
+      blockchainTransactions.Service.getTransactionsByAddress(address) pipeTo sender()
     }
     case GetTransactionsPerPageByAddress(_, address, pageNumber) => {
-      blockchainTransaction.Service.getTransactionsPerPageByAddress(address, pageNumber) pipeTo sender()
+      blockchainTransactions.Service.getTransactionsPerPageByAddress(address, pageNumber) pipeTo sender()
     }
     case GetNumberOfTransactions(_, height) => {
-      blockchainTransaction.Service.getNumberOfTransactions(height) pipeTo sender()
+      blockchainTransactions.Service.getNumberOfTransactions(height) pipeTo sender()
     }
     case GetNumberOfBlockTransactions(_, blockHeights) => {
-      blockchainTransaction.Service.getNumberOfTransactions(blockHeights) pipeTo sender()
+      blockchainTransactions.Service.getNumberOfTransactions(blockHeights) pipeTo sender()
     }
     case GetTransactionsPerPage(_, pageNumber) => {
-      blockchainTransaction.Service.getTransactionsPerPage(pageNumber) pipeTo sender()
+      blockchainTransactions.Service.getTransactionsPerPage(pageNumber) pipeTo sender()
     }
   }
 }

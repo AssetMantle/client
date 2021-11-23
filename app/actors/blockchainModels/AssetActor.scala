@@ -10,7 +10,7 @@ import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 import javax.inject.{Inject, Singleton}
 
 object AssetActor {
-  def props(blockchainAsset: models.blockchain.Assets) = Props(new AssetActor(blockchainAsset))
+  def props(blockchainAssets: models.blockchain.Assets) = Props(new AssetActor(blockchainAssets))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -37,34 +37,34 @@ object AssetActor {
 
 @Singleton
 class AssetActor @Inject()(
-                            blockchainAsset: models.blockchain.Assets
+                            blockchainAssets: models.blockchain.Assets
                             )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateAsset(_, asset) => {
-      blockchainAsset.Service.create(asset) pipeTo sender()
+      blockchainAssets.Service.create(asset) pipeTo sender()
     }
     case TryGetAsset(_, id) => {
-      blockchainAsset.Service.tryGet(id) pipeTo sender()
+      blockchainAssets.Service.tryGet(id) pipeTo sender()
     }
     case GetAsset(_, id) => {
-      blockchainAsset.Service.get(id) pipeTo sender()
+      blockchainAssets.Service.get(id) pipeTo sender()
     }
     case GetAllAsset(_) => {
-      blockchainAsset.Service.getAll pipeTo sender()
+      blockchainAssets.Service.getAll pipeTo sender()
     }
     case InsertMultipleAssets(_, assets) => {
-      blockchainAsset.Service.insertMultiple(assets) pipeTo sender()
+      blockchainAssets.Service.insertMultiple(assets) pipeTo sender()
     }
     case InsertOrUpdateAsset(_, asset) => {
-      blockchainAsset.Service.insertOrUpdate(asset) pipeTo sender()
+      blockchainAssets.Service.insertOrUpdate(asset) pipeTo sender()
     }
     case DeleteAsset(_, id) => {
-      blockchainAsset.Service.delete(id) pipeTo sender()
+      blockchainAssets.Service.delete(id) pipeTo sender()
     }
     case CheckExistsAsset(_, id) => {
-      blockchainAsset.Service.checkExistsAssetWithActor(id) pipeTo sender()
+      blockchainAssets.Service.checkExistsAssetWithActor(id) pipeTo sender()
     }
   }
 

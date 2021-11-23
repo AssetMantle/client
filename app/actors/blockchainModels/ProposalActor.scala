@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object ProposalActor {
-  def props(blockchainProposal: models.blockchain.Proposals) = Props(new ProposalActor(blockchainProposal))
+  def props(blockchainProposals: models.blockchain.Proposals) = Props(new ProposalActor(blockchainProposals))
   
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@TryGetProposal(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -39,34 +39,34 @@ object ProposalActor {
 
 @Singleton
 class ProposalActor @Inject()(
-                                 blockchainProposal: models.blockchain.Proposals
+                                 blockchainProposals: models.blockchain.Proposals
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case InsertOrUpdateProposal(_, proposal) => {
-      blockchainProposal.Service.insertOrUpdate(proposal) pipeTo sender()
+      blockchainProposals.Service.insertOrUpdate(proposal) pipeTo sender()
     }
     case TryGetProposal(_, id) => {
-      blockchainProposal.Service.tryGet(id) pipeTo sender()
+      blockchainProposals.Service.tryGet(id) pipeTo sender()
     }
     case GetProposalWithActor(_, id) => {
-      blockchainProposal.Service.get(id) pipeTo sender()
+      blockchainProposals.Service.get(id) pipeTo sender()
     }
     case GetLatestProposalID(_) => {
-      blockchainProposal.Service.getLatestProposalID pipeTo sender()
+      blockchainProposals.Service.getLatestProposalID pipeTo sender()
     }
     case GetAllActiveProposals(_, time) => {
-      blockchainProposal.Service.getAllActiveProposals(time) pipeTo sender()
+      blockchainProposals.Service.getAllActiveProposals(time) pipeTo sender()
     }
     case GetAllInActiveProposals(_, time) => {
-      blockchainProposal.Service.getAllInactiveProposals(time) pipeTo sender()
+      blockchainProposals.Service.getAllInactiveProposals(time) pipeTo sender()
     }
     case DeleteProposal(_, id) => {
-      blockchainProposal.Service.delete(id) pipeTo sender()
+      blockchainProposals.Service.delete(id) pipeTo sender()
     }
     case GetProposals(_) => {
-      blockchainProposal.Service.get() pipeTo sender()
+      blockchainProposals.Service.get() pipeTo sender()
     }
   }
 

@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import constants.Actor.{NUMBER_OF_SHARDS, NUMBER_OF_ENTITIES}
 
 object DelegationActor {
-  def props(blockchainDelegation: models.blockchain.Delegations) = Props(new DelegationActor(blockchainDelegation))
+  def props(blockchainDelegations: models.blockchain.Delegations) = Props(new DelegationActor(blockchainDelegations))
   
   val idExtractor: ShardRegion.ExtractEntityId = {
     case attempt@CreateDelegation(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -35,31 +35,31 @@ object DelegationActor {
 
 @Singleton
 class DelegationActor @Inject()(
-                                 blockchainDelegation: models.blockchain.Delegations
+                                 blockchainDelegations: models.blockchain.Delegations
                                )extends Actor with ActorLogging {
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case CreateDelegation(_, delegation) => {
-      blockchainDelegation.Service.create(delegation) pipeTo sender()
+      blockchainDelegations.Service.create(delegation) pipeTo sender()
     }
     case InsertMultipleDelegation(_, delegations) => {
-      blockchainDelegation.Service.insertMultiple(delegations) pipeTo sender()
+      blockchainDelegations.Service.insertMultiple(delegations) pipeTo sender()
     }
     case InsertOrUpdateDelegation(_, delegation) => {
-      blockchainDelegation.Service.insertOrUpdate(delegation) pipeTo sender()
+      blockchainDelegations.Service.insertOrUpdate(delegation) pipeTo sender()
     }
     case GetDelegation(_, delegatorAddress, operatorAddress) => {
-      blockchainDelegation.Service.get(delegatorAddress, operatorAddress) pipeTo sender()
+      blockchainDelegations.Service.get(delegatorAddress, operatorAddress) pipeTo sender()
     }
     case GetAllDelegationForDelegator(_, address) => {
-      blockchainDelegation.Service.getAllForDelegator(address) pipeTo sender()
+      blockchainDelegations.Service.getAllForDelegator(address) pipeTo sender()
     }
     case GetAllDelegationForValidator(_, operatorAddress) => {
-      blockchainDelegation.Service.getAllForValidator(operatorAddress) pipeTo sender()
+      blockchainDelegations.Service.getAllForValidator(operatorAddress) pipeTo sender()
     }
     case DeleteDelegation(_, delegatorAddress, operatorAddress) => {
-      blockchainDelegation.Service.delete(delegatorAddress, operatorAddress) pipeTo sender()
+      blockchainDelegations.Service.delete(delegatorAddress, operatorAddress) pipeTo sender()
     }
   }
 }
