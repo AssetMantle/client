@@ -4,12 +4,13 @@ import java.sql.Timestamp
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, SplitActor, StartActor, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import actors.models
+import actors.models.blockchain.{CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -162,10 +163,10 @@ class Tokens @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val tokenActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(models.blockchain.Service.actorSystem).start(
         typeName = "tokenRegion",
         entityProps = TokenActor.props(Tokens.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
         extractEntityId = TokenActor.idExtractor,
         extractShardId = TokenActor.shardResolver
       )

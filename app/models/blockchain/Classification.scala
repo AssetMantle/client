@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{BlockActor, CheckExistsClassification, ClassificationActor, CreateClassification, DeleteClassification, GetAllClassification, GetClassification, InsertMultipleClassification, InsertOrUpdateClassification, TryGetClassification}
+import actors.models.blockchain
+import actors.models.blockchain.{CheckExistsClassification, ClassificationActor, CreateClassification, DeleteClassification, GetAllClassification, GetClassification, InsertMultipleClassification, InsertOrUpdateClassification, TryGetClassification}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -120,10 +121,10 @@ class Classifications @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val classificationActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "classificationRegion",
         entityProps = ClassificationActor.props(Classifications.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = ClassificationActor.idExtractor,
         extractShardId = ClassificationActor.shardResolver
       )

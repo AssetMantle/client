@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{BlockActor, CreateMaintainer, DeleteMaintainer, GetAllMaintainer, GetMaintainer, IdentityActor, InsertMultipleMaintainer, InsertOrUpdateMaintainer, MaintainerActor, TryGetMaintainer}
+import actors.models.blockchain
+import actors.models.blockchain.{CreateMaintainer, DeleteMaintainer, GetAllMaintainer, GetMaintainer, InsertMultipleMaintainer, InsertOrUpdateMaintainer, MaintainerActor, TryGetMaintainer}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -126,10 +127,10 @@ class Maintainers @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val maintainerActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "maintainerRegion",
         entityProps = MaintainerActor.props(Maintainers.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = MaintainerActor.idExtractor,
         extractShardId = MaintainerActor.shardResolver
       )

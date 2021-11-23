@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{CreateParameter, GetAllParameter, InsertOrUpdateParameter, OrderActor, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
+import actors.models.blockchain
+import actors.models.blockchain.{CreateParameter, GetAllParameter, InsertOrUpdateParameter, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -116,10 +117,10 @@ class Parameters @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val parameterActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "parameterRegion",
         entityProps = ParameterActor.props(Parameters.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = ParameterActor.idExtractor,
         extractShardId = ParameterActor.shardResolver
       )

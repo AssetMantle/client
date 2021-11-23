@@ -1,4 +1,4 @@
-package actors.blockchainModels
+package actors.models.blockchain
 
 import actors.Service.actorSystem.dispatcher
 import akka.actor.{Actor, ActorLogging, Props}
@@ -14,7 +14,7 @@ object AccountActor {
   def props(blockchainAccounts: models.blockchain.Accounts) = Props(new AccountActor(blockchainAccounts))
 
   val idExtractor: ShardRegion.ExtractEntityId = {
-    case attempt@GetAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAccountWithActor(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@TryGetAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@CreateAccount(id, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
     case attempt@InsertOrUpdateAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
@@ -26,7 +26,7 @@ object AccountActor {
     case attempt@CheckAccountExists(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
   val shardResolver: ShardRegion.ExtractShardId = {
-    case GetAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAccountWithActor(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
     case TryGetAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
     case CreateAccount(id, _, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
     case InsertOrUpdateAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
@@ -46,7 +46,7 @@ class AccountActor @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   override def receive: Receive = {
-    case GetAccount(_, address) => {
+    case GetAccountWithActor(_, address) => {
       blockchainAccounts.Service.get(address) pipeTo sender()
     }
     case CreateAccount(_, address, username, accountType, publicKey) => {
@@ -81,7 +81,7 @@ class AccountActor @Inject()(
 }
 
 
-case class GetAccount(id:String, address: String)
+case class GetAccountWithActor(id:String, address: String)
 case class TryGetAccount(id:String, address: String)
 case class CreateAccount(id:String, address: String, username: String, accountType: String, publicKey: Option[PublicKey])
 case class InsertOrUpdateAccount(id:String, account: Account)

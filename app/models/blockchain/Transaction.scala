@@ -2,11 +2,13 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, StartActor, TokenActor, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
+import actors.models.blockchain
+import actors.models.blockchain.{CreateTransaction, GetNumberOfBlockTransactions, GetNumberOfTransactions, GetTransactions, GetTransactionsByAddress, GetTransactionsPerPage, GetTransactionsPerPageByAddress, InsertMultipleTransaction, InsertOrUpdateTransaction, Service, TransactionActor, TryGetHeight, TryGetMessages, TryGetStatus, TryGetTransaction}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.{Fee, StdMsg}
+import actors.models
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -186,10 +188,10 @@ class Transactions @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val transactionActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(models.blockchain.Service.actorSystem).start(
         typeName = "transactionRegion",
         entityProps = TransactionActor.props(Transactions.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = TransactionActor.idExtractor,
         extractShardId = TransactionActor.shardResolver
       )

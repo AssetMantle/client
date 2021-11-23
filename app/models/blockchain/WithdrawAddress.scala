@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{CreateWithdrawAddress, GetAllWithdrawAddresses, GetWithdrawAddress, InsertMultipleWithdrawAddress, InsertOrUpdateWithdrawAddress, ProposalVoteActor, StartActor, ValidatorActor, WithdrawAddressActor}
+import actors.models.blockchain
+import actors.models.blockchain.{CreateWithdrawAddress, GetAllWithdrawAddresses, GetWithdrawAddress, InsertMultipleWithdrawAddress, InsertOrUpdateWithdrawAddress, WithdrawAddressActor}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -101,10 +102,10 @@ class WithdrawAddresses @Inject()(
   object Service {
    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
    private val withdrawAddressActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "withdrawAddressRegion",
         entityProps = WithdrawAddressActor.props(WithdrawAddresses.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = WithdrawAddressActor.idExtractor,
         extractShardId = WithdrawAddressActor.shardResolver
       )

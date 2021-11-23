@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalDepositActor, ProposalVoteActor, TryGetProposalVote}
+import actors.models.blockchain
+import actors.models.blockchain.{GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalVoteActor, TryGetProposalVote}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -95,10 +96,10 @@ class ProposalVotes @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val proposalVoteActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "proposalVoteRegion",
         entityProps = ProposalVoteActor.props(ProposalVotes.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = ProposalVoteActor.idExtractor,
         extractShardId = ProposalVoteActor.shardResolver
       )

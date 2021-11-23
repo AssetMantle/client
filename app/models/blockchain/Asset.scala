@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{AccountActor, AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
+import actors.models.blockchain
+import actors.models.blockchain.{AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -131,10 +132,10 @@ class Assets @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val assetActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "assetRegion",
         entityProps = AssetActor.props(Assets.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = AssetActor.idExtractor,
         extractShardId = AssetActor.shardResolver
       )

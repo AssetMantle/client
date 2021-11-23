@@ -2,7 +2,6 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{ BlockActor, ClassificationActor, CreateDelegation, DelegationActor, DeleteDelegation, GetAllDelegationForDelegator, GetAllDelegationForValidator, GetDelegation, InsertMultipleDelegation, InsertOrUpdateDelegation}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 
 import java.sql.Timestamp
@@ -10,6 +9,8 @@ import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
+import actors.models
+import actors.models.blockchain.{CreateDelegation, DelegationActor, DeleteDelegation, GetAllDelegationForDelegator, GetAllDelegationForValidator, GetDelegation, InsertMultipleDelegation, InsertOrUpdateDelegation}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -108,10 +109,10 @@ class Delegations @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val delegationActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(models.blockchain.Service.actorSystem).start(
         typeName = "delegationRegion",
         entityProps = DelegationActor.props(Delegations.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
         extractEntityId = DelegationActor.idExtractor,
         extractShardId = DelegationActor.shardResolver
       )

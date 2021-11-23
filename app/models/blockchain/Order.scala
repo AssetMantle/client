@@ -2,7 +2,8 @@ package models.blockchain
 
 import akka.pattern.ask
 import akka.util.Timeout
-import actors.blockchainModels.{CheckExistsOrder, CreateOrder, DeleteOrder, GetAllOrder, GetAllPrivateOrderIDs, GetAllPublicOrderIDs, GetOrder, InsertMultipleOrder, InsertOrUpdateOrder, MaintainerActor, MetaActor, OrderActor, TryGetOrder}
+import actors.models.blockchain
+import actors.models.blockchain.{CheckExistsOrder, CreateOrder, DeleteOrder, GetAllOrder, GetAllPrivateOrderIDs, GetAllPublicOrderIDs, GetOrder, InsertMultipleOrder, InsertOrUpdateOrder, OrderActor, TryGetOrder}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 import models.Trait.Logged
@@ -148,10 +149,10 @@ class Orders @Inject()(
   object Service {
     private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
     private val orderActorRegion = {
-      ClusterSharding(actors.blockchainModels.Service.actorSystem).start(
+      ClusterSharding(blockchain.Service.actorSystem).start(
         typeName = "orderRegion",
         entityProps = OrderActor.props(Orders.this),
-        settings = ClusterShardingSettings(actors.blockchainModels.Service.actorSystem),
+        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
         extractEntityId = OrderActor.idExtractor,
         extractShardId = OrderActor.shardResolver
       )
