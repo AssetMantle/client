@@ -1,8 +1,11 @@
 package constants
 
-import scala.concurrent.duration.DurationInt
+import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration, SECONDS}
 
 object Actor {
+  val CONFIG = ConfigFactory.load("clustering/clustering.conf")
 
   val ACTOR_NOT_FOUND = "ACTOR_NOT_FOUND"
   val ACTOR_NOT_FOUND_FOR_SHUTDOWN = "ACTOR_NOT_FOUND_FOR_SHUTDOWN"
@@ -13,10 +16,9 @@ object Actor {
   val ACTOR_APP_WEB_SOCKET = "ACTOR_APP_WEB_SOCKET"
   val ACTOR_PUSH_NOTIFICATION = "ACTOR_PUSH_NOTIFICATION"
 
-  val ACTOR_ASK_TIMEOUT = 5 seconds
-
-  val NUMBER_OF_ENTITIES = 100
-  val NUMBER_OF_SHARDS = 10
+  val ACTOR_ASK_TIMEOUT = FiniteDuration(Duration(CONFIG.getString("custom-shard.timeout")).toSeconds, SECONDS)
+  val NUMBER_OF_ENTITIES = CONFIG.getString("custom-shard.entities").toInt
+  val NUMBER_OF_SHARDS = CONFIG.getString("custom-shard.shards").toInt
 
   object MessageType {
     val NEW_BLOCK = "NEW_BLOCK"
