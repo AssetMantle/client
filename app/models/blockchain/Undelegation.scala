@@ -59,6 +59,18 @@ class Undelegations @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val undelegationActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "undelegationRegion",
+      entityProps = UndelegationActor.props(Undelegations.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = UndelegationActor.idExtractor,
+      extractShardId = UndelegationActor.shardResolver
+    )
+  }
+
   case class UndelegationSerialized(delegatorAddress: String, validatorAddress: String, entries: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Undelegation = Undelegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress, entries = utilities.JSON.convertJsonStringToObject[Seq[UndelegationEntry]](entries), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -131,16 +143,6 @@ class Undelegations @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val undelegationActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "undelegationRegion",
-        entityProps = UndelegationActor.props(Undelegations.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = UndelegationActor.idExtractor,
-        extractShardId = UndelegationActor.shardResolver
-      )
-    }
 
     def createUndelegationWithActor(undelegation: Undelegation): Future[String] = (undelegationActorRegion ? CreateUndelegation(uniqueId, undelegation)).mapTo[String]
 

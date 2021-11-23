@@ -46,6 +46,18 @@ class Metas @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val metaActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "metaRegion",
+      entityProps = MetaActor.props(Metas.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = MetaActor.idExtractor,
+      extractShardId = MetaActor.shardResolver
+    )
+  }
+
   private def add(meta: Meta): Future[String] = db.run((metaTable returning metaTable.map(_.id) += meta).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -104,16 +116,6 @@ class Metas @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val metaActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "metaRegion",
-        entityProps = MetaActor.props(Metas.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = MetaActor.idExtractor,
-        extractShardId = MetaActor.shardResolver
-      )
-    }
 
     def createDataWithActor(data: Data): Future[String] = (metaActorRegion ? CreateData(uniqueId, data)).mapTo[String]
 

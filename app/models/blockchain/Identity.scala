@@ -85,6 +85,18 @@ class Identities @Inject()(
 
   private[models] val identityPropertiesTable = TableQuery[IdentityPropertiesTable]
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val identityActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "identityRegion",
+      entityProps = IdentityActor.props(Identities.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = IdentityActor.idExtractor,
+      extractShardId = IdentityActor.shardResolver
+    )
+  }
+
   private def addProvisionedAddressByID(id: String, address: String): Future[String] = db.run((identityProvisionedTable returning identityProvisionedTable.map(_.id) += IdentityProvisionedSerialized(id = id, address = address)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -227,16 +239,6 @@ class Identities @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val identityActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "identityRegion",
-        entityProps = IdentityActor.props(Identities.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = IdentityActor.idExtractor,
-        extractShardId = IdentityActor.shardResolver
-      )
-    }
 
     def createIdentityWithActor(identity: Identity): Future[String] = (identityActorRegion ? CreateIdentity(uniqueId, identity)).mapTo[String]
 

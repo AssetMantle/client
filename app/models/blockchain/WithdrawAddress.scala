@@ -19,7 +19,6 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -45,6 +44,18 @@ class WithdrawAddresses @Inject()(
   private[models] val withdrawAddressTable = TableQuery[WithdrawAddressTable]
 
   private val uniqueId: String = UUID.randomUUID().toString
+
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val withdrawAddressActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "withdrawAddressRegion",
+      entityProps = WithdrawAddressActor.props(WithdrawAddresses.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = WithdrawAddressActor.idExtractor,
+      extractShardId = WithdrawAddressActor.shardResolver
+    )
+  }
 
   private def add(withdrawAddress: WithdrawAddress): Future[String] = db.run((withdrawAddressTable returning withdrawAddressTable.map(_.withdrawAddress) += withdrawAddress).asTry).map {
     case Success(result) => result
@@ -100,16 +111,6 @@ class WithdrawAddresses @Inject()(
   }
 
   object Service {
-   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-   private val withdrawAddressActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "withdrawAddressRegion",
-        entityProps = WithdrawAddressActor.props(WithdrawAddresses.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = WithdrawAddressActor.idExtractor,
-        extractShardId = WithdrawAddressActor.shardResolver
-      )
-    }
 
     def createWithdrawAddressWithActor(withdrawAddress: WithdrawAddress): Future[String] = (withdrawAddressActorRegion ? CreateWithdrawAddress(uniqueId, withdrawAddress)).mapTo[String]
 

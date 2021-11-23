@@ -47,6 +47,18 @@ class Splits @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val splitActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "splitClusterRegion",
+      entityProps = SplitActor.props(Splits.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = SplitActor.idExtractor,
+      extractShardId = SplitActor.shardResolver
+    )
+  }
+
   private def add(split: Split): Future[String] = db.run((splitTable returning splitTable.map(_.ownerID) += split).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -119,16 +131,6 @@ class Splits @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val splitActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "splitClusterRegion",
-        entityProps = SplitActor.props(Splits.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = SplitActor.idExtractor,
-        extractShardId = SplitActor.shardResolver
-      )
-    }
 
     def createSplitWithActor(split: Split): Future[String] = (splitActorRegion ? CreateSplit(uniqueId, split)).mapTo[String]
 

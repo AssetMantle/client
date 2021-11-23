@@ -56,6 +56,18 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
+  private implicit val timeout = Timeout(5 seconds)
+
+  private val accountActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "accountRegion",
+      entityProps = AccountActor.props(Accounts.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = AccountActor.idExtractor,
+      extractShardId = AccountActor.shardResolver
+    )
+  }
+
   case class AccountSerialized(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey.fold[Option[PublicKey]](None)(x => Option(utilities.JSON.convertJsonStringToObject[PublicKey](x))), accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -154,18 +166,6 @@ class Accounts @Inject()(
   }
 
   object Service {
-
-    private implicit val timeout = Timeout(5 seconds) // needed for `?` below
-
-    private val accountActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "accountRegion",
-        entityProps = AccountActor.props(Accounts.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = AccountActor.idExtractor,
-        extractShardId = AccountActor.shardResolver
-      )
-    }
 
     def createWithAccountActor(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = (accountActorRegion ? CreateAccount(uniqueId, address, username, accountType, publicKey)).mapTo[String]
 

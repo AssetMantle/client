@@ -59,6 +59,18 @@ class Redelegations @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val redelegationActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "redelegationRegion",
+      entityProps = RedelegationActor.props(Redelegations.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = RedelegationActor.idExtractor,
+      extractShardId = RedelegationActor.shardResolver
+    )
+  }
+
   case class RedelegationSerialized(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String, entries: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Redelegation = Redelegation(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress, entries = utilities.JSON.convertJsonStringToObject[Seq[RedelegationEntry]](entries), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -131,16 +143,6 @@ class Redelegations @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val redelegationActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "redelegationRegion",
-        entityProps = RedelegationActor.props(Redelegations.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = RedelegationActor.idExtractor,
-        extractShardId = RedelegationActor.shardResolver
-      )
-    }
 
     def createRedelegationWithActor(redelegation: Redelegation): Future[String] = (redelegationActorRegion ? CreateRedelegation(uniqueId, redelegation)).mapTo[String]
 

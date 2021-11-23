@@ -52,6 +52,18 @@ class Blocks @Inject()(
 
   private[models] val blockTable = TableQuery[BlockTable]
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val blockActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "blockRegion",
+      entityProps = BlockActor.props(Blocks.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = BlockActor.idExtractor,
+      extractShardId = BlockActor.shardResolver
+    )
+  }
+
   case class BlockSerialized(height: Int, time: String, proposerAddress: String, validators: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Block = Block(height = height, time = time, proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -128,16 +140,6 @@ class Blocks @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val blockActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "blockRegion",
-        entityProps = BlockActor.props(Blocks.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = BlockActor.idExtractor,
-        extractShardId = BlockActor.shardResolver
-      )
-    }
 
     def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (blockActorRegion ? CreateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[String]
 

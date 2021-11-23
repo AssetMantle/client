@@ -56,6 +56,18 @@ class Assets @Inject()(
 
   import databaseConfig.profile.api._
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val assetActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "assetRegion",
+      entityProps = AssetActor.props(Assets.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = AssetActor.idExtractor,
+      extractShardId = AssetActor.shardResolver
+    )
+  }
+
   case class AssetSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Asset = Asset(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -130,16 +142,6 @@ class Assets @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val assetActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "assetRegion",
-        entityProps = AssetActor.props(Assets.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = AssetActor.idExtractor,
-        extractShardId = AssetActor.shardResolver
-      )
-    }
 
     def createAssetWithActor(asset: Asset): Future[String] = (assetActorRegion ? CreateAsset(uniqueId, asset)).mapTo[String]
 

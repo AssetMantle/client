@@ -47,6 +47,18 @@ class ProposalVotes @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val proposalVoteActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "proposalVoteRegion",
+      entityProps = ProposalVoteActor.props(ProposalVotes.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ProposalVoteActor.idExtractor,
+      extractShardId = ProposalVoteActor.shardResolver
+    )
+  }
+
   private def add(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -94,16 +106,6 @@ class ProposalVotes @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val proposalVoteActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "proposalVoteRegion",
-        entityProps = ProposalVoteActor.props(ProposalVotes.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ProposalVoteActor.idExtractor,
-        extractShardId = ProposalVoteActor.shardResolver
-      )
-    }
 
     def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (proposalVoteActorRegion ? TryGetProposalVote(uniqueId, proposalID)).mapTo[ProposalVote]
 

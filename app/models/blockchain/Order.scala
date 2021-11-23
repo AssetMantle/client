@@ -73,6 +73,18 @@ class Orders @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val orderActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "orderRegion",
+      entityProps = OrderActor.props(Orders.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = OrderActor.idExtractor,
+      extractShardId = OrderActor.shardResolver
+    )
+  }
+
   case class OrderSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Order = Order(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -147,16 +159,6 @@ class Orders @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val orderActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "orderRegion",
-        entityProps = OrderActor.props(Orders.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = OrderActor.idExtractor,
-        extractShardId = OrderActor.shardResolver
-      )
-    }
 
     def createOrderWithActor(order: Order): Future[String] = (orderActorRegion ? CreateOrder(uniqueId, order)).mapTo[String]
 

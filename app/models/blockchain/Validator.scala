@@ -78,6 +78,18 @@ class Validators @Inject()(
 
   private[models] val validatorTable = TableQuery[ValidatorTable]
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val validatorActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "validatorRegion",
+      entityProps = ValidatorActor.props(Validators.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ValidatorActor.idExtractor,
+      extractShardId = ValidatorActor.shardResolver
+    )
+  }
+
   case class ValidatorSerialized(operatorAddress: String, hexAddress: String, consensusPublicKey: String, jailed: Boolean, status: String, tokens: String, delegatorShares: BigDecimal, description: String, unbondingHeight: Int, unbondingTime: String, commission: String, minimumSelfDelegation: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Validator = Validator(operatorAddress = operatorAddress, hexAddress = hexAddress, consensusPublicKey = utilities.JSON.convertJsonStringToObject[PublicKey](consensusPublicKey), status = status, jailed = jailed, tokens = new MicroNumber(tokens), delegatorShares = delegatorShares, description = utilities.JSON.convertJsonStringToObject[Description](description), unbondingHeight = unbondingHeight, unbondingTime = unbondingTime, commission = utilities.JSON.convertJsonStringToObject[Commission](commission), minimumSelfDelegation = new MicroNumber(minimumSelfDelegation), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -213,18 +225,6 @@ class Validators @Inject()(
   }
 
   object Service {
-
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val validatorActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "validatorRegion",
-        entityProps = ValidatorActor.props(Validators.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ValidatorActor.idExtractor,
-        extractShardId = ValidatorActor.shardResolver
-      )
-    }
-
 
     def createValidatorWithActor(validator: Validator): Future[String] = (validatorActorRegion ? CreateValidatorWithActor(uniqueId,validator)).mapTo[String]
 

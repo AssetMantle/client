@@ -46,6 +46,18 @@ class Delegations @Inject()(
 
   private[models] val delegationTable = TableQuery[DelegationTable]
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val delegationActorRegion = {
+    ClusterSharding(models.blockchain.Service.actorSystem).start(
+      typeName = "delegationRegion",
+      entityProps = DelegationActor.props(Delegations.this),
+      settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
+      extractEntityId = DelegationActor.idExtractor,
+      extractShardId = DelegationActor.shardResolver
+    )
+  }
+
   private val responseErrorDelegationNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.delegationNotFound")
 
   private def add(delegation: Delegation): Future[String] = db.run((delegationTable returning delegationTable.map(_.delegatorAddress) += delegation).asTry).map {
@@ -107,16 +119,6 @@ class Delegations @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val delegationActorRegion = {
-      ClusterSharding(models.blockchain.Service.actorSystem).start(
-        typeName = "delegationRegion",
-        entityProps = DelegationActor.props(Delegations.this),
-        settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
-        extractEntityId = DelegationActor.idExtractor,
-        extractShardId = DelegationActor.shardResolver
-      )
-    }
 
     def createDelegationWithActor(delegation: Delegation): Future[String] = (delegationActorRegion ? CreateDelegation(uniqueId, delegation)).mapTo[String]
 

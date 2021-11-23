@@ -53,6 +53,18 @@ class ProposalDeposits @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val proposalDepositActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "proposalDepositRegion",
+      entityProps = ProposalDepositActor.props(ProposalDeposits.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ProposalDepositActor.idExtractor,
+      extractShardId = ProposalDepositActor.shardResolver
+    )
+  }
+
   case class ProposalDepositSerialized(proposalID: Int, depositor: String, amount: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: ProposalDeposit = ProposalDeposit(proposalID = proposalID, depositor = depositor, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -110,16 +122,6 @@ class ProposalDeposits @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val proposalDepositActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "proposalDepositRegion",
-        entityProps = ProposalDepositActor.props(ProposalDeposits.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ProposalDepositActor.idExtractor,
-        extractShardId = ProposalDepositActor.shardResolver
-      )
-    }
 
     def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (proposalDepositActorRegion ? TryGetProposalDeposit(uniqueId, proposalID)).mapTo[ProposalDeposit]
 

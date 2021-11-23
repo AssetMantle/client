@@ -64,6 +64,18 @@ class Parameters @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val parameterActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "parameterRegion",
+      entityProps = ParameterActor.props(Parameters.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ParameterActor.idExtractor,
+      extractShardId = ParameterActor.shardResolver
+    )
+  }
+
   case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -115,16 +127,6 @@ class Parameters @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val parameterActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "parameterRegion",
-        entityProps = ParameterActor.props(Parameters.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ParameterActor.idExtractor,
-        extractShardId = ParameterActor.shardResolver
-      )
-    }
 
     def createParameterWithActor(parameter: Parameter): Future[String] = (parameterActorRegion ? CreateParameter(uniqueId, parameter)).mapTo[String]
 

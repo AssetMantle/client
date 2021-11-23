@@ -49,6 +49,18 @@ class Maintainers @Inject()(
 
   import databaseConfig.profile.api._
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val maintainerActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "maintainerRegion",
+      entityProps = MaintainerActor.props(Maintainers.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = MaintainerActor.idExtractor,
+      extractShardId = MaintainerActor.shardResolver
+    )
+  }
+
   case class MaintainerSerialized(id: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Maintainer = Maintainer(id = id, maintainedTraits = utilities.JSON.convertJsonStringToObject[Mutables](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -125,16 +137,6 @@ class Maintainers @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val maintainerActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "maintainerRegion",
-        entityProps = MaintainerActor.props(Maintainers.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = MaintainerActor.idExtractor,
-        extractShardId = MaintainerActor.shardResolver
-      )
-    }
 
     def createMaintainerWithActor(maintainer: Maintainer): Future[String] = (maintainerActorRegion ? CreateMaintainer(uniqueId, maintainer)).mapTo[String]
 

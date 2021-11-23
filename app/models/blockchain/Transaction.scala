@@ -75,6 +75,18 @@ class Transactions @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val transactionActorRegion = {
+    ClusterSharding(models.blockchain.Service.actorSystem).start(
+      typeName = "transactionRegion",
+      entityProps = TransactionActor.props(Transactions.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = TransactionActor.idExtractor,
+      extractShardId = TransactionActor.shardResolver
+    )
+  }
+
   case class TransactionSerialized(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: String, fee: String, memo: String, timestamp: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), memo = memo, timestamp = timestamp, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -186,16 +198,6 @@ class Transactions @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val transactionActorRegion = {
-      ClusterSharding(models.blockchain.Service.actorSystem).start(
-        typeName = "transactionRegion",
-        entityProps = TransactionActor.props(Transactions.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = TransactionActor.idExtractor,
-        extractShardId = TransactionActor.shardResolver
-      )
-    }
 
     def createTransactionWithActor(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = (transactionActorRegion ? CreateTransaction(uniqueId, hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp)).mapTo[Int]
 

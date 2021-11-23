@@ -45,6 +45,17 @@ class Classifications @Inject()(
 
   import databaseConfig.profile.api._
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val classificationActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "classificationRegion",
+      entityProps = ClassificationActor.props(Classifications.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ClassificationActor.idExtractor,
+      extractShardId = ClassificationActor.shardResolver
+    )
+  }
   case class ClassificationSerialized(id: String, immutableTraits: String, mutableTraits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Classification = Classification(id = id, immutableTraits = utilities.JSON.convertJsonStringToObject[Immutables](immutableTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Mutables](mutableTraits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -119,16 +130,6 @@ class Classifications @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val classificationActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "classificationRegion",
-        entityProps = ClassificationActor.props(Classifications.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ClassificationActor.idExtractor,
-        extractShardId = ClassificationActor.shardResolver
-      )
-    }
 
     def createClassificationWithActor(classification: Classification): Future[String] = (classificationActorRegion ? CreateClassification(uniqueId, classification)).mapTo[String]
 

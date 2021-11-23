@@ -56,6 +56,18 @@ class Tokens @Inject()(
 
   private[models] val tokenTable = TableQuery[TokenTable]
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val tokenActorRegion = {
+    ClusterSharding(models.blockchain.Service.actorSystem).start(
+      typeName = "tokenRegion",
+      entityProps = TokenActor.props(Tokens.this),
+      settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
+      extractEntityId = TokenActor.idExtractor,
+      extractShardId = TokenActor.shardResolver
+    )
+  }
+
   case class TokenSerialized(denom: String, totalSupply: String, bondedAmount: String, notBondedAmount: String, communityPool: String, inflation: BigDecimal, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Token = Token(denom = denom, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -161,16 +173,6 @@ class Tokens @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val tokenActorRegion = {
-      ClusterSharding(models.blockchain.Service.actorSystem).start(
-        typeName = "tokenRegion",
-        entityProps = TokenActor.props(Tokens.this),
-        settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
-        extractEntityId = TokenActor.idExtractor,
-        extractShardId = TokenActor.shardResolver
-      )
-    }
 
     def createTokenWithActor(token: Token): Future[String] = (tokenActorRegion ? CreateToken(uniqueId, token)).mapTo[String]
 

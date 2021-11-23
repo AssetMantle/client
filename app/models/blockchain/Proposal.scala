@@ -96,6 +96,18 @@ class Proposals @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val proposalActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "proposalRegion",
+      entityProps = ProposalActor.props(Proposals.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = ProposalActor.idExtractor,
+      extractShardId = ProposalActor.shardResolver
+    )
+  }
+
   case class ProposalSerialized(id: Int, content: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = submitTime, depositEndTime = depositEndTime, totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = votingStartTime, votingEndTime = votingEndTime, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -172,16 +184,6 @@ class Proposals @Inject()(
   }
 
   object Service {
-    private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-    private val proposalActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "proposalRegion",
-        entityProps = ProposalActor.props(Proposals.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = ProposalActor.idExtractor,
-        extractShardId = ProposalActor.shardResolver
-      )
-    }
 
     def tryGetProposalWithActor(id: Int): Future[Proposal] = (proposalActorRegion ? TryGetProposal(uniqueId, id)).mapTo[Proposal]
 

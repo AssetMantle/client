@@ -54,6 +54,18 @@ class Balances @Inject()(
 
   private[models] val balanceTable = TableQuery[BalanceTable]
 
+  private implicit val timeout = akkaTimeout(constants.Actor.ACTOR_ASK_TIMEOUT)
+
+  private val balanceActorRegion = {
+    ClusterSharding(blockchain.Service.actorSystem).start(
+      typeName = "balanceRegion",
+      entityProps = BalanceActor.props(Balances.this),
+      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
+      extractEntityId = BalanceActor.idExtractor,
+      extractShardId = BalanceActor.shardResolver
+    )
+  }
+
   case class BalanceSerialized(address: String, coins: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -109,17 +121,6 @@ class Balances @Inject()(
   }
 
   object Service {
-   private implicit val timeout = akkaTimeout(constants.Actor.ACTOR_ASK_TIMEOUT) // needed for `?` below
-
-    private val balanceActorRegion = {
-      ClusterSharding(blockchain.Service.actorSystem).start(
-        typeName = "balanceRegion",
-        entityProps = BalanceActor.props(Balances.this),
-        settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-        extractEntityId = BalanceActor.idExtractor,
-        extractShardId = BalanceActor.shardResolver
-      )
-    }
 
     def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (balanceActorRegion ? Create(uniqueId, address, coins)).mapTo[String]
 
