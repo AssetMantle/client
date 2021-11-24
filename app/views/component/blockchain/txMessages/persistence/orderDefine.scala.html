@@ -6,13 +6,7 @@
 
 @defining(msg.asInstanceOf[OrderDefine]) { orderDefine =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderDefine.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderDefine.from}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(orderDefine.fromID, routes.IndexController.search(orderDefine.fromID)))
-    @Messages(constants.View.IMMUTABLE_META_TRAITS):
-    @views.html.component.blockchain.metaProperties(orderDefine.immutableMetaTraits.metaPropertyList)
-    @Messages(constants.View.MUTABLE_META_TRAITS):
-    @views.html.component.blockchain.metaProperties(orderDefine.mutableMetaTraits.metaPropertyList)
-    @Messages(constants.View.IMMUTABLE_TRAITS):
-    @views.html.component.blockchain.properties(orderDefine.immutableTraits.propertyList)
-    @Messages(constants.View.MUTABLE_TRAITS):
-    @views.html.component.blockchain.properties(orderDefine.mutableTraits.propertyList)
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(orderDefine.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderDefine.fromID}'))")))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = orderDefine.mutableMetaTraits.metaPropertyList, immutableMetaProperties = orderDefine.immutableMetaTraits.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = orderDefine.mutableTraits.propertyList, immutableProperties = orderDefine.immutableTraits.propertyList)
 }

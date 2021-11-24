@@ -4,10 +4,7 @@
 @(classification: Classification)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.CLASSIFICATION) {
+    @classification.id
 } {
-    @commonTextInfo(constants.View.CLASSIFICATION_ID, classification.id)
-    @Messages(constants.View.MUTABLE_TRAITS):
-    @views.html.component.blockchain.mutables(classification.mutableTraits)
-    @Messages(constants.View.IMMUTABLE_TRAITS):
-    @views.html.component.blockchain.immutables(classification.immutableTraits)
+    @views.html.component.blockchain.properties(mutableProperties = classification.mutableTraits.properties.propertyList, immutableProperties = classification.immutableTraits.properties.propertyList)
 }

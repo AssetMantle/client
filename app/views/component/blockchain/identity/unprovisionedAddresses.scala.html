@@ -5,7 +5,6 @@
 @commonModalInfo(constants.View.UNPROVISIONED_ADDRESS_LIST) {
     @commonTextInfo(constants.View.IDENTITY_ID, identityID)
     @unprovisionedAddresses.map { address =>
-        @address
-        <br>
+        @address<br>
     }
 }
