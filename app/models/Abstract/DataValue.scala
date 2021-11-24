@@ -13,6 +13,6 @@ abstract class DataValue {
 
   def asID: String
 
-  def toString: String
+  def toFormattedString: String
 
 }

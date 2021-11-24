@@ -28,7 +28,7 @@ object DataValue {
 
     def asID: String = ""
 
-    override def toString: String = value
+    def toFormattedString: String = value
   }
 
   implicit val stringDataReads: Reads[StringDataValue] = Json.reads[StringDataValue]
@@ -55,7 +55,7 @@ object DataValue {
 
     def asID: String = ""
 
-    override def toString: String = utilities.NumericOperation.formatNumber(value)
+    def toFormattedString: String = utilities.NumericOperation.formatNumber(value)
   }
 
   implicit val decDataReads: Reads[DecDataValue] = Json.reads[DecDataValue]
@@ -75,7 +75,7 @@ object DataValue {
 
     def asID: String = ""
 
-    override def toString: String = value.toString
+    def toFormattedString: String = utilities.NumericOperation.formatNumber(value)
   }
 
   implicit val heightDataReads: Reads[HeightDataValue] = Json.reads[HeightDataValue]
@@ -95,7 +95,7 @@ object DataValue {
 
     def asID: String = value
 
-    override def toString: String = value
+    def toFormattedString: String = value
   }
 
   implicit val idDataReads: Reads[IDDataValue] = Json.reads[IDDataValue]

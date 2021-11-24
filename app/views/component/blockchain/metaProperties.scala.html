@@ -16,7 +16,7 @@
             <tr>
                 <td><span class="hashCode" title="@mutableMetaProperty.id">@mutableMetaProperty.id</span></td>
                 <td>@Messages(constants.View.DataTypesMap.getOrElse(mutableMetaProperty.metaFact.data.dataType, mutableMetaProperty.metaFact.data.dataType))</td>
-                <td><span class="stringEllipse" title="@mutableMetaProperty.metaFact.data.value.toString">@mutableMetaProperty.metaFact.data.value.toString</span></td>
+                <td><span class="stringEllipse" title="@mutableMetaProperty.metaFact.data.value.toFormattedString">@mutableMetaProperty.metaFact.data.value.toString</span></td>
                 <td><span cmuk-icon="check" class="check"></span></td>
             </tr>
         }
@@ -24,7 +24,7 @@
             <tr>
                 <td><span class="hashCode" title="@immutableMetaProperty.id">@immutableMetaProperty.id</span></td>
                 <td>@Messages(constants.View.DataTypesMap.getOrElse(immutableMetaProperty.metaFact.data.dataType, immutableMetaProperty.metaFact.data.dataType))</td>
-                <td><span class="stringEllipse" title="@immutableMetaProperty.metaFact.data.value.toString">@immutableMetaProperty.metaFact.data.value.toString</span></td>
+                <td><span class="stringEllipse" title="@immutableMetaProperty.metaFact.data.value.toFormattedString">@immutableMetaProperty.metaFact.data.value.toString</span></td>
                 <td><span cmuk-icon="close" class="close"></span></td>
             </tr>
         }
