@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CreateSplit, DeleteSplit, GetAllSplit, GetByOwnable, GetByOwner, GetByOwnerIDs, GetByOwnerOrOwnable, GetSplit, InsertMultipleSplit, InsertOrUpdateSplit, SplitActor, TryGetSplit}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Splits.{CreateSplit, DeleteSplit, GetAllSplit, GetByOwnable, GetByOwner, GetByOwnerIDs, GetByOwnerOrOwnable, GetSplit, InsertMultipleSplit, InsertOrUpdateSplit, SplitActor, TryGetSplit}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.TransactionMessages.{SplitSend, SplitUnwrap, SplitWrap}
 import models.master
@@ -31,7 +33,7 @@ class Splits @Inject()(
                         configuration: Configuration,
                         blockchainBalances: Balances,
                         masterSplits: master.Splits
-                      )(implicit executionContext: ExecutionContext) {
+                      )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -49,15 +51,38 @@ class Splits @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val splitActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "splitClusterRegion",
-      entityProps = SplitActor.props(Splits.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = SplitActor.idExtractor,
-      extractShardId = SplitActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwner(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnerIDs(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnable(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByOwnerOrOwnable(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllSplit(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateSplit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteSplit(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwner(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnerIDs(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnable(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByOwnerOrOwnable(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllSplit(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateSplit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteSplit(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "splitRegion"
+
+  override def props: Props = Splits.props(Splits.this)
 
   private def add(split: Split): Future[String] = db.run((splitTable returning splitTable.map(_.ownerID) += split).asTry).map {
     case Success(result) => result
@@ -132,47 +157,47 @@ class Splits @Inject()(
 
   object Service {
 
-    def createSplitWithActor(split: Split): Future[String] = (splitActorRegion ? CreateSplit(uniqueId, split)).mapTo[String]
+    def createSplitWithActor(split: Split): Future[String] = (actorRegion ? CreateSplit(uniqueId, split)).mapTo[String]
 
     def create(split: Split): Future[String] = add(split)
 
-    def getSplitByOwnerWithActor(ownerID: String): Future[Seq[Split]] = (splitActorRegion ? GetByOwner(uniqueId, ownerID)).mapTo[Seq[Split]]
+    def getSplitByOwnerWithActor(ownerID: String): Future[Seq[Split]] = (actorRegion ? GetByOwner(uniqueId, ownerID)).mapTo[Seq[Split]]
 
     def getByOwner(ownerID: String): Future[Seq[Split]] = getByOwnerID(ownerID)
 
-    def getSplitByOwnerIDsWithActo(ownerIDs: Seq[String]): Future[Seq[Split]] = (splitActorRegion ? GetByOwnerIDs(uniqueId, ownerIDs)).mapTo[Seq[Split]]
+    def getSplitByOwnerIDsWithActo(ownerIDs: Seq[String]): Future[Seq[Split]] = (actorRegion ? GetByOwnerIDs(uniqueId, ownerIDs)).mapTo[Seq[Split]]
 
     def getByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[Split]] = getAllByOwnerIDs(ownerIDs)
 
-    def getSplitByOwnableWithActo(ownableID: String): Future[Seq[Split]] = (splitActorRegion ? GetByOwnable(uniqueId, ownableID)).mapTo[Seq[Split]]
+    def getSplitByOwnableWithActo(ownableID: String): Future[Seq[Split]] = (actorRegion ? GetByOwnable(uniqueId, ownableID)).mapTo[Seq[Split]]
 
     def getByOwnable(ownableID: String): Future[Seq[Split]] = getByOwnableID(ownableID)
 
-    def getSplitByOwnerOrOwnableWithActo(id: String): Future[Seq[Split]] = (splitActorRegion ? GetByOwnerOrOwnable(uniqueId, id)).mapTo[Seq[Split]]
+    def getSplitByOwnerOrOwnableWithActo(id: String): Future[Seq[Split]] = (actorRegion ? GetByOwnerOrOwnable(uniqueId, id)).mapTo[Seq[Split]]
 
     def getByOwnerOrOwnable(id: String): Future[Seq[Split]] = getByOwnerOrOwnableID(id)
 
-    def getSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (splitActorRegion ? GetSplit(uniqueId, ownerID, ownableID)).mapTo[Option[Split]]
+    def getSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (actorRegion ? GetSplit(uniqueId, ownerID, ownableID)).mapTo[Option[Split]]
 
     def get(ownerID: String, ownableID: String): Future[Option[Split]] = getByOwnerAndOwnableID(ownerID = ownerID, ownableID = ownableID)
 
-    def tryGetSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (splitActorRegion ? TryGetSplit(uniqueId, ownerID, ownableID)).mapTo[Option[Split]]
+    def tryGetSplitWithActor(ownerID: String, ownableID: String): Future[Option[Split]] = (actorRegion ? TryGetSplit(uniqueId, ownerID, ownableID)).mapTo[Option[Split]]
 
     def tryGet(ownerID: String, ownableID: String): Future[Split] = tryGetByOwnerAndOwnableID(ownerID = ownerID, ownableID = ownableID)
 
-    def getAllSplitWithActor: Future[Seq[Split]] = (splitActorRegion ? GetAllSplit(uniqueId)).mapTo[Seq[Split]]
+    def getAllSplitWithActor: Future[Seq[Split]] = (actorRegion ? GetAllSplit(uniqueId)).mapTo[Seq[Split]]
 
     def getAll: Future[Seq[Split]] = getAllSplits
 
-    def insertMultipleSplitWithActor(splits: Seq[Split]): Future[Seq[String]] = (splitActorRegion ? InsertMultipleSplit(uniqueId, splits)).mapTo[Seq[String]]
+    def insertMultipleSplitWithActor(splits: Seq[Split]): Future[Seq[String]] = (actorRegion ? InsertMultipleSplit(uniqueId, splits)).mapTo[Seq[String]]
 
     def insertMultiple(splits: Seq[Split]): Future[Seq[String]] = addMultiple(splits)
 
-    def insertOrUpdateSplitWithActor(split: Split): Future[Int] = (splitActorRegion ? InsertOrUpdateSplit(uniqueId, split)).mapTo[Int]
+    def insertOrUpdateSplitWithActor(split: Split): Future[Int] = (actorRegion ? InsertOrUpdateSplit(uniqueId, split)).mapTo[Int]
 
     def insertOrUpdate(split: Split): Future[Int] = upsert(split)
 
-    def deleteSplitWithActor(ownerID: String, ownableID: String): Future[Int] = (splitActorRegion ? DeleteSplit(uniqueId, ownerID, ownableID)).mapTo[Int]
+    def deleteSplitWithActor(ownerID: String, ownableID: String): Future[Int] = (actorRegion ? DeleteSplit(uniqueId, ownerID, ownableID)).mapTo[Int]
 
     def delete(ownerID: String, ownableID: String): Future[Int] = deleteByIDs(ownerID = ownerID, ownableID = ownableID)
 
@@ -355,4 +380,63 @@ class Splits @Inject()(
     }
   }
 
+}
+
+object Splits {
+  def props(blockchainSplits: models.blockchain.Splits) (implicit executionContext: ExecutionContext) = Props(new SplitActor(blockchainSplits))
+
+  @Singleton
+  class SplitActor @Inject()(
+                              blockchainSplits: models.blockchain.Splits
+                            ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateSplit(_, split) => {
+        blockchainSplits.Service.create(split) pipeTo sender()
+      }
+      case InsertMultipleSplit(_, splits) => {
+        blockchainSplits.Service.insertMultiple(splits) pipeTo sender()
+      }
+      case InsertOrUpdateSplit(_, split) => {
+        blockchainSplits.Service.insertOrUpdate(split) pipeTo sender()
+      }
+      case GetByOwner(_, ownerID) => {
+        blockchainSplits.Service.getByOwner(ownerID) pipeTo sender()
+      }
+      case GetByOwnerIDs(_, ownerIDs) => {
+        blockchainSplits.Service.getByOwnerIDs(ownerIDs) pipeTo sender()
+      }
+      case GetByOwnable(_, ownableID) => {
+        blockchainSplits.Service.getByOwnable(ownableID) pipeTo sender()
+      }
+      case GetByOwnerOrOwnable(_, id) => {
+        blockchainSplits.Service.getByOwnerOrOwnable(id) pipeTo sender()
+      }
+      case GetAllSplit(_) => {
+        blockchainSplits.Service.getAll pipeTo sender()
+      }
+      case DeleteSplit(_, ownerID, ownableID) => {
+        blockchainSplits.Service.delete(ownerID, ownableID) pipeTo sender()
+      }
+      case TryGetSplit(_, ownerID, ownableID) => {
+        blockchainSplits.Service.tryGet(ownerID, ownableID) pipeTo sender()
+      }
+      case GetSplit(_, ownerID, ownableID) => {
+        blockchainSplits.Service.get(ownerID, ownableID) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateSplit(uid: String, split: Split)
+  case class GetByOwner(uid: String, ownerID: String)
+  case class GetByOwnerIDs(uid: String, ownerIDs: Seq[String])
+  case class GetByOwnable(uid: String, ownableID: String)
+  case class GetByOwnerOrOwnable(uid: String, id: String)
+  case class GetAllSplit(uid: String)
+  case class GetSplit(uid: String, ownerID: String, ownableID: String)
+  case class TryGetSplit(uid: String, ownerID: String, ownableID: String)
+  case class InsertMultipleSplit(uid: String, splits: Seq[Split])
+  case class InsertOrUpdateSplit(uid: String, split: Split)
+  case class DeleteSplit(uid: String, ownerID: String, ownableID: String)
 }

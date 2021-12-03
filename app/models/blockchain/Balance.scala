@@ -1,12 +1,11 @@
 package models.blockchain
 
-import akka.actor.{ActorRef, Props}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Balances.{Create, Get, GetList, InsertOrUpdate, TryGet}
+import akka.actor.{Actor, ActorLogging, Props}
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Serializable.Coin
 import models.common.TransactionMessages.{Acknowledgement, MultiSend, RecvPacket, SendCoin, Timeout, TimeoutOnClose, Transfer}
-import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -18,15 +17,15 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.{Timeout => akkaTimeout}
-import actors.models.blockchain
-import actors.models.blockchain.{BalanceActor, Create, Get, GetList, InsertOrUpdate, TryGet}
+import akka.cluster.sharding.ShardRegion.{ExtractEntityId, ExtractShardId}
+import models.Abstract.ShardedActorRegion
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 
 
 
@@ -38,7 +37,7 @@ class Balances @Inject()(
                           getBalance: GetBalance,
                           configuration: Configuration,
                           utilitiesOperations: utilities.Operations,
-                        )(implicit executionContext: ExecutionContext) {
+                        )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -56,15 +55,25 @@ class Balances @Inject()(
 
   private implicit val timeout = akkaTimeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val balanceActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "balanceRegion",
-      entityProps = BalanceActor.props(Balances.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = BalanceActor.idExtractor,
-      extractShardId = BalanceActor.shardResolver
-    )
+  override def idExtractor: ExtractEntityId = {
+    case attempt@Get(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGet(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@Create(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdate(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetList(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ExtractShardId = {
+    case Get(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGet(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case Create(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdate(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetList(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "balanceRegion"
+
+  override def props: Props = Balances.props(Balances.this)
 
   case class BalanceSerialized(address: String, coins: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -122,23 +131,23 @@ class Balances @Inject()(
 
   object Service {
 
-    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (balanceActorRegion ? Create(uniqueId, address, coins)).mapTo[String]
+    def createWithActor(address: String, coins: Seq[Coin]): Future[String] = (actorRegion ? Create(uniqueId, address, coins)).mapTo[String]
 
     def create(address: String, coins: Seq[Coin]): Future[String] = add(Balance(address = address, coins = coins))
 
-    def tryGetWithActor(address: String): Future[Balance] = (balanceActorRegion ? TryGet(uniqueId, address)).mapTo[Balance]
+    def tryGetWithActor(address: String): Future[Balance] = (actorRegion ? TryGet(uniqueId, address)).mapTo[Balance]
 
     def tryGet(address: String): Future[Balance] = tryGetByAddress(address).map(_.deserialize)
 
-    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (balanceActorRegion ? InsertOrUpdate(uniqueId, balance)).mapTo[Int]
+    def insertOrUpdateWithActor(balance: Balance): Future[Int] = (actorRegion ? InsertOrUpdate(uniqueId, balance)).mapTo[Int]
 
     def insertOrUpdate(balance: Balance): Future[Int] = upsert(balance)
 
-    def getWithActor(address: String): Future[Option[Balance]] = (balanceActorRegion ? Get(uniqueId, address)).mapTo[Option[Balance]]
+    def getWithActor(address: String): Future[Option[Balance]] = (actorRegion ? Get(uniqueId, address)).mapTo[Option[Balance]]
 
     def get(address: String): Future[Option[Balance]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (balanceActorRegion ? GetList(uniqueId, addresses)).mapTo[Seq[Balance]]
+    def getListWithActor(addresses: Seq[String]): Future[Seq[Balance]] = (actorRegion ? GetList(uniqueId, addresses)).mapTo[Seq[Balance]]
 
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
@@ -290,5 +299,40 @@ class Balances @Inject()(
       }
     }
   }
-
 }
+
+object Balances {
+  def props(blockchainBalances: models.blockchain.Balances) (implicit executionContext: ExecutionContext) = Props(new BalanceActor(blockchainBalances))
+
+  @Singleton
+  class BalanceActor @Inject()(
+                                blockchainBalances: models.blockchain.Balances
+                              ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+
+    override def receive: Receive = {
+      case Get(_, address) => {
+        blockchainBalances.Service.get(address) pipeTo sender()
+      }
+      case Create(_, address, coins) => {
+        blockchainBalances.Service.create(address, coins) pipeTo sender()
+      }
+      case TryGet(_, address) => {
+        blockchainBalances.Service.tryGet(address) pipeTo sender()
+      }
+      case InsertOrUpdate(_, balance) => {
+        blockchainBalances.Service.insertOrUpdate(balance) pipeTo sender()
+      }
+      case GetList(_, addresses) => {
+        blockchainBalances.Service.getList(addresses) pipeTo sender()
+      }
+    }
+  }
+  case class Get(id: String, address: String)
+  case class TryGet(id: String, address: String)
+  case class Create(id: String, address: String, coins: Seq[Coin])
+  case class InsertOrUpdate(id: String, balance: Balance)
+  case class GetList(id: String, addresses: Seq[String])
+}
+
+
+

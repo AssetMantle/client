@@ -1,13 +1,14 @@
 package models.blockchain
 
 import java.sql.Timestamp
-import akka.actor.ActorSystem
-import akka.pattern.ask
+import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, TryGetUndelegation, UndelegationActor}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Undelegations.{CreateUndelegation, DeleteUndelegation, GetAllUndelegation, GetAllUndelegationByDelegator, GetAllUndelegationByValidator, InsertMultipleUndelegation, InsertOrUpdateUndelegation, TryGetUndelegation, UndelegationActor}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
@@ -18,14 +19,12 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegation}
-import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -43,7 +42,7 @@ class Undelegations @Inject()(
                                blockchainWithdrawAddresses: WithdrawAddresses,
                                blockchainBalances: Balances,
                                utilitiesOperations: utilities.Operations,
-                             )(implicit executionContext: ExecutionContext) {
+                             )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -61,15 +60,31 @@ class Undelegations @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val undelegationActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "undelegationRegion",
-      entityProps = UndelegationActor.props(Undelegations.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = UndelegationActor.idExtractor,
-      extractShardId = UndelegationActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateUndelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegationByDelegator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegationByValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUndelegation(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteUndelegation(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetUndelegation(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateUndelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegationByDelegator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegationByValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUndelegation(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteUndelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetUndelegation(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "undelegationRegion"
+
+  override def props: Props = Undelegations.props(Undelegations.this)
 
   case class UndelegationSerialized(delegatorAddress: String, validatorAddress: String, entries: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Undelegation = Undelegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress, entries = utilities.JSON.convertJsonStringToObject[Seq[UndelegationEntry]](entries), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -144,35 +159,35 @@ class Undelegations @Inject()(
 
   object Service {
 
-    def createUndelegationWithActor(undelegation: Undelegation): Future[String] = (undelegationActorRegion ? CreateUndelegation(uniqueId, undelegation)).mapTo[String]
+    def createUndelegationWithActor(undelegation: Undelegation): Future[String] = (actorRegion ? CreateUndelegation(uniqueId, undelegation)).mapTo[String]
 
     def create(undelegation: Undelegation): Future[String] = add(undelegation)
 
-    def insertMultipleUndelegationWithActor(undelegations: Seq[Undelegation]): Future[Seq[String]] = (undelegationActorRegion ? InsertMultipleUndelegation(uniqueId, undelegations)).mapTo[Seq[String]]
+    def insertMultipleUndelegationWithActor(undelegations: Seq[Undelegation]): Future[Seq[String]] = (actorRegion ? InsertMultipleUndelegation(uniqueId, undelegations)).mapTo[Seq[String]]
 
     def insertMultiple(undelegations: Seq[Undelegation]): Future[Seq[String]] = addMultiple(undelegations)
 
-    def insertOrUpdateUndelegationWithActor(undelegation: Undelegation): Future[Int] = (undelegationActorRegion ? InsertOrUpdateUndelegation(uniqueId, undelegation)).mapTo[Int]
+    def insertOrUpdateUndelegationWithActor(undelegation: Undelegation): Future[Int] = (actorRegion ? InsertOrUpdateUndelegation(uniqueId, undelegation)).mapTo[Int]
 
     def insertOrUpdate(undelegation: Undelegation): Future[Int] = upsert(undelegation)
 
-    def getAllUndelegationByDelegatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegationByDelegator(uniqueId, address)).mapTo[Seq[Undelegation]]
+    def getAllUndelegationByDelegatorWithActor(address: String): Future[Seq[Undelegation]] = (actorRegion ? GetAllUndelegationByDelegator(uniqueId, address)).mapTo[Seq[Undelegation]]
 
     def getAllByDelegator(address: String): Future[Seq[Undelegation]] = findAllByDelegator(address).map(_.map(_.deserialize))
 
-    def getAllUndelegationByValidatorWithActor(address: String): Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegationByValidator(uniqueId, address)).mapTo[Seq[Undelegation]]
+    def getAllUndelegationByValidatorWithActor(address: String): Future[Seq[Undelegation]] = (actorRegion ? GetAllUndelegationByValidator(uniqueId, address)).mapTo[Seq[Undelegation]]
 
     def getAllByValidator(address: String): Future[Seq[Undelegation]] = findAllByValidator(address).map(_.map(_.deserialize))
 
-    def getAllUndelegationWithActor: Future[Seq[Undelegation]] = (undelegationActorRegion ? GetAllUndelegation(uniqueId)).mapTo[Seq[Undelegation]]
+    def getAllUndelegationWithActor: Future[Seq[Undelegation]] = (actorRegion ? GetAllUndelegation(uniqueId)).mapTo[Seq[Undelegation]]
 
     def getAll: Future[Seq[Undelegation]] = findAll.map(_.map(_.deserialize))
 
-    def deleteUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActorRegion ? DeleteUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
+    def deleteUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (actorRegion ? DeleteUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
 
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress, validatorAddress)
 
-    def tryGetUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (undelegationActorRegion ? TryGetUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
+    def tryGetUndelegationWithActor(delegatorAddress: String, validatorAddress: String): Future[Int] = (actorRegion ? TryGetUndelegation(uniqueId, delegatorAddress, validatorAddress)).mapTo[Int]
 
     def tryGet(delegatorAddress: String, validatorAddress: String): Future[Undelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).map(_.deserialize)
 
@@ -274,4 +289,51 @@ class Undelegations @Inject()(
 
   }
 
+}
+
+object Undelegations {
+  def props(blockchainUndelegations: models.blockchain.Undelegations) (implicit executionContext: ExecutionContext) = Props(new UndelegationActor(blockchainUndelegations))
+
+  @Singleton
+  class UndelegationActor @Inject()(
+                                     blockchainUndelegations: models.blockchain.Undelegations
+                                   ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateUndelegation(_, undelegation) => {
+        blockchainUndelegations.Service.create(undelegation) pipeTo sender()
+      }
+      case InsertMultipleUndelegation(_, undelegations) => {
+        blockchainUndelegations.Service.insertMultiple(undelegations) pipeTo sender()
+      }
+      case InsertOrUpdateUndelegation(_, undelegation) => {
+        blockchainUndelegations.Service.insertOrUpdate(undelegation) pipeTo sender()
+      }
+      case GetAllUndelegationByDelegator(_, address) => {
+        blockchainUndelegations.Service.getAllByDelegator(address) pipeTo sender()
+      }
+      case GetAllUndelegationByValidator(_, address) => {
+        blockchainUndelegations.Service.getAllByValidator(address) pipeTo sender()
+      }
+      case GetAllUndelegation(_) => {
+        blockchainUndelegations.Service.getAll pipeTo sender()
+      }
+      case DeleteUndelegation(_, delegatorAddress, validatorAddress) => {
+        blockchainUndelegations.Service.delete(delegatorAddress, validatorAddress) pipeTo sender()
+      }
+      case TryGetUndelegation(_, delegatorAddress, validatorAddress) => {
+        blockchainUndelegations.Service.tryGet(delegatorAddress, validatorAddress) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateUndelegation(uid: String, undelegation: Undelegation)
+  case class InsertMultipleUndelegation(uid: String, undelegations: Seq[Undelegation])
+  case class InsertOrUpdateUndelegation(uid: String, undelegation: Undelegation)
+  case class GetAllUndelegationByDelegator(uid: String, address: String)
+  case class GetAllUndelegationByValidator(uid: String, address: String)
+  case class GetAllUndelegation(uid: String)
+  case class DeleteUndelegation(uid: String, delegatorAddress: String, validatorAddress: String)
+  case class TryGetUndelegation(uid: String, delegatorAddress: String, validatorAddress: String)
 }

@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CreateMaintainer, DeleteMaintainer, GetAllMaintainer, GetMaintainer, InsertMultipleMaintainer, InsertOrUpdateMaintainer, MaintainerActor, TryGetMaintainer}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Maintainers.{CreateMaintainer, DeleteMaintainer, GetAllMaintainer, GetMaintainer, InsertMultipleMaintainer, InsertOrUpdateMaintainer, MaintainerActor, TryGetMaintainer}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.MaintainerDeputize
@@ -20,7 +22,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -35,7 +36,7 @@ class Maintainers @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
                              masterClassifications: master.Classifications
-                           )(implicit executionContext: ExecutionContext) {
+                           )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -51,15 +52,29 @@ class Maintainers @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val maintainerActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "maintainerRegion",
-      entityProps = MaintainerActor.props(Maintainers.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = MaintainerActor.idExtractor,
-      extractShardId = MaintainerActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllMaintainer(uid) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteMaintainer(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllMaintainer(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteMaintainer(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "maintainerRegion"
+
+  override def props: Props = Maintainers.props(Maintainers.this)
 
   case class MaintainerSerialized(id: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Maintainer = Maintainer(id = id, maintainedTraits = utilities.JSON.convertJsonStringToObject[Mutables](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -138,31 +153,31 @@ class Maintainers @Inject()(
 
   object Service {
 
-    def createMaintainerWithActor(maintainer: Maintainer): Future[String] = (maintainerActorRegion ? CreateMaintainer(uniqueId, maintainer)).mapTo[String]
+    def createMaintainerWithActor(maintainer: Maintainer): Future[String] = (actorRegion ? CreateMaintainer(uniqueId, maintainer)).mapTo[String]
 
     def create(maintainer: Maintainer): Future[String] = add(maintainer)
 
-    def tryGetWithActor(id: String): Future[Maintainer] = (maintainerActorRegion ? TryGetMaintainer(uniqueId, id)).mapTo[Maintainer]
+    def tryGetWithActor(id: String): Future[Maintainer] = (actorRegion ? TryGetMaintainer(uniqueId, id)).mapTo[Maintainer]
 
     def tryGet(id: String): Future[Maintainer] = tryGetByID(id).map(_.deserialize)
 
-    def getMaintainerWithActor(id: String): Future[Option[Maintainer]] = (maintainerActorRegion ? GetMaintainer(uniqueId, id)).mapTo[Option[Maintainer]]
+    def getMaintainerWithActor(id: String): Future[Option[Maintainer]] = (actorRegion ? GetMaintainer(uniqueId, id)).mapTo[Option[Maintainer]]
 
     def get(id: String): Future[Option[Maintainer]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAllMaintainerWithActor: Future[Seq[Maintainer]] = (maintainerActorRegion ? GetAllMaintainer(uniqueId)).mapTo[Seq[Maintainer]]
+    def getAllMaintainerWithActor: Future[Seq[Maintainer]] = (actorRegion ? GetAllMaintainer(uniqueId)).mapTo[Seq[Maintainer]]
 
     def getAll: Future[Seq[Maintainer]] = getAllMaintainers.map(_.map(_.deserialize))
 
-    def insertMultipleMaintainersWithActor(maintainers: Seq[Maintainer]): Future[Seq[String]] = (maintainerActorRegion ? InsertMultipleMaintainer(uniqueId, maintainers)).mapTo[Seq[String]]
+    def insertMultipleMaintainersWithActor(maintainers: Seq[Maintainer]): Future[Seq[String]] = (actorRegion ? InsertMultipleMaintainer(uniqueId, maintainers)).mapTo[Seq[String]]
 
     def insertMultiple(maintainers: Seq[Maintainer]): Future[Seq[String]] = addMultiple(maintainers)
 
-    def insertOrUpdateMaintainerWithActor(maintainer: Maintainer): Future[Seq[String]] = (maintainerActorRegion ? InsertOrUpdateMaintainer(uniqueId, maintainer)).mapTo[Seq[String]]
+    def insertOrUpdateMaintainerWithActor(maintainer: Maintainer): Future[Seq[String]] = (actorRegion ? InsertOrUpdateMaintainer(uniqueId, maintainer)).mapTo[Seq[String]]
 
     def insertOrUpdate(maintainer: Maintainer): Future[Int] = upsert(maintainer)
 
-    def deleteMaintainer(id: String): Future[Int] = (maintainerActorRegion ? DeleteMaintainer(uniqueId, id)).mapTo[Int]
+    def deleteMaintainer(id: String): Future[Int] = (actorRegion ? DeleteMaintainer(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
   }
@@ -205,4 +220,47 @@ class Maintainers @Inject()(
     }
   }
 
+}
+
+object Maintainers {
+  def props(blockchainMaintainers: models.blockchain.Maintainers) (implicit executionContext: ExecutionContext) = Props(new MaintainerActor(blockchainMaintainers))
+  
+  @Singleton
+  class MaintainerActor @Inject()(
+                                   blockchainMaintainers: models.blockchain.Maintainers
+                                 ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateMaintainer(_, maintainer) => {
+        blockchainMaintainers.Service.create(maintainer) pipeTo sender()
+      }
+      case InsertMultipleMaintainer(_, maintainers) => {
+        blockchainMaintainers.Service.insertMultiple(maintainers) pipeTo sender()
+      }
+      case InsertOrUpdateMaintainer(_, maintainer) => {
+        blockchainMaintainers.Service.insertOrUpdate(maintainer) pipeTo sender()
+      }
+      case TryGetMaintainer(_, id) => {
+        blockchainMaintainers.Service.tryGet(id) pipeTo sender()
+      }
+      case GetMaintainer(_, id) => {
+        blockchainMaintainers.Service.get(id) pipeTo sender()
+      }
+      case GetAllMaintainer(_) => {
+        blockchainMaintainers.Service.getAll pipeTo sender()
+      }
+      case DeleteMaintainer(_, id) => {
+        blockchainMaintainers.Service.delete(id) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateMaintainer(uid: String, maintainer: Maintainer)
+  case class TryGetMaintainer(uid: String, id: String)
+  case class InsertMultipleMaintainer(uid: String, maintainer: Seq[Maintainer])
+  case class InsertOrUpdateMaintainer(uid: String, maintainer: Maintainer)
+  case class GetAllMaintainer(uid: String)
+  case class GetMaintainer(uid: String, id: String)
+  case class DeleteMaintainer(uid: String, id: String)
 }

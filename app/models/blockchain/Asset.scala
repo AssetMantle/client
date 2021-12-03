@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import models.blockchain.Assets.{CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{AssetActor, CheckExistsAsset, CreateAsset, DeleteAsset, GetAllAsset, GetAsset, InsertMultipleAssets, InsertOrUpdateAsset, TryGetAsset}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.ShardRegion.{ExtractEntityId, ExtractShardId}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
@@ -21,7 +23,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -42,7 +43,7 @@ class Assets @Inject()(
                         masterClassifications: master.Classifications,
                         masterAssets: master.Assets,
                         masterProperties: master.Properties,
-                      )(implicit executionContext: ExecutionContext) {
+                      )(implicit executionContext: ExecutionContext) extends ShardedActorRegion{
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -58,15 +59,31 @@ class Assets @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val assetActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "assetRegion",
-      entityProps = AssetActor.props(Assets.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = AssetActor.idExtractor,
-      extractShardId = AssetActor.shardResolver
-    )
+  override def idExtractor: ExtractEntityId = {
+    case attempt@CreateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllAsset(uid) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleAssets(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsAsset(uid, _) => ((uid.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ExtractShardId = {
+    case CreateAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllAsset(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleAssets(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsAsset(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "assetRegion"
+
+  override def props: Props = Assets.props(Assets.this)
 
   case class AssetSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Asset = Asset(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -143,35 +160,35 @@ class Assets @Inject()(
 
   object Service {
 
-    def createAssetWithActor(asset: Asset): Future[String] = (assetActorRegion ? CreateAsset(uniqueId, asset)).mapTo[String]
+    def createAssetWithActor(asset: Asset): Future[String] = (actorRegion ? CreateAsset(uniqueId, asset)).mapTo[String]
 
     def create(asset: Asset): Future[String] = add(asset)
 
-    def tryGetAssetWithActor(id: String): Future[Asset] = (assetActorRegion ? TryGetAsset(uniqueId, id)).mapTo[Asset]
+    def tryGetAssetWithActor(id: String): Future[Asset] = (actorRegion ? TryGetAsset(uniqueId, id)).mapTo[Asset]
 
     def tryGet(id: String): Future[Asset] = tryGetByID(id).map(_.deserialize)
 
-    def getAssetWithActor(id: String): Future[Option[Asset]] = (assetActorRegion ? GetAsset(uniqueId, id)).mapTo[Option[Asset]]
+    def getAssetWithActor(id: String): Future[Option[Asset]] = (actorRegion ? GetAsset(uniqueId, id)).mapTo[Option[Asset]]
 
     def get(id: String): Future[Option[Asset]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAllAssetWithActor: Future[Seq[Asset]] = (assetActorRegion ? GetAllAsset(uniqueId)).mapTo[Seq[Asset]]
+    def getAllAssetWithActor: Future[Seq[Asset]] = (actorRegion ? GetAllAsset(uniqueId)).mapTo[Seq[Asset]]
 
     def getAll: Future[Seq[Asset]] = getAllAssets.map(_.map(_.deserialize))
 
-    def insertMultipleAssetWithActor(assets: Seq[Asset]): Future[Seq[String]] = (assetActorRegion ? InsertMultipleAssets(uniqueId, assets)).mapTo[Seq[String]]
+    def insertMultipleAssetWithActor(assets: Seq[Asset]): Future[Seq[String]] = (actorRegion ? InsertMultipleAssets(uniqueId, assets)).mapTo[Seq[String]]
 
     def insertMultiple(assets: Seq[Asset]): Future[Seq[String]] = addMultiple(assets)
 
-    def insertOrUpdateAssetWithActor(asset: Asset): Future[Int] = (assetActorRegion ? InsertOrUpdateAsset(uniqueId, asset)).mapTo[Int]
+    def insertOrUpdateAssetWithActor(asset: Asset): Future[Int] = (actorRegion ? InsertOrUpdateAsset(uniqueId, asset)).mapTo[Int]
 
     def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
 
-    def deleteAssetWithActor(id: String): Future[Int] = (assetActorRegion ? DeleteAsset(uniqueId, id)).mapTo[Int]
+    def deleteAssetWithActor(id: String): Future[Int] = (actorRegion ? DeleteAsset(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def checkExistsAssetWithActor(id: String): Future[Boolean] = (assetActorRegion ? CheckExistsAsset(uniqueId, id)).mapTo[Boolean]
+    def checkExistsAssetWithActor(id: String): Future[Boolean] = (actorRegion ? CheckExistsAsset(uniqueId, id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
   }
@@ -277,5 +294,51 @@ class Assets @Inject()(
       }
     }
   }
+}
 
+
+object Assets {
+  def props(blockchainAssets: models.blockchain.Assets) (implicit executionContext: ExecutionContext) = Props(new AssetActor(blockchainAssets))
+
+  @Singleton
+  class AssetActor @Inject()(
+                              blockchainAssets: models.blockchain.Assets
+                            ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateAsset(_, asset) => {
+        blockchainAssets.Service.create(asset) pipeTo sender()
+      }
+      case TryGetAsset(_, id) => {
+        blockchainAssets.Service.tryGet(id) pipeTo sender()
+      }
+      case GetAsset(_, id) => {
+        blockchainAssets.Service.get(id) pipeTo sender()
+      }
+      case GetAllAsset(_) => {
+        blockchainAssets.Service.getAll pipeTo sender()
+      }
+      case InsertMultipleAssets(_, assets) => {
+        blockchainAssets.Service.insertMultiple(assets) pipeTo sender()
+      }
+      case InsertOrUpdateAsset(_, asset) => {
+        blockchainAssets.Service.insertOrUpdate(asset) pipeTo sender()
+      }
+      case DeleteAsset(_, id) => {
+        blockchainAssets.Service.delete(id) pipeTo sender()
+      }
+      case CheckExistsAsset(_, id) => {
+        blockchainAssets.Service.checkExistsAssetWithActor(id) pipeTo sender()
+      }
+    }
+  }
+  case class CreateAsset(uid: String, asset: Asset)
+  case class TryGetAsset(uid: String, id: String)
+  case class GetAsset(uid: String, id: String)
+  case class GetAllAsset(uid: String)
+  case class InsertMultipleAssets(uid: String, assets: Seq[Asset])
+  case class InsertOrUpdateAsset(uid: String, asset: Asset)
+  case class DeleteAsset(uid: String, id: String)
+  case class CheckExistsAsset(uid: String, id: String)
 }

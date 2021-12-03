@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalVoteActor, TryGetProposalVote}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.ProposalVotes.{GetAllByProposalVoteId, InsertOrUpdateProposalVote, ProposalVoteActor, TryGetProposalVote}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.TransactionMessages.Vote
 import org.postgresql.util.PSQLException
@@ -19,7 +21,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -31,7 +32,7 @@ class ProposalVotes @Inject()(
                                getProposalVote: GetProposalVote,
                                configuration: Configuration,
                                utilitiesOperations: utilities.Operations
-                             )(implicit executionContext: ExecutionContext) {
+                             )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -49,16 +50,21 @@ class ProposalVotes @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val proposalVoteActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "proposalVoteRegion",
-      entityProps = ProposalVoteActor.props(ProposalVotes.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = ProposalVoteActor.idExtractor,
-      extractShardId = ProposalVoteActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@TryGetProposalVote(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateProposalVote(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllByProposalVoteId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+  }
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case TryGetProposalVote(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateProposalVote(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllByProposalVoteId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
   }
 
+  override def regionName: String = "proposalVoteRegion"
+
+  override def props: Props = ProposalVotes.props(ProposalVotes.this)
+  
   private def add(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -107,15 +113,15 @@ class ProposalVotes @Inject()(
 
   object Service {
 
-    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (proposalVoteActorRegion ? TryGetProposalVote(uniqueId, proposalID)).mapTo[ProposalVote]
+    def tryGetProposalVoteWithActor(proposalID: Int): Future[ProposalVote] = (actorRegion ? TryGetProposalVote(uniqueId, proposalID)).mapTo[ProposalVote]
 
     def tryGet(proposalID: Int): Future[ProposalVote] = tryGetByID(proposalID)
 
-    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (proposalVoteActorRegion ? InsertOrUpdateProposalVote(uniqueId, proposalVote)).mapTo[ProposalVote]
+    def insertOrUpdateProposalVoteWithActor(proposalVote: ProposalVote): Future[ProposalVote] = (actorRegion ? InsertOrUpdateProposalVote(uniqueId, proposalVote)).mapTo[ProposalVote]
 
     def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
 
-    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[Seq[ProposalVote]] = (proposalVoteActorRegion ? GetAllByProposalVoteId(uniqueId, proposalID)).mapTo[Seq[ProposalVote]]
+    def getAllProposalVoteByIDWithActor(proposalID: Int): Future[Seq[ProposalVote]] = (actorRegion ? GetAllByProposalVoteId(uniqueId, proposalID)).mapTo[Seq[ProposalVote]]
 
     def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
   }
@@ -146,4 +152,31 @@ class ProposalVotes @Inject()(
     }
   }
 
+}
+
+object ProposalVotes {
+  def props(blockchainProposalVotes: models.blockchain.ProposalVotes) (implicit executionContext: ExecutionContext) = Props(new ProposalVoteActor(blockchainProposalVotes))
+
+  @Singleton
+  class ProposalVoteActor @Inject()(
+                                     blockchainProposalVotes: models.blockchain.ProposalVotes
+                                   ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case InsertOrUpdateProposalVote(_, proposal) => {
+        blockchainProposalVotes.Service.insertOrUpdate(proposal) pipeTo sender()
+      }
+      case TryGetProposalVote(_, proposalID) => {
+        blockchainProposalVotes.Service.tryGet(proposalID) pipeTo sender()
+      }
+      case GetAllByProposalVoteId(_, id) => {
+        blockchainProposalVotes.Service.getAllByID(id) pipeTo sender()
+      }
+    }
+  }
+
+  case class TryGetProposalVote(uid: String, proposalID: Int)
+  case class InsertOrUpdateProposalVote(uid: String, proposalVote: ProposalVote)
+  case class GetAllByProposalVoteId(uid: String, id: Int)
 }

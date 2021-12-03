@@ -1,34 +1,32 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CreateParameter, GetAllParameter, InsertOrUpdateParameter, ParameterActor, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.ShardRegion
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 
 import java.sql.Timestamp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
-import models.Abstract.{Parameter => abstractParameter}
+import models.Abstract.{ShardedActorRegion, Parameter => abstractParameter}
 import models.Trait.Logged
+import models.blockchain.Parameter.{CreateParameter, GetAllParameter, InsertOrUpdateParameter, TryGetAuthParameter, TryGetBankParameter, TryGetDistributionParameter, TryGetGovernanceParameter, TryGetHalvingParameter, TryGetMintingParameter, TryGetParameter, TryGetSlashingParameter, TryGetStakingParameter}
 import models.common.Parameters._
 import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.Coin
-import models.common.TransactionMessages._
 import models.masterTransaction
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.blockchain.params._
-import queries.responses.blockchain.params._
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -48,7 +46,7 @@ class Parameters @Inject()(
                             getMintParams: GetMint,
                             getSlashingParams: GetSlashing,
                             getStakingParams: GetStaking
-                          )(implicit executionContext: ExecutionContext) {
+                          )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -66,15 +64,38 @@ class Parameters @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val parameterActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "parameterRegion",
-      entityProps = ParameterActor.props(Parameters.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = ParameterActor.idExtractor,
-      extractShardId = ParameterActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateParameter(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateParameter(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetParameter(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetAuthParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetBankParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetDistributionParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetGovernanceParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetHalvingParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetMintingParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetSlashingParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetStakingParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllParameter(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateParameter(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateParameter(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetParameter(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetAuthParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetBankParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetDistributionParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetGovernanceParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetHalvingParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetMintingParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetSlashingParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetStakingParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllParameter(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+  override def regionName: String = "parameterRegion"
+
+  override def props: Props = Parameter.props(Parameters.this)
 
   case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -128,51 +149,51 @@ class Parameters @Inject()(
 
   object Service {
 
-    def createParameterWithActor(parameter: Parameter): Future[String] = (parameterActorRegion ? CreateParameter(uniqueId, parameter)).mapTo[String]
+    def createParameterWithActor(parameter: Parameter): Future[String] = (actorRegion ? CreateParameter(uniqueId, parameter)).mapTo[String]
 
     def create(parameter: Parameter): Future[String] = add(parameter)
 
-    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (parameterActorRegion ? InsertOrUpdateParameter(uniqueId, parameter)).mapTo[Int]
+    def insertOrUpdateParameterWithActor(parameter: Parameter): Future[Int] = (actorRegion ? InsertOrUpdateParameter(uniqueId, parameter)).mapTo[Int]
 
     def insertOrUpdate(parameter: Parameter): Future[Int] = upsert(parameter)
 
-    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (parameterActorRegion ? TryGetParameter(uniqueId, parameterType)).mapTo[Parameter]
+    def tryGetParameterWithActor(parameterType: String): Future[Parameter] = (actorRegion ? TryGetParameter(uniqueId, parameterType)).mapTo[Parameter]
 
     def tryGet(parameterType: String): Future[Parameter] = tryGetByType(parameterType).map(_.deserialize)
 
-    def tryGetAuthParameterWithActor: Future[AuthParameter] = (parameterActorRegion ? TryGetAuthParameter(uniqueId)).mapTo[AuthParameter]
+    def tryGetAuthParameterWithActor: Future[AuthParameter] = (actorRegion ? TryGetAuthParameter(uniqueId)).mapTo[AuthParameter]
 
     def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(constants.Blockchain.ParameterType.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
 
-    def tryGetBankParameterWithActor: Future[BankParameter] = (parameterActorRegion ? TryGetBankParameter(uniqueId)).mapTo[BankParameter]
+    def tryGetBankParameterWithActor: Future[BankParameter] = (actorRegion ? TryGetBankParameter(uniqueId)).mapTo[BankParameter]
 
     def tryGetBankParameter: Future[BankParameter] = tryGetByType(constants.Blockchain.ParameterType.BANK).map(_.deserialize).map(_.value.asBankParameter)
 
-    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (parameterActorRegion ? TryGetDistributionParameter(uniqueId)).mapTo[DistributionParameter]
+    def tryGetDistributionParameterWithActor: Future[DistributionParameter] = (actorRegion ? TryGetDistributionParameter(uniqueId)).mapTo[DistributionParameter]
 
     def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(constants.Blockchain.ParameterType.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
 
-    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (parameterActorRegion ? TryGetGovernanceParameter(uniqueId)).mapTo[GovernanceParameter]
+    def tryGetGovernanceParameterWithActor: Future[GovernanceParameter] = (actorRegion ? TryGetGovernanceParameter(uniqueId)).mapTo[GovernanceParameter]
 
     def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(constants.Blockchain.ParameterType.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
 
-    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (parameterActorRegion ? TryGetHalvingParameter(uniqueId)).mapTo[HalvingParameter]
+    def tryGetHalvingParameterWithActor: Future[HalvingParameter] = (actorRegion ? TryGetHalvingParameter(uniqueId)).mapTo[HalvingParameter]
 
     def tryGetHalvingParameter: Future[HalvingParameter] = tryGetByType(constants.Blockchain.ParameterType.HALVING).map(_.deserialize).map(_.value.asHalvingParameter)
 
-    def tryGetMintingParameterWithActor: Future[MintingParameter] = (parameterActorRegion ? TryGetMintingParameter(uniqueId)).mapTo[MintingParameter]
+    def tryGetMintingParameterWithActor: Future[MintingParameter] = (actorRegion ? TryGetMintingParameter(uniqueId)).mapTo[MintingParameter]
 
     def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(constants.Blockchain.ParameterType.MINT).map(_.deserialize).map(_.value.asMintingParameter)
 
-    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (parameterActorRegion ? TryGetSlashingParameter(uniqueId)).mapTo[SlashingParameter]
+    def tryGetSlashingParameterWithActor: Future[SlashingParameter] = (actorRegion ? TryGetSlashingParameter(uniqueId)).mapTo[SlashingParameter]
 
     def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(constants.Blockchain.ParameterType.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
 
-    def tryGetStakingParameterWithActor: Future[StakingParameter] = (parameterActorRegion ? TryGetStakingParameter(uniqueId)).mapTo[StakingParameter]
+    def tryGetStakingParameterWithActor: Future[StakingParameter] = (actorRegion ? TryGetStakingParameter(uniqueId)).mapTo[StakingParameter]
 
     def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
-    def getAllParameterWithActor: Future[Seq[Parameter]] = (parameterActorRegion ? GetAllParameter).mapTo[Seq[Parameter]]
+    def getAllParameterWithActor: Future[Seq[Parameter]] = (actorRegion ? GetAllParameter).mapTo[Seq[Parameter]]
 
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 
@@ -266,5 +287,69 @@ class Parameters @Inject()(
       }
     }
   }
+
+}
+
+object Parameter {
+  def props(blockchainParameters: models.blockchain.Parameters) (implicit executionContext: ExecutionContext) = Props(new ParameterActor(blockchainParameters))
+
+  @Singleton
+  class ParameterActor @Inject()(
+                                  blockchainParameters: models.blockchain.Parameters
+                                ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateParameter(_, parameter) => {
+        blockchainParameters.Service.create(parameter) pipeTo sender()
+      }
+      case TryGetParameter(_, parameterType) => {
+        blockchainParameters.Service.tryGet(parameterType) pipeTo sender()
+      }
+      case InsertOrUpdateParameter(_, parameter) => {
+        blockchainParameters.Service.insertOrUpdate(parameter) pipeTo sender()
+      }
+      case TryGetAuthParameter(_) => {
+        blockchainParameters.Service.tryGetAuthParameter pipeTo sender()
+      }
+      case TryGetBankParameter(_) => {
+        blockchainParameters.Service.tryGetBankParameter pipeTo sender()
+      }
+      case TryGetDistributionParameter(_) => {
+        blockchainParameters.Service.tryGetDistributionParameter pipeTo sender()
+      }
+      case TryGetGovernanceParameter(_) => {
+        blockchainParameters.Service.tryGetGovernanceParameter pipeTo sender()
+      }
+      case TryGetHalvingParameter(_) => {
+        blockchainParameters.Service.tryGetHalvingParameter pipeTo sender()
+      }
+      case TryGetMintingParameter(_) => {
+        blockchainParameters.Service.tryGetMintingParameter pipeTo sender()
+      }
+      case TryGetSlashingParameter(_) => {
+        blockchainParameters.Service.tryGetSlashingParameter pipeTo sender()
+      }
+      case TryGetStakingParameter(_) => {
+        blockchainParameters.Service.tryGetStakingParameter pipeTo sender()
+      }
+      case GetAllParameter(_) => {
+        blockchainParameters.Service.getAll pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateParameter(id: String, parameter: Parameter)
+  case class InsertOrUpdateParameter(id: String, parameter: Parameter)
+  case class TryGetParameter(id: String, parameterType: String)
+  case class TryGetAuthParameter(id: String)
+  case class TryGetBankParameter(id: String)
+  case class TryGetDistributionParameter(id: String)
+  case class TryGetGovernanceParameter(id: String)
+  case class TryGetHalvingParameter(id: String)
+  case class TryGetMintingParameter(id: String)
+  case class TryGetSlashingParameter(id: String)
+  case class TryGetStakingParameter(id: String)
+  case class GetAllParameter(id: String)
 
 }

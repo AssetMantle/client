@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposalDeposit, ProposalDepositActor, TryGetProposalDeposit}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.ProposalDeposits.{DeleteByProposalDepositId, GetByProposalDepositId, GetProposalDepositWithActor, InsertOrUpdateProposalDeposit, ProposalDepositActor, TryGetProposalDeposit}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.Parameters.GovernanceParameter
 import models.common.Serializable.Coin
@@ -37,7 +39,7 @@ class ProposalDeposits @Inject()(
                                   blockchainBalances: Balances,
                                   blockchainProposals: Proposals,
                                   blockchainParameters: Parameters,
-                                )(implicit executionContext: ExecutionContext) {
+                                )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -55,15 +57,25 @@ class ProposalDeposits @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val proposalDepositActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "proposalDepositRegion",
-      entityProps = ProposalDepositActor.props(ProposalDeposits.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = ProposalDepositActor.idExtractor,
-      extractShardId = ProposalDepositActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@TryGetProposalDeposit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateProposalDeposit(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetProposalDepositWithActor(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteByProposalDepositId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetByProposalDepositId(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case TryGetProposalDeposit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateProposalDeposit(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetProposalDepositWithActor(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteByProposalDepositId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetByProposalDepositId(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "proposalDepositRegion"
+
+  override def props: Props = ProposalDeposits.props(ProposalDeposits.this)
 
   case class ProposalDepositSerialized(proposalID: Int, depositor: String, amount: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: ProposalDeposit = ProposalDeposit(proposalID = proposalID, depositor = depositor, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -123,23 +135,23 @@ class ProposalDeposits @Inject()(
 
   object Service {
 
-    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (proposalDepositActorRegion ? TryGetProposalDeposit(uniqueId, proposalID)).mapTo[ProposalDeposit]
+    def tryGetProposalWithActor(proposalID: Int): Future[ProposalDeposit] = (actorRegion ? TryGetProposalDeposit(uniqueId, proposalID)).mapTo[ProposalDeposit]
 
     def tryGet(proposalID: Int): Future[ProposalDeposit] = tryGetByID(proposalID).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (proposalDepositActorRegion ? InsertOrUpdateProposalDeposit(uniqueId, proposalDeposit)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposalDeposit: ProposalDeposit): Future[Int] = (actorRegion ? InsertOrUpdateProposalDeposit(uniqueId, proposalDeposit)).mapTo[Int]
 
     def insertOrUpdate(proposalDeposit: ProposalDeposit): Future[Int] = upsert(proposalDeposit)
 
-    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (proposalDepositActorRegion ? GetProposalDepositWithActor(uniqueId, proposalID, depositor)).mapTo[Option[ProposalDeposit]]
+    def getProposalWithActor(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = (actorRegion ? GetProposalDepositWithActor(uniqueId, proposalID, depositor)).mapTo[Option[ProposalDeposit]]
 
     def get(proposalID: Int, depositor: String): Future[Option[ProposalDeposit]] = getByIDAndDepositor(proposalID = proposalID, depositor = depositor).map(_.map(_.deserialize))
 
-    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActorRegion ? GetByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
+    def getByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (actorRegion ? GetByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def getByProposalID(proposalID: Int): Future[Seq[ProposalDeposit]] = getByID(proposalID).map(_.map(_.deserialize))
 
-    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (proposalDepositActorRegion ? DeleteByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
+    def deleteByProposalIDWithActor(proposalID: Int): Future[Seq[ProposalDeposit]] = (actorRegion ? DeleteByProposalDepositId(uniqueId, proposalID)).mapTo[Seq[ProposalDeposit]]
 
     def deleteByProposalID(proposalID: Int): Future[Int] = deleteByID(proposalID)
 
@@ -187,5 +199,43 @@ class ProposalDeposits @Inject()(
       }
     }
   }
+
+}
+
+object ProposalDeposits {
+  def props(blockchainProposalDeposits: models.blockchain.ProposalDeposits) (implicit executionContext: ExecutionContext) = Props(new ProposalDepositActor(blockchainProposalDeposits))
+
+  @Singleton
+  class ProposalDepositActor @Inject()(
+                                        blockchainProposalDeposits: models.blockchain.ProposalDeposits
+                                      ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case InsertOrUpdateProposalDeposit(_, proposal) => {
+        blockchainProposalDeposits.Service.insertOrUpdate(proposal) pipeTo sender()
+      }
+      case TryGetProposalDeposit(_, proposalID) => {
+        blockchainProposalDeposits.Service.tryGet(proposalID) pipeTo sender()
+      }
+      case GetProposalDepositWithActor(_, proposalID, depositor) => {
+        blockchainProposalDeposits.Service.get(proposalID, depositor) pipeTo sender()
+      }
+      case DeleteByProposalDepositId(_, id) => {
+        blockchainProposalDeposits.Service.deleteByProposalID(id) pipeTo sender()
+      }
+      case GetByProposalDepositId(_, id) => {
+        blockchainProposalDeposits.Service.getByProposalID(id) pipeTo sender()
+      }
+    }
+
+  }
+
+  case class TryGetProposalDeposit(uid: String, proposalID: Int)
+  case class InsertOrUpdateProposalDeposit(uid: String, proposalDeposit: ProposalDeposit)
+  case class GetProposalDepositWithActor(uid: String, proposalID: Int, depositor: String)
+  case class DeleteByProposalDepositId(uid: String, id: Int)
+  case class GetByProposalDepositId(uid: String, id: Int)
+
 
 }

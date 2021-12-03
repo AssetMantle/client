@@ -1,8 +1,9 @@
 package models.blockchain
 
-import akka.actor.{ActorSystem, Props}
+import models.blockchain.Accounts.{CheckAccountExists, CreateAccount, GetAccountWithActor, GetListAccount, GetUsernameAccount, InsertOrUpdateAccount, TryGetAccount, TryGetAddressAccount, TryGetByUsernameAccount, TryGetUsernameAccount}
+import akka.actor.{Actor, ActorLogging, Props}
 import exceptions.BaseException
-import models.Abstract.PublicKey
+import models.Abstract.{PublicKey, ShardedActorRegion}
 import models.Trait.Logged
 import models.common.Serializable.Vesting.VestingParameters
 import models.master
@@ -23,12 +24,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{AccountActor, CheckAccountExists, CreateAccount, GetAccountWithActor, GetListAccount, GetUsernameAccount, InsertOrUpdateAccount, TryGetAccount, TryGetAddressAccount, TryGetByUsernameAccount, TryGetUsernameAccount}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import akka.cluster.sharding.ShardRegion.{ExtractEntityId, ExtractShardId}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 
 case class Account(address: String, username: String, accountType: String, publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
@@ -40,7 +39,7 @@ class Accounts @Inject()(
                           masterAccounts: master.Accounts,
                           utilitiesOperations: utilities.Operations,
                           blockchainBalances: Balances,
-                        )(implicit executionContext: ExecutionContext) {
+                        )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -56,17 +55,37 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  private implicit val timeout = Timeout(5 seconds)
+  private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val accountActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "accountRegion",
-      entityProps = AccountActor.props(Accounts.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = AccountActor.idExtractor,
-      extractShardId = AccountActor.shardResolver
-    )
+  override def idExtractor: ExtractEntityId = {
+    case attempt@GetAccountWithActor(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CreateAccount(id, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetListAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetByUsernameAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetUsernameAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetUsernameAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetAddressAccount(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckAccountExists(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ExtractShardId = {
+    case GetAccountWithActor(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CreateAccount(id, _, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetListAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetByUsernameAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetUsernameAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetUsernameAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetAddressAccount(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckAccountExists(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "accountRegion"
+
+  override val props: Props = Accounts.props(Accounts.this)
 
   case class AccountSerialized(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey.fold[Option[PublicKey]](None)(x => Option(utilities.JSON.convertJsonStringToObject[PublicKey](x))), accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -167,43 +186,43 @@ class Accounts @Inject()(
 
   object Service {
 
-    def createWithAccountActor(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = (accountActorRegion ? CreateAccount(uniqueId, address, username, accountType, publicKey)).mapTo[String]
+    def createWithAccountActor(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = (actorRegion ? CreateAccount(uniqueId, address, username, accountType, publicKey)).mapTo[String]
 
     def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
-    def tryGetWithAccountActor(address: String): Future[Account] = (accountActorRegion ? TryGetAccount(uniqueId, address)).mapTo[Account]
+    def tryGetWithAccountActor(address: String): Future[Account] = (actorRegion ? TryGetAccount(uniqueId, address)).mapTo[Account]
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
-    def insertOrUpdateWithAccountActor(account: Account): Future[Int] = (accountActorRegion ? InsertOrUpdateAccount(uniqueId, account)).mapTo[Int]
+    def insertOrUpdateWithAccountActor(account: Account): Future[Int] = (actorRegion ? InsertOrUpdateAccount(uniqueId, account)).mapTo[Int]
 
     def insertOrUpdate(account: Account): Future[Int] = upsert(account)
 
-    def getWithAccountActor(address: String): Future[Option[Account]] = (accountActorRegion ? GetAccountWithActor(uniqueId, address)).mapTo[Option[Account]]
+    def getWithAccountActor(address: String): Future[Option[Account]] = (actorRegion ? GetAccountWithActor(uniqueId, address)).mapTo[Option[Account]]
 
     def get(address: String): Future[Option[Account]] = getByAddress(address).map(_.map(_.deserialize))
 
-    def getListWithAccountActor(addresses: Seq[String]): Future[Seq[Account]] = (accountActorRegion ? GetListAccount(uniqueId, addresses)).mapTo[Seq[Account]]
+    def getListWithAccountActor(addresses: Seq[String]): Future[Seq[Account]] = (actorRegion ? GetListAccount(uniqueId, addresses)).mapTo[Seq[Account]]
 
     def getList(addresses: Seq[String]): Future[Seq[Account]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
-    def tryGetByUsernameWithAccountActor(username: String): Future[Account] = (accountActorRegion ? TryGetByUsernameAccount(uniqueId, username)).mapTo[Account]
+    def tryGetByUsernameWithAccountActor(username: String): Future[Account] = (actorRegion ? TryGetByUsernameAccount(uniqueId, username)).mapTo[Account]
 1
     def tryGetByUsername(username: String): Future[Account] = findByUsername(username).map(_.deserialize)
 
-    def tryGetUsernameWithAccountActor(address: String): Future[String] = (accountActorRegion ? TryGetUsernameAccount(uniqueId, address)).mapTo[String]
+    def tryGetUsernameWithAccountActor(address: String): Future[String] = (actorRegion ? TryGetUsernameAccount(uniqueId, address)).mapTo[String]
 
     def tryGetUsername(address: String): Future[String] = findUsernameByAddress(address)
 
-    def getUsernameWithAccountActor(address: String): Future[Option[String]] = (accountActorRegion ? GetUsernameAccount(uniqueId, address)).mapTo[Option[String]]
+    def getUsernameWithAccountActor(address: String): Future[Option[String]] = (actorRegion ? GetUsernameAccount(uniqueId, address)).mapTo[Option[String]]
 
     def getUsername(address: String): Future[Option[String]] = getUsernameByAddress(address)
 
-    def tryGetAddressWithAccountActor(username: String): Future[String] = (accountActorRegion ? TryGetAddressAccount(uniqueId, username)).mapTo[String]
+    def tryGetAddressWithAccountActor(username: String): Future[String] = (actorRegion ? TryGetAddressAccount(uniqueId, username)).mapTo[String]
 
     def tryGetAddress(username: String): Future[String] = findAddressByID(username)
 
-    def checkAccountExistsWithAccountActor(username: String): Future[Boolean] = (accountActorRegion ? CheckAccountExists(uniqueId, username)).mapTo[Boolean]
+    def checkAccountExistsWithAccountActor(username: String): Future[Boolean] = (actorRegion ? CheckAccountExists(uniqueId, username)).mapTo[Boolean]
 
     def checkAccountExists(username: String): Future[Boolean] = checkAccountExistsByUsername(username)
 
@@ -269,4 +288,60 @@ class Accounts @Inject()(
     }
   }
 
+
+}
+
+object Accounts {
+  def props(blockchainAccounts: models.blockchain.Accounts) (implicit executionContext: ExecutionContext) = Props(new AccountActor(blockchainAccounts))
+
+  @Singleton
+  class AccountActor @Inject()(
+                                blockchainAccounts: models.blockchain.Accounts
+                              ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case GetAccountWithActor(_, address) => {
+        blockchainAccounts.Service.get(address) pipeTo sender()
+      }
+      case CreateAccount(_, address, username, accountType, publicKey) => {
+        blockchainAccounts.Service.create(address, username, accountType, publicKey) pipeTo sender()
+      }
+      case TryGetAccount(_, address) => {
+        blockchainAccounts.Service.tryGet(address) pipeTo sender()
+      }
+      case InsertOrUpdateAccount(_, account) => {
+        blockchainAccounts.Service.insertOrUpdate(account) pipeTo sender()
+      }
+      case GetListAccount(_, addresses) => {
+        blockchainAccounts.Service.getList(addresses) pipeTo sender()
+      }
+      case TryGetByUsernameAccount(_, username) => {
+        blockchainAccounts.Service.tryGetByUsername(username) pipeTo sender()
+      }
+      case TryGetUsernameAccount(_, username) => {
+        blockchainAccounts.Service.tryGetUsername(username) pipeTo sender()
+      }
+      case GetUsernameAccount(_, address) => {
+        blockchainAccounts.Service.getUsername(address) pipeTo sender()
+      }
+      case TryGetAddressAccount(_, address) => {
+        blockchainAccounts.Service.tryGetAddress(address) pipeTo sender()
+      }
+      case CheckAccountExists(_, address) => {
+        blockchainAccounts.Service.checkAccountExists(address) pipeTo sender()
+      }
+    }
+  }
+
+  case class GetAccountWithActor(id:String, address: String)
+  case class TryGetAccount(id:String, address: String)
+  case class CreateAccount(id:String, address: String, username: String, accountType: String, publicKey: Option[PublicKey])
+  case class InsertOrUpdateAccount(id:String, account: Account)
+  case class GetListAccount(id:String, addresses: Seq[String])
+  case class TryGetByUsernameAccount(id:String, username: String)
+  case class TryGetUsernameAccount(id:String, address: String)
+  case class GetUsernameAccount(id:String, address: String)
+  case class TryGetAddressAccount(id:String, username: String)
+  case class CheckAccountExists(id:String, username: String)
 }

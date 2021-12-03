@@ -1,10 +1,10 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{BlockActor, CreateBlock, GetBlocksPerPage, GetLastNBlocks, GetLatestBlock, GetLatestBlockHeight, InsertOrUpdateBlock, TryGetBlock, TryGetProposerAddressBlock}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Blocks.{CreateBlock, GetBlocksPerPage, GetLastNBlocks, GetLatestBlock, GetLatestBlockHeight, InsertOrUpdateBlock, TryGetBlock, TryGetProposerAddressBlock}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ ShardRegion}
 
 import java.sql.Timestamp
 import exceptions.BaseException
@@ -19,9 +19,11 @@ import slick.jdbc.JdbcProfile
 
 import java.time.Duration
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
+import models.Abstract.ShardedActorRegion
+
 
 case class Block(height: Int, time: String, proposerAddress: String, validators: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
@@ -29,7 +31,7 @@ case class Block(height: Int, time: String, proposerAddress: String, validators:
 class Blocks @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
                         configuration: Configuration
-                      )(implicit executionContext: ExecutionContext) {
+                      )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -47,22 +49,38 @@ class Blocks @Inject()(
 
   private val uniqueId: String = UUID.randomUUID().toString
 
-
   import databaseConfig.profile.api._
 
   private[models] val blockTable = TableQuery[BlockTable]
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val blockActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "blockRegion",
-      entityProps = BlockActor.props(Blocks.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = BlockActor.idExtractor,
-      extractShardId = BlockActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateBlock(id, _, _, _, _ ) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateBlock(id, _, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetBlock(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetProposerAddressBlock(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetLatestBlockHeight(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetLatestBlock(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetBlocksPerPage(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetLastNBlocks(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateBlock(id, _, _, _, _ ) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateBlock(id, _, _, _, _ ) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetBlock(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetProposerAddressBlock(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetLatestBlockHeight(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetLatestBlock(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetBlocksPerPage(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetLastNBlocks(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "blockRegion"
+
+  override def props: Props = Blocks.props(Blocks.this)
+
 
   case class BlockSerialized(height: Int, time: String, proposerAddress: String, validators: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Block = Block(height = height, time = time, proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -141,27 +159,27 @@ class Blocks @Inject()(
 
   object Service {
 
-    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (blockActorRegion ? CreateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[String]
+    def createBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = (actorRegion ? CreateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[String]
 
     def create(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (blockActorRegion ? InsertOrUpdateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[Int]
+    def insertOrUpdateBlockWithActor(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = (actorRegion ? InsertOrUpdateBlock(uniqueId, height, time, proposerAddress, validators)).mapTo[Int]
 
     def insertOrUpdate(height: Int, time: String, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
 
-    def tryGetBlockWithActor(height: Int): Future[Block] = (blockActorRegion ? TryGetBlock(uniqueId, height)).mapTo[Block]
+    def tryGetBlockWithActor(height: Int): Future[Block] = (actorRegion ? TryGetBlock(uniqueId, height)).mapTo[Block]
 
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
-    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (blockActorRegion ? TryGetProposerAddressBlock(uniqueId, height)).mapTo[String]
+    def tryGetProposerAddressBlockWithActor(height: Int): Future[String] = (actorRegion ? TryGetProposerAddressBlock(uniqueId, height)).mapTo[String]
 
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
 
-    def getLatestBlockHeightWithActor: Future[Int] = (blockActorRegion ? GetLatestBlockHeight(uniqueId)).mapTo[Int]
+    def getLatestBlockHeightWithActor: Future[Int] = (actorRegion ? GetLatestBlockHeight(uniqueId)).mapTo[Int]
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
-    def getLatestBlockWithActor: Future[Block] = (blockActorRegion ? GetLatestBlock(uniqueId)).mapTo[Block]
+    def getLatestBlockWithActor: Future[Block] = (actorRegion ? GetLatestBlock(uniqueId)).mapTo[Block]
 
     def getLatestBlock: Future[Block] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -171,7 +189,7 @@ class Blocks @Inject()(
       } yield block
     }
 
-    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (blockActorRegion ? GetBlocksPerPage(uniqueId, pageNumber)).mapTo[Seq[Block]]
+    def getBlocksPerPageWithActor(pageNumber: Int): Future[Seq[Block]] = (actorRegion ? GetBlocksPerPage(uniqueId, pageNumber)).mapTo[Seq[Block]]
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -181,7 +199,7 @@ class Blocks @Inject()(
       } yield blockList
     }
 
-    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (blockActorRegion ? GetLastNBlocks(uniqueId, n)).mapTo[Seq[Block]]
+    def getLastNBlocksWithActor(n: Int): Future[Seq[Block]] = (actorRegion ? GetLastNBlocks(uniqueId, n)).mapTo[Seq[Block]]
 
     def getLastNBlocks(n: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight
@@ -212,4 +230,50 @@ class Blocks @Inject()(
 
   }
 
+}
+
+object Blocks {
+  def props(blockchainBlocks: models.blockchain.Blocks) (implicit executionContext: ExecutionContext) = Props(new BlockActor(blockchainBlocks))
+
+  @Singleton
+  class BlockActor @Inject()(
+                              blockchainBlocks: models.blockchain.Blocks
+                            ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateBlock(_, height, time, proposerAddress, validators) => {
+        blockchainBlocks.Service.create(height, time, proposerAddress, validators) pipeTo sender()
+      }
+      case InsertOrUpdateBlock(_, height, time, proposerAddress, validators) => {
+        blockchainBlocks.Service.insertOrUpdate(height, time, proposerAddress, validators) pipeTo sender()
+      }
+      case TryGetBlock(_, height) => {
+        blockchainBlocks.Service.tryGet(height) pipeTo sender()
+      }
+      case TryGetProposerAddressBlock(_, height) => {
+        blockchainBlocks.Service.tryGetProposerAddress(height) pipeTo sender()
+      }
+      case GetLatestBlockHeight(_) => {
+        blockchainBlocks.Service.getLatestBlockHeight pipeTo sender()
+      }
+      case GetLatestBlock(_) => {
+        blockchainBlocks.Service.getLatestBlock pipeTo sender()
+      }
+      case GetBlocksPerPage(_, pageNumber) => {
+        blockchainBlocks.Service.getBlocksPerPage(pageNumber) pipeTo sender()
+      }
+      case GetLastNBlocks(_, n) => {
+        blockchainBlocks.Service.getLastNBlocks(n) pipeTo sender()
+      }
+    }
+  }
+  case class CreateBlock(id: String, height: Int, time: String, proposerAddress: String, validators: Seq[String])
+  case class InsertOrUpdateBlock(id: String, height: Int, time: String, proposerAddress: String, validators: Seq[String])
+  case class TryGetBlock(id: String, height: Int)
+  case class TryGetProposerAddressBlock(id: String, height: Int)
+  case class GetLatestBlockHeight(id: String)
+  case class GetLatestBlock(id: String)
+  case class GetBlocksPerPage(id: String, pageNumber: Int)
+  case class GetLastNBlocks(id: String, n: Int)
 }

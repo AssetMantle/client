@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{AddProvisionAddressIdentity, AddUnprovisionedAddressIdentity, CheckExistsIdentity, CreateIdentity, DeleteIdentity, DeleteProvisionAddressIdentity, DeleteUnprovisionedAddressIdentity, GetAllIDsByProvisionedIdentity, GetAllIDsByUnProvisionedIdentity, GetAllProvisionAddressesIdentity, GetAllUnprovisionedAddressesIdentity, GetIdentity, IdentityActor, InsertMultipleIdentity, TryGetIdentity}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Identities.{AddProvisionAddressIdentity, AddUnprovisionedAddressIdentity, CheckExistsIdentity, CreateIdentity, DeleteIdentity, DeleteProvisionAddressIdentity, DeleteUnprovisionedAddressIdentity, GetAllIDsByProvisionedIdentity, GetAllIDsByUnProvisionedIdentity, GetAllProvisionAddressesIdentity, GetAllUnprovisionedAddressesIdentity, GetIdentity, IdentityActor, InsertMultipleIdentity, TryGetIdentity}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.DataValue.IDDataValue
 import models.common.Serializable._
@@ -22,7 +24,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -43,7 +44,7 @@ class Identities @Inject()(
                             masterIdentities: master.Identities,
                             masterProperties: master.Properties,
                             utilitiesOperations: utilities.Operations
-                          )(implicit executionContext: ExecutionContext) {
+                          )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -87,15 +88,43 @@ class Identities @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val identityActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "identityRegion",
-      entityProps = IdentityActor.props(Identities.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = IdentityActor.idExtractor,
-      extractShardId = IdentityActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllIDsByProvisionedIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllIDsByUnProvisionedIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllProvisionAddressesIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllUnprovisionedAddressesIdentity(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@AddProvisionAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteProvisionAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@AddUnprovisionedAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteUnprovisionedAddressIdentity(id, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllIDsByProvisionedIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllIDsByUnProvisionedIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllProvisionAddressesIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllUnprovisionedAddressesIdentity(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case AddProvisionAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteProvisionAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case AddUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteUnprovisionedAddressIdentity(id, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "identityRegion"
+
+  override def props: Props = Identities.props(Identities.this)
 
   private def addProvisionedAddressByID(id: String, address: String): Future[String] = db.run((identityProvisionedTable returning identityProvisionedTable.map(_.id) += IdentityProvisionedSerialized(id = id, address = address)).asTry).map {
     case Success(result) => result
@@ -240,7 +269,7 @@ class Identities @Inject()(
 
   object Service {
 
-    def createIdentityWithActor(identity: Identity): Future[String] = (identityActorRegion ? CreateIdentity(uniqueId, identity)).mapTo[String]
+    def createIdentityWithActor(identity: Identity): Future[String] = (actorRegion ? CreateIdentity(uniqueId, identity)).mapTo[String]
 
     def create(identity: Identity): Future[String] = {
       val insertProperties = upsertProperty(identity)
@@ -267,7 +296,7 @@ class Identities @Inject()(
       }
     }
 
-    def tryGetIdentityWithActor(id: String): Future[Identity] = (identityActorRegion ? TryGetIdentity(uniqueId, id)).mapTo[Identity]
+    def tryGetIdentityWithActor(id: String): Future[Identity] = (actorRegion ? TryGetIdentity(uniqueId, id)).mapTo[Identity]
 
     def tryGet(id: String): Future[Identity] = {
       val property = tryGetPropertiesByID(id)
@@ -283,7 +312,7 @@ class Identities @Inject()(
       }
     }
 
-    def getIdentityWithActor(id: String): Future[Option[Identity]] = (identityActorRegion ? GetIdentity(uniqueId, id)).mapTo[Option[Identity]]
+    def getIdentityWithActor(id: String): Future[Option[Identity]] = (actorRegion ? GetIdentity(uniqueId, id)).mapTo[Option[Identity]]
 
     def get(id: String): Future[Option[Identity]] = {
       val property = getPropertiesByID(id)
@@ -299,7 +328,7 @@ class Identities @Inject()(
       }
     }
 
-    def insertMultipleIdentitiesWithActor(identities: Seq[Identity]): Future[Seq[String]] = (identityActorRegion ? InsertMultipleIdentity(uniqueId, identities)).mapTo[Seq[String]]
+    def insertMultipleIdentitiesWithActor(identities: Seq[Identity]): Future[Seq[String]] = (actorRegion ? InsertMultipleIdentity(uniqueId, identities)).mapTo[Seq[String]]
 
     def insertMultiple(identities: Seq[Identity]): Future[Seq[String]] = {
       utilitiesOperations.traverse(identities) { identity =>
@@ -312,7 +341,7 @@ class Identities @Inject()(
       }
     }
 
-    def deleteIdentityWithActor(id: String): Future[Int] = (identityActorRegion ? DeleteIdentity(uniqueId, id)).mapTo[Int]
+    def deleteIdentityWithActor(id: String): Future[Int] = (actorRegion ? DeleteIdentity(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = {
       val deleteProvisioned = deleteAllProvisionedAddressesByID(id)
@@ -328,39 +357,39 @@ class Identities @Inject()(
       } yield 1
     }
 
-    def getAllIDsByProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (identityActorRegion ? GetAllIDsByProvisionedIdentity(uniqueId, address)).mapTo[Seq[String]]
+    def getAllIDsByProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (actorRegion ? GetAllIDsByProvisionedIdentity(uniqueId, address)).mapTo[Seq[String]]
 
     def getAllIDsByProvisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByProvisionedAddress(address)
 
-    def getAllIDsByUnProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (identityActorRegion ? GetAllIDsByUnProvisionedIdentity(uniqueId, address)).mapTo[Seq[String]]
+    def getAllIDsByUnProvisionedByIdentityWithActor(address: String): Future[Seq[String]] = (actorRegion ? GetAllIDsByUnProvisionedIdentity(uniqueId, address)).mapTo[Seq[String]]
 
     def getAllIDsByUnprovisioned(address: String): Future[Seq[String]] = getAllIdentityIDsByUnprovisionedAddress(address)
 
-    def checkExistsIdentityWithActor(id: String): Future[Boolean] = (identityActorRegion ? CheckExistsIdentity(uniqueId, id)).mapTo[Boolean]
+    def checkExistsIdentityWithActor(id: String): Future[Boolean] = (actorRegion ? CheckExistsIdentity(uniqueId, id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
 
-    def getAllProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (identityActorRegion ? GetAllProvisionAddressesIdentity(uniqueId, id)).mapTo[Seq[String]]
+    def getAllProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (actorRegion ? GetAllProvisionAddressesIdentity(uniqueId, id)).mapTo[Seq[String]]
 
     def getAllProvisionAddresses(id: String): Future[Seq[String]] = getAllProvisionedAddressByID(id)
 
-    def getAllUnProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (identityActorRegion ? GetAllUnprovisionedAddressesIdentity(uniqueId, id)).mapTo[Seq[String]]
+    def getAllUnProvisionAddressesByIdentityWithActor(id: String): Future[Seq[String]] = (actorRegion ? GetAllUnprovisionedAddressesIdentity(uniqueId, id)).mapTo[Seq[String]]
 
     def getAllUnprovisionAddresses(id: String): Future[Seq[String]] = getAllUnprovisionedAddressByID(id)
 
-    def addProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (identityActorRegion ? AddProvisionAddressIdentity(uniqueId, id, address)).mapTo[String]
+    def addProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (actorRegion ? AddProvisionAddressIdentity(uniqueId, id, address)).mapTo[String]
 
     def addProvisionAddress(id: String, address: String): Future[String] = addProvisionedAddressByID(id = id, address = address)
 
-    def deleteProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (identityActorRegion ? DeleteProvisionAddressIdentity(uniqueId, id, address)).mapTo[String]
+    def deleteProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (actorRegion ? DeleteProvisionAddressIdentity(uniqueId, id, address)).mapTo[String]
 
     def deleteProvisionAddress(id: String, address: String): Future[Int] = deleteProvisionedAddressByIDAndAddress(id = id, address = address)
 
-    def addUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (identityActorRegion ? AddUnprovisionedAddressIdentity(uniqueId, id, address)).mapTo[String]
+    def addUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (actorRegion ? AddUnprovisionedAddressIdentity(uniqueId, id, address)).mapTo[String]
 
     def addUnprovisionAddress(id: String, address: String): Future[String] = addUnprovisionedAddressByID(id = id, address = address)
 
-    def deleteUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (identityActorRegion ? DeleteUnprovisionedAddressIdentity(uniqueId, id, address)).mapTo[String]
+    def deleteUnProvisionAddressByIdentityWithActor(id: String, address: String): Future[String] = (actorRegion ? DeleteUnprovisionedAddressIdentity(uniqueId, id, address)).mapTo[String]
 
     def deleteUnprovisionAddress(id: String, address: String): Future[Int] = deleteUnprovisionedAddressByIDAndAddress(id = id, address = address)
   }
@@ -500,4 +529,75 @@ class Identities @Inject()(
     def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(nubID))))
   }
 
+}
+
+object Identities {
+  def props(blockchainIdentities: models.blockchain.Identities) (implicit executionContext: ExecutionContext) = Props(new IdentityActor(blockchainIdentities))
+
+  @Singleton
+  class IdentityActor @Inject()(
+                                 blockchainIdentities: models.blockchain.Identities
+                               ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateIdentity(_, identity) => {
+        blockchainIdentities.Service.create(identity) pipeTo sender()
+      }
+      case TryGetIdentity(_, id) => {
+        blockchainIdentities.Service.tryGet(id) pipeTo sender()
+      }
+      case GetIdentity(_, id) => {
+        blockchainIdentities.Service.get(id) pipeTo sender()
+      }
+      case InsertMultipleIdentity(_, identities) => {
+        blockchainIdentities.Service.insertMultiple(identities) pipeTo sender()
+      }
+      case DeleteIdentity(_, id) => {
+        blockchainIdentities.Service.delete(id) pipeTo sender()
+      }
+      case GetAllIDsByProvisionedIdentity(_, address) => {
+        blockchainIdentities.Service.getAllIDsByProvisioned(address) pipeTo sender()
+      }
+      case GetAllIDsByUnProvisionedIdentity(_, address) => {
+        blockchainIdentities.Service.getAllIDsByUnprovisioned(address) pipeTo sender()
+      }
+      case CheckExistsIdentity(_, id) => {
+        blockchainIdentities.Service.checkExists(id) pipeTo sender()
+      }
+      case GetAllProvisionAddressesIdentity(_, id) => {
+        blockchainIdentities.Service.getAllProvisionAddresses(id) pipeTo sender()
+      }
+      case GetAllUnprovisionedAddressesIdentity(_, id) => {
+        blockchainIdentities.Service.getAllUnprovisionAddresses(id) pipeTo sender()
+      }
+      case AddProvisionAddressIdentity(_, id, address) => {
+        blockchainIdentities.Service.addProvisionAddress(id, address) pipeTo sender()
+      }
+      case DeleteProvisionAddressIdentity(_, id, address) => {
+        blockchainIdentities.Service.deleteProvisionAddress(id, address) pipeTo sender()
+      }
+      case AddUnprovisionedAddressIdentity(_, id, address) => {
+        blockchainIdentities.Service.addUnprovisionAddress(id, address) pipeTo sender()
+      }
+      case DeleteUnprovisionedAddressIdentity(_, id, address) => {
+        blockchainIdentities.Service.deleteUnprovisionAddress(id, address) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateIdentity(uid: String, identity: Identity)
+  case class TryGetIdentity(uid: String, id: String)
+  case class GetIdentity(uid: String, id: String)
+  case class InsertMultipleIdentity(uid: String, identities: Seq[Identity])
+  case class DeleteIdentity(uid: String, id: String)
+  case class GetAllIDsByProvisionedIdentity(uid: String, address: String)
+  case class GetAllIDsByUnProvisionedIdentity(uid: String, address: String)
+  case class CheckExistsIdentity(uid: String, id: String)
+  case class GetAllProvisionAddressesIdentity(uid: String, id: String)
+  case class GetAllUnprovisionedAddressesIdentity(uid: String, id: String)
+  case class AddProvisionAddressIdentity(uid: String, id: String, address: String)
+  case class DeleteProvisionAddressIdentity(uid: String, id: String, address: String)
+  case class AddUnprovisionedAddressIdentity(uid: String, id: String, address: String)
+  case class DeleteUnprovisionedAddressIdentity(uid: String, id: String, address: String)
 }

@@ -1,11 +1,13 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CheckExistsOrder, CreateOrder, DeleteOrder, GetAllOrder, GetAllPrivateOrderIDs, GetAllPublicOrderIDs, GetOrder, InsertMultipleOrder, InsertOrUpdateOrder, OrderActor, TryGetOrder}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Orders.{CheckExistsOrder, CreateOrder, DeleteOrder, GetAllOrder, GetAllPrivateOrderIDs, GetAllPublicOrderIDs, GetOrder, InsertMultipleOrder, InsertOrUpdateOrder, OrderActor, TryGetOrder}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 import models.Trait.Logged
 import models.common.DataValue._
 import models.common.Serializable._
@@ -59,7 +61,7 @@ class Orders @Inject()(
                         masterClassifications: master.Classifications,
                         masterProperties: master.Properties,
                         masterOrders: master.Orders,
-                      )(implicit executionContext: ExecutionContext) {
+                      )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -75,16 +77,36 @@ class Orders @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val orderActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "orderRegion",
-      entityProps = OrderActor.props(Orders.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = OrderActor.idExtractor,
-      extractShardId = OrderActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@CheckExistsOrder(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllOrder(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllPublicOrderIDs(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllPrivateOrderIDs(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
 
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case CheckExistsOrder(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllOrder(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllPublicOrderIDs(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllPrivateOrderIDs(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "orderRegion"
+
+  override def props: Props = Orders.props(Orders.this)
+  
   case class OrderSerialized(id: String, immutables: String, mutables: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Order = Order(id = id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](mutables), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
@@ -160,43 +182,43 @@ class Orders @Inject()(
 
   object Service {
 
-    def createOrderWithActor(order: Order): Future[String] = (orderActorRegion ? CreateOrder(uniqueId, order)).mapTo[String]
+    def createOrderWithActor(order: Order): Future[String] = (actorRegion ? CreateOrder(uniqueId, order)).mapTo[String]
 
     def create(order: Order): Future[String] = add(order)
 
-    def tryGetOrderWithActor(id: String): Future[Order] = (orderActorRegion ? TryGetOrder(uniqueId, id)).mapTo[Order]
+    def tryGetOrderWithActor(id: String): Future[Order] = (actorRegion ? TryGetOrder(uniqueId, id)).mapTo[Order]
 
     def tryGet(id: String): Future[Order] = tryGetByID(id).map(_.deserialize)
 
-    def getOrderWithActor(id: String): Future[Option[Order]] = (orderActorRegion ? GetOrder(uniqueId, id)).mapTo[Option[Order]]
+    def getOrderWithActor(id: String): Future[Option[Order]] = (actorRegion ? GetOrder(uniqueId, id)).mapTo[Option[Order]]
 
     def get(id: String): Future[Option[Order]] = getByID(id).map(_.map(_.deserialize))
 
-    def getAllOrderWithActor: Future[Seq[Order]] = (orderActorRegion ? GetAllOrder(uniqueId)).mapTo[Seq[Order]]
+    def getAllOrderWithActor: Future[Seq[Order]] = (actorRegion ? GetAllOrder(uniqueId)).mapTo[Seq[Order]]
 
     def getAll: Future[Seq[Order]] = getAllOrders.map(_.map(_.deserialize))
 
-    def insertMultipleOrderWithActor(orders: Seq[Order]): Future[Seq[String]] = (orderActorRegion ? InsertMultipleOrder(uniqueId, orders)).mapTo[Seq[String]]
+    def insertMultipleOrderWithActor(orders: Seq[Order]): Future[Seq[String]] = (actorRegion ? InsertMultipleOrder(uniqueId, orders)).mapTo[Seq[String]]
 
     def insertMultiple(orders: Seq[Order]): Future[Seq[String]] = addMultiple(orders)
 
-    def insertOrUpdateOrderWithActor(order: Order): Future[Int] = (orderActorRegion ? InsertOrUpdateOrder(uniqueId, order)).mapTo[Int]
+    def insertOrUpdateOrderWithActor(order: Order): Future[Int] = (actorRegion ? InsertOrUpdateOrder(uniqueId, order)).mapTo[Int]
 
     def insertOrUpdate(order: Order): Future[Int] = upsert(order)
 
-    def deleteOrderWithActor(id: String): Future[Int] = (orderActorRegion ? DeleteOrder(uniqueId, id)).mapTo[Int]
+    def deleteOrderWithActor(id: String): Future[Int] = (actorRegion ? DeleteOrder(uniqueId, id)).mapTo[Int]
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def checkExistsOrderWithActor(id: String): Future[Boolean] = (orderActorRegion ? CheckExistsOrder(uniqueId, id)).mapTo[Boolean]
+    def checkExistsOrderWithActor(id: String): Future[Boolean] = (actorRegion ? CheckExistsOrder(uniqueId, id)).mapTo[Boolean]
 
     def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
 
-    def getAllPublicOrderIDsOrderWithActor: Future[Seq[String]] = (orderActorRegion ? GetAllPublicOrderIDs(uniqueId)).mapTo[Seq[String]]
+    def getAllPublicOrderIDsOrderWithActor: Future[Seq[String]] = (actorRegion ? GetAllPublicOrderIDs(uniqueId)).mapTo[Seq[String]]
 
     def getAllPublicOrderIDs: Future[Seq[String]] = getAllOrders.map(_.map(_.deserialize).filter(_.getTakerID.fact.hash == "").map(_.id))
 
-    def getAllPrivateOrderIDsOrderWithActor(identityIDs: Seq[String]): Future[Seq[String]] = (orderActorRegion ? GetAllPrivateOrderIDs(uniqueId, identityIDs)).mapTo[Seq[String]]
+    def getAllPrivateOrderIDsOrderWithActor(identityIDs: Seq[String]): Future[Seq[String]] = (actorRegion ? GetAllPrivateOrderIDs(uniqueId, identityIDs)).mapTo[Seq[String]]
 
     def getAllPrivateOrderIDs(identityIDs: Seq[String]): Future[Seq[String]] = {
       val hashedIdentityIDs = identityIDs.map(utilities.Hash.getHash(_))
@@ -413,4 +435,59 @@ class Orders @Inject()(
     }
   }
 
+}
+
+object Orders {
+  def props(blockchainOrders: models.blockchain.Orders) (implicit executionContext: ExecutionContext) = Props(new OrderActor(blockchainOrders))
+
+  @Singleton
+  class OrderActor @Inject()(
+                              blockchainOrders: models.blockchain.Orders
+                            ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateOrder(_, order) => {
+        blockchainOrders.Service.create(order) pipeTo sender()
+      }
+      case TryGetOrder(_, id) => {
+        blockchainOrders.Service.tryGet(id) pipeTo sender()
+      }
+      case GetOrder(_, id) => {
+        blockchainOrders.Service.get(id) pipeTo sender()
+      }
+      case InsertMultipleOrder(_, orders) => {
+        blockchainOrders.Service.insertMultiple(orders) pipeTo sender()
+      }
+      case DeleteOrder(_, id) => {
+        blockchainOrders.Service.delete(id) pipeTo sender()
+      }
+      case GetAllOrder(_) => {
+        blockchainOrders.Service.getAll pipeTo sender()
+      }
+      case CheckExistsOrder(_, id) => {
+        blockchainOrders.Service.checkExists(id) pipeTo sender()
+      }
+      case InsertOrUpdateOrder(_, order) => {
+        blockchainOrders.Service.insertOrUpdate(order) pipeTo sender()
+      }
+      case GetAllPublicOrderIDs(_) => {
+        blockchainOrders.Service.getAllPublicOrderIDs pipeTo sender()
+      }
+      case GetAllPrivateOrderIDs(_, identityIDs) => {
+        blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateOrder(uid: String, order: Order)
+  case class TryGetOrder(uid: String, id: String)
+  case class GetOrder(uid: String, id: String)
+  case class InsertMultipleOrder(uid: String, order: Seq[Order])
+  case class DeleteOrder(uid: String, id: String)
+  case class InsertOrUpdateOrder(uid: String, order: Order)
+  case class CheckExistsOrder(uid: String, id: String)
+  case class GetAllOrder(uid: String)
+  case class GetAllPublicOrderIDs(uid: String)
+  case class GetAllPrivateOrderIDs(uid: String, identityIDs: Seq[String])
 }

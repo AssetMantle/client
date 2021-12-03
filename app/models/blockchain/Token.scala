@@ -1,20 +1,19 @@
 package models.blockchain
 
 import java.sql.Timestamp
-import akka.actor.ActorSystem
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import actors.models
-import actors.models.blockchain.{CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
+import models.blockchain.Tokens.{CreateToken, GetAllDenoms, GetAllToken, GetStakingToken, GetToken, GetTotalBondedAmount, InsertMultipleToken, InsertOrUpdateToken, TokenActor, UpdateStakingAmounts, UpdateTotalSupplyAndInflation}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.ShardRegion
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries._
 import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
@@ -22,9 +21,9 @@ import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPool
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
+import models.Abstract.ShardedActorRegion
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -38,7 +37,7 @@ class Tokens @Inject()(
                         getStakingPool: GetStakingPool,
                         getMintingInflation: GetMintingInflation,
                         getCommunityPool: GetCommunityPool,
-                      )(implicit executionContext: ExecutionContext) {
+                      )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -58,15 +57,35 @@ class Tokens @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val tokenActorRegion = {
-    ClusterSharding(models.blockchain.Service.actorSystem).start(
-      typeName = "tokenRegion",
-      entityProps = TokenActor.props(Tokens.this),
-      settings = ClusterShardingSettings(models.blockchain.Service.actorSystem),
-      extractEntityId = TokenActor.idExtractor,
-      extractShardId = TokenActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateToken(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetToken(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllToken(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllDenoms(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetStakingToken(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleToken(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateToken(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@UpdateStakingAmounts(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@UpdateTotalSupplyAndInflation(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetTotalBondedAmount(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateToken(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetToken(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllToken(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllDenoms(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetStakingToken(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleToken(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateToken(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case UpdateStakingAmounts(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case UpdateTotalSupplyAndInflation(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetTotalBondedAmount(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "tokenRegion"
+
+  override def props: Props = Tokens.props(Tokens.this)
 
   case class TokenSerialized(denom: String, totalSupply: String, bondedAmount: String, notBondedAmount: String, communityPool: String, inflation: BigDecimal, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Token = Token(denom = denom, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -174,43 +193,43 @@ class Tokens @Inject()(
 
   object Service {
 
-    def createTokenWithActor(token: Token): Future[String] = (tokenActorRegion ? CreateToken(uniqueId, token)).mapTo[String]
+    def createTokenWithActor(token: Token): Future[String] = (actorRegion ? CreateToken(uniqueId, token)).mapTo[String]
 
     def create(token: Token): Future[String] = add(token)
 
-    def getTokenWithActor(denom: String): Future[Token] = (tokenActorRegion ? GetToken(uniqueId, denom)).mapTo[Token]
+    def getTokenWithActor(denom: String): Future[Token] = (actorRegion ? GetToken(uniqueId, denom)).mapTo[Token]
 
     def get(denom: String): Future[Token] = findByDenom(denom).map(_.deserialize)
 
-    def getAllTokenWithActor: Future[Seq[Token]] = (tokenActorRegion ? GetAllToken(uniqueId)).mapTo[Seq[Token]]
+    def getAllTokenWithActor: Future[Seq[Token]] = (actorRegion ? GetAllToken(uniqueId)).mapTo[Seq[Token]]
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
 
-    def getAllDenomsWithActor: Future[Seq[String]] = (tokenActorRegion ? GetAllDenoms(uniqueId)).mapTo[Seq[String]]
+    def getAllDenomsWithActor: Future[Seq[String]] = (actorRegion ? GetAllDenoms(uniqueId)).mapTo[Seq[String]]
 
     def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
 
-    def getStakingTokenWithActor: Future[Token] = (tokenActorRegion ? GetStakingToken(uniqueId)).mapTo[Token]
+    def getStakingTokenWithActor: Future[Token] = (actorRegion ? GetStakingToken(uniqueId)).mapTo[Token]
 
     def getStakingToken: Future[Token] = findByDenom(stakingDenom).map(_.deserialize)
 
-    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (tokenActorRegion ? InsertMultipleToken(uniqueId, tokens)).mapTo[Seq[String]]
+    def insertMultipleTokenWithActor(tokens: Seq[Token]): Future[Seq[String]] = (actorRegion ? InsertMultipleToken(uniqueId, tokens)).mapTo[Seq[String]]
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
-    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (tokenActorRegion ? InsertOrUpdateToken(uniqueId, token)).mapTo[Int]
+    def insertOrUpdateTokenWithActor(token: Token): Future[Int] = (actorRegion ? InsertOrUpdateToken(uniqueId, token)).mapTo[Int]
 
     def insertOrUpdate(token: Token): Future[Int] = upsert(token)
 
-    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (tokenActorRegion ? UpdateStakingAmounts(uniqueId, denom, bondedAmount, notBondedAmount)).mapTo[Int]
+    def updateStakingAmountsWithActor(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = (actorRegion ? UpdateStakingAmounts(uniqueId, denom, bondedAmount, notBondedAmount)).mapTo[Int]
 
     def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (tokenActorRegion ? UpdateTotalSupplyAndInflation(uniqueId, denom, totalSupply, inflation)).mapTo[Int]
+    def updateTotalSupplyAndInflationWithActor(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = (actorRegion ? UpdateTotalSupplyAndInflation(uniqueId, denom, totalSupply, inflation)).mapTo[Int]
 
     def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationByDenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
 
-    def getTotalBondedAmountWithActor: Future[MicroNumber] = (tokenActorRegion ? GetTotalBondedAmount(uniqueId)).mapTo[MicroNumber]
+    def getTotalBondedAmountWithActor: Future[MicroNumber] = (actorRegion ? GetTotalBondedAmount(uniqueId)).mapTo[MicroNumber]
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }
@@ -260,4 +279,59 @@ class Tokens @Inject()(
     }
   }
 
+}
+
+object Tokens {
+  def props(blockchainTokens: models.blockchain.Tokens) (implicit executionContext: ExecutionContext) = Props(new TokenActor(blockchainTokens))
+
+  @Singleton
+  class TokenActor @Inject()(
+                              blockchainTokens: models.blockchain.Tokens
+                            ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateToken(_, token) => {
+        blockchainTokens.Service.create(token) pipeTo sender()
+      }
+      case GetToken(_, denom) => {
+        blockchainTokens.Service.get(denom) pipeTo sender()
+      }
+      case GetAllToken(_) => {
+        blockchainTokens.Service.getAll pipeTo sender()
+      }
+      case GetAllDenoms(_) => {
+        blockchainTokens.Service.getAllDenoms pipeTo sender()
+      }
+      case GetStakingToken(_) => {
+        blockchainTokens.Service.getStakingToken pipeTo sender()
+      }
+      case InsertMultipleToken(_, tokens) => {
+        blockchainTokens.Service.insertMultiple(tokens) pipeTo sender()
+      }
+      case InsertOrUpdateToken(_, token) => {
+        blockchainTokens.Service.insertOrUpdate(token) pipeTo sender()
+      }
+      case UpdateStakingAmounts(_, denom, bondedAmount, notBondedAmount) => {
+        blockchainTokens.Service.updateStakingAmounts(denom, bondedAmount, notBondedAmount) pipeTo sender()
+      }
+      case UpdateTotalSupplyAndInflation(_, denom, totalSupply, inflation) => {
+        blockchainTokens.Service.updateTotalSupplyAndInflation(denom, totalSupply, inflation) pipeTo sender()
+      }
+      case GetTotalBondedAmount(_) => {
+        blockchainTokens.Service.getTotalBondedAmount pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateToken(id: String, Token: Token)
+  case class GetToken(id: String, denom: String)
+  case class GetAllToken(id: String)
+  case class GetAllDenoms(id: String)
+  case class GetStakingToken(id: String)
+  case class InsertMultipleToken(id: String, Tokens: Seq[Token])
+  case class InsertOrUpdateToken(id: String, Token: Token)
+  case class UpdateStakingAmounts(id: String, denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber)
+  case class UpdateTotalSupplyAndInflation(id: String, denom: String, totalSupply: MicroNumber, inflation: BigDecimal)
+  case class GetTotalBondedAmount(id: String)
 }

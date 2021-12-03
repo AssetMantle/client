@@ -1,32 +1,31 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{CreateRedelegation, DeleteRedelegation, GetAllRedelegation, GetAllRedelegationBySourceValidator, InsertMultipleRedelegation, InsertOrUpdateRedelegation, RedelegationActor, TryGetRedelegation}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Redelegations.{CreateRedelegation, DeleteRedelegation, GetAllRedelegation, GetAllRedelegationBySourceValidator, InsertMultipleRedelegation, InsertOrUpdateRedelegation, RedelegationActor, TryGetRedelegation}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 
 import java.sql.Timestamp
 import exceptions.BaseException
+import models.Abstract.ShardedActorRegion
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Parameters.SlashingParameter
 import models.common.Serializable.RedelegationEntry
 import models.common.TransactionMessages.Redelegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.blockchain.{GetDelegatorRedelegations, GetValidatorDelegatorDelegation}
-import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
+import queries.blockchain.{GetDelegatorRedelegations}
 import queries.responses.blockchain.DelegatorRedelegationsResponse.{Response => DelegatorRedelegationsResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -43,7 +42,7 @@ class Redelegations @Inject()(
                                blockchainParameters: Parameters,
                                blockchainUndelegations: Undelegations,
                                utilitiesOperations: utilities.Operations,
-                             )(implicit executionContext: ExecutionContext) {
+                             )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -61,15 +60,29 @@ class Redelegations @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val redelegationActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "redelegationRegion",
-      entityProps = RedelegationActor.props(Redelegations.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = RedelegationActor.idExtractor,
-      extractShardId = RedelegationActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@CreateRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertMultipleRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateRedelegation(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllRedelegationBySourceValidator(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllRedelegation(id) => (id, attempt)
+    case attempt@DeleteRedelegation(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@TryGetRedelegation(id, _, _, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case CreateRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertMultipleRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateRedelegation(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllRedelegationBySourceValidator(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllRedelegation(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteRedelegation(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case TryGetRedelegation(id, _, _, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "redelegationRegion"
+
+  override def props: Props = Redelegations.props(Redelegations.this)
 
   case class RedelegationSerialized(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String, entries: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Redelegation = Redelegation(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress, entries = utilities.JSON.convertJsonStringToObject[Seq[RedelegationEntry]](entries), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -144,31 +157,31 @@ class Redelegations @Inject()(
 
   object Service {
 
-    def createRedelegationWithActor(redelegation: Redelegation): Future[String] = (redelegationActorRegion ? CreateRedelegation(uniqueId, redelegation)).mapTo[String]
+    def createRedelegationWithActor(redelegation: Redelegation): Future[String] = (actorRegion ? CreateRedelegation(uniqueId, redelegation)).mapTo[String]
 
     def create(redelegation: Redelegation): Future[String] = add(redelegation)
 
-    def insertMultipleRedelegationWithActor(redelegations: Seq[Redelegation]): Future[Seq[String]] = (redelegationActorRegion ? InsertMultipleRedelegation(uniqueId, redelegations)).mapTo[Seq[String]]
+    def insertMultipleRedelegationWithActor(redelegations: Seq[Redelegation]): Future[Seq[String]] = (actorRegion ? InsertMultipleRedelegation(uniqueId, redelegations)).mapTo[Seq[String]]
 
     def insertMultiple(redelegations: Seq[Redelegation]): Future[Seq[String]] = addMultiple(redelegations)
 
-    def insertOrUpdateRedelegationWithActor(redelegation: Redelegation): Future[Int] = (redelegationActorRegion ? InsertOrUpdateRedelegation(uniqueId, redelegation)).mapTo[Int]
+    def insertOrUpdateRedelegationWithActor(redelegation: Redelegation): Future[Int] = (actorRegion ? InsertOrUpdateRedelegation(uniqueId, redelegation)).mapTo[Int]
 
     def insertOrUpdate(redelegation: Redelegation): Future[Int] = upsert(redelegation)
 
-    def getAllBySourceValidatorRedelegationWithActor(address: String): Future[Seq[Redelegation]] = (redelegationActorRegion ? GetAllRedelegationBySourceValidator(uniqueId, address)).mapTo[Seq[Redelegation]]
+    def getAllBySourceValidatorRedelegationWithActor(address: String): Future[Seq[Redelegation]] = (actorRegion ? GetAllRedelegationBySourceValidator(uniqueId, address)).mapTo[Seq[Redelegation]]
 
     def getAllBySourceValidator(address: String): Future[Seq[Redelegation]] = findAllByValidatorSource(address).map(_.map(_.deserialize))
 
-    def getAllRedelegationWithActor: Future[Seq[Redelegation]] = (redelegationActorRegion ? GetAllRedelegation(uniqueId)).mapTo[Seq[Redelegation]]
+    def getAllRedelegationWithActor: Future[Seq[Redelegation]] = (actorRegion ? GetAllRedelegation(uniqueId)).mapTo[Seq[Redelegation]]
 
     def getAll: Future[Seq[Redelegation]] = findAll.map(_.map(_.deserialize))
 
-    def deleteRedelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = (redelegationActorRegion ? DeleteRedelegation(uniqueId, delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Int]
+    def deleteRedelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = (actorRegion ? DeleteRedelegation(uniqueId, delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Int]
 
     def delete(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = deleteByAddresses(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress)
 
-    def tryGetDelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = (redelegationActorRegion ? TryGetRedelegation(uniqueId, delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Redelegation]
+    def tryGetDelegationWithActor(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = (actorRegion ? TryGetRedelegation(uniqueId, delegatorAddress, validatorSourceAddress, validatorDestinationAddress)).mapTo[Redelegation]
 
     def tryGet(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Redelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorSourceAddress = validatorSourceAddress, validatorDestinationAddress = validatorDestinationAddress).map(_.deserialize)
   }
@@ -253,4 +266,47 @@ class Redelegations @Inject()(
 
   }
 
+}
+
+object Redelegations {
+  def props(blockchainRedelegations: models.blockchain.Redelegations) (implicit executionContext: ExecutionContext) = Props(new RedelegationActor(blockchainRedelegations))
+
+  @Singleton
+  class RedelegationActor @Inject()(
+                                     blockchainRedelegations: models.blockchain.Redelegations
+                                   ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case CreateRedelegation(_, redelegation) => {
+        blockchainRedelegations.Service.create(redelegation) pipeTo sender()
+      }
+      case InsertMultipleRedelegation(_, redelegations) => {
+        blockchainRedelegations.Service.insertMultiple(redelegations) pipeTo sender()
+      }
+      case InsertOrUpdateRedelegation(_, redelegation) => {
+        blockchainRedelegations.Service.insertOrUpdate(redelegation) pipeTo sender()
+      }
+      case GetAllRedelegationBySourceValidator(_, address) => {
+        blockchainRedelegations.Service.getAllBySourceValidator(address) pipeTo sender()
+      }
+      case GetAllRedelegation(_) => {
+        blockchainRedelegations.Service.getAll pipeTo sender()
+      }
+      case DeleteRedelegation(_, delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
+        blockchainRedelegations.Service.delete(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
+      }
+      case TryGetRedelegation(_, delegatorAddress, validatorSourceAddress, validatorDestinationAddress) => {
+        blockchainRedelegations.Service.tryGet(delegatorAddress, validatorSourceAddress, validatorDestinationAddress) pipeTo sender()
+      }
+    }
+  }
+
+  case class CreateRedelegation(uid: String, redelegation: Redelegation)
+  case class InsertMultipleRedelegation(uid: String, redelegations: Seq[Redelegation])
+  case class InsertOrUpdateRedelegation(uid: String, redelegation: Redelegation)
+  case class GetAllRedelegationBySourceValidator(uid: String, address: String)
+  case class GetAllRedelegation(uid: String)
+  case class DeleteRedelegation(uid: String, delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String)
+  case class TryGetRedelegation(uid: String, delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String)
 }

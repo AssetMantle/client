@@ -1,14 +1,14 @@
 package models.blockchain
 
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import actors.models.blockchain
-import actors.models.blockchain.{DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import models.blockchain.Proposals.{DeleteProposal, GetAllActiveProposals, GetAllInActiveProposals, GetAllProposal, GetLatestProposalID, GetProposalWithActor, GetProposals, InsertOrUpdateProposal, ProposalActor, TryGetProposal}
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.cluster.sharding.{ShardRegion}
+import constants.Actor.{NUMBER_OF_ENTITIES, NUMBER_OF_SHARDS}
 import exceptions.BaseException
-import models.Abstract.ProposalContent
+import models.Abstract.{ProposalContent, ShardedActorRegion}
 import models.Trait.Logged
-import models.common.Parameters.{GovernanceParameter, MintingParameter}
 import models.common.ProposalContents._
 import models.common.Serializable.{Coin, FinalTallyResult}
 import models.common.TransactionMessages.{Deposit, SubmitProposal}
@@ -24,7 +24,6 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -78,7 +77,7 @@ class Proposals @Inject()(
                            blockchainBalances: Balances,
                            blockchainValidators: Validators,
                            blockchainTokens: Tokens,
-                         )(implicit executionContext: ExecutionContext) {
+                         )(implicit executionContext: ExecutionContext) extends ShardedActorRegion {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -98,15 +97,33 @@ class Proposals @Inject()(
 
   private implicit val timeout = Timeout(constants.Actor.ACTOR_ASK_TIMEOUT)
 
-  private val proposalActorRegion = {
-    ClusterSharding(blockchain.Service.actorSystem).start(
-      typeName = "proposalRegion",
-      entityProps = ProposalActor.props(Proposals.this),
-      settings = ClusterShardingSettings(blockchain.Service.actorSystem),
-      extractEntityId = ProposalActor.idExtractor,
-      extractShardId = ProposalActor.shardResolver
-    )
+  override def idExtractor: ShardRegion.ExtractEntityId = {
+    case attempt@TryGetProposal(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@InsertOrUpdateProposal(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllProposal(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetProposalWithActor(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetLatestProposalID(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllActiveProposals(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetAllInActiveProposals(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@GetProposals(id) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
+    case attempt@DeleteProposal(id, _) => ((id.hashCode.abs % NUMBER_OF_ENTITIES).toString, attempt)
   }
+
+  override def shardResolver: ShardRegion.ExtractShardId = {
+    case TryGetProposal(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case InsertOrUpdateProposal(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllProposal(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetProposalWithActor(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetLatestProposalID(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllActiveProposals(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetAllInActiveProposals(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case GetProposals(id) => (id.hashCode % NUMBER_OF_SHARDS).toString
+    case DeleteProposal(id, _) => (id.hashCode % NUMBER_OF_SHARDS).toString
+  }
+
+  override def regionName: String = "proposalRegion"
+
+  override def props: Props = Proposals.props(Proposals.this)
 
   case class ProposalSerialized(id: Int, content: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = submitTime, depositEndTime = depositEndTime, totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = votingStartTime, votingEndTime = votingEndTime, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
@@ -185,35 +202,35 @@ class Proposals @Inject()(
 
   object Service {
 
-    def tryGetProposalWithActor(id: Int): Future[Proposal] = (proposalActorRegion ? TryGetProposal(uniqueId, id)).mapTo[Proposal]
+    def tryGetProposalWithActor(id: Int): Future[Proposal] = (actorRegion ? TryGetProposal(uniqueId, id)).mapTo[Proposal]
 
     def tryGet(id: Int): Future[Proposal] = tryGetByID(id).map(_.deserialize)
 
-    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (proposalActorRegion ? InsertOrUpdateProposal(uniqueId, proposal)).mapTo[Int]
+    def insertOrUpdateProposalWithActor(proposal: Proposal): Future[Int] = (actorRegion ? InsertOrUpdateProposal(uniqueId, proposal)).mapTo[Int]
 
     def insertOrUpdate(proposal: Proposal): Future[Int] = upsert(proposal)
 
-    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (proposalActorRegion ? GetProposalWithActor(uniqueId, id)).mapTo[Option[Proposal]]
+    def getProposalWithActor(id: Int): Future[Option[Proposal]] = (actorRegion ? GetProposalWithActor(uniqueId, id)).mapTo[Option[Proposal]]
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 
-    def getLatestProposalIDWithActor: Future[Int] = (proposalActorRegion ? GetLatestProposalID(uniqueId)).mapTo[Int]
+    def getLatestProposalIDWithActor: Future[Int] = (actorRegion ? GetLatestProposalID(uniqueId)).mapTo[Int]
 
     def getLatestProposalID: Future[Int] = getMaxProposalID
 
-    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActorRegion ? GetAllActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
+    def getAllActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (actorRegion ? GetAllActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
 
     def getAllActiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.votingEndTime != "" && utilities.Date.isMature(completionTimestamp = x.votingEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (proposalActorRegion ? GetAllInActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
+    def getAllInActiveProposalsWithActor(time: String): Future[Seq[Proposal]] = (actorRegion ? GetAllInActiveProposals(uniqueId, time)).mapTo[Seq[Proposal]]
 
     def getAllInactiveProposals(time: String): Future[Seq[Proposal]] = getAllProposals.map(_.filter(x => x.depositEndTime != "" && utilities.Date.isMature(completionTimestamp = x.depositEndTime, currentTimeStamp = time)).map(_.deserialize))
 
-    def deleteProposalsWithActor(id: Int): Future[Int] = (proposalActorRegion ? DeleteProposal(uniqueId, id)).mapTo[Int]
+    def deleteProposalsWithActor(id: Int): Future[Int] = (actorRegion ? DeleteProposal(uniqueId, id)).mapTo[Int]
 
     def delete(id: Int): Future[Int] = deleteByID(id)
 
-    def getProposalsWithActor(): Future[Seq[Proposal]] = (proposalActorRegion ? GetProposals(uniqueId)).mapTo[Seq[Proposal]]
+    def getProposalsWithActor(): Future[Seq[Proposal]] = (actorRegion ? GetProposals(uniqueId)).mapTo[Seq[Proposal]]
 
     def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 
@@ -290,4 +307,52 @@ class Proposals @Inject()(
 
   }
 
+}
+
+object Proposals {
+  def props(blockchainProposals: models.blockchain.Proposals) (implicit executionContext: ExecutionContext) = Props(new ProposalActor(blockchainProposals))
+
+  @Singleton
+  class ProposalActor @Inject()(
+                                 blockchainProposals: models.blockchain.Proposals
+                               ) (implicit executionContext: ExecutionContext) extends Actor with ActorLogging {
+    private implicit val logger: Logger = Logger(this.getClass)
+
+    override def receive: Receive = {
+      case InsertOrUpdateProposal(_, proposal) => {
+        blockchainProposals.Service.insertOrUpdate(proposal) pipeTo sender()
+      }
+      case TryGetProposal(_, id) => {
+        blockchainProposals.Service.tryGet(id) pipeTo sender()
+      }
+      case GetProposalWithActor(_, id) => {
+        blockchainProposals.Service.get(id) pipeTo sender()
+      }
+      case GetLatestProposalID(_) => {
+        blockchainProposals.Service.getLatestProposalID pipeTo sender()
+      }
+      case GetAllActiveProposals(_, time) => {
+        blockchainProposals.Service.getAllActiveProposals(time) pipeTo sender()
+      }
+      case GetAllInActiveProposals(_, time) => {
+        blockchainProposals.Service.getAllInactiveProposals(time) pipeTo sender()
+      }
+      case DeleteProposal(_, id) => {
+        blockchainProposals.Service.delete(id) pipeTo sender()
+      }
+      case GetProposals(_) => {
+        blockchainProposals.Service.get() pipeTo sender()
+      }
+    }
+  }
+
+  case class TryGetProposal(uid: String, id: Int)
+  case class InsertOrUpdateProposal(uid: String, proposal: Proposal)
+  case class GetAllProposal(uid: String)
+  case class GetProposalWithActor(uid: String, id: Int)
+  case class GetLatestProposalID(uid: String)
+  case class GetAllActiveProposals(uid: String, time: String)
+  case class GetAllInActiveProposals(uid: String, time: String)
+  case class GetProposals(uid: String)
+  case class DeleteProposal(uid: String, id: Int)
 }
