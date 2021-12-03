@@ -6,6 +6,6 @@
 
 @defining(msg.asInstanceOf[SplitWrap]) { splitWrap =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(splitWrap.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${splitWrap.from}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(splitWrap.fromID, routes.IndexController.search(splitWrap.fromID)))
-    @commonTextInfo(constants.View.COIN, splitWrap.coins.map(coin => s"${coin.amount} ${coin.denom}").mkString(", "))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(splitWrap.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitWrap.fromID}'))")))
+    @commonTextInfo(constants.View.COIN, splitWrap.coins.map(_.getAmountWithNormalizedDenom()).mkString(", "))
 }

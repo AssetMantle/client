@@ -896,6 +896,16 @@ body.lightMode {
   white-space: nowrap;
   max-width: 100%;
   width:120px;
+  display: block;
+}
+
+.stringEllipse {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  width: 200px;
+  display: block;
 }
 
 .footer {

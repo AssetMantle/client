@@ -6,7 +6,7 @@
 @commonModalInfo(constants.View.PROVISIONED_ADDRESS_LIST) {
     @commonTextInfo(constants.View.IDENTITY_ID, identityID)
     @provisionedAddresses.map { address =>
-        @address
+        @address<br>
         @loginState match {
             case Some(login) => {
                 @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identityID}', '${address}'")

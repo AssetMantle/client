@@ -7,5 +7,5 @@
 @defining(msg.asInstanceOf[IdentityUnprovision]) { identityUnprovision =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityUnprovision.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityUnprovision.from}'))")))
     @commonHtmlInfo(constants.View.TO, commonJavascriptLink(identityUnprovision.to, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityUnprovision.to}'))")))
-    @commonHtmlInfo(constants.View.IDENTITY_ID, commonLink(identityUnprovision.identityID, routes.IndexController.search(identityUnprovision.identityID)))
+    @commonHtmlInfo(constants.View.IDENTITY_ID, commonJavascriptLink(identityUnprovision.identityID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${identityUnprovision.identityID}'))")))
 }

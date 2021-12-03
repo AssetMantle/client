@@ -6,13 +6,7 @@
 
 @defining(msg.asInstanceOf[AssetDefine]) { assetDefine =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetDefine.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetDefine.from}'))")))
-    @commonHtmlInfo(constants.View.FROM_ID, commonLink(assetDefine.fromID, routes.IndexController.search(assetDefine.fromID)))
-    @Messages(constants.View.IMMUTABLE_META_TRAITS):
-    @views.html.component.blockchain.metaProperties(assetDefine.immutableMetaTraits.metaPropertyList)
-    @Messages(constants.View.MUTABLE_META_TRAITS):
-    @views.html.component.blockchain.metaProperties(assetDefine.mutableMetaTraits.metaPropertyList)
-    @Messages(constants.View.IMMUTABLE_TRAITS):
-    @views.html.component.blockchain.properties(assetDefine.immutableTraits.propertyList)
-    @Messages(constants.View.MUTABLE_TRAITS):
-    @views.html.component.blockchain.properties(assetDefine.mutableTraits.propertyList)
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(assetDefine.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetDefine.fromID}'))")))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = assetDefine.mutableMetaTraits.metaPropertyList, immutableMetaProperties = assetDefine.immutableMetaTraits.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = assetDefine.mutableTraits.propertyList, immutableProperties = assetDefine.immutableTraits.propertyList)
 }

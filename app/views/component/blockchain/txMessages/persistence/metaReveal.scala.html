@@ -6,6 +6,6 @@
 
 @defining(msg.asInstanceOf[MetaReveal]) { metaReveal =>
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(metaReveal.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${metaReveal.from}'))")))
-    @Messages(constants.View.META_FACT):
-    @views.html.component.blockchain.data(metaReveal.metaFact.data)
+    @commonTextInfo(constants.View.DATA_TYPE, constants.View.DataTypesMap.getOrElse(metaReveal.metaFact.data.dataType, metaReveal.metaFact.data.dataType))
+    @commonTextInfo(constants.View.DATA_VALUE, metaReveal.metaFact.data.value.toFormattedString)
 }
