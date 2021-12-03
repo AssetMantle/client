@@ -1,0 +1,14 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ChannelOpenAck
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ChannelOpenAck]) { channelOpenAck =>
+    @commonTextInfo(constants.View.PORT_ID, channelOpenAck.portID)
+    @commonTextInfo(constants.View.CHANNEL_ID, channelOpenAck.channelID)
+    @commonTextInfo(constants.View.COUNTERPARTY_CHANNEL_ID, channelOpenAck.counterpartyChannelID)
+    @commonTextInfo(constants.View.COUNTERPARTY_VERSION, channelOpenAck.counterpartyVersion)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, channelOpenAck.proofHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(channelOpenAck.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${channelOpenAck.signer}'))")))
+}

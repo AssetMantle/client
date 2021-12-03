@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -39,6 +40,10 @@ class SplitController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   def sendForm(ownableID: String, fromID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.splitSend(ownableID = ownableID, fromID = fromID))
@@ -66,7 +71,7 @@ class SplitController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID, sendData.fromID)))
 
@@ -111,7 +116,7 @@ class SplitController @Inject()(
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -154,7 +159,7 @@ class SplitController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID, unwrapData.fromID)))
 

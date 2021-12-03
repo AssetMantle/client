@@ -6,15 +6,11 @@ import transactions.Abstract.BaseResponse
 
 object DelegatorRewardsResponse {
 
-  case class Reward(validator_address: String, reward: Option[Seq[Coin]])
+  case class Reward(validator_address: String, reward: Seq[Coin])
 
   implicit val rewardReads: Reads[Reward] = Json.reads[Reward]
 
-  case class Result(rewards: Option[Seq[Reward]], total: Option[Seq[Coin]])
-
-  implicit val resultReads: Reads[Result] = Json.reads[Result]
-
-  case class Response(height: String, result: Result) extends BaseResponse
+  case class Response(rewards: Seq[Reward], total: Seq[Coin]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

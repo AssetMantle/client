@@ -1,0 +1,11 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Deposit
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Deposit]) { deposit =>
+    @commonHtmlInfo(constants.View.DEPOSITOR, commonJavascriptLink(deposit.depositor, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${deposit.depositor}'))")))
+    @commonTextInfo(constants.View.PROPOSAL_ID, deposit.proposalID.toString)
+    @commonTextInfo(constants.View.AMOUNTS, deposit.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+}

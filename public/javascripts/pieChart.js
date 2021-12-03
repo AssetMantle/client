@@ -3,9 +3,14 @@ function pieChart(chartID, keys, values, showLegend) {
     let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
     let totalValue = 0.0;
     let colors = [];
+    let colorPrefixes = ["e", 4 , 1 , 2, 6, "b", 9, 3, "f", 5, 6, 0 , "e", 2, 8, "b", 9, 3, "f", 5, "a" , 7 , "c", 2, 6, "b", 9, 3, "f", 5,"e", 4 , 1 , 2, 6, "b", 9, 3, "f", 5, 6, 0 , "e", 2, 8, "b", 9, 3, "f", 5];
     for (let i = 0; i < valueList.length; i++) {
         totalValue = totalValue + parseFloat(valueList[i]);
-        colors.push('#' + ((i + 1) * 16777215) / (valueList.length + 1).toString(16));
+        if(colorPrefixes.length <= i){
+            colors.push('#' +colorPrefixes[i - colorPrefixes.length] + ((i + 50) * 884).toString());
+        }else {
+            colors.push('#' +colorPrefixes[i] + ((i + 50) * 884).toString());
+        }
     }
 
     Chart.defaults.global.legend.display = showLegend;
@@ -20,7 +25,7 @@ function pieChart(chartID, keys, values, showLegend) {
     };
     let ctx = $('#' + chartID);
     let chart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: chartData,
         options: {
             tooltips: {

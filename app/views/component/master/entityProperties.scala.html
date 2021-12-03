@@ -5,26 +5,26 @@
 @import views.html.base._
 
 @(isOwner: Boolean, properties: Seq[Property], immutables: Immutables, mutables: Mutables, metas: Seq[Meta])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
-@commonModalInfo(constants.View.PROPERTIES){
+@commonModalInfo(constants.View.PROPERTIES) {
     @if(properties.nonEmpty) {
         @properties.map { property =>
-                @defining(metas.exists(_.id == property.hashID)) { isRevealed =>
-                    @commonTextInfo(constants.View.NAME, property.name)
-                    @if(isOwner || isRevealed) {
-                        @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
-                    }
-                    @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
-                    @commonTextInfo(constants.View.HASH_ID, property.hashID)
-                    @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
-                    @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
-                    @commonBooleanInfo(constants.View.IS_REVEALED, Option(isRevealed))
-                    @if(!isRevealed && property.hashID != "") {
-                        @commonFormButton(constants.Form.META_REVEAL, 'parameters -> s"'${property.value.getOrElse("")}', '${property.dataType}'")
-                    }
+            @defining(metas.exists(_.id == property.hashID)) { isRevealed =>
+                @commonTextInfo(constants.View.NAME, property.name)
+                @if(isOwner || isRevealed) {
+                    @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
                 }
+                @commonTextInfo(constants.View.DATA_TYPE, property.dataType)
+                @commonTextInfo(constants.View.HASH_ID, property.hashID)
+                @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
+                @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
+                @commonBooleanInfo(constants.View.IS_REVEALED, Option(isRevealed))
+                @if(!isRevealed && property.hashID != "") {
+                    @commonFormButton(constants.Form.META_REVEAL, 'parameters -> s"'${property.value.getOrElse("")}', '${property.dataType}'")
+                }
+            }
+            <br>
         }
     } else {
-        @views.html.component.blockchain.immutables(immutables)
-        @views.html.component.blockchain.mutables(mutables)
+        @views.html.component.blockchain.properties(mutableProperties = mutables.properties.propertyList, immutableProperties = immutables.properties.propertyList)
     }
 }

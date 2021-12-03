@@ -11,6 +11,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
+import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -319,7 +320,7 @@ class Identities @Inject()(
 
     private val chainID = configuration.get[String]("blockchain.chainID")
 
-    def onDefine(identityDefine: IdentityDefine): Future[Unit] = {
+    def onDefine(identityDefine: IdentityDefine)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityDefine.immutableMetaTraits.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityDefine.mutableMetaTraits.metaPropertyList)
 
@@ -349,11 +350,11 @@ class Identities @Inject()(
         _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onIssue(identityIssue: IdentityIssue): Future[Unit] = {
+    def onIssue(identityIssue: IdentityIssue)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.immutableMetaProperties.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.mutableMetaProperties.metaPropertyList)
 
@@ -381,21 +382,21 @@ class Identities @Inject()(
         _ <- masterOperations(identityID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onProvision(identityProvision: IdentityProvision): Future[Unit] = {
+    def onProvision(identityProvision: IdentityProvision)(implicit header: Header): Future[Unit] = {
       val add = Service.addProvisionAddress(id = identityProvision.identityID, address = identityProvision.to)
       (for {
         _ <- add
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_PROVISION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onUnprovision(identityUnprovision: IdentityUnprovision): Future[Unit] = {
+    def onUnprovision(identityUnprovision: IdentityUnprovision)(implicit header: Header): Future[Unit] = {
       val deleteProvision = Service.deleteProvisionAddress(id = identityUnprovision.identityID, address = identityUnprovision.to)
       val addUnprovision = Service.addUnprovisionAddress(id = identityUnprovision.identityID, address = identityUnprovision.to)
       (for {
@@ -403,11 +404,11 @@ class Identities @Inject()(
         _ <- addUnprovision
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def onNub(identityNub: IdentityNub): Future[Unit] = {
+    def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
       val nubMetaProperty = getNubMetaProperty(identityNub.nubID)
       val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(nubMetaProperty))
 
@@ -443,7 +444,7 @@ class Identities @Inject()(
         _ <- masterOperations(classificationID = classificationID, identityID = identityID)
       } yield ()
         ).recover {
-        case _: BaseException => logger.error(constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage)
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_NUB + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 

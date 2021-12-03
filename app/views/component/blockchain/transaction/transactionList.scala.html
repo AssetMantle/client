@@ -1,0 +1,27 @@
+@import views.html.base._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-card cmuk-card-default cmuk-animation-fade transactionsList">
+    <div class="cmuk-overflow-auto">
+        <div class="cmuk-card-header">
+            <p class="leftText"> @Messages(constants.View.TRANSACTIONS)</p>
+        </div>
+        <div class="cmuk-card-body">
+            <div class="productTable">
+                <table class="cmuk-table cmuk-table-striped">
+                    <tbody id="transactionListPage">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @commonSpinner("transactionListPageChangeSpinner")
+    @commonJavascriptButton(constants.View.BACK, JavaScript("getTransactionList(-1)"), 'id -> "transactionList_BACK")
+    @commonJavascriptButton(constants.View.NEXT, JavaScript("getTransactionList(1)"), 'id -> "transactionList_NEXT")
+</div>
+<script>
+        componentResource('transactionListPage', jsRoutes.controllers.ComponentViewController.transactionListPage(1), 'transactionListPageChangeSpinner', 'pageChange');
+        checkAndPushState(jsRoutes.controllers.ViewController.transactions().url, "", "transactionList");
+</script>
+

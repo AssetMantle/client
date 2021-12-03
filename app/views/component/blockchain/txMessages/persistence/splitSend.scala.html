@@ -1,0 +1,13 @@
+@import models.Abstract.TransactionMessage
+@import views.html.base._
+@import models.common.TransactionMessages.SplitSend
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SplitSend]) { splitSend =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(splitSend.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${splitSend.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(splitSend.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.fromID}'))")))
+    @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(splitSend.toID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.toID}'))")))
+    @commonHtmlInfo(constants.View.OWNABLE_ID, commonJavascriptLink(splitSend.ownableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitSend.ownableID}'))")))
+    @commonTextInfo(constants.View.SPLIT, utilities.NumericOperation.formatNumber(splitSend.split))
+}

@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.SplitWrap
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[SplitWrap]) { splitWrap =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(splitWrap.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${splitWrap.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(splitWrap.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${splitWrap.fromID}'))")))
+    @commonTextInfo(constants.View.COIN, splitWrap.coins.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+}

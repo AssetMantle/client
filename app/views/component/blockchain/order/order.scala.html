@@ -1,0 +1,10 @@
+@import models.blockchain.Order
+@import views.html.base._
+
+@(order: Order)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @commonCard(constants.View.ORDER) {
+        <span class="stringEllipse" title="@order.id">@order.id</span>
+    } {
+        @views.html.component.blockchain.properties(mutableProperties = order.mutables.properties.propertyList, immutableProperties = order.immutables.properties.propertyList)
+    }

@@ -4,7 +4,7 @@ object View {
   val PERSISTENCE = "PERSISTENCE"
   val IDENTIFICATION_DETAILS = "IDENTIFICATION_DETAILS"
   val UPDATE_IDENTIFICATION_DETAILS = "UPDATE_IDENTIFICATION_DETAILS"
-
+  val META_DESCRIPTION = "META_DESCRIPTION"
   val SIGN_UP = "SIGN_UP"
   //addIdentification
   val ID_PROOF = "ID_PROOF"
@@ -215,9 +215,11 @@ object View {
   val MOBILE_OTP_NOTE = "MOBILE_OTP_NOTE"
 
   val BLOCKS = "BLOCKS"
+  val TRANSACTION_STATISTICS_X_LABEL = "TRANSACTION_STATISTICS_X_LABEL"
   val TRANSACTIONS = "TRANSACTIONS"
   val TRANSACTION = "TRANSACTION"
   val VALIDATORS = "VALIDATORS"
+  val PROPOSALS = "PROPOSALS"
 
   val BLOCKCHAIN_CONNECTION_LOST = "BLOCKCHAIN_CONNECTION_LOST"
 
@@ -228,10 +230,12 @@ object View {
   val BLOCK_HEADER = "BLOCK_HEADER"
   val HEIGHT = "HEIGHT"
   val PROPOSER = "PROPOSER"
+
   val TIME = "TIME"
   val NUMBER_OF_TRANSACTIONS = "NUMBER_OF_TRANSACTIONS"
   val AVERAGE_BLOCK_TIME = "AVERAGE_BLOCK_TIME"
   val CHAIN_ID = "CHAIN_ID"
+  val USDT = "USDT"
 
   val NO_BLOCK_TRANSACTIONS = "NO_BLOCK_TRANSACTIONS"
   val BLOCK_TRANSACTIONS = "BLOCK_TRANSACTIONS"
@@ -240,14 +244,20 @@ object View {
   val TRANSACTION_FEES = "TRANSACTION_FEES"
   val NUMBER_OF_MESSAGES = "NUMBER_OF_MESSAGES"
   val LOG = "LOG"
+  val CODE = "CODE"
+  val MEMO = "MEMO"
+  val SIGNER = "SIGNER"
+  val FEE_PAYER = "FEE_PAYER"
   val TOKENS_STATISTICS = "TOKENS_STATISTICS"
   val VOTING_POWERS = "VOTING_POWERS"
   val TOTAL_ACTIVE_VALIDATORS = "TOTAL_ACTIVE_VALIDATORS"
-
   val ACCOUNT_WALLET = "ACCOUNT_WALLET"
+  val TOKEN_PRICE = "TOKEN_PRICE"
 
-  val TOKENS_PRICE = "TOKENS_PRICE"
-
+  val PROPOSAL = "PROPOSAL"
+  val PROPOSAL_DEPOSITS = "PROPOSAL_DEPOSITS"
+  val PROPOSAL_VOTES = "PROPOSAL_VOTES"
+  val PROPOSAL_ID = "PROPOSAL_ID"
   val VALIDATOR = "VALIDATOR"
   val ACTIVE_VALIDATORS = "ACTIVE_VALIDATORS"
   val INACTIVE_VALIDATORS = "INACTIVE_VALIDATORS"
@@ -263,6 +273,7 @@ object View {
   val TOKENS = "TOKENS"
   val DELEGATOR_SHARES = "DELEGATOR_SHARES"
   val COMMISSION_RATE = "COMMISSION_RATE"
+  val DELEGATIONS = "DELEGATIONS"
   val MAXIMUM_RATE = "MAXIMUM_RATE"
   val MAXIMUM_CHANGE_RATE = "MAXIMUM_CHANGE_RATE"
   val VALIDATOR_BONDING_STATUS = "VALIDATOR_BONDING_STATUS"
@@ -281,13 +292,26 @@ object View {
   val MINIMUM_SELF_DELEGATION = "MINIMUM_SELF_DELEGATION"
   val VALIDATOR_SOURCE_ADDRESS = "VALIDATOR_SOURCE_ADDRESS"
   val VALIDATOR_DESTINATION_ADDRESS = "VALIDATOR_DESTINATION_ADDRESS"
+  val VOTING_START = "VOTING_START"
+  val VOTING_END = "VOTING_END"
+  val SUBMIT_TIME = "SUBMIT_TIME"
+  val TOTAL_DEPOSIT = "TOTAL_DEPOSIT"
+  val INITIAL_DEPOSIT = "INITIAL_DEPOSIT"
+  val DEPOSIT_END_TIME = "DEPOSIT_END_TIME"
+  val CONTENT = "CONTENT"
+  val VOTE = "VOTE"
+  val FINAL_TALLY_RESULTS = "FINAL_TALLY_RESULTS"
+  val NO_WITH_VETO = "NO_WITH_VETO"
+  val ABSTAIN = "ABSTAIN"
 
   val BONDED_AMOUNT = "BONDED_AMOUNT"
   val NOT_BONDED_AMOUNT = "NOT_BONDED_AMOUNT"
   val TOTAL_SUPPLY = "TOTAL_SUPPLY"
   val COMMUNITY_POOL = "COMMUNITY_POOL"
+  val APY = "APY"
   val INFLATION = "INFLATION"
-
+  val BONDED_TOKENS = "BONDED_TOKENS"
+  val STAKING_POOL = "STAKING_POOL"
   val EVENTS = "EVENTS"
   val NO_EVENTS = "NO_EVENTS"
 
@@ -302,6 +326,11 @@ object View {
   val DELEGATOR_REWARDS = "DELEGATOR_REWARDS"
   val STAKING_TOKEN = "STAKING_TOKEN"
   val ALL_TOKENS = "ALL_TOKENS"
+  val REWARDS = "REWARDS"
+  val TOTAL_REWARDS = "TOTAL_REWARDS"
+  val TX_STATISTICS = "TX_STATISTICS"
+  val TOTAL_ACCOUNTS = "TOTAL_ACCOUNTS"
+  val TOTAL_TRANSACTIONS = "TOTAL_TRANSACTIONS"
 
   val UPTIME = "UPTIME"
   val SELF_DELEGATED = "SELF_DELEGATED"
@@ -319,6 +348,8 @@ object View {
   val BURN = "BURN"
   val IMMUTABLE_PROPERTIES = "IMMUTABLE_PROPERTIES"
   val MUTABLE_PROPERTIES = "MUTABLE_PROPERTIES"
+  val MUTABLES = "MUTABLES"
+  val IMMUTABLES = "IMMUTABLES"
   val IMMUTABLE_META_PROPERTIES = "IMMUTABLE_META_PROPERTIES"
   val MUTABLE_META_PROPERTIES = "MUTABLE_META_PROPERTIES"
   val PROPERTY_ID = "PROPERTY_ID"
@@ -371,6 +402,7 @@ object View {
   val META_PROPERTY_ID = "META_PROPERTY_ID"
   val DATA = "DATA"
   val DATA_TYPE = "DATA_TYPE"
+  val DATA_VALUE = "DATA_VALUE"
   val MUTABLE_TRAITS = "MUTABLE_TRAITS"
   val IMMUTABLE_TRAITS = "IMMUTABLE_TRAITS"
   val IMMUTABLE_META_TRAITS = "IMMUTABLE_META_TRAITS"
@@ -432,5 +464,131 @@ object View {
   val AMOUNTS = "AMOUNTS"
   val LATEST_BLOCKS = "LATEST_BLOCKS"
   val COPY = "COPY"
+  val END_TIME = "END_TIME"
+  val DELAYED = "DELAYED"
+  val SENDER = "SENDER"
+  val INVARIANT_MODULE_NAME = "INVARIANT_MODULE_NAME"
+  val INVARIANT_ROUTE = "INVARIANT_ROUTE"
+  val DEPOSITOR = "DEPOSITOR"
+  val SUBMITTER = "SUBMITTER"
+  val EVIDENCE = "EVIDENCE"
+  val POWER = "POWER"
+  val CONSENSUS_ADDRESS = "CONSENSUS_ADDRESS"
+  val CLIENT_ID = "CLIENT_ID"
+  val COUNTERPARTY = "COUNTERPARTY"
+  val CONNECTION_ID = "CONNECTION_ID"
+  val VERSION = "VERSION"
+  val IDENTIFIER = "IDENTIFIER"
+  val FEATURES = "FEATURES"
+  val DELAY_PERIOD = "DELAY_PERIOD"
+  val CLIENT_HEIGHT = "CLIENT_HEIGHT"
+  val REVISION_HEIGHT = "REVISION_HEIGHT"
+  val REVISION_NUMBER = "REVISION_NUMBER"
+  val CHANNEL = "CHANNEL"
+  val STATE = "STATE"
+  val ORDERING = "ORDERING"
+  val CONNECTION_HOPS = "CONNECTION_HOPS"
+  val FUNGIBLE_TOKEN_PACKET_DATA = "FUNGIBLE_TOKEN_PACKET_DATA"
+  val DENOM = "DENOM"
+  val RECEIVER = "RECEIVER"
+  val SEQUENCE = "SEQUENCE"
+  val SOURCE_PORT = "SOURCE_PORT"
+  val SOURCE_CHANNEL = "SOURCE_CHANNEL"
+  val DESTINATION_PORT = "DESTINATION_PORT"
+  val DESTINATION_CHANNEL = "DESTINATION_CHANNEL"
+  val TIMEOUT_HEIGHT = "TIMEOUT_HEIGHT"
+  val TIMEOUT_TIMESTAMP = "TIMEOUT_TIMESTAMP"
+  val PROOF_HEIGHT = "PROOF_HEIGHT"
+  val COUNTERPARTY_CONNECTION_ID = "COUNTERPARTY_CONNECTION_ID"
+  val CONSENSUS_HEIGHT = "CONSENSUS_HEIGHT"
+  val PREVIOUS_CONNECTION_ID = "PREVIOUS_CONNECTION_ID"
+  val PORT_ID = "PORT_ID"
+  val PREVIOUS_CHANNEL_ID = "PREVIOUS_CHANNEL_ID"
+  val COUNTERPARTY_VERSION = "COUNTERPARTY_VERSION"
+  val CHANNEL_ID = "CHANNEL_ID"
+  val COUNTERPARTY_CHANNEL_ID = "COUNTERPARTY_CHANNEL_ID"
+  val PACKET = "PACKET"
+  val NEXT_SEQUENCE_RECV = "NEXT_SEQUENCE_RECV"
+  val TOKEN = "TOKEN"
+  val VOTER = "VOTER"
+  val OPTION = "OPTION"
+  val SUBSPACE = "SUBSPACE"
+  val KEY = "KEY"
+  val RECIPIENT = "RECIPIENT"
+  val INFO = "INFO"
+  val MESSAGES_TYPE = "MESSAGES_TYPE"
+  val NO_DELEGATIONS_FOUND = "NO_DELEGATIONS_FOUND"
+
+  val TxMessagesMap: Map[String, String] = Map(
+    constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
+    constants.Blockchain.TransactionMessage.SEND_COIN -> "MESSAGE_SEND",
+    constants.Blockchain.TransactionMessage.MULTI_SEND -> "MESSAGE_MULTI_SEND",
+    constants.Blockchain.TransactionMessage.VERIFY_INVARIANT -> "MESSAGE_VERIFY_INVARIANT",
+    constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS -> "MESSAGE_SET_WITHDRAW_ADDRESS",
+    constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD -> "MESSAGE_WITHDRAW_REWARD",
+    constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION -> "MESSAGE_WITHDRAW_COMMISSION",
+    constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL -> "MESSAGE_FUND_COMMUNITY_POOL",
+    constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE -> "MESSAGE_SUBMIT_EVIDENCE",
+    constants.Blockchain.TransactionMessage.DEPOSIT -> "MESSAGE_DEPOSIT",
+    constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL -> "MESSAGE_PROPOSAL",
+    constants.Blockchain.TransactionMessage.VOTE -> "MESSAGE_VOTE",
+    constants.Blockchain.TransactionMessage.UNJAIL -> "MESSAGE_UNJAIL",
+    constants.Blockchain.TransactionMessage.CREATE_VALIDATOR -> "MESSAGE_CREATE_VALIDATOR",
+    constants.Blockchain.TransactionMessage.EDIT_VALIDATOR -> "MESSAGE_EDIT_VALIDATOR",
+    constants.Blockchain.TransactionMessage.DELEGATE -> "MESSAGE_DELEGATE",
+    constants.Blockchain.TransactionMessage.REDELEGATE -> "MESSAGE_REDELEGATE",
+    constants.Blockchain.TransactionMessage.UNDELEGATE -> "MESSAGE_UNBOND",
+    constants.Blockchain.TransactionMessage.CREATE_CLIENT -> "MESSAGE_IBC_CREATE_CLIENT",
+    constants.Blockchain.TransactionMessage.UPDATE_CLIENT -> "MESSAGE_IBC_UPDATE_CLIENT",
+    constants.Blockchain.TransactionMessage.UPGRADE_CLIENT -> "MESSAGE_IBC_UPGRADE_CLIENT",
+    constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR -> "MESSAGE_IBC_MISBEHAVIOUR",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT -> "MESSAGE_IBC_CONN_OPEN_INIT",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY -> "MESSAGE_IBC_CONN_OPEN_TRY",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK -> "MESSAGE_IBC_CONN_OPEN_ACK",
+    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM -> "MESSAGE_IBC_CONN_OPEN_CONFIRM",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT -> "MESSAGE_IBC_CHANNEL_OPEN_INIT",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY -> "MESSAGE_IBC_CHANNEL_OPEN_TRY",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK -> "MESSAGE_IBC_CHANNEL_OPEN_ACK",
+    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM -> "MESSAGE_IBC_CHANNEL_OPEN_CONFIRM",
+    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT -> "MESSAGE_IBC_CHANNEL_CLOSE_INIT",
+    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM -> "MESSAGE_IBC_CHANNEL_CLOSE_CONFIRM",
+    constants.Blockchain.TransactionMessage.RECV_PACKET -> "MESSAGE_IBC_RECV_PACKET",
+    constants.Blockchain.TransactionMessage.TIMEOUT -> "MESSAGE_IBC_TIMEOUT",
+    constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
+    constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
+    constants.Blockchain.TransactionMessage.TRANSFER -> "MESSAGE_IBC_TRANSFER",
+    constants.Blockchain.TransactionMessage.ASSET_DEFINE -> "MESSAGE_ASSET_DEFINE",
+    constants.Blockchain.TransactionMessage.ASSET_MINT -> "MESSAGE_ASSET_MINT",
+    constants.Blockchain.TransactionMessage.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
+    constants.Blockchain.TransactionMessage.ASSET_BURN -> "MESSAGE_ASSET_BURN",
+    constants.Blockchain.TransactionMessage.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
+    constants.Blockchain.TransactionMessage.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
+    constants.Blockchain.TransactionMessage.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
+    constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
+    constants.Blockchain.TransactionMessage.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    constants.Blockchain.TransactionMessage.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
+    constants.Blockchain.TransactionMessage.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
+    constants.Blockchain.TransactionMessage.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
+    constants.Blockchain.TransactionMessage.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
+    constants.Blockchain.TransactionMessage.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
+    constants.Blockchain.TransactionMessage.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    constants.Blockchain.TransactionMessage.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
+    constants.Blockchain.TransactionMessage.META_REVEAL -> "MESSAGE_META_REVEAL",
+    constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE -> "MESSAGE_MAINTAINER_DEPUTIZE",
+  )
+
+  val DataTypesMap: Map[String, String] = Map(
+    constants.Blockchain.DataType.STRING_DATA -> "STRING_DATA",
+    constants.Blockchain.DataType.DEC_DATA -> "DECIMAL_DATA",
+    constants.Blockchain.DataType.ID_DATA -> "ID_DATA",
+    constants.Blockchain.DataType.HEIGHT_DATA -> "HEIGHT_DATA",
+  )
+
+  val FactTypesMap: Map[String, String] = Map(
+    constants.Blockchain.FactType.STRING -> "STRING_FACT",
+    constants.Blockchain.FactType.DEC -> "DECIMAL_FACT",
+    constants.Blockchain.FactType.ID -> "ID_FACT",
+    constants.Blockchain.FactType.HEIGHT -> "HEIGHT_FACT",
+  )
 
 }

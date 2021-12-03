@@ -1,24 +1,12 @@
 package queries.responses.blockchain
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.{Json, Reads}
+import queries.responses.common.Coin
 import transactions.Abstract.BaseResponse
-import utilities.MicroNumber
 
 object CommunityPoolResponse {
 
-  case class Result(denom: String, amount: MicroNumber)
-
-  object Result {
-    def apply(denom: String, amount: String): Result = new Result(denom, new MicroNumber(BigDecimal(amount).toBigInt()))
-  }
-
-  implicit val resultReads: Reads[Result] = (
-    (JsPath \ "denom").read[String] and
-      (JsPath \ "amount").read[String]
-    ) (Result.apply _)
-
-  case class Response(height: String, result: Seq[Result]) extends BaseResponse
+  case class Response(pool: Seq[Coin]) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

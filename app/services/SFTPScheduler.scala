@@ -36,6 +36,8 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
   private val system: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = Materializer(system)
 
+  private val enableActor = configuration.get[Boolean]("westernUnion.scheduler.enable")
+
   private val wuSFTPInitialDelay = configuration.get[Int]("westernUnion.scheduler.initialDelay").seconds
   private val wuSFTPIntervalTime = configuration.get[Int]("westernUnion.scheduler.intervalTime").seconds
   private val basePathSFTPFiles = configuration.get[String]("westernUnion.sftpFileBasePath")
@@ -92,22 +94,22 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
             Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
           }
 
-          val complete=for {
+          val complete = for {
             _ <- writeEncryptedData
             csvFileContentBuffer <- decryptAndReadCSV
             _ <- csvBufferCloseAndRemoveSFTPFile(csvFileContentBuffer)
           } yield {}
-          Await.result(complete,Duration.Inf)
+          Await.result(complete, Duration.Inf)
         }
 
       Await.result(sftpProcess, Duration.Inf)
     }
     catch {
-      case baseException: BaseException=>
+      case baseException: BaseException =>
         logger.error(baseException.failure.message, baseException)
         Done
       case e: Exception =>
-        logger.error(e.getMessage,e)
+        logger.error(e.getMessage, e)
         Done
     }
   }
@@ -116,6 +118,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, sFTPFileTransactions: SF
     override def run(): Unit =
       scheduler
   }
-
-  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime)(runnable)(schedulerExecutionContext)
+  if (enableActor) {
+    actorSystem.scheduler.scheduleAtFixedRate(initialDelay = wuSFTPInitialDelay, interval = wuSFTPIntervalTime)(runnable)(schedulerExecutionContext)
+  }
 }

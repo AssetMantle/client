@@ -1,0 +1,18 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.MultiSend
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[MultiSend]) { multiSend =>
+    @Messages(constants.View.INPUTS):
+    @multiSend.inputs.map { input =>
+        @commonHtmlInfo(constants.View.ADDRESS, commonJavascriptLink(input.address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${input.address}'))")))
+        @commonTextInfo(constants.View.AMOUNTS, input.coins.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+    }
+    @Messages(constants.View.OUTPUTS):
+    @multiSend.outputs.map { output =>
+        @commonHtmlInfo(constants.View.ADDRESS, commonJavascriptLink(output.address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${output.address}'))")))
+        @commonTextInfo(constants.View.AMOUNTS, output.coins.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+    }
+}

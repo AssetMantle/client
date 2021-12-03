@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -35,6 +36,10 @@ class MetaController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   def revealForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.metaReveal())
@@ -62,7 +67,7 @@ class MetaController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -71,7 +76,7 @@ class MetaController @Inject()(
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

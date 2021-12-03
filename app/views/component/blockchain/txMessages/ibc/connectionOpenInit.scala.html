@@ -1,0 +1,16 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ConnectionOpenInit
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ConnectionOpenInit]) { connectionOpenInit =>
+    @commonTextInfo(constants.View.CLIENT_ID, connectionOpenInit.clientID)
+    @views.html.component.blockchain.txMessages.ibc.commonConnectionCounterparty(constants.View.COUNTERPARTY, connectionOpenInit.counterparty)
+    @if(connectionOpenInit.version.isDefined) {
+        @views.html.component.blockchain.txMessages.ibc.commonVersion(constants.View.VERSION, connectionOpenInit.version.get
+        )
+    }
+    @commonTextInfo(constants.View.DELAY_PERIOD, connectionOpenInit.delayPeriod)
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenInit.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenInit.signer}'))")))
+}

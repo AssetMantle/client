@@ -1,15 +1,26 @@
-@import views.html.base._
 @import models.blockchain.Split
+@import views.html.base._
 
 @(splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.SPLITS) {
 } {
-    @splits.map { split =>
-        @commonInfoBox() {
-            @commonTextInfo(constants.View.OWNER_ID, split.ownerID)
-            @commonTextInfo(constants.View.OWNABLE_ID, split.ownableID)
-            @commonTextInfo(constants.View.SPLIT, split.split.toString)
+    <table class="cmuk-table cmuk-table-striped tableSort">
+        <thead>
+            <tr>
+                <th>@Messages(constants.View.OWNER_ID)</th>
+                <th>@Messages(constants.View.OWNABLE_ID)</th>
+                <th>@Messages(constants.View.SPLIT)</th>
+            </tr>
+        </thead>
+        <tbody>
+        @splits.map { split =>
+            <tr>
+                <td><span class="stringEllipse" title="@split.ownerID">@split.ownerID</span></td>
+                <td><span class="stringEllipse" title="@split.ownableID">@split.ownableID</span></td>
+                <td>@utilities.NumericOperation.formatNumber(split.split)</td>
+            </tr>
         }
-    }
+        </tbody>
+    </table>
 }

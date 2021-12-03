@@ -44,6 +44,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ChatController.replyToMessage,
           routes.javascript.ChatController.markChatAsRead,
 
+          routes.javascript.ContactController.verifyEmailAddressForm,
+          routes.javascript.ContactController.verifyMobileNumberForm,
+
+          routes.javascript.ComponentViewController.dashboard,
+          routes.javascript.ComponentViewController.block,
+          routes.javascript.ComponentViewController.transaction,
+          routes.javascript.ComponentViewController.validator,
+          routes.javascript.ComponentViewController.wallet,
+          routes.javascript.ComponentViewController.proposal,
+
           routes.javascript.ComponentViewController.commonHome,
           routes.javascript.ComponentViewController.profilePicture,
           routes.javascript.ComponentViewController.identification,
@@ -54,6 +64,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.votingPowers,
 
           routes.javascript.ComponentViewController.tokensPrices,
+          routes.javascript.ComponentViewController.transactionStatistics,
 
           routes.javascript.ComponentViewController.accountWallet,
           routes.javascript.ComponentViewController.accountDelegations,
@@ -70,6 +81,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionListPage,
           routes.javascript.ComponentViewController.transactionDetails,
           routes.javascript.ComponentViewController.transactionMessages,
+          routes.javascript.ComponentViewController.withdrawRewardAmount,
+
+          routes.javascript.ComponentViewController.proposalList,
+          routes.javascript.ComponentViewController.proposalDetails,
+          routes.javascript.ComponentViewController.proposalDeposits,
+          routes.javascript.ComponentViewController.proposalVotes,
 
           routes.javascript.ComponentViewController.validatorList,
           routes.javascript.ComponentViewController.activeValidatorList,
@@ -137,10 +154,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
           routes.javascript.SendCoinController.sendCoinForm,
 
-          routes.javascript.ContactController.verifyEmailAddressForm,
-
-          routes.javascript.ContactController.verifyMobileNumberForm,
-
           routes.javascript.OrderController.defineForm,
           routes.javascript.OrderController.makeForm,
           routes.javascript.OrderController.takeForm,
@@ -151,10 +164,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.SplitController.unwrapForm,
 
           routes.javascript.ViewController.profile,
-          routes.javascript.ViewController.dashboard,
+          routes.javascript.ViewController.identity,
+          routes.javascript.ViewController.asset,
+          routes.javascript.ViewController.order,
           routes.javascript.ViewController.block,
-          routes.javascript.ViewController.transaction,
           routes.javascript.ViewController.validator,
+          routes.javascript.ViewController.transaction,
+          routes.javascript.ViewController.proposal,
+          routes.javascript.ViewController.blocks,
+          routes.javascript.ViewController.transactions,
+          routes.javascript.ViewController.validators,
+          routes.javascript.ViewController.proposals,
+          routes.javascript.ViewController.wallet,
 
           routes.javascript.BackgroundCheckController.memberScanForm,
           routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,

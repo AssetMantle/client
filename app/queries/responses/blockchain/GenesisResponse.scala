@@ -1,122 +1,170 @@
 package queries.responses.blockchain
 
+import models.Abstract.Parameter
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
+import models.common.Parameters.GovernanceParameter
 import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
-import queries.responses.blockchain.TransactionResponse.Msg
-import queries.responses.common.{Account, Coin, Delegation, Validator}
+import queries.Abstract.Account
+import queries.responses.blockchain.TransactionResponse._
+import queries.responses.blockchain.params.{AuthResponse, BankResponse, DistributionResponse, HalvingResponse, MintResponse, SlashingResponse, StakingResponse}
+import queries.responses.blockchain.params.StakingResponse._
+import queries.responses.common.{Coin, Delegation, Validator}
 import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
 
 object GenesisResponse {
 
-  case class GenTxValue(msg: Seq[Msg])
+  import queries.responses.common.Accounts.accountReads
 
-  implicit val genTxValueReads: Reads[GenTxValue] = Json.reads[GenTxValue]
+  case class GenTxBody(messages: Seq[Msg], memo: String)
 
-  case class GenTx(value: GenTxValue)
+  implicit val genTxBodyReads: Reads[GenTxBody] = Json.reads[GenTxBody]
+
+  case class GenTx(body: GenTxBody, auth_info: AuthInfo) {
+    def getSigners: Seq[String] = {
+      var seen: Map[String, Boolean] = Map()
+      var signers: Seq[String] = Seq()
+      body.messages.foreach(message => message.toStdMsg.getSigners.foreach(signer => {
+        if (!seen.getOrElse(signer, false)) {
+          signers = signers :+ signer
+          seen = seen + (signer -> true)
+        }
+      }))
+      signers
+    }
+
+    def getFeePayer: String = {
+      val signers = getSigners
+      if (signers.nonEmpty) signers.head else ""
+    }
+  }
 
   implicit val genTxReads: Reads[GenTx] = Json.reads[GenTx]
 
-  case class Genutil(gentxs: Option[Seq[GenTx]])
+  case class GenUtil(gen_txs: Seq[GenTx])
 
-  implicit val genUtilReads: Reads[Genutil] = Json.reads[Genutil]
+  implicit val genUtilReads: Reads[GenUtil] = Json.reads[GenUtil]
 
-  case class Bank(send_enabled: Boolean)
+  object Auth {
 
-  implicit val bankReads: Reads[Bank] = Json.reads[Bank]
+    case class Module(accounts: Seq[Account], params: AuthResponse.Params)
 
-  case class Auth(accounts: Seq[Account.Result])
-
-  implicit val authReads: Reads[Auth] = Json.reads[Auth]
-
-  case class RedelegationEntry(creation_height: String, completion_time: String, initial_balance: String, shares_dst: BigDecimal) {
-    def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = shares_dst)
+    implicit val authModuleReads: Reads[Module] = Json.reads[Module]
   }
 
-  implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
+  object Bank {
 
-  case class Redelegation(delegator_address: String, validator_src_address: String, validator_dst_address: String, entries: Seq[RedelegationEntry]) {
-    def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = delegator_address, validatorSourceAddress = validator_src_address, validatorDestinationAddress = validator_dst_address, entries = entries.map(_.toRedelegationEntry))
+    case class BankBalance(address: String, coins: Seq[Coin])
+
+    implicit val bankBalanceReads: Reads[BankBalance] = Json.reads[BankBalance]
+
+    case class DenomUnits(denom: Option[String], exponent: Option[Int], aliases: Seq[String])
+
+    implicit val denomUnitsReads: Reads[DenomUnits] = Json.reads[DenomUnits]
+
+    case class Module(params: BankResponse.Params, balances: Seq[BankBalance], supply: Seq[Coin])
+
+    implicit val bankModuleReads: Reads[Module] = Json.reads[Module]
   }
 
-  implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
+  object Distribution {
 
-  case class UndelegationEntry(creation_height: String, completion_time: String, initial_balance: String, balance: String) {
-    def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
+    case class WithdrawAddress(delegator_address: String, withdraw_address: String) {
+      def toWithdrawAddress: BlockchainWithdrawAddress = BlockchainWithdrawAddress(delegatorAddress = delegator_address, withdrawAddress = withdraw_address)
+    }
+
+    implicit val withdrawAddressReads: Reads[WithdrawAddress] = Json.reads[WithdrawAddress]
+
+    case class Module(params: DistributionResponse.Params, delegator_withdraw_infos: Seq[WithdrawAddress])
+
+    implicit val distributionReads: Reads[Module] = Json.reads[Module]
   }
 
-  implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
+  object Halving {
 
-  case class Undelegation(delegator_address: String, validator_address: String, entries: Seq[UndelegationEntry]) {
-    def toUndelegation: BlockchainUndelegation = BlockchainUndelegation(delegatorAddress = delegator_address, validatorAddress = validator_address, entries = entries.map(_.toUndelegationEntry))
+    case class Module(params: HalvingResponse.Params)
+
+    implicit val moduleReads: Reads[Module] = Json.reads[Module]
   }
 
-  implicit val undelegationReads: Reads[Undelegation] = Json.reads[Undelegation]
+  object Mint {
 
-  case class StakingParams(bond_denom: String, historical_entries: Int, max_entries: Int, max_validators: Int, unbonding_time: String)
+    case class Minter(inflation: String, annual_provisions: String)
 
-  implicit val stakingParamsReads: Reads[StakingParams] = Json.reads[StakingParams]
+    implicit val minterReads: Reads[Minter] = Json.reads[Minter]
 
-  case class Staking(params: StakingParams, delegations: Option[Seq[Delegation.Result]], redelegations: Option[Seq[Redelegation]], unbonding_delegations: Option[Seq[Undelegation]], validators: Option[Seq[Validator.Result]])
+    case class Module(minter: Minter, params: MintResponse.Params)
 
-  implicit val stakingReads: Reads[Staking] = Json.reads[Staking]
-
-  case class WithdrawAddress(delegator_address: String, withdraw_address: String) {
-    def toWithdrawAddress: BlockchainWithdrawAddress = BlockchainWithdrawAddress(delegatorAddress = delegator_address, withdrawAddress = withdraw_address)
+    implicit val mintReads: Reads[Module] = Json.reads[Module]
   }
 
-  implicit val withdrawAddressReads: Reads[WithdrawAddress] = Json.reads[WithdrawAddress]
+  object Slashing {
 
-  case class DistributionParams(community_tax: BigDecimal, base_proposer_reward: BigDecimal, bonus_proposer_reward: BigDecimal, withdraw_addr_enabled: Boolean)
+    case class Module(params: SlashingResponse.Params)
 
-  implicit val distributionParamsReads: Reads[DistributionParams] = Json.reads[DistributionParams]
+    implicit val slashingReads: Reads[Module] = Json.reads[Module]
 
-  case class Distribution(params: DistributionParams, delegator_withdraw_infos: Option[Seq[WithdrawAddress]])
+  }
 
-  implicit val distributionReads: Reads[Distribution] = Json.reads[Distribution]
+  object Staking {
 
-  case class Minter(inflation: BigDecimal, annual_provisions: BigDecimal)
+    case class RedelegationEntry(creation_height: String, completion_time: String, initial_balance: String, shares_dst: String) {
+      def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
+    }
 
-  implicit val minterReads: Reads[Minter] = Json.reads[Minter]
+    implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
 
-  case class MintParams(mint_denom: String, inflation_rate_change: BigDecimal, inflation_min: BigDecimal, inflation_max: BigDecimal, goal_bonded: BigDecimal, blocks_per_year: String)
+    case class Redelegation(delegator_address: String, validator_src_address: String, validator_dst_address: String, entries: Seq[RedelegationEntry]) {
+      def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = delegator_address, validatorSourceAddress = validator_src_address, validatorDestinationAddress = validator_dst_address, entries = entries.map(_.toRedelegationEntry))
+    }
 
-  implicit val mintParamsReads: Reads[MintParams] = Json.reads[MintParams]
+    implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
-  case class Mint(minter: Minter, params: MintParams)
+    case class UndelegationEntry(creation_height: String, completion_time: String, initial_balance: String, balance: String) {
+      def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
+    }
 
-  implicit val mintReads: Reads[Mint] = Json.reads[Mint]
+    implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
 
-  case class SlashingParams(signed_blocks_window: String, min_signed_per_window: BigDecimal, downtime_jail_duration: String, slash_fraction_double_sign: BigDecimal, slash_fraction_downtime: BigDecimal)
+    case class Undelegation(delegator_address: String, validator_address: String, entries: Seq[UndelegationEntry]) {
+      def toUndelegation: BlockchainUndelegation = BlockchainUndelegation(delegatorAddress = delegator_address, validatorAddress = validator_address, entries = entries.map(_.toUndelegationEntry))
+    }
 
-  implicit val slashingParamsReads: Reads[SlashingParams] = Json.reads[SlashingParams]
+    implicit val undelegationReads: Reads[Undelegation] = Json.reads[Undelegation]
 
-  case class Slashing(params: SlashingParams)
+    case class Module(params: StakingResponse.Params, delegations: Seq[Delegation], redelegations: Seq[Redelegation], unbonding_delegations: Seq[Undelegation], validators: Seq[Validator.Result])
 
-  implicit val slashingReads: Reads[Slashing] = Json.reads[Slashing]
+    implicit val stakingReads: Reads[Module] = Json.reads[Module]
 
-  case class DepositParams(min_deposit: Seq[Coin], max_deposit_period: String)
+  }
 
-  implicit val depositParamsReads: Reads[DepositParams] = Json.reads[DepositParams]
+  object Gov {
 
-  case class VotingParams(voting_period: String)
+    case class DepositParams(min_deposit: Seq[Coin], max_deposit_period: String)
 
-  implicit val votingParamsReads: Reads[VotingParams] = Json.reads[VotingParams]
+    implicit val depositParamsReads: Reads[DepositParams] = Json.reads[DepositParams]
 
-  case class TallyParams(quorum: BigDecimal, threshold: BigDecimal, veto: BigDecimal)
+    case class VotingParams(voting_period: String)
 
-  implicit val tallyParamsReads: Reads[TallyParams] = Json.reads[TallyParams]
+    implicit val votingParamsReads: Reads[VotingParams] = Json.reads[VotingParams]
 
-  case class Gov(deposit_params: DepositParams, voting_params: VotingParams, tally_params: TallyParams)
+    case class TallyParams(quorum: String, threshold: String, veto_threshold: String)
 
-  implicit val govReads: Reads[Gov] = Json.reads[Gov]
+    implicit val tallyParamsReads: Reads[TallyParams] = Json.reads[TallyParams]
 
-  case class AppState(bank: Bank, genutil: Genutil, auth: Auth, distribution: Distribution, staking: Staking, mint: Mint, slashing: Slashing, gov: Gov)
+    case class Module(deposit_params: DepositParams, voting_params: VotingParams, tally_params: TallyParams, proposals: Seq[ProposalResponse.Proposal], deposits: Seq[ProposalDepositResponse.Deposit], votes: Seq[ProposalVoteResponse.Vote]) {
+      def toParameter: Parameter = GovernanceParameter(minDeposit = deposit_params.min_deposit.map(_.toCoin), maxDepositPeriod = deposit_params.max_deposit_period.split("s")(0).toLong, votingPeriod = voting_params.voting_period.split("s")(0).toLong, quorum = BigDecimal(tally_params.quorum), threshold = BigDecimal(tally_params.threshold), vetoThreshold = BigDecimal(tally_params.veto_threshold))
+    }
+
+    implicit val govReads: Reads[Module] = Json.reads[Module]
+  }
+
+  case class AppState(auth: Auth.Module, bank: Bank.Module, distribution: Distribution.Module, genutil: GenUtil, gov: Gov.Module, halving: Halving.Module, mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 
-  case class Genesis(app_state: AppState)
+  case class Genesis(app_state: AppState, genesis_time: String, chain_id: String, initial_height: String)
 
   implicit val genesisReads: Reads[Genesis] = Json.reads[Genesis]
 

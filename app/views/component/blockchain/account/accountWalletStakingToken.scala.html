@@ -1,0 +1,36 @@
+@import utilities.MicroNumber
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+@import models.common.Serializable.Coin
+
+@(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="pieChartContainer">
+    <div>
+        @commonTextInfo(constants.View.AVAILABLE, available.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.DELEGATED, delegated.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.UNDELEGATING, undelegating.getAmountWithNormalizedDenom())
+        @commonTextInfo(constants.View.DELEGATOR_REWARDS, delegationTotalRewards.getAmountWithNormalizedDenom())
+        @if(isValidator) {
+            @commonTextInfo(constants.View.COMMISSION_REWARDS, commissionRewards.getAmountWithNormalizedDenom())
+        }
+    </div>
+    @if(available.amount != MicroNumber.zero || delegated.amount != MicroNumber.zero || undelegating.amount != MicroNumber.zero) {
+        @defining(if(isValidator)
+            ListMap(
+                constants.View.AVAILABLE -> available.amount.toDouble,
+                constants.View.DELEGATED -> delegated.amount.toDouble,
+                constants.View.UNDELEGATING -> undelegating.amount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationTotalRewards.amount.toDouble,
+                constants.View.COMMISSION_REWARDS -> commissionRewards.amount.toDouble,
+            ) else ListMap(
+                constants.View.AVAILABLE -> available.amount.toDouble,
+                constants.View.DELEGATED -> delegated.amount.toDouble,
+                constants.View.UNDELEGATING -> undelegating.amount.toDouble,
+                constants.View.DELEGATOR_REWARDS -> delegationTotalRewards.amount.toDouble,
+            )
+        ) { dataMap =>
+            @commonPieChart("accountWalletStakingTokenChart", dataMap, showLegend = true)
+        }
+    }
+</div>
+

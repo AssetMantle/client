@@ -63,6 +63,8 @@ class Delegations @Inject()(
 
   private def getAllByValidatorAddress(validatorAddress: String): Future[Seq[Delegation]] = db.run(delegationTable.filter(_.validatorAddress === validatorAddress).result)
 
+  private def getByDelegatorAndValidatorAddress(delegatorAddress: String, validatorAddress: String): Future[Option[Delegation]] = db.run(delegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).result.headOption)
+
   private def deleteByAddress(delegatorAddress: String, validatorAddress: String): Future[Int] = db.run(delegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -106,6 +108,8 @@ class Delegations @Inject()(
 
     def getAllForValidator(operatorAddress: String): Future[Seq[Delegation]] = getAllByValidatorAddress(operatorAddress)
 
+    def get(delegatorAddress: String, operatorAddress: String): Future[Option[Delegation]] = getByDelegatorAndValidatorAddress(delegatorAddress = delegatorAddress, validatorAddress = operatorAddress)
+
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
   }
@@ -121,9 +125,10 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.result.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
+        case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorDelegationNotFound)) throw baseException else logger.info(baseException.failure.logMessage)
       }
     }
 
@@ -134,7 +139,7 @@ class Delegations @Inject()(
 
       (for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.result.toDelegation)
+        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
         case baseException: BaseException => if (baseException.failure.message.matches(responseErrorDelegationNotFound)) {
           val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
@@ -142,7 +147,7 @@ class Delegations @Inject()(
             _ <- delete
           } yield ()
             ).recover {
-            case baseException: BaseException => throw baseException
+            case baseException: BaseException => logger.info(baseException.failure.logMessage)
           }
         } else throw baseException
       }

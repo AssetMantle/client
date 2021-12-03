@@ -1,0 +1,11 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.AssetBurn
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[AssetBurn]) { assetBurn =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetBurn.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetBurn.from}'))")))
+    @commonHtmlInfo(constants.View.ASSET_ID, commonJavascriptLink(assetBurn.assetID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetBurn.assetID}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(assetBurn.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetBurn.fromID}'))")))
+}

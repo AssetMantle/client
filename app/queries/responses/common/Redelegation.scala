@@ -6,24 +6,31 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import utilities.MicroNumber
 
+case class Redelegation(delegator_address: String, validator_src_address: String, validator_dst_address: String)
+
 object Redelegation {
 
-  case class Entry(creation_height: Int, completion_time: String, initial_balance: MicroNumber, shares_dst: BigDecimal, balance: MicroNumber) {
-    def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = initial_balance, sharesDestination = shares_dst)
+  implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
+
+  case class RedelegationEntry(creation_height: Int, completion_time: String, initial_balance: MicroNumber, shares_dst: String) {
+    def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = initial_balance, sharesDestination = BigDecimal(shares_dst))
   }
 
-  def entryApply(creation_height: Int, completion_time: String, initial_balance: String, shares_dst: BigDecimal, balance: String): Entry = Entry(creation_height, completion_time, new MicroNumber(BigInt(initial_balance)), shares_dst, new MicroNumber(BigInt(balance)))
+  def redelegationEntryApply(creation_height: Int, completion_time: String, initial_balance: String, shares_dst: String): RedelegationEntry = RedelegationEntry(creation_height = creation_height, completion_time = completion_time, initial_balance = new MicroNumber(BigDecimal(initial_balance).toBigInt), shares_dst = shares_dst)
 
-  implicit val entryReads: Reads[Entry] = (
+  implicit val redelegationEntryReads: Reads[RedelegationEntry] = (
     (JsPath \ "creation_height").read[Int] and
       (JsPath \ "completion_time").read[String] and
       (JsPath \ "initial_balance").read[String] and
-      (JsPath \ "shares_dst").read[BigDecimal] and
-      (JsPath \ "balance").read[String]
-    ) (entryApply _)
+      (JsPath \ "shares_dst").read[String]
+    ) (redelegationEntryApply _)
 
-  case class Result(delegator_address: String, validator_src_address: String, validator_dst_address: String, entries: Seq[Entry]) {
-    def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = delegator_address, validatorSourceAddress = validator_src_address, validatorDestinationAddress = validator_dst_address, entries = entries.map(_.toRedelegationEntry))
+  case class Entry(redelegation_entry: RedelegationEntry)
+
+  implicit val entryReads: Reads[Entry] = Json.reads[Entry]
+
+  case class Result(redelegation: Redelegation, entries: Seq[Entry]) {
+    def toRedelegation: BlockchainRedelegation = BlockchainRedelegation(delegatorAddress = redelegation.delegator_address, validatorSourceAddress = redelegation.validator_src_address, validatorDestinationAddress = redelegation.validator_dst_address, entries = entries.map(_.redelegation_entry.toRedelegationEntry))
   }
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]

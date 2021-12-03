@@ -3,9 +3,9 @@
 @import views.html.helper.form
 @import views.html.helper.CSRF
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
     <form class="cmuk-search cmuk-search-default searchForm">
-        <a class="cmuk-search-icon-flip" onclick="searchFunction('searchInput')" cmuk-search-icon></a>
-        @commonInputText(Form(constants.FormField.SEARCH.field), constants.FormField.SEARCH, 'id -> "searchInput" , 'onkeypress -> "searchFunctionOnEnter(event, 'searchInput')" , 'class -> "cmuk-search-input")
+        <a class="cmuk-search-icon-flip" onclick="searchFunction('@id')" cmuk-search-icon></a>
+        @commonInputText(Form(constants.FormField.SEARCH.field), constants.FormField.SEARCH, 'id -> id , 'onkeypress -> "searchFunctionOnEnter(event, id)" , 'class -> "cmuk-search-input")
     </form>
 <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>

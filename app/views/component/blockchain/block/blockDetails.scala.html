@@ -1,0 +1,12 @@
+@import views.html.base._
+@import models.blockchain.Block
+
+@(block: Block, proposer: String, numTxs: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.BLOCK_HEADER) {
+} {
+    @commonIntInfo(constants.View.HEIGHT, block.height)
+    @commonTextInfo(constants.View.TIME, utilities.Date.bcTimestampToString(block.time))
+    @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))")))
+    @commonIntInfo(constants.View.NUMBER_OF_TRANSACTIONS, numTxs)
+}

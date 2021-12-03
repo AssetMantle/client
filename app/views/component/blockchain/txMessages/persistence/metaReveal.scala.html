@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.MetaReveal
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[MetaReveal]) { metaReveal =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(metaReveal.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${metaReveal.from}'))")))
+    @commonTextInfo(constants.View.DATA_TYPE, constants.View.DataTypesMap.getOrElse(metaReveal.metaFact.data.dataType, metaReveal.metaFact.data.dataType))
+    @commonTextInfo(constants.View.DATA_VALUE, metaReveal.metaFact.data.value.toFormattedString)
+}

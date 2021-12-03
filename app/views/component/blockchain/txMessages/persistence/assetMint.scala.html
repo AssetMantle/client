@@ -1,0 +1,14 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.AssetMint
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[AssetMint]) { assetMint =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetMint.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetMint.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(assetMint.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.fromID}'))")))
+    @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(assetMint.toID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.toID}'))")))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID,commonJavascriptLink(assetMint.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetMint.classificationID}'))")))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = assetMint.mutableMetaProperties.metaPropertyList, immutableMetaProperties = assetMint.immutableMetaProperties.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = assetMint.mutableProperties.propertyList, immutableProperties = assetMint.immutableProperties.propertyList)
+}

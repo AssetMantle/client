@@ -1,0 +1,10 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.UpgradeClient
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[UpgradeClient]) { upgradeClient =>
+    @commonTextInfo(constants.View.CLIENT_ID, upgradeClient.clientID)
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(upgradeClient.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${upgradeClient.signer}'))")))
+}

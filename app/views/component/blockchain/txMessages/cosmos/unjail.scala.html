@@ -1,0 +1,9 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.Unjail
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[Unjail]) { unjail =>
+    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(unjail.validatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${unjail.validatorAddress}'))")))
+}

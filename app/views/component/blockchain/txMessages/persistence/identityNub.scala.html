@@ -1,0 +1,10 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.IdentityNub
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[IdentityNub]) { identityNub =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityNub.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityNub.from}'))")))
+    @commonTextInfo(constants.View.NUB_ID, identityNub.nubID)
+}

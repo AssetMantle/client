@@ -2,7 +2,9 @@ package controllers
 
 import controllers.actions.WithLoginActionAsync
 import controllers.results.WithUsernameToken
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.master.{Email, Mobile}
 import models.{master, masterTransaction}
@@ -29,7 +31,12 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
   private implicit val module: String = constants.Module.CONTROLLERS_CONTACT
 
   implicit val emailAddressWrites: OWrites[master.Email] = Json.writes[master.Email]
+
   implicit val mobileNumberWrites: OWrites[master.Mobile] = Json.writes[master.Mobile]
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

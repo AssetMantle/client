@@ -1,0 +1,21 @@
+@import views.html.base._
+@import models.common.Serializable.Coin
+@import scala.collection.immutable.ListMap
+
+@(accountBalances: Seq[Coin])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @if(accountBalances.nonEmpty) {
+        <div>
+        @accountBalances.map { coin =>
+            @commonTextInfo(coin.denom, utilities.NumericOperation.formatNumber(coin.amount, normalize = false))
+        }
+        </div>
+        @* @defining[ListMap[String, Double]](*@
+        @* ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)*@
+        @* ) { data =>*@
+        @* @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)*@
+        @* }*@
+    } else {
+        @Messages(constants.View.EMPTY_WALLET)
+    }
+</div>

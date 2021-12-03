@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.AssetDefine
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[AssetDefine]) { assetDefine =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(assetDefine.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${assetDefine.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(assetDefine.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${assetDefine.fromID}'))")))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = assetDefine.mutableMetaTraits.metaPropertyList, immutableMetaProperties = assetDefine.immutableMetaTraits.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = assetDefine.mutableTraits.propertyList, immutableProperties = assetDefine.immutableTraits.propertyList)
+}

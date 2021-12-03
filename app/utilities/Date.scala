@@ -2,8 +2,7 @@ package utilities
 
 import java.sql.Timestamp
 import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{LocalDateTime, ZonedDateTime}
-
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime, Instant}
 import exceptions.BaseException
 import play.api.Logger
 
@@ -18,6 +17,8 @@ object Date {
   def utilDateToSQLDate(utilDate: java.util.Date): java.sql.Date = new java.sql.Date(utilDate.getTime)
 
   def sqlDateToUtilDate(sqlDate: java.sql.Date): java.util.Date = new java.util.Date(sqlDate.getTime)
+
+  def getTimeFromSqlTimestamp(sqlTime: java.sql.Timestamp): String = ZonedDateTime.parse(sqlTime.toInstant.toString).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
   def stringDateToTimeStamp(stringDate: String): Timestamp =
     try {
@@ -40,7 +41,7 @@ object Date {
       ZonedDateTime.parse(timestamp).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)).format(dateTimeFormat)
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        ""
+        timestamp
     }
   }
 
@@ -52,6 +53,15 @@ object Date {
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
         throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+  }
+
+  def addTime(timestamp: String, addEpochTime: Long): String = {
+    try {
+      ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(timestamp).toEpochSecond + addEpochTime), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+    } catch {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_DATA_TYPE)
     }
   }
 

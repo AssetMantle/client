@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ConnectionOpenConfirm
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ConnectionOpenConfirm]) { connectionOpenConfirm =>
+    @commonTextInfo(constants.View.CONNECTION_ID, connectionOpenConfirm.connectionID)
+    @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.PROOF_HEIGHT, connectionOpenConfirm.proofHeight)
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(connectionOpenConfirm.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${connectionOpenConfirm.signer}'))")))
+}

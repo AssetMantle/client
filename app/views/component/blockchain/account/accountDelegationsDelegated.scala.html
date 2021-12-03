@@ -1,0 +1,13 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+@import utilities.MicroNumber
+
+@(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="pieChartContainer">
+    @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.map{case (operator, amount) => validatorsMoniker.getOrElse(operator, operator) -> amount.toDouble}.toList: _*), showLegend = false)
+    <div>
+    @delegations.map { case (validatorAddress, amount) =>
+        @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(utilities.NumericOperation.formatNumber(amount)))
+    }
+    </div>
+</div>

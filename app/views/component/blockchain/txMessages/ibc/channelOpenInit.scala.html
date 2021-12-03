@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.ChannelOpenInit
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[ChannelOpenInit]) { channelOpenInit =>
+    @commonTextInfo(constants.View.PORT_ID, channelOpenInit.portID)
+    @views.html.component.blockchain.txMessages.ibc.commonChannel(constants.View.CHANNEL, channelOpenInit.channel)
+    @commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(channelOpenInit.signer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${channelOpenInit.signer}'))")))
+}

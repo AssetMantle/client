@@ -1,0 +1,47 @@
+name: Explorer - Production 
+
+on:
+  push:
+    tags:  
+      - 'explorer-**'      
+      - '!**-rc'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Tools
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Run Build
+        run: sbt dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: client.zip
+          path: target/universal/persistenceclient-1.0.zip
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: client.zip
+          path: target/universal/persistenceclient-1.0.zip
+      - name: Operations
+        uses: alinz/ssh-scp-action@master
+        with:
+          key: ${{ secrets.EXPLORER_PROD_SSH_KEY }}
+          host: ${{ secrets.EXPLORER_PROD_HOST }}
+          port: 22
+          user: ${{ secrets.EXPLORER_PROD_USERNAME }}
+          ssh_before: |
+            rm -r explorer.zip
+          scp: |
+           target/universal/persistenceclient-1.0.zip ${{ secrets.EXPLORER_PROD_USERNAME }}@${{ secrets.EXPLORER_PROD_HOST }}:~/explorer.zip
+          # then run these commands
+          ssh_after: |
+            ${{ secrets.EXPLORER_PROD_SCRIPT }}

@@ -1,0 +1,6 @@
+@(name: String, function: JavaScript, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<a id='@arguments.toMap.get('id).map(_.toString).getOrElse("")' class='@Seq("cmuk-link", arguments.toMap.get('class).map(_.toString).getOrElse("")).mkString(" ")' onclick="@function">
+@Messages(name)
+</a>
+@* Example Usage: commonJavascriptLink(validator.description.moniker, JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validator.operatorAddress}'))""")) *@

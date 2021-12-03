@@ -1,12 +1,32 @@
 @import models.common.Serializable.MetaProperty
-@import views.html.base._
 
-@(metaProperties: Seq[MetaProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(mutableMetaProperties: Seq[MetaProperty], immutableMetaProperties: Seq[MetaProperty])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@metaProperties.map { metaProperty =>
-    @commonInfoBox() {
-        @commonTextInfo(constants.View.META_PROPERTY_ID, metaProperty.id)
-        @Messages(constants.View.META_FACT):
-        @views.html.component.blockchain.data(metaProperty.metaFact.data)
-    }
-}
+<table class="cmuk-table cmuk-table-striped tableSort">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.META_PROPERTY_ID)</th>
+            <th>@Messages(constants.View.DATA_TYPE)</th>
+            <th>@Messages(constants.View.DATA_VALUE)</th>
+            <th>@Messages(constants.View.MUTABLE)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @mutableMetaProperties.map { mutableMetaProperty =>
+            <tr>
+                <td><span class="hashCode" title="@mutableMetaProperty.id">@mutableMetaProperty.id</span></td>
+                <td>@Messages(constants.View.DataTypesMap.getOrElse(mutableMetaProperty.metaFact.data.dataType, mutableMetaProperty.metaFact.data.dataType))</td>
+                <td><span class="stringEllipse" title="@mutableMetaProperty.metaFact.data.value.toFormattedString">@mutableMetaProperty.metaFact.data.value.toFormattedString</span></td>
+                <td><span cmuk-icon="check" class="check"></span></td>
+            </tr>
+        }
+        @immutableMetaProperties.map { immutableMetaProperty =>
+            <tr>
+                <td><span class="hashCode" title="@immutableMetaProperty.id">@immutableMetaProperty.id</span></td>
+                <td>@Messages(constants.View.DataTypesMap.getOrElse(immutableMetaProperty.metaFact.data.dataType, immutableMetaProperty.metaFact.data.dataType))</td>
+                <td><span class="stringEllipse" title="@immutableMetaProperty.metaFact.data.value.toFormattedString">@immutableMetaProperty.metaFact.data.value.toFormattedString</span></td>
+                <td><span cmuk-icon="close" class="close"></span></td>
+            </tr>
+        }
+    </tbody>
+</table>

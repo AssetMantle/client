@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.IdentityDefine
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[IdentityDefine]) { identityDefine =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(identityDefine.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${identityDefine.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(identityDefine.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${identityDefine.fromID}'))")))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = identityDefine.mutableMetaTraits.metaPropertyList, immutableMetaProperties = identityDefine.immutableMetaTraits.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = identityDefine.mutableTraits.propertyList, immutableProperties = identityDefine.immutableTraits.propertyList)
+}

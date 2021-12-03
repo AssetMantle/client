@@ -1,0 +1,15 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@(delegationsMap: ListMap[String, Double], selfDelegatedPercentage: Double, othersDelegatedPercentage: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.VALIDATOR_DELEGATIONS) {
+} {
+    @if(delegationsMap.nonEmpty) {
+        @commonPieChart("validatorDelegationsChart", delegationsMap, showLegend = true)
+        @commonTextInfo(constants.View.SELF_DELEGATED, s"${utilities.NumericOperation.roundOff(selfDelegatedPercentage)} %")
+        @commonTextInfo(constants.View.OTHERS_DELEGATED, s"${utilities.NumericOperation.roundOff(othersDelegatedPercentage)} %")
+    } else {
+        @Messages(constants.View.NO_DELEGATIONS_FOUND)
+    }
+}

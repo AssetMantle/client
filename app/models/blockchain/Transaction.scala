@@ -11,15 +11,36 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Transaction(hash: String, height: Int, code: Option[Int], rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, timestamp: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Transaction(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
+
+  def getSigners: Seq[String] = {
+    var seen: Map[String, Boolean] = Map()
+    var signers: Seq[String] = Seq()
+    messages.foreach(message => message.getSigners.foreach(signer => {
+      if (!seen.getOrElse(signer, false)) {
+        signers = signers :+ signer
+        seen = seen + (signer -> true)
+      }
+    }))
+    signers
+  }
+
+  def getFeePayer: String = {
+    val signers = getSigners
+    if (signers.nonEmpty) signers.head else ""
+  }
+
+}
 
 @Singleton
 class Transactions @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
-                              configuration: Configuration
+                              configuration: Configuration,
+                              utilitiesOperations: utilities.Operations,
                             )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -32,17 +53,23 @@ class Transactions @Inject()(
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
 
+  private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
+
+  private val transactionsStatisticsTotalBins = configuration.get[Int]("statistics.transactions.totalBins")
+
+  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
+
   private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
 
   import databaseConfig.profile.api._
 
   private[models] val transactionTable = TableQuery[TransactionTable]
 
-  case class TransactionSerialized(hash: String, height: Int, code: Option[Int], rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: String, fee: String, timestamp: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), timestamp = timestamp, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class TransactionSerialized(hash: String, height: Int, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: String, fee: String, memo: String, timestamp: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), memo = memo, timestamp = timestamp, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(transaction: Transaction): TransactionSerialized = TransactionSerialized(hash = transaction.hash, height = transaction.height, code = transaction.code, rawLog = transaction.rawLog, status = transaction.status, gasWanted = transaction.gasWanted, gasUsed = transaction.gasUsed, messages = Json.toJson(transaction.messages).toString, fee = Json.toJson(transaction.fee).toString, timestamp = transaction.timestamp, createdBy = transaction.createdBy, createdOn = transaction.createdOn, createdOnTimeZone = transaction.createdOnTimeZone, updatedBy = transaction.updatedBy, updatedOn = transaction.updatedOn, updatedOnTimeZone = transaction.updatedOnTimeZone)
+  def serialize(transaction: Transaction): TransactionSerialized = TransactionSerialized(hash = transaction.hash, height = transaction.height, code = transaction.code, rawLog = transaction.rawLog, status = transaction.status, gasWanted = transaction.gasWanted, gasUsed = transaction.gasUsed, messages = Json.toJson(transaction.messages).toString, fee = Json.toJson(transaction.fee).toString, memo = transaction.memo, timestamp = transaction.timestamp, createdBy = transaction.createdBy, createdOn = transaction.createdOn, createdOnTimeZone = transaction.createdOnTimeZone, updatedBy = transaction.updatedBy, updatedOn = transaction.updatedOn, updatedOnTimeZone = transaction.updatedOnTimeZone)
 
   private def add(transaction: Transaction): Future[Int] = db.run((transactionTable returning transactionTable.map(_.height) += serialize(transaction)).asTry).map {
     case Success(result) => result
@@ -65,6 +92,8 @@ class Transactions @Inject()(
     }
   }
 
+  private def getTotalTransactionsNumber: Future[Int] = db.run(transactionTable.length.result)
+
   private def findTransactionsForAddress(address: String): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).result)
 
   private def findTransactionsPerPageForAddress(address: String, offset: Int, limit: Int): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.messages.like(s"""%$address%""")).sortBy(_.height.desc).drop(offset).take(limit).result)
@@ -77,6 +106,8 @@ class Transactions @Inject()(
   }
 
   private def getTransactionsByHeightList(heights: Seq[Int]): Future[Seq[TransactionSerialized]] = db.run(transactionTable.filter(_.height.inSet(heights)).result)
+
+  private def getTransactionsNumberByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).length.result)
 
   private def getNumberOfTransactionsByHeight(height: Int): Future[Int] = db.run(transactionTable.filter(_.height === height).length.result)
 
@@ -107,7 +138,7 @@ class Transactions @Inject()(
 
   private[models] class TransactionTable(tag: Tag) extends Table[TransactionSerialized](tag, "Transaction") {
 
-    def * = (hash, height, code.?, rawLog, status, gasWanted, gasUsed, messages, fee, timestamp, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
+    def * = (hash, height, code, rawLog, status, gasWanted, gasUsed, messages, fee, memo, timestamp, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 
@@ -127,6 +158,8 @@ class Transactions @Inject()(
 
     def fee = column[String]("fee")
 
+    def memo = column[String]("memo")
+
     def timestamp = column[String]("timestamp")
 
     def createdBy = column[String]("createdBy")
@@ -144,11 +177,11 @@ class Transactions @Inject()(
 
   object Service {
 
-    def create(hash: String, height: String, code: Option[Int], rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, timestamp: String): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, timestamp = timestamp))
+    def create(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
 
     def insertMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
 
-    def insertOrUpdate(hash: String, height: String, code: Option[Int], rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, timestamp: String): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, timestamp = timestamp))
+    def insertOrUpdate(hash: String, height: String, code: Int, rawLog: String, status: Boolean, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: String): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, rawLog = rawLog, status = status, gasWanted = gasWanted, gasUsed = gasUsed, messages = messages, fee = fee, memo = memo, timestamp = timestamp))
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash).map(_.deserialize)
 
@@ -175,6 +208,25 @@ class Transactions @Inject()(
     }
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage).map(_.map(_.deserialize))
-  }
 
+    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
+
+    def getTransactionStatisticsData(latestHeight: Int): Future[ListMap[String, Int]] = {
+      val end = if (latestHeight % transactionsStatisticsBinWidth == 0) latestHeight else ((latestHeight / transactionsStatisticsBinWidth) + 1) * transactionsStatisticsBinWidth
+      val start = if (end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth > blockchainStartHeight) end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth else blockchainStartHeight - 1
+      val maxBins = (end - start + 1) / transactionsStatisticsBinWidth
+      val totalBins = if (maxBins == transactionsStatisticsTotalBins) transactionsStatisticsTotalBins else maxBins
+      val result = utilitiesOperations.traverse(0 until totalBins) { index =>
+        val s = start + index * transactionsStatisticsBinWidth + 1
+        val e = start + (index + 1) * transactionsStatisticsBinWidth
+        val numTxs = getTransactionsNumberByHeightRange(s, e)
+        for {
+          numTxs <- numTxs
+        } yield s"""${s/transactionsStatisticsBinWidth} - ${e/transactionsStatisticsBinWidth}""" -> numTxs
+      }
+      for {
+        result <- result
+      } yield ListMap(result.toList: _*)
+    }
+  }
 }

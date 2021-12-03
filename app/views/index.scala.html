@@ -1,16 +1,14 @@
 @import controllers.actions.LoginState
-@import play.twirl.api.Html
-@import views.html.base._
-@import scala.collection.immutable.ListMap
+@import utilities.Configuration.OtherApp
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(component: Option[String] = None, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
     @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
     @left = {
         <div class="leftContainer">
-            <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard"></div>
-            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom"></div>
+            <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cmuk-card-styles containerHeight"></div>
+            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
@@ -19,24 +17,58 @@
     }
 
     @center = {
-        <div class="cmuk-container cmuk-margin-bottom">
-            <div class="cmuk-grid-match" cmuk-grid>
-                <div class="cmuk-width-expand@@m">
-                    <div id="tokensPrices" class="cardSelectHeader"></div>
-                </div>
-            </div>
+        <div id="explorerContent">
         </div>
-        <script>
-                componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
-        </script>
+
+
+    @component match {
+        case Some(page) => {
+            @page match {
+                case constants.View.BLOCKS => {
+                    <script>
+                    componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList());
+                    </script>
+                }
+                case constants.View.TRANSACTIONS => {
+                    <script>
+                    componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList());
+                    </script>
+                }
+                case constants.View.VALIDATORS => {
+                    <script>
+                    componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList());
+                    </script>
+                }
+                case constants.View.PROPOSALS => {
+                    <script>
+                    componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList());
+                    </script>
+                }
+                case constants.View.DASHBOARD => {
+                    <script>
+                    componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard());
+                    </script>
+                }
+                case default => {
+                }
+            }
+        }
+        case None => {
+            <script>
+                componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())
+            </script>
+        }
+    }
+        <script src="@routes.Assets.versioned("javascripts/transactionList.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/blockList.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/getExplorerContent.js")" type="text/javascript"></script>
+
     }
 
     @right = {
         <div class="rightContainer">
-            <div class="recentActivityContainer">
-                <div id="recentActivities"></div>
-            </div>
-            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard"></div>
+            <div id="recentActivities" class="recentActivityContainer cmuk-card-styles containerHeight"></div>
+            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import views.html.base._
+@import models.common.TransactionMessages.OrderCancel
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[OrderCancel]) { orderCancel =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderCancel.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderCancel.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(orderCancel.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderCancel.fromID}'))")))
+    @commonHtmlInfo(constants.View.ORDER_ID, commonJavascriptLink(orderCancel.orderID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderCancel.orderID}'))")))
+}

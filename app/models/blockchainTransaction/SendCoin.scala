@@ -63,6 +63,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
+
   private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += serialize(sendCoin)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -258,7 +260,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem,
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
-  }
+//  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
+//    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+//  }
 }

@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.common.Serializable.BaseProperty
 import models.{blockchain, blockchainTransaction, master}
@@ -40,6 +41,10 @@ class MaintainerController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
+
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
   def deputizeForm(classificationID: String, entityType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -55,9 +60,9 @@ class MaintainerController @Inject()(
       } yield {
         if (properties.nonEmpty && maintainerIDs.intersect(identityIDs).nonEmpty) {
           val mutables = Option(properties.filter(_.isMutable).map(x => Option(views.companion.common.Property.Data(dataType = x.dataType, dataName = x.name, dataValue = x.value))))
-          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerIDs.intersect(identityIDs).head, classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = identityIDs.intersect(maintainerIDs).head, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
+          Ok(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(blockchainCompanion.MaintainerDeputize.Data(fromID = maintainerIDs.intersect(identityIDs).headOption.getOrElse(""), classificationID = classificationID, toID = "", addMaintainer = false, removeMaintainer = false, mutateMaintainer = false, maintainedTraits = mutables, addMaintainedTraits = false, gas = MicroNumber.zero, password = None)), classificationID = classificationID, fromID = identityIDs.intersect(maintainerIDs).head, numMaintainedTraitsForm = mutables.fold(0)(_.length)))
         } else {
-          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerIDs.intersect(identityIDs).head))
+          Ok(blockchainForms.maintainerDeputize(classificationID = classificationID, fromID = maintainerIDs.intersect(identityIDs).headOption.getOrElse("")))
         }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -93,7 +98,7 @@ class MaintainerController @Inject()(
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), deputizeData.classificationID, deputizeData.fromID, deputizeData.maintainedTraits.fold(0)(_.flatten.length))))
 
@@ -102,7 +107,7 @@ class MaintainerController @Inject()(
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
-              case baseException: BaseException => InternalServerError(views.html.dashboard(failures = Seq(baseException.failure)))
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
           }
         }

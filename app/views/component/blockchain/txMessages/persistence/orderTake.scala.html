@@ -1,0 +1,12 @@
+@import models.Abstract.TransactionMessage
+@import views.html.base._
+@import models.common.TransactionMessages.OrderTake
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[OrderTake]) { orderTake =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderTake.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderTake.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(orderTake.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderTake.fromID}'))")))
+    @commonHtmlInfo(constants.View.ORDER_ID, commonJavascriptLink(orderTake.orderID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderTake.orderID}'))")))
+    @commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, orderTake.takerOwnableSplit.toString)
+}

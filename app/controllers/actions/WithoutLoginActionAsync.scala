@@ -1,7 +1,9 @@
 package controllers.actions
 
 import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
+
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -18,6 +20,10 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
                                         masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def apply(f: ⇒ Option[LoginState] => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
@@ -49,7 +55,7 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
         result <- verifySessionTokenUserTypeAndGetResult(username, sessionToken)
       } yield result).recover {
         case baseException: BaseException =>
-          Results.InternalServerError(views.html.index(Seq(baseException.failure))).withNewSession
+          Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession
       }
     }
   }

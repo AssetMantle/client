@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.master.{AccountKYC, Email}
 import models.{blockchain, docusign, master}
@@ -25,6 +26,10 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_DOCUSIGN
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def send(id: String, documentType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

@@ -1,0 +1,24 @@
+@import views.html.base._
+@import models.blockchain.ProposalDeposit
+
+@(proposalDeposits: Seq[ProposalDeposit])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.PROPOSAL_DEPOSITS) {
+} {
+    <table class="cmuk-table cmuk-table-striped tableSort">
+        <thead>
+            <tr>
+                <th>@Messages(constants.View.DEPOSITOR)</th>
+                <th>@Messages(constants.View.AMOUNT)</th>
+            </tr>
+        </thead>
+        <tbody>
+        @proposalDeposits.map { proposalDeposit =>
+            <tr>
+                <td>@commonJavascriptLink(proposalDeposit.depositor, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${proposalDeposit.depositor}'))"))</td>
+                <td>@proposalDeposit.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

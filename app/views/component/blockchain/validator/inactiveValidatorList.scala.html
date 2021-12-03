@@ -1,0 +1,41 @@
+@import views.html.base._
+@import models.blockchain.Validator
+
+@(validators: Seq[Validator], keyBaseValidators: Seq[keyBase.ValidatorAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<table class="cmuk-table cmuk-table-striped tableSort">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.VALIDATOR)</th>
+            <th>@Messages(constants.View.DELEGATIONS)</th>
+            <th>@Messages(constants.View.COMMISSION_RATE)</th>
+            <th>@Messages(constants.View.VALIDATOR_BONDING_STATUS)</th>
+            <th>@Messages(constants.View.JAILED)</th>
+        </tr>
+<tbody>
+    @validators.map { validator =>
+        <tr>
+            <td class="blockHeightItem">
+                @keyBaseValidators.find(x => x.address == validator.operatorAddress).flatMap(_.pictureURL) match {
+                    case Some(pictureURL) => {
+                        @commonImageResource(pictureURL)
+                    }
+                    case None => {
+                        @commonImage("note.svg")
+                    }
+                }
+            <span>@commonVerticalHtmlInfo(validator.description.moniker, commonJavascriptLink(validator.description.moniker, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validator.operatorAddress}'))")))</span>
+            </td>
+            <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(validator.tokens.toDouble))</td>
+            <td>@((validator.commission.commissionRates.rate * 100).toString())%</td>
+            <td>@Messages(validator.status)</td>
+            <td>@if(validator.jailed) {
+                <span cmuk-icon="check" class="check"></span>
+            } else {
+                <span cmuk-icon="close" class="close"></span>
+            }</td>
+        </tr>
+    }
+</tbody>
+</table>
+<script src="@routes.Assets.versioned("javascripts/dataTables/dataTable.js")" type="text/javascript"></script>

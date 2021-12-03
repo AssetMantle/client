@@ -1,0 +1,18 @@
+@import models.Abstract.TransactionMessage
+@import views.html.base._
+@import views.html.component.blockchain.properties
+@import models.common.TransactionMessages.OrderMake
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[OrderMake]) { orderMake =>
+    @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(orderMake.from, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${orderMake.from}'))")))
+    @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(orderMake.fromID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.fromID}'))")))
+    @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(orderMake.classificationID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.classificationID}'))")))
+    @commonHtmlInfo(constants.View.MAKER_OWNABLE_ID, commonJavascriptLink(orderMake.makerOwnableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.makerOwnableID}'))")))
+    @commonHtmlInfo(constants.View.TAKER_OWNABLE_ID, commonJavascriptLink(orderMake.takerOwnableID, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.IndexController.search('${orderMake.takerOwnableID}'))")))
+    @commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, orderMake.makerOwnableSplit.toString)
+    @commonTextInfo(constants.View.EXPIRES_IN, utilities.NumericOperation.formatNumber(orderMake.expiresIn))
+    @views.html.component.blockchain.metaProperties(mutableMetaProperties = orderMake.mutableMetaProperties.metaPropertyList, immutableMetaProperties = orderMake.immutableMetaProperties.metaPropertyList)
+    @views.html.component.blockchain.properties(mutableProperties = orderMake.mutableProperties.propertyList, immutableProperties = orderMake.immutableProperties.propertyList)
+}

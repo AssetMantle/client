@@ -3,6 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
+import utilities.Configuration.OtherApp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -38,11 +39,15 @@ class SendCoinController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val denom = configuration.get[String]("blockchain.denom")
+  private val denom = configuration.get[String]("blockchain.stakingDenom")
+
+  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  }
 
   def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-    Ok(blockchainForms.sendCoin())
+      Ok(blockchainForms.sendCoin())
   }
 
   def sendCoin: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -67,7 +72,7 @@ class SendCoinController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.dashboard(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.index(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.sendCoin(blockchainCompanion.SendCoin.form.fill(sendCoinData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 

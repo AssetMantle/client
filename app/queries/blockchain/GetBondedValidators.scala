@@ -20,7 +20,7 @@ class GetBondedValidators @Inject()()(implicit wsClient: WSClient, configuration
 
   private val port = configuration.get[String]("blockchain.restPort")
 
-  private val path = "staking/validators?status=bonded"
+  private val path = "cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED"
 
   private val url = ip + ":" + port + "/" + path
 

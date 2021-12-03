@@ -3,7 +3,7 @@
 
 @(title: String, arguments: (Symbol, Any)*)(headerContent: Html = Html(""))(content: Html = Html(""))(implicit messagesProvider: MessagesProvider)
 
-<div class="cmuk-card cmuk-card-default commonCard cmuk-animation-fade">
+<div class="cmuk-card commonCard cmuk-card-default cmuk-animation-fade">
     <div class="cmuk-card-header cmuk-flex" style="align-items: center ;
         justify-content: space-between;">
         <div>
@@ -15,9 +15,7 @@
         </div>
         @headerContent
     </div>
-    <div class="scroller">
-        <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
+    <div class="cmuk-card-body cmuk-height-medium cmuk-overflow-auto">
         @content
-        </div>
     </div>
 </div>

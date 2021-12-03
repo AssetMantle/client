@@ -1,0 +1,11 @@
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.VerifyInvariant
+@import views.html.base._
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[VerifyInvariant]) { verifyInvariant =>
+    @commonHtmlInfo(constants.View.SENDER, commonJavascriptLink(verifyInvariant.sender, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${verifyInvariant.sender}'))")))
+    @commonTextInfo(constants.View.INVARIANT_MODULE_NAME, verifyInvariant.invariantModuleName)
+    @commonTextInfo(constants.View.INVARIANT_ROUTE, verifyInvariant.invariantRoute)
+}

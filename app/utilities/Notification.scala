@@ -25,11 +25,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
                              masterAccounts: master.Accounts,
                              messagesApi: MessagesApi,
                              keyStore: KeyStore
-                            )
-                            (implicit
-                             executionContext: ExecutionContext,
-                             configuration: Configuration
-                            ) {
+                            )(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_NOTIFICATION
 

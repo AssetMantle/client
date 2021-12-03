@@ -21,10 +21,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
     "address"           VARCHAR NOT NULL,
     "username"          VARCHAR NOT NULL UNIQUE,
-    "coins"             VARCHAR NOT NULL,
-    "publicKey"         VARCHAR NOT NULL,
-    "accountNumber"     VARCHAR NOT NULL,
-    "sequence"          VARCHAR NOT NULL,
+    "accountType"       VARCHAR NOT NULL,
+    "publicKey"         VARCHAR,
+    "accountNumber"     INTEGER NOT NULL,
+    "sequence"          INTEGER NOT NULL,
+    "vestingParameters" VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -48,19 +49,17 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."AverageBlockTime"
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Balance_BC"
 (
-    "id"                VARCHAR NOT NULL,
-    "height"            INTEGER NOT NULL,
-    "value"             BIGINT  NOT NULL,
-    "time"              VARCHAR NOT NULL,
+    "address"           VARCHAR NOT NULL,
+    "coins"             VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Block"
@@ -204,6 +203,54 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Parameter"
     PRIMARY KEY ("parameterType")
 );
 
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Proposal_BC"
+(
+    "id"                INTEGER NOT NULL,
+    "content"           VARCHAR NOT NULL,
+    "status"            VARCHAR NOT NULL,
+    "finalTallyResult"  VARCHAR NOT NULL,
+    "submitTime"        VARCHAR NOT NULL,
+    "depositEndTime"    VARCHAR NOT NULL,
+    "totalDeposit"      VARCHAR NOT NULL,
+    "votingStartTime"   VARCHAR NOT NULL,
+    "votingEndTime"     VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalDeposit_BC"
+(
+    "proposalID"        INTEGER NOT NULL,
+    "depositor"         VARCHAR NOT NULL,
+    "amount"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("proposalID", "depositor")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalVote_BC"
+(
+    "proposalID"        INTEGER NOT NULL,
+    "voter"             VARCHAR NOT NULL,
+    "option"            VARCHAR NOT NULL,
+    "createdBy"         VARCHAR,
+    "createdOn"         TIMESTAMP,
+    "createdOnTimeZone" VARCHAR,
+    "updatedBy"         VARCHAR,
+    "updatedOn"         TIMESTAMP,
+    "updatedOnTimeZone" VARCHAR,
+    PRIMARY KEY ("proposalID", "voter")
+);
+
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Redelegation"
 (
     "delegatorAddress"            VARCHAR NOT NULL,
@@ -254,13 +301,14 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Transaction"
 (
     "hash"              VARCHAR NOT NULL,
     "height"            INTEGER NOT NULL,
-    "code"              INTEGER,
+    "code"              INTEGER NOT NULL,
     "rawLog"            VARCHAR NOT NULL,
     "status"            BOOLEAN NOT NULL,
     "gasWanted"         VARCHAR NOT NULL,
     "gasUsed"           VARCHAR NOT NULL,
     "messages"          VARCHAR NOT NULL,
     "fee"               VARCHAR NOT NULL,
+    "memo"              VARCHAR NOT NULL,
     "timestamp"         VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -291,12 +339,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Validator"
     "hexAddress"            VARCHAR NOT NULL UNIQUE,
     "consensusPublicKey"    VARCHAR NOT NULL UNIQUE,
     "jailed"                BOOLEAN NOT NULL,
-    "status"                INTEGER NOT NULL,
+    "status"                VARCHAR NOT NULL,
     "tokens"                VARCHAR NOT NULL,
     "delegatorShares"       NUMERIC NOT NULL,
     "description"           VARCHAR NOT NULL,
-    "unbondingHeight"       INTEGER,
-    "unbondingTime"         VARCHAR,
+    "unbondingHeight"       INTEGER NOT NULL,
+    "unbondingTime"         VARCHAR NOT NULL,
     "commission"            VARCHAR NOT NULL,
     "minimumSelfDelegation" VARCHAR NOT NULL,
     "createdBy"             VARCHAR,
@@ -790,7 +838,7 @@ CREATE TABLE IF NOT EXISTS KEY_BASE."ValidatorAccount"
     "address"           VARCHAR NOT NULL,
     "identity"          VARCHAR,
     "username"          VARCHAR,
-    "picture"           BYTEA,
+    "pictureURL"        VARCHAR,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
     "createdOnTimeZone" VARCHAR,
@@ -1133,7 +1181,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("denom")
+    PRIMARY KEY ("serial")
 );
 
 CREATE TABLE IF NOT EXISTS WESTERN_UNION."FiatRequest"
@@ -1311,6 +1359,10 @@ ALTER TABLE BLOCKCHAIN."IdentityProvisioned_BC"
     ADD CONSTRAINT Identity_ID_Provisioned FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 ALTER TABLE BLOCKCHAIN."IdentityUnprovisioned_BC"
     ADD CONSTRAINT Identity_ID_Unprovisioned FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
+ALTER TABLE BLOCKCHAIN."ProposalDeposit_BC"
+    ADD CONSTRAINT ProposalDeposit_Proposal_ID FOREIGN KEY ("proposalID") REFERENCES BLOCKCHAIN."Proposal_BC" ("id");
+ALTER TABLE BLOCKCHAIN."ProposalVote_BC"
+    ADD CONSTRAINT ProposalVote_Proposal_ID FOREIGN KEY ("proposalID") REFERENCES BLOCKCHAIN."Proposal_BC" ("id");
 ALTER TABLE BLOCKCHAIN."Redelegation"
     ADD CONSTRAINT Redelegation_Validator_validatorSourceAddress FOREIGN KEY ("validatorSourceAddress") REFERENCES BLOCKCHAIN."Validator" ("operatorAddress");
 ALTER TABLE BLOCKCHAIN."Redelegation"
@@ -1335,8 +1387,6 @@ ALTER TABLE MASTER."Identification"
     ADD CONSTRAINT Identification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Order"
     ADD CONSTRAINT Order_Maker_id FOREIGN KEY ("makerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
-ALTER TABLE MASTER."Classification"
-    ADD CONSTRAINT Classification_Identity_Maintainer FOREIGN KEY ("maintainerID") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."Chat"
     ADD CONSTRAINT Chat_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
@@ -1401,9 +1451,9 @@ CREATE TRIGGER ASSET_BC_LOG
     ON BLOCKCHAIN."Asset_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
-CREATE TRIGGER AVERAGE_BLOCK_TIME_LOG
+CREATE TRIGGER BALANCE_BC_LOG
     BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."AverageBlockTime"
+    ON BLOCKCHAIN."Balance_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER BLOCK_LOG
@@ -1454,6 +1504,21 @@ EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER PARAMETER_LOG
     BEFORE INSERT OR UPDATE
     ON BLOCKCHAIN."Parameter"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PROPOSAL_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."Proposal_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PROPOSAL_DEPOSIT_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."ProposalDeposit_BC"
+    FOR EACH ROW
+EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+CREATE TRIGGER PROPOSAL_VOTE_BC_LOG
+    BEFORE INSERT OR UPDATE
+    ON BLOCKCHAIN."ProposalVote_BC"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
 CREATE TRIGGER REDELEGATION_LOG
@@ -1804,7 +1869,7 @@ EXECUTE PROCEDURE MEMBER_CHECK.VESSEL_SCAN_DECISION_HISTORY();
 /*Log Triggers*/
 DROP TRIGGER IF EXISTS ACCOUNT_BC_LOG ON BLOCKCHAIN."Account_BC" CASCADE;
 DROP TRIGGER IF EXISTS ASSET_BC_LOG ON BLOCKCHAIN."Asset_BC" CASCADE;
-DROP TRIGGER IF EXISTS AVERAGE_BLOCK_TIME_LOG ON BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TRIGGER IF EXISTS BALANCE_BC_LOG ON BLOCKCHAIN."Balance_BC" CASCADE;
 DROP TRIGGER IF EXISTS BLOCK_LOG ON BLOCKCHAIN."Block" CASCADE;
 DROP TRIGGER IF EXISTS CLASSIFICATION_BC_LOG ON BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TRIGGER IF EXISTS DELEGATION_LOG ON BLOCKCHAIN."Delegation" CASCADE;
@@ -1815,6 +1880,9 @@ DROP TRIGGER IF EXISTS MAINTAINER_BC_LOG ON BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TRIGGER IF EXISTS META_BC_LOG ON BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_BC_LOG ON BLOCKCHAIN."Order_BC" CASCADE;
 DROP TRIGGER IF EXISTS PARAMETER_LOG ON BLOCKCHAIN."Parameter" CASCADE;
+DROP TRIGGER IF EXISTS PROPOSAL_BC_LOG ON BLOCKCHAIN."Proposal_BC" CASCADE;
+DROP TRIGGER IF EXISTS PROPOSAL_DEPOSIT_BC_LOG ON BLOCKCHAIN."ProposalDeposit_BC" CASCADE;
+DROP TRIGGER IF EXISTS PROPOSAL_VOTE_BC_LOG ON BLOCKCHAIN."ProposalVote_BC" CASCADE;
 DROP TRIGGER IF EXISTS REDELEGATION_LOG ON BLOCKCHAIN."Redelegation" CASCADE;
 DROP TRIGGER IF EXISTS SPLIT_BC_LOG ON BLOCKCHAIN."Split_BC" CASCADE;
 DROP TRIGGER IF EXISTS TOKEN_LOG ON BLOCKCHAIN."Token" CASCADE;
@@ -1890,7 +1958,7 @@ DROP TRIGGER IF EXISTS DELETE_VESSEL_SCAN_DECISION ON MEMBER_CHECK."VesselScanDe
 
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."AverageBlockTime" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Balance_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Block" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Classification_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Delegation" CASCADE;
@@ -1901,6 +1969,9 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Maintainer_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Meta_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Parameter" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Proposal_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."ProposalDeposit_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."ProposalVote_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Redelegation" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Split_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Token" CASCADE;
