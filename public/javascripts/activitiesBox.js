@@ -1,10 +1,5 @@
-function loadMoreActivities(notificationRoute, negotiationID = null) {
-    let route;
-    if (negotiationID === null) {
-        route = notificationRoute($(".recentActivityBox").length + 1);
-    } else {
-        route = notificationRoute(negotiationID, $(".recentActivityBox").length + 1);
-    }
+function loadMoreActivities(notificationRoute) {
+    let route = notificationRoute($(".recentActivityBox").length + 1);
     let loadingSpinner = $('#RECENT_ACTIVITY_LOADING');
     $.ajax({
         url: route.url,
@@ -19,6 +14,7 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
         },
         statusCode: {
             200: function (data) {
+
                 const loadMore = $(".recentActivityBox .notification:last");
                 loadMore.after(data);
             }
@@ -77,22 +73,23 @@ function loadMoreActivities(notificationRoute, negotiationID = null) {
 //     });
 // }
 
-function loadMoreActivitiesOnScroll(negotiationID) {
-    $('.recentActivityMessages').on('scroll', function () {
-        if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
-            if ($(this).scrollTop() +
-                $(this).innerHeight() >=
-                $(this)[0].scrollHeight) {
-                if (negotiationID) {
-                    loadMoreActivities(jsRoutes.controllers.NegotiationController.tradeActivityMessages, negotiationID)
-                } else {
-                    loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
-                }
-            }
-        }
-    });
-}
+window.addEventListener('load', (event) => {
+    var el = document.getElementById("recentActivityMessages")
+    if(el) {
+        el.addEventListener("mouseover", function(event) {
+            console.log(el);
+            loadMoreActivitiesOnScroll()
+        });
+    }
+});
 
+
+function loadMoreActivitiesOnScroll() {
+    console.log("Reaching")
+    if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
+        loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
+    }
+}
 function onNotificationClick(route, inNewPage) {
     if (route !== "") {
         if (inNewPage) {
