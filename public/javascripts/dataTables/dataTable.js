@@ -6,7 +6,8 @@
                 "paging":   false,
                 "info":     false,
                 "oLanguage": { "sSearch": "search"
-                }
+                },
+                "order" : [[1,"desc"]]
             }
         );
      var tables = $(".tableSortPagination").DataTable(
