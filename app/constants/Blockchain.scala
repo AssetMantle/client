@@ -6,10 +6,9 @@ import com.typesafe.config.ConfigFactory
 import org.bitcoinj.crypto.ChildNumber
 
 object Blockchain {
-  val CONFIG = ConfigFactory.load()
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = CONFIG.getString("blockchainAccount.prefix")
+  val AccountPrefix = ConfigFactory.load().getString("blockchainAccount.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val NegotiationDefaultTime = 5000000
