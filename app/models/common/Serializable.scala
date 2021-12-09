@@ -54,7 +54,7 @@ object Serializable {
 
     def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
 
-    def getRealDenomName: String = if (ibcResult != null)  ibcWhitelistedNames(denom) else "UNKOWN"
+    def getRealDenomName: String = if (ibcResult != null)  ibcWhitelistedNames(denom) else denom
 
   }
 
