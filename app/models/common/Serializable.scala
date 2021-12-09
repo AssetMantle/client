@@ -22,7 +22,6 @@ object Serializable {
 
   implicit val addressReads: Reads[Address] = Json.reads[Address]
 
-
   object Validator {
 
     case class Description(moniker: String, identity: String, website: String, securityContact: String, details: String)
@@ -53,7 +52,6 @@ object Serializable {
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 
     def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
-
 
   }
 
