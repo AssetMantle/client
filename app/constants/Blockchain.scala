@@ -2,12 +2,13 @@ package constants
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
+import com.typesafe.config.ConfigFactory
 import org.bitcoinj.crypto.ChildNumber
 
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = "persistence"
+  val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val NegotiationDefaultTime = 5000000
