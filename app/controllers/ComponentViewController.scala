@@ -600,7 +600,7 @@ class ComponentViewController @Inject()(
         (for {
           validators <- validators
           keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
-        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators, validators.map(_.tokens).sum, keyBaseValidators))
+        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators.sortBy(_.tokens).reverse, validators.map(_.tokens).sum, keyBaseValidators))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
