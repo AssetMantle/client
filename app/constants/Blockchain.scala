@@ -8,7 +8,7 @@ import org.bitcoinj.crypto.ChildNumber
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = ConfigFactory.load().getString("blockchainAccount.prefix")
+  val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val NegotiationDefaultTime = 5000000
