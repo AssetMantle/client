@@ -76,7 +76,7 @@ function loadMoreActivities(notificationRoute) {
 window.addEventListener('load', (event) => {
     var el = document.getElementById("recentActivityMessages")
     if(el) {
-        el.addEventListener("mouseover", function(event) {
+        el.addEventListener("scroll", function(event) {
             console.log(el);
             loadMoreActivitiesOnScroll()
         });
@@ -85,11 +85,14 @@ window.addEventListener('load', (event) => {
 
 
 function loadMoreActivitiesOnScroll() {
-    console.log("Reaching")
     if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
-        loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
+        const el = document.getElementById("recentActivityMessages");
+        if(el) {
+            loadMoreActivities(jsRoutes.controllers.NotificationController.recentActivityMessages)
+        }
     }
 }
+
 function onNotificationClick(route, inNewPage) {
     if (route !== "") {
         if (inNewPage) {
