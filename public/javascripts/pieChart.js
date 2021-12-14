@@ -24,23 +24,64 @@ function pieChart(chartID, keys, values, showLegend) {
             }]
     };
     let ctx = $('#' + chartID);
-    let chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: chartData,
-        options: {
-            tooltips: {
-                displayColors: false,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        let name = nameList[tooltipItem.index];
-                        let value = valueList[tooltipItem.index];
-                        let dataset = data.datasets[tooltipItem.datasetIndex];
-                        return [name, (value * 100.0 / totalValue).toFixed(2) + "%", value];
-                    }
+    // let chart = new Chart(ctx, {
+    //     type: 'doughnut',
+    //     data: chartData,
+    //     options: {
+    //         tooltips: {
+    //             displayColors: false,
+    //             callbacks: {
+    //                 label: function (tooltipItem, data) {
+    //                     let name = nameList[tooltipItem.index];
+    //                     let value = valueList[tooltipItem.index];
+    //                     let dataset = data.datasets[tooltipItem.datasetIndex];
+    //                     return [name, (value * 100.0 / totalValue).toFixed(2) + "%", value];
+    //                 }
+    //             }
+    //         },
+    //         responsive: true,
+    //         maintainAspectRatio: false,
+    //         legend: {
+    //             position: 'right',
+    //             align: 'center',
+    //             labels: {
+    //                 boxWidth: 10,
+    //                 boxHeight: 2
+    //             }
+    //         }
+    //     }
+    // });
+
+
+    const thresholdPercent = 11;
+    const slices = valueList.map((v, i) => ({ label: nameList[i], value: v }))
+        .reduce((accumulator, currObj) => {
+            const percent = 100 * currObj.value / totalValue;
+            if (percent < thresholdPercent) {
+                const others = accumulator.find(o => o.label == 'Others');
+                if (!others) {
+                    return accumulator.concat({ label: 'Others', value: currObj.value });
                 }
-            },
+                others.value += currObj.value;
+            } else {
+                accumulator.push(currObj);
+            }
+            return accumulator;
+        }, []);
+
+    myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: slices.map(o => o.label),
+            datasets: [{
+                data: slices.map(o => o.value),
+                backgroundColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             legend: {
                 position: 'right',
                 align: 'center',
@@ -48,7 +89,15 @@ function pieChart(chartID, keys, values, showLegend) {
                     boxWidth: 10,
                     boxHeight: 2
                 }
+            },
+            hover: {
+                onHover: function(e, el) {
+                    $("#myChart").css("cursor", e[0] ? "pointer" : "default");
+                }
             }
         }
     });
 }
+
+
+
