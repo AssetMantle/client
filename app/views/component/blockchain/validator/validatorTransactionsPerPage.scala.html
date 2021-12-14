@@ -36,7 +36,11 @@
                     <span cmuk-icon="close" class="close"></span>
                 }
                 </td>
-                <td>@utilities.Date.bcTimestampToString(tx.timestamp)</td>
+                <td id="date_@tx.hash">
+                    <script>
+                     document.getElementById("date_@tx.hash").innerHTML = convertUTCDateToLocalDate('@tx.timestamp')
+                    </script>
+                </td>
             </tr>
         }
         </tbody>
@@ -44,3 +48,4 @@
 } else {
     @Messages(constants.View.NO_TRANSACTIONS_FOUND)
 }
+

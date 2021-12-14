@@ -8,5 +8,5 @@ function convertUTCDateToLocalDate(date) {
         minute: '2-digit',
         second: '2-digit'
     };
-    return newDate.toLocaleDateString("en", options)
+    return newDate.toLocaleDateString("en", options);
 }
