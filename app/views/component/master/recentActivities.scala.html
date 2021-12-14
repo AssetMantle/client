@@ -7,9 +7,9 @@
 @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#recentActivity") {
 } {
     <div class="scroller">
-        <div  id="recentActivityMessages" class="recentActivityMessages dredd" ></div>
+        <div  id="recentActivityMessages" class="recentActivityMessages" ></div>
         <div class="load-more-container">
-            <p onclick="loadMoreActivitiesOnScroll()">Load more</p>
+            <p onclick="loadMoreActivitiesOnScroll()">@Messages(constants.View.LOAD_MORE)</p>
         </div>
     </div>
 }
