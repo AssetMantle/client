@@ -73,16 +73,6 @@ function loadMoreActivities(notificationRoute) {
 //     });
 // }
 
-window.addEventListener('load', (event) => {
-    var el = document.getElementById("recentActivityMessages")
-    if(el) {
-        el.addEventListener("scroll", function(event) {
-            console.log(el);
-            loadMoreActivitiesOnScroll()
-        });
-    }
-});
-
 
 function loadMoreActivitiesOnScroll() {
     if (!$('.recentActivityMessages .recentActivityBox  > div').hasClass("noActivity")) {
