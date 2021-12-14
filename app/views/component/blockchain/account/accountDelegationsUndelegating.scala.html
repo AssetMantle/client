@@ -4,10 +4,25 @@
 
 @(undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@undelegations.map { case (validatorAddress, undelegationEntries) =>
-    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))")))
-    @undelegationEntries.map { undelegationEntry =>
-        @commonTextInfo(constants.View.AMOUNT_UNDELEGATING, utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble)))
-        @commonTextInfo(constants.View.COMPLETION_TIME, utilities.Date.bcTimestampToString(undelegationEntry.completionTime))
+<table class="cmuk-table cmuk-table-striped">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.VALIDATOR_ADDRESS)</th>
+            <th>@Messages(constants.View.AMOUNT_UNDELEGATING)</th>
+            <th>@Messages(constants.View.COMPLETION_TIME)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @undelegations.map { case (validatorAddress, undelegationEntries) =>
+        <tr>
+            @undelegationEntries.map { undelegationEntry =>
+                <td>
+                    @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorAddress}", s"${validatorAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"))
+                </td>
+                <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble))</td>
+                <td>@utilities.Date.bcTimestampToString(undelegationEntry.completionTime)</td>
+            }
+        </tr>
     }
-}
+    </tbody>
+</table>
