@@ -38,7 +38,7 @@
                 </td>
                 <td id="date_@tx.hash">
                     <script>
-                     document.getElementById("date_@tx.hash").innerHTML = convertUTCDateToLocalDate('@tx.timestamp')
+                        convertUTCDateToLocalDate('@tx.timestamp', "date_@tx.hash")
                     </script>
                 </td>
             </tr>

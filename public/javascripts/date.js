@@ -1,4 +1,4 @@
-function convertUTCDateToLocalDate(date) {
+function convertUTCDateToLocalDate(date, id) {
     let newDate = new Date(date);
     let options = {
         year: "numeric",
@@ -8,5 +8,5 @@ function convertUTCDateToLocalDate(date) {
         minute: '2-digit',
         second: '2-digit'
     };
-    return newDate.toLocaleDateString("en", options);
+    document.getElementById(id).innerHTML = newDate.toLocaleDateString("en", options);
 }

@@ -18,7 +18,7 @@
     <td id="blockListPageItemNumTxs_@index">@numberOfTxs.getOrElse(block.height, 0)</td>
     <td id="blockListPageItemTime_@index">
         <script>
-             document.getElementById("blockListPageItemTime_@index").innerHTML = convertUTCDateToLocalDate('@block.time')
+             convertUTCDateToLocalDate('@block.time',"blockListPageItemTime_@index")
         </script>
     </td>
 </tr>
