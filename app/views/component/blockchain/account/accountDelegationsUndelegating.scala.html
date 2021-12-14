@@ -20,7 +20,11 @@
                     @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorAddress}", s"${validatorAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"))
                 </td>
                 <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble))</td>
-                <td>@utilities.Date.bcTimestampToString(undelegationEntry.completionTime)</td>
+                <td id="undelegationEntry_@undelegationEntry.completionTime">
+                    <script>
+                            document.getElementById("undelegationEntry_@undelegationEntry.completionTime").innerHTML = convertUTCDateToLocalDate('@undelegationEntry.completionTime')
+                    </script>
+                </td>
             }
         </tr>
     }
