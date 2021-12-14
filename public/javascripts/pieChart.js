@@ -6,6 +6,7 @@ function pieChart(chartID, keys, values, showLegend) {
     let colorPrefixes = ["e", 4 , 1 , 2, 6, "b", 9, 3, "f", 5, 6, 0 , "e", 2, 8, "b", 9, 3, "f", 5, "a" , 7 , "c", 2, 6, "b", 9, 3, "f", 5,"e", 4 , 1 , 2, 6, "b", 9, 3, "f", 5, 6, 0 , "e", 2, 8, "b", 9, 3, "f", 5];
     for (let i = 0; i < valueList.length; i++) {
         totalValue = totalValue + parseFloat(valueList[i]);
+        console.log(totalValue)
         if(colorPrefixes.length <= i){
             colors.push('#' +colorPrefixes[i - colorPrefixes.length] + ((i + 50) * 884).toString());
         }else {
@@ -53,35 +54,50 @@ function pieChart(chartID, keys, values, showLegend) {
     // });
 
 
-    const thresholdPercent = 11;
+    const thresholdPercent = 12;
     const slices = valueList.map((v, i) => ({ label: nameList[i], value: v }))
         .reduce((accumulator, currObj) => {
             const percent = 100 * currObj.value / totalValue;
             if (percent < thresholdPercent) {
                 const others = accumulator.find(o => o.label == 'Others');
                 if (!others) {
+                    console.log("here")
+                    console.log(currObj.value)
+
                     return accumulator.concat({ label: 'Others', value: currObj.value });
                 }
-                others.value += currObj.value;
+                others.value += parseFloat(currObj.value);
+                console.log(others.value)
             } else {
                 accumulator.push(currObj);
             }
             return accumulator;
         }, []);
+console.log(slices)
 
-    myChart = new Chart(ctx, {
-        type: 'doughnut',
+   let chart = new Chart(ctx, {
+        type: 'pie',
         data: {
             labels: slices.map(o => o.label),
             datasets: [{
                 data: slices.map(o => o.value),
                 backgroundColor: colors,
-                borderWidth: 1
             }]
         },
         options: {
+            tooltips: {
+                displayColors: false,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        let name = nameList[tooltipItem.index];
+                        let value = valueList[tooltipItem.index];
+                        let dataset = data.datasets[tooltipItem.datasetIndex];
+                        return [name, (value * 100.0 / totalValue).toFixed(2) + "%", value];
+                    }
+                }
+            },
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             legend: {
                 position: 'right',
                 align: 'center',
@@ -97,6 +113,7 @@ function pieChart(chartID, keys, values, showLegend) {
             }
         }
     });
+console.log(chart.data)
 }
 
 
