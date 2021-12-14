@@ -44,7 +44,7 @@
     </td>
     <td id="transactionListPageItemTxFees_@index">
          <script>
-             document.getElementById("transactionListPageItemTxFees_@index").innerHTML = convertUTCDateToLocalDate('@tx.timestamp')
+             convertUTCDateToLocalDate('@tx.timestamp', "transactionListPageItemTxFees_@index")
         </script>
     </td>
 </tr>

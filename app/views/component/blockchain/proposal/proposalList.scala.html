@@ -27,12 +27,12 @@
                         <td>@Messages(proposal.status)</td>
                         <td id="startingTime_@proposal.id">
                             <script>
-                                    document.getElementById("startingTime_@proposal.id").innerHTML = convertUTCDateToLocalDate('@proposal.votingStartTime')
+                                    convertUTCDateToLocalDate('@proposal.votingStartTime',"startingTime_@proposal.id")
                             </script>
                         </td>
                         <td id="submitTime_@proposal.id">
                             <script>
-                                    document.getElementById("submitTime_@proposal.id").innerHTML = convertUTCDateToLocalDate('@proposal.submitTime')
+                                    convertUTCDateToLocalDate('@proposal.submitTime',"submitTime_@proposal.id")
                             </script>
                         </td>
                         <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
