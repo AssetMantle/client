@@ -28,7 +28,7 @@ object View {
   val DESCRIPTION = "DESCRIPTION"
 
   //ChatRoom
-  val LOAD_MORE_CHATS = "LOAD_MORE_CHATS"
+  val LOAD_MORE = "LOAD_MORE"
   val READ_BY = "READ_BY"
   val CHAT = "CHAT"
 

@@ -7,10 +7,13 @@
 @commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#recentActivity") {
 } {
     <div class="scroller">
-        <div id="recentActivityMessages" class="recentActivityMessages"></div>
+        <div  id="recentActivityMessages" class="recentActivityMessages" ></div>
+        <div class="load-more-container">
+            <p onclick="loadMoreActivitiesOnScroll()">@Messages(constants.View.LOAD_MORE)</p>
+        </div>
     </div>
 }
 <script>
-        loadMoreActivitiesOnScroll(jsRoutes.controllers.NotificationController.recentActivityMessages);
+    loadMoreActivitiesOnScroll();
     componentResource('recentActivityMessages', jsRoutes.controllers.NotificationController.recentActivityMessages(1), 'RECENT_ACTIVITY_LOADING');
 </script>
