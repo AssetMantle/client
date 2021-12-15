@@ -20,7 +20,7 @@ function pieChart(chartID, keys, values, showLegend) {
     let slices = valueList.sort(function(a, b){return b - a}).map((v, i) => ({ label: nameList[i], value: v }))
         .reduce((accumulator, currObj) => {
              percent += 100 * currObj.value / totalValue;
-            if (percent > 77) {
+            if (percent > 67) {
                 const others = accumulator.find(o => o.label == 'Others');
                 if (!others) {
                     return accumulator.concat({ label: 'Others', value: currObj.value });
