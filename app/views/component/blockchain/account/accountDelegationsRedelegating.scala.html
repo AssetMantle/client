@@ -1,13 +1,36 @@
 @import views.html.base._
-@import models.common.Serializable.UndelegationEntry
 @import scala.collection.immutable.ListMap
+@import models.common.Serializable.RedelegationEntry
 
-@(undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(redelegations: ListMap[(String, String), Seq[RedelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@undelegations.map { case (validatorAddress, undelegationEntries) =>
-    @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))")))
-    @undelegationEntries.map { undelegationEntry =>
-        @commonTextInfo(constants.View.AMOUNT_UNDELEGATING, utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble)))
-        @commonTextInfo(constants.View.COMPLETION_TIME, utilities.Date.bcTimestampToString(undelegationEntry.completionTime))
-    }
-}
+<table class="cmuk-table cmuk-table-striped">
+    <thead>
+        <tr>
+            <th>@Messages(constants.View.VALIDATOR_SOURCE_ADDRESS)</th>
+            <th>@Messages(constants.View.VALIDATOR_DESTINATION_ADDRESS)</th>
+            <th>@Messages(constants.View.AMOUNT)</th>
+            <th>@Messages(constants.View.COMPLETION_TIME)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @redelegations.map { case ((validatorSoruceAddress, validatorDestinationAddress), redelegationEntries) =>
+        <tr>
+            @redelegationEntries.map { redelegationEntry =>
+                <td>
+                    @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorSoruceAddress}", s"${validatorSoruceAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorSoruceAddress}'))"))
+                </td>
+                <td>
+                @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorDestinationAddress}", s"${validatorDestinationAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorDestinationAddress}'))"))
+                </td>
+                <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(redelegationEntry.initialBalance.toDouble))</td>
+                <td id="redelegationEntry_@redelegationEntry.completionTime">
+                    <script>
+                            convertUTCDateToLocalDate('@redelegationEntry.completionTime', "redelegationEntry_@redelegationEntry.completionTime")
+                    </script>
+                </td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
