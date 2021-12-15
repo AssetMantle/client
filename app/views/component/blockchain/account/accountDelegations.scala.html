@@ -7,7 +7,7 @@
 
 @import views.html.component.blockchain.account.accountDelegationsRedelegating
 @import models.common.Serializable.RedelegationEntry
-@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[String, Seq[RedelegationEntry]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[(String, String), Seq[RedelegationEntry]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.ACCOUNT_DELEGATIONS) {
 } {
