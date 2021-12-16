@@ -17,7 +17,7 @@
         </tr>
         <tr>
             <th>@Messages(constants.View.TIME)</th>
-            <td id="latestBlockHeight_time">@utilities.Date.bcTimestampToString(time)</td>
+            <td id="latestBlockHeight_time"></td>
         </tr>
         <tr>
             <th>@Messages(constants.View.AVERAGE_BLOCK_TIME)</th>
@@ -30,3 +30,6 @@
     }
 }
 
+<script>
+    convertUTCDateToLocalDate("@time", "latestBlockHeight_time")
+</script>

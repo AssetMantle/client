@@ -16,6 +16,10 @@
     </td>
     <td id="blockListPageItemProposer_@index">@proposersList.getOrElse(block.height, "")</td>
     <td id="blockListPageItemNumTxs_@index">@numberOfTxs.getOrElse(block.height, 0)</td>
-    <td id="blockListPageItemTime_@index">@utilities.Date.bcTimestampToString(block.time)</td>
+    <td id="blockListPageItemTime_@index">
+        <script>
+             convertUTCDateToLocalDate('@block.time',"blockListPageItemTime_@index")
+        </script>
+    </td>
 </tr>
 }
