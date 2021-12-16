@@ -78,7 +78,7 @@ function onAsset(message) {
 function updateLatestBlockHeightCard(message) {
     $('#latestBlockHeight_height').text(message.block.height);
     $('#latestBlockHeight_proposer').text(message.block.proposer);
-    $('#latestBlockHeight_time').text(message.block.time);
+    convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), "latestBlockHeight_time")
     $('#latestBlockHeight_averageBlockTime').text(message.averageBlockTime + "s");
 }
 
