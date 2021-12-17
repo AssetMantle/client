@@ -245,12 +245,29 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
+        def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
+          val totalTokens = sortedBondedValidators.map(_.tokens).sum
+          var percent:MicroNumber = 0.0
+          var countedToken = 0.0
+          sortedBondedValidators.map({
+            validator => {
+              percent += ((100*validator.tokens.toDouble)/totalTokens)
+              if(percent < 67) {
+                countedToken += validator.tokens.toDouble
+                validator.description.moniker -> validator.tokens.toDouble
+              }
+              else {
+                "Others" -> (totalTokens.toDouble - countedToken)
+              }
+            }
+          })
+        }
 
-        def getVotingPowerMap(sortedBondedValidators: Seq[Validator]): ListMap[String, Double] = sortedBondedValidators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
+        def getSortedValidatorsListMap(validatorSeq: Seq[(String, Double)]): ListMap[String, Double] = ListMap(validatorSeq: _*)
 
         (for {
           allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = getVotingPowerMap(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
+        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = getSortedValidatorsListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED))), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
