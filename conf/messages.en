@@ -327,6 +327,8 @@ SOURCES=Sources
 MIDDLE_NAME=Middle Name
 LINKED_INDIVIDUALS=Linked Individuals
 OTHER_CATEGORIES=Other Categories
+OTHERS=Others
+
 SUB_CATEGORIES=Sub Categories
 LINKED_COMPANIES=Linked Companies
 DATES=Dates
