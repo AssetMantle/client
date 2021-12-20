@@ -13,8 +13,8 @@ object Blockchain {
   val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
-  val IBCRealNames: Seq[utilities.Configuration.IBCRealName] = configuration.get[Seq[Configuration]]("blockchain.ibcRealName.ibcDenomNames").map { iBCRealName =>
-    utilities.Configuration.IBCRealName(denomHash = iBCRealName.get[String]("denomHash"), denomName = iBCRealName.get[String]("denomName"))
+  val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
+    utilities.Configuration.IBCDenom(denomHash = ibcDenoms.get[String]("denomHash"), denomName = ibcDenoms.get[String]("denomName"))
   }
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
