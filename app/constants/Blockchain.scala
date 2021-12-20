@@ -4,13 +4,18 @@ import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import com.typesafe.config.ConfigFactory
 import org.bitcoinj.crypto.ChildNumber
+import play.api.Configuration
 
 object Blockchain {
+  val configuration = Configuration(ConfigFactory.load())
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
   val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
+  val IBCRealNames: Seq[utilities.Configuration.IBCRealName] = configuration.get[Seq[Configuration]]("blockchain.ibcRealName.ibcDenomNames").map { iBCRealName =>
+    utilities.Configuration.IBCRealName(denomHash = iBCRealName.get[String]("denomHash"), denomName = iBCRealName.get[String]("denomName"))
+  }
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."

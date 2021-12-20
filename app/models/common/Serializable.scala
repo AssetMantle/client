@@ -1,6 +1,6 @@
 package models.common
 
-import com.typesafe.config.ConfigFactory
+import constants.Blockchain.IBCRealNames
 import models.Abstract.{DataValue, TransactionMessage}
 import models.common.DataValue._
 import models.common.TransactionMessages._
@@ -21,7 +21,6 @@ object Serializable {
 
   implicit val addressReads: Reads[Address] = Json.reads[Address]
 
-  private val ibcWhitelistedFilePath = ConfigFactory.load().getString("ibcRealName.ibcWhiteListedFilePath")
 
   object Validator {
 
@@ -46,15 +45,13 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    val ibcWhitelistedNames = Json.parse(scala.io.Source.fromFile(ibcWhitelistedFilePath.toString).mkString).as[Map[String,String]]
-    val ibcResult = ibcWhitelistedNames.find(_._1==denom).getOrElse(null)
-    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else denom.toUpperCase()
+    val ibcResult = IBCRealNames.find(_.denomHash==denom).getOrElse(null)
+    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else if (ibcResult !=null) ibcResult.denomName else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 
     def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
 
-    def getRealDenomName: String = if (ibcResult != null)  ibcWhitelistedNames(denom) else denom
 
   }
 
