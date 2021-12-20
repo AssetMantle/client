@@ -10,7 +10,7 @@
     } {
         @commonHorizontalSwitcher(ListMap(
             constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationTotalRewards = delegationTotalRewards, isValidator = isValidator, commissionRewards = commissionRewards),
-            constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap),
-            constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances)),
+            constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances),
+            constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap)),
         )
     }

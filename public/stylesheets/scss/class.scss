@@ -1200,6 +1200,13 @@ body.lightMode {
     flex:50%;
   }
 }
+.pieChartContainer .ibcDenom .infoRowLabel {
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
 
 .comdex {
   .cmuk-overflow-auto{

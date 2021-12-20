@@ -45,8 +45,8 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    val ibcResult = IBCDenoms.find(_.denomHash==denom).getOrElse(null)
-    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else if (ibcResult !=null) ibcResult.denomName else denom.toUpperCase()
+    val ibcResult = Option(IBCDenoms.find(_.denomHash == denom))
+    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else if (ibcResult.isEmpty) ibcResult.get.toString else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 
