@@ -7,6 +7,7 @@ import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utilities.Configuration.IBCDenom
 import utilities.MicroNumber
 
 object Serializable {
@@ -45,8 +46,9 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    val ibcResult = Option(IBCDenoms.find(_.denomHash == denom))
-    def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else if (ibcResult.isEmpty) ibcResult.get.toString else denom.toUpperCase()
+    def ibcDenom: String = IBCDenoms.find(_.denomHash == denom).fold(denom)(_.denomName)
+
+    def normalizeDenom: String = if (ibcDenom(0) == 'u') ibcDenom.split("u")(1).toUpperCase() else ibcDenom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 
