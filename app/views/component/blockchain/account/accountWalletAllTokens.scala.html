@@ -7,15 +7,16 @@
     @if(accountBalances.nonEmpty) {
         <div>
         @accountBalances.map { coin =>
-            @commonTextInfo(coin.normalizeDenom, utilities.NumericOperation.formatNumber(coin.amount, normalize = false))
+            @commonTextInfo(coin.normalizeDenom, utilities.NumericOperation.formatNumber(coin.amount, normalize = true))
 
         }
         </div>
-        @* @defining[ListMap[String, Double]](*@
-        @* ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)*@
-        @* ) { data =>*@
-        @* @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)*@
-        @* }*@
+        @*
+        @defining[ListMap[String, Double]](
+        ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)
+        ) { data =>
+        @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)
+        } *@
     } else {
         @Messages(constants.View.EMPTY_WALLET)
     }
