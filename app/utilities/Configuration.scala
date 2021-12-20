@@ -5,6 +5,6 @@ object Configuration {
 
   case class OtherApp(url: String, name: String)
 
-  case class IBCRealName(denomHash: String, denomName: String)
+  case class IBCDenom(denomHash: String, denomName: String)
 
 }

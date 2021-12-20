@@ -1,6 +1,6 @@
 package models.common
 
-import constants.Blockchain.IBCRealNames
+import constants.Blockchain.IBCDenoms
 import models.Abstract.{DataValue, TransactionMessage}
 import models.common.DataValue._
 import models.common.TransactionMessages._
@@ -45,7 +45,7 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    val ibcResult = IBCRealNames.find(_.denomHash==denom).getOrElse(null)
+    val ibcResult = IBCDenoms.find(_.denomHash==denom).getOrElse(null)
     def normalizeDenom: String = if (denom(0) == 'u') denom.split("u")(1).toUpperCase() else if (ibcResult !=null) ibcResult.denomName else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
