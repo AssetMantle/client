@@ -7,6 +7,7 @@ import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utilities.Configuration.IBCDenom
 import utilities.MicroNumber
 
 object Serializable {
