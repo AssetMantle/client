@@ -14,7 +14,7 @@ object Blockchain {
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
-    utilities.Configuration.IBCDenom(denom = ibcDenoms.get[String]("denom"), name = ibcDenoms.get[String]("name"))
+    utilities.Configuration.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
   }
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
