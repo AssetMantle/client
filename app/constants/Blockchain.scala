@@ -10,7 +10,7 @@ object Blockchain {
   private val configuration = Configuration(ConfigFactory.load())
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
+  val AccountPrefix = configuration.get[String]("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
