@@ -45,7 +45,7 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    def ibcDenom: String = IBCDenoms.find(_.denomHash == denom).fold(denom)(_.denomName)
+    def ibcDenom: String = IBCDenoms.find(_.denom == denom).fold(denom)(_.name)
 
     def normalizeDenom: String = if (ibcDenom(0) == 'u') ibcDenom.split("u")(1).toUpperCase() else ibcDenom.toUpperCase()
 

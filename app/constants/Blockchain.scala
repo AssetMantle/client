@@ -7,14 +7,14 @@ import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
 
 object Blockchain {
-  val configuration = Configuration(ConfigFactory.load())
+  private val configuration = Configuration(ConfigFactory.load())
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
   val AccountPrefix = ConfigFactory.load().getString("blockchain.account.prefix")
   val ValidatorPrefix = "persistencevaloper"
   val ValidatorConsensusPublicPrefix = "persistencevalconspub"
   val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
-    utilities.Configuration.IBCDenom(denomHash = ibcDenoms.get[String]("denomHash"), denomName = ibcDenoms.get[String]("denomName"))
+    utilities.Configuration.IBCDenom(denom = ibcDenoms.get[String]("denom"), name = ibcDenoms.get[String]("name"))
   }
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
