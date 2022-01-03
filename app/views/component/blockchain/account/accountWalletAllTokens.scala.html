@@ -3,19 +3,17 @@
 @import scala.collection.immutable.ListMap
 
 @(accountBalances: Seq[Coin])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div>
-    @if(accountBalances.nonEmpty) {
-        <div>
-        @accountBalances.map { coin =>
-            @commonTextInfo(coin.denom, utilities.NumericOperation.formatNumber(coin.amount, normalize = false))
-        }
-        </div>
-        @* @defining[ListMap[String, Double]](*@
-        @* ListMap(accountBalances.map(x => x.denom -> x.amount.toDouble): _*)*@
-        @* ) { data =>*@
-        @* @commonPieChart("accountWalletAllTokensChart", data, showLegend = true)*@
-        @* }*@
-    } else {
-        @Messages(constants.View.EMPTY_WALLET)
-    }
+<div class="pieChartContainer">
+	@if(accountBalances.nonEmpty) {
+		<div class="ibcDenom">
+		@accountBalances.map { coin =>
+			@commonTextInfo(coin.normalizeDenom, utilities.NumericOperation.formatNumber(coin.amount))
+		}
+		</div>
+		@defining[ListMap[String, Double]](ListMap(accountBalances.map(x => x.normalizeDenom -> x.amount.toDouble): _*)) { data =>
+			@commonPieChart("accountWalletAllTokensChart", data, showLegend = false)
+		}
+	} else {
+		@Messages(constants.View.EMPTY_WALLET)
+	}
 </div>
