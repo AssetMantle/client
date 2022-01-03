@@ -245,12 +245,24 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
-
-        def getVotingPowerMap(sortedBondedValidators: Seq[Validator]): ListMap[String, Double] = sortedBondedValidators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
+        def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
+          val totalTokens = sortedBondedValidators.map(_.tokens).sum
+          var percent, countedToken: MicroNumber = 0.0
+          sortedBondedValidators.map(validator => {
+            percent += ((100*validator.tokens.toDouble)/totalTokens)
+            if(percent < 67) {
+                countedToken += validator.tokens.toDouble
+                validator.description.moniker -> validator.tokens.toDouble
+              }
+              else {
+                constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
+              }
+          })
+        }
 
         (for {
           allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = getVotingPowerMap(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
+        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
