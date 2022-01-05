@@ -11,5 +11,4 @@ object TickerResponse {
   case class Response(persistence: Data) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
-
 }
