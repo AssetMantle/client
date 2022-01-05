@@ -8,6 +8,7 @@
         <entry key="ASCENDEX_URL" value="https://ascendex.com/api/pro/v1" />
         <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ABCI_PORT" value="26657" />
+        <entry key="BLOCKCHAIN_ACCOUNT_PREFIX" value="persistence" />
         <entry key="BLOCKCHAIN_HOST" value="128.199.29.15" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
         <entry key="CHAIN_ID" value="test-core-1" />

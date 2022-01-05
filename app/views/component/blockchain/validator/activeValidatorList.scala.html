@@ -6,6 +6,7 @@
 <table class="cmuk-table cmuk-table-striped tableSort">
     <thead>
         <tr>
+            <th>@Messages(constants.View.RANK)</th>
             <th>@Messages(constants.View.VALIDATOR)</th>
             <th>@Messages(constants.View.VOTING_POWER)</th>
             <th>@Messages(constants.View.DELEGATIONS)</th>
@@ -13,8 +14,10 @@
         </tr>
     </thead>
     <tbody>
-    @validators.map { validator =>
+
+    @validators.zipWithIndex.map { case (validator, index) =>
         <tr>
+            <td> @(index+1) </td>
             <td class="blockHeightItem">
                 @keyBaseValidators.find(x => x.address == validator.operatorAddress).flatMap(_.pictureURL) match {
                     case Some(pictureURL) => {

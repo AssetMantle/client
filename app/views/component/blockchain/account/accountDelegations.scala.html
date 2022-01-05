@@ -5,12 +5,15 @@
 @import views.html.component.blockchain.account.accountDelegationsUndelegating
 @import utilities.MicroNumber
 
-@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import views.html.component.blockchain.account.accountDelegationsRedelegating
+@import models.common.Serializable.RedelegationEntry
+@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[(String, String), Seq[RedelegationEntry]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.ACCOUNT_DELEGATIONS) {
 } {
     @commonHorizontalSwitcher(ListMap(
         constants.View.DELEGATED -> accountDelegationsDelegated(delegations, validatorsMoniker),
         constants.View.UNDELEGATING -> accountDelegationsUndelegating(undelegations, validatorsMoniker),
+        constants.View.REDELEGATING -> accountDelegationsRedelegating(redelegations, validatorsMoniker),
     ))
 }

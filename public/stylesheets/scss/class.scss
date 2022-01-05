@@ -1200,6 +1200,13 @@ body.lightMode {
     flex:50%;
   }
 }
+.pieChartContainer .ibcDenom .infoRowLabel {
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
 
 .comdex {
   .cmuk-overflow-auto{
@@ -3977,4 +3984,18 @@ figure.zoom {
 }
 .tableViewCard .cmuk-flex.infoRow:last-child{
   display: table-row;
+}
+
+.load-more-container{
+  text-align: center;
+  margin: 10px 0;
+  p{
+    display: inline;
+    font-weight: 500;
+    font-size: 14px;
+    &:hover{
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
 }

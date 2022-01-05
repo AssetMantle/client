@@ -42,6 +42,10 @@
             <span cmuk-icon="close" class="close"></span>
         </div>
     </td>
-    <td id="transactionListPageItemTxFees_@index">@utilities.Date.bcTimestampToString(tx.timestamp)</td>
+    <td id="transactionListPageItemTxFees_@index">
+         <script>
+             convertUTCDateToLocalDate('@tx.timestamp', "transactionListPageItemTxFees_@index")
+        </script>
+    </td>
 </tr>
 }
