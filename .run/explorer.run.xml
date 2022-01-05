@@ -12,6 +12,7 @@
         <entry key="BLOCKCHAIN_HOST" value="128.199.29.15" />
         <entry key="BLOCKCHAIN_REST_PORT" value="1317" />
         <entry key="CHAIN_ID" value="test-core-1" />
+        <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
         <entry key="COMDEX_URL" value="http://localhost:9000" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
