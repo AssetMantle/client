@@ -4,7 +4,7 @@
 @import models.common.Serializable.Coin
 
 @import models.masterTransaction.TokenPrice
-@(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, tokenPrices: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
     <div>
         @if(isValidator) {
