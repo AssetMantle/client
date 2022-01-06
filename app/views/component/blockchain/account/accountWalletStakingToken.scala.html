@@ -8,9 +8,9 @@
 <div class="pieChartContainer">
     <div>
         @if(isValidator) {
-            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount) * tokenPrices.price).floatValue})")
+            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount) * tokenPrice.price).floatValue})")
         }else {
-            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount) * tokenPrices.price).floatValue})")
+            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount) * tokenPrice.price).floatValue})")
         }
         @commonTextInfo(constants.View.AVAILABLE, available.getAmountWithNormalizedDenom())
         @commonTextInfo(constants.View.DELEGATED, delegated.getAmountWithNormalizedDenom())

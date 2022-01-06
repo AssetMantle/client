@@ -328,7 +328,7 @@ class ComponentViewController @Inject()(
 
         def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(stakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
-        def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = stakingDenom)
+        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = stakingDenom)
 
         (for {
           operatorAddress <- operatorAddress
@@ -341,7 +341,7 @@ class ComponentViewController @Inject()(
           undelegations <- undelegations
           validators <- getValidatorsDelegated((delegations.map(_.validatorAddress) ++ delegationRewards.rewards.map(_.validator_address)).distinct)
           allDenoms <- allDenoms
-          tokenPrices <- getTokenPrices
+          tokenPrice <- getTokenPrice
 
         } yield Ok(views.html.component.blockchain.account.accountWallet(
           address = address,
@@ -356,7 +356,7 @@ class ComponentViewController @Inject()(
           validatorRewards = ListMap(delegationRewards.rewards.map(reward => reward.validator_address -> reward.reward.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin)): _*),
           validatorsMap = validators.map(x => x.operatorAddress -> x.description.moniker).toMap,
           withdrawAddress = withdrawAddress,
-          tokenPrices = tokenPrices
+          tokenPrice = tokenPrice
         ))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
