@@ -16,13 +16,11 @@ class GetSplit @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path = "splits/splits"
 
-  private val url = ip + ":" + port + "/" + path + "/"
+  private val url = restURL + "/" + path + "/"
 
   private def action(ownerID: String, ownableID: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + ownerID + "|" + ownableID).get)
 

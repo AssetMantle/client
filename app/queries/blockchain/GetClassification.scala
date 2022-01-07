@@ -16,13 +16,11 @@ class GetClassification @Inject()()(implicit wsClient: WSClient, configuration: 
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path = "classifications/classifications"
 
-  private val url = ip + ":" + port + "/" + path + "/"
+  private val url = restURL + "/" + path + "/"
 
   private def action(classificationID: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + classificationID).get)
 

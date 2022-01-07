@@ -16,13 +16,11 @@ class GetSigningInfo @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path = "cosmos/slashing/v1beta1/signing_infos"
 
-  private val url = ip + ":" + port + "/" + path + "/"
+  private val url = restURL + "/" + path + "/"
 
   private def action(validatorConsAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + validatorConsAddress).get)
 

@@ -19,15 +19,13 @@ class AssetDefine @Inject()(wsClient: WSClient)(implicit configuration: Configur
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
   private val path = "xprt/assets/define"
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = restURL + "/" + path
 
   case class BaseReq(from: String, chain_id: String = chainID, gas: MicroNumber)
 
