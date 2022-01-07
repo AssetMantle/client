@@ -16,13 +16,11 @@ class GetBalance @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path = "cosmos/bank/v1beta1/balances"
 
-  private val url = ip + ":" + port + "/" + path + "/"
+  private val url = restURL + "/" + path + "/"
 
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 

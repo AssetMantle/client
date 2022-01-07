@@ -15,9 +15,7 @@ class GetDelegatorRedelegations @Inject()()(implicit wsClient: WSClient, configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path1 = "cosmos/staking/v1beta1/delegators"
 
@@ -27,7 +25,7 @@ class GetDelegatorRedelegations @Inject()()(implicit wsClient: WSClient, configu
 
   private val path4 = "dst_validator_addr="
 
-  private val url = ip + ":" + port + "/" + path1 + "/"
+  private val url = restURL + "/" + path1 + "/"
 
   private def action(url: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

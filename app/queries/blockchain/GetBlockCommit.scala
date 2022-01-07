@@ -16,13 +16,11 @@ class GetBlockCommit @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.abciPort")
+  private val rpcURL = configuration.get[String]("blockchain.rpcURL")
 
   private val path = "commit?height="
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = rpcURL + "/" + path
 
   private def action(height: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + height).get)
 
