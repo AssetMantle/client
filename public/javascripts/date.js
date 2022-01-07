@@ -8,5 +8,10 @@ function convertUTCDateToLocalDate(date, id) {
         minute: '2-digit',
         second: '2-digit'
     };
-    document.getElementById(id).innerHTML = newDate.toLocaleDateString("en", options);
+    if(id){
+        console.log(id);
+        document.getElementById(id).innerHTML = newDate.toLocaleDateString("en", options);
+    }else{
+        return newDate.toLocaleDateString("en", options);
+    }
 }
