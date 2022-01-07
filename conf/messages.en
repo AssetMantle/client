@@ -441,6 +441,7 @@ COMMISSION_REWARDS=Commission
 STAKING_TOKEN=Staking Token
 ALL_TOKENS=All Tokens
 REWARDS=Rewards
+REDELEGATING=Redelegating
 TOTAL_REWARDS=Total Rewards
 TX_STATISTICS=Tx Statistics
 TOTAL_ACCOUNTS=Total Accounts
