@@ -15,9 +15,7 @@ class GetValidatorDelegatorUndelegation @Inject()()(implicit wsClient: WSClient,
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path1 = "cosmos/staking/v1beta1/validators"
 
@@ -25,7 +23,7 @@ class GetValidatorDelegatorUndelegation @Inject()()(implicit wsClient: WSClient,
 
   private val path3 = "/unbonding_delegation"
 
-  private val url = ip + ":" + port + "/" + path1 + "/"
+  private val url = restURL + "/" + path1 + "/"
 
   private def action(delegatorAddress: String, validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + validatorAddress + path2 + delegatorAddress + path3).get)
 
