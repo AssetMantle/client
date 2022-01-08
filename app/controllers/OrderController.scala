@@ -93,7 +93,7 @@ class OrderController @Inject()(
 
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.assetMantle.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -170,7 +170,7 @@ class OrderController @Inject()(
 
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.assetMantle.order(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
@@ -213,7 +213,7 @@ class OrderController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.assetMantle.order(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.orderTake(blockchainCompanion.OrderTake.form.fill(takeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), takeData.orderID)))
 
@@ -255,7 +255,7 @@ class OrderController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.order(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.assetMantle.order(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID, cancelData.fromID)))
 

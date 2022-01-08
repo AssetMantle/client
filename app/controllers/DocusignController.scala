@@ -1,13 +1,13 @@
 package controllers
 
 import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
-import utilities.Configuration.OtherApp
 import exceptions.BaseException
 import models.master.{AccountKYC, Email}
 import models.{blockchain, docusign, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.Configuration.OtherApp
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,7 +68,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       (for {
         envelope <- envelope
         senderViewURL <- getSenderViewURL(envelope)
-      } yield Ok(views.html.component.master.docusignView(senderViewURL))
+      } yield Ok(views.html.component.master.docuSign.docusignView(senderViewURL))
         ).recover {
         case baseException: BaseException => InternalServerError
       }
@@ -113,9 +113,9 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         account <- account
         counterPartyAccount <- counterPartyAccount
         _ <- updateStatus(envelope, Seq(account.username, counterPartyAccount.username))
-      } yield Ok(views.html.component.master.docusignCallBackView(event))
+      } yield Ok(views.html.component.master.docuSign.docusignCallBackView(event))
         ).recover {
-        case _: BaseException => InternalServerError(views.html.component.master.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
+        case _: BaseException => InternalServerError(views.html.component.master.docuSign.docusignCallBackView(constants.View.UNEXPECTED_EVENT))
       }
   }
 
@@ -131,7 +131,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
         recepientViewURL <- utilitiesDocusign.createRecipientView(envelope.envelopeID, emailAddress, account)
       } yield {
         if (envelope.status == constants.External.Docusign.Status.SENT) {
-          Ok(views.html.component.master.docusignView(recepientViewURL))
+          Ok(views.html.component.master.docuSign.docusignView(recepientViewURL))
         } else {
           throw new BaseException(constants.Response.UNAUTHORIZED)
         }
@@ -143,7 +143,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def authorization: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
-        case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -152,7 +152,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {
         _ <- updateAccessToken
-      } yield Ok(views.html.account(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
+      } yield Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

@@ -33,7 +33,7 @@ class NotificationController @Inject()(
 
       (for {
         notifications <- notifications
-      } yield Ok(views.html.component.master.recentActivityMessages(notifications = notifications))
+      } yield Ok(views.html.component.master.notification.recentActivityMessages(notifications = notifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

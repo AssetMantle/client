@@ -90,7 +90,7 @@ class AssetController @Inject()(
 
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.assetMantle.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
@@ -167,7 +167,7 @@ class AssetController @Inject()(
 
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.assetMantle.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
 
@@ -238,7 +238,7 @@ class AssetController @Inject()(
 
               for {
                 ticketID <- broadcastTx
-                result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
+                result <- withUsernameToken.Ok(views.html.assetMantle.asset(successes = Seq(new Success(ticketID))))
               } yield result
             } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID, mutateData.fromID)))
 
@@ -281,7 +281,7 @@ class AssetController @Inject()(
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             for {
               ticketID <- broadcastTx
-              result <- withUsernameToken.Ok(views.html.asset(successes = Seq(new Success(ticketID))))
+              result <- withUsernameToken.Ok(views.html.assetMantle.asset(successes = Seq(new Success(ticketID))))
             } yield result
           } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID, burnData.fromID)))
 

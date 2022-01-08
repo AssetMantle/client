@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import utilities.Configuration.OtherApp
 
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState)
@@ -9,7 +8,7 @@
 @left = {
     <div class="leftContainer">
         <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cmuk-card-styles containerHeight"></div>
-        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
+        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cardContainer cmuk-card-styles"></div>
     </div>
     <script>
             componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
@@ -21,37 +20,37 @@
     <div class="cmuk-container cmuk-margin-bottom">
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="identitiesDefinition"></div>
+                <div id="ordersDefinition"></div>
             </div>
         </div>
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="identitiesProvisioned"></div>
+                <div id="ordersMade"></div>
             </div>
         </div>
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="identitiesUnprovisioned"></div>
+                <div id="ordersTake"></div>
             </div>
         </div>
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="identityTransactions"></div>
+                <div id="orderTransactions"></div>
             </div>
         </div>
     </div>
     <script>
-            componentResource('identitiesDefinition', jsRoutes.controllers.ComponentViewController.identitiesDefinition());
-            componentResource('identitiesProvisioned', jsRoutes.controllers.ComponentViewController.identitiesProvisioned());
-            componentResource('identitiesUnprovisioned', jsRoutes.controllers.ComponentViewController.identitiesUnprovisioned());
-            componentResource('identityTransactions', jsRoutes.controllers.ComponentViewController.moduleTransactions('@constants.View.IDENTITY'));
+            componentResource('ordersDefinition', jsRoutes.controllers.ComponentViewController.ordersDefinition());
+            componentResource('ordersMade', jsRoutes.controllers.ComponentViewController.ordersMade());
+            componentResource('ordersTake', jsRoutes.controllers.ComponentViewController.ordersTake());
+            componentResource('orderTransactions', jsRoutes.controllers.ComponentViewController.moduleTransactions('@constants.View.ORDER'));
     </script>
 }
 
 @right = {
     <div class="rightContainer">
-            <div id="recentActivities" class="recentActivityContainer cmuk-card-styles containerHeight"></div>
-            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
+        <div id="recentActivities" class="cmuk-card-styles containerHeight recentActivityContainer"></div>
+        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

@@ -102,7 +102,7 @@ class ComponentViewController @Inject()(
   def recentActivities: EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.component.master.recentActivities())
+        Ok(views.html.component.master.notification.recentActivities())
     }
   }
 
@@ -111,7 +111,7 @@ class ComponentViewController @Inject()(
       val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
       (for {
         profilePicture <- profilePicture
-      } yield Ok(views.html.profilePicture(profilePicture))
+      } yield Ok(views.html.assetMantle.profilePicture(profilePicture))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -123,7 +123,7 @@ class ComponentViewController @Inject()(
         loginState match {
           case Some(loginState) => {
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.account())
+            withUsernameToken.Ok(views.html.explorer.account())
           }
           case None => Future(Ok(views.html.component.blockchain.account.wallet(address)))
         }
@@ -202,7 +202,7 @@ class ComponentViewController @Inject()(
       (for {
         accountKYC <- accountKYC
         identification <- identification
-      } yield Ok(views.html.component.master.identification(identification = identification, accountKYC = accountKYC))
+      } yield Ok(views.html.component.master.account.identification(identification = identification, accountKYC = accountKYC))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -245,18 +245,19 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
+
         def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
           val totalTokens = sortedBondedValidators.map(_.tokens).sum
           var percent, countedToken: MicroNumber = 0.0
           sortedBondedValidators.map(validator => {
-            percent += ((100*validator.tokens.toDouble)/totalTokens)
-            if(percent < 67) {
-                countedToken += validator.tokens.toDouble
-                validator.description.moniker -> validator.tokens.toDouble
-              }
-              else {
-                constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
-              }
+            percent += ((100 * validator.tokens.toDouble) / totalTokens)
+            if (percent < 67) {
+              countedToken += validator.tokens.toDouble
+              validator.description.moniker -> validator.tokens.toDouble
+            }
+            else {
+              constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
+            }
           })
         }
 
@@ -746,7 +747,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         classifications <- getIdentitiesDefined(identityIDs)
-      } yield Ok(views.html.component.master.identitiesDefinition(classifications))
+      } yield Ok(views.html.component.master.identity.identitiesDefinition(classifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -761,7 +762,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         identities <- getIdentitiesIssued(identityIDs)
-      } yield Ok(views.html.component.master.identitiesProvisioned(identities))
+      } yield Ok(views.html.component.master.identity.identitiesProvisioned(identities))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -776,7 +777,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         identities <- getIdentitiesIssued(identityIDs)
-      } yield Ok(views.html.component.master.identitiesUnprovisioned(identities))
+      } yield Ok(views.html.component.master.identity.identitiesUnprovisioned(identities))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -791,7 +792,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         classifications <- getAssetsDefined(identityIDs)
-      } yield Ok(views.html.component.master.assetsDefinition(classifications))
+      } yield Ok(views.html.component.master.asset.assetsDefinition(classifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -809,7 +810,7 @@ class ComponentViewController @Inject()(
         identityIDs <- identityIDs
         splits <- getAssetSplits(identityIDs)
         assets <- getAssets(splits.map(_.ownableID))
-      } yield Ok(views.html.component.master.assetsMinted(assets, splits))
+      } yield Ok(views.html.component.master.asset.assetsMinted(assets, splits))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -824,7 +825,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         classifications <- getOrdersDefined(identityIDs)
-      } yield Ok(views.html.component.master.ordersDefinition(classifications))
+      } yield Ok(views.html.component.master.order.ordersDefinition(classifications))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -839,7 +840,7 @@ class ComponentViewController @Inject()(
       (for {
         identityIDs <- identityIDs
         orders <- getOrdersMade(identityIDs)
-      } yield Ok(views.html.component.master.ordersMade(orders))
+      } yield Ok(views.html.component.master.order.ordersMade(orders))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -847,7 +848,7 @@ class ComponentViewController @Inject()(
 
   def ordersTake(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      Future(Ok(views.html.component.master.ordersTake()))
+      Future(Ok(views.html.component.master.order.ordersTake()))
   }
 
   def ordersTakePublic(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -859,7 +860,7 @@ class ComponentViewController @Inject()(
       (for {
         publicOrderIDs <- publicTakeOrderIDs
         publicOrders <- getPublicOrders(publicOrderIDs)
-      } yield Ok(views.html.component.master.ordersTakePublic(publicOrders = publicOrders))
+      } yield Ok(views.html.component.master.order.ordersTakePublic(publicOrders = publicOrders))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -877,7 +878,7 @@ class ComponentViewController @Inject()(
         identityIDs <- identityIDs
         privateOrderIDs <- getPrivateOrderIDs(identityIDs)
         privateOrders <- getPrivateOrders(privateOrderIDs)
-      } yield Ok(views.html.component.master.ordersTakePrivate(privateOrders = privateOrders))
+      } yield Ok(views.html.component.master.order.ordersTakePrivate(privateOrders = privateOrders))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
