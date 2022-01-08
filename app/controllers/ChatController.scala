@@ -54,7 +54,7 @@ class ChatController @Inject()(
       (
         for {
           chats <- getChats
-        } yield Ok(views.html.component.master.chatRoom(chatID = chatID, chats = chats))
+        } yield Ok(views.html.component.master.chat.chatRoom(chatID = chatID, chats = chats))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -74,7 +74,7 @@ class ChatController @Inject()(
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-          } yield Ok(views.html.component.master.chatWindow(views.companion.master.SendMessage.form.fill(views.companion.master.SendMessage.Data(chatID, "", None)), chatsInWindow, readChats, chatID))
+          } yield Ok(views.html.component.master.chat.chatWindow(views.companion.master.SendMessage.form.fill(views.companion.master.SendMessage.Data(chatID, "", None)), chatsInWindow, readChats, chatID))
         } else {
           Future(Unauthorized)
         }
@@ -103,7 +103,7 @@ class ChatController @Inject()(
           for {
             chatsInWindow <- chatsInWindow
             readChats <- readChats(chatsInWindow.map(_.id))
-          } yield Ok(views.html.component.master.chatMessages(chatsInWindow, readChats, chatID))
+          } yield Ok(views.html.component.master.chat.chatMessages(chatsInWindow, readChats, chatID))
         } else {
           Future(Unauthorized)
         }
@@ -121,7 +121,7 @@ class ChatController @Inject()(
   //send chat form
   def sendMessageForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.sendMessage())
+      Ok(views.html.component.master.chat.sendMessage())
   }
 
   def sendMessage(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -153,7 +153,7 @@ class ChatController @Inject()(
                 message <- message
                 chats <- chats
                 _ <- chatReceive(chats.filter(_.accountID != loginState.username).map(_.accountID), message)
-                result <- withUsernameToken.Ok(views.html.component.master.messageBox(message)())
+                result <- withUsernameToken.Ok(views.html.component.master.chat.messageBox(message)())
               } yield {
                 result
               }

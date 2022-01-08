@@ -6,7 +6,7 @@
 
 @(identification: Option[Identification], accountKYC: Option[AccountKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.ID_PROOF, 'cardIconPath -> "images/icons/icons.svg#kycproofs") {
+@commonCard(constants.View.ID_PROOF, 'cardIconPath -> "../../../../../public/images/icons/icons.svg") {
     @identification match {
         case Some(identification) => {
             @if(!identification.completionStatus) {
@@ -19,8 +19,8 @@
     @identification match {
         case Some(identification) => {
             @commonHorizontalSwitcher(ListMap(
-                constants.View.DETAILS -> views.html.component.master.identificationInformation(identification),
-                constants.View.DOCUMENTS -> views.html.component.master.identificationDocuments(accountKYC))
+                constants.View.DETAILS -> views.html.component.master.account.identificationInformation(identification),
+                constants.View.DOCUMENTS -> views.html.component.master.account.identificationDocuments(accountKYC))
             )
         }
         case None => {

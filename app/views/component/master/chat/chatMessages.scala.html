@@ -2,7 +2,7 @@
 @import views.html.base._
 @import models.masterTransaction.Message
 @import models.masterTransaction.MessageRead
-@import views.html.component.master.messageBox
+@import views.html.component.master.chat.messageBox
 
 @(messages: Seq[Message], readMessages: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 

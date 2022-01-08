@@ -5,7 +5,7 @@
 
 @(mobileNumber: Option[Mobile], emailAddress: Option[Email])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "images/icons/icons.svg#contactDetails") {
+@commonCard(constants.View.CONTACT_DETAILS, 'cardIconPath -> "../../../../../public/images/icons/icons.svg") {
    } {
     <div class="contactInfoItem">
         @mobileNumber match {

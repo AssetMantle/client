@@ -36,16 +36,7 @@ class ViewController @Inject()(
   def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
-        result <- withUsernameToken.Ok(views.html.profile())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def account: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.account())
+        result <- withUsernameToken.Ok(views.html.assetMantle.profile())
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -54,7 +45,7 @@ class ViewController @Inject()(
   def identity: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
-        result <- withUsernameToken.Ok(views.html.identity())
+        result <- withUsernameToken.Ok(views.html.assetMantle.identity())
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -63,7 +54,7 @@ class ViewController @Inject()(
   def asset: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
-        result <- withUsernameToken.Ok(views.html.asset())
+        result <- withUsernameToken.Ok(views.html.assetMantle.asset())
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -72,7 +63,7 @@ class ViewController @Inject()(
   def order: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {
-        result <- withUsernameToken.Ok(views.html.order())
+        result <- withUsernameToken.Ok(views.html.assetMantle.order())
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -81,63 +72,63 @@ class ViewController @Inject()(
   def validators(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.validators(None))
+        Ok(views.html.explorer.validators(None))
     }
   }
 
   def validator(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.validators(Option(address)))
+        Ok(views.html.explorer.validators(Option(address)))
     }
   }
 
   def blocks(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.blocks(None))
+        Ok(views.html.explorer.blocks(None))
     }
   }
 
   def block(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.blocks(Option(height)))
+        Ok(views.html.explorer.blocks(Option(height)))
     }
   }
 
   def transactions(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.transactions(None))
+        Ok(views.html.explorer.transactions(None))
     }
   }
 
   def transaction(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.transactions(Option(txHash)))
+        Ok(views.html.explorer.transactions(Option(txHash)))
     }
   }
 
   def proposals(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.proposals(None))
+        Ok(views.html.explorer.proposals(None))
     }
   }
 
   def proposal(proposalID: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.proposals(Option(proposalID)))
+        Ok(views.html.explorer.proposals(Option(proposalID)))
     }
   }
 
   def wallet(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
-        Ok(views.html.wallet(address))
+        Ok(views.html.explorer.wallet(address))
     }
   }
 }

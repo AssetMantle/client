@@ -4,7 +4,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 
-@commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "images/icons/icons.svg#recentActivity") {
+@commonCard(constants.View.RECENT_ACTIVITY, 'cardIconPath -> "../../../../../public/images/icons/icons.svg") {
 } {
     <div class="scroller">
         <div  id="recentActivityMessages" class="recentActivityMessages" ></div>
