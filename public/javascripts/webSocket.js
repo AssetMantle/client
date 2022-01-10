@@ -86,7 +86,6 @@ function updateBlockList(message) {
     let blockListPage = $('#blockListPage');
     if (blockListPage.length !== 0 && blockListPageNumber === 1) {
         for (let i = blockListPage.children().length - 1; i >= 0; i--) {
-            console.log(i);
             if (i === 0) {
                 $('#blockListPageItemHeight_' + i).text(message.block.height);
                 convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `blockListPageItemTime_${i}`)
