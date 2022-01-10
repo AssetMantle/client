@@ -25,8 +25,16 @@
                         <td>@commonJavascriptLink(proposal.id.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(${proposal.id}))"))</td>
                         <td>@proposal.content.title</td>
                         <td>@Messages(proposal.status)</td>
-                        <td>@utilities.Date.bcTimestampToString(proposal.votingStartTime)</td>
-                        <td>@utilities.Date.bcTimestampToString(proposal.submitTime)</td>
+                        <td id="startingTime_@proposal.id">
+                            <script>
+                                    convertUTCDateToLocalDate('@proposal.votingStartTime',"startingTime_@proposal.id")
+                            </script>
+                        </td>
+                        <td id="submitTime_@proposal.id">
+                            <script>
+                                    convertUTCDateToLocalDate('@proposal.submitTime',"submitTime_@proposal.id")
+                            </script>
+                        </td>
                         <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
                     </tr>
                 }

@@ -56,7 +56,7 @@ object Bip39 {
 
   def toSeed(mnemonic: String, passphrase: Option[String] = None): Array[Byte] = {
     val spec = new PBEKeySpec(
-      normalize(mnemonic.toCharArray, NFKD).toCharArray,
+      normalize(mnemonic, NFKD).toCharArray,
       normalize(s"mnemonic${passphrase.getOrElse("")}", NFKD).getBytes,
       Pbkdf2Iterations,
       Pbkdf2KeyLength

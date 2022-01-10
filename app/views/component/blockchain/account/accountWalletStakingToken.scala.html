@@ -3,9 +3,15 @@
 @import scala.collection.immutable.ListMap
 @import models.common.Serializable.Coin
 
-@(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import models.masterTransaction.TokenPrice
+@(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer">
     <div>
+        @if(isValidator) {
+            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount) * tokenPrice.price).floatValue})")
+        }else {
+            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount)).getAmountWithNormalizedDenom()+ s" ( $$${((available.amount + delegated.amount + delegationTotalRewards.amount) * tokenPrice.price).floatValue})")
+        }
         @commonTextInfo(constants.View.AVAILABLE, available.getAmountWithNormalizedDenom())
         @commonTextInfo(constants.View.DELEGATED, delegated.getAmountWithNormalizedDenom())
         @commonTextInfo(constants.View.UNDELEGATING, undelegating.getAmountWithNormalizedDenom())

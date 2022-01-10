@@ -30,6 +30,7 @@ class ComponentViewController @Inject()(
                                          blockchainOrders: blockchain.Orders,
                                          blockchainSplits: blockchain.Splits,
                                          blockchainUndelegations: blockchain.Undelegations,
+                                         blockchainRedelegations: blockchain.Redelegations,
                                          blockchainBlocks: blockchain.Blocks,
                                          blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
                                          blockchainTransactions: blockchain.Transactions,
@@ -244,12 +245,24 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
-
-        def getVotingPowerMap(sortedBondedValidators: Seq[Validator]): ListMap[String, Double] = sortedBondedValidators.map(validator => validator.description.moniker -> validator.tokens.toDouble)(collection.breakOut)
+        def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
+          val totalTokens = sortedBondedValidators.map(_.tokens).sum
+          var percent, countedToken: MicroNumber = 0.0
+          sortedBondedValidators.map(validator => {
+            percent += ((100*validator.tokens.toDouble)/totalTokens)
+            if(percent < 67) {
+                countedToken += validator.tokens.toDouble
+                validator.description.moniker -> validator.tokens.toDouble
+              }
+              else {
+                constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
+              }
+          })
+        }
 
         (for {
           allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = getVotingPowerMap(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONDED)), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONDED), totalValidators = allSortedValidators.length))
+        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONDED), totalValidators = allSortedValidators.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -315,6 +328,8 @@ class ComponentViewController @Inject()(
 
         def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(stakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
+        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = stakingDenom)
+
         (for {
           operatorAddress <- operatorAddress
           isValidator <- isValidator(operatorAddress)
@@ -326,6 +341,8 @@ class ComponentViewController @Inject()(
           undelegations <- undelegations
           validators <- getValidatorsDelegated((delegations.map(_.validatorAddress) ++ delegationRewards.result.rewards.fold[Seq[String]](Seq())(_.map(_.validator_address))).distinct)
           allDenoms <- allDenoms
+          tokenPrice <- getTokenPrice
+
         } yield Ok(views.html.component.blockchain.account.accountWallet(
           address = address,
           accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins),
@@ -338,7 +355,8 @@ class ComponentViewController @Inject()(
           totalTokens = allDenoms.length,
           validatorRewards = ListMap(delegationRewards.result.rewards.fold[Seq[(String, Coin)]](Seq())(_.map(reward => reward.validator_address -> reward.reward.fold(Coin(stakingDenom, MicroNumber.zero))(_.head.toCoin))): _*),
           validatorsMap = validators.map(x => x.operatorAddress -> x.description.moniker).toMap,
-          withdrawAddress = withdrawAddress
+          withdrawAddress = withdrawAddress,
+          tokenPrice = tokenPrice
         ))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -351,6 +369,7 @@ class ComponentViewController @Inject()(
       implicit request =>
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
         val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
+        val redelegations = blockchainRedelegations.Service.getAllByDelegator(address)
         val validators = blockchainValidators.Service.getAll
 
         def getDelegationsMap(delegations: Seq[Delegation], validators: Seq[Validator]) = ListMap(delegations.map(delegation => delegation.validatorAddress -> validators.find(_.operatorAddress == delegation.validatorAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND)).getTokensFromShares(delegation.shares)): _*)
@@ -359,11 +378,14 @@ class ComponentViewController @Inject()(
 
         def getValidatorsMoniker(validators: Seq[Validator]) = Map(validators.map(validator => validator.operatorAddress -> validator.description.moniker): _*)
 
+        def getRedelegationsMap(redelegations: Seq[Redelegation]) = ListMap(redelegations.map(redelegation => (redelegation.validatorSourceAddress, redelegation.validatorDestinationAddress) -> redelegation.entries): _*)
+
         (for {
           delegations <- delegations
           undelegations <- undelegations
           validators <- validators
-        } yield Ok(views.html.component.blockchain.account.accountDelegations(delegations = getDelegationsMap(delegations, validators), undelegations = getUndelegationsMap(undelegations), validatorsMoniker = getValidatorsMoniker(validators)))
+          redelegations <- redelegations
+        } yield Ok(views.html.component.blockchain.account.accountDelegations(delegations = getDelegationsMap(delegations, validators), undelegations = getUndelegationsMap(undelegations), validatorsMoniker = getValidatorsMoniker(validators), redelegations = getRedelegationsMap(redelegations)))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -600,7 +622,7 @@ class ComponentViewController @Inject()(
         (for {
           validators <- validators
           keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
-        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators, validators.map(_.tokens).sum, keyBaseValidators))
+        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators.sortBy(_.tokens).reverse, validators.map(_.tokens).sum, keyBaseValidators))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

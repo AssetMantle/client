@@ -9,7 +9,7 @@ version := "1.0"
 
 lazy val GatlingTest = config("gatling") extend Test
 
-scalaSource in GatlingTest := baseDirectory.value / "gatling/simulation"
+GatlingTest / scalaSource  := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)
@@ -20,7 +20,7 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.12.14"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
@@ -30,9 +30,9 @@ libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
 
 libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
 
-libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.1"
 
-libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "8.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "8.0.1"
 
 libraryDependencies += "com.twilio.sdk" % "twilio" % "7.49.0"
 
@@ -40,7 +40,7 @@ libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "
 
 libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.1.1" % "test"
 
-unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
+Test / unmanagedResourceDirectories  += (baseDirectory.value / "target/web/public/test")
 
 libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.8"
 
@@ -50,7 +50,7 @@ libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
 
 libraryDependencies += "commons-codec" % "commons-codec" % "1.14"
 
-libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "1.1.2"
+libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "3.0.4"
 
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.65"
 

@@ -78,6 +78,8 @@ class Redelegations @Inject()(
 
   private def findAllByValidatorSource(address: String): Future[Seq[RedelegationSerialized]] = db.run(redelegationTable.filter(_.validatorSourceAddress === address).result)
 
+  private def findAllByDelegator(delegatorAddress: String): Future[Seq[RedelegationSerialized]] = db.run(redelegationTable.filter(_.delegatorAddress === delegatorAddress).result)
+
   private def findAll: Future[Seq[RedelegationSerialized]] = db.run(redelegationTable.result)
 
   private def deleteByAddresses(delegatorAddress: String, validatorSourceAddress: String, validatorDestinationAddress: String): Future[Int] = db.run(redelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorSourceAddress === validatorSourceAddress && x.validatorDestinationAddress === validatorDestinationAddress).delete.asTry).map {
@@ -129,6 +131,8 @@ class Redelegations @Inject()(
     def insertOrUpdate(redelegation: Redelegation): Future[Int] = upsert(redelegation)
 
     def getAllBySourceValidator(address: String): Future[Seq[Redelegation]] = findAllByValidatorSource(address).map(_.map(_.deserialize))
+
+    def getAllByDelegator(address: String): Future[Seq[Redelegation]] = findAllByDelegator(address).map(_.map(_.deserialize))
 
     def getAll: Future[Seq[Redelegation]] = findAll.map(_.map(_.deserialize))
 

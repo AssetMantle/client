@@ -7,7 +7,7 @@ import models.blockchain
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.ascendex.GetTicker
+import queries.coingecko.GetTicker
 import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
@@ -23,7 +23,7 @@ class TokenPrices @Inject()(
                              actorSystem: ActorSystem,
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
-                             getAscendexTicker: GetTicker,
+                             getCoingeckoTicker: GetTicker,
                              blockchainTokens: blockchain.Tokens,
                              utilitiesOperations: utilities.Operations
                            )(implicit executionContext: ExecutionContext) {
@@ -73,6 +73,13 @@ class TokenPrices @Inject()(
     }
   }
 
+  private def getLatestTokenPrice(denom: String): Future[TokenPrice] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private def getLatestSerial: Future[Int] = db.run(tokenPriceTable.map(_.serial).max.result.asTry).map {
     case Success(result) => result.getOrElse(0)
     case Failure(exception) => exception match {
@@ -111,6 +118,8 @@ class TokenPrices @Inject()(
 
     def getLatestByToken(denom: String, n: Int): Future[Seq[TokenPrice]] = getLatestTokens(denom = denom, n = n)
 
+    def getLatestByTokenPrice(denom: String): Future[TokenPrice] = getLatestTokenPrice(denom = denom)
+
     def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
       (for {
         latestSerial <- getLatestSerial
@@ -126,7 +135,7 @@ class TokenPrices @Inject()(
     def insertPrice(): Future[Unit] = {
       val tokenTicker = tokenTickers.find(_.denom == stakingDenom)
       if (tokenTicker.isDefined) {
-        val price = getAscendexTicker.Service.get(tokenTicker.get.ticker).map(_.data.close.toDouble)
+        val price = getCoingeckoTicker.Service.get().map(_.persistence.usd)
         (for {
           price <- price
           _ <- Service.create(denom = stakingDenom, price = price)

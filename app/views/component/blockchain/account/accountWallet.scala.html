@@ -4,12 +4,13 @@
 @import views.html.component.blockchain.account.{accountWalletAllTokens, accountWalletStakingToken, accountWalletRewards}
 @import scala.collection.immutable.ListMap
 
-@(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int, validatorRewards: ListMap[String, Coin], withdrawAddress: String, validatorsMap: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import models.masterTransaction.TokenPrice
+@(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int, validatorRewards: ListMap[String, Coin], withdrawAddress: String, validatorsMap: Map[String, String], tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
     @commonCard(constants.View.ACCOUNT_WALLET) {
         @address
     } {
         @commonHorizontalSwitcher(ListMap(
-            constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationTotalRewards = delegationTotalRewards, isValidator = isValidator, commissionRewards = commissionRewards),
+            constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationTotalRewards = delegationTotalRewards, isValidator = isValidator, commissionRewards = commissionRewards, tokenPrice = tokenPrice),
             constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap),
             constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances)),
         )
