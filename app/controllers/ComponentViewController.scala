@@ -248,26 +248,17 @@ class ComponentViewController @Inject()(
         def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
           val totalTokens = sortedBondedValidators.map(_.tokens).sum
           var percent, countedToken: MicroNumber = 0.0
-          var flag = false
           sortedBondedValidators.map(validator => {
-            if((67 - percent) < 3){
-              flag = false
-            }
             percent += ((100*validator.tokens.toDouble)/totalTokens)
-            if(percent < 67 || flag) {
-              if((67 - percent) >= 3 && (67 - percent <= 10)) {
-                  flag = true
-                }
+            if(percent < 67 || ((percent - 67) <= 7)) {
                 countedToken += validator.tokens.toDouble
                 validator.description.moniker -> validator.tokens.toDouble
               }
               else {
                 constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
               }
-
           })
         }
-
         (for {
           allSortedValidators <- allSortedValidators
         } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))

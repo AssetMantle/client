@@ -6,7 +6,11 @@
 @commonCard(constants.View.BLOCK_HEADER) {
 } {
     @commonIntInfo(constants.View.HEIGHT, block.height)
-    @commonTextInfo(constants.View.TIME, utilities.Date.bcTimestampToString(block.time))
+    @commonTextInfo(constants.View.TIME, null, 'id -> "blockDetailsTime")
     @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))")))
     @commonIntInfo(constants.View.NUMBER_OF_TRANSACTIONS, numTxs)
 }
+
+<script>
+        convertUTCDateToLocalDate('@block.time', "blockDetailsTime")
+</script>
