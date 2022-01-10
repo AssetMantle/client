@@ -8,7 +8,7 @@
     @commonTextInfo(constants.View.TRANSACTION_HASH, transaction.hash)
     @commonHtmlInfo(constants.View.HEIGHT, commonJavascriptLink(transaction.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${transaction.height}))")))
     @commonBooleanInfo(constants.View.STATUS, Option(transaction.status))
-    @commonTextInfo(constants.View.TIME, null ,'id -> "transactionDetailsTime")
+    @commonTextInfo(constants.View.TIME, "" ,'id -> "transactionDetailsTime")
     @commonTextInfo(constants.View.TRANSACTION_FEES, if(transaction.fee.amount.nonEmpty) transaction.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ") else "0")
     @commonIntInfo(constants.View.NUMBER_OF_MESSAGES, transaction.messages.length)
     @if(!transaction.status) {
