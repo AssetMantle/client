@@ -93,7 +93,7 @@ function updateBlockList(message) {
                 $('#blockListPageItemProposer_' + i).text(message.block.proposer);
             } else {
                 $('#blockListPageItemHeight_' + i).text($('#blockListPageItemHeight_' + (i - 1)).text());//.replace(/^\s+|\s+$/g, ''));
-                $('#blockListPageItemTime_' + i).text($('#blockListPageItemTime_' + (i - 1)).text());
+                convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `blockListPageItemTime_${i-1}`)
                 $('#blockListPageItemNumTxs_' + i).text($('#blockListPageItemNumTxs_' + (i - 1)).text());
                 $('#blockListPageItemProposer_' + i).text($('#blockListPageItemProposer_' + (i - 1)).text());
             }
