@@ -119,7 +119,7 @@ function updateTransactionList(message) {
                         $('#transactionListPageItemTxStatusTrue_' + i).hide();
                         $('#transactionListPageItemTxStatusFalse_' + i).show();
                     }
-                    convertUTCDateToLocalDate(new Date(message.txs[numTxs - i].proposer.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
+                    convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
                 } else {
                     if (i <= (numTxs - 1)) {
                         $('#transactionListPageItemTxHash_' + i).text(message.txs[i].hash);
@@ -133,13 +133,13 @@ function updateTransactionList(message) {
                             $('#transactionListPageItemTxStatusTrue_' + i).hide();
                             $('#transactionListPageItemTxStatusFalse_' + i).show();
                         }
-                        convertUTCDateToLocalDate(new Date(message.txs[numTxs - i].proposer.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
+                        convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
                     } else {
                         $('#transactionListPageItemTxHash_' + i).text($('#transactionListPageItemTxHash_' + (i - 1)).text());
                         $('#transactionListPageItemTxMessageTypes_' + i).text($('#transactionListPageItemTxMessageTypes_' + (i - 1)).text());
                         $('#transactionListPageItemTxHeight_' + i).text($('#transactionListPageItemTxHeight_' + (i - 1)).text());
                         $('#transactionListPageItemTxStatus_' + i).html($('#transactionListPageItemTxStatus_' + (i - 1)).html());
-                        convertUTCDateToLocalDate(new Date($('#transactionListPageItemTxTime_' + (i - 1)).text().toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
+                        $('#transactionListPageItemTxTime_' + i).html($('#transactionListPageItemTxTime_' + (i - 1)).html());
                     }
                 }
             }
