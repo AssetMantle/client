@@ -36,7 +36,11 @@
                     <span cmuk-icon="close" class="close"></span>
                 }
                 </td>
-                <td>@utilities.Date.bcTimestampToString(tx.timestamp)</td>
+                <td id="accountTxDate_@tx.hash">
+                    <script>
+                            convertUTCDateToLocalDate('@tx.timestamp', "accountTxDate_@tx.hash")
+                    </script>
+                </td>
             </tr>
         }
         </tbody>

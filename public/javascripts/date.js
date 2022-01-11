@@ -10,3 +10,4 @@ function convertUTCDateToLocalDate(date, id) {
     };
     document.getElementById(id).innerHTML = newDate.toLocaleDateString("en", options);
 }
+
