@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.Breaks.break
 
 @Singleton
 class ComponentViewController @Inject()(
@@ -247,19 +248,12 @@ class ComponentViewController @Inject()(
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
         def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
           val totalTokens = sortedBondedValidators.map(_.tokens).sum
-          var percent, countedToken: MicroNumber = 0.0
-          sortedBondedValidators.map(validator => {
-            percent += ((100*validator.tokens.toDouble)/totalTokens)
-            if(percent < 67) {
-                countedToken += validator.tokens.toDouble
-                validator.description.moniker -> validator.tokens.toDouble
-              }
-              else {
-                constants.View.OTHERS -> (totalTokens.toDouble - countedToken.toDouble)
-              }
-          })
+          var countedToken = MicroNumber.zero
+          sortedBondedValidators.takeWhile(validator => {
+            countedToken = countedToken + validator.tokens
+            countedToken <= 2 * totalTokens / 3
+          }).map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> (totalTokens - countedToken).toDouble)
         }
-
         (for {
           allSortedValidators <- allSortedValidators
         } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
