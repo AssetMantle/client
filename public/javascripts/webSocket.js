@@ -85,15 +85,15 @@ function updateLatestBlockHeightCard(message) {
 function updateBlockList(message) {
     let blockListPage = $('#blockListPage');
     if (blockListPage.length !== 0 && blockListPageNumber === 1) {
-        for (let i = blockListPage.children().length - 1; i >= 0; i--) {
+        for (let i = blockListPage.children().length - 2; i >= 0; i--) {
             if (i === 0) {
                 $('#blockListPageItemHeight_' + i).text(message.block.height);
-                convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `blockListPageItemTime_${i}`)
+                convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')), `blockListPageItemTime_${i}`)
                 $('#blockListPageItemNumTxs_' + i).text(message.txs.length);
                 $('#blockListPageItemProposer_' + i).text(message.block.proposer);
             } else {
                 $('#blockListPageItemHeight_' + i).text($('#blockListPageItemHeight_' + (i - 1)).text());//.replace(/^\s+|\s+$/g, ''));
-                convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `blockListPageItemTime_${i-1}`)
+                convertUTCDateToLocalDate(new Date($('#blockListPageItemTime_' + (i-1)).text().toString()), `blockListPageItemTime_${i}`)
                 $('#blockListPageItemNumTxs_' + i).text($('#blockListPageItemNumTxs_' + (i - 1)).text());
                 $('#blockListPageItemProposer_' + i).text($('#blockListPageItemProposer_' + (i - 1)).text());
             }
@@ -119,7 +119,7 @@ function updateTransactionList(message) {
                         $('#transactionListPageItemTxStatusTrue_' + i).hide();
                         $('#transactionListPageItemTxStatusFalse_' + i).show();
                     }
-                    $('#transactionListPageItemTxFees_' + i).text(message.txs[numTxs - i].proposer);
+                    convertUTCDateToLocalDate(new Date(message.txs[numTxs - i].proposer.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
                 } else {
                     if (i <= (numTxs - 1)) {
                         $('#transactionListPageItemTxHash_' + i).text(message.txs[i].hash);
@@ -133,13 +133,13 @@ function updateTransactionList(message) {
                             $('#transactionListPageItemTxStatusTrue_' + i).hide();
                             $('#transactionListPageItemTxStatusFalse_' + i).show();
                         }
-                        $('#transactionListPageItemTxFees_' + i).text(message.txs[i].proposer);
+                        convertUTCDateToLocalDate(new Date(message.txs[numTxs - i].proposer.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
                     } else {
                         $('#transactionListPageItemTxHash_' + i).text($('#transactionListPageItemTxHash_' + (i - 1)).text());
                         $('#transactionListPageItemTxMessageTypes_' + i).text($('#transactionListPageItemTxMessageTypes_' + (i - 1)).text());
                         $('#transactionListPageItemTxHeight_' + i).text($('#transactionListPageItemTxHeight_' + (i - 1)).text());
                         $('#transactionListPageItemTxStatus_' + i).html($('#transactionListPageItemTxStatus_' + (i - 1)).html());
-                        $('#transactionListPageItemTxFees_' + i).text($('#transactionListPageItemTxFees_' + (i - 1)).text());
+                        convertUTCDateToLocalDate(new Date($('#transactionListPageItemTxTime_' + (i - 1)).text().toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
                     }
                 }
             }
