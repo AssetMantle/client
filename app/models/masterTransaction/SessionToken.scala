@@ -34,10 +34,6 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
 
   import databaseConfig.profile.api._
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
   private[models] val sessionTokenTable = TableQuery[SessionTokenTable]
 
   private def add(sessionToken: SessionToken): Future[String] = db.run((sessionTokenTable returning sessionTokenTable.map(_.id) += sessionToken).asTry).map {
@@ -166,6 +162,6 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, protected val databaseCo
     }
   }
 
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(runnable)(schedulerExecutionContext)
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Blockchain.KafkaTxIteratorInitialDelay, delay = constants.Blockchain.KafkaTxIteratorInterval)(runnable)(schedulerExecutionContext)
 }
 
