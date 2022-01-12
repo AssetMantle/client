@@ -16,9 +16,7 @@ class GetMintingInflation @Inject()()(implicit wsClient: WSClient, configuration
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
-  private val url = restURL + "/cosmos/mint/v1beta1/inflation"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/mint/v1beta1/inflation"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

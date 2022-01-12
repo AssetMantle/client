@@ -16,11 +16,9 @@ class GetHalving @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "persistence/halving/v1beta1/params"
 
-  private val url = restURL + "/" + path
+  private val url = constants.Blockchain.RestEndPoint + "/" + path
 
   private def action(): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

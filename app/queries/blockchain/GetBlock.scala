@@ -16,11 +16,9 @@ class GetBlock @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val rpcURL = configuration.get[String]("blockchain.rpcURL")
-
   private val path = "block?height="
 
-  private val url = rpcURL + "/" + path
+  private val url = constants.Blockchain.RPCEndPoint + "/" + path
 
   private def action(height: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + height).get)
 

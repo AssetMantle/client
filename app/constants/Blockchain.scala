@@ -39,6 +39,9 @@ object Blockchain {
     new ChildNumber(0, false)
   )
 
+  val RPCEndPoint: String = AppConfig.configuration.get[String]("blockchain.rpcURL")
+  val RestEndPoint: String = AppConfig.configuration.get[String]("blockchain.restURL")
+
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
     val SINGLE = "/cosmos.crypto.secp256k1.PubKey"

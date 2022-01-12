@@ -15,11 +15,9 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "keys/seed"
 
-  private val url = restURL + "/" + path
+  private val url = constants.Blockchain.RestEndPoint + "/" + path
 
   private def action(): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
 
