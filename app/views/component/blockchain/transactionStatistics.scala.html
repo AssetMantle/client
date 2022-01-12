@@ -2,7 +2,7 @@
 @import scala.collection.immutable.ListMap
 
 @(totalAccounts: Int, totalTxs: Int, txData: ListMap[String, Int], binWidth: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonCard(constants.View.TX_STATISTICS) {
+@commonCard(constants.View.TRANSACTIONS_TRAFFIC) {
     @Messages(constants.View.TOTAL_ACCOUNTS): @utilities.NumericOperation.formatNumber(totalAccounts) / @Messages(constants.View.TOTAL_TRANSACTIONS): @utilities.NumericOperation.formatNumber(totalTxs)
 } {
     @commonBarChart("txStatistics", txData, "", showLegend = false, Messages(constants.View.TRANSACTION_STATISTICS_X_LABEL, utilities.NumericOperation.formatNumber(binWidth)), constants.View.NUMBER_OF_TRANSACTIONS)

@@ -16,11 +16,9 @@ class GetGenesis @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val rpcURL = configuration.get[String]("blockchain.rpcURL")
-
   private val path = "genesis"
 
-  private val url = rpcURL + "/" + path
+  private val url = constants.Blockchain.RPCEndPoint + "/" + path
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).withMethod("GET").stream())
 

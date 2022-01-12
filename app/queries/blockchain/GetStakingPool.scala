@@ -16,9 +16,7 @@ class GetStakingPool @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
-  private val url = restURL + "/cosmos/staking/v1beta1/pool"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/staking/v1beta1/pool"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

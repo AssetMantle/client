@@ -16,13 +16,11 @@ class GetValidatorOutstandingRewards @Inject()()(implicit wsClient: WSClient, co
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path1 = "cosmos/distribution/v1beta1/validators"
 
   private val path2 = "/outstanding_rewards"
 
-  private val url = restURL + "/" + path1 + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
 
   private def action(validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + validatorAddress + path2).get)
 

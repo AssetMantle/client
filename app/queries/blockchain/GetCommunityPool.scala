@@ -16,9 +16,7 @@ class GetCommunityPool @Inject()()(implicit wsClient: WSClient, configuration: C
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
-  private val url = restURL + "/cosmos/distribution/v1beta1/community_pool"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/distribution/v1beta1/community_pool"
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

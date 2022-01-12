@@ -18,11 +18,9 @@ class IdentityProvision @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "xprt/identities/provision"
 
-  private val url = restURL + "/" + path
+  private val url = constants.Blockchain.RestEndPoint + "/" + path
 
   case class BaseReq(from: String, chain_id: String = constants.Blockchain.ChainID, gas: MicroNumber)
 
