@@ -1,20 +1,19 @@
 package controllers
 
-import java.nio.file.Files
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import utilities.Configuration.OtherApp
 import exceptions.BaseException
-
-import javax.inject._
+import models.master
 import models.master.{AccountFile, AccountKYC}
-import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import utilities.Configuration.OtherApp
 import views.companion.master.FileUpload
 
+import java.nio.file.Files
+import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -39,12 +38,12 @@ class FileController @Inject()(
 
   def uploadAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
+      Ok(views.html.component.master.file.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }
 
   def updateAccountKYCForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
+      Ok(views.html.component.master.file.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountKYC), documentType))
   }
 
   def uploadAccountKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -56,13 +55,13 @@ class FileController @Inject()(
       fileUploadInfo => {
         try {
           request.body.file(constants.File.KEY_FILE) match {
-            case None => BadRequest(views.html.profile(failures = Seq(constants.Response.NO_FILE)))
+            case None => BadRequest(views.html.assetMantle.profile(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKYCFilePath(documentType))
               Ok
           }
         }
         catch {
-          case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -80,7 +79,7 @@ class FileController @Inject()(
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.AccountKYC.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, documentType))
+        case constants.File.AccountKYC.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.account.userViewUploadOrUpdateIdentification(accountKYC, documentType))
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
 
@@ -90,7 +89,7 @@ class FileController @Inject()(
         result <- getResult(accountKYC)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -108,7 +107,7 @@ class FileController @Inject()(
       def accountKYC = masterAccountKYCs.Service.get(loginState.username, documentType)
 
       def getResult(accountKYC: Option[AccountKYC]) = documentType match {
-        case constants.File.AccountKYC.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.userViewUploadOrUpdateIdentification(accountKYC, documentType))
+        case constants.File.AccountKYC.IDENTIFICATION => withUsernameToken.PartialContent(views.html.component.master.account.userViewUploadOrUpdateIdentification(accountKYC, documentType))
         case _ => throw new BaseException(constants.Response.NO_SUCH_DOCUMENT_TYPE_EXCEPTION)
       }
 
@@ -119,7 +118,7 @@ class FileController @Inject()(
         result <- getResult(accountKYC)
       } yield result
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -131,18 +130,18 @@ class FileController @Inject()(
         checkFileNameExists <- checkFileNameExists
       } yield if (checkFileNameExists) Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getAccountKYCFilePath(documentType), fileName = fileName)) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         ).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
   def uploadAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
+      Ok(views.html.component.master.file.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
   def updateAccountFileForm(documentType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
-      Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
+      Ok(views.html.component.master.file.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>

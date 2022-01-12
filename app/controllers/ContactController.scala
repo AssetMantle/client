@@ -2,18 +2,17 @@ package controllers
 
 import controllers.actions.WithLoginActionAsync
 import controllers.results.WithUsernameToken
-import utilities.Configuration.OtherApp
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.master.{Email, Mobile}
 import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import utilities.Configuration.OtherApp
 import views.companion.master.{AddOrUpdateEmailAddress, AddOrUpdateMobileNumber}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -46,11 +45,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.addOrUpdateEmailAddress(views.companion.master.AddOrUpdateEmailAddress.form.fill(value = views.companion.master.AddOrUpdateEmailAddress.Data(emailAddress = contact.emailAddress))))
-          case None => Ok(views.html.component.master.addOrUpdateEmailAddress())
+          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateEmailAddress(views.companion.master.AddOrUpdateEmailAddress.form.fill(value = views.companion.master.AddOrUpdateEmailAddress.Data(emailAddress = contact.emailAddress))))
+          case None => Ok(views.html.component.master.contact.addOrUpdateEmailAddress())
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -58,7 +57,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       AddOrUpdateEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addOrUpdateEmailAddress(formWithErrors)))
+          Future(BadRequest(views.html.component.master.contact.addOrUpdateEmailAddress(formWithErrors)))
         },
         addOrUpdateEmailAddressData => {
           val emailAddress = masterEmails.Service.get(loginState.username)
@@ -80,7 +79,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             emailAddress <- emailAddress
             _ <- addOrUpdateEmailAddress(emailAddress)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_ADDRESS_UPDATED, loginState.username)()
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -97,11 +96,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(1), countryCode = contact.mobileNumber.split("-")(0)))))
-          case None => Ok(views.html.component.master.addOrUpdateMobileNumber())
+          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(1), countryCode = contact.mobileNumber.split("-")(0)))))
+          case None => Ok(views.html.component.master.contact.addOrUpdateMobileNumber())
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -109,7 +108,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       AddOrUpdateMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.addOrUpdateMobileNumber(formWithErrors)))
+          Future(BadRequest(views.html.component.master.contact.addOrUpdateMobileNumber(formWithErrors)))
         },
         addOrUpdateMobileNumberData => {
           val mobileNumber = masterMobiles.Service.get(loginState.username)
@@ -131,7 +130,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             mobileNumber <- mobileNumber
             _ <- addOrUpdateMobileNumber(mobileNumber)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)()
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -147,7 +146,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       (for {
         emailAddress <- emailAddress
         mobileNumber <- mobileNumber
-      } yield Ok(views.html.component.master.contact(mobileNumber, emailAddress))
+      } yield Ok(views.html.component.master.contact.contact(mobileNumber, emailAddress))
         ).recover {
         case _: BaseException => InternalServerError
       }
@@ -161,7 +160,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
       def sendOTPAndGetResult(emailAddress: String, otp: String): Future[Result] = {
         utilitiesNotification.sendEmailToEmailAddress(fromAccountID = loginState.username, emailAddress = emailAddress, email = constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
+        withUsernameToken.Ok(views.html.component.master.contact.verifyEmailAddress())
       }
 
       (for {
@@ -169,7 +168,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         otp <- getOTP
         result <- sendOTPAndGetResult(emailAddress = emailAddress, otp = otp)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -177,7 +176,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors)))
+          Future(BadRequest(views.html.component.master.contact.verifyEmailAddress(formWithErrors)))
         },
         verifyEmailAddressData => {
           val verifyOTP = masterTransactionEmailOTPs.Service.verifyOTP(id = loginState.username, otp = verifyEmailAddressData.otp)
@@ -187,11 +186,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyEmailAddress(otpVerified)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
+            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)()
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -207,9 +206,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         mobileNumber <- mobileNumber
         otp <- getOTP
         _ <- utilitiesNotification.sendSMSToMobileNumber(fromAccountID = loginState.username, mobileNumber = mobileNumber, sms = constants.Notification.VERIFY_PHONE.sms.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
-        result <- withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
+        result <- withUsernameToken.Ok(views.html.component.master.contact.verifyMobileNumber())
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
       }
   }
 
@@ -217,7 +216,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
-          Future(BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors)))
+          Future(BadRequest(views.html.component.master.contact.verifyMobileNumber(formWithErrors)))
         },
         verifyMobileNumberData => {
           val verifyOTP = masterTransactionSMSOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
@@ -227,11 +226,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyMobileNumber(otpVerified)
-            result <- withUsernameToken.Ok(views.html.profile(successes = Seq(constants.Response.SUCCESS)))
+            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.SUCCESS)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)()
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
           }
         }
       )
