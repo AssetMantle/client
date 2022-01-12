@@ -18,7 +18,6 @@ GET         /docusign/callBack                                   controllers.Doc
 GET         /docusign/authorizationCallBack                      controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /profile                                             controllers.ViewController.profile
-GET         /account                                             controllers.ViewController.account
 GET         /identity                                            controllers.ViewController.identity
 GET         /asset                                               controllers.ViewController.asset
 GET         /order                                               controllers.ViewController.order

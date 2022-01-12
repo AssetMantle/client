@@ -6,7 +6,7 @@
 
 @accountKYC match {
     case Some(file) => {
-        @component.master.commonDocumentViewer(file) {
+        @commonDocumentViewer(file) {
             @routes.FileController.getAccountKYCFile(file.fileName, file.documentType)
         } {
             <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)" target="_blank">@Messages(file.documentType)</a>

@@ -3,8 +3,8 @@
 
 @(address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
-    @views.html.index(Option(""))
-    <script>
+@views.html.index(Option(""))
+<script>
         componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('@address'));
         checkAndPushState(jsRoutes.controllers.ComponentViewController.wallet().url, '@address', "wallet")
-    </script>
+</script>

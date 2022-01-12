@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.{Message, MessageRead}
 @import views.companion.master.SendMessage
-@import views.html.component.master.sendMessage
+@import views.html.component.master.chat.sendMessage
 
 @(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
 @if(chats.nonEmpty) {

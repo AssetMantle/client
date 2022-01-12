@@ -12,7 +12,7 @@
     @commonModalButton(Seq(Messages(constants.View.UPLOAD), Messages(documentType)).mkString(" "), routes.javascript.FileController.uploadAccountKYCForm, 'parameters -> s"'${documentType}'", 'id -> Seq(constants.View.UPLOAD, documentType).mkString("_"))
     @accountKYC match {
         case Some(file) => {
-            @component.master.commonDocumentViewer(file) {
+            @commonDocumentViewer(file) {
                 @routes.FileController.getAccountKYCFile(file.fileName, file.documentType)
             } {
                 <a href="@routes.FileController.getAccountKYCFile(file.fileName, file.documentType)">@Messages(file.documentType)</a>

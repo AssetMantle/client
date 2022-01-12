@@ -81,7 +81,7 @@ class SendCoinController @Inject()(
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.account(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
           }
         }
       )
