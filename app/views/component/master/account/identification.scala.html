@@ -6,7 +6,7 @@
 
 @(identification: Option[Identification], accountKYC: Option[AccountKYC])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@commonCard(constants.View.ID_PROOF, 'cardIconPath -> "../../../../../public/images/icons/icons.svg") {
+@commonCard(constants.View.ID_PROOF, 'cardIconPath -> "images/icons/icons.svg#kycproofs") {
     @identification match {
         case Some(identification) => {
             @if(!identification.completionStatus) {
