@@ -192,15 +192,13 @@ class IdentityNubs @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val identityNub = Service.getTransaction(ticketID)
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty))),
+      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty))),
         entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = Seq.empty, immutables = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None)), mutableMetas = Seq.empty, mutables = Seq.empty)
 
       def insertIdentityProperties(identityNub: IdentityNub, classificationID: String) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = classificationID, Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData())))),

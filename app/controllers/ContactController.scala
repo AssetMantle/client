@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import views.companion.master.{AddOrUpdateEmailAddress, AddOrUpdateMobileNumber}
 
 import javax.inject.{Inject, Singleton}
@@ -32,10 +32,6 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
   implicit val emailAddressWrites: OWrites[master.Email] = Json.writes[master.Email]
 
   implicit val mobileNumberWrites: OWrites[master.Mobile] = Json.writes[master.Mobile]
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def addOrUpdateEmailAddressForm(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

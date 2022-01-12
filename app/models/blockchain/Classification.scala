@@ -130,11 +130,9 @@ class Classifications @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     //Insert in master.Classification happens in respective txs
     def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[String] = {
-      val classificationID = utilities.IDGenerator.getClassificationID(chainID = chainID, immutables = immutables, mutables = mutables)
+      val classificationID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, immutables = immutables, mutables = mutables)
       val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
 
       (for {

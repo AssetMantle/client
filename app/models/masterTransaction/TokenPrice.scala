@@ -48,10 +48,6 @@ class TokenPrices @Inject()(
 
   private val tokenPriceUpdateRate = configuration.get[Int]("blockchain.token.priceUpdateRate")
 
-  private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
-    utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
-  }
-
   private def add(tokenPrice: TokenPrice): Future[Int] = db.run((tokenPriceTable returning tokenPriceTable.map(_.serial) += tokenPrice).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -133,7 +129,7 @@ class TokenPrices @Inject()(
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val tokenTicker = tokenTickers.find(_.denom == stakingDenom)
+      val tokenTicker = constants.AppConfig.tokenTickers.find(_.denom == stakingDenom)
       if (tokenTicker.isDefined) {
         val price = getCoingeckoTicker.Service.get().map(_.persistence.usd)
         (for {

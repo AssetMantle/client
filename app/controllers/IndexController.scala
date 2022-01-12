@@ -2,16 +2,14 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Maintainer, Meta}
-import models.master._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, EssentialAction, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import queries.blockchain.GetAccount
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -39,10 +37,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def index: EssentialAction = cached.apply(req => req.path, cacheDuration) {
     withoutLoginActionAsync { implicit loginState =>

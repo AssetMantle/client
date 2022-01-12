@@ -13,7 +13,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -76,23 +76,11 @@ class ComponentViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 
-  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
-
   private val priceChartDataPoints = configuration.get[Int]("blockchain.token.priceChartDataPoints")
-
-  private val chainID = configuration.get[String]("blockchain.chainID")
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
   private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
-
-  private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
-    utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
-  }
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
@@ -221,7 +209,7 @@ class ComponentViewController @Inject()(
           latestBlock <- latestBlock
           averageBlockTime <- getAverageBlockTime(latestBlock)
           proposer <- getProposer(latestBlock.proposerAddress)
-        } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = chainID))
+        } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime, chainID = constants.Blockchain.ChainID))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -274,11 +262,11 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
 
-        def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByToken(denom = stakingDenom, n = priceChartDataPoints)
+        def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByToken(denom = constants.Blockchain.StakingDenom, n = priceChartDataPoints)
 
         (for {
           tokenPrices <- getTokenPrices
-        } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, stakingDenom, tokenTickers))
+        } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, constants.Blockchain.StakingDenom, tokenTickers))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -320,16 +308,16 @@ class ComponentViewController @Inject()(
         def isValidator(operatorAddress: String) = blockchainValidators.Service.exists(operatorAddress)
 
         def getValidatorCommissionRewards(operatorAddress: String, isValidator: Boolean): Future[Coin] = if (isValidator) {
-          getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(stakingDenom, x))
-        } else Future(Coin(stakingDenom, MicroNumber.zero))
+          getValidatorCommission.Service.get(operatorAddress).map(x => x.commission.commission.headOption.fold(MicroNumber.zero)(_.amount)).map(x => Coin(constants.Blockchain.StakingDenom, x))
+        } else Future(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero))
 
         def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 
-        def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(stakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum)
+        def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(constants.Blockchain.StakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum)
 
-        def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(stakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
+        def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(constants.Blockchain.StakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
-        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = stakingDenom)
+        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = constants.Blockchain.StakingDenom)
 
         (for {
           operatorAddress <- operatorAddress
@@ -349,12 +337,12 @@ class ComponentViewController @Inject()(
           accountBalances = balances.fold[Seq[Coin]](Seq())(_.coins),
           delegated = getDelegatedAmount(delegations, validators),
           undelegating = getUndelegatingAmount(undelegations),
-          delegationTotalRewards = delegationRewards.total.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin),
+          delegationTotalRewards = delegationRewards.total.headOption.fold(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero))(_.toCoin),
           isValidator = isValidator,
           commissionRewards = commissionRewards,
-          stakingDenom = stakingDenom,
+          stakingDenom = constants.Blockchain.StakingDenom,
           totalTokens = allDenoms.length,
-          validatorRewards = ListMap(delegationRewards.rewards.map(reward => reward.validator_address -> reward.reward.headOption.fold(Coin(stakingDenom, MicroNumber.zero))(_.toCoin)): _*),
+          validatorRewards = ListMap(delegationRewards.rewards.map(reward => reward.validator_address -> reward.reward.headOption.fold(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero))(_.toCoin)): _*),
           validatorsMap = validators.map(x => x.operatorAddress -> x.description.moniker).toMap,
           withdrawAddress = withdrawAddress,
           tokenPrice = tokenPrice
@@ -527,11 +515,11 @@ class ComponentViewController @Inject()(
           if (transaction.status) {
             val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.rawLog)
               .find(_.msg_index.getOrElse(0) == msgIndex)
-              .fold(MicroNumber.zero + stakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + stakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + stakingDenom)(_.value.getOrElse(MicroNumber.zero + stakingDenom))))
+              .fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.value.getOrElse(MicroNumber.zero + constants.Blockchain.StakingDenom))))
               .split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
             Ok(Coin(coinArray.tail.head, coinArray.head.toDouble / 1000000).getAmountWithNormalizedDenom())
           } else {
-            Ok(Coin(stakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
+            Ok(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
           }
         }
           ).recover {

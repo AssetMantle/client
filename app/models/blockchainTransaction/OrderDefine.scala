@@ -200,15 +200,13 @@ class OrderDefines @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val orderDefine = Service.getTransaction(ticketID)
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty)))),
+      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.ORDER_DEFINITION, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits)
 
       def insertMaintainerProperties(classificationID: String, orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = orderDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits)
