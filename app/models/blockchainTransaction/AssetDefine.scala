@@ -201,15 +201,13 @@ class AssetDefines @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val assetDefine = Service.getTransaction(ticketID)
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertClassificationProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits).map(_.toProperty)))),
+      def insertClassificationProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.ASSET_DEFINITION, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits)
 
       def insertMaintainerProperties(classificationID: String, assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = assetDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits)

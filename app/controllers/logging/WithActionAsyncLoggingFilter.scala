@@ -1,6 +1,6 @@
 package controllers.logging
 
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
@@ -14,10 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class WithActionAsyncLoggingFilter @Inject()(messagesControllerComponents: MessagesControllerComponents, messagesApi: MessagesApi, utilitiesLog: utilities.Log)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val lang: Lang = Lang(configuration.get[String]("play.log.lang"))
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def next(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request ⇒
     val startTime = System.currentTimeMillis()

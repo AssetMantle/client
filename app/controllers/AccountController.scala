@@ -12,7 +12,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import transactions.blockchain.{AddKey, ChangePassword, ForgotPassword}
 import transactions.responses.blockchain.KeyResponse
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import utilities.KeyStore
 import views.companion.master.AddIdentification.AddressData
 import views.companion.master.{ImportWallet, Login, Logout, SignUp}
@@ -52,10 +52,6 @@ class AccountController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>

@@ -2,20 +2,20 @@ package constants
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
-import com.typesafe.config.ConfigFactory
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
 
 object Blockchain {
-  private val configuration = Configuration(ConfigFactory.load())
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = configuration.get[String]("blockchain.account.prefix")
-  val ValidatorPrefix = "persistencevaloper"
-  val ValidatorConsensusPublicPrefix = "persistencevalconspub"
-  val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
-    utilities.Configuration.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
+  val AccountPrefix: String = AppConfig.configuration.get[String]("blockchain.account.prefix")
+  val ValidatorPrefix: String = AccountPrefix + "valoper"
+  val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
+  val IBCDenoms: Seq[AppConfig.IBCDenom] = AppConfig.configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
+    constants.AppConfig.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
   }
+  val ChainID: String = AppConfig.configuration.get[String]("blockchain.chainID")
+  val StakingDenom: String = AppConfig.configuration.get[String]("blockchain.stakingDenom")
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."

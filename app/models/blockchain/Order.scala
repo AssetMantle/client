@@ -165,8 +165,6 @@ class Orders @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onDefine(orderDefine: OrderDefine)(implicit header: Header): Future[Unit] = {
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.immutableMetaTraits.metaPropertyList)
       val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderDefine.mutableMetaTraits.metaPropertyList)

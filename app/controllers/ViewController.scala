@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -28,10 +28,6 @@ class ViewController @Inject()(
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
   private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>

@@ -42,8 +42,8 @@ class WesternUnionController @Inject()(
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val otherApps: Seq[utilities.Configuration.OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    utilities.Configuration.OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
+  private implicit val otherApps: Seq[constants.AppConfig.OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
+    constants.AppConfig.OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
   }
 
   def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
