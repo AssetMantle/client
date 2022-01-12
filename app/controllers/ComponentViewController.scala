@@ -1,5 +1,6 @@
 package controllers
 
+import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -13,12 +14,10 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
-import constants.AppConfig._
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -78,8 +77,6 @@ class ComponentViewController @Inject()(
 
   private val priceChartDataPoints = configuration.get[Int]("blockchain.token.priceChartDataPoints")
 
-  private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
-
   private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
 
   def commonHome: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
@@ -87,7 +84,7 @@ class ComponentViewController @Inject()(
       Future(Ok(views.html.component.master.commonHome()))
   }
 
-  def recentActivities: EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def recentActivities: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.component.master.notification.recentActivities())
@@ -105,7 +102,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def wallet(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def wallet(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -118,7 +115,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def block(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def block(height: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -131,7 +128,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transaction(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transaction(txHash: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -144,7 +141,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validator(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validator(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -157,7 +154,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposal(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def proposal(id: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -170,7 +167,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def dashboard: EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def dashboard: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -196,7 +193,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val latestBlock = blockchainBlocks.Service.getLatestBlock
@@ -216,7 +213,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val token = blockchainTokens.Service.getStakingToken
@@ -229,7 +226,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def votingPowers(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def votingPowers(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
@@ -242,6 +239,7 @@ class ComponentViewController @Inject()(
             countedToken <= 2 * totalTokens / 3
           }).map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> (totalTokens - countedToken).toDouble)
         }
+
         (for {
           allSortedValidators <- allSortedValidators
         } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
@@ -251,7 +249,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensPrices(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def tokensPrices(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
 
@@ -266,7 +264,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionStatistics(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
@@ -287,7 +285,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountWallet(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def accountWallet(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val operatorAddress = Future(utilities.Bech32.convertAccountAddressToOperatorAddress(address))
@@ -346,7 +344,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountDelegations(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def accountDelegations(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
@@ -374,7 +372,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def accountTransactions(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def accountTransactions(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.component.blockchain.account.accountTransactions(address))
@@ -392,7 +390,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def blockList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def blockList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.component.blockchain.block.blockList())
@@ -430,7 +428,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def blockDetails(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def blockDetails(height: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val block = blockchainBlocks.Service.tryGet(height)
@@ -449,7 +447,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def blockTransactions(height: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def blockTransactions(height: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transactions = blockchainTransactions.Service.getTransactions(height)
@@ -463,7 +461,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.component.blockchain.transaction.transactionList())
@@ -484,7 +482,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def transactionDetails(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionDetails(txHash: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
@@ -498,7 +496,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
@@ -521,7 +519,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def transactionMessages(txHash: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def transactionMessages(txHash: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val messages = blockchainTransactions.Service.tryGetMessages(txHash)
@@ -535,7 +533,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposalList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def proposalList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val proposals = blockchainProposals.Service.get()
@@ -548,7 +546,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposalDetails(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def proposalDetails(id: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val proposal = blockchainProposals.Service.tryGet(id)
@@ -561,7 +559,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposalDeposits(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def proposalDeposits(id: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val proposalDeposits = blockchainProposalDeposits.Service.getByProposalID(id)
@@ -574,7 +572,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
@@ -587,14 +585,14 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.component.blockchain.validator.validatorList())
     }
   }
 
-  def activeValidatorList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def activeValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val validators = blockchainValidators.Service.getAllActiveValidatorList
@@ -611,7 +609,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def inactiveValidatorList(): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def inactiveValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val validators = blockchainValidators.Service.getAllInactiveValidatorList
@@ -628,7 +626,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorDetails(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validatorDetails(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val validator = blockchainValidators.Service.tryGet(address)
@@ -647,7 +645,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorUptime(address: String, n: Int): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validatorUptime(address: String, n: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetHexAddress(address)
@@ -667,7 +665,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorDelegations(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validatorDelegations(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
@@ -694,7 +692,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validatorTransactions(address: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def validatorTransactions(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
@@ -885,7 +883,7 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def provisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def provisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val provisionedAddresses = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
@@ -898,7 +896,7 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def unprovisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def unprovisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val unprovisionedAddresses = blockchainIdentities.Service.getAllUnprovisionAddresses(identityID)

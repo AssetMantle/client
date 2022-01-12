@@ -34,8 +34,6 @@ class MetaController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_META
 
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
   def revealForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.metaReveal())
@@ -51,7 +49,7 @@ class MetaController @Inject()(
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = revealData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.MetaReveal, transactionsMetaReveal.Request](
-            entity = blockchainTransaction.MetaReveal(from = loginState.address, metaFact = revealData.revealFact.toMetaFact, gas = revealData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.MetaReveal(from = loginState.address, metaFact = revealData.revealFact.toMetaFact, gas = revealData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
             blockchainTransactionCreate = blockchainTransactionMetaReveals.Service.create,
             request = transactionsMetaReveal.Request(transactionsMetaReveal.Message(transactionsMetaReveal.BaseReq(from = loginState.address, gas = revealData.gas), metaFact = revealData.revealFact)),
             action = transactionsMetaReveal.Service.post,

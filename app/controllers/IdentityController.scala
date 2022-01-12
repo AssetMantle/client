@@ -49,8 +49,6 @@ class IdentityController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_IDENTITY
 
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
   def nubForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
@@ -69,7 +67,7 @@ class IdentityController @Inject()(
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityNub, transactionsIdentityNub.Request](
-              entity = blockchainTransaction.IdentityNub(from = loginState.address, nubID = nubData.nubID, gas = nubData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.IdentityNub(from = loginState.address, nubID = nubData.nubID, gas = nubData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
               blockchainTransactionCreate = blockchainTransactionIdentityNubs.Service.create,
               request = transactionsIdentityNub.Request(transactionsIdentityNub.Message(transactionsIdentityNub.BaseReq(from = loginState.address, gas = nubData.gas), nubID = nubData.nubID)),
               action = transactionsIdentityNub.Service.post,
@@ -122,7 +120,7 @@ class IdentityController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.IdentityDefine, transactionsIdentityDefine.Request](
-                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IdentityDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityDefines.Service.create,
                 request = transactionsIdentityDefine.Request(transactionsIdentityDefine.Message(transactionsIdentityDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
                 action = transactionsIdentityDefine.Service.post,
@@ -198,7 +196,7 @@ class IdentityController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.IdentityIssue, transactionsIdentityIssue.Request](
-                entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = issueData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IdentityIssue(from = loginState.address, fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = issueData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
                 blockchainTransactionCreate = blockchainTransactionIdentityIssues.Service.create,
                 request = transactionsIdentityIssue.Request(transactionsIdentityIssue.Message(transactionsIdentityIssue.BaseReq(from = loginState.address, gas = issueData.gas), fromID = issueData.fromID, classificationID = issueData.classificationID, to = issueData.to, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsIdentityIssue.Service.post,
@@ -241,7 +239,7 @@ class IdentityController @Inject()(
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityProvision, transactionsIdentityProvision.Request](
-              entity = blockchainTransaction.IdentityProvision(from = loginState.address, to = provisionData.to, identityID = provisionData.identityID, gas = provisionData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.IdentityProvision(from = loginState.address, to = provisionData.to, identityID = provisionData.identityID, gas = provisionData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
               blockchainTransactionCreate = blockchainTransactionIdentityProvisions.Service.create,
               request = transactionsIdentityProvision.Request(transactionsIdentityProvision.Message(transactionsIdentityProvision.BaseReq(from = loginState.address, gas = provisionData.gas), to = provisionData.to, identityID = provisionData.identityID)),
               action = transactionsIdentityProvision.Service.post,
@@ -282,7 +280,7 @@ class IdentityController @Inject()(
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityUnprovision, transactionsIdentityUnprovision.Request](
-              entity = blockchainTransaction.IdentityUnprovision(from = loginState.address, to = unprovisionData.to, identityID = unprovisionData.identityID, gas = unprovisionData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.IdentityUnprovision(from = loginState.address, to = unprovisionData.to, identityID = unprovisionData.identityID, gas = unprovisionData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
               blockchainTransactionCreate = blockchainTransactionIdentityUnprovisions.Service.create,
               request = transactionsIdentityUnprovision.Request(transactionsIdentityUnprovision.Message(transactionsIdentityUnprovision.BaseReq(from = loginState.address, gas = unprovisionData.gas), to = unprovisionData.to, identityID = unprovisionData.identityID)),
               action = transactionsIdentityUnprovision.Service.post,

@@ -1,12 +1,10 @@
 package controllers
 
+import constants.AppConfig._
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import constants.AppConfig._
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.common.Serializable.Coin
 import models.{blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -16,6 +14,7 @@ import transactions.blockchain.SendCoin
 import views.companion.{blockchain => blockchainCompanion}
 import views.html.component.blockchain.{txForms => blockchainForms}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,10 +36,6 @@ class SendCoinController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_COIN
 
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private val denom = configuration.get[String]("blockchain.stakingDenom")
-
   def sendCoinForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.sendCoin())
@@ -56,9 +51,9 @@ class SendCoinController @Inject()(
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendCoinData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = Seq(Coin(denom, sendCoinData.amount)), gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = Seq(Coin(constants.Blockchain.StakingDenom, sendCoinData.amount)), gas = sendCoinData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
             blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-            request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denom, sendCoinData.amount.toString)), mode = transactionMode),
+            request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(constants.Blockchain.StakingDenom, sendCoinData.amount.toString)), mode = constants.Blockchain.TransactionMode),
             action = transactionsSendCoin.Service.post,
             onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
             onFailure = blockchainTransactionSendCoins.Utility.onFailure,

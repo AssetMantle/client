@@ -36,9 +36,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
-  private val cacheDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
-
-  def index: EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         loginState match {
@@ -50,7 +48,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  def search(query: String): EssentialAction = cached.apply(req => req.path, cacheDuration) {
+  def search(query: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
 

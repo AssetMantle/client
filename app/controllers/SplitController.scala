@@ -38,8 +38,6 @@ class SplitController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_SPLIT
 
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
   def sendForm(ownableID: String, fromID: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(blockchainForms.splitSend(ownableID = ownableID, fromID = fromID))
@@ -55,7 +53,7 @@ class SplitController @Inject()(
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.SplitSend, transactionsSplitSend.Request](
-            entity = blockchainTransaction.SplitSend(from = loginState.address, fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split, gas = sendData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.SplitSend(from = loginState.address, fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split, gas = sendData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
             blockchainTransactionCreate = blockchainTransactionSplitSends.Service.create,
             request = transactionsSplitSend.Request(transactionsSplitSend.Message(transactionsSplitSend.BaseReq(from = loginState.address, gas = sendData.gas), fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split)),
             action = transactionsSplitSend.Service.post,
@@ -100,7 +98,7 @@ class SplitController @Inject()(
             val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = wrapData.password)
 
             def broadcastTx = transaction.process[blockchainTransaction.SplitWrap, transactionsSplitWrap.Request](
-              entity = blockchainTransaction.SplitWrap(from = loginState.address, fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin), gas = wrapData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.SplitWrap(from = loginState.address, fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin), gas = wrapData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
               blockchainTransactionCreate = blockchainTransactionSplitWraps.Service.create,
               request = transactionsSplitWrap.Request(transactionsSplitWrap.Message(transactionsSplitWrap.BaseReq(from = loginState.address, gas = wrapData.gas), fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin))),
               action = transactionsSplitWrap.Service.post,
@@ -143,7 +141,7 @@ class SplitController @Inject()(
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unwrapData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.SplitUnwrap, transactionsSplitUnwrap.Request](
-            entity = blockchainTransaction.SplitUnwrap(from = loginState.address, fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split, gas = unwrapData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.SplitUnwrap(from = loginState.address, fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split, gas = unwrapData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
             blockchainTransactionCreate = blockchainTransactionSplitUnwraps.Service.create,
             request = transactionsSplitUnwrap.Request(transactionsSplitUnwrap.Message(transactionsSplitUnwrap.BaseReq(from = loginState.address, gas = unwrapData.gas), fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split)),
             action = transactionsSplitUnwrap.Service.post,
