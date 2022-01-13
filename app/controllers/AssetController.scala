@@ -3,7 +3,7 @@ package controllers
 import constants.Response.Success
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import exceptions.BaseException
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
@@ -44,12 +44,6 @@ class AssetController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ASSET
 
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
-
   private def getNumberOfFields(addField: Boolean, currentNumber: Int) = if (addField) currentNumber + 1 else currentNumber
 
   def defineForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
@@ -80,7 +74,7 @@ class AssetController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.AssetDefine, transactionsAssetDefine.Request](
-                entity = blockchainTransaction.AssetDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.AssetDefine(from = loginState.address, fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables, gas = defineData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
                 blockchainTransactionCreate = blockchainTransactionAssetDefines.Service.create,
                 request = transactionsAssetDefine.Request(transactionsAssetDefine.Message(transactionsAssetDefine.BaseReq(from = loginState.address, gas = defineData.gas), fromID = defineData.fromID, immutableMetaTraits = immutableMetas, immutableTraits = immutables, mutableMetaTraits = mutableMetas, mutableTraits = mutables)),
                 action = transactionsAssetDefine.Service.post,
@@ -157,7 +151,7 @@ class AssetController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.AssetMint, transactionsAssetMint.Request](
-                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = mintData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.AssetMint(from = loginState.address, fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = mintData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
                 blockchainTransactionCreate = blockchainTransactionAssetMints.Service.create,
                 request = transactionsAssetMint.Request(transactionsAssetMint.Message(transactionsAssetMint.BaseReq(from = loginState.address, gas = mintData.gas), fromID = mintData.fromID, toID = mintData.toID, classificationID = mintData.classificationID, immutableMetaProperties = immutableMetas, immutableProperties = immutables, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsAssetMint.Service.post,
@@ -228,7 +222,7 @@ class AssetController @Inject()(
 
             def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
               val broadcastTx = transaction.process[blockchainTransaction.AssetMutate, transactionsAssetMutate.Request](
-                entity = blockchainTransaction.AssetMutate(from = loginState.address, fromID = mutateData.fromID, assetID = mutateData.assetID, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = mutateData.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.AssetMutate(from = loginState.address, fromID = mutateData.fromID, assetID = mutateData.assetID, mutableMetaProperties = mutableMetas, mutableProperties = mutables, gas = mutateData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
                 blockchainTransactionCreate = blockchainTransactionAssetMutates.Service.create,
                 request = transactionsAssetMutate.Request(transactionsAssetMutate.Message(transactionsAssetMutate.BaseReq(from = loginState.address, gas = mutateData.gas), fromID = mutateData.fromID, assetID = mutateData.assetID, mutableMetaProperties = mutableMetas, mutableProperties = mutables)),
                 action = transactionsAssetMutate.Service.post,
@@ -269,7 +263,7 @@ class AssetController @Inject()(
           val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = burnData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.AssetBurn, transactionsAssetBurn.Request](
-            entity = blockchainTransaction.AssetBurn(from = loginState.address, fromID = burnData.fromID, assetID = burnData.assetID, gas = burnData.gas, ticketID = "", mode = transactionMode),
+            entity = blockchainTransaction.AssetBurn(from = loginState.address, fromID = burnData.fromID, assetID = burnData.assetID, gas = burnData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
             blockchainTransactionCreate = blockchainTransactionAssetBurns.Service.create,
             request = transactionsAssetBurn.Request(transactionsAssetBurn.Message(transactionsAssetBurn.BaseReq(from = loginState.address, gas = burnData.gas), fromID = burnData.fromID, assetID = burnData.assetID)),
             action = transactionsAssetBurn.Service.post,

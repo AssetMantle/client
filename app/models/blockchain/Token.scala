@@ -1,15 +1,10 @@
 package models.blockchain
 
-import java.sql.Timestamp
-import akka.actor.ActorSystem
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries._
 import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
@@ -18,6 +13,8 @@ import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupply
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -36,8 +33,6 @@ class Tokens @Inject()(
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -85,7 +80,7 @@ class Tokens @Inject()(
 
   private def getAllTokendenoms: Future[Seq[String]] = db.run(tokenTable.map(_.denom).result)
 
-  private def getTotalBondedTokenAmount: Future[String] = db.run(tokenTable.filter(_.denom === stakingDenom).map(_.bondedAmount).result.head.asTry).map {
+  private def getTotalBondedTokenAmount: Future[String] = db.run(tokenTable.filter(_.denom === constants.Blockchain.StakingDenom).map(_.bondedAmount).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
@@ -161,7 +156,7 @@ class Tokens @Inject()(
 
     def getAllDenoms: Future[Seq[String]] = getAllTokendenoms
 
-    def getStakingToken: Future[Token] = findByDenom(stakingDenom).map(_.deserialize)
+    def getStakingToken: Future[Token] = findByDenom(constants.Blockchain.StakingDenom).map(_.deserialize)
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
@@ -179,7 +174,7 @@ class Tokens @Inject()(
     def onSlashing: Future[Unit] = {
       val stakingPoolResponse = getStakingPool.Service.get
 
-      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = stakingDenom, bondedAmount = stakingPoolResponse.pool.bonded_tokens, notBondedAmount = stakingPoolResponse.pool.not_bonded_tokens)
+      def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = constants.Blockchain.StakingDenom, bondedAmount = stakingPoolResponse.pool.bonded_tokens, notBondedAmount = stakingPoolResponse.pool.not_bonded_tokens)
 
       (for {
         stakingPoolResponse <- stakingPoolResponse
@@ -198,10 +193,10 @@ class Tokens @Inject()(
 
       def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.supply) { token =>
         Service.insertOrUpdate(Token(denom = token.denom, totalSupply = token.amount,
-          bondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
-          notBondedAmount = if (token.denom == stakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
+          bondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
+          notBondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
           communityPool = communityPoolResponse.pool.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
-          inflation = if (token.denom == stakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
+          inflation = if (token.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
         ))
       }
 

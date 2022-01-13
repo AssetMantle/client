@@ -52,16 +52,6 @@ class MaintainerDeputizes @Inject()(
 
   private[models] val maintainerDeputizeTable = TableQuery[MaintainerDeputizeTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-
   private def add(maintainerDeputize: MaintainerDeputize): Future[String] = db.run((maintainerDeputizeTable returning maintainerDeputizeTable.map(_.ticketID) += serialize(maintainerDeputize)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -236,7 +226,7 @@ class MaintainerDeputizes @Inject()(
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+  if ((constants.Blockchain.KafkaEnabled || constants.Blockchain.TransactionMode != constants.Transactions.BLOCK_MODE) && constants.Blockchain.EnableTxSchemaActor) {
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Blockchain.KafkaTxIteratorInitialDelay, delay = constants.Blockchain.KafkaTxIteratorInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

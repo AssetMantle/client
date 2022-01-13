@@ -52,16 +52,6 @@ class IdentityNubs @Inject()(
 
   private[models] val identityNubTable = TableQuery[IdentityNubTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-
   private def add(identityNub: IdentityNub): Future[String] = db.run((identityNubTable returning identityNubTable.map(_.ticketID) += serialize(identityNub)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -192,15 +182,13 @@ class IdentityNubs @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val identityNub = Service.getTransaction(ticketID)
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty))),
+      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty))),
         entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = Seq.empty, immutables = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None)), mutableMetas = Seq.empty, mutables = Seq.empty)
 
       def insertIdentityProperties(identityNub: IdentityNub, classificationID: String) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = classificationID, Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData())))),
@@ -235,7 +223,7 @@ class IdentityNubs @Inject()(
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+  if ((constants.Blockchain.KafkaEnabled || constants.Blockchain.TransactionMode != constants.Transactions.BLOCK_MODE) && constants.Blockchain.EnableTxSchemaActor) {
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Blockchain.KafkaTxIteratorInitialDelay, delay = constants.Blockchain.KafkaTxIteratorInterval)(txRunnable)(schedulerExecutionContext)
   }
 }

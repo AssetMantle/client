@@ -40,17 +40,11 @@ class TokenPrices @Inject()(
 
   private[models] val tokenPriceTable = TableQuery[TokenPriceTable]
 
-  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
-
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
   private val tokenPriceInitialDelay = configuration.get[Int]("blockchain.token.priceInitialDelay")
 
   private val tokenPriceUpdateRate = configuration.get[Int]("blockchain.token.priceUpdateRate")
-
-  private implicit val tokenTickers: Seq[utilities.Configuration.TokenTicker] = configuration.get[Seq[Configuration]]("blockchain.token.tickers").map { tokenTicker =>
-    utilities.Configuration.TokenTicker(denom = tokenTicker.get[String]("denom"), normalizedDenom = tokenTicker.get[String]("normalizedDenom"), ticker = tokenTicker.get[String]("ticker"))
-  }
 
   private def add(tokenPrice: TokenPrice): Future[Int] = db.run((tokenPriceTable returning tokenPriceTable.map(_.serial) += tokenPrice).asTry).map {
     case Success(result) => result
@@ -133,12 +127,12 @@ class TokenPrices @Inject()(
 
   object Utility {
     def insertPrice(): Future[Unit] = {
-      val tokenTicker = tokenTickers.find(_.denom == stakingDenom)
+      val tokenTicker = constants.AppConfig.tokenTickers.find(_.denom == constants.Blockchain.StakingDenom)
       if (tokenTicker.isDefined) {
         val price = getCoingeckoTicker.Service.get().map(_.persistence.usd)
         (for {
           price <- price
-          _ <- Service.create(denom = stakingDenom, price = price)
+          _ <- Service.create(denom = constants.Blockchain.StakingDenom, price = price)
         } yield ()).recover {
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }

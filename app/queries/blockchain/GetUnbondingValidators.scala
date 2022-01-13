@@ -16,11 +16,9 @@ class GetUnbondingValidators @Inject()()(implicit wsClient: WSClient, configurat
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "cosmos/staking/v1beta1/validators?status=BOND_STATUS_UNBONDING"
 
-  private val url = restURL + "/" + path
+  private val url = constants.Blockchain.RestEndPoint + "/" + path
 
   private def action(): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

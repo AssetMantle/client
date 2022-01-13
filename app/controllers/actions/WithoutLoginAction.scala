@@ -1,7 +1,7 @@
 package controllers.actions
 
 import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
-import utilities.Configuration.OtherApp
+import constants.AppConfig._
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
@@ -20,10 +20,6 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
-
-  private implicit val otherApps: Seq[OtherApp] = configuration.get[Seq[Configuration]]("webApp.otherApps").map { otherApp =>
-    OtherApp(url = otherApp.get[String]("url"), name = otherApp.get[String]("name"))
-  }
 
   def apply(f: ⇒ Option[LoginState] => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
