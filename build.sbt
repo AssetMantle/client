@@ -16,10 +16,6 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
-Compile / PB.targets := Seq(
-  scalapb.gen() -> (Compile / sourceManaged).value / "scalapb"
-)
-
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
