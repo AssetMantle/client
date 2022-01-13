@@ -16,11 +16,9 @@ class GetMeta @Inject()()(implicit wsClient: WSClient, configuration: Configurat
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "xprt/metas/metas"
 
-  private val url = restURL + "/" + path + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path + "/"
 
   private def action(metaID: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + metaID).get)
 

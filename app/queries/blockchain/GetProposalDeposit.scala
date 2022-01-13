@@ -16,13 +16,11 @@ class GetProposalDeposit @Inject()()(implicit wsClient: WSClient, configuration:
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path1 = "gov/proposals"
 
   private val path2 = "/deposits/"
 
-  private val url = restURL + "/" + path1 + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
 
   private def action(id: String, address: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + id + path2 + address).get)
 

@@ -4,6 +4,7 @@ import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.DelegatorRedelegationsResponse.Response
+
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,11 +16,9 @@ class GetDelegatorRedelegations @Inject()()(implicit wsClient: WSClient, configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "staking/redelegations"
 
-  private val url = restURL + "/" + path
+  private val url = constants.Blockchain.RestEndPoint + "/" + path
 
   private def action: Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 

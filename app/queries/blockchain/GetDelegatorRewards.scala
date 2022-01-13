@@ -16,13 +16,11 @@ class GetDelegatorRewards @Inject()()(implicit wsClient: WSClient, configuration
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path1 = "distribution/delegators"
 
   private val path2 = "/rewards"
 
-  private val url = restURL + "/" + path1 + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
 
   private def action(delegatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + delegatorAddress + path2).get)
 

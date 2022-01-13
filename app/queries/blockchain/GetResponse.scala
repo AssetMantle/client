@@ -15,11 +15,9 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path = "response"
 
-  private val url = restURL + "/" + path + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path + "/"
 
   private def action(request: String): Future[WSResponse] = wsClient.url(url + request).get
 

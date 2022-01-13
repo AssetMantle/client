@@ -56,8 +56,6 @@ class Startup @Inject()(
 
   private val genesisFilePath = configuration.get[String]("blockchain.genesisFilePath")
 
-  private val stakingDenom = configuration.get[String]("blockchain.stakingDenom")
-
   private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
 
   private val explorerInitialDelay = configuration.get[Int]("blockchain.explorer.initialDelay").millis
@@ -174,10 +172,10 @@ class Startup @Inject()(
 
     def insert(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = {
       blockchainTokens.Service.insertMultiple(totalSupplyResponse.result.map(x => Token(denom = x.denom, totalSupply = x.amount,
-        bondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
-        notBondedAmount = if (x.denom == stakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
+        bondedAmount = if (x.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.result.bonded_tokens else MicroNumber.zero,
+        notBondedAmount = if (x.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.result.not_bonded_tokens else MicroNumber.zero,
         communityPool = communityPoolResponse.result.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
-        inflation = if (x.denom == stakingDenom) BigDecimal(mintingInflationResponse.result) else BigDecimal(0.0)
+        inflation = if (x.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.result) else BigDecimal(0.0)
       )))
     }
 

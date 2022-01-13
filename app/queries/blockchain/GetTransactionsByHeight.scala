@@ -16,9 +16,7 @@ class GetTransactionsByHeight @Inject()()(implicit wsClient: WSClient, configura
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val rpcURL = configuration.get[String]("blockchain.rpcURL")
-
-  private val url = rpcURL + "/"
+  private val url = constants.Blockchain.RPCEndPoint + "/"
 
   private def action(height: Int, page: Int, perPage: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + s"""tx_search?query="tx.height=${height}"&page=${page}&per_page=${perPage}""").get)
 

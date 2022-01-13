@@ -1,7 +1,7 @@
 @import models.blockchain.Token
 @import views.html.base._
 
-@(token: Token, tokenTickers: Seq[utilities.Configuration.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(token: Token, tokenTickers: Seq[constants.AppConfig.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKEN) {
     <p>$@tokenTickers.find(_.denom == token.denom).fold(token.denom)(_.normalizedDenom)</p>

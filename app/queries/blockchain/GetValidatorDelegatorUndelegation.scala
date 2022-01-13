@@ -4,7 +4,6 @@ import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.Response
-
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,13 +15,11 @@ class GetValidatorDelegatorUndelegation @Inject()()(implicit wsClient: WSClient,
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path1 = "staking/delegators"
 
   private val path2 = "/unbonding_delegations/"
 
-  private val url = restURL + "/" + path1 + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
 
   private def action(delegatorAddress: String, validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + delegatorAddress + path2 + validatorAddress).get)
 

@@ -2,20 +2,22 @@ package constants
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
-import com.typesafe.config.ConfigFactory
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
 
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
 object Blockchain {
-  private val configuration = Configuration(ConfigFactory.load())
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
-  val AccountPrefix = configuration.get[String]("blockchain.account.prefix")
-  val ValidatorPrefix = "persistencevaloper"
-  val ValidatorConsensusPublicPrefix = "persistencevalconspub"
-  val IBCDenoms: Seq[utilities.Configuration.IBCDenom] = configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
-    utilities.Configuration.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
+  val AccountPrefix: String = AppConfig.configuration.get[String]("blockchain.account.prefix")
+  val ValidatorPrefix: String = AccountPrefix + "valoper"
+  val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
+  val IBCDenoms: Seq[AppConfig.IBCDenom] = AppConfig.configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
+    constants.AppConfig.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
   }
+  val ChainID: String = AppConfig.configuration.get[String]("blockchain.chainID")
+  val StakingDenom: String = AppConfig.configuration.get[String]("blockchain.stakingDenom")
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
@@ -38,6 +40,15 @@ object Blockchain {
     new ChildNumber(0, false),
     new ChildNumber(0, false)
   )
+
+  val RPCEndPoint: String = AppConfig.configuration.get[String]("blockchain.rpcURL")
+  val RestEndPoint: String = AppConfig.configuration.get[String]("blockchain.restURL")
+  val TransactionMode: String = AppConfig.configuration.get[String]("blockchain.transaction.mode")
+  val KafkaEnabled: Boolean = AppConfig.configuration.get[Boolean]("blockchain.kafka.enabled")
+  val KafkaTxIteratorInitialDelay: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
+  val KafkaTxIteratorInterval: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
+
 
   object PublicKey {
     val MULTI_SIG = "tendermint/PubKeyMultisigThreshold"

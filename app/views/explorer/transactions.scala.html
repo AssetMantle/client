@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import utilities.Configuration.OtherApp
+@import constants.AppConfig.OtherApp
 
 @(txHash: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 

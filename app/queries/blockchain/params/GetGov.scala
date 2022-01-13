@@ -16,19 +16,17 @@ class GetGov @Inject()()(implicit wsClient: WSClient, configuration: Configurati
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val restURL = configuration.get[String]("blockchain.restURL")
-
   private val path1 = "gov/parameters/voting"
 
   private val path2 = "gov/parameters/deposit"
 
   private val path3 = "gov/parameters/tallying"
 
-  private val url1 = restURL + "/" + path1
+  private val url1 = constants.Blockchain.RestEndPoint + "/" + path1
 
-  private val url2 = restURL + "/" + path2
+  private val url2 = constants.Blockchain.RestEndPoint + "/" + path2
 
-  private val url3 = restURL + "/" + path3
+  private val url3 = constants.Blockchain.RestEndPoint + "/" + path3
 
   private def votingAction(): Future[VotingResponse] = utilities.JSON.getResponseFromJson[VotingResponse](wsClient.url(url1).get)
 

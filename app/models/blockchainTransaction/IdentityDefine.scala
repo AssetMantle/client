@@ -52,16 +52,6 @@ class IdentityDefines @Inject()(
 
   private[models] val identityDefineTable = TableQuery[IdentityDefineTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-
-  private val enableActor = configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-
   private def add(identityDefine: IdentityDefine): Future[String] = db.run((identityDefineTable returning identityDefineTable.map(_.ticketID) += serialize(identityDefine)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -200,15 +190,13 @@ class IdentityDefines @Inject()(
 
   object Utility {
 
-    private val chainID = configuration.get[String]("blockchain.chainID")
-
     def onSuccess(ticketID: String, txHash: String): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val identityDefine = Service.tryGet(ticketID)
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = chainID, Immutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits).map(_.toProperty)))),
+      def insertProperties(identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits).map(_.toProperty)))),
         entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits)
 
       def insertMaintainerProperties(classificationID: String, identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = identityDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits)
@@ -241,7 +229,7 @@ class IdentityDefines @Inject()(
     def run(): Unit = Await.result(transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure), Duration.Inf)
   }
 
-  if ((kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) && enableActor) {
-    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = schedulerInitialDelay, delay = schedulerInterval)(txRunnable)(schedulerExecutionContext)
+  if ((constants.Blockchain.KafkaEnabled || constants.Blockchain.TransactionMode != constants.Transactions.BLOCK_MODE) && constants.Blockchain.EnableTxSchemaActor) {
+    actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = constants.Blockchain.KafkaTxIteratorInitialDelay, delay = constants.Blockchain.KafkaTxIteratorInterval)(txRunnable)(schedulerExecutionContext)
   }
 }
