@@ -16,6 +16,10 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
+Compile / PB.targets := Seq(
+  scalapb.gen() -> (Compile / sourceManaged).value / "scalapb"
+)
+
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
@@ -67,3 +71,5 @@ libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
 libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
 
 libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
+
+libraryDependencies += evolutions
