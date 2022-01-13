@@ -234,10 +234,13 @@ class ComponentViewController @Inject()(
         def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
           val totalTokens = sortedBondedValidators.map(_.tokens).sum
           var countedToken = MicroNumber.zero
-          sortedBondedValidators.takeWhile(validator => {
+          val bottomValidators = sortedBondedValidators.reverse.takeWhile(validator => {
             countedToken = countedToken + validator.tokens
-            countedToken <= 2 * totalTokens / 3
-          }).map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> (totalTokens - countedToken).toDouble)
+            countedToken <= totalTokens / 3
+          })
+          val bottomValidatorAddresses = bottomValidators.map(_.operatorAddress)
+          sortedBondedValidators.filterNot(x => bottomValidatorAddresses.contains(x.operatorAddress))
+            .map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> bottomValidators.map(_.tokens).sum.toDouble)
         }
 
         (for {
