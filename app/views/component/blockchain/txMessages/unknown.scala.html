@@ -1,7 +1,0 @@
-@import views.html.base._
-@import models.Abstract.TransactionMessage
-@import models.common.TransactionMessages.Unknown
-
-@(msg: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@commonTextInfo(constants.View.MESSAGE, msg)
