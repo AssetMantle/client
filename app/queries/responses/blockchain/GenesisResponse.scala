@@ -7,15 +7,12 @@ import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
 import queries.responses.blockchain.TransactionResponse._
-import queries.responses.blockchain.params.{AuthResponse, BankResponse, DistributionResponse, HalvingResponse, MintResponse, SlashingResponse, StakingResponse}
-import queries.responses.blockchain.params.StakingResponse._
+import queries.responses.blockchain.params._
 import queries.responses.common.{Coin, Delegation, Validator}
 import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
 
 object GenesisResponse {
-
-  import queries.responses.common.Accounts.accountReads
 
   case class GenTxBody(messages: Seq[Msg], memo: String)
 
@@ -53,6 +50,17 @@ object GenesisResponse {
     implicit val authModuleReads: Reads[Module] = Json.reads[Module]
   }
 
+  object Authz {
+
+    case class Authorization(granter: String, grantee: String, expiration: String, authorization: Authz.Authorization)
+
+    implicit val authorizationReads: Reads[Authorization] = Json.reads[Authorization]
+
+    case class Module(authorization: Seq[Authorization])
+
+    implicit val authzModuleReads: Reads[Module] = Json.reads[Module]
+  }
+
   object Bank {
 
     case class BankBalance(address: String, coins: Seq[Coin])
@@ -79,6 +87,17 @@ object GenesisResponse {
     case class Module(params: DistributionResponse.Params, delegator_withdraw_infos: Seq[WithdrawAddress])
 
     implicit val distributionReads: Reads[Module] = Json.reads[Module]
+  }
+
+  object FeeGrant {
+
+    case class Allowance(granter: String, grantee: String, allowance: FeeGrant.Allowance)
+
+    implicit val allowanceReads: Reads[Allowance] = Json.reads[Allowance]
+
+    case class Module(allowances: Seq[Allowance])
+
+    implicit val feeGrantReads: Reads[Module] = Json.reads[Module]
   }
 
   object Halving {
@@ -160,7 +179,7 @@ object GenesisResponse {
     implicit val govReads: Reads[Module] = Json.reads[Module]
   }
 
-  case class AppState(auth: Auth.Module, bank: Bank.Module, distribution: Distribution.Module, genutil: GenUtil, gov: Gov.Module, halving: Halving.Module, mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
+  case class AppState(auth: Auth.Module, authz: Authz.Module, bank: Bank.Module, distribution: Distribution.Module, feegrant: FeeGrant.Module, genutil: GenUtil, gov: Gov.Module, halving: Option[Halving.Module], mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 

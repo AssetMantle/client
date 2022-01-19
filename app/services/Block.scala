@@ -3,19 +3,19 @@ package services
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
 import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
-import models.common.Parameters.{SlashingParameter}
+import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
-import models.common.Serializable.StdMsg
 import models.common.TransactionMessages._
 import models.{blockchain, keyBase, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
+import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
+import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
-import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
-import queries.responses.common.{Event, Header}
-import queries.blockchain.{GetBlock, GetBlockCommit, GetProposal, GetTransaction, GetTransactionsByHeight}
+import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
 import queries.responses.common.ProposalContents.CommunityPoolSpend
+import queries.responses.common.{Event, Header}
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -44,12 +44,10 @@ class Block @Inject()(
                        blockchainUndelegations: blockchain.Undelegations,
                        blockchainValidators: blockchain.Validators,
                        blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
-                       keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                        getBlockCommit: GetBlockCommit,
                        getBlock: GetBlock,
                        getTransaction: GetTransaction,
                        getTransactionsByHeight: GetTransactionsByHeight,
-                       getProposal: GetProposal,
                        masterTransactionNotifications: masterTransaction.Notifications,
                        utilitiesOperations: utilities.Operations,
                        messagesApi: MessagesApi
@@ -105,7 +103,11 @@ class Block @Inject()(
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
 
-      def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
+      def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = {
+        val a = transactions.head.messages.head
+        val b = Json.toJson(transactions.head.messages.head)
+        blockchainTransactions.Service.insertMultiple(transactions)
+      }
 
       for {
         transactions <- transactions
@@ -152,7 +154,7 @@ class Block @Inject()(
     def getWebSocketNewBlock(proposer: String): actorsMessage.WebSocket.NewBlock = actorsMessage.WebSocket.NewBlock(
       block = actorsMessage.WebSocket.Block(
         height = blockCommitResponse.result.signed_header.header.height,
-        time = utilities.Date.bcTimestampToString(blockCommitResponse.result.signed_header.header.time),
+        time = blockCommitResponse.result.signed_header.header.time,
         proposer = proposer),
       txs = transactions.map(tx => actorsMessage.WebSocket.Tx(
         hash = tx.hash,
@@ -178,12 +180,12 @@ class Block @Inject()(
     val updateAccount = utilitiesOperations.traverse(transaction.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
     // Should always be called after messages are processed, otherwise can create conflict
-    def updateBalance() = blockchainBalances.Utility.insertOrUpdateBalance(transaction.getFeePayer)
+    def updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(transaction.getFeePayer)
 
     (for {
       _ <- messages
       _ <- updateAccount
-      _ <- updateBalance()
+      _ <- updateBalance
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
@@ -194,6 +196,10 @@ class Block @Inject()(
       val processMsg = stdMsg.messageType match {
         //auth
         case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => blockchainAccounts.Utility.onCreateVestingAccount(stdMsg.message.asInstanceOf[CreateVestingAccount])
+        //authz
+        case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => Future()
+        case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => Future()
+        case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => Future()
         //bank
         case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
         case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainBalances.Utility.onMultiSend(stdMsg.message.asInstanceOf[MultiSend])
@@ -206,6 +212,9 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => blockchainBalances.Utility.insertOrUpdateBalance(stdMsg.message.asInstanceOf[FundCommunityPool].depositor)
         //evidence
         case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Future()
+        //feeGrant
+        case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => Future()
+        case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => Future()
         //gov
         case constants.Blockchain.TransactionMessage.DEPOSIT => blockchainProposalDeposits.Utility.onDeposit(stdMsg.message.asInstanceOf[Deposit])
         case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => blockchainProposals.Utility.onSubmitProposal(stdMsg.message.asInstanceOf[SubmitProposal])
@@ -291,13 +300,12 @@ class Block @Inject()(
           val hexAddress = utilities.Bech32.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
+          // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
           def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
           else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
-
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
             val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
-
 
             slash(validatorAddress = operatorAddress, infractionHeight = distributionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
           }

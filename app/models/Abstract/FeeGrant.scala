@@ -1,14 +1,16 @@
-package queries.Abstract
+package models.Abstract
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Reads}
-import queries.responses.common.FeeGrant.allowanceApply
+import models.common.FeeGrant.{AllowedMsgAllowance, BasicAllowance, PeriodicAllowance}
+import play.api.libs.functional.syntax.toAlternativeOps
+import play.api.libs.json.{Json, Reads, Writes}
 
 object FeeGrant {
   abstract class FeeAllowance {}
 
-  implicit val feeAllowanceReads: Reads[FeeAllowance] = (
-    (JsPath \ "@type").read[String] and
-      JsPath.read[JsObject]
-    ) (allowanceApply _)
+  implicit val feeAllowanceWrites: Writes[FeeAllowance] = {
+    case basicAllowance: BasicAllowance => Json.toJson(basicAllowance)
+    case periodicAllowance: PeriodicAllowance => Json.toJson(periodicAllowance)
+    case allowedMsgAllowance: AllowedMsgAllowance => Json.toJson(allowedMsgAllowance)
+  }
+
 }

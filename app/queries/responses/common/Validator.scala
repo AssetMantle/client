@@ -5,7 +5,6 @@ import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import queries.Abstract.PublicKey
-import queries.responses.common.PublicKeys.publicKeyReads
 import utilities.MicroNumber
 
 object Validator {

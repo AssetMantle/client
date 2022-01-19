@@ -2,8 +2,7 @@ package queries.responses.blockchain
 
 import exceptions.BaseException
 import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Json, Reads}
+import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
@@ -44,11 +43,6 @@ object BlockResponse {
     case constants.Blockchain.Tendermint.LightClientAttackEvidence => utilities.JSON.convertJsonStringToObject[LightClientAttackEvidence](value.toString)
     case _ => throw new BaseException(constants.Response.UNKNOWN_TENDERMINT_EVIDENCE_TYPE)
   }
-
-  implicit val tendermintEvidenceReads: Reads[TendermintEvidence] = (
-    (JsPath \ "type").read[String] and
-      (JsPath \ "value").read[JsObject]
-    ) (tendermintEvidenceApply _)
 
   case class Evidence(evidence: Seq[TendermintEvidence])
 

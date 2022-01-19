@@ -73,7 +73,7 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.halving.params.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
+      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.halving.fold[Parameter](HalvingParameter(Int.MaxValue))(_.params.toParameter), genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
@@ -193,7 +193,7 @@ class Startup @Inject()(
   }
 
   private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
-    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.`type`, value = parameter))
+    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 
     (for {
       _ <- insert

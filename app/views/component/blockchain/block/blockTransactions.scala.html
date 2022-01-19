@@ -12,8 +12,8 @@
             <thead>
                 <tr>
                     <th>@Messages(constants.View.TRANSACTION_HASH)</th>
-                    <th>@Messages(constants.View.STATUS)</th>
                     <th>@Messages(constants.View.NUMBER_OF_MESSAGES)</th>
+                    <th>@Messages(constants.View.STATUS)</th>
                     <th>@Messages(constants.View.TRANSACTION_FEES)</th>
                 </tr>
             </thead>
@@ -23,6 +23,12 @@
                     <td class="blockHeightItem">
                         @commonJavascriptLink(tx.hash, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction('${tx.hash}'))"))
                     </td>
+                    <td>@if(tx.messages.length == 1) {
+                        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+                    } else {
+                        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+                        (+@(tx.messages.length - 1))
+                    }</td>
                     <td>
                     @if(tx.status) {
                         <span cmuk-icon="check" class="check hidden"></span>
@@ -30,7 +36,6 @@
                         <span cmuk-icon="close" class="close hidden"></span>
                     }
                     </td>
-                    <td>@tx.messages.length</td>
                     <td>@if(tx.fee.amount.nonEmpty) {
                         @tx.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
                     } else {

@@ -303,7 +303,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Transaction"
     "height"            INTEGER NOT NULL,
     "code"              INTEGER NOT NULL,
     "rawLog"            VARCHAR NOT NULL,
-    "status"            BOOLEAN NOT NULL,
     "gasWanted"         VARCHAR NOT NULL,
     "gasUsed"           VARCHAR NOT NULL,
     "messages"          VARCHAR NOT NULL,

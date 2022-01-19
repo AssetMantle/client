@@ -29,9 +29,4 @@ object PublicKeys {
 
   implicit val multiSigPublicKeyFormat: OFormat[MultiSigPublicKey] = Json.format[MultiSigPublicKey]
 
-  implicit val publicKeyReads: Reads[PublicKey] = {
-    Json.format[SinglePublicKey].map(x => x: SinglePublicKey) or
-      Json.format[MultiSigPublicKey].map(x => x: MultiSigPublicKey)
-  }
-
 }

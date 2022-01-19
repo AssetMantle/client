@@ -1,1 +1,16 @@
-@()
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.GrantAuthorization
+@import views.html.component.blockchain.authorization
+
+@(msg: TransactionMessage, index: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[GrantAuthorization]) { grantAuthorization =>
+    @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(grantAuthorization.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.granter}'))")))
+    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(grantAuthorization.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.grantee}'))")))
+    @commonTextInfo(constants.View.EXPIRATION, "", 'id -> s"grantAuthorization_${index}")
+    @authorization(grantAuthorization.grant.authorization)
+  <script>
+        convertUTCDateToLocalDate('@grantAuthorization.grant.expiration', "grantAuthorization_@index")
+  </script>
+}

@@ -1,5 +1,9 @@
 package queries.Abstract
 
-class FeeGrant {
+import models.Abstract
 
+object FeeGrant {
+  abstract class FeeAllowance {
+    def toSerializable: Abstract.FeeGrant.FeeAllowance
+  }
 }

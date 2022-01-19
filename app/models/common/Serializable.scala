@@ -174,17 +174,6 @@ object Serializable {
 
   implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
 
-  case class StdMsg(messageType: String, message: TransactionMessage) {
-    def getSigners: Seq[String] = message.getSigners
-  }
-
-  implicit val msgReads: Reads[StdMsg] = (
-    (JsPath \ "messageType").read[String] and
-      (JsPath \ "message").read[JsObject]
-    ) (stdMsgApply _)
-
-  implicit val msgWrites: OWrites[StdMsg] = Json.writes[StdMsg]
-
   case class BaseProperty(dataType: String, dataName: String, dataValue: Option[String]) {
     def toRequestString: String = utilities.String.getPropertyRequestWithValue(dataNameWithType = utilities.String.getPropertyRequestNameAndType(dataType = dataType, dataName = dataName), dataValue = dataValue)
 

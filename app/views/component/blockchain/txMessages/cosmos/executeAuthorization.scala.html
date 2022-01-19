@@ -1,11 +1,11 @@
-@import views.html.base._
 @import models.Abstract.TransactionMessage
-@import models.common.TransactionMessages.RevokeAuthorization
+@import models.common.TransactionMessages.ExecuteAuthorization
+@import views.html.base._
+@import views.html.component.blockchain.txMessages.stdMsgs
 
 @(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@defining(msg.asInstanceOf[RevokeAuthorization]) { revokeAuthorization =>
-    @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(revokeAuthorization.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.granter}'))")))
-    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(revokeAuthorization.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.grantee}'))")))
-    @commonTextInfo(constants.View.MESSAGES_TYPE, revokeAuthorization.messageTypeURL)
+@defining(msg.asInstanceOf[ExecuteAuthorization]) { executeAuthorization =>
+    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(executeAuthorization.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${executeAuthorization.grantee}'))")))
+    @stdMsgs(title = constants.View.MESSAGES, txHash = "", messages = executeAuthorization.messages)
 }

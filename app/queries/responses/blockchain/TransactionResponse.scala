@@ -2,6 +2,7 @@ package queries.responses.blockchain
 
 import models.blockchain.Transaction
 import models.common.Serializable
+import models.common.TransactionMessages.StdMsg
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.{PublicKey, TransactionMessageResponse}
@@ -27,7 +28,7 @@ object TransactionResponse {
   implicit val authInfoReads: Reads[AuthInfo] = Json.reads[AuthInfo]
 
   case class Msg(msgType: String, value: TransactionMessageResponse) {
-    def toStdMsg: Serializable.StdMsg = Serializable.StdMsg(msgType, value.toTxMsg)
+    def toStdMsg: StdMsg = StdMsg(msgType, value.toTxMsg)
   }
 
   implicit val msgReads: Reads[Msg] = (
@@ -51,7 +52,6 @@ object TransactionResponse {
       rawLog = raw_log,
       gasWanted = gas_wanted,
       gasUsed = gas_used,
-      status = code == 0,
       messages = tx.body.messages.map(_.toStdMsg),
       fee = tx.auth_info.fee.toFee,
       memo = tx.body.memo,

@@ -78,7 +78,7 @@ function onAsset(message) {
 function updateLatestBlockHeightCard(message) {
     $('#latestBlockHeight_height').text(message.block.height);
     $('#latestBlockHeight_proposer').text(message.block.proposer);
-    convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), "latestBlockHeight_time")
+    convertUTCDateToLocalDate(message.block.time, "latestBlockHeight_time");
     $('#latestBlockHeight_averageBlockTime').text(message.averageBlockTime + "s");
 }
 
@@ -88,12 +88,12 @@ function updateBlockList(message) {
         for (let i = blockListPage.children().length - 2; i >= 0; i--) {
             if (i === 0) {
                 $('#blockListPageItemHeight_' + i).text(message.block.height);
-                convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')), `blockListPageItemTime_${i}`)
+                convertUTCDateToLocalDate(message.block.time, `blockListPageItemTime_${i}`)
                 $('#blockListPageItemNumTxs_' + i).text(message.txs.length);
                 $('#blockListPageItemProposer_' + i).text(message.block.proposer);
             } else {
                 $('#blockListPageItemHeight_' + i).text($('#blockListPageItemHeight_' + (i - 1)).text());//.replace(/^\s+|\s+$/g, ''));
-                convertUTCDateToLocalDate(new Date($('#blockListPageItemTime_' + (i-1)).text().toString()), `blockListPageItemTime_${i}`)
+                $('#blockListPageItemTime_' + i).text($('#blockListPageItemTime_' + (i - 1)).text());
                 $('#blockListPageItemNumTxs_' + i).text($('#blockListPageItemNumTxs_' + (i - 1)).text());
                 $('#blockListPageItemProposer_' + i).text($('#blockListPageItemProposer_' + (i - 1)).text());
             }
@@ -119,7 +119,7 @@ function updateTransactionList(message) {
                         $('#transactionListPageItemTxStatusTrue_' + i).hide();
                         $('#transactionListPageItemTxStatusFalse_' + i).show();
                     }
-                    convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
+                    convertUTCDateToLocalDate(message.block.time, `transactionListPageItemTxTime_${i}`)
                 } else {
                     if (i <= (numTxs - 1)) {
                         $('#transactionListPageItemTxHash_' + i).text(message.txs[i].hash);
@@ -133,7 +133,7 @@ function updateTransactionList(message) {
                             $('#transactionListPageItemTxStatusTrue_' + i).hide();
                             $('#transactionListPageItemTxStatusFalse_' + i).show();
                         }
-                        convertUTCDateToLocalDate(new Date(message.block.time.toString().replace(/at|Z/g, '')).toString(), `transactionListPageItemTxTime_${i}`)
+                        convertUTCDateToLocalDate(message.block.time, `transactionListPageItemTxTime_${i}`)
                     } else {
                         $('#transactionListPageItemTxHash_' + i).text($('#transactionListPageItemTxHash_' + (i - 1)).text());
                         $('#transactionListPageItemTxMessageTypes_' + i).text($('#transactionListPageItemTxMessageTypes_' + (i - 1)).text());
