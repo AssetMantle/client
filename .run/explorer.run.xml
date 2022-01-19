@@ -32,6 +32,9 @@
                 <entry key="STAKING_DENOM" value="uxprt"/>
                 <entry key="TRULIOO_URL" value="https://api.globalgateway.io"/>
                 <entry key="WEB_APP_URL" value="http://localhost:9000"/>
+                <entry key="BOXFUSE_DATABASE_PASSWORD" value="persistence" />
+                <entry key="BOXFUSE_DATABASE_URL" value="jdbc:postgresql://localhost:5432/persistence" />
+                <entry key="BOXFUSE_DATABASE_USER" value="persistence" />
             </map>
         </option>
         <option name="play2IsNonDefaultInstallDirUsed" value="false"/>
