@@ -58,7 +58,7 @@ object TransactionMessages {
   implicit val revokeAuthorizationWrites: OWrites[RevokeAuthorization] = Json.writes[RevokeAuthorization]
 
   case class ExecuteAuthorization(grantee: String, messages: Seq[StdMsg]) extends TransactionMessage {
-    def getSigners: Seq[String] = messages.flatMap(_.getSigners)
+    def getSigners: Seq[String] = Seq(grantee)
   }
 
   implicit val executeAuthorizationReads: Reads[ExecuteAuthorization] = Json.reads[ExecuteAuthorization]
