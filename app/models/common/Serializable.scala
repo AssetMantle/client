@@ -1,9 +1,9 @@
 package models.common
 
 import constants.Blockchain.IBCDenoms
-import models.Abstract.{DataValue, TransactionMessage}
+import exceptions.BaseException
+import models.Abstract.DataValue
 import models.common.DataValue._
-import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -52,6 +52,24 @@ object Serializable {
 
     def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
 
+    def isNegative: Boolean = amount < 0
+
+    def isZero: Boolean = amount == MicroNumber.zero
+
+    def add(coin: Coin): Coin = {
+      if (coin.denom != denom) {
+        throw new BaseException(constants.Response.ARITHMETIC_OPERATION_ON_DIFFERENT_COIN)
+      }
+      Coin(denom = denom, amount = amount + coin.amount)
+    }
+
+    def subtract(coin: Coin): Coin = {
+      val result = add(coin.copy(amount = amount * -1))
+      if (result.isNegative) {
+        throw new BaseException(constants.Response.COIN_AMOUNT_NEGATIVE)
+      }
+      result
+    }
   }
 
   def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))

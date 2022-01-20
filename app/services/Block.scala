@@ -6,9 +6,8 @@ import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Trans
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.common.TransactionMessages._
-import models.{blockchain, keyBase, masterTransaction}
+import models.{blockchain, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
@@ -31,7 +30,7 @@ class Block @Inject()(
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
                        blockchainClassifications: blockchain.Classifications,
-                       blockchainDelegations: blockchain.Delegations,
+                       blockchainAuthorizations: blockchain.Authorizations,
                        blockchainIdentities: blockchain.Identities,
                        blockchainMetas: blockchain.Metas,
                        blockchainParameters: blockchain.Parameters,
@@ -103,11 +102,7 @@ class Block @Inject()(
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
 
-      def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = {
-        val a = transactions.head.messages.head
-        val b = Json.toJson(transactions.head.messages.head)
-        blockchainTransactions.Service.insertMultiple(transactions)
-      }
+      def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
       for {
         transactions <- transactions
@@ -197,9 +192,18 @@ class Block @Inject()(
         //auth
         case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => blockchainAccounts.Utility.onCreateVestingAccount(stdMsg.message.asInstanceOf[CreateVestingAccount])
         //authz
-        case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => Future()
-        case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => Future()
-        case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => Future()
+        case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => blockchainAuthorizations.Utility.onGrantAuthorization(stdMsg.message.asInstanceOf[GrantAuthorization])
+        case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => blockchainAuthorizations.Utility.onRevokeAuthorization(stdMsg.message.asInstanceOf[RevokeAuthorization])
+        case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => {
+          val messages = blockchainAuthorizations.Utility.onExecuteAuthorization(stdMsg.message.asInstanceOf[ExecuteAuthorization])
+
+          def processMessages(messages: Seq[StdMsg]) = utilitiesOperations.traverse(messages)(message => actionOnTxMessages(message))
+
+          for {
+            messages <- messages
+            _ <- processMessages(messages)
+          } yield ()
+        }
         //bank
         case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainBalances.Utility.onSendCoin(stdMsg.message.asInstanceOf[SendCoin])
         case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainBalances.Utility.onMultiSend(stdMsg.message.asInstanceOf[MultiSend])

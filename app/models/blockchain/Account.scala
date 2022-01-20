@@ -4,6 +4,7 @@ import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
 import models.common.Serializable.Vesting.VestingParameters
+import models.common.TransactionMessages.CreateVestingAccount
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,10 +12,8 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
-import slick.jdbc.JdbcProfile
-import models.common.PublicKeys._
-import models.common.TransactionMessages.CreateVestingAccount
 import queries.responses.common.Header
+import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}

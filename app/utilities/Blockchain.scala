@@ -1,5 +1,6 @@
 package utilities
 
+import models.Abstract.Authz.Authorization
 import models.common.Serializable.Coin
 
 object Blockchain {
@@ -9,4 +10,12 @@ object Blockchain {
     newCoins ++ add.filter(x => !newCoins.map(_.denom).contains(x.denom))
   } else add
 
+  def subtractCoins(fromCoins: Seq[Coin], amount: Seq[Coin]): (Seq[Coin], Boolean) = {
+    val result = addCoins(fromCoins, amount.map(x => x.copy(amount = x.amount * -1)))
+    (result, result.exists(_.isNegative == true))
+  }
+
+  object Authz {
+    case class ValidateResponse(accept: Boolean, delete: Boolean, updated: Option[Authorization])
+  }
 }

@@ -20,11 +20,6 @@ object PublicKey {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  //  implicit val publicKeyReads: Reads[PublicKey] = (
-  //    (JsPath \ "publicKeyType").read[String] and
-  //      JsPath.read[JsObject]
-  //    ) (publicKeyApply _)
-
   implicit val publicKeyWrites: Writes[PublicKey] = {
     case singlePublicKey: SinglePublicKey => Json.toJson(singlePublicKey)
     case multiSigPublicKey: MultiSigPublicKey => Json.toJson(multiSigPublicKey)
@@ -34,10 +29,4 @@ object PublicKey {
     Json.format[SinglePublicKey].map(x => x: SinglePublicKey) or
       Json.format[MultiSigPublicKey].map(x => x: MultiSigPublicKey)
   }
-
-  //  implicit val publicKeyWrites: Writes[PublicKey] = {
-  //    case singlePublicKey: SinglePublicKey => Json.toJson(singlePublicKey)
-  //    case multiSigPublicKey: MultiSigPublicKey => Json.toJson(multiSigPublicKey)(Json.writes[MultiSigPublicKey])
-  //    case _ => throw new BaseException(constants.Response.NO_SUCH_PUBLIC_KEY_TYPE)
-  //  }
 }
