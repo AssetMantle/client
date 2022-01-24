@@ -2,7 +2,7 @@ package services
 
 import actors.{Message => actorsMessage}
 import exceptions.BaseException
-import models.blockchain.{Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
+import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.common.TransactionMessages._
@@ -29,7 +29,7 @@ class Block @Inject()(
                        blockchainProposalDeposits: blockchain.ProposalDeposits,
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
-                       blockchainClassifications: blockchain.Classifications,
+                       blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
                        blockchainIdentities: blockchain.Identities,
                        blockchainMetas: blockchain.Metas,
@@ -175,12 +175,33 @@ class Block @Inject()(
     val updateAccount = utilitiesOperations.traverse(transaction.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
     // Should always be called after messages are processed, otherwise can create conflict
-    def updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(transaction.getFeePayer)
+    def deductFees = {
+      val deductFeesFrom = if (transaction.getFeeGranter != "") {
+        val grantee = transaction.getFeePayer
+        val feeGrant = blockchainFeeGrants.Service.tryGet(granter = transaction.getFeeGranter, grantee = grantee)
+        def updateOrDeleteFeeGrant(feeGrant: FeeGrant) = {
+          val response = feeGrant.allowance.validate(blockTime = header.time, fees = transaction.fee.amount)
+          if (response.delete) blockchainFeeGrants.Service.delete(granter = transaction.getFeeGranter, grantee = grantee)
+          else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated))
+        }
+        for {
+          feeGrant <- feeGrant
+          _ <- updateOrDeleteFeeGrant(feeGrant)
+        } yield transaction.getFeeGranter
+      } else Future(transaction.getFeePayer)
+
+      def updateBalance(address: String) = blockchainBalances.Utility.insertOrUpdateBalance(address)
+
+      for {
+        deductFeesFrom <- deductFeesFrom
+        _ <- updateBalance(deductFeesFrom)
+      } yield ()
+    }
 
     (for {
       _ <- messages
       _ <- updateAccount
-      _ <- updateBalance
+      _ <- deductFees
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
@@ -217,8 +238,8 @@ class Block @Inject()(
         //evidence
         case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Future()
         //feeGrant
-        case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => Future()
-        case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => Future()
+        case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => blockchainFeeGrants.Utility.onFeeGrantAllowance(stdMsg.message.asInstanceOf[FeeGrantAllowance])
+        case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => blockchainFeeGrants.Utility.onFeeRevokeAllowance(stdMsg.message.asInstanceOf[FeeRevokeAllowance])
         //gov
         case constants.Blockchain.TransactionMessage.DEPOSIT => blockchainProposalDeposits.Utility.onDeposit(stdMsg.message.asInstanceOf[Deposit])
         case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => blockchainProposals.Utility.onSubmitProposal(stdMsg.message.asInstanceOf[SubmitProposal])

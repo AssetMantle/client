@@ -16,6 +16,9 @@ object Authz {
 
   //bank
   case class SendAuthorization(spendLimit: Seq[Coin]) extends AuthzAbstract.Authorization {
+
+    def getAuthorizationType: String = constants.Blockchain.Authz.SEND_AUTHORIZATION
+
     def getMsgTypeURL: String = constants.Blockchain.TransactionMessage.SEND_COIN
 
     def validate(stdMsg: TransactionMessages.StdMsg): ValidateResponse = {
@@ -23,8 +26,6 @@ object Authz {
       if (limitLeft.exists(_.isZero)) ValidateResponse(accept = true, delete = true, updated = None)
       else ValidateResponse(accept = true, delete = false, updated = Option(SendAuthorization(spendLimit = limitLeft)))
     }
-
-    def getAuthorizationType: String = constants.Blockchain.Authz.SEND_AUTHORIZATION
   }
 
   implicit val sendAuthorizationReads: Reads[SendAuthorization] = Json.reads[SendAuthorization]
@@ -33,11 +34,11 @@ object Authz {
 
   //authz
   case class GenericAuthorization(message: String) extends AuthzAbstract.Authorization {
+    def getAuthorizationType: String = constants.Blockchain.Authz.GENERIC_AUTHORIZATION
+
     def getMsgTypeURL: String = message
 
     def validate(stdMsg: TransactionMessages.StdMsg): ValidateResponse = ValidateResponse(accept = true, delete = false, updated = None)
-
-    def getAuthorizationType: String = constants.Blockchain.Authz.GENERIC_AUTHORIZATION
   }
 
   implicit val genericAuthorizationReads: Reads[GenericAuthorization] = Json.reads[GenericAuthorization]
@@ -52,6 +53,9 @@ object Authz {
   implicit val stakeAuthorizationValidatorsWrites: Writes[StakeAuthorizationValidators] = Json.writes[StakeAuthorizationValidators]
 
   case class StakeAuthorization(maxTokens: Option[Coin], allowList: Option[StakeAuthorizationValidators], denyList: Option[StakeAuthorizationValidators], authorizationType: String) extends AuthzAbstract.Authorization {
+
+    def getAuthorizationType: String = constants.Blockchain.Authz.STAKE_AUTHORIZATION
+
     def getMsgTypeURL: String = authorizationType match {
       case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => constants.Blockchain.TransactionMessage.DELEGATE
       case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => constants.Blockchain.TransactionMessage.UNDELEGATE
@@ -72,8 +76,6 @@ object Authz {
       if (limitLeft.isZero) ValidateResponse(accept = true, delete = true, updated = None)
       else ValidateResponse(accept = true, delete = false, updated = Option(this.copy(maxTokens = Option(limitLeft))))
     }
-
-    def getAuthorizationType: String = constants.Blockchain.Authz.STAKE_AUTHORIZATION
   }
 
   implicit val stakeAuthorizationReads: Reads[StakeAuthorization] = Json.reads[StakeAuthorization]

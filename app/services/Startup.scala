@@ -8,7 +8,7 @@ import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
-import queries.blockchain.{GetABCIInfo, GetBlockResults, GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply, GetUnbondedValidators, GetUnbondingValidators}
+import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
@@ -34,6 +34,8 @@ class Startup @Inject()(
                          blockchainParameters: blockchain.Parameters,
                          blockchainDelegations: blockchain.Delegations,
                          blockchainValidators: blockchain.Validators,
+                         blockchainAuthorizations: blockchain.Authorizations,
+                         blockchainFeeGrants: blockchain.FeeGrants,
                          blocksServices: Block,
                          blockchainTokens: blockchain.Tokens,
                          blockchainRedelegations: blockchain.Redelegations,
@@ -80,6 +82,8 @@ class Startup @Inject()(
       _ <- insertGenesisTransactionsOnStart(genesis.app_state.genutil.gen_txs, chainID = genesis.chain_id, initialHeight = genesis.initial_height.toInt, genesisTime = genesis.genesis_time)
       _ <- updateDistributionOnStart(genesis.app_state.distribution)
       _ <- insertAllTokensOnStart()
+      _ <- insertAuthorizationsOnStart(genesis.app_state.authz.authorization)
+      _ <- insertFeeGrantsOnStart(genesis.app_state.feegrant.allowances)
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
@@ -195,6 +199,26 @@ class Startup @Inject()(
   private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
     val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 
+    (for {
+      _ <- insert
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  })
+
+  def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
+    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.toSerializable.value.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable, expiration = authorization.expiration))
+    (for {
+      _ <- insert
+    } yield ()
+      ).recover {
+      case baseException: BaseException => throw baseException
+    }
+  })
+
+  def insertFeeGrantsOnStart(allowances: Seq[FeeGrant.Allowance]): Future[Seq[Unit]] = utilitiesOperations.traverse(allowances)(allowance => {
+    val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.toSerializable))
     (for {
       _ <- insert
     } yield ()

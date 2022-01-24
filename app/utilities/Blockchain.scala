@@ -1,6 +1,7 @@
 package utilities
 
 import models.Abstract.Authz.Authorization
+import models.common.FeeGrant.Allowance
 import models.common.Serializable.Coin
 
 object Blockchain {
@@ -17,5 +18,9 @@ object Blockchain {
 
   object Authz {
     case class ValidateResponse(accept: Boolean, delete: Boolean, updated: Option[Authorization])
+  }
+
+  object FeeGrant {
+    case class ValidateResponse(delete: Boolean, updated: Allowance)
   }
 }

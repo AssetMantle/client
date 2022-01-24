@@ -20,22 +20,12 @@ case class Transaction(hash: String, height: Int, code: Int, rawLog: String, gas
 
   def status: Boolean = code == 0
 
-  def getSigners: Seq[String] = {
-    var seen: Map[String, Boolean] = Map()
-    var signers: Seq[String] = Seq()
-    messages.foreach(message => message.getSigners.foreach(signer => {
-      if (!seen.getOrElse(signer, false)) {
-        signers = signers :+ signer
-        seen = seen + (signer -> true)
-      }
-    }))
-    signers
-  }
+  // Since Seq in scala is by default immutable and ordering is maintained, we can use these methods directly
+  def getSigners: Seq[String] = messages.flatMap(_.getSigners).distinct
 
-  def getFeePayer: String = {
-    val signers = getSigners
-    if (signers.nonEmpty) signers.head else ""
-  }
+  def getFeePayer: String = if (fee.payer != "") fee.payer else getSigners.headOption.getOrElse("")
+
+  def getFeeGranter: String = fee.granter
 
 }
 

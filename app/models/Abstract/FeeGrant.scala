@@ -1,11 +1,15 @@
 package models.Abstract
 
 import models.common.FeeGrant.{AllowedMsgAllowance, BasicAllowance, PeriodicAllowance}
-import play.api.libs.functional.syntax.toAlternativeOps
-import play.api.libs.json.{Json, Reads, Writes}
+import models.common.Serializable.Coin
+import play.api.libs.json.{Json, Writes}
 
 object FeeGrant {
-  abstract class FeeAllowance {}
+  abstract class FeeAllowance {
+    def getExpiration: Option[String]
+
+    def validate(blockTime: String, fees: Seq[Coin]): (Boolean, FeeAllowance)
+  }
 
   implicit val feeAllowanceWrites: Writes[FeeAllowance] = {
     case basicAllowance: BasicAllowance => Json.toJson(basicAllowance)

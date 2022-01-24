@@ -4,7 +4,7 @@ import exceptions.BaseException
 import models.common.{Serializable, Authz => SerializableAuthz}
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Json, Reads}
+import play.api.libs.json.{Format, JsObject, JsPath, Json, Reads}
 import queries.Abstract.{Authz => AuthzAbstract}
 
 object Authz {
@@ -12,6 +12,19 @@ object Authz {
   implicit val module: String = constants.Module.TRANSACTION_MESSAGE_RESPONSES_AUTHZ
 
   implicit val logger: Logger = Logger(this.getClass)
+
+  def authorizationApply(authorizationType: String, value: JsObject): Authorization = try {
+    authorizationType match {
+      case constants.Blockchain.Authz.SEND_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[SendAuthorization](value.toString))
+      case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[GenericAuthorization](value.toString))
+      case constants.Blockchain.Authz.STAKE_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[StakeAuthorization](value.toString))
+      case _ => throw new BaseException(constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE)
+    }
+  } catch {
+    case baseException: BaseException => throw baseException
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      throw new BaseException(constants.Response.GRANT_AUTHORIZATION_RESPONSE_STRUCTURE_CHANGED)
+  }
 
   //bank
   case class SendAuthorization(spend_limit: Seq[Coin]) extends AuthzAbstract.Authorization {
@@ -42,19 +55,6 @@ object Authz {
 
   case class Authorization(authorizationType: String, value: AuthzAbstract.Authorization) {
     def toSerializable: SerializableAuthz.Authorization = SerializableAuthz.Authorization(authorizationType = authorizationType, value = value.toSerializable)
-  }
-
-  def authorizationApply(authorizationType: String, value: JsObject): Authorization = try {
-    authorizationType match {
-      case constants.Blockchain.Authz.SEND_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[SendAuthorization](value.toString))
-      case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[GenericAuthorization](value.toString))
-      case constants.Blockchain.Authz.STAKE_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[StakeAuthorization](value.toString))
-      case _ => throw new BaseException(constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE)
-    }
-  } catch {
-    case baseException: BaseException => throw baseException
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      throw new BaseException(constants.Response.GRANT_AUTHORIZATION_RESPONSE_STRUCTURE_CHANGED)
   }
 
   implicit val authorizationReads: Reads[Authorization] = (

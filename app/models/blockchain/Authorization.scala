@@ -80,9 +80,9 @@ class Authorizations @Inject()(
 
     def * = (granter, grantee, msgTypeURL, grantedAuthorization, expiration, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AuthorizationSerialized.tupled, AuthorizationSerialized.unapply)
 
-    def granter = column[String]("address", O.PrimaryKey)
+    def granter = column[String]("granter", O.PrimaryKey)
 
-    def grantee = column[String]("address", O.PrimaryKey)
+    def grantee = column[String]("grantee", O.PrimaryKey)
 
     def msgTypeURL = column[String]("msgTypeURL", O.PrimaryKey)
 
@@ -121,9 +121,9 @@ class Authorizations @Inject()(
   object Utility {
 
     def onGrantAuthorization(grantAuthorization: GrantAuthorization)(implicit header: Header): Future[Unit] = {
-      val insert = Service.create(granter = grantAuthorization.granter, grantee = grantAuthorization.grantee, msgTypeURL = grantAuthorization.grant.authorization.value.getMsgTypeURL, grantedAuthorization = grantAuthorization.grant.authorization, expiration = grantAuthorization.grant.expiration)
+      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.granter, grantee = grantAuthorization.grantee, msgTypeURL = grantAuthorization.grant.authorization.value.getMsgTypeURL, grantedAuthorization = grantAuthorization.grant.authorization, expiration = grantAuthorization.grant.expiration))
       (for {
-        _ <- insert
+        _ <- insertOrUpdate
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }

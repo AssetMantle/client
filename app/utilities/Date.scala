@@ -1,10 +1,11 @@
 package utilities
 
-import java.sql.Timestamp
-import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime, Instant}
 import exceptions.BaseException
 import play.api.Logger
+
+import java.sql.Timestamp
+import java.time.format.{DateTimeFormatter, FormatStyle}
+import java.time.{Instant, LocalDateTime, ZoneId, ZonedDateTime}
 
 object Date {
 
@@ -20,49 +21,69 @@ object Date {
 
   def getTimeFromSqlTimestamp(sqlTime: java.sql.Timestamp): String = ZonedDateTime.parse(sqlTime.toInstant.toString).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
-  def stringDateToTimeStamp(stringDate: String): Timestamp =
-    try {
-      Timestamp.valueOf(stringDate)
-    } catch {
-      case _: Exception => new Timestamp(System.currentTimeMillis())
-    }
-
-  def bcTimestampToZonedDateTime(timestamp: String): ZonedDateTime = {
-    try {
-      ZonedDateTime.parse(timestamp)
-    } catch {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-        ZonedDateTime.now()
-    }
+  def stringDateToTimeStamp(stringDate: String): Timestamp = try {
+    Timestamp.valueOf(stringDate)
+  } catch {
+    case _: Exception => new Timestamp(System.currentTimeMillis())
   }
 
-  def bcTimestampToString(timestamp: String): String = {
-    try {
-      ZonedDateTime.parse(timestamp).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)).format(dateTimeFormat)
-    } catch {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-        timestamp
-    }
+  def bcTimestampToZonedDateTime(timestamp: String): ZonedDateTime = try {
+    ZonedDateTime.parse(timestamp)
+  } catch {
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      ZonedDateTime.now()
   }
 
-  def isMature(completionTimestamp: String, currentTimeStamp: String): Boolean = {
-    try {
-      val completionTime = ZonedDateTime.parse(completionTimestamp)
-      val currentTime = ZonedDateTime.parse(currentTimeStamp)
-      currentTime.isEqual(completionTime) || currentTime.isAfter(completionTime)
-    } catch {
-      case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
-    }
+  def bcTimestampToString(timestamp: String): String = try {
+    ZonedDateTime.parse(timestamp).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)).format(dateTimeFormat)
+  } catch {
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      timestamp
   }
 
-  def addTime(timestamp: String, addEpochTime: Long): String = {
-    try {
-      ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(timestamp).toEpochSecond + addEpochTime), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
-    } catch {
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_DATA_TYPE)
-    }
+  def isMature(completionTimestamp: String, currentTimeStamp: String): Boolean = try {
+    val completionTime = ZonedDateTime.parse(completionTimestamp)
+    val currentTime = ZonedDateTime.parse(currentTimeStamp)
+    currentTime.isEqual(completionTime) || currentTime.isAfter(completionTime)
+  } catch {
+    case exception: Exception => logger.error(exception.getMessage)
+      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
   }
 
+  def isAfter(t1: String, t2: String): Boolean = try {
+    ZonedDateTime.parse(t1).isAfter(ZonedDateTime.parse(t2))
+  } catch {
+    case exception: Exception => logger.error(exception.getMessage)
+      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+  }
+
+  def isBefore(t1: String, t2: String): Boolean = try {
+    ZonedDateTime.parse(t1).isBefore(ZonedDateTime.parse(t2))
+  } catch {
+    case exception: Exception => logger.error(exception.getMessage)
+      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+  }
+
+  def addTime(timestamp: String, addEpochTime: Long): String = try {
+    ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(timestamp).toEpochSecond + addEpochTime), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+  } catch {
+    case exception: Exception => logger.error(exception.getLocalizedMessage)
+      throw new BaseException(constants.Response.INVALID_DATA_TYPE)
+  }
+
+  def addTime(t1: String, t2: String): String = try {
+    ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(t1).toEpochSecond + ZonedDateTime.parse(t2).toEpochSecond), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+  } catch {
+    case exception: Exception => logger.error(exception.getMessage)
+      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+  }
+
+  def getEpoch(time: String): Long = {
+    time.split("").last match {
+      case "s" => time.dropRight(1).toLong
+      case "m" => 60 * time.dropRight(1).toLong
+      case "h" => 60 * 60 * time.dropRight(1).toLong
+      case _ => throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+  }
 }

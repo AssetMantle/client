@@ -4,6 +4,8 @@ import models.Abstract.Parameter
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
 import models.common.Parameters.GovernanceParameter
 import models.common.Serializable
+import queries.responses.common.{Authz => commonAuthz}
+import queries.responses.common.{FeeGrant => commonFeeGrant}
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
 import queries.responses.blockchain.TransactionResponse._
@@ -52,7 +54,7 @@ object GenesisResponse {
 
   object Authz {
 
-    case class Authorization(granter: String, grantee: String, expiration: String, authorization: Authz.Authorization)
+    case class Authorization(granter: String, grantee: String, expiration: String, authorization: commonAuthz.Authorization)
 
     implicit val authorizationReads: Reads[Authorization] = Json.reads[Authorization]
 
@@ -91,7 +93,7 @@ object GenesisResponse {
 
   object FeeGrant {
 
-    case class Allowance(granter: String, grantee: String, allowance: FeeGrant.Allowance)
+    case class Allowance(granter: String, grantee: String, allowance: commonFeeGrant.Allowance)
 
     implicit val allowanceReads: Reads[Allowance] = Json.reads[Allowance]
 
