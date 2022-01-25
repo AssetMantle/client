@@ -198,7 +198,7 @@ class Redelegations @Inject()(
       def update(optionalDelegation: Option[Delegation], destinationValidator: Validator) = optionalDelegation.fold(Future(MicroNumber.zero))(delegation => {
         val updateEntries = utilitiesOperations.traverse(redelegation.entries)(entry => {
           val sharesToUnbond = slashingFraction * entry.sharesDestination
-          val unbond = if (!(entry.creationHeight < infractionHeight) || !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTIme) || !(sharesToUnbond < 0)) {
+          val unbond = if (entry.creationHeight >= infractionHeight && !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTIme) && sharesToUnbond != 0) {
             val slashShares = if (sharesToUnbond > delegation.shares) delegation.shares else sharesToUnbond
             blockchainUndelegations.Utility.unbond(delegation, destinationValidator, slashShares)
           } else Future(MicroNumber.zero)
