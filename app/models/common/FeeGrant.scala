@@ -32,7 +32,7 @@ object FeeGrant {
     def getExpiration: Option[RFC3339] = expiration
 
     def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (getExpiration.fold(false)(expiry => expiry.isBefore(blockTime)))
+      if (getExpiration.fold(false)(_.isBefore(blockTime)))
         (true, this)
       else if (spendLimit.nonEmpty) {
         val (left, _) = utilities.Blockchain.subtractCoins(spendLimit, fees)
@@ -49,7 +49,7 @@ object FeeGrant {
     def getExpiration: Option[RFC3339] = basicAllowance.getExpiration
 
     def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (getExpiration.fold(false)(expiry => blockTime.isAfter(expiry)))
+      if (getExpiration.fold(false)(_.isBefore(blockTime)))
         (true, this)
       else {
         val (resetPeriodCanSpend, updatedPeriodReset) = if (!blockTime.isBefore(this.periodReset)) {

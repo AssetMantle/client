@@ -27,7 +27,7 @@ object TransactionMessages {
   implicit val stdMsgWrites: Writes[StdMsg] = Json.writes[StdMsg]
 
   //auth
-  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: RFC3339, delayed: Boolean) extends TransactionMessage {
+  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: String, delayed: Boolean) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(fromAddress)
   }
 
@@ -397,7 +397,7 @@ object TransactionMessages {
   implicit val acknowledgementWrites: OWrites[Acknowledgement] = Json.writes[Acknowledgement]
 
   //ibc-transfer
-  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: RFC3339) extends TransactionMessage {
+  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: String) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(sender)
   }
 

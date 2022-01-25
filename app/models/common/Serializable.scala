@@ -225,7 +225,7 @@ object Serializable {
 
     implicit val vestingPeriodWrites: OWrites[VestingPeriod] = Json.writes[VestingPeriod]
 
-    case class VestingParameters(originalVesting: Seq[Coin], delegatedFree: Seq[Coin], delegatedVesting: Seq[Coin], endTime: RFC3339, startTime: Option[RFC3339], vestingPeriods: Seq[VestingPeriod])
+    case class VestingParameters(originalVesting: Seq[Coin], delegatedFree: Seq[Coin], delegatedVesting: Seq[Coin], endTime: String, startTime: Option[String], vestingPeriods: Seq[VestingPeriod])
 
     implicit val vestingParametersReads: Reads[VestingParameters] = Json.reads[VestingParameters]
 

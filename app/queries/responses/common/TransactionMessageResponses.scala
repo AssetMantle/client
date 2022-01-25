@@ -19,7 +19,7 @@ object TransactionMessageResponses {
   implicit val logger: Logger = Logger(this.getClass)
 
   //auth
-  case class CreateVestingAccount(from_address: String, to_address: String, amount: Seq[Coin], end_time: RFC3339, delayed: Boolean) extends TransactionMessageResponse {
+  case class CreateVestingAccount(from_address: String, to_address: String, amount: Seq[Coin], end_time: String, delayed: Boolean) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.CreateVestingAccount(fromAddress = from_address, toAddress = to_address, amount = amount.map(_.toCoin), endTime = end_time, delayed = delayed)
   }
 
@@ -322,7 +322,7 @@ object TransactionMessageResponses {
   implicit val acknowledgementReads: Reads[Acknowledgement] = Json.reads[Acknowledgement]
 
   //ibc-transfer
-  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: RFC3339) extends TransactionMessageResponse {
+  case class Transfer(source_port: String, source_channel: String, token: Coin, sender: String, receiver: String, timeout_height: ClientHeight, timeout_timestamp: String) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.Transfer(sourcePort = source_port, sourceChannel = source_channel, token = token.toCoin, sender = sender, receiver = receiver, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
   }
 

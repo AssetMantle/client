@@ -8,7 +8,6 @@ import models.common.Serializable.Vesting.VestingParameters
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.{Account, PublicKey}
-import utilities.Date.RFC3339
 
 object Accounts {
 
@@ -30,7 +29,7 @@ object Accounts {
 
   implicit val moduleAccountReads: Reads[ModuleAccount] = Json.reads[ModuleAccount]
 
-  case class BaseVestingAccount(base_account: BaseAccount, original_vesting: Seq[Coin], delegated_free: Seq[Coin], delegated_vesting: Seq[Coin], end_time: RFC3339)
+  case class BaseVestingAccount(base_account: BaseAccount, original_vesting: Seq[Coin], delegated_free: Seq[Coin], delegated_vesting: Seq[Coin], end_time: String)
 
   implicit val baseVestingAccountReads: Reads[BaseVestingAccount] = Json.reads[BaseVestingAccount]
 
@@ -42,7 +41,7 @@ object Accounts {
 
   implicit val delayedVestingAccountReads: Reads[DelayedVestingAccount] = Json.reads[DelayedVestingAccount]
 
-  case class ContinuousVestingAccount(base_vesting_account: BaseVestingAccount, start_time: RFC3339) extends Account {
+  case class ContinuousVestingAccount(base_vesting_account: BaseVestingAccount, start_time: String) extends Account {
     val address: String = base_vesting_account.base_account.address
 
     def toSerializableAccount(username: String): BlockchainAccount = BlockchainAccount(address = base_vesting_account.base_account.address, username = username, accountType = constants.Blockchain.Account.CONTINUOUS_VESTING, publicKey = base_vesting_account.base_account.public_key.fold[Option[SerializablePublicKey]](None)(x => Option(x.toSerializablePublicKey)), accountNumber = base_vesting_account.base_account.account_number.toInt, sequence = base_vesting_account.base_account.sequence.toInt, vestingParameters = Option(VestingParameters(originalVesting = base_vesting_account.original_vesting.map(_.toCoin), delegatedFree = base_vesting_account.delegated_free.map(_.toCoin), delegatedVesting = base_vesting_account.delegated_vesting.map(_.toCoin), endTime = base_vesting_account.end_time, startTime = Option(start_time), vestingPeriods = Seq())))
@@ -56,7 +55,7 @@ object Accounts {
 
   implicit val vestingPeriodReads: Reads[VestingPeriod] = Json.reads[VestingPeriod]
 
-  case class PeriodicVestingAccount(base_vesting_account: BaseVestingAccount, start_time: RFC3339, vesting_periods: Seq[VestingPeriod]) extends Account {
+  case class PeriodicVestingAccount(base_vesting_account: BaseVestingAccount, start_time: String, vesting_periods: Seq[VestingPeriod]) extends Account {
     val address: String = base_vesting_account.base_account.address
 
     def toSerializableAccount(username: String): BlockchainAccount = BlockchainAccount(address = base_vesting_account.base_account.address, username = username, accountType = constants.Blockchain.Account.CONTINUOUS_VESTING, publicKey = base_vesting_account.base_account.public_key.fold[Option[SerializablePublicKey]](None)(x => Option(x.toSerializablePublicKey)), accountNumber = base_vesting_account.base_account.account_number.toInt, sequence = base_vesting_account.base_account.sequence.toInt, vestingParameters = Option(VestingParameters(originalVesting = base_vesting_account.original_vesting.map(_.toCoin), delegatedFree = base_vesting_account.delegated_free.map(_.toCoin), delegatedVesting = base_vesting_account.delegated_vesting.map(_.toCoin), endTime = base_vesting_account.end_time, startTime = Option(start_time), vestingPeriods = vesting_periods.map(_.toSerializableVestingPeriod))))

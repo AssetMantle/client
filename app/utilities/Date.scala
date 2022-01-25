@@ -14,8 +14,6 @@ object Date {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val dateTimeFormat: LocalDateTime = LocalDateTime.of(2016, 8, 23, 13, 12, 45)
-
   def utilDateToSQLDate(utilDate: java.util.Date): java.sql.Date = new java.sql.Date(utilDate.getTime)
 
   def sqlDateToUtilDate(sqlDate: java.sql.Date): java.util.Date = new java.util.Date(sqlDate.getTime)
@@ -46,9 +44,9 @@ object Date {
 
   case class RFC3339(timestamp: String) {
 
-    def unix: Long = ZonedDateTime.parse(this.timestamp).toEpochSecond
+    def zonedDateTime: ZonedDateTime = ZonedDateTime.parse(this.timestamp)
 
-    def zonedDateTime: ZonedDateTime = ZonedDateTime.parse(timestamp)
+    def unix: Long = zonedDateTime.toEpochSecond
 
     override def toString: String = this.timestamp
 
