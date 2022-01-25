@@ -176,7 +176,7 @@ class Redelegations @Inject()(
       val redelegation = Service.tryGet(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
 
       def updateOrDelete(redelegation: Redelegation) = {
-        val updatedEntries = redelegation.entries.filter(entry => !currentBlockTimeStamp.isAfterOrEqual(entry.completionTime))
+        val updatedEntries = redelegation.entries.filterNot(_.isMature(currentBlockTimeStamp))
         if (updatedEntries.isEmpty) Service.delete(delegatorAddress = redelegation.delegatorAddress, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
         else Service.insertOrUpdate(redelegation.copy(entries = updatedEntries))
       }
@@ -196,7 +196,7 @@ class Redelegations @Inject()(
       def update(optionalDelegation: Option[Delegation], destinationValidator: Validator) = optionalDelegation.fold(Future(MicroNumber.zero))(delegation => {
         val updateEntries = utilitiesOperations.traverse(redelegation.entries)(entry => {
           val sharesToUnbond = slashingFraction * entry.sharesDestination
-          val unbond = if (!(entry.creationHeight < infractionHeight) || !currentBlockTIme.isAfterOrEqual(entry.completionTime) || !(sharesToUnbond < 0)) {
+          val unbond = if (entry.creationHeight >= infractionHeight && !entry.isMature(currentBlockTIme) && sharesToUnbond != 0) {
             val slashShares = if (sharesToUnbond > delegation.shares) delegation.shares else sharesToUnbond
             blockchainUndelegations.Utility.unbond(delegation, destinationValidator, slashShares)
           } else Future(MicroNumber.zero)

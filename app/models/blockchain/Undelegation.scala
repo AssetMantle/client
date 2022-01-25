@@ -169,7 +169,7 @@ class Undelegations @Inject()(
       val undelegation = Service.tryGet(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
       def updateOrDelete(undelegation: Undelegation) = {
-        val updatedEntries = undelegation.entries.filter(entry => !currentBlockTimeStamp.isAfterOrEqual(entry.completionTime))
+        val updatedEntries = undelegation.entries.filterNot(_.isMature(currentBlockTimeStamp))
         if (updatedEntries.isEmpty) Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress)
         else Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
       }
@@ -187,7 +187,7 @@ class Undelegations @Inject()(
       val updatedEntries = undelegation.entries.map(entry => {
         val slashAmount = MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
         val unbondingSlashAmount = if (slashAmount < entry.balance) slashAmount else entry.balance
-        if (!(entry.creationHeight < infractionHeight) && !currentBlockTime.isAfterOrEqual(entry.completionTime) && unbondingSlashAmount != MicroNumber.zero) {
+        if (entry.creationHeight >= infractionHeight && !entry.isMature(currentBlockTime) && unbondingSlashAmount != MicroNumber.zero) {
           entry.copy(balance = entry.balance - unbondingSlashAmount)
         } else entry
       })

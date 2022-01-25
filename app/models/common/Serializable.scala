@@ -97,13 +97,18 @@ object Serializable {
 
   implicit val notificationTemplateWrites: OWrites[NotificationTemplate] = Json.writes[NotificationTemplate]
 
-  case class RedelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, sharesDestination: BigDecimal)
+  case class RedelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, sharesDestination: BigDecimal) {
+    def isMature(currentTime: RFC3339): Boolean = !this.completionTime.isAfter(currentTime)
+  }
 
   implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
 
   implicit val redelegationEntryWrites: OWrites[RedelegationEntry] = Json.writes[RedelegationEntry]
 
-  case class UndelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, balance: MicroNumber)
+  case class UndelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, balance: MicroNumber) {
+    def isMature(currentTime: RFC3339): Boolean = !this.completionTime.isAfter(currentTime)
+  }
+
 
   implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
 
