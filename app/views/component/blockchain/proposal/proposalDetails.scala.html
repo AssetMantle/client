@@ -12,11 +12,11 @@
         @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
         @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
         @commonTextInfo(constants.View.STATUS, Messages(proposal.status))
-        @commonTextInfo(constants.View.SUBMIT_TIME, utilities.Date.bcTimestampToString(proposal.submitTime))
-        @commonTextInfo(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime)
+        @commonRFC3339Info(constants.View.SUBMIT_TIME, proposal.submitTime, "proposalSubmitTime")
+        @commonRFC3339Info(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime, "proposalDepositEndTime")
         @commonTextInfo(constants.View.TOTAL_DEPOSIT, proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(","))
-        @commonTextInfo(constants.View.VOTING_START, proposal.votingStartTime)
-        @commonTextInfo(constants.View.VOTING_END, proposal.votingEndTime)
+        @commonRFC3339Info(constants.View.VOTING_START, proposal.votingStartTime, "proposalVotingStartTime")
+        @commonRFC3339Info(constants.View.VOTING_END, proposal.votingEndTime, "proposalVotingEndTime")
         <div>
             @Messages(constants.View.FINAL_TALLY_RESULTS):
             @commonTextInfo(constants.View.YES, proposal.finalTallyResult.yes.toString())
@@ -43,7 +43,7 @@
                     @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
                         commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
                         commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
-                        commonTextInfo(constants.View.TIME, softwareUpgrade.plan.time)
+                        commonRFC3339Info(constants.View.TIME, softwareUpgrade.plan.time, "softwareUpgradePlanTime")
                         commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
                     })
                 }

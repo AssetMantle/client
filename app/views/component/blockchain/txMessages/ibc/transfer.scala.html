@@ -11,6 +11,6 @@
     @commonHtmlInfo(constants.View.SENDER, commonJavascriptLink(transfer.sender, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${transfer.sender}'))")))
     @commonTextInfo(constants.View.RECEIVER, transfer.receiver)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.TIMEOUT_HEIGHT, transfer.timeoutHeight)
-    @commonTextInfo(constants.View.TIMEOUT_TIMESTAMP, transfer.timeoutTimestamp)
+    @commonRFC3339Info(constants.View.TIMEOUT_TIMESTAMP, transfer.timeoutTimestamp, "transferTimeoutTimestamp")
 
 }

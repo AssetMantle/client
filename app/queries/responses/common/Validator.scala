@@ -5,6 +5,7 @@ import models.common.Serializable
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import queries.Abstract.PublicKey
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object Validator {
@@ -15,7 +16,7 @@ object Validator {
 
   implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
 
-  case class Commission(commission_rates: CommissionRates, update_time: String) {
+  case class Commission(commission_rates: CommissionRates, update_time: RFC3339) {
     def toCommission: Serializable.Validator.Commission = Serializable.Validator.Commission(commissionRates = commission_rates.toCommissionRates, updateTime = update_time)
   }
 
@@ -27,7 +28,7 @@ object Validator {
 
   implicit val descriptionReads: Reads[Description] = Json.reads[Description]
 
-  case class Result(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String) {
+  case class Result(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: RFC3339, commission: Commission, min_self_delegation: String) {
     def toValidator: BlockchainValidator = BlockchainValidator(
       operatorAddress = operator_address,
       hexAddress = utilities.Bech32.convertValidatorPublicKeyToHexAddress(consensus_pubkey.toSerializablePublicKey.value),
@@ -44,7 +45,7 @@ object Validator {
   }
 
   def resultApply(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: String, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: String, commission: Commission, min_self_delegation: String): Result = Result(
-    operator_address = operator_address, consensus_pubkey = consensus_pubkey, jailed = jailed, status = status, tokens = new MicroNumber(BigInt(tokens)), delegator_shares = delegator_shares, description = description, unbonding_height = unbonding_height, unbonding_time = unbonding_time, commission = commission, min_self_delegation = min_self_delegation)
+    operator_address = operator_address, consensus_pubkey = consensus_pubkey, jailed = jailed, status = status, tokens = new MicroNumber(BigInt(tokens)), delegator_shares = delegator_shares, description = description, unbonding_height = unbonding_height, unbonding_time = RFC3339(unbonding_time), commission = commission, min_self_delegation = min_self_delegation)
 
   implicit val resultReads: Reads[Result] = (
     (JsPath \ "operator_address").read[String] and

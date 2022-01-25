@@ -6,6 +6,7 @@ import models.common.Serializable._
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object TransactionMessages {
@@ -26,7 +27,7 @@ object TransactionMessages {
   implicit val stdMsgWrites: Writes[StdMsg] = Json.writes[StdMsg]
 
   //auth
-  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: String, delayed: Boolean) extends TransactionMessage {
+  case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: RFC3339, delayed: Boolean) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(fromAddress)
   }
 
@@ -35,7 +36,7 @@ object TransactionMessages {
   implicit val createVestingAccountWrites: OWrites[CreateVestingAccount] = Json.writes[CreateVestingAccount]
 
   //authz
-  case class Grant(authorization: Authz.Authorization, expiration: String)
+  case class Grant(authorization: Authz.Authorization, expiration: RFC3339)
 
   implicit val grantReads: Reads[Grant] = Json.reads[Grant]
 
@@ -136,7 +137,7 @@ object TransactionMessages {
 
   implicit val fundCommunityPoolWrites: OWrites[FundCommunityPool] = Json.writes[FundCommunityPool]
 
-  case class Equivocation(height: Int, time: String, power: String, consensusAddress: String)
+  case class Equivocation(height: Int, time: RFC3339, power: String, consensusAddress: String)
 
   implicit val equivocationReads: Reads[Equivocation] = Json.reads[Equivocation]
 
@@ -396,7 +397,7 @@ object TransactionMessages {
   implicit val acknowledgementWrites: OWrites[Acknowledgement] = Json.writes[Acknowledgement]
 
   //ibc-transfer
-  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: String) extends TransactionMessage {
+  case class Transfer(sourcePort: String, sourceChannel: String, token: Coin, sender: String, receiver: String, timeoutHeight: ClientHeight, timeoutTimestamp: RFC3339) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(sender)
   }
 

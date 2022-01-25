@@ -1,24 +1,22 @@
 package models.blockchain
 
-import java.sql.Timestamp
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
-import models.common.Parameters.SlashingParameter
 import models.common.Serializable.RedelegationEntry
 import models.common.TransactionMessages.Redelegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
-import queries.blockchain.{GetDelegatorRedelegations, GetValidatorDelegatorDelegation}
-import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.{Response => ValidatorDelegatorDelegationResponse}
+import queries.blockchain.GetDelegatorRedelegations
 import queries.responses.blockchain.DelegatorRedelegationsResponse.{Response => DelegatorRedelegationsResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -174,11 +172,11 @@ class Redelegations @Inject()(
       }
     }
 
-    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String, currentBlockTimeStamp: String): Future[Unit] = {
+    def onRedelegationCompletionEvent(delegator: String, srcValidator: String, dstValidator: String, currentBlockTimeStamp: RFC3339): Future[Unit] = {
       val redelegation = Service.tryGet(delegatorAddress = delegator, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
 
       def updateOrDelete(redelegation: Redelegation) = {
-        val updatedEntries = redelegation.entries.filter(entry => !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTimeStamp))
+        val updatedEntries = redelegation.entries.filter(entry => !currentBlockTimeStamp.isAfterOrEqual(entry.completionTime))
         if (updatedEntries.isEmpty) Service.delete(delegatorAddress = redelegation.delegatorAddress, validatorSourceAddress = srcValidator, validatorDestinationAddress = dstValidator)
         else Service.insertOrUpdate(redelegation.copy(entries = updatedEntries))
       }
@@ -191,14 +189,14 @@ class Redelegations @Inject()(
       }
     }
 
-    def slashRedelegation(redelegation: Redelegation, infractionHeight: Int, currentBlockTIme: String, slashingFraction: BigDecimal): Future[MicroNumber] = {
+    def slashRedelegation(redelegation: Redelegation, infractionHeight: Int, currentBlockTIme: RFC3339, slashingFraction: BigDecimal): Future[MicroNumber] = {
       val delegation = blockchainDelegations.Service.get(delegatorAddress = redelegation.delegatorAddress, operatorAddress = redelegation.validatorDestinationAddress)
       val destinationValidator = blockchainValidators.Service.tryGet(redelegation.validatorDestinationAddress)
 
       def update(optionalDelegation: Option[Delegation], destinationValidator: Validator) = optionalDelegation.fold(Future(MicroNumber.zero))(delegation => {
         val updateEntries = utilitiesOperations.traverse(redelegation.entries)(entry => {
           val sharesToUnbond = slashingFraction * entry.sharesDestination
-          val unbond = if (!(entry.creationHeight < infractionHeight) || !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTIme) || !(sharesToUnbond < 0)) {
+          val unbond = if (!(entry.creationHeight < infractionHeight) || !currentBlockTIme.isAfterOrEqual(entry.completionTime) || !(sharesToUnbond < 0)) {
             val slashShares = if (sharesToUnbond > delegation.shares) delegation.shares else sharesToUnbond
             blockchainUndelegations.Utility.unbond(delegation, destinationValidator, slashShares)
           } else Future(MicroNumber.zero)

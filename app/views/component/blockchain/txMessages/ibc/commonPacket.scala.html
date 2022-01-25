@@ -12,5 +12,5 @@
     @commonTextInfo(constants.View.DESTINATION_CHANNEL, packet.destinationChannel)
     @views.html.component.blockchain.txMessages.ibc.commonFungibleTokenPacketData(constants.View.DATA, packet.data)
     @views.html.component.blockchain.txMessages.ibc.commonClientHeight(constants.View.TIMEOUT_HEIGHT, packet.timeoutHeight)
-    @commonTextInfo(constants.View.TIMEOUT_TIMESTAMP, packet.timeoutTimestamp)
+    @commonRFC3339Info(constants.View.TIMEOUT_TIMESTAMP, packet.timeoutTimestamp, "packetTimeoutTimestamp")
 </div>

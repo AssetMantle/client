@@ -8,9 +8,6 @@
 @defining(msg.asInstanceOf[GrantAuthorization]) { grantAuthorization =>
     @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(grantAuthorization.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.granter}'))")))
     @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(grantAuthorization.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${grantAuthorization.grantee}'))")))
-    @commonTextInfo(constants.View.EXPIRATION, "", 'id -> s"grantAuthorization_${index}")
+    @commonRFC3339Info(constants.View.EXPIRATION, grantAuthorization.grant.expiration, s"grantAuthorization_${index}")
     @authorization(grantAuthorization.grant.authorization)
-  <script>
-        convertUTCDateToLocalDate('@grantAuthorization.grant.expiration', "grantAuthorization_@index")
-  </script>
 }

@@ -19,6 +19,7 @@ import queries.responses.blockchain.MintingInflationResponse.{Response => Mintin
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.common.Header
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -147,7 +148,7 @@ class Startup @Inject()(
   }
 
   // IMPORTANT: Assuming all GenTxs are valid txs and successfully goes through
-  private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: String): Future[Unit] = {
+  private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: RFC3339): Future[Unit] = {
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
       val updateTx = utilitiesOperations.traverse(genTx.body.messages)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
       val updateAccount = utilitiesOperations.traverse(genTx.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
@@ -252,7 +253,7 @@ class Startup @Inject()(
     }
   }
 
-  private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: String): Future[Unit] = {
+  private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: RFC3339): Future[Unit] = {
     val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
     val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
     val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)

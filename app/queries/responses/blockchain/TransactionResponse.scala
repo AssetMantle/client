@@ -10,6 +10,7 @@ import queries.responses.common.Coin
 import queries.responses.common.PublicKeys._
 import queries.responses.common.TransactionMessageResponses.msgApply
 import transactions.Abstract.BaseResponse
+import utilities.Date.RFC3339
 
 object TransactionResponse {
 
@@ -44,7 +45,7 @@ object TransactionResponse {
 
   implicit val txReads: Reads[Tx] = Json.reads[Tx]
 
-  case class TxResponse(height: String, txhash: String, code: Int, raw_log: String, gas_wanted: String, gas_used: String, tx: Tx, timestamp: String) {
+  case class TxResponse(height: String, txhash: String, code: Int, raw_log: String, gas_wanted: String, gas_used: String, tx: Tx, timestamp: RFC3339) {
     def toTransaction: Transaction = Transaction(
       hash = txhash,
       height = height.toInt,

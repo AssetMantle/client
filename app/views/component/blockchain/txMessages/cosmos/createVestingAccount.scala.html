@@ -8,6 +8,6 @@
     @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(createVestingAccount.fromAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${createVestingAccount.fromAddress}'))")))
     @commonHtmlInfo(constants.View.TO, commonJavascriptLink(createVestingAccount.toAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${createVestingAccount.toAddress}'))")))
     @commonTextInfo(constants.View.AMOUNTS, createVestingAccount.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
-    @commonTextInfo(constants.View.END_TIME, createVestingAccount.endTime)
+    @commonRFC3339Info(constants.View.END_TIME, createVestingAccount.endTime, "createVestingAccountEndTime")
     @commonBooleanInfo(constants.View.DELAYED, Option(createVestingAccount.delayed))
 }

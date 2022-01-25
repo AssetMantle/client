@@ -2,10 +2,11 @@ package utilities
 
 import exceptions.BaseException
 import play.api.Logger
+import play.api.libs.json._
 
 import java.sql.Timestamp
-import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{Instant, LocalDateTime, ZoneId, ZonedDateTime}
+import java.time._
+import java.time.format.DateTimeFormatter
 
 object Date {
 
@@ -34,50 +35,6 @@ object Date {
       ZonedDateTime.now()
   }
 
-  def bcTimestampToString(timestamp: String): String = try {
-    ZonedDateTime.parse(timestamp).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)).format(dateTimeFormat)
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      timestamp
-  }
-
-  def isMature(completionTimestamp: String, currentTimeStamp: String): Boolean = try {
-    val completionTime = ZonedDateTime.parse(completionTimestamp)
-    val currentTime = ZonedDateTime.parse(currentTimeStamp)
-    currentTime.isEqual(completionTime) || currentTime.isAfter(completionTime)
-  } catch {
-    case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
-  }
-
-  def isAfter(t1: String, t2: String): Boolean = try {
-    ZonedDateTime.parse(t1).isAfter(ZonedDateTime.parse(t2))
-  } catch {
-    case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
-  }
-
-  def isBefore(t1: String, t2: String): Boolean = try {
-    ZonedDateTime.parse(t1).isBefore(ZonedDateTime.parse(t2))
-  } catch {
-    case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
-  }
-
-  def addTime(timestamp: String, addEpochTime: Long): String = try {
-    ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(timestamp).toEpochSecond + addEpochTime), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
-  } catch {
-    case exception: Exception => logger.error(exception.getLocalizedMessage)
-      throw new BaseException(constants.Response.INVALID_DATA_TYPE)
-  }
-
-  def addTime(t1: String, t2: String): String = try {
-    ZonedDateTime.ofInstant(Instant.ofEpochSecond(ZonedDateTime.parse(t1).toEpochSecond + ZonedDateTime.parse(t2).toEpochSecond), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
-  } catch {
-    case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
-  }
-
   def getEpoch(time: String): Long = {
     time.split("").last match {
       case "s" => time.dropRight(1).toLong
@@ -85,5 +42,71 @@ object Date {
       case "h" => 60 * 60 * time.dropRight(1).toLong
       case _ => throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
     }
+  }
+
+  case class RFC3339(timestamp: String) {
+
+    def unix: Long = ZonedDateTime.parse(this.timestamp).toEpochSecond
+
+    def zonedDateTime: ZonedDateTime = ZonedDateTime.parse(timestamp)
+
+    override def toString: String = this.timestamp
+
+    def isAfter(that: RFC3339): Boolean = try {
+      this.zonedDateTime.isAfter(that.zonedDateTime)
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+
+    def isBefore(that: RFC3339): Boolean = try {
+      this.zonedDateTime.isBefore(that.zonedDateTime)
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+
+    def isEqual(that: RFC3339): Boolean = this.zonedDateTime.isEqual(that.zonedDateTime)
+
+    def isAfterOrEqual(that: RFC3339): Boolean = try {
+      val thisTime = this.zonedDateTime
+      val thatTime = that.zonedDateTime
+      thisTime.isEqual(thatTime) || thisTime.isAfter(thatTime)
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+
+    def isBeforeOrEqual(that: RFC3339): Boolean = try {
+      val thisTime = this.zonedDateTime
+      val thatTime = that.zonedDateTime
+      thisTime.isEqual(thatTime) || thisTime.isBefore(thatTime)
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+
+    def addEpoch(epoch: Long): RFC3339 = try {
+      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.unix + epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+    } catch {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.INVALID_DATA_TYPE)
+    }
+
+    def add(that: RFC3339): RFC3339 = try {
+      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.unix + that.unix), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+    } catch {
+      case exception: Exception => logger.error(exception.getMessage)
+        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    }
+
+    def difference(that: RFC3339): Duration = Duration.between(this.zonedDateTime, that.zonedDateTime)
+
+  }
+
+  object RFC3339 {
+    implicit val rfc3339Writes: Writes[RFC3339] = (rfc3339: RFC3339) => Json.toJson(rfc3339.timestamp)
+
+    implicit val rfc3339Reads: Reads[RFC3339] = (json: JsValue) => json.validate[String].map(x => RFC3339(x))
   }
 }

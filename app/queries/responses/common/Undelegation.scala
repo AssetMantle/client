@@ -4,15 +4,16 @@ import models.blockchain.{Undelegation => BlockchainUndelegation}
 import models.common.Serializable
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object Undelegation {
 
-  case class Entry(creation_height: String, completion_time: String, initial_balance: MicroNumber, balance: MicroNumber) {
+  case class Entry(creation_height: String, completion_time: RFC3339, initial_balance: MicroNumber, balance: MicroNumber) {
     def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = initial_balance, balance = balance)
   }
 
-  def entryApply(creation_height: String, completion_time: String, initial_balance: String, balance: String): Entry = Entry(creation_height, completion_time, new MicroNumber(BigInt(initial_balance)), new MicroNumber(BigInt(balance)))
+  def entryApply(creation_height: String, completion_time: String, initial_balance: String, balance: String): Entry = Entry(creation_height, RFC3339(completion_time), new MicroNumber(BigInt(initial_balance)), new MicroNumber(BigInt(balance)))
 
   implicit val entryReads: Reads[Entry] = (
     (JsPath \ "creation_height").read[String] and

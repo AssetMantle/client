@@ -26,7 +26,7 @@
                 <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(redelegationEntry.initialBalance.toDouble))</td>
                 <td id="redelegationEntry_@redelegationEntry.completionTime">
                     <script>
-                            convertUTCDateToLocalDate('@redelegationEntry.completionTime', "redelegationEntry_@redelegationEntry.completionTime")
+                            convertUTCDateToLocalDate('@redelegationEntry.completionTime.toString', "redelegationEntry_@redelegationEntry.completionTime")
                     </script>
                 </td>
             }

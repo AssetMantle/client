@@ -6,6 +6,7 @@ import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object BlockResponse {
@@ -18,9 +19,9 @@ object BlockResponse {
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
-  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: String) extends TendermintEvidence {
+  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: RFC3339) extends TendermintEvidence {
     val height: Int = vote_a.height.toInt
-    val timeStamp: String = Timestamp
+    val timeStamp: RFC3339 = Timestamp
     val validatorHexAddress: String = vote_a.validator_address
     val validatorPower: MicroNumber = MicroNumber(ValidatorPower)
     val totalVotingPower: MicroNumber = MicroNumber(TotalVotingPower)
@@ -28,9 +29,9 @@ object BlockResponse {
 
   implicit val duplicateVoteEvidenceReads: Reads[DuplicateVoteEvidence] = Json.reads[DuplicateVoteEvidence]
 
-  case class LightClientAttackEvidence(CommonHeight: String, Timestamp: String) extends TendermintEvidence {
+  case class LightClientAttackEvidence(CommonHeight: String, Timestamp: RFC3339) extends TendermintEvidence {
     val height: Int = CommonHeight.toInt
-    val timeStamp: String = Timestamp
+    val timeStamp: RFC3339 = Timestamp
     val validatorHexAddress: String = ""
     val validatorPower: MicroNumber = MicroNumber.zero
     val totalVotingPower: MicroNumber = MicroNumber.zero

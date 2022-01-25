@@ -1,16 +1,12 @@
-@import views.html.base._
 @import models.blockchain.Block
+@import views.html.base._
 
 @(block: Block, proposer: String, numTxs: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.BLOCK_HEADER) {
 } {
     @commonIntInfo(constants.View.HEIGHT, block.height)
-    @commonTextInfo(constants.View.TIME, "", 'id -> "blockDetailsTime")
+    @commonRFC3339Info(constants.View.TIME, block.time, "blockDetailsTime")
     @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))")))
     @commonIntInfo(constants.View.NUMBER_OF_TRANSACTIONS, numTxs)
 }
-
-<script>
-        convertUTCDateToLocalDate('@block.time', "blockDetailsTime")
-</script>

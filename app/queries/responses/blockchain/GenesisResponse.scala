@@ -12,6 +12,7 @@ import queries.responses.blockchain.TransactionResponse._
 import queries.responses.blockchain.params._
 import queries.responses.common.{Coin, Delegation, Validator}
 import transactions.Abstract.BaseResponse
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object GenesisResponse {
@@ -54,7 +55,7 @@ object GenesisResponse {
 
   object Authz {
 
-    case class Authorization(granter: String, grantee: String, expiration: String, authorization: commonAuthz.Authorization)
+    case class Authorization(granter: String, grantee: String, expiration: RFC3339, authorization: commonAuthz.Authorization)
 
     implicit val authorizationReads: Reads[Authorization] = Json.reads[Authorization]
 
@@ -130,7 +131,7 @@ object GenesisResponse {
 
   object Staking {
 
-    case class RedelegationEntry(creation_height: String, completion_time: String, initial_balance: String, shares_dst: String) {
+    case class RedelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, shares_dst: String) {
       def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
     }
 
@@ -142,7 +143,7 @@ object GenesisResponse {
 
     implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
-    case class UndelegationEntry(creation_height: String, completion_time: String, initial_balance: String, balance: String) {
+    case class UndelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, balance: String) {
       def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
     }
 
@@ -185,7 +186,7 @@ object GenesisResponse {
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 
-  case class Genesis(app_state: AppState, genesis_time: String, chain_id: String, initial_height: String)
+  case class Genesis(app_state: AppState, genesis_time: RFC3339, chain_id: String, initial_height: String)
 
   implicit val genesisReads: Reads[Genesis] = Json.reads[Genesis]
 

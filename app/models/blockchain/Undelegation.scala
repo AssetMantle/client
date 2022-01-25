@@ -1,10 +1,7 @@
 package models.blockchain
 
-import java.sql.Timestamp
 import akka.actor.ActorSystem
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Serializable.UndelegationEntry
 import models.common.TransactionMessages.Undelegate
@@ -13,12 +10,14 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetAllValidatorUndelegations, GetValidatorDelegatorUndelegation}
-import queries.responses.blockchain.AllValidatorUndelegationsResponse.{Response => AllValidatorUndelegationsResponse}
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
+import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -165,12 +164,12 @@ class Undelegations @Inject()(
       }
     }
 
-    def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String, currentBlockTimeStamp: String): Future[Unit] = {
+    def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String, currentBlockTimeStamp: RFC3339): Future[Unit] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegatorAddress)
       val undelegation = Service.tryGet(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
       def updateOrDelete(undelegation: Undelegation) = {
-        val updatedEntries = undelegation.entries.filter(entry => !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTimeStamp))
+        val updatedEntries = undelegation.entries.filter(entry => !currentBlockTimeStamp.isAfterOrEqual(entry.completionTime))
         if (updatedEntries.isEmpty) Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress)
         else Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
       }
@@ -184,11 +183,11 @@ class Undelegations @Inject()(
       }
     }
 
-    def slashUndelegation(undelegation: Undelegation, currentBlockTime: String, infractionHeight: Int, slashingFraction: BigDecimal): Future[Unit] = {
+    def slashUndelegation(undelegation: Undelegation, currentBlockTime: RFC3339, infractionHeight: Int, slashingFraction: BigDecimal): Future[Unit] = {
       val updatedEntries = undelegation.entries.map(entry => {
         val slashAmount = MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
         val unbondingSlashAmount = if (slashAmount < entry.balance) slashAmount else entry.balance
-        if (!(entry.creationHeight < infractionHeight) && !utilities.Date.isMature(completionTimestamp = entry.completionTime, currentTimeStamp = currentBlockTime) && unbondingSlashAmount != MicroNumber.zero) {
+        if (!(entry.creationHeight < infractionHeight) && !currentBlockTime.isAfterOrEqual(entry.completionTime) && unbondingSlashAmount != MicroNumber.zero) {
           entry.copy(balance = entry.balance - unbondingSlashAmount)
         } else entry
       })

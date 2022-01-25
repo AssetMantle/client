@@ -8,7 +8,7 @@ import transactions.Abstract.BaseResponse
 object StakingResponse {
 
   case class Params(unbonding_time: String, max_validators: Int, max_entries: Int, historical_entries: Int, bond_denom: String) {
-    def toParameter: Parameter = StakingParameter(unbondingTime = unbonding_time.split("s")(0).toLong, maxValidators = max_validators, maxEntries = max_entries, historicalEntries = historical_entries, bondDenom = bond_denom)
+    def toParameter: Parameter = StakingParameter(unbondingTime = utilities.Date.getEpoch(unbonding_time), maxValidators = max_validators, maxEntries = max_entries, historicalEntries = historical_entries, bondDenom = bond_denom)
   }
 
   implicit val paramsReads: Reads[Params] = Json.reads[Params]
