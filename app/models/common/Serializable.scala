@@ -1,9 +1,9 @@
 package models.common
 
 import constants.Blockchain.IBCDenoms
-import models.Abstract.{DataValue, TransactionMessage}
+import exceptions.BaseException
+import models.Abstract.DataValue
 import models.common.DataValue._
-import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -52,6 +52,24 @@ object Serializable {
 
     def getMicroAmountWithDenom: String = s"${utilities.NumericOperation.formatNumber(number = amount, normalize = false)} $denom"
 
+    def isNegative: Boolean = amount < 0
+
+    def isZero: Boolean = amount == MicroNumber.zero
+
+    def add(coin: Coin): Coin = {
+      if (coin.denom != denom) {
+        throw new BaseException(constants.Response.ARITHMETIC_OPERATION_ON_DIFFERENT_COIN)
+      }
+      Coin(denom = denom, amount = amount + coin.amount)
+    }
+
+    def subtract(coin: Coin): Coin = {
+      val result = add(coin.copy(amount = amount * -1))
+      if (result.isNegative) {
+        throw new BaseException(constants.Response.COIN_AMOUNT_NEGATIVE)
+      }
+      result
+    }
   }
 
   def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
@@ -173,17 +191,6 @@ object Serializable {
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]
 
   implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
-
-  case class StdMsg(messageType: String, message: TransactionMessage) {
-    def getSigners: Seq[String] = message.getSigners
-  }
-
-  implicit val msgReads: Reads[StdMsg] = (
-    (JsPath \ "messageType").read[String] and
-      (JsPath \ "message").read[JsObject]
-    ) (stdMsgApply _)
-
-  implicit val msgWrites: OWrites[StdMsg] = Json.writes[StdMsg]
 
   case class BaseProperty(dataType: String, dataName: String, dataValue: Option[String]) {
     def toRequestString: String = utilities.String.getPropertyRequestWithValue(dataNameWithType = utilities.String.getPropertyRequestNameAndType(dataType = dataType, dataName = dataName), dataValue = dataValue)

@@ -1,8 +1,8 @@
 package controllers
 
+import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import constants.AppConfig._
 import exceptions.BaseException
 import models.blockchain
 import models.blockchain.{Maintainer, Meta}
@@ -13,8 +13,7 @@ import play.api.{Configuration, Logger}
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton

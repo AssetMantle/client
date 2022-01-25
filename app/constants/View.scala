@@ -1,5 +1,7 @@
 package constants
 
+import scala.language.postfixOps
+
 object View {
   val PERSISTENCE = "PERSISTENCE"
   val IDENTIFICATION_DETAILS = "IDENTIFICATION_DETAILS"
@@ -525,11 +527,54 @@ object View {
   val MESSAGES_TYPE = "MESSAGES_TYPE"
   val NO_DELEGATIONS_FOUND = "NO_DELEGATIONS_FOUND"
 
+  val AUTHORIZATION_TYPE = "AUTHORIZATION_TYPE"
+  val GRANT = "GRANT"
+  val GRANTER = "GRANTER"
+  val GRANTEE = "GRANTEE"
+  val ALLOWANCE = "ALLOWANCE"
+  val EXPIRATION = "EXPIRATION"
+  val SPEND_LIMITS = "SPEND_LIMITS"
+  val MAX_TOKENS = "MAX_TOKENS"
+  val ALLOW_LIST = "ALLOW_LIST"
+  val DENY_LIST = "DENY_LIST"
+  val AUTHORIZATION = "AUTHORIZATION"
+  val MESSAGES = "MESSAGES"
+  val ALLOWANCE_TYPE = "ALLOWANCE_TYPE"
+  val PERIOD = "PERIOD"
+  val PERIOD_SPEND_LIMIT = "PERIOD_SPEND_LIMIT"
+  val PERIOD_CAN_SPEND = "PERIOD_CAN_SPEND"
+  val PERIOD_RESET = "PERIOD_RESET"
+  val ALLOWED_MESSAGES = "ALLOWED_MESSAGES"
+  val STAKE_AUTHORIZATION_TYPE = "STAKE_AUTHORIZATION_TYPE"
+
+  val AuthzAuthorizationMap: Map[String, String] = Map(
+    constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
+    constants.Blockchain.Authz.GENERIC_AUTHORIZATION -> "GENERIC_AUTHORIZATION",
+    constants.Blockchain.Authz.STAKE_AUTHORIZATION -> "STAKE_AUTHORIZATION",
+  )
+
+  val FeeGrantAllowanceMap: Map[String, String] = Map(
+    constants.Blockchain.FeeGrant.BASIC_ALLOWANCE -> "BASIC_ALLOWANCE",
+    constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE -> "PERIODIC_ALLOWANCE",
+    constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE -> "ALLOWED_MSG_ALLOWANCE",
+  )
+
   val TxMessagesMap: Map[String, String] = Map(
+    //auth
     constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
+    //authz
+    constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION -> "MESSAGE_GRANT_AUTHORIZATION",
+    constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION -> "MESSAGE_REVOKE_AUTHORIZATION",
+    constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION -> "MESSAGE_EXECUTE_AUTHORIZATION",
+    //bank
     constants.Blockchain.TransactionMessage.SEND_COIN -> "MESSAGE_SEND",
     constants.Blockchain.TransactionMessage.MULTI_SEND -> "MESSAGE_MULTI_SEND",
+    //evidence
     constants.Blockchain.TransactionMessage.VERIFY_INVARIANT -> "MESSAGE_VERIFY_INVARIANT",
+    //feeGrant
+    constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE -> "MESSAGE_FEE_GRANT_ALLOWANCE",
+    constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE -> "MESSAGE_FEE_REVOKE_ALLOWANCE",
+    //distribution
     constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS -> "MESSAGE_SET_WITHDRAW_ADDRESS",
     constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD -> "MESSAGE_WITHDRAW_REWARD",
     constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION -> "MESSAGE_WITHDRAW_COMMISSION",

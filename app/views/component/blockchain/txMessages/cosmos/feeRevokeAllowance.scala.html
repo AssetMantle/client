@@ -1,0 +1,10 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.FeeRevokeAllowance
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[FeeRevokeAllowance]) { feeRevokeAllowance =>
+    @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(feeRevokeAllowance.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${feeRevokeAllowance.granter}'))")))
+    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(feeRevokeAllowance.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${feeRevokeAllowance.grantee}'))")))
+}

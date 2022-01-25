@@ -1,0 +1,32 @@
+@import models.common.Authz._
+@import views.html.base._
+
+@(authorization: Authorization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.AUTHORIZATION_TYPE, constants.View.AuthzAuthorizationMap.getOrElse(authorization.authorizationType, authorization.authorizationType))
+@authorization.authorizationType match {
+    case constants.Blockchain.Authz.SEND_AUTHORIZATION => {
+        @defining(authorization.value.asInstanceOf[SendAuthorization]) { sendAuthorization =>
+            @commonTextInfo(constants.View.SPEND_LIMITS, sendAuthorization.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+        }
+    }
+    case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => {
+        @defining(authorization.value.asInstanceOf[GenericAuthorization]) { genericAuthorization =>
+            @commonTextInfo(constants.View.MESSAGE, genericAuthorization.message)
+        }
+    }
+    case constants.Blockchain.Authz.STAKE_AUTHORIZATION => {
+        @defining(authorization.value.asInstanceOf[StakeAuthorization]) { stakeAuthorization =>
+            @commonTextInfo(constants.View.MAX_TOKENS, stakeAuthorization.maxTokens.fold("")(_.getAmountWithNormalizedDenom()))
+            @if(stakeAuthorization.allowList.nonEmpty) {
+                @commonTextInfo(constants.View.ALLOW_LIST, stakeAuthorization.allowList.fold("")(_.address.mkString(", ")))
+            } else {
+                @commonTextInfo(constants.View.DENY_LIST, stakeAuthorization.denyList.fold("")(_.address.mkString(", ")))
+            }
+            @commonTextInfo(constants.View.STAKE_AUTHORIZATION_TYPE, stakeAuthorization.authorizationType)
+        }
+    }
+    case _ => {
+
+    }
+}

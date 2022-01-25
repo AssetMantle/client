@@ -1,18 +1,15 @@
 package queries.responses.common
 
-import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import exceptions.BaseException
-import play.api.Logger
-import models.common.Serializable
-import models.blockchain.{Account => BlockchainAccount}
-import play.api.libs.functional.syntax._
 import models.Abstract.{PublicKey => SerializablePublicKey}
+import models.blockchain.{Account => BlockchainAccount}
+import models.common.Serializable
 import models.common.Serializable.Vesting.VestingParameters
+import play.api.Logger
+import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.{Account, PublicKey}
 
 object Accounts {
-
-  import queries.responses.common.PublicKeys.publicKeyReads
 
   private implicit val module: String = constants.Module.ACCOUNT_RESPONSE
 
@@ -74,9 +71,4 @@ object Accounts {
     case constants.Blockchain.Account.PERIODIC_VESTING => utilities.JSON.convertJsonStringToObject[PeriodicVestingAccount](value.toString)
     case _ => throw new BaseException(constants.Response.ACCOUNT_TYPE_NOT_FOUND)
   }
-
-  implicit val accountReads: Reads[Account] = (
-    (JsPath \ "@type").read[String] and
-      JsPath.read[JsObject]
-    ) (accountApply _)
 }

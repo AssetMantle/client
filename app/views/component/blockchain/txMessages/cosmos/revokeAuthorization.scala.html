@@ -1,0 +1,11 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.RevokeAuthorization
+
+@(msg: TransactionMessage)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[RevokeAuthorization]) { revokeAuthorization =>
+    @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(revokeAuthorization.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${revokeAuthorization.granter}'))")))
+    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(revokeAuthorization.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${revokeAuthorization.grantee}'))")))
+    @commonTextInfo(constants.View.MESSAGES_TYPE, constants.View.TxMessagesMap.getOrElse(revokeAuthorization.messageTypeURL, revokeAuthorization.messageTypeURL))
+}

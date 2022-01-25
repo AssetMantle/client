@@ -1,0 +1,43 @@
+@import models.common.FeeGrant._
+@import views.html.base._
+
+@(allowance: Allowance, index: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.ALLOWANCE_TYPE, constants.View.FeeGrantAllowanceMap.getOrElse(allowance.allowanceType, allowance.allowanceType))
+@allowance.allowanceType match {
+    case constants.Blockchain.FeeGrant.BASIC_ALLOWANCE => {
+        @defining(allowance.value.asInstanceOf[BasicAllowance]) { basicAllowance =>
+            @commonTextInfo(constants.View.SPEND_LIMITS, basicAllowance.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+            @commonTextInfo(constants.View.EXPIRATION, basicAllowance.expiration.getOrElse(""), 'id -> s"basicAllowance_${index}")
+            @if(basicAllowance.expiration.nonEmpty) {
+                <script>
+                        convertUTCDateToLocalDate('@basicAllowance.expiration.getOrElse("")', "basicAllowance_@index")
+                </script>
+            }
+        }
+    }
+    case constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE => {
+        @defining(allowance.value.asInstanceOf[PeriodicAllowance]) { periodicAllowance =>
+            @commonTextInfo(constants.View.SPEND_LIMITS, periodicAllowance.basicAllowance.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+            @commonTextInfo(constants.View.EXPIRATION, periodicAllowance.basicAllowance.expiration.getOrElse(""), 'id -> s"basicAllowance_${index}")
+            @if(periodicAllowance.basicAllowance.expiration.nonEmpty) {
+                <script>
+                        convertUTCDateToLocalDate('@periodicAllowance.basicAllowance.expiration.getOrElse("")', "basicAllowance_@index")
+                </script>
+            }
+            @commonTextInfo(constants.View.PERIOD, periodicAllowance.period)
+            @commonTextInfo(constants.View.PERIOD_SPEND_LIMIT, periodicAllowance.periodSpendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+            @commonTextInfo(constants.View.PERIOD_CAN_SPEND, periodicAllowance.periodCanSpend.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+            @commonTextInfo(constants.View.PERIOD_RESET, periodicAllowance.periodReset)
+        }
+    }
+    case constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE => {
+        @defining(allowance.value.asInstanceOf[AllowedMsgAllowance]) { allowedMsgAllowance =>
+            @commonTextInfo(constants.View.ALLOWED_MESSAGES, allowedMsgAllowance.allowedMessages.mkString(", "))
+            @views.html.component.blockchain.feeGrantAllowance(allowedMsgAllowance.allowance, index)
+        }
+    }
+    case _ => {
+
+    }
+}

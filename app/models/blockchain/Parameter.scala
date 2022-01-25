@@ -29,8 +29,6 @@ case class Parameter(parameterType: String, value: abstractParameter, createdBy:
 @Singleton
 class Parameters @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
-                            configuration: Configuration,
-                            masterTransactionNotifications: masterTransaction.Notifications,
                             utilitiesOperations: utilities.Operations,
                             getAuthParams: GetAuth,
                             getBankParams: GetBank,
@@ -140,7 +138,7 @@ class Parameters @Inject()(
       def checkAndUpdate(halvingParameter: HalvingParameter) = if ((header.height % halvingParameter.blockHeight) == 0) {
         val mintingParameter = Service.tryGetMintingParameter
 
-        def updateMintingParameter(mintingParameter: MintingParameter) = Service.insertOrUpdate(Parameter(parameterType = mintingParameter.`type`, value = mintingParameter.copy(inflationMax = mintingParameter.inflationMax / 2, inflationMin = mintingParameter.inflationMin / 2, inflationRateChange = (mintingParameter.inflationMax / 2) - (mintingParameter.inflationMin / 2))))
+        def updateMintingParameter(mintingParameter: MintingParameter) = Service.insertOrUpdate(Parameter(parameterType = mintingParameter.parameterType, value = mintingParameter.copy(inflationMax = mintingParameter.inflationMax / 2, inflationMin = mintingParameter.inflationMin / 2, inflationRateChange = (mintingParameter.inflationMax / 2) - (mintingParameter.inflationMin / 2))))
 
         for {
           mintingParameter <- mintingParameter
@@ -204,8 +202,8 @@ class Parameters @Inject()(
           case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
         }
 
-        def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.`type` != constants.Blockchain.ParameterType.CRISIS || parameterValue.`type` != constants.Blockchain.ParameterType.IBC || parameterValue.`type` != constants.Blockchain.ParameterType.TRANSFER)
-          Service.insertOrUpdate(Parameter(parameterType = parameterValue.`type`, value = parameterValue)) else Future(0)
+        def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
+          Service.insertOrUpdate(Parameter(parameterType = parameterValue.parameterType, value = parameterValue)) else Future(0)
 
         for {
           parameter <- parameter

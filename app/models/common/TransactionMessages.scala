@@ -1,19 +1,29 @@
 package models.common
 
+import exceptions.BaseException
 import models.Abstract.{ProposalContent, PublicKey, TransactionMessage}
 import models.common.Serializable._
 import play.api.Logger
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import utilities.MicroNumber
 
 object TransactionMessages {
 
-  import models.common.ProposalContents._
-  import models.common.PublicKeys._
-
   private implicit val module: String = constants.Module.TRANSACTION_MESSAGE
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  case class StdMsg(messageType: String, message: TransactionMessage) {
+    def getSigners: Seq[String] = message.getSigners
+  }
+
+  implicit val stdMsgReads: Reads[StdMsg] = (
+    (JsPath \ "messageType").read[String] and
+      (JsPath \ "message").read[JsObject]
+    ) (stdMsgApply _)
+
+  implicit val stdMsgWrites: Writes[StdMsg] = Json.writes[StdMsg]
 
   //auth
   case class CreateVestingAccount(fromAddress: String, toAddress: String, amount: Seq[Coin], endTime: String, delayed: Boolean) extends TransactionMessage {
@@ -23,6 +33,37 @@ object TransactionMessages {
   implicit val createVestingAccountReads: Reads[CreateVestingAccount] = Json.reads[CreateVestingAccount]
 
   implicit val createVestingAccountWrites: OWrites[CreateVestingAccount] = Json.writes[CreateVestingAccount]
+
+  //authz
+  case class Grant(authorization: Authz.Authorization, expiration: String)
+
+  implicit val grantReads: Reads[Grant] = Json.reads[Grant]
+
+  implicit val grantWrites: OWrites[Grant] = Json.writes[Grant]
+
+  case class GrantAuthorization(granter: String, grantee: String, grant: Grant) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(granter)
+  }
+
+  implicit val grantAuthorizationReads: Reads[GrantAuthorization] = Json.reads[GrantAuthorization]
+
+  implicit val grantAuthorizationWrites: OWrites[GrantAuthorization] = Json.writes[GrantAuthorization]
+
+  case class RevokeAuthorization(granter: String, grantee: String, messageTypeURL: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(granter)
+  }
+
+  implicit val revokeAuthorizationReads: Reads[RevokeAuthorization] = Json.reads[RevokeAuthorization]
+
+  implicit val revokeAuthorizationWrites: OWrites[RevokeAuthorization] = Json.writes[RevokeAuthorization]
+
+  case class ExecuteAuthorization(grantee: String, messages: Seq[StdMsg]) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(grantee)
+  }
+
+  implicit val executeAuthorizationReads: Reads[ExecuteAuthorization] = Json.reads[ExecuteAuthorization]
+
+  implicit val executeAuthorizationWrites: OWrites[ExecuteAuthorization] = Json.writes[ExecuteAuthorization]
 
   //bank
   case class Input(address: String, coins: Seq[Coin])
@@ -101,6 +142,7 @@ object TransactionMessages {
 
   implicit val equivocationWrites: OWrites[Equivocation] = Json.writes[Equivocation]
 
+  //evidence
   case class SubmitEvidence(submitter: String, evidence: Equivocation) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(submitter)
   }
@@ -108,6 +150,23 @@ object TransactionMessages {
   implicit val submitEvidenceReads: Reads[SubmitEvidence] = Json.reads[SubmitEvidence]
 
   implicit val submitEvidenceWrites: OWrites[SubmitEvidence] = Json.writes[SubmitEvidence]
+
+  //feeGrant
+  case class FeeGrantAllowance(granter: String, grantee: String, allowance: FeeGrant.Allowance) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(granter)
+  }
+
+  implicit val feeGrantAllowanceReads: Reads[FeeGrantAllowance] = Json.reads[FeeGrantAllowance]
+
+  implicit val feeGrantAllowanceWrites: OWrites[FeeGrantAllowance] = Json.writes[FeeGrantAllowance]
+
+  case class FeeRevokeAllowance(granter: String, grantee: String) extends TransactionMessage {
+    def getSigners: Seq[String] = Seq(granter)
+  }
+
+  implicit val feeRevokeAllowanceReads: Reads[FeeRevokeAllowance] = Json.reads[FeeRevokeAllowance]
+
+  implicit val feeRevokeAllowanceWrites: OWrites[FeeRevokeAllowance] = Json.writes[FeeRevokeAllowance]
 
   //gov
   case class Deposit(proposalID: Int, depositor: String, amount: Seq[Coin]) extends TransactionMessage {
@@ -495,96 +554,14 @@ object TransactionMessages {
 
   implicit val maintainerDeputizeWrites: OWrites[MaintainerDeputize] = Json.writes[MaintainerDeputize]
 
-  //unknown
-  case class Unknown(value: String) extends TransactionMessage {
-    def getSigners: Seq[String] = Seq("")
-  }
-
-  implicit val unknownReads: Reads[Unknown] = Json.reads[Unknown]
-
-  implicit val unknownWrites: OWrites[Unknown] = Json.writes[Unknown]
-
-  implicit val transactionMessageWrites: Writes[TransactionMessage] = {
-    //auth
-    case createVestingAccount: CreateVestingAccount => Json.toJson(createVestingAccount)
-    //bank
-    case sendCoin: SendCoin => Json.toJson(sendCoin)
-    case multiSend: MultiSend => Json.toJson(multiSend)
-    //crisis
-    case verifyInvariant: VerifyInvariant => Json.toJson(verifyInvariant)
-    //distribution
-    case setWithdrawAddress: SetWithdrawAddress => Json.toJson(setWithdrawAddress)
-    case withdrawDelegatorReward: WithdrawDelegatorReward => Json.toJson(withdrawDelegatorReward)
-    case withdrawValidatorCommission: WithdrawValidatorCommission => Json.toJson(withdrawValidatorCommission)
-    case fundCommunityPool: FundCommunityPool => Json.toJson(fundCommunityPool)
-    //evidence
-    case submitEvidence: SubmitEvidence => Json.toJson(submitEvidence)
-    //gov
-    case deposit: Deposit => Json.toJson(deposit)
-    case submitProposal: SubmitProposal => Json.toJson(submitProposal)
-    case vote: Vote => Json.toJson(vote)
-    //slashing
-    case unjail: Unjail => Json.toJson(unjail)
-    //staking
-    case createValidator: CreateValidator => Json.toJson(createValidator)
-    case editValidator: EditValidator => Json.toJson(editValidator)
-    case delegate: Delegate => Json.toJson(delegate)
-    case redelegate: Redelegate => Json.toJson(redelegate)
-    case undelegate: Undelegate => Json.toJson(undelegate)
-    //ibc-client
-    case createClient: CreateClient => Json.toJson(createClient)
-    case updateClient: UpdateClient => Json.toJson(updateClient)
-    case submitMisbehaviour: SubmitMisbehaviour => Json.toJson(submitMisbehaviour)
-    case upgradeClient: UpgradeClient => Json.toJson(upgradeClient)
-    //ibc-connection
-    case connectionOpenInit: ConnectionOpenInit => Json.toJson(connectionOpenInit)
-    case connectionOpenConfirm: ConnectionOpenConfirm => Json.toJson(connectionOpenConfirm)
-    case connectionOpenAck: ConnectionOpenAck => Json.toJson(connectionOpenAck)
-    case connectionOpenTry: ConnectionOpenTry => Json.toJson(connectionOpenTry)
-    //ibc-channel
-    case channelOpenInit: ChannelOpenInit => Json.toJson(channelOpenInit)
-    case channelOpenConfirm: ChannelOpenConfirm => Json.toJson(channelOpenConfirm)
-    case channelOpenAck: ChannelOpenAck => Json.toJson(channelOpenAck)
-    case channelOpenTry: ChannelOpenTry => Json.toJson(channelOpenTry)
-    case channelCloseInit: ChannelCloseInit => Json.toJson(channelCloseInit)
-    case channelCloseConfirm: ChannelCloseConfirm => Json.toJson(channelCloseConfirm)
-    case recvPacket: RecvPacket => Json.toJson(recvPacket)
-    case timeout: Timeout => Json.toJson(timeout)
-    case timeoutOnClose: TimeoutOnClose => Json.toJson(timeoutOnClose)
-    case acknowledgement: Acknowledgement => Json.toJson(acknowledgement)
-    //ibc-transfer
-    case transfer: Transfer => Json.toJson(transfer)
-    //asset
-    case assetDefine: AssetDefine => Json.toJson(assetDefine)
-    case assetMint: AssetMint => Json.toJson(assetMint)
-    case assetMutate: AssetMutate => Json.toJson(assetMutate)
-    case assetBurn: AssetBurn => Json.toJson(assetBurn)
-    //Identity
-    case identityDefine: IdentityDefine => Json.toJson(identityDefine)
-    case identityIssue: IdentityIssue => Json.toJson(identityIssue)
-    case identityProvision: IdentityProvision => Json.toJson(identityProvision)
-    case identityUnprovision: IdentityUnprovision => Json.toJson(identityUnprovision)
-    case identityNub: IdentityNub => Json.toJson(identityNub)
-    //Split
-    case splitSend: SplitSend => Json.toJson(splitSend)
-    case splitWrap: SplitWrap => Json.toJson(splitWrap)
-    case splitUnwrap: SplitUnwrap => Json.toJson(splitUnwrap)
-    //Order
-    case orderDefine: OrderDefine => Json.toJson(orderDefine)
-    case orderMake: OrderMake => Json.toJson(orderMake)
-    case orderTake: OrderTake => Json.toJson(orderTake)
-    case orderCancel: OrderCancel => Json.toJson(orderCancel)
-    //meta
-    case metaReveal: MetaReveal => Json.toJson(metaReveal)
-    //maintainer
-    case deputize: MaintainerDeputize => Json.toJson(deputize)
-    case x: Any => Json.toJson(x.toString)
-  }
-
   def stdMsgApply(msgType: String, value: JsObject): StdMsg = {
     msgType match {
       //auth
       case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[CreateVestingAccount](value.toString))
+      //authz
+      case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[GrantAuthorization](value.toString))
+      case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[RevokeAuthorization](value.toString))
+      case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[ExecuteAuthorization](value.toString))
       //bank
       case constants.Blockchain.TransactionMessage.SEND_COIN => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SendCoin](value.toString))
       case constants.Blockchain.TransactionMessage.MULTI_SEND => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MultiSend](value.toString))
@@ -597,6 +574,9 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[FundCommunityPool](value.toString))
       //evidence
       case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitEvidence](value.toString))
+      //feeGrant
+      case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[FeeGrantAllowance](value.toString))
+      case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[FeeRevokeAllowance](value.toString))
       //gov
       case constants.Blockchain.TransactionMessage.DEPOSIT => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Deposit](value.toString))
       case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[SubmitProposal](value.toString))
@@ -656,9 +636,8 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.META_REVEAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
       //maintainer
       case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MaintainerDeputize](value.toString))
-      case _ => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[Unknown](value.toString))
+      case _ => throw new BaseException(constants.Response.UNKNOWN_TRANSACTION_MESSAGE)
     }
   }
-
 
 }

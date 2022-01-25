@@ -1,0 +1,11 @@
+@import views.html.base._
+@import models.Abstract.TransactionMessage
+@import models.common.TransactionMessages.FeeGrantAllowance
+
+@(msg: TransactionMessage, index: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(msg.asInstanceOf[FeeGrantAllowance]) { feeGrantAllowance =>
+    @commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(feeGrantAllowance.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${feeGrantAllowance.granter}'))")))
+    @commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(feeGrantAllowance.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${feeGrantAllowance.grantee}'))")))
+    @views.html.component.blockchain.feeGrantAllowance(feeGrantAllowance.allowance, index)
+}

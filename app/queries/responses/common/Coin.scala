@@ -2,7 +2,7 @@ package queries.responses.common
 
 import models.common.Serializable
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json._
 import utilities.MicroNumber
 
 case class Coin(denom: String, amount: MicroNumber) {

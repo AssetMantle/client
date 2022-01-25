@@ -256,9 +256,31 @@ object Blockchain {
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/request"
   }
 
+  object Authz {
+    val SEND_AUTHORIZATION = "/cosmos.bank.v1beta1.SendAuthorization"
+    val GENERIC_AUTHORIZATION = "/cosmos.authz.v1beta1.GenericAuthorization"
+    val STAKE_AUTHORIZATION = "/cosmos.staking.v1beta1.StakeAuthorization"
+
+    object StakeAuthorization {
+      val AUTHORIZATION_TYPE_DELEGATE = "AUTHORIZATION_TYPE_DELEGATE"
+      val AUTHORIZATION_TYPE_UNDELEGATE = "AUTHORIZATION_TYPE_UNDELEGATE"
+      val AUTHORIZATION_TYPE_REDELEGATE = "AUTHORIZATION_TYPE_REDELEGATE"
+    }
+  }
+
+  object FeeGrant {
+    val BASIC_ALLOWANCE = "/cosmos.feegrant.v1beta1.BasicAllowance"
+    val PERIODIC_ALLOWANCE = "/cosmos.feegrant.v1beta1.PeriodicAllowance"
+    val ALLOWED_MSG_ALLOWANCE = "/cosmos.feegrant.v1beta1.AllowedMsgAllowance"
+  }
+
   object TransactionMessage {
     //auth
     val CREATE_VESTING_ACCOUNT = "/cosmos.vesting.v1beta1.MsgCreateVestingAccount"
+    //authz
+    val GRANT_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgGrant"
+    val REVOKE_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgRevoke"
+    val EXECUTE_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgExec"
     //bank
     val SEND_COIN = "/cosmos.bank.v1beta1.MsgSend"
     val MULTI_SEND = "/cosmos.bank.v1beta1.MsgMultiSend"
@@ -271,6 +293,9 @@ object Blockchain {
     val FUND_COMMUNITY_POOL = "/cosmos.distribution.v1beta1.MsgFundCommunityPool"
     //evidence
     val SUBMIT_EVIDENCE = "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
+    //feeGrant
+    val FEE_GRANT_ALLOWANCE = "/cosmos.feegrant.v1beta1.MsgGrantAllowance"
+    val FEE_REVOKE_ALLOWANCE = "/cosmos.feegrant.v1beta1.MsgRevokeAllowance"
     //gov
     val DEPOSIT = "/cosmos.gov.v1beta1.MsgDeposit"
     val SUBMIT_PROPOSAL = "/cosmos.gov.v1beta1.MsgSubmitProposal"
