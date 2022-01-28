@@ -179,11 +179,13 @@ class Block @Inject()(
       val deductFeesFrom = if (transaction.getFeeGranter != "") {
         val grantee = transaction.getFeePayer
         val feeGrant = blockchainFeeGrants.Service.tryGet(granter = transaction.getFeeGranter, grantee = grantee)
+
         def updateOrDeleteFeeGrant(feeGrant: FeeGrant) = {
           val response = feeGrant.allowance.validate(blockTime = header.time, fees = transaction.fee.amount)
           if (response.delete) blockchainFeeGrants.Service.delete(granter = transaction.getFeeGranter, grantee = grantee)
           else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated))
         }
+
         for {
           feeGrant <- feeGrant
           _ <- updateOrDeleteFeeGrant(feeGrant)
@@ -326,8 +328,8 @@ class Block @Inject()(
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
-          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
-          else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
+          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) (height - 2)
+          else (blockResponse.result.block.evidence.evidence.flatMap(_.getSlashingEvidences).find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
             val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
@@ -338,8 +340,7 @@ class Block @Inject()(
           for {
             operatorAddress <- operatorAddress
             slashingReason <- slashingReason
-            distributionHeight <- getDistributionHeight(slashingReason)
-            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = distributionHeight)
+            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = getDistributionHeight(slashingReason))
           } yield (operatorAddress, slashingReason)
         })
       }
