@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 import java.sql.Timestamp
 import java.time._
-import java.time.format.{DateTimeFormatter, FormatStyle}
+import java.time.format.DateTimeFormatter
 
 object Date {
 
