@@ -6,6 +6,7 @@ import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.FeeGrant.FeeAllowance
+import utilities.Date.RFC3339
 
 object FeeGrant {
 
@@ -22,13 +23,13 @@ object FeeGrant {
       JsPath.read[JsObject]
     ) (allowanceApply _)
 
-  case class BasicAllowance(spend_limit: Seq[Coin], expiration: Option[String]) extends FeeAllowance {
+  case class BasicAllowance(spend_limit: Seq[Coin], expiration: Option[RFC3339]) extends FeeAllowance {
     def toSerializable: commonFeeGrant.BasicAllowance = commonFeeGrant.BasicAllowance(spendLimit = spend_limit.map(_.toCoin), expiration = expiration)
   }
 
   implicit val basicAllowanceReads: Reads[BasicAllowance] = Json.reads[BasicAllowance]
 
-  case class PeriodicAllowance(basic: BasicAllowance, period: String, period_spend_limit: Seq[Coin], period_can_spend: Seq[Coin], period_reset: String) extends FeeAllowance {
+  case class PeriodicAllowance(basic: BasicAllowance, period: String, period_spend_limit: Seq[Coin], period_can_spend: Seq[Coin], period_reset: RFC3339) extends FeeAllowance {
     def toSerializable: commonFeeGrant.PeriodicAllowance = commonFeeGrant.PeriodicAllowance(basicAllowance = basic.toSerializable, period = period, periodSpendLimit = period_spend_limit.map(_.toCoin), periodCanSpend = period_can_spend.map(_.toCoin), periodReset = period_reset)
   }
 

@@ -3,12 +3,13 @@ package models.Abstract
 import models.common.FeeGrant.{AllowedMsgAllowance, BasicAllowance, PeriodicAllowance}
 import models.common.Serializable.Coin
 import play.api.libs.json.{Json, Writes}
+import utilities.Date.RFC3339
 
 object FeeGrant {
   abstract class FeeAllowance {
-    def getExpiration: Option[String]
+    def getExpiration: Option[RFC3339]
 
-    def validate(blockTime: String, fees: Seq[Coin]): (Boolean, FeeAllowance)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, FeeAllowance)
   }
 
   implicit val feeAllowanceWrites: Writes[FeeAllowance] = {

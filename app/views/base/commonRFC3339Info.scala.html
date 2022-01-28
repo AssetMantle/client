@@ -1,0 +1,16 @@
+@import utilities.Date.RFC3339
+
+@(key: String, value: RFC3339, id: String, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div class="cmuk-flex infoRow">
+    <div class="infoRowLabel">
+        @Messages(key)
+    </div>
+    <div id='@id' class='@arguments.toMap.get('class).map(_.toString).getOrElse("infoRowValue")'>
+    @value.toString
+    </div>
+</div>
+
+<script>
+        convertUTCDateToLocalDate('@value.toString', '@id');
+</script>

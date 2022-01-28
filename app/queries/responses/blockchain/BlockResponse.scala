@@ -7,6 +7,7 @@ import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
 import utilities.Blockchain.SlashingEvidence
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object BlockResponse {
@@ -15,11 +16,11 @@ object BlockResponse {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  case class Vote(`type`: Int, height: String, round: Int, timestamp: String, validator_address: String, validator_index: Int, signature: String)
+  case class Vote(`type`: Int, height: String, round: Int, timestamp: RFC3339, validator_address: String, validator_index: Int, signature: String)
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
-  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: String) extends TendermintEvidence {
+  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: RFC3339) extends TendermintEvidence {
     def getSlashingEvidences: Seq[SlashingEvidence] = Seq(SlashingEvidence(height = vote_a.height.toInt, time = Timestamp, validatorHexAddress = vote_a.validator_address, validatorPower = MicroNumber(ValidatorPower)))
   }
 
@@ -29,7 +30,7 @@ object BlockResponse {
 
   implicit val byzantineValidatorReads: Reads[ByzantineValidator] = Json.reads[ByzantineValidator]
 
-  case class LightClientAttackEvidence(CommonHeight: String, ByzantineValidators: Seq[ByzantineValidator], TotalVotingPower: String, Timestamp: String) extends TendermintEvidence {
+  case class LightClientAttackEvidence(CommonHeight: String, ByzantineValidators: Seq[ByzantineValidator], TotalVotingPower: String, Timestamp: RFC3339) extends TendermintEvidence {
     def getSlashingEvidences: Seq[SlashingEvidence] = this.ByzantineValidators.map(validator => SlashingEvidence(height = this.CommonHeight.toInt, time = this.Timestamp, validatorHexAddress = validator.address, validatorPower = MicroNumber(validator.voting_power)))
   }
 

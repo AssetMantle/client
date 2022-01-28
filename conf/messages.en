@@ -671,6 +671,7 @@ ID=ID
 DATA_NAME=Data Name
 FROM_ID=From ID
 TO_ID=To ID
+NO_EXPIRY_DATE=Never expires!
 DENOM=Denom
 DATA_TYPE=Type
 ADD_IMMUTABLE_META_FIELD=Add Immutable Meta Field
