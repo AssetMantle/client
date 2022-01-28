@@ -7,6 +7,7 @@ import models.common.DataValue._
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object Serializable {
@@ -35,7 +36,7 @@ object Serializable {
 
     implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
 
-    case class Commission(commissionRates: CommissionRates, updateTime: String)
+    case class Commission(commissionRates: CommissionRates, updateTime: RFC3339)
 
     implicit val commissionWrites: OWrites[Commission] = Json.writes[Commission]
 
@@ -96,13 +97,17 @@ object Serializable {
 
   implicit val notificationTemplateWrites: OWrites[NotificationTemplate] = Json.writes[NotificationTemplate]
 
-  case class RedelegationEntry(creationHeight: Int, completionTime: String, initialBalance: MicroNumber, sharesDestination: BigDecimal)
+  case class RedelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, sharesDestination: BigDecimal) {
+    def isMature(currentTime: RFC3339): Boolean = !this.completionTime.isAfter(currentTime)
+  }
 
   implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
 
   implicit val redelegationEntryWrites: OWrites[RedelegationEntry] = Json.writes[RedelegationEntry]
 
-  case class UndelegationEntry(creationHeight: Int, completionTime: String, initialBalance: MicroNumber, balance: MicroNumber)
+  case class UndelegationEntry(creationHeight: Int, completionTime: RFC3339, initialBalance: MicroNumber, balance: MicroNumber) {
+    def isMature(currentTime: RFC3339): Boolean = !this.completionTime.isAfter(currentTime)
+  }
 
   implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
 

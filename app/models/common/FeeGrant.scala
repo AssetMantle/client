@@ -6,6 +6,7 @@ import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import utilities.Blockchain.{FeeGrant => utilitiesFeeGrant}
+import utilities.Date.RFC3339
 
 object FeeGrant {
 
@@ -14,8 +15,8 @@ object FeeGrant {
   private implicit val logger: Logger = Logger(this.getClass)
 
   case class Allowance(allowanceType: String, value: AbstarctFeeGrant.FeeAllowance) {
-    def validate(blockTime: String, fees: Seq[Coin]): utilitiesFeeGrant.ValidateResponse = {
-      val (delete, updatedAllowanceValue) = this.value.validate(blockTime, fees)
+    def validate(blockTime: RFC3339, fees: Seq[Coin]): utilitiesFeeGrant.ValidateResponse = {
+      val (delete, updatedAllowanceValue) = this.value.deleteAndUpdate(blockTime, fees)
       utilitiesFeeGrant.ValidateResponse(delete = delete, updated = this.copy(value = updatedAllowanceValue))
     }
   }
@@ -27,12 +28,11 @@ object FeeGrant {
 
   implicit val allowanceWrites: Writes[Allowance] = Json.writes[Allowance]
 
-  case class BasicAllowance(spendLimit: Seq[Coin], expiration: Option[String]) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[String] = expiration
+  case class BasicAllowance(spendLimit: Seq[Coin], expiration: Option[RFC3339]) extends AbstarctFeeGrant.FeeAllowance {
+    def getExpiration: Option[RFC3339] = expiration
 
-    def validate(blockTime: String, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (getExpiration.nonEmpty && utilities.Date.isBefore(t1 = getExpiration.getOrElse(""), t2 = blockTime))
-        (true, this)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
+      if (this.getExpiration.fold(false)(_.isBefore(blockTime))) (true, this)
       else if (spendLimit.nonEmpty) {
         val (left, _) = utilities.Blockchain.subtractCoins(spendLimit, fees)
         (left.exists(_.isZero), this.copy(spendLimit = left))
@@ -44,19 +44,18 @@ object FeeGrant {
 
   implicit val basicAllowanceWrites: Writes[BasicAllowance] = Json.writes[BasicAllowance]
 
-  case class PeriodicAllowance(basicAllowance: BasicAllowance, period: String, periodSpendLimit: Seq[Coin], periodCanSpend: Seq[Coin], periodReset: String) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[String] = basicAllowance.getExpiration
+  case class PeriodicAllowance(basicAllowance: BasicAllowance, period: String, periodSpendLimit: Seq[Coin], periodCanSpend: Seq[Coin], periodReset: RFC3339) extends AbstarctFeeGrant.FeeAllowance {
+    def getExpiration: Option[RFC3339] = basicAllowance.getExpiration
 
-    def validate(blockTime: String, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (getExpiration.nonEmpty && utilities.Date.isAfter(t1 = blockTime, t2 = getExpiration.getOrElse("")))
-        (true, this)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
+      if (getExpiration.fold(false)(_.isBefore(blockTime))) (true, this)
       else {
-        val (resetPeriodCanSpend, updatedPeriodReset) = if (!utilities.Date.isBefore(t1 = blockTime, t2 = this.periodReset)) {
+        val (resetPeriodCanSpend, updatedPeriodReset) = if (!blockTime.isBefore(this.periodReset)) {
           val (_, isNeg) = utilities.Blockchain.subtractCoins(fromCoins = this.basicAllowance.spendLimit, amount = this.periodSpendLimit)
           val resetPeriodCanSpend = if (isNeg && this.basicAllowance.spendLimit.nonEmpty) this.basicAllowance.spendLimit else this.periodSpendLimit
           val updatedPeriodReset = {
-            val addPeriod = utilities.Date.addTime(timestamp = this.periodReset, addEpochTime = utilities.Date.getEpoch(this.period))
-            if (utilities.Date.isAfter(t1 = blockTime, t2 = addPeriod)) utilities.Date.addTime(blockTime, utilities.Date.getEpoch(this.period)) else addPeriod
+            val addPeriod = blockTime.addEpoch(utilities.Date.getEpoch(this.period))
+            if (blockTime.isAfter(addPeriod)) blockTime.addEpoch(utilities.Date.getEpoch(this.period)) else addPeriod
           }
           (resetPeriodCanSpend, updatedPeriodReset)
         } else (this.periodCanSpend, this.periodReset)
@@ -74,9 +73,9 @@ object FeeGrant {
   implicit val periodicAllowanceWrites: Writes[PeriodicAllowance] = Json.writes[PeriodicAllowance]
 
   case class AllowedMsgAllowance(allowance: Allowance, allowedMessages: Seq[String]) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[String] = allowance.value.getExpiration
+    def getExpiration: Option[RFC3339] = allowance.value.getExpiration
 
-    def validate(blockTime: String, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = this.allowance.value.validate(blockTime, fees)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = this.allowance.value.deleteAndUpdate(blockTime, fees)
   }
 
   implicit val allowedMsgAllowanceReads: Reads[AllowedMsgAllowance] = Json.reads[AllowedMsgAllowance]

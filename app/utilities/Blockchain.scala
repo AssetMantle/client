@@ -3,6 +3,7 @@ package utilities
 import models.Abstract.Authz.Authorization
 import models.common.FeeGrant.Allowance
 import models.common.Serializable.Coin
+import utilities.Date.RFC3339
 
 object Blockchain {
 
@@ -23,4 +24,6 @@ object Blockchain {
   object FeeGrant {
     case class ValidateResponse(delete: Boolean, updated: Allowance)
   }
+
+  case class SlashingEvidence(height: Int, time: RFC3339, validatorHexAddress: String, validatorPower: MicroNumber)
 }

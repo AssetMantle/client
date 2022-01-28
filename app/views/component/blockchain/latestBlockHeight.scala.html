@@ -1,6 +1,7 @@
 @import views.html.base._
+@import utilities.Date.RFC3339
 
-@(blockHeight: Int, proposer: String, time: String, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockHeight: Int, proposer: String, time: RFC3339, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
 } {
@@ -31,5 +32,5 @@
 }
 
 <script>
-    convertUTCDateToLocalDate("@time", "latestBlockHeight_time")
+    convertUTCDateToLocalDate("@time.toString", "latestBlockHeight_time")
 </script>

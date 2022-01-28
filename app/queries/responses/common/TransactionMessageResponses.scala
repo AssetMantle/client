@@ -7,6 +7,7 @@ import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.{ProposalContent, PublicKey, TransactionMessageResponse}
 import queries.responses.blockchain.TransactionResponse.Msg
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object TransactionMessageResponses {
@@ -25,7 +26,7 @@ object TransactionMessageResponses {
   implicit val createVestingAccountReads: Reads[CreateVestingAccount] = Json.reads[CreateVestingAccount]
 
   //authz
-  case class Grant(authorization: Authz.Authorization, expiration: String) {
+  case class Grant(authorization: Authz.Authorization, expiration: RFC3339) {
     def toSerializable: TransactionMessages.Grant = TransactionMessages.Grant(authorization = authorization.toSerializable, expiration = expiration)
   }
 
@@ -106,8 +107,8 @@ object TransactionMessageResponses {
 
   implicit val fundCommunityPoolReads: Reads[FundCommunityPool] = Json.reads[FundCommunityPool]
 
-  //evidence - TODO As evidence interface
-  case class Equivocation(height: String, time: String, power: String, consensus_address: String) {
+  //evidence - TODO evidence as interface - there is only struct which implements this (Equivocation) as of v0.44.5
+  case class Equivocation(height: String, time: RFC3339, power: String, consensus_address: String) {
     def toEvidence: TransactionMessages.Equivocation = TransactionMessages.Equivocation(height = height.toInt, time = time, power = power, consensusAddress = consensus_address)
   }
 
@@ -120,7 +121,6 @@ object TransactionMessageResponses {
   implicit val submitEvidenceReads: Reads[SubmitEvidence] = Json.reads[SubmitEvidence]
 
   // feeGrant
-
   case class FeeGrantAllowance(granter: String, grantee: String, allowance: FeeGrant.Allowance) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.FeeGrantAllowance(granter = granter, grantee = grantee, allowance = allowance.toSerializable)
   }
@@ -172,7 +172,7 @@ object TransactionMessageResponses {
 
   implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]
 
-  case class Commission(commission_rates: CommissionRates, update_time: String) {
+  case class Commission(commission_rates: CommissionRates, update_time: RFC3339) {
     def toCommission: Serializable.Validator.Commission = Serializable.Validator.Commission(commissionRates = commission_rates.toCommissionRates, updateTime = update_time)
   }
 

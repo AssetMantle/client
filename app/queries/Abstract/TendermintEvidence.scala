@@ -3,14 +3,10 @@ package queries.Abstract
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Reads}
 import queries.responses.blockchain.BlockResponse.tendermintEvidenceApply
-import utilities.MicroNumber
+import utilities.Blockchain.SlashingEvidence
 
 abstract class TendermintEvidence {
-  val height: Int
-  val timeStamp: String
-  val validatorHexAddress: String
-  val validatorPower: MicroNumber
-  val totalVotingPower: MicroNumber
+  def getSlashingEvidences: Seq[SlashingEvidence]
 }
 
 object TendermintEvidence {

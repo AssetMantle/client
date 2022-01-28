@@ -546,6 +546,7 @@ object View {
   val PERIOD_RESET = "PERIOD_RESET"
   val ALLOWED_MESSAGES = "ALLOWED_MESSAGES"
   val STAKE_AUTHORIZATION_TYPE = "STAKE_AUTHORIZATION_TYPE"
+  val NO_EXPIRY_DATE = "NO_EXPIRY_DATE"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",

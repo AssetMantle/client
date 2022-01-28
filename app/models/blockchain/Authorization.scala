@@ -10,13 +10,14 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.Date.RFC3339
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Authorizations @Inject()(
@@ -37,10 +38,10 @@ class Authorizations @Inject()(
   private[models] val authorizationTable = TableQuery[AuthorizationTable]
 
   case class AuthorizationSerialized(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: String, expiration: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Authorization = Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = utilities.JSON.convertJsonStringToObject[Authz.Authorization](grantedAuthorization), expiration = expiration, createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+    def deserialize: Authorization = Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = utilities.JSON.convertJsonStringToObject[Authz.Authorization](grantedAuthorization), expiration = RFC3339(expiration), createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(authorization: Authorization): AuthorizationSerialized = AuthorizationSerialized(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.msgTypeURL, grantedAuthorization = Json.toJson(authorization.grantedAuthorization).toString, expiration = authorization.expiration, createdBy = authorization.createdBy, createdOn = authorization.createdOn, createdOnTimeZone = authorization.createdOnTimeZone, updatedBy = authorization.updatedBy, updatedOn = authorization.updatedOn, updatedOnTimeZone = authorization.updatedOnTimeZone)
+  def serialize(authorization: Authorization): AuthorizationSerialized = AuthorizationSerialized(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.msgTypeURL, grantedAuthorization = Json.toJson(authorization.grantedAuthorization).toString, expiration = authorization.expiration.toString, createdBy = authorization.createdBy, createdOn = authorization.createdOn, createdOnTimeZone = authorization.createdOnTimeZone, updatedBy = authorization.updatedBy, updatedOn = authorization.updatedOn, updatedOnTimeZone = authorization.updatedOnTimeZone)
 
   private def add(authorization: Authorization): Future[String] = db.run((authorizationTable returning authorizationTable.map(_.granter) += serialize(authorization)).asTry).map {
     case Success(result) => result
@@ -105,7 +106,7 @@ class Authorizations @Inject()(
 
   object Service {
 
-    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: String): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization, expiration = expiration))
+    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization, expiration = expiration))
 
     def tryGet(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = findByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL).map(_.deserialize)
 

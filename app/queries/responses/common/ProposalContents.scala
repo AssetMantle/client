@@ -6,13 +6,14 @@ import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads}
 import queries.Abstract.ProposalContent
+import utilities.Date.RFC3339
 
 object ProposalContents {
   private implicit val module: String = constants.Module.PROPOSAL_CONTENT_RESPONSE
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  case class Plan(name: String, time: String, height: String, info: String) {
+  case class Plan(name: String, time: RFC3339, height: String, info: String) {
     def toSerializablePlan: SerializableProposalContents.Plan = SerializableProposalContents.Plan(name = name, time = time, height = height, info = info)
   }
 

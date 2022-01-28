@@ -15,6 +15,7 @@ import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
 import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
 import queries.responses.common.ProposalContents.CommunityPoolSpend
 import queries.responses.common.{Event, Header}
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -149,7 +150,7 @@ class Block @Inject()(
     def getWebSocketNewBlock(proposer: String): actorsMessage.WebSocket.NewBlock = actorsMessage.WebSocket.NewBlock(
       block = actorsMessage.WebSocket.Block(
         height = blockCommitResponse.result.signed_header.header.height,
-        time = blockCommitResponse.result.signed_header.header.time,
+        time = blockCommitResponse.result.signed_header.header.time.toString,
         proposer = proposer),
       txs = transactions.map(tx => actorsMessage.WebSocket.Tx(
         hash = tx.hash,
@@ -179,11 +180,13 @@ class Block @Inject()(
       val deductFeesFrom = if (transaction.getFeeGranter != "") {
         val grantee = transaction.getFeePayer
         val feeGrant = blockchainFeeGrants.Service.tryGet(granter = transaction.getFeeGranter, grantee = grantee)
+
         def updateOrDeleteFeeGrant(feeGrant: FeeGrant) = {
           val response = feeGrant.allowance.validate(blockTime = header.time, fees = transaction.fee.amount)
           if (response.delete) blockchainFeeGrants.Service.delete(granter = transaction.getFeeGranter, grantee = grantee)
           else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated))
         }
+
         for {
           feeGrant <- feeGrant
           _ <- updateOrDeleteFeeGrant(feeGrant)
@@ -326,8 +329,8 @@ class Block @Inject()(
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
-          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) Future(height - 2)
-          else Future(blockResponse.result.block.evidence.evidence.find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
+          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) (height - 2)
+          else (blockResponse.result.block.evidence.evidence.flatMap(_.getSlashingEvidences).find(_.validatorHexAddress == hexAddress).getOrElse(throw new BaseException(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND)).height - 1)
 
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
             val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
@@ -338,8 +341,7 @@ class Block @Inject()(
           for {
             operatorAddress <- operatorAddress
             slashingReason <- slashingReason
-            distributionHeight <- getDistributionHeight(slashingReason)
-            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = distributionHeight)
+            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = getDistributionHeight(slashingReason))
           } yield (operatorAddress, slashingReason)
         })
       }
@@ -470,7 +472,7 @@ class Block @Inject()(
     }
   })
 
-  def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event], currentBlockTimeStamp: String): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
+  def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
     val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator, currentBlockTimeStamp = currentBlockTimeStamp) else Future(throw new BaseException(constants.Response.INVALID_UNBONDING_COMPLETION_EVENT))
@@ -482,7 +484,7 @@ class Block @Inject()(
     }
   })
 
-  def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event], currentBlockTimeStamp: String): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
+  def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
     val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value.getOrElse(""))
     val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
@@ -495,7 +497,7 @@ class Block @Inject()(
     }
   })
 
-  private def slash(validatorAddress: String, infractionHeight: Int, currentBlockHeight: Int, currentBlockTIme: String, slashingFraction: BigDecimal) = {
+  private def slash(validatorAddress: String, infractionHeight: Int, currentBlockHeight: Int, currentBlockTIme: RFC3339, slashingFraction: BigDecimal) = {
     val validator = blockchainValidators.Service.tryGet(validatorAddress)
 
     def update(validator: Validator) = if (!validator.isUnbonded && infractionHeight < currentBlockHeight) {

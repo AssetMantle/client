@@ -6,6 +6,8 @@ import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
 import transactions.Abstract.BaseResponse
+import utilities.Blockchain.SlashingEvidence
+import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object BlockResponse {
@@ -14,26 +16,22 @@ object BlockResponse {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  case class Vote(`type`: Int, height: String, round: Int, timestamp: String, validator_address: String, validator_index: Int, signature: String)
+  case class Vote(`type`: Int, height: String, round: Int, timestamp: RFC3339, validator_address: String, validator_index: Int, signature: String)
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 
-  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: String) extends TendermintEvidence {
-    val height: Int = vote_a.height.toInt
-    val timeStamp: String = Timestamp
-    val validatorHexAddress: String = vote_a.validator_address
-    val validatorPower: MicroNumber = MicroNumber(ValidatorPower)
-    val totalVotingPower: MicroNumber = MicroNumber(TotalVotingPower)
+  case class DuplicateVoteEvidence(vote_a: Vote, vote_b: Vote, TotalVotingPower: String, ValidatorPower: String, Timestamp: RFC3339) extends TendermintEvidence {
+    def getSlashingEvidences: Seq[SlashingEvidence] = Seq(SlashingEvidence(height = vote_a.height.toInt, time = Timestamp, validatorHexAddress = vote_a.validator_address, validatorPower = MicroNumber(ValidatorPower)))
   }
 
   implicit val duplicateVoteEvidenceReads: Reads[DuplicateVoteEvidence] = Json.reads[DuplicateVoteEvidence]
 
-  case class LightClientAttackEvidence(CommonHeight: String, Timestamp: String) extends TendermintEvidence {
-    val height: Int = CommonHeight.toInt
-    val timeStamp: String = Timestamp
-    val validatorHexAddress: String = ""
-    val validatorPower: MicroNumber = MicroNumber.zero
-    val totalVotingPower: MicroNumber = MicroNumber.zero
+  case class ByzantineValidator(address: String, voting_power: String)
+
+  implicit val byzantineValidatorReads: Reads[ByzantineValidator] = Json.reads[ByzantineValidator]
+
+  case class LightClientAttackEvidence(CommonHeight: String, ByzantineValidators: Seq[ByzantineValidator], TotalVotingPower: String, Timestamp: RFC3339) extends TendermintEvidence {
+    def getSlashingEvidences: Seq[SlashingEvidence] = this.ByzantineValidators.map(validator => SlashingEvidence(height = this.CommonHeight.toInt, time = this.Timestamp, validatorHexAddress = validator.address, validatorPower = MicroNumber(validator.voting_power)))
   }
 
   implicit val lightClientAttackEvidenceReads: Reads[LightClientAttackEvidence] = Json.reads[LightClientAttackEvidence]

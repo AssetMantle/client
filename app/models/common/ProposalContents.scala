@@ -6,6 +6,7 @@ import models.common.Serializable.Coin
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads, Writes}
+import utilities.Date.RFC3339
 
 object ProposalContents {
 
@@ -13,7 +14,7 @@ object ProposalContents {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  case class Plan(name: String, time: String, height: String, info: String)
+  case class Plan(name: String, time: RFC3339, height: String, info: String)
 
   implicit val plainReads: Reads[Plan] = Json.reads[Plan]
 
