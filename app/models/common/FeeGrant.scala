@@ -54,7 +54,7 @@ object FeeGrant {
           val (_, isNeg) = utilities.Blockchain.subtractCoins(fromCoins = this.basicAllowance.spendLimit, amount = this.periodSpendLimit)
           val resetPeriodCanSpend = if (isNeg && this.basicAllowance.spendLimit.nonEmpty) this.basicAllowance.spendLimit else this.periodSpendLimit
           val updatedPeriodReset = {
-            val addPeriod = blockTime.addEpoch(utilities.Date.getEpoch(this.period))
+            val addPeriod = this.periodReset.addEpoch(utilities.Date.getEpoch(this.period))
             if (blockTime.isAfter(addPeriod)) blockTime.addEpoch(utilities.Date.getEpoch(this.period)) else addPeriod
           }
           (resetPeriodCanSpend, updatedPeriodReset)
