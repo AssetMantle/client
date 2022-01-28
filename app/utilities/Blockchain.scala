@@ -23,4 +23,6 @@ object Blockchain {
   object FeeGrant {
     case class ValidateResponse(delete: Boolean, updated: Allowance)
   }
+
+  case class SlashingEvidence(height: Int, time: String, validatorHexAddress: String, validatorPower: MicroNumber)
 }
