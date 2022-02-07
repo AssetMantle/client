@@ -17,6 +17,7 @@ GET         /docusign/authorization                              controllers.Doc
 GET         /docusign/callBack                                   controllers.DocusignController.callBack(envelopeId:String, event:String)
 GET         /docusign/authorizationCallBack                      controllers.DocusignController.authorizationCallBack(code:String)
 
+GET         /account                                             controllers.ViewController.account
 GET         /profile                                             controllers.ViewController.profile
 GET         /identity                                            controllers.ViewController.identity
 GET         /asset                                               controllers.ViewController.asset
@@ -43,27 +44,11 @@ GET         /profilePicture                                      controllers.Com
 GET         /account/signUp                                      controllers.AccountController.signUpForm
 POST        /account/signUp                                      controllers.AccountController.signUp
 
-GET         /account/createWallet                                controllers.AccountController.createWalletForm(username: String)
-POST        /account/createWallet                                controllers.AccountController.createWallet
+GET         /account/signIn                                      controllers.AccountController.signInForm
+POST        /account/signIn                                      controllers.AccountController.signIn
 
-GET         /account/checkMnemonics                              controllers.AccountController.checkMnemonics(mnemonics: String)
-GET         /account/importWallet                                controllers.AccountController.importWalletForm
-POST        /account/importWallet                                controllers.AccountController.importWallet
-
-GET         /account/login                                       controllers.AccountController.loginForm
-POST        /account/login                                       controllers.AccountController.login
-
-GET         /account/logout                                      controllers.AccountController.logoutForm
-POST        /account/logout                                      controllers.AccountController.logout
-
-GET         /account/changePassword                              controllers.AccountController.changePasswordForm
-POST        /account/changePassword                              controllers.AccountController.changePassword
-
-GET         /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername                      controllers.AccountController.emailOTPForgotPassword
-
-GET         /account/forgotPassword                              controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                              controllers.AccountController.forgotPassword
+GET         /account/signOut                                     controllers.AccountController.signOutForm
+POST        /account/signOut                                     controllers.AccountController.signOut
 
 GET         /account/checkUsernameAvailable                      controllers.AccountController.checkUsernameAvailable(username: String)
 

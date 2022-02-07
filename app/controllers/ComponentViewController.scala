@@ -108,7 +108,7 @@ class ComponentViewController @Inject()(
         loginState match {
           case Some(loginState) => {
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.explorer.account())
+            withUsernameToken.Ok(views.html.assetMantle.account())
           }
           case None => Future(Ok(views.html.component.blockchain.account.wallet(address)))
         }

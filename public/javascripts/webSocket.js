@@ -1,4 +1,4 @@
-let webSocket;
+webSocket = {};
 
 function init() {
     webSocket = new WebSocket(ws.url);

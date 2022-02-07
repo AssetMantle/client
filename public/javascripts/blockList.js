@@ -1,7 +1,7 @@
-let blockListPageNumber = 1;
+blockListPageNumber = 1;
 
 function getBlockList(change = 0) {
-    blockListPageNumber = blockListPageNumber + change;
+    blockListPageNumber += change;
     componentResource('blockListPage', jsRoutes.controllers.ComponentViewController.blockListPage(blockListPageNumber), 'blockListPageChangeSpinner', 'pageChange');
     showHideBlockListBackButtons();
 }

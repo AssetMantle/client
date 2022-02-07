@@ -1,4 +1,4 @@
-const firebaseConfig = {
+firebaseConfig = {
     apiKey: "AIzaSyBEvfVgcKstwt7qzgnusGTrtHMf3sCEzQY",
     authDomain: "comdex-3be8d.firebaseapp.com",
     databaseURL: "https://comdex-3be8d.firebaseio.com",
@@ -8,11 +8,11 @@ const firebaseConfig = {
     appId: "1:656465615885:web:18bfbb26f03fd043278944",
 };
 
-const ws = {
+ws = {
     url: 'wss://' + $(location).attr('host') + '/websocket',
     start: 'START',
 };
 if ($(location).attr('host') === "localhost:9000") {
     ws.url = 'ws://' + $(location).attr('host') + '/websocket'
 }
-let addState = true
+addState = true

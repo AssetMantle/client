@@ -1,7 +1,7 @@
-let transactionListPageNumber = 1;
+transactionListPageNumber = 1;
 
 function getTransactionList(change = 0) {
-    transactionListPageNumber = transactionListPageNumber + change;
+    transactionListPageNumber += change;
     componentResource('transactionListPage', jsRoutes.controllers.ComponentViewController.transactionListPage(transactionListPageNumber), 'transactionListPageChangeSpinner', 'pageChange');
     showHideTransactionListBackButtons();
 }

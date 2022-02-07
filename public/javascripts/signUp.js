@@ -1,5 +1,5 @@
-let timer = 0;
-let timeoutFlag = true;
+timer = 0;
+timeoutFlag = true;
 
 function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {
@@ -8,7 +8,7 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
         timer = setTimeout(function () {
             timeoutFlag = true;
             const username = $(source).val();
-            const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
+            // const usernameAvailableCheckBox = $(usernameAvailableCheckBoxID);
             const route = jsRoutes.controllers.AccountController.checkUsernameAvailable(username);
             let loadingSpinner = $('#usernameAvailableLoading');
             if (username.length > 0) {
@@ -25,12 +25,12 @@ function checkUsernameAvailable(source, usernameAvailableCheckBoxID) {
                     },
                     statusCode: {
                         200: function () {
-                            usernameAvailableCheckBox[0].checked = true;
+                            // usernameAvailableCheckBox[0].checked = true;
                             $("#checkUsernameAvailableResult").fadeOut();
                             $("#checkIcon").fadeIn();
                         },
                         204: function () {
-                            usernameAvailableCheckBox[0].checked = false;
+                            // usernameAvailableCheckBox[0].checked = false;
                             $("#checkIcon").fadeOut();
                             $("#checkUsernameAvailableResult").fadeIn();
                         },
@@ -65,4 +65,14 @@ function showPassword() {
         password.type = "password";
         matchPassword.type = "password";
     }
+}
+
+async function keplrOnSignUp(source) {
+    const username = $('#signUpUsername').val();
+    const [offlineSigner, address] = await getKeplrWallet();
+    const signArbitraryResponse = await signArbitrary(address, username);
+    $('#signUpPublicKeyType').val(signArbitraryResponse.pub_key.type);
+    $('#signUpPublicKey').val(signArbitraryResponse.pub_key.value);
+    $('#signUpSignature').val(signArbitraryResponse.signature);
+    submitForm(source, 'commonModalContent');
 }

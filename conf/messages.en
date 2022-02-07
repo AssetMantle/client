@@ -1,9 +1,9 @@
 INDEX=Persistence Explorer: Native block explorer for Persistence chains
 USERNAME=Username
 PASSWORD=Password
-LOGIN=Login
-LOGOUT=Log Out
-SIGNUP=Sign Up
+SIGN_UP=Sign Up
+SIGN_IN=Sign In
+SIGN_OUT=Sign Out
 SEARCH=Search
 META_DESCRIPTION=Native block explorer for Persistence chains. Get real time block event updates and query transactions, wallets, validator set and chain metrics.
 #//Contact
@@ -109,8 +109,8 @@ EMAIL.VERIFY_EMAIL.MESSAGE = Your OTP for registering your Persistence account i
 EMAIL.EMAIL_VERIFIED.SUBJECT=Email has been verified
 EMAIL.EMAIL_VERIFIED.MESSAGE=Email has been verified
 FORM.SIGN_UP.LEGEND=Sign Up
-FORM.LOGIN.LEGEND=Login
-FORM.LOGIN.SUBMIT=Sign in
+FORM.SIGN_IN.LEGEND=Sign In
+FORM.SIGN_IN.SUBMIT=Sign in
 FORM.FORGOT_PASSWORD.LEGEND=Forgot Password
 FORM.FORGOT_PASSWORD.SUBMIT=Change Password
 CONFIRM_PASSWORD=Confirm Password
@@ -798,6 +798,7 @@ DELEGATIONS=Delegations
 NO_DELEGATIONS_FOUND=No delegations found!
 APY=APY
 TRANSACTION_STATISTICS_X_LABEL=Blocks ( x{0})
+KEPLR=Keplr
 
 PUSH_NOTIFICATION.VALIDATOR_CREATED.TITLE=New Validator
 PUSH_NOTIFICATION.VALIDATOR_CREATED.MESSAGE={0} started.

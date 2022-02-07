@@ -1,7 +1,5 @@
 package constants
 
-import java.util.Date
-
 import play.api.data.Forms.{boolean, date, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
@@ -9,11 +7,12 @@ import play.api.data.validation.Constraints
 import utilities.MicroNumber
 import utilities.NumericOperation.checkPrecision
 
+import java.util.Date
 import scala.util.matching.Regex
 
 object FormField {
   //StringFormField
-  val SIGNUP_USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
+  val SIGN_IN_USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
   val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
@@ -71,6 +70,9 @@ object FormField {
   val LABEL = new StringFormField("LABEL", 1, 200)
   val ENTITY_ID = new StringFormField("ENTITY_ID", 1, 500)
   val VALUE = new StringFormField("VALUE", 1, 1000)
+  val PUBLIC_KEY_TYPE = new StringFormField("PUBLIC_KEY_TYPE", 1, 100)
+  val PUBLIC_KEY = new StringFormField("PUBLIC_KEY", 1, 500)
+  val SIGNATURE = new StringFormField("SIGNATURE", 1, 1000)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)

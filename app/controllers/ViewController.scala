@@ -25,6 +25,15 @@ class ViewController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
 
+  def account: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      (for {
+        result <- withUsernameToken.Ok(views.html.assetMantle.account())
+      } yield result).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       (for {

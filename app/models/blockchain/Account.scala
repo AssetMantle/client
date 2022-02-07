@@ -3,6 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
+import models.common.PublicKeys.SinglePublicKey
 import models.common.Serializable.Vesting.VestingParameters
 import models.common.TransactionMessages.CreateVestingAccount
 import models.master
@@ -20,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, username: String, accountType: String, publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(address: String, username: String, accountType: Option[String], publicKey: Option[PublicKey], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Accounts @Inject()(
@@ -44,7 +45,7 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(address: String, username: String, accountType: String, publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  case class AccountSerialized(address: String, username: String, accountType: Option[String], publicKey: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Account = Account(address = address, username = username, accountType = accountType, publicKey = publicKey.fold[Option[PublicKey]](None)(x => Option(utilities.JSON.convertJsonStringToObject[PublicKey](x))), accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -112,7 +113,7 @@ class Accounts @Inject()(
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account_BC") {
 
-    def * = (address, username, accountType, publicKey.?, accountNumber, sequence, vestingParameters.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (address, username, accountType.?, publicKey.?, accountNumber, sequence, vestingParameters.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -143,7 +144,7 @@ class Accounts @Inject()(
 
   object Service {
 
-    def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = accountType, publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
+    def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = Option(accountType), publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
@@ -223,6 +224,29 @@ class Accounts @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-  }
 
+    def onKeplrSignUp(address: String, username: String, publicKey: String): Future[Unit] = {
+      val optionalAccountResponse = {
+        val accountResponse = getAccount.Service.get(address)
+        (for {
+          accountResponse <- accountResponse
+        } yield Option(accountResponse)).recover {
+          case baseException: BaseException => if (baseException.failure.logMessage == s"LOG.rpc error: code = NotFound desc = account ${address} not found: key not found") {
+            None
+          } else throw baseException
+        }
+      }
+
+      def upsert(optionalAccountResponse: Option[AccountResponse]) = optionalAccountResponse.fold {
+        Service.insertOrUpdate(Account(address = address, username = username, accountType = None, publicKey = Option(SinglePublicKey(publicKeyType = constants.Blockchain.PublicKey.SINGLE, key = publicKey)), accountNumber = -1, sequence = 0, vestingParameters = None))
+      } { accountResponse => Service.insertOrUpdate(accountResponse.account.toSerializableAccount(username)) }
+
+      (for {
+        optionalAccountResponse <- optionalAccountResponse
+        _ <- upsert(optionalAccountResponse)
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
+    }
+  }
 }
