@@ -1,45 +1,56 @@
-@import controllers.actions.LoginState
 @import constants.AppConfig.OtherApp
+@import controllers.actions.LoginState
+@import models.master.Profile
+@import views.html.base._
 
-@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(profile: Option[Profile], email: String, mobile: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, otherApps: Seq[OtherApp], loginState: LoginState)
 
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="leftContainer">
-        <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cmuk-card-styles containerHeight"></div>
-        <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
-    </div>
-    <script>
-            componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
-            componentResource('tokensStatistics', jsRoutes.controllers.ComponentViewController.tokensStatistics());
-    </script>
 }
 
 @center = {
-    <div class="cmuk-container cmuk-margin-bottom profileContainer">
-        <div class="cmuk-grid-small" cmuk-grid>
-            <div class="cmuk-width-1-2@@m profileDetails">
-                <div id="commonHome"></div>
-            </div>
-            <div class="cmuk-width-1-2@@m">
-                <div id="contact" class="contactDetails"></div>
+    <div class="cmuk-card cmuk-card-default cmuk-animation-fade">
+        <div class="cmuk-overflow-auto">
+            <div class="cmuk-card-body">
+                <div>
+                    <div id="profilePhoto" class="cmuk-text-center"></div>
+                </div>
+                <div>
+                    @commonFormButton(constants.Form.UPDATE_PROFILE)
+                    @commonFormButton(constants.Form.UPDATE_SOCIAL_PROFILE)
+                    @commonTextInfo(constants.View.NAME, profile.fold("")(_.name))
+                    @commonTextInfo(constants.View.DESCRIPTION, profile.fold("")(_.description))
+                    @commonTextInfo(constants.View.EMAIL_ADDRESS, email)
+                    @commonTextInfo(constants.View.MOBILE_NUMBER, mobile)
+                </div>
+                <div>
+                    @commonTextInfo(constants.User.USER_NAME, loginState.username)
+                    @commonTextInfo(constants.User.USER_TYPE, loginState.userType)
+                    @commonTextInfo(constants.View.BLOCKCHAIN_ADDRESS, loginState.address)
+                </div>
+                <div>
+                @if(profile.isDefined) {
+                    @profile.get.socialProfiles.map { socialProfile =>
+                        @commonTextInfo(socialProfile.platform, socialProfile.username)
+                    }
+                }
+                </div>
             </div>
         </div>
+        @commonSpinner("accountProfile")
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
-            componentResource('contact', jsRoutes.controllers.ContactController.contact());
+            componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture(), 'DETAILS_LOADING');
     </script>
 }
 
 @right = {
     <div class="rightContainer">
         <div id="recentActivities" class="recentActivityContainer cmuk-card-styles containerHeight"></div>
-        <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
     </div>
     <script>
             componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());
-            componentResource('votingPowers', jsRoutes.controllers.ComponentViewController.votingPowers());
     </script>
 }

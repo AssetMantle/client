@@ -22,9 +22,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.AccountController.signInForm,
           routes.javascript.AccountController.signOutForm,
           routes.javascript.AccountController.checkUsernameAvailable,
-          routes.javascript.AccountController.addIdentificationForm,
-          routes.javascript.AccountController.userViewUploadOrUpdateIdentification,
-          routes.javascript.AccountController.userReviewIdentificationForm,
+          routes.javascript.AccountController.updateProfileForm,
+          routes.javascript.AccountController.updateSocialProfileForm,
 
           routes.javascript.AssetController.defineForm,
           routes.javascript.AssetController.mintForm,
@@ -50,7 +49,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
           routes.javascript.ComponentViewController.commonHome,
           routes.javascript.ComponentViewController.profilePicture,
-          routes.javascript.ComponentViewController.identification,
           routes.javascript.ComponentViewController.recentActivities,
 
           routes.javascript.ComponentViewController.latestBlockHeight,
@@ -125,11 +123,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.FileController.updateAccountFileForm,
           routes.javascript.FileController.updateAccountFile,
           routes.javascript.FileController.file,
-          routes.javascript.FileController.uploadAccountKYCForm,
-          routes.javascript.FileController.uploadAccountKYC,
-          routes.javascript.FileController.storeAccountKYC,
-          routes.javascript.FileController.updateAccountKYCForm,
-          routes.javascript.FileController.updateAccountKYC,
 
           routes.javascript.IdentityController.nubForm,
           routes.javascript.IdentityController.defineForm,
@@ -145,8 +138,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.NotificationController.recentActivityMessages,
           routes.javascript.NotificationController.unreadNotificationCount,
           routes.javascript.NotificationController.markNotificationRead,
-
-          routes.javascript.SendCoinController.sendCoinForm,
 
           routes.javascript.OrderController.defineForm,
           routes.javascript.OrderController.makeForm,

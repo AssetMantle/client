@@ -4,6 +4,7 @@ import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+import models.master
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -14,6 +15,9 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ViewController @Inject()(
+                                masterMobiles: master.Mobiles,
+                                masterEmails: master.Emails,
+                                masterProfiles: master.Profiles,
                                 messagesControllerComponents: MessagesControllerComponents,
                                 withLoginActionAsync: WithLoginActionAsync,
                                 withUsernameToken: WithUsernameToken,
@@ -36,8 +40,15 @@ class ViewController @Inject()(
 
   def profile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
+      val masterProfile = masterProfiles.Service.get(loginState.username)
+      val email = masterEmails.Service.get(loginState.username)
+      val mobile = masterMobiles.Service.get(loginState.username)
+
       (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.profile())
+        masterProfile <- masterProfile
+        email <- email
+        mobile <- mobile
+        result <- withUsernameToken.Ok(views.html.assetMantle.profile(profile = masterProfile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber)))
       } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

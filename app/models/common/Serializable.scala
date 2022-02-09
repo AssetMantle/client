@@ -16,6 +16,12 @@ object Serializable {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  case class SocialProfile(platform: String, username: String, url: String)
+
+  implicit val socialProfileWrites: OWrites[SocialProfile] = Json.writes[SocialProfile]
+
+  implicit val socialProfileReads: Reads[SocialProfile] = Json.reads[SocialProfile]
+
   case class Address(addressLine1: String, addressLine2: String, landmark: Option[String] = None, city: String, country: String, zipCode: String, phone: String)
 
   implicit val addressWrites: OWrites[Address] = Json.writes[Address]

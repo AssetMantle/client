@@ -43,7 +43,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         loginState match {
           case Some(loginState) =>
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.assetMantle.profile())
+            withUsernameToken.Ok(views.html.assetMantle.account())
           case None => Future(Ok(views.html.index()))
         }
     }

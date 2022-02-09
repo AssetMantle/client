@@ -4,8 +4,7 @@ import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.common.Serializable.Address
-import models.master.Identification
+import models.master.{Email, Mobile, Profile}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -13,8 +12,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import transactions.blockchain.{AddKey, ChangePassword, ForgotPassword}
 import utilities.KeyStore
-import views.companion.master.AddIdentification.AddressData
-import views.companion.master.{SignIn, SignOut, SignUp}
+import views.companion.master._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,6 +25,7 @@ class AccountController @Inject()(
                                    withUsernameToken: WithUsernameToken,
                                    blockchainAccounts: blockchain.Accounts,
                                    masterAccounts: master.Accounts,
+                                   masterProfiles: master.Profiles,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
@@ -88,14 +87,10 @@ class AccountController @Inject()(
                 } yield LoginState(username = signUpData.username, userType = masterAccount.userType, address = address)
               } else throw new BaseException(constants.Response.INCORRECT_USERNAME_OR_WALLET_ADDRESS)
             }
-            val contactWarnings: Future[Seq[constants.Response.Warning]] = {
-              val email = masterEmails.Service.get(signUpData.username)
-              val mobile = masterMobiles.Service.get(signUpData.username)
-              for {
-                email <- email
-                mobile <- mobile
-              } yield utilities.Contact.getWarnings(mobile, email)
-            }
+
+            val profile = masterProfiles.Service.get(signUpData.username)
+            val email = masterEmails.Service.get(signUpData.username)
+            val mobile = masterMobiles.Service.get(signUpData.username)
 
             def sendNotification = {
               val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = signUpData.username, token = signUpData.pushNotificationToken)
@@ -105,13 +100,15 @@ class AccountController @Inject()(
               } yield ()
             }
 
-            def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(warnings = warnings))
+            def getResult(warnings: Seq[constants.Response.Warning], profile: Option[Profile], email: Option[Email], mobile: Option[Mobile])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), warnings = warnings))
 
             (for {
               logInState <- logInState
-              contactWarnings <- contactWarnings
+              profile <- profile
+              email <- email
+              mobile <- mobile
               _ <- sendNotification
-              result <- getResult(contactWarnings)(logInState)
+              result <- getResult(utilities.Contact.getWarnings(mobile, email), profile, email, mobile)(logInState)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -148,16 +145,11 @@ class AccountController @Inject()(
 
           def validateSignature(address: String) = Future(utilities.Blockchain.verifySecp256k1Signature(publicKey = signInData.publicKey, data = utilities.Keplr.newArbitraryData(data = signInData.username, signer = address).getSHA256, signature = signInData.signature))
 
-          def getResult(validSignature: Boolean, address: String, masterAccount: master.Account) = if (validSignature) {
+          def result(validSignature: Boolean, address: String, masterAccount: master.Account) = if (validSignature) {
             val logInState = LoginState(username = masterAccount.id, userType = masterAccount.userType, address = address)
-            val contactWarnings: Future[Seq[constants.Response.Warning]] = {
-              val email = masterEmails.Service.get(masterAccount.id)
-              val mobile = masterMobiles.Service.get(masterAccount.id)
-              for {
-                email <- email
-                mobile <- mobile
-              } yield utilities.Contact.getWarnings(mobile, email)
-            }
+            val profile = masterProfiles.Service.get(signInData.username)
+            val email = masterEmails.Service.get(masterAccount.id)
+            val mobile = masterMobiles.Service.get(masterAccount.id)
 
             def sendNotification = {
               val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = signInData.username, token = signInData.pushNotificationToken)
@@ -167,12 +159,14 @@ class AccountController @Inject()(
               } yield ()
             }
 
-            def getResult(warnings: Seq[constants.Response.Warning])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(warnings = warnings))
+            def getResult(warnings: Seq[constants.Response.Warning], profile: Option[Profile], email: Option[Email], mobile: Option[Mobile])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), warnings = warnings))
 
             (for {
-              contactWarnings <- contactWarnings
+              profile <- profile
+              email <- email
+              mobile <- mobile
               _ <- sendNotification
-              result <- getResult(contactWarnings)(logInState)
+              result <- getResult(utilities.Contact.getWarnings(mobile, email), profile, email, mobile)(logInState)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -181,10 +175,10 @@ class AccountController @Inject()(
 
           (for {
             address <- address
-            bcAccount <- bcAccount
+            _ <- bcAccount
             masterAccount <- masterAccount
             validSignature <- validateSignature(address)
-            result <- getResult(validSignature, address, masterAccount)
+            result <- result(validSignature, address, masterAccount)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -219,122 +213,89 @@ class AccountController @Inject()(
       )
   }
 
+  def updateProfileForm: Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.component.master.account.updateProfile())
+  }
+
+  def updateProfile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      UpdateProfile.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.account.updateProfile(formWithErrors)))
+        },
+        updateProfileData => {
+          val optionalProfile = masterProfiles.Service.get(loginState.username)
+
+          def updateProfileNameDescription(optionalProfile: Option[Profile]) = optionalProfile.fold {
+            masterProfiles.Service.insertOrUpdate(Profile(accountID = loginState.username, name = updateProfileData.name, description = updateProfileData.description, socialProfiles = Seq()))
+          } { profile =>
+            masterProfiles.Service.insertOrUpdate(profile.copy(name = updateProfileData.name, description = updateProfileData.description))
+          }
+
+          def profile = masterProfiles.Service.get(loginState.username)
+
+          val email = masterEmails.Service.get(loginState.username)
+          val mobile = masterMobiles.Service.get(loginState.username)
+
+          (for {
+            optionalProfile <- optionalProfile
+            _ <- updateProfileNameDescription(optionalProfile)
+            profile <- profile
+            email <- email
+            mobile <- mobile
+          } yield Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def updateSocialProfileForm(platform: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+    implicit request =>
+      Ok(views.html.component.master.account.updateSocialProfile(platform = platform))
+  }
+
+  def updateSocialProfile: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      UpdateSocialProfile.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future(BadRequest(views.html.component.master.account.updateSocialProfile(formWithErrors, platform = formWithErrors.get.platform)))
+        },
+        updateSocialProfileData => {
+          val optionalProfile = masterProfiles.Service.get(loginState.username)
+
+          def updateProfileNameDescription(optionalProfile: Option[Profile]) = optionalProfile.fold {
+            masterProfiles.Service.insertOrUpdate(Profile(accountID = loginState.username, name = "", description = "", socialProfiles = Seq(updateSocialProfileData.toSocialProfile)))
+          } { profile =>
+            masterProfiles.Service.insertOrUpdate(profile.copy(socialProfiles = profile.socialProfiles :+ updateSocialProfileData.toSocialProfile))
+          }
+
+          def profile = masterProfiles.Service.get(loginState.username)
+
+          val email = masterEmails.Service.get(loginState.username)
+          val mobile = masterMobiles.Service.get(loginState.username)
+
+          (for {
+            optionalProfile <- optionalProfile
+            _ <- updateProfileNameDescription(optionalProfile)
+            profile <- profile
+            email <- email
+            mobile <- mobile
+          } yield Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
   def checkUsernameAvailable(username: String): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
       val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
       for {
         checkUsernameAvailable <- checkUsernameAvailable
       } yield if (checkUsernameAvailable) Ok else NoContent
-  }
-
-  def addIdentificationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      val identification = masterIdentifications.Service.get(loginState.username)
-
-      def getResult(identification: Option[Identification]): Future[Result] = identification match {
-        case Some(identity) => withUsernameToken.Ok(views.html.component.master.account.addIdentification(views.companion.master.AddIdentification.form.fill(views.companion.master.AddIdentification.Data(firstName = identity.firstName, lastName = identity.lastName, dateOfBirth = utilities.Date.sqlDateToUtilDate(identity.dateOfBirth), idNumber = identity.idNumber, idType = identity.idType, address = AddressData(identity.address.addressLine1, identity.address.addressLine2, identity.address.landmark, identity.address.city, identity.address.country, identity.address.zipCode, identity.address.phone)))))
-        case None => withUsernameToken.Ok(views.html.component.master.account.addIdentification())
-      }
-
-      (for {
-        identification <- identification
-        result <- getResult(identification)
-      } yield result
-        ).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def addIdentification(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.AddIdentification.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(views.html.component.master.account.addIdentification(formWithErrors)))
-        },
-        addIdentificationData => {
-          val add = masterIdentifications.Service.insertOrUpdate(loginState.username, addIdentificationData.firstName, addIdentificationData.lastName, utilities.Date.utilDateToSQLDate(addIdentificationData.dateOfBirth), addIdentificationData.idNumber, addIdentificationData.idType, Address(addressLine1 = addIdentificationData.address.addressLine1, addressLine2 = addIdentificationData.address.addressLine2, landmark = addIdentificationData.address.landmark, city = addIdentificationData.address.city, country = addIdentificationData.address.country, zipCode = addIdentificationData.address.zipCode, phone = addIdentificationData.address.phone))
-
-          def getAccountKYC: Future[Option[models.master.AccountKYC]] = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-
-          (for {
-            _ <- add
-            accountKYC <- getAccountKYC
-            result <- withUsernameToken.PartialContent(views.html.component.master.account.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
-  def userViewUploadOrUpdateIdentification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-      for {
-        accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.account.userViewUploadOrUpdateIdentification(accountKYC, constants.File.AccountKYC.IDENTIFICATION))
-      } yield result
-  }
-
-  def userReviewIdentificationForm: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identification = masterIdentifications.Service.get(loginState.username)
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-      (for {
-        identification <- identification
-        accountKYC <- accountKYC
-        result <- withUsernameToken.Ok(views.html.component.master.account.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def userReviewIdentification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      views.companion.master.UserReviewIdentification.form.bindFromRequest().fold(
-        formWithErrors => {
-          val identification = masterIdentifications.Service.get(loginState.username)
-          val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-          (for {
-            identification <- identification
-            accountKYC <- accountKYC
-          } yield BadRequest(views.html.component.master.account.userReviewIdentification(formWithErrors, identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        },
-        userReviewAddZoneRequestData => {
-          val identificationFileExists = masterAccountKYCs.Service.checkFileExists(id = loginState.username, documentType = constants.File.AccountKYC.IDENTIFICATION)
-
-          def markIdentificationFormCompletedAndGetResult(identificationFileExists: Boolean): Future[Result] = {
-            if (identificationFileExists && userReviewAddZoneRequestData.completionStatus) {
-              val updateCompletionStatus = masterIdentifications.Service.markIdentificationFormCompleted(loginState.username)
-              for {
-                _ <- updateCompletionStatus
-                //TODO: Remove this when Trulioo is integrated
-                _ <- masterIdentifications.Service.markVerified(loginState.username)
-                _ <- utilitiesNotification.send(loginState.username, constants.Notification.USER_REVIEWED_IDENTIFICATION_DETAILS)()
-                result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED_FOR_VERIFICATION)))
-              } yield result
-            } else {
-              val identification = masterIdentifications.Service.get(loginState.username)
-              val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-              for {
-                identification <- identification
-                accountKYC <- accountKYC
-              } yield BadRequest(views.html.component.master.account.userReviewIdentification(identification = identification.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), accountKYC = accountKYC.getOrElse(throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION))))
-            }
-          }
-
-          (for {
-            identificationFileExists <- identificationFileExists
-            result <- markIdentificationFormCompletedAndGetResult(identificationFileExists)
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
   }
 }

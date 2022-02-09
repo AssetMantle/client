@@ -16,8 +16,8 @@ object Form {
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp, routes.javascript.AccountController.signUpForm)
   val SIGN_IN = new Form("SIGN_IN", routes.AccountController.signIn, routes.javascript.AccountController.signInForm)
   val SIGN_OUT = new Form("SIGN_OUT", routes.AccountController.signOut, routes.javascript.AccountController.signOutForm)
-  val ADD_IDENTIFICATION = new Form("ADD_IDENTIFICATION", routes.AccountController.addIdentification, routes.javascript.AccountController.addIdentificationForm)
-  val USER_REVIEW_IDENTIFICATION = new Form("USER_REVIEW_IDENTIFICATION", routes.AccountController.userReviewIdentification, routes.javascript.AccountController.userReviewIdentificationForm)
+  val UPDATE_PROFILE = new Form("UPDATE_PROFILE", routes.AccountController.updateProfile, routes.javascript.AccountController.updateProfileForm)
+  val UPDATE_SOCIAL_PROFILE = new Form("UPDATE_SOCIAL_PROFILE", routes.AccountController.updateSocialProfile, routes.javascript.AccountController.updateSocialProfileForm)
 
   //AssetController
   val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define, routes.javascript.AssetController.defineForm)
@@ -66,9 +66,6 @@ object Form {
   val ORDER_MAKE = new Form("ORDER_MAKE", routes.OrderController.make, routes.javascript.OrderController.makeForm)
   val ORDER_TAKE = new Form("ORDER_TAKE", routes.OrderController.take, routes.javascript.OrderController.takeForm)
   val ORDER_CANCEL = new Form("ORDER_CANCEL", routes.OrderController.cancel, routes.javascript.OrderController.cancelForm)
-
-  //SendCoinController
-  val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin, routes.javascript.SendCoinController.sendCoinForm)
 
   //SplitController
   val SPLIT_SEND = new Form("SPLIT_SEND", routes.SplitController.send, routes.javascript.SplitController.sendForm)

@@ -21,7 +21,7 @@ object FormField {
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
   val TO = new StringFormField("TO", 45, 45)
   val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 16, RegularExpression.HASH)
-  val NAME = new StringFormField("NAME", 2, 50)
+  val NAME = new StringFormField("NAME", 2, 100)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val COMMENT = new StringFormField("COMMENT", 0, 200)
@@ -73,6 +73,9 @@ object FormField {
   val PUBLIC_KEY_TYPE = new StringFormField("PUBLIC_KEY_TYPE", 1, 100)
   val PUBLIC_KEY = new StringFormField("PUBLIC_KEY", 1, 500)
   val SIGNATURE = new StringFormField("SIGNATURE", 1, 1000)
+  val DESCRIPTION = new StringFormField("DESCRIPTION", 0, 512)
+  val URL = new StringFormField("URL", 10, 100)
+  val PLATFORM = new StringFormField("PLATFORM", 2, 100)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)

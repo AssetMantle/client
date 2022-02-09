@@ -1,0 +1,10 @@
+@import controllers.actions.LoginState
+@import views.companion.master.UpdateProfile
+@import views.html.base._
+
+@(updateProfileForm: Form[UpdateProfile.Data] = UpdateProfile.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@commonForm(constants.Form.UPDATE_PROFILE, updateProfileForm) {
+    @commonInputText(updateProfileForm, constants.FormField.NAME)
+    @commonInputText(updateProfileForm, constants.FormField.DESCRIPTION)
+}

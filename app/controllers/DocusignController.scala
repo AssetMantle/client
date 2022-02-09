@@ -139,7 +139,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
   def authorization: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
       Future(Redirect(utilitiesDocusign.getAuthorizationURI)).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -148,7 +148,7 @@ class DocusignController @Inject()(messagesControllerComponents: MessagesControl
       val updateAccessToken = Future(utilitiesDocusign.updateAccessToken(code))
       (for {
         _ <- updateAccessToken
-      } yield Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
+      } yield Ok(views.html.index(successes = Seq(constants.Response.DOCUSIGN_AUTHORIZED, constants.Response.ACCESS_TOKEN_UPDATED)))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

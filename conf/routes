@@ -52,11 +52,11 @@ POST        /account/signOut                                     controllers.Acc
 
 GET         /account/checkUsernameAvailable                      controllers.AccountController.checkUsernameAvailable(username: String)
 
-GET         /account/addIdentification                           controllers.AccountController.addIdentificationForm
-POST        /account/addIdentification                           controllers.AccountController.addIdentification
-GET         /account/userViewUploadOrUpdateIdentification        controllers.AccountController.userViewUploadOrUpdateIdentification
-GET         /account/userReviewIdentification                    controllers.AccountController.userReviewIdentificationForm
-POST        /account/userReviewIdentification                    controllers.AccountController.userReviewIdentification
+GET         /account/updateProfile                               controllers.AccountController.updateProfileForm
+POST        /account/updateProfile                               controllers.AccountController.updateProfile
+
+GET         /account/updateSocialProfile                         controllers.AccountController.updateSocialProfileForm(platform: String)
+POST        /account/updateSocialProfile                         controllers.AccountController.updateSocialProfile
 
 GET         /asset/define                                        controllers.AssetController.defineForm
 POST        /asset/define                                        controllers.AssetController.define
@@ -123,7 +123,6 @@ GET         /notification/unreadNotificationCount                controllers.Not
 GET         /notification/markNotificationAsRead                 controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /component/commonHome                                controllers.ComponentViewController.commonHome
-GET         /component/identification                            controllers.ComponentViewController.identification
 GET         /component/recentActivities                          controllers.ComponentViewController.recentActivities
 
 GET         /component/latestBlockHeight                         controllers.ComponentViewController.latestBlockHeight
@@ -191,13 +190,6 @@ GET         /accountUpload/storeFile                             controllers.Fil
 GET         /accountUpdate                                       controllers.FileController.updateAccountFileForm(documentType: String)
 GET         /accountUpdate/updateFile                            controllers.FileController.updateAccountFile(name: String, documentType: String)
 
-GET         /userUpload                                          controllers.FileController.uploadAccountKYCForm(documentType: String)
-POST        /userUpload/file                                     controllers.FileController.uploadAccountKYC(documentType: String)
-GET         /userUpload/storeFile                                controllers.FileController.storeAccountKYC(name: String, documentType: String)
-GET         /userUpdate                                          controllers.FileController.updateAccountKYCForm(documentType: String)
-GET         /userUpdate/updateFile                               controllers.FileController.updateAccountKYC(name: String, documentType: String)
-GET         /userUpload/getFile                                  controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
-
 GET         /background/memberScan                               controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
 POST        /background/memberScan                               controllers.BackgroundCheckController.memberScan
 GET         /background/memberScanResult                         controllers.BackgroundCheckController.memberScanResult(resultID: Int)
@@ -219,9 +211,6 @@ GET         /background/vesselScanResultDecision                 controllers.Bac
 POST        /background/vesselScanResultDecision                 controllers.BackgroundCheckController.vesselScanResultDecision
 GET         /background/addAsset                                 controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
 POST        /background/addAsset                                 controllers.BackgroundCheckController.addAssetMemberCheck
-
-GET         /master/sendCoin                                     controllers.SendCoinController.sendCoinForm
-POST        /master/sendCoin                                     controllers.SendCoinController.sendCoin
 
 GET         /chat/room                                           controllers.ChatController.chatRoom(negotiationID: String)
 GET         /chat/window                                         controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)

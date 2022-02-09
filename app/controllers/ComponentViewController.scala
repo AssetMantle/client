@@ -180,19 +180,6 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def identification: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.AccountKYC.IDENTIFICATION)
-      val identification = masterIdentifications.Service.get(loginState.username)
-      (for {
-        accountKYC <- accountKYC
-        identification <- identification
-      } yield Ok(views.html.component.master.account.identification(identification = identification, accountKYC = accountKYC))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
   def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
