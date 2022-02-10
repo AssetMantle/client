@@ -1,9 +1,0 @@
-@import views.companion.master.UpsertEntityLabel
-@import views.html.base._
-
-@(addEntityLabelForm: Form[UpsertEntityLabel.Data] = UpsertEntityLabel.form, entityID: String, entityType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@commonForm(constants.Form.UPSERT_ENTITY_LABEL, addEntityLabelForm) {
-    @commonInputText(addEntityLabelForm, constants.FormField.ENTITY_ID, 'value -> entityID, 'readonly -> true)
-    @commonSelect(addEntityLabelForm, constants.FormField.ENTITY_TYPE , 'value -> entityType, 'readonly -> true)
-    @commonInputText(addEntityLabelForm, constants.FormField.LABEL)
-}

@@ -59,23 +59,42 @@ CREATE TABLE IF NOT EXISTS MASTER."Watchlist"
     PRIMARY KEY ("accountID", "watching")
 );
 
+ALTER TABLE IF EXISTS BLOCKCHAIN."Account_BC"
+    ALTER COLUMN "accountType" DROP NOT NULL;
+ALTER TABLE BLOCKCHAIN."IdentityProperties_BC"
+    RENAME TO "Identity_BC";
+ALTER TABLE BLOCKCHAIN."IdentityProvisioned_BC"
+    RENAME TO "IdentityProvision_BC";
+ALTER TABLE BLOCKCHAIN."IdentityUnprovisioned_BC"
+    RENAME TO "IdentityUnprovision_BC";
+ALTER TABLE IF EXISTS BLOCKCHAIN."Transaction"
+    DROP COLUMN IF EXISTS "status";
+
+ALTER TABLE IF EXISTS MASTER."Account"
+    DROP COLUMN IF EXISTS "partialMnemonic";
+ALTER TABLE IF EXISTS MASTER."Account"
+    ADD COLUMN IF NOT EXISTS "salt" VARCHAR;
+ALTER TABLE IF EXISTS MASTER."Account"
+    ADD COLUMN IF NOT EXISTS "iterations" INTEGER;
+ALTER TABLE IF EXISTS MASTER."Identity"
+    DROP COLUMN IF EXISTS "label";
+ALTER TABLE IF EXISTS MASTER."Identity"
+    DROP COLUMN IF EXISTS "status";
+ALTER TABLE IF EXISTS MASTER."Identity"
+    ADD COLUMN "accountID" VARCHAR NOT NULL default '';
+ALTER TABLE IF EXISTS MASTER."Identity"
+    ADD COLUMN "nubID" VARCHAR;
+
+ALTER TABLE MASTER."Identity"
+    ADD CONSTRAINT Identity_BC_Identity_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
+ALTER TABLE MASTER."Identity"
+    ADD CONSTRAINT Identity_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Profile"
     ADD CONSTRAINT Profile_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Watchlist"
     ADD CONSTRAINT Watchlist_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Watchlist"
     ADD CONSTRAINT Watchlist_Watched FOREIGN KEY ("watching") REFERENCES MASTER."Account" ("id");
-
-ALTER TABLE BLOCKCHAIN."Account_BC"
-    ALTER COLUMN "accountType" DROP NOT NULL;
-ALTER TABLE BLOCKCHAIN."Transaction"
-    DROP COLUMN "status";
-ALTER TABLE MASTER."Account"
-    DROP COLUMN "partialMnemonic";
-ALTER TABLE MASTER."Account"
-    ADD COLUMN "salt" VARCHAR;
-ALTER TABLE MASTER."Account"
-    ADD COLUMN "iterations" INTEGER;
 
 CREATE TRIGGER FEE_GRANT_LOG
     BEFORE INSERT OR UPDATE

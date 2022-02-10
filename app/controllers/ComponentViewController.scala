@@ -26,6 +26,8 @@ class ComponentViewController @Inject()(
                                          blockchainBalances: blockchain.Balances,
                                          blockchainDelegations: blockchain.Delegations,
                                          blockchainIdentities: blockchain.Identities,
+                                         blockchainIdentityProvisions: blockchain.IdentityProvisions,
+                                         blockchainIdentityUnprovisions: blockchain.IdentityUnprovisions,
                                          blockchainOrders: blockchain.Orders,
                                          blockchainSplits: blockchain.Splits,
                                          blockchainUndelegations: blockchain.Undelegations,
@@ -709,7 +711,7 @@ class ComponentViewController @Inject()(
 
   def identitiesDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getIdentitiesDefined(identityIDs: Seq[String]) = masterClassifications.Service.getIdentityDefinitionsByIdentityIDs(identityIDs)
 
@@ -724,7 +726,7 @@ class ComponentViewController @Inject()(
 
   def identitiesProvisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getIdentitiesIssued(identityIDs: Seq[String]) = masterIdentities.Service.getAllByIDs(identityIDs)
 
@@ -739,7 +741,7 @@ class ComponentViewController @Inject()(
 
   def identitiesUnprovisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByUnprovisioned(loginState.address)
+      val identityIDs = blockchainIdentityUnprovisions.Service.getAllIDsByUnprovisioned(loginState.address)
 
       def getIdentitiesIssued(identityIDs: Seq[String]) = masterIdentities.Service.getAllByIDs(identityIDs)
 
@@ -754,7 +756,7 @@ class ComponentViewController @Inject()(
 
   def assetsDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getAssetsDefined(identityIDs: Seq[String]) = masterClassifications.Service.getAssetDefinitionsByIdentityIDs(identityIDs)
 
@@ -769,7 +771,7 @@ class ComponentViewController @Inject()(
 
   def assetsMinted(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getAssetSplits(identityIDs: Seq[String]) = masterSplits.Service.getAllAssetsByOwnerIDs(identityIDs)
 
@@ -787,7 +789,7 @@ class ComponentViewController @Inject()(
 
   def ordersDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getOrdersDefined(identityIDs: Seq[String]) = masterClassifications.Service.getOrderDefinitionsByIdentityIDs(identityIDs)
 
@@ -802,7 +804,7 @@ class ComponentViewController @Inject()(
 
   def ordersMade(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getOrdersMade(identityIDs: Seq[String]) = masterOrders.Service.getAllByMakerIDs(identityIDs)
 
@@ -837,7 +839,7 @@ class ComponentViewController @Inject()(
 
   def ordersTakePrivate(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
       def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs)
 
@@ -855,7 +857,7 @@ class ComponentViewController @Inject()(
 
   def accountSplits(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
       val allDenoms = blockchainTokens.Service.getAllDenoms
 
       def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getByOwnerIDs(identityIDs)
@@ -876,7 +878,7 @@ class ComponentViewController @Inject()(
   def provisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val provisionedAddresses = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+        val provisionedAddresses = blockchainIdentityProvisions.Service.getAllProvisionAddresses(identityID)
         (for (
           provisionedAddresses <- provisionedAddresses
         ) yield Ok(views.html.component.blockchain.identity.provisionedAddresses(identityID, provisionedAddresses))
@@ -889,7 +891,7 @@ class ComponentViewController @Inject()(
   def unprovisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val unprovisionedAddresses = blockchainIdentities.Service.getAllUnprovisionAddresses(identityID)
+        val unprovisionedAddresses = blockchainIdentityUnprovisions.Service.getAllUnprovisionAddresses(identityID)
         (for (
           unprovisionedAddresses <- unprovisionedAddresses
         ) yield Ok(views.html.component.blockchain.identity.unprovisionedAddresses(identityID, unprovisionedAddresses))

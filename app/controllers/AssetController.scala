@@ -33,7 +33,7 @@ class AssetController @Inject()(
                                  masterProperties: master.Properties,
                                  masterSplits: master.Splits,
                                  masterClassifications: master.Classifications,
-                                 blockchainIdentities: blockchain.Identities,
+                                 blockchainIdentities: blockchain.IdentityProvisions,
                                  withUserLoginAction: WithUserLoginAction,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,

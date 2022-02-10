@@ -100,8 +100,6 @@ POST        /split/wrap                                          controllers.Spl
 GET         /split/unwrap                                        controllers.SplitController.unwrapForm(ownableID: String, fromID: String)
 POST        /split/unwrap                                        controllers.SplitController.unwrap
 
-GET         /entity/upsertLabel                                  controllers.EntityController.upsertLabelForm(entityID: String, entityType: String)
-POST        /entity/upsertLabel                                  controllers.EntityController.upsertLabel
 GET         /component/entityProperties                          controllers.EntityController.properties(entityID: String, entityType: String)
 
 GET         /contact                                             controllers.ContactController.contact

@@ -23,6 +23,7 @@ class EntityController @Inject()(
                                   masterSplits: master.Splits,
                                   masterIdentities: master.Identities,
                                   masterOrders: master.Orders,
+                                  blockchainIdentityProvisions: blockchain.IdentityProvisions,
                                   blockchainIdentities: blockchain.Identities,
                                   blockchainClassifications: blockchain.Classifications,
                                   blockchainMetas: blockchain.Metas,
@@ -41,85 +42,14 @@ class EntityController @Inject()(
 
   private implicit val module: String = constants.Module.CONTROLLERS_ENTITY
 
-  def upsertLabelForm(entityID: String, entityType: String): Action[AnyContent] = withoutLoginAction { implicit loginState =>
-    implicit request =>
-      Ok(masterComponent.upsertEntityLabel(entityID = entityID, entityType = entityType))
-  }
-
-  def upsertLabel(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      masterCompanion.UpsertEntityLabel.form.bindFromRequest().fold(
-        formWithErrors => {
-          Future(BadRequest(masterComponent.upsertEntityLabel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.ENTITY_TYPE.name, ""))))
-        },
-        upsertLabelData => {
-          def getProvisionedAddress(maintainer: String) = blockchainIdentities.Service.getAllProvisionAddresses(maintainer)
-
-          val verifyAndUpdate = upsertLabelData.entityType match {
-            case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
-              val maintainerIDs = masterClassifications.Service.getMaintainerIDs(upsertLabelData.entityID)
-              val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
-
-              def checkAndUpdate(maintainerIDs: Seq[String], identityIDs: Seq[String]) = if (identityIDs.intersect(maintainerIDs).nonEmpty) masterClassifications.Service.updateLabel(id = upsertLabelData.entityID, maintainerID = identityIDs.intersect(maintainerIDs).headOption.getOrElse(""), label = upsertLabelData.label)
-              else throw new BaseException(constants.Response.UNAUTHORIZED)
-
-              for {
-                maintainerIDs <- maintainerIDs
-                identityIDs <- identityIDs
-                _ <- checkAndUpdate(maintainerIDs, identityIDs)
-              } yield ()
-            case constants.Blockchain.Entity.ASSET =>
-              val ownerID = masterSplits.Service.tryGetOwnerID(upsertLabelData.entityID)
-
-              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterAssets.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
-              else throw new BaseException(constants.Response.UNAUTHORIZED)
-
-              for {
-                ownerID <- ownerID
-                provisionedAddresses <- getProvisionedAddress(ownerID)
-                _ <- checkAndUpdate(provisionedAddresses)
-              } yield ()
-            case constants.Blockchain.Entity.IDENTITY =>
-              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterIdentities.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
-              else throw new BaseException(constants.Response.UNAUTHORIZED)
-
-              for {
-                provisionedAddresses <- getProvisionedAddress(upsertLabelData.entityID)
-                _ <- checkAndUpdate(provisionedAddresses)
-              } yield ()
-            case constants.Blockchain.Entity.ORDER =>
-              val makerID = masterOrders.Service.tryGetMakerID(upsertLabelData.entityID)
-
-              def checkAndUpdate(provisionedAddresses: Seq[String]) = if (provisionedAddresses.contains(loginState.address)) masterOrders.Service.updateLabel(id = upsertLabelData.entityID, label = upsertLabelData.label)
-              else throw new BaseException(constants.Response.UNAUTHORIZED)
-
-              for {
-                makerID <- makerID
-                provisionedAddresses <- getProvisionedAddress(makerID)
-                _ <- checkAndUpdate(provisionedAddresses)
-              } yield ()
-            case _ => Future(throw new BaseException(constants.Response.UNAUTHORIZED))
-          }
-
-          (for {
-            _ <- verifyAndUpdate
-            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.LABEL_UPDATED)))
-          } yield result
-            ).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }
-
   def properties(entityID: String, entityType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      def getProvisionedAddresses(identityID: String) = blockchainIdentities.Service.getAllProvisionAddresses(identityID)
+      def getProvisionedAddresses(identityID: String) = blockchainIdentityProvisions.Service.getAllProvisionAddresses(identityID)
 
       val checkAndGet: Future[(Boolean, Immutables, Mutables)] = entityType match {
         case constants.Blockchain.Entity.IDENTITY_DEFINITION | constants.Blockchain.Entity.ASSET_DEFINITION | constants.Blockchain.Entity.ORDER_DEFINITION =>
           val maintainerIDs = masterClassifications.Service.getMaintainerIDs(id = entityID)
-          val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+          val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
           val classification = blockchainClassifications.Service.tryGet(entityID)
           for {
             maintainerIDs <- maintainerIDs
@@ -143,7 +73,7 @@ class EntityController @Inject()(
         case constants.Blockchain.Entity.ORDER =>
           val makerID = masterOrders.Service.tryGetMakerID(entityID)
           val order = blockchainOrders.Service.tryGet(entityID)
-          val identityIDs = blockchainIdentities.Service.getAllIDsByProvisioned(loginState.address)
+          val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
           for {
             makerID <- makerID
             order <- order

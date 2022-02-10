@@ -24,7 +24,7 @@ class IdentityController @Inject()(
                                     blockchainTransactionIdentityProvisions: blockchainTransaction.IdentityProvisions,
                                     blockchainTransactionIdentityUnprovisions: blockchainTransaction.IdentityUnprovisions,
                                     blockchainMetas: blockchain.Metas,
-                                    blockchainIdentities: blockchain.Identities,
+                                    blockchainIdentities: blockchain.IdentityProvisions,
                                     blockchainClassifications: blockchain.Classifications,
                                     messagesControllerComponents: MessagesControllerComponents,
                                     transaction: utilities.Transaction,

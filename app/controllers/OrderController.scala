@@ -37,7 +37,7 @@ class OrderController @Inject()(
                                  transactionsOrderCancel: transactions.blockchain.OrderCancel,
                                  blockchainTransactionOrderCancels: blockchainTransaction.OrderCancels,
                                  withUserLoginAction: WithUserLoginAction,
-                                 blockchainIdentities: blockchain.Identities,
+                                 blockchainIdentities: blockchain.IdentityProvisions,
                                  withUsernameToken: WithUsernameToken,
                                  withoutLoginAction: WithoutLoginAction,
                                  withoutLoginActionAsync: WithoutLoginActionAsync

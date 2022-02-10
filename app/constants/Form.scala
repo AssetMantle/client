@@ -45,9 +45,6 @@ object Form {
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.ContactController.verifyEmailAddress, routes.javascript.ContactController.verifyEmailAddressForm)
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber, routes.javascript.ContactController.verifyMobileNumberForm)
 
-  //EntityController
-  val UPSERT_ENTITY_LABEL = new Form("UPSERT_ENTITY_LABEL", routes.EntityController.upsertLabel, routes.javascript.EntityController.upsertLabelForm)
-
   //IdentityController
   val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub, routes.javascript.IdentityController.nubForm)
   val IDENTITY_DEFINE = new Form("IDENTITY_DEFINE", routes.IdentityController.define, routes.javascript.IdentityController.defineForm)

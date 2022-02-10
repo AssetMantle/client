@@ -25,7 +25,7 @@ class MaintainerController @Inject()(
                                       masterProperties: master.Properties,
                                       masterClassifications: master.Classifications,
                                       withLoginActionAsync: WithLoginActionAsync,
-                                      blockchainIdentities: blockchain.Identities,
+                                      blockchainIdentities: blockchain.IdentityProvisions,
                                       withUnknownLoginAction: WithUnknownLoginAction,
                                       transactionsMaintainerDeputize: transactions.blockchain.MaintainerDeputize,
                                       blockchainTransactionMaintainerDeputizes: blockchainTransaction.MaintainerDeputizes,
