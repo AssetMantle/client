@@ -33,7 +33,7 @@ class Identities @Inject()(
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
                             masterClassifications: master.Classifications,
-                            masterIdentities: master.Identities,
+                            masterIdentityNubs: master.IdentityNubs,
                             masterProperties: master.Properties,
                             utilitiesOperations: utilities.Operations
                           )(implicit executionContext: ExecutionContext) {
@@ -187,8 +187,7 @@ class Identities @Inject()(
     }
 
     def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
-      val nubMetaProperty = getNubMetaProperty(identityNub.nubID)
-      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(nubMetaProperty))
+      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(getNubMetaProperty(identityNub.nubID)))
 
       def defineAndUpsert(nubProperty: Property) = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
@@ -206,9 +205,12 @@ class Identities @Inject()(
         } yield (classificationID, identityID)
       }
 
+      def masterUpdates(identityID: String) = masterIdentityNubs.Utility.onIdentityNubTx(identityID = identityID, nubID = identityNub.nubID, creatorAddress = identityNub.from)
+
       (for {
         nubProperty <- nubProperty
         (classificationID, identityID) <- defineAndUpsert(nubProperty.head)
+        _ <- masterUpdates(identityID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_NUB + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)

@@ -52,7 +52,7 @@ class Identities @Inject()(
     }
   }
 
-  private def getByID(id: String) = db.run(identityTable.filter(_.id === id).result.headOption)
+  private def getByID(id: String, accountID: String) = db.run(identityTable.filter(x => x.id === id && x.accountID === accountID).result.headOption)
 
   private def getAllByIdentityIDs(ids: Seq[String]) = db.run(identityTable.filter(_.id.inSet(ids)).result)
 
@@ -62,7 +62,7 @@ class Identities @Inject()(
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def accountID = column[String]("accountID")
+    def accountID = column[String]("accountID", O.PrimaryKey)
 
     def nubID = column[String]("nubID")
 
@@ -88,7 +88,15 @@ class Identities @Inject()(
 
     def getAllByIDs(ids: Seq[String]): Future[Seq[Identity]] = getAllByIdentityIDs(ids)
 
-    def get(id: String): Future[Option[Identity]] = getByID(id)
+    def get(id: String, accountID: String): Future[Option[Identity]] = getByID(id = id, accountID = accountID)
+  }
+
+  object Utility {
+
+    def onSignIn(accountID: String, identityId: String): Future[Unit] = {
+      val optionalIdentity = Service.get(id = identityId, accountID = accountID)
+
+    }
   }
 
 }
