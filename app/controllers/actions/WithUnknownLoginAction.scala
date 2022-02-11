@@ -21,6 +21,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
     withActionAsyncLoggingFilter.next { implicit request ⇒
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+      val identityID = Future(request.session.get(constants.Security.IDENTITY_ID).getOrElse(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND)))
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String): Future[String] = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -40,8 +41,9 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
       (for {
         username <- username
         sessionToken <- sessionToken
+        identityID <- identityID
         address <- verifySessionTokenAndUserType(username, sessionToken)
-        result <- result(LoginState(username, constants.User.UNKNOWN, address))
+        result <- result(LoginState(username = username, userType = constants.User.UNKNOWN, address = address, identityID = identityID))
       } yield result).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))

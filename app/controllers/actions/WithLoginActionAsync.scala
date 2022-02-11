@@ -26,6 +26,7 @@ class WithLoginActionAsync @Inject()(
 
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+      val identityID = Future(request.session.get(constants.Security.IDENTITY_ID).getOrElse(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND)))
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String) = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -45,8 +46,9 @@ class WithLoginActionAsync @Inject()(
       (for {
         username <- username
         sessionToken <- sessionToken
+        identityID <- identityID
         (userType, address) <- verifySessionTokenAndUserType(username, sessionToken)
-        result <- result(LoginState(username, userType, address))
+        result <- result(LoginState(username = username, userType = userType, address = address, identityID = identityID))
       } yield {
         result
       }).recover {
