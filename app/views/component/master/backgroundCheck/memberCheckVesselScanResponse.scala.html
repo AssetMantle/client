@@ -1,6 +1,8 @@
 @import controllers.actions.LoginState
 @import queries.responses.memberCheck.CorporateScanResponse
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.infos._
+@import views.html.base.buttons._
 
 @(corporateScanResponse: CorporateScanResponse.Response, assetID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <legend class="cmuk-legend">

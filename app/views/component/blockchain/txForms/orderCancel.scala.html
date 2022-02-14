@@ -1,5 +1,6 @@
 @import views.companion.blockchain.OrderCancel
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(orderCancelForm: Form[OrderCancel.Data] = OrderCancel.form, orderID: String, makerID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ORDER_CANCEL, orderCancelForm) {

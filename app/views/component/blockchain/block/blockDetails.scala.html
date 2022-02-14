@@ -1,4 +1,6 @@
-@import views.html.base._
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.base.buttons._
 @import models.blockchain.Block
 
 @(block: Block, proposer: String, numTxs: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)

@@ -1,6 +1,9 @@
 @import controllers.actions.LoginState
 @import models.master.Classification
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.cards._
+@import views.html.base.buttons._
+@import views.html.base.infos._
 
 @(classifications: Seq[Classification])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 

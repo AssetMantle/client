@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.companion.master.UpdateSocialProfile
-@import views.html.base._
+@import views.html.base.form._
 
 @(updateSocialProfileForm: Form[UpdateSocialProfile.Data] = UpdateSocialProfile.form, platform: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 

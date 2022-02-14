@@ -1,5 +1,6 @@
 @import views.companion.blockchain.AssetBurn
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(assetBurnForm: Form[AssetBurn.Data] = AssetBurn.form, assetID: String, fromID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ASSET_BURN, assetBurnForm) {

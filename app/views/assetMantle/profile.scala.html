@@ -1,6 +1,8 @@
 @import constants.AppConfig.OtherApp
 @import controllers.actions.LoginState
 @import models.master.Profile
+@import views.html.base.form._
+@import views.html.base.infos._
 @import views.html.base._
 
 @(profile: Option[Profile], email: String, mobile: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, otherApps: Seq[OtherApp], loginState: LoginState)

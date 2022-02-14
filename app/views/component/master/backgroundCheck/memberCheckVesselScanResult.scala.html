@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import base._
+@import views.html.base.infos._
 @import queries.responses.memberCheck.CorporateScanResultResponse
 
 @(response: CorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)

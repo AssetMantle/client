@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.form._
 @import views.companion.master.AddAssetMemberCheck
 
 @(addAssetBackgroundCheckForm: Form[AddAssetMemberCheck.Data] = AddAssetMemberCheck.form, assetID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)

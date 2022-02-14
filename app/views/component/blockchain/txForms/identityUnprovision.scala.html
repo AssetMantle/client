@@ -1,5 +1,6 @@
 @import views.companion.blockchain.IdentityUnprovision
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(identityUnprovisionForm: Form[IdentityUnprovision.Data] = IdentityUnprovision.form, identityID: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

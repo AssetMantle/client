@@ -1,4 +1,7 @@
 @import views.html.base._
+@import views.html.base.infos._
+@import views.html.base.buttons._
+@import views.html.base.cards._
 @import models.blockchain.Validator
 
 @(validator: Validator, selfDelegationAddress: String, votingPower: String, bondedStatus: String, keyBaseValidatorAccount: Option[keyBase.ValidatorAccount])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)

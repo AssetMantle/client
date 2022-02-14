@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.cards._
+@import views.html.base.infos._
 @(coins: String = "0", profilePicture: Array[Byte] = Array())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @commonCard(constants.View.DETAILS , 'cardIconPath -> "images/icons/icons.svg#contactDetails") {

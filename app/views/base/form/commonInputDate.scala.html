@@ -24,7 +24,7 @@
                 nestedFormField match {
                     case Some(field: NestedFormField) => {
                         //This case handles nested fields. See AddOrganization for example.
-                        formData(Seq(field.name, formField.name).mkString("."))
+                        formData(Seq(field.name, formField.name).mkString("../../../../public"))
                     }
                     case None => {
                         //This case handles generic fields.
