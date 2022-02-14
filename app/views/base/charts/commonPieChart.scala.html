@@ -4,9 +4,9 @@
    <div style="position: relative; height: 140px">
     <canvas id="@id"></canvas>
    </div>
-    <script type="text/javascript" src="@routes.Assets.versioned("../../../../public/javascripts/Chart.min.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.versioned("../../../../public/javascripts/Chart.bundle.min.js")"></script>
-    <script src="@routes.Assets.versioned("../../../../public/javascripts/pieChart.js")" type="text/javascript"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.bundle.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/pieChart.js")" type="text/javascript"></script>
     @defining[ListMap[String, Double]](data.map { case (k, v) => Messages(k) -> v }) { transformedData =>
         <script>pieChart('@id', '@transformedData.keys.toString', '@transformedData.values.toString', @showLegend)</script>
     }
