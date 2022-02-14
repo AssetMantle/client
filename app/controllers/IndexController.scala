@@ -10,7 +10,6 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import queries.blockchain.GetAccount
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +29,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 cached: Cached,
-                                getAccount: GetAccount,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
