@@ -1,24 +1,23 @@
 @import controllers.actions.LoginState
-@import models.master.Identity
 @import views.html.base._
 
-@(identities: Seq[Identity])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(identityIDs: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.PROVISIONED_IDENTITIES) {
     @commonFormButton(constants.Form.IDENTITY_NUB)
 } {
-    @identities.map { identity =>
+    @identityIDs.map { identityID =>
         @commonVerticalInfoBox() {
-            @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
+            @commonVerticalTextInfo(constants.View.IDENTITY_ID, identityID)
 
             <div class="buttonsListChild">
-            @commonModalButton(constants.View.PROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.provisionedAddresses, 'parameters -> s"'${identity.id}'")
-            @commonModalButton(constants.View.UNPROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.unprovisionedAddresses, 'parameters -> s"'${identity.id}'")
+            @commonModalButton(constants.View.PROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.provisionedAddresses, 'parameters -> s"'${identityID}'")
+            @commonModalButton(constants.View.UNPROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.unprovisionedAddresses, 'parameters -> s"'${identityID}'")
             </div>
 
             <div class="buttonsListChild">
-                @commonFormButton(constants.Form.IDENTITY_PROVISION, 'parameters -> s"'${identity.id}'")
-                @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identity.id}', ''")
+                @commonFormButton(constants.Form.IDENTITY_PROVISION, 'parameters -> s"'${identityID}'")
+                @commonFormButton(constants.Form.IDENTITY_UNPROVISION, 'parameters -> s"'${identityID}', ''")
             </div>
         }
     }

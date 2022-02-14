@@ -38,7 +38,6 @@ class IdentityController @Inject()(
                                     withUserLoginAction: WithUserLoginAction,
                                     withUsernameToken: WithUsernameToken,
                                     masterProperties: master.Properties,
-                                    masterIdentities: master.Identities,
                                     masterClassifications: master.Classifications,
                                     masterAccounts: master.Accounts,
                                     withoutLoginAction: WithoutLoginAction,

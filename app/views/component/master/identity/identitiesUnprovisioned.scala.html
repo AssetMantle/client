@@ -1,19 +1,18 @@
 @import controllers.actions.LoginState
-@import models.master.Identity
 @import views.html.base._
 
-@(identities: Seq[Identity])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
+@(identityIDs: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.UNPROVISIONED_IDENTITIES) {
 } {
-    @identities.map { identity =>
+    @identityIDs.map { identityID =>
         @commonVerticalInfoBox() {
-            @commonVerticalTextInfo(constants.View.IDENTITY_ID, identity.id)
+            @commonVerticalTextInfo(constants.View.IDENTITY_ID, identityID)
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
-            @commonModalButton(constants.View.PROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.provisionedAddresses, 'parameters -> s"'${identity.id}'")
+            @commonModalButton(constants.View.PROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.provisionedAddresses, 'parameters -> s"'${identityID}'")
             </div>
             <div class="listItemChild cmuk-flex cmuk-flex-middle">
-            @commonModalButton(constants.View.UNPROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.unprovisionedAddresses, 'parameters -> s"'${identity.id}'")
+            @commonModalButton(constants.View.UNPROVISIONED_ADDRESS_LIST, routes.javascript.ComponentViewController.unprovisionedAddresses, 'parameters -> s"'${identityID}'")
             </div>
         }
     }

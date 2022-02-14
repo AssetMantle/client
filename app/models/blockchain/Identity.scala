@@ -33,8 +33,6 @@ class Identities @Inject()(
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
                             masterClassifications: master.Classifications,
-                            masterIdentityNubs: master.IdentityNubs,
-                            masterProperties: master.Properties,
                             utilitiesOperations: utilities.Operations
                           )(implicit executionContext: ExecutionContext) {
 
@@ -205,12 +203,9 @@ class Identities @Inject()(
         } yield (classificationID, identityID)
       }
 
-      def masterUpdates(identityID: String) = masterIdentityNubs.Utility.onIdentityNubTx(identityID = identityID, nubID = identityNub.nubID, creatorAddress = identityNub.from)
-
       (for {
         nubProperty <- nubProperty
         (classificationID, identityID) <- defineAndUpsert(nubProperty.head)
-        _ <- masterUpdates(identityID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_NUB + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)

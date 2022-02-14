@@ -6,7 +6,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models.master.{Email, Mobile, Profile}
 import models.{blockchain, master, masterTransaction}
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, MessagesProvider}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -52,12 +52,37 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  private def sendNotificationsAndGetResult(loginState: LoginState, pushNotificationToken: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash): Future[Result] = {
+    val profile = masterProfiles.Service.get(loginState.username)
+    val email = masterEmails.Service.get(loginState.username)
+    val mobile = masterMobiles.Service.get(loginState.username)
+
+    def sendNotification = {
+      val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = pushNotificationToken)
+      for {
+        _ <- pushNotificationTokenUpdate
+        _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOGIN, loginState.username)()
+      } yield ()
+    }
+
+    def getResult(warnings: Seq[constants.Response.Warning], profile: Option[Profile], email: Option[Email], mobile: Option[Mobile])(implicit loginState: LoginState, requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash): Future[Result] =
+      withUsernameToken.Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), warnings = warnings)(requestHeader, messagesProvider, flash, otherApps, loginState))
+
+    for {
+      profile <- profile
+      email <- email
+      mobile <- mobile
+      _ <- sendNotification
+      result <- getResult(warnings = utilities.Contact.getWarnings(mobile, email), profile = profile, email = email, mobile = mobile)(loginState, requestHeader, messagesProvider, flash)
+    } yield result
+  }
+
+  def signUpForm(): Action[AnyContent] = withoutLoginAction { implicit x: Option[LoginState] =>
     implicit request =>
       Ok(views.html.component.master.account.signUp())
   }
 
-  def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def signUp: Action[AnyContent] = withoutLoginActionAsync { implicit x: Option[LoginState] =>
     implicit request =>
       SignUp.form.bindFromRequest().fold(
         formWithErrors => {
@@ -73,7 +98,7 @@ class AccountController @Inject()(
           def updateAccountsAndGetResult(validSignature: Boolean, optionalBCAccount: Option[blockchain.Account], address: String) = if (validSignature) {
             def getIdentityIDList(address: String) = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(address)
 
-            val logInState = optionalBCAccount.fold {
+            val loginState = optionalBCAccount.fold {
               val upsertBCAccount = blockchainAccounts.Utility.onKeplrSignUp(address = address, username = signUpData.username, publicKey = signUpData.publicKey)
 
               def addToMaster() = masterAccounts.Service.upsertOnKeplrSignUp(username = signUpData.username, language = request.lang)
@@ -93,27 +118,9 @@ class AccountController @Inject()(
               } else throw new BaseException(constants.Response.INCORRECT_USERNAME_OR_WALLET_ADDRESS)
             }
 
-            val profile = masterProfiles.Service.get(signUpData.username)
-            val email = masterEmails.Service.get(signUpData.username)
-            val mobile = masterMobiles.Service.get(signUpData.username)
-
-            def sendNotification = {
-              val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = signUpData.username, token = signUpData.pushNotificationToken)
-              for {
-                _ <- pushNotificationTokenUpdate
-                _ <- utilitiesNotification.send(signUpData.username, constants.Notification.LOGIN, signUpData.username)()
-              } yield ()
-            }
-
-            def getResult(warnings: Seq[constants.Response.Warning], profile: Option[Profile], email: Option[Email], mobile: Option[Mobile])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), warnings = warnings))
-
             (for {
-              logInState <- logInState
-              profile <- profile
-              email <- email
-              mobile <- mobile
-              _ <- sendNotification
-              result <- getResult(utilities.Contact.getWarnings(mobile, email), profile, email, mobile)(logInState)
+              loginState <- loginState
+              result <- sendNotificationsAndGetResult(loginState = loginState, pushNotificationToken = signUpData.pushNotificationToken)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -132,12 +139,12 @@ class AccountController @Inject()(
       )
   }
 
-  def signInForm(): Action[AnyContent] = withoutLoginAction { implicit loginState =>
+  def signInForm(): Action[AnyContent] = withoutLoginAction { implicit x: Option[LoginState] =>
     implicit request =>
       Ok(views.html.component.master.account.signIn())
   }
 
-  def signIn: Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+  def signIn: Action[AnyContent] = withoutLoginActionAsync { implicit x: Option[LoginState] =>
     implicit request =>
       SignIn.form.bindFromRequest().fold(
         formWithErrors => {
@@ -153,27 +160,9 @@ class AccountController @Inject()(
           def getIdentityIDList(address: String) = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(address)
 
           def result(validSignature: Boolean, address: String, masterAccount: master.Account, identityIDs: Seq[String]) = if (validSignature) {
-            val logInState = LoginState(username = masterAccount.id, userType = masterAccount.userType, address = address, identityID = identityIDs.headOption.getOrElse(""))
-            val profile = masterProfiles.Service.get(signInData.username)
-            val email = masterEmails.Service.get(masterAccount.id)
-            val mobile = masterMobiles.Service.get(masterAccount.id)
-
-            def sendNotification = {
-              val pushNotificationTokenUpdate = masterTransactionPushNotificationTokens.Service.update(id = signInData.username, token = signInData.pushNotificationToken)
-              for {
-                _ <- pushNotificationTokenUpdate
-                _ <- utilitiesNotification.send(signInData.username, constants.Notification.LOGIN, signInData.username)()
-              } yield ()
-            }
-
-            def getResult(warnings: Seq[constants.Response.Warning], profile: Option[Profile], email: Option[Email], mobile: Option[Mobile])(implicit loginState: LoginState): Future[Result] = withUsernameToken.Ok(views.html.assetMantle.profile(profile = profile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), warnings = warnings))
-
+            val loginState = LoginState(username = masterAccount.id, userType = masterAccount.userType, address = address, identityID = identityIDs.headOption.getOrElse(""))
             (for {
-              profile <- profile
-              email <- email
-              mobile <- mobile
-              _ <- sendNotification
-              result <- getResult(utilities.Contact.getWarnings(mobile, email), profile, email, mobile)(logInState)
+              result <- sendNotificationsAndGetResult(loginState = loginState, pushNotificationToken = signInData.pushNotificationToken)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
