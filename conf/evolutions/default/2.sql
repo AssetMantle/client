@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."FeeGrant_BC"
 
 CREATE TABLE IF NOT EXISTS MASTER."Profile"
 (
-    "accountID"         VARCHAR NOT NULL,
+    "identityID"        VARCHAR NOT NULL,
     "name"              VARCHAR NOT NULL,
     "description"       VARCHAR NOT NULL,
     "socialProfiles"    VARCHAR NOT NULL,
@@ -43,12 +43,12 @@ CREATE TABLE IF NOT EXISTS MASTER."Profile"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("accountID")
+    PRIMARY KEY ("identityID")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER."Watchlist"
 (
-    "accountID"         VARCHAR NOT NULL,
+    "identityID"        VARCHAR NOT NULL,
     "watching"          VARCHAR NOT NULL,
     "createdBy"         VARCHAR,
     "createdOn"         TIMESTAMP,
@@ -56,16 +56,16 @@ CREATE TABLE IF NOT EXISTS MASTER."Watchlist"
     "updatedBy"         VARCHAR,
     "updatedOn"         TIMESTAMP,
     "updatedOnTimeZone" VARCHAR,
-    PRIMARY KEY ("accountID", "watching")
+    PRIMARY KEY ("identityID", "watching")
 );
 
 ALTER TABLE IF EXISTS BLOCKCHAIN."Account_BC"
     ALTER COLUMN "accountType" DROP NOT NULL;
-ALTER TABLE BLOCKCHAIN."IdentityProperties_BC"
+ALTER TABLE IF EXISTS BLOCKCHAIN."IdentityProperties_BC"
     RENAME TO "Identity_BC";
-ALTER TABLE BLOCKCHAIN."IdentityProvisioned_BC"
+ALTER TABLE IF EXISTS BLOCKCHAIN."IdentityProvisioned_BC"
     RENAME TO "IdentityProvision_BC";
-ALTER TABLE BLOCKCHAIN."IdentityUnprovisioned_BC"
+ALTER TABLE IF EXISTS BLOCKCHAIN."IdentityUnprovisioned_BC"
     RENAME TO "IdentityUnprovision_BC";
 ALTER TABLE IF EXISTS BLOCKCHAIN."Transaction"
     DROP COLUMN IF EXISTS "status";
@@ -76,23 +76,11 @@ ALTER TABLE IF EXISTS MASTER."Account"
     ADD COLUMN IF NOT EXISTS "salt" VARCHAR;
 ALTER TABLE IF EXISTS MASTER."Account"
     ADD COLUMN IF NOT EXISTS "iterations" INTEGER;
-ALTER TABLE IF EXISTS MASTER."Identity"
-    DROP COLUMN IF EXISTS "label";
-ALTER TABLE IF EXISTS MASTER."Identity"
-    DROP COLUMN IF EXISTS "status";
-ALTER TABLE IF EXISTS MASTER."Identity"
-    ADD COLUMN "accountID" VARCHAR NOT NULL default '';
-ALTER TABLE IF EXISTS MASTER."Identity"
-    ADD COLUMN "nubID" VARCHAR;
 
-ALTER TABLE MASTER."Identity"
-    ADD CONSTRAINT Identity_BC_Identity_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."IdentityProperties_BC" ("id");
-ALTER TABLE MASTER."Identity"
-    ADD CONSTRAINT Identity_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Profile"
-    ADD CONSTRAINT Profile_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT Profile_Account_id FOREIGN KEY ("identityID") REFERENCES BLOCKCHAIN."Identity_BC" ("id");
 ALTER TABLE MASTER."Watchlist"
-    ADD CONSTRAINT Watchlist_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+    ADD CONSTRAINT Watchlist_Account_id FOREIGN KEY ("identityID") REFERENCES BLOCKCHAIN."Identity_BC" ("id");
 ALTER TABLE MASTER."Watchlist"
     ADD CONSTRAINT Watchlist_Watched FOREIGN KEY ("watching") REFERENCES MASTER."Account" ("id");
 
@@ -117,6 +105,10 @@ CREATE TRIGGER WATCHLIST_LOG
     ON MASTER."Watchlist"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_LOG();
+
+DROP TRIGGER IF EXISTS IDENTITY_LOG ON MASTER."Identity" CASCADE;
+
+DROP TABLE IF EXISTS MASTER."Identity" CASCADE;
 
 # --- !Downs
 DROP TRIGGER IF EXISTS AUTHORIZATION_BC_LOG ON BLOCKCHAIN."Authorization_BC" CASCADE;

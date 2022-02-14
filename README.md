@@ -1,4 +1,4 @@
-# persistenceClient
+# assetMantleClient
 
 This project implements explorer and other web2 applications for persistence ecosystem.
 
@@ -49,7 +49,7 @@ This project implements explorer and other web2 applications for persistence eco
    1. Go to project directory in terminal.
    2. `sbt clean`
    3. `sbt dist`
-   4. You get a `persistenceClient-1.0.zip` file which contains binary file in `bin` folder.
+   4. You get a `assetMantle-1.0.zip` file which contains binary file in `bin` folder.
 8. Modify `applicaltion.conf` as per the requirements.
 9. Run `./persistenceclient`
 

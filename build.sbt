@@ -1,9 +1,9 @@
 import _root_.io.gatling.sbt.GatlingPlugin
 import _root_.sbt.Keys._
 
-name := "persistenceClient"
+name := "assetMantleClient"
 
-maintainer := "admin@persistence.one"
+maintainer := "admin@assetmantle.one"
 
 version := "1.0"
 

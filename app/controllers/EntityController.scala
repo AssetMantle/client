@@ -21,7 +21,6 @@ class EntityController @Inject()(
                                   masterProperties: master.Properties,
                                   masterAssets: master.Assets,
                                   masterSplits: master.Splits,
-                                  masterIdentities: master.Identities,
                                   masterOrders: master.Orders,
                                   blockchainIdentityProvisions: blockchain.IdentityProvisions,
                                   blockchainIdentities: blockchain.Identities,

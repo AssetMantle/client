@@ -66,7 +66,6 @@ class ComponentViewController @Inject()(
                                          masterAssets: master.Assets,
                                          masterOrders: master.Orders,
                                          masterClassifications: master.Classifications,
-                                         masterIdentities: master.Identities,
                                          masterSplits: master.Splits,
                                          masterIdentifications: master.Identifications,
                                          withLoginActionAsync: WithLoginActionAsync,
@@ -728,12 +727,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
 
-      def getIdentitiesIssued(identityIDs: Seq[String]) = masterIdentities.Service.getAllByIDs(identityIDs)
-
       (for {
         identityIDs <- identityIDs
-        identities <- getIdentitiesIssued(identityIDs)
-      } yield Ok(views.html.component.master.identity.identitiesProvisioned(identities))
+      } yield Ok(views.html.component.master.identity.identitiesProvisioned(identityIDs))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -743,12 +739,9 @@ class ComponentViewController @Inject()(
     implicit request =>
       val identityIDs = blockchainIdentityUnprovisions.Service.getAllIDsByUnprovisioned(loginState.address)
 
-      def getIdentitiesIssued(identityIDs: Seq[String]) = masterIdentities.Service.getAllByIDs(identityIDs)
-
       (for {
         identityIDs <- identityIDs
-        identities <- getIdentitiesIssued(identityIDs)
-      } yield Ok(views.html.component.master.identity.identitiesUnprovisioned(identities))
+      } yield Ok(views.html.component.master.identity.identitiesUnprovisioned(identityIDs))
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }

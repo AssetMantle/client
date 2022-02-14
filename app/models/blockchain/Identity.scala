@@ -33,8 +33,6 @@ class Identities @Inject()(
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
                             masterClassifications: master.Classifications,
-                            masterIdentities: master.Identities,
-                            masterProperties: master.Properties,
                             utilitiesOperations: utilities.Operations
                           )(implicit executionContext: ExecutionContext) {
 
@@ -187,8 +185,7 @@ class Identities @Inject()(
     }
 
     def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
-      val nubMetaProperty = getNubMetaProperty(identityNub.nubID)
-      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(nubMetaProperty))
+      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(getNubMetaProperty(identityNub.nubID)))
 
       def defineAndUpsert(nubProperty: Property) = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
