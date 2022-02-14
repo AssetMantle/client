@@ -1,5 +1,6 @@
 @import views.companion.blockchain.SplitWrap
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(splitWrapForm: Form[SplitWrap.Data] = SplitWrap.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SPLIT_WRAP, splitWrapForm) {

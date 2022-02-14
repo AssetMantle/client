@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.buttons._
+
 @(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @if(profilePicture sameElements Array[Byte]()) {

@@ -1,5 +1,6 @@
 @import views.companion.blockchain.MaintainerDeputize
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(maintainerDeputizeForm: Form[MaintainerDeputize.Data] = MaintainerDeputize.form, classificationID: String, fromID: String, numMaintainedTraitsForm: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.MAINTAINER_DEPUTIZE, maintainerDeputizeForm) {

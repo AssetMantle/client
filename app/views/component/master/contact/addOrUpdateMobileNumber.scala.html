@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.form._
 @import views.companion.master.AddOrUpdateMobileNumber
 
 @(addOrUpdateMobileNumber: Form[AddOrUpdateMobileNumber.Data] = AddOrUpdateMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)

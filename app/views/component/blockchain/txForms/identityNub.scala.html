@@ -1,5 +1,6 @@
 @import views.companion.blockchain.IdentityNub
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(identityNubForm: Form[IdentityNub.Data] = IdentityNub.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.IDENTITY_NUB, identityNubForm) {

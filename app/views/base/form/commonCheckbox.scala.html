@@ -1,11 +1,11 @@
-@import constants.FormField.{IntFormField, NestedFormField}
+@import constants.FormField.{BooleanFormField, NestedFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
-<div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonInputInt")'>
-@defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
+<div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonCheckBox")'>
+@defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
@@ -24,7 +24,7 @@
                 nestedFormField match {
                     case Some(field: NestedFormField) => {
                         //This case handles nested fields. See AddOrganization for example.
-                        formData(Seq(field.name, formField.name).mkString("."))
+                        formData(Seq(field.name, formField.name).mkString("../../../../public"))
                     }
                     case None => {
                         //This case handles generic fields.
@@ -34,7 +34,7 @@
             }
         }
     ) { field =>
-        @inputText(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, defaultArguments ++ arguments: _*)
+        @checkbox(field, defaultArguments ++ arguments: _*)
     }
 }
 </div>

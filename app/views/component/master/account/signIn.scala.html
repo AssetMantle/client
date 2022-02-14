@@ -1,6 +1,8 @@
 @import controllers.actions.LoginState
 @import views.companion.master.SignIn
+@import views.html.base.form._
 @import views.html.base._
+@import views.html.base.buttons._
 
 @(signInForm: Form[SignIn.Data] = SignIn.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div class="signUpForm">

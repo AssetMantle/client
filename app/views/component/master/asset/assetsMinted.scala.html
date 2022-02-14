@@ -1,6 +1,9 @@
 @import controllers.actions.LoginState
 @import models.master.{Asset, Split}
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.cards._
+@import views.html.base.buttons._
+@import views.html.base.infos._
 
 @(assets: Seq[Asset], splits: Seq[Split])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 

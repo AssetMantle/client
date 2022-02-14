@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.cards._
+@import views.html.base.buttons._
 @import models.masterTransaction.Chat
 
 @(chatID: String, chats: Seq[Chat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)

@@ -1,6 +1,9 @@
 @import controllers.actions.LoginState
 @import models.master.Order
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.base.buttons._
 
 @(orders: Seq[Order])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 

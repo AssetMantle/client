@@ -1,6 +1,7 @@
 @import constants.FormField.NestedFormField
 @import helper._
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 @import constants.FormField.BooleanFormField
 
 @(form: Form[_], nestedFormField: NestedFormField, addField: BooleanFormField, target: String = "commonModalContent")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)

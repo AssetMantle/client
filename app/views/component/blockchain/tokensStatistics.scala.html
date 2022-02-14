@@ -1,5 +1,6 @@
 @import models.blockchain.Token
-@import views.html.base._
+@import views.html.base.cards._
+@import views.html.base.infos._
 
 @(token: Token, tokenTickers: Seq[constants.AppConfig.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

@@ -7,4 +7,4 @@
 @input(formData(formField.name)) { (id, name, value, args) =>
     <input type='range' name='@name' id='@fieldID.getOrElse(id)' class='@fieldClass.getOrElse("cmuk-range")' value='@formField.minimumValue' step='@step.getOrElse(1)' min='@formField.minimumValue' max='@formField.maximumValue' required='@required' oninput='showRangeSliderValue(this, "@Seq(formField.name, "Value").mkString("")")' @toHtmlArgs(args)>
 }
-<script src="@routes.Assets.versioned("javascripts/rangeSlider.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("../../../../public/javascripts/rangeSlider.js")" type="text/javascript"></script>

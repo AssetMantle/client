@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.infos._
+@import views.html.base.form._
 
 @(identityID: String, provisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
 

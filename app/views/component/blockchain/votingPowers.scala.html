@@ -1,4 +1,6 @@
-@import views.html.base._
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.base.charts._
 @import scala.collection.immutable.ListMap
 
 @(sortedVotingPowerMap: ListMap[String, Double], totalActiveValidators: Int, totalValidators: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
