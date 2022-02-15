@@ -76,3 +76,9 @@ async function keplrOnSignUp(source) {
     $('#signUpSignature').val(signArbitraryResponse.signature);
     submitForm(source, 'commonModalContent');
 }
+
+function checkKepler() {
+    if (!keplrSet) {
+        location.reload();
+    }
+}
