@@ -85,7 +85,7 @@ object TransactionMessage {
     case orderMake: OrderMake => Json.toJson(orderMake)
     case orderTake: OrderTake => Json.toJson(orderTake)
     case orderCancel: OrderCancel => Json.toJson(orderCancel)
-    //meta
+    //metaList
     case metaReveal: MetaReveal => Json.toJson(metaReveal)
     //maintainer
     case deputize: MaintainerDeputize => Json.toJson(deputize)

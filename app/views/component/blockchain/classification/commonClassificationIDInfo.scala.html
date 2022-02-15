@@ -1,0 +1,7 @@
+@import models.common.ID.ClassificationID
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(classificationID: ClassificationID)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(classificationID.asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.maintainer('${classificationID.asString}'))")))

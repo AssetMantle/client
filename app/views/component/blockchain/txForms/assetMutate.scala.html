@@ -1,5 +1,6 @@
 @import views.companion.blockchain.AssetMutate
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(assetMutateForm: Form[AssetMutate.Data] = AssetMutate.form, assetID: String, fromID: String, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.ASSET_MUTATE, assetMutateForm) {

@@ -1,7 +1,7 @@
-let validatorTxsPageNum = 1;
+validatorTxsPageNum = 1;
 
 function getValidatorTxs(address, change = 0) {
-    validatorTxsPageNum = validatorTxsPageNum + change;
+    validatorTxsPageNum += change;
     componentResource('validatorTxs', jsRoutes.controllers.ComponentViewController.validatorTransactionsPerPage(address, validatorTxsPageNum), 'validatorTransactionsPageChangeSpinner', 'pageChange');
     showHideValidatorTxListBackButtons();
 }

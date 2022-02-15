@@ -1,15 +1,14 @@
 package controllers.actions
 
-import controllers.logging.WithActionAsyncLoggingFilter
 import constants.AppConfig._
+import controllers.logging.WithActionAsyncLoggingFilter
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -21,6 +20,7 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
     withActionAsyncLoggingFilter.next { implicit request ⇒
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+      val identityID = Future(request.session.get(constants.Security.IDENTITY_ID).getOrElse(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND)))
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String): Future[String] = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -40,8 +40,9 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
       (for {
         username <- username
         sessionToken <- sessionToken
+        identityID <- identityID
         address <- verifySessionTokenAndUserType(username, sessionToken)
-        result <- result(LoginState(username, constants.User.USER, address))
+        result <- result(LoginState(username = username, userType = constants.User.USER, address = address, identityID = identityID))
       } yield result).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))

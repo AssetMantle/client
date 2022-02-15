@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import views.html.base.form._
 @import views.companion.master.VerifyMobileNumber
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)

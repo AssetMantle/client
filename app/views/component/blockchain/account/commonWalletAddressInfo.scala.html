@@ -1,0 +1,6 @@
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(key: String, address: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(key, commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")))

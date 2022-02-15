@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.ClassificationID
 import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -31,7 +32,6 @@ class AssetDefines @Inject()(
                               masterAccounts: master.Accounts,
                               blockchainAccounts: blockchain.Accounts,
                               blockchainClassifications: blockchain.Classifications,
-                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class AssetDefineSerialized(from: String, fromID: String, immutableMetaTraits: String, immutableTraits: String, mutableMetaTraits: String, mutableTraits: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -197,20 +197,15 @@ class AssetDefines @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertClassificationProperties(assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.ASSET_DEFINITION, immutableMetas = assetDefine.immutableMetaTraits, immutables = assetDefine.immutableTraits, mutableMetas = assetDefine.mutableMetaTraits, mutables = assetDefine.mutableTraits)
-
-      def insertMaintainerProperties(classificationID: String, assetDefine: AssetDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = assetDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits)
+      def getClassificationID(assetDefine: AssetDefine) = ClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((assetDefine.immutableMetaTraits ++ assetDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((assetDefine.mutableMetaTraits ++ assetDefine.mutableTraits).map(_.toProperty))))
 
       def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         assetDefine <- assetDefine
-        classificationID <- insertClassificationProperties(assetDefine)
-        maintainerID <- insertMaintainerProperties(classificationID, assetDefine)
         accountID <- getAccountID(assetDefine.from)
-        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+        _ <- sendNotifications(accountID = accountID, classificationID = getClassificationID(assetDefine).asString)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

@@ -33,6 +33,8 @@ class Block @Inject()(
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
                        blockchainIdentities: blockchain.Identities,
+                       blockchainIdentityProvisions: blockchain.IdentityProvisions,
+                       blockchainIdentityUnprovisions: blockchain.IdentityUnprovisions,
                        blockchainMetas: blockchain.Metas,
                        blockchainParameters: blockchain.Parameters,
                        blockchainMaintainers: blockchain.Maintainers,
@@ -286,8 +288,8 @@ class Block @Inject()(
         //Identity
         case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => blockchainIdentities.Utility.onDefine(stdMsg.message.asInstanceOf[IdentityDefine])
         case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(stdMsg.message.asInstanceOf[IdentityIssue])
-        case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(stdMsg.message.asInstanceOf[IdentityProvision])
-        case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(stdMsg.message.asInstanceOf[IdentityUnprovision])
+        case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => blockchainIdentityProvisions.Utility.onProvision(stdMsg.message.asInstanceOf[IdentityProvision])
+        case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentityUnprovisions.Utility.onUnprovision(stdMsg.message.asInstanceOf[IdentityUnprovision])
         case constants.Blockchain.TransactionMessage.IDENTITY_NUB => blockchainIdentities.Utility.onNub(stdMsg.message.asInstanceOf[IdentityNub])
         //Split
         case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(stdMsg.message.asInstanceOf[SplitSend])
@@ -298,7 +300,7 @@ class Block @Inject()(
         case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(stdMsg.message.asInstanceOf[OrderMake])
         case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(stdMsg.message.asInstanceOf[OrderTake])
         case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(stdMsg.message.asInstanceOf[OrderCancel])
-        //meta
+        //metaList
         case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onReveal(stdMsg.message.asInstanceOf[MetaReveal])
         //maintainer
         case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => blockchainMaintainers.Utility.onDeputize(stdMsg.message.asInstanceOf[MaintainerDeputize])

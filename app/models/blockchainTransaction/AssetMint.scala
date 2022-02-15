@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.AssetID
 import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -29,7 +30,6 @@ class AssetMints @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             utilitiesNotification: utilities.Notification,
                             masterAccounts: master.Accounts,
-                            masterProperties: master.Properties,
                             blockchainAccounts: blockchain.Accounts
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -199,15 +199,14 @@ class AssetMints @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(assetMint: AssetMint) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getAssetID(classificationID = assetMint.classificationID, Immutables(Properties((assetMint.immutableMetaProperties ++ assetMint.immutableProperties).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.ASSET, immutableMetas = assetMint.immutableMetaProperties, immutables = assetMint.immutableProperties, mutableMetas = assetMint.mutableMetaProperties, mutables = assetMint.mutableProperties)
+      def getAssetID(assetMint: AssetMint) = Future(AssetID(classificationID = assetMint.classificationID, hashID = Immutables(Properties((assetMint.immutableMetaProperties ++ assetMint.immutableProperties).map(_.toProperty))).getHashID))
 
-      def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MINTED, assetID, txHash)(s"'$txHash'")
+      def sendNotifications(accountID: String, assetID: AssetID) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MINTED, assetID.asString, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         assetMint <- assetMint
-        assetID <- insertProperties(assetMint)
+        assetID <- getAssetID(assetMint)
         accountID <- getAccountID(assetMint.from)
         _ <- sendNotifications(accountID = accountID, assetID = assetID)
       } yield ()).recover {

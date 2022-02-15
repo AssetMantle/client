@@ -1,7 +1,7 @@
-let accountTxsPageNum = 1;
+accountTxsPageNum = 1;
 
 function getAccountTxs(address, change = 0) {
-    accountTxsPageNum = accountTxsPageNum + change;
+    accountTxsPageNum += change;
     componentResource('accountTxs', jsRoutes.controllers.ComponentViewController.accountTransactionsPerPage(address, accountTxsPageNum), 'accountTransactionsPageChangeSpinner', 'pageChange');
     showHideAccountTxListBackButtons();
 }

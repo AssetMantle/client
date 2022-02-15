@@ -4,6 +4,7 @@ import constants.Blockchain.IBCDenoms
 import exceptions.BaseException
 import models.Abstract.DataValue
 import models.common.DataValue._
+import models.common.ID.MetaID
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -15,6 +16,12 @@ object Serializable {
   private implicit val module: String = constants.Module.SERIALIZABLE
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  case class SocialProfile(platform: String, username: String, url: String)
+
+  implicit val socialProfileWrites: OWrites[SocialProfile] = Json.writes[SocialProfile]
+
+  implicit val socialProfileReads: Reads[SocialProfile] = Json.reads[SocialProfile]
 
   case class Address(addressLine1: String, addressLine2: String, landmark: Option[String] = None, city: String, country: String, zipCode: String, phone: String)
 
@@ -119,7 +126,9 @@ object Serializable {
 
   implicit val idWrites: OWrites[ID] = Json.writes[ID]
 
-  case class Data(dataType: String, value: DataValue)
+  case class Data(dataType: String, value: DataValue) {
+    def getMetaID: MetaID = MetaID(this)
+  }
 
   implicit val dataReads: Reads[Data] = (
     (JsPath \ "dataType").read[String] and
@@ -128,7 +137,17 @@ object Serializable {
 
   implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
-  case class Fact(factType: String, hash: String)
+  object Data {
+
+    def apply(dataType: String, value: DataValue) = new Data(dataType = dataType, value = value)
+
+    def apply(dataType: String, dataValue: Option[String]): Data = Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))
+
+  }
+
+  case class Fact(factType: String, hash: String) {
+    def getMetaID: MetaID = MetaID(typeID = DataValue.getDataTypeFromFactType(factType), hashID = hash)
+  }
 
   def NewFact(factType: String, dataValue: DataValue): Fact = Fact(factType = factType, hash = dataValue.generateHash)
 
@@ -154,6 +173,8 @@ object Serializable {
     def getHash: String = data.value.generateHash
 
     def removeData(): Fact = NewFact(DataValue.getFactTypeFromDataType(data.dataType), data.value)
+
+    def getMetaID: MetaID = data.getMetaID
   }
 
   implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]
@@ -200,7 +221,7 @@ object Serializable {
   case class BaseProperty(dataType: String, dataName: String, dataValue: Option[String]) {
     def toRequestString: String = utilities.String.getPropertyRequestWithValue(dataNameWithType = utilities.String.getPropertyRequestNameAndType(dataType = dataType, dataName = dataName), dataValue = dataValue)
 
-    def toMetaProperty: MetaProperty = MetaProperty(id = dataName, metaFact = MetaFact(DataValue.getData(dataType = dataType, dataValue = dataValue)))
+    def toMetaProperty: MetaProperty = MetaProperty(id = dataName, metaFact = MetaFact(Data(dataType = dataType, dataValue = dataValue)))
 
     def toProperty: Property = Property(id = dataName, fact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
 

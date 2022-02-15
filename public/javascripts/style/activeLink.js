@@ -1,4 +1,4 @@
-let lastUrl = location.href;
+lastUrl = location.href;
 
 function navBar() {
     $('nav .cmuk-navbar-nav li a').filter(function (idx, elem) {

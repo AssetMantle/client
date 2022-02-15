@@ -1,5 +1,6 @@
 @import views.companion.blockchain.IdentityIssue
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(identityIssueForm: Form[IdentityIssue.Data] = IdentityIssue.form, classificationID: String, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

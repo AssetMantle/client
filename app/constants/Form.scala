@@ -14,15 +14,10 @@ object Form {
 
   //AccountController
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp, routes.javascript.AccountController.signUpForm)
-  val CREATE_WALLET = new Form("CREATE_WALLET", routes.AccountController.createWallet, routes.javascript.AccountController.createWalletForm)
-  val IMPORT_WALLET = new Form("IMPORT_WALLET", routes.AccountController.importWallet, routes.javascript.AccountController.importWalletForm)
-  val LOGIN = new Form("LOGIN", routes.AccountController.login, routes.javascript.AccountController.loginForm)
-  val LOGOUT = new Form("LOGOUT", routes.AccountController.logout, routes.javascript.AccountController.logoutForm)
-  val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword, routes.javascript.AccountController.changePasswordForm)
-  val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword, routes.javascript.AccountController.emailOTPForgotPasswordForm)
-  val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword, routes.javascript.AccountController.forgotPasswordForm)
-  val ADD_IDENTIFICATION = new Form("ADD_IDENTIFICATION", routes.AccountController.addIdentification, routes.javascript.AccountController.addIdentificationForm)
-  val USER_REVIEW_IDENTIFICATION = new Form("USER_REVIEW_IDENTIFICATION", routes.AccountController.userReviewIdentification, routes.javascript.AccountController.userReviewIdentificationForm)
+  val SIGN_IN = new Form("SIGN_IN", routes.AccountController.signIn, routes.javascript.AccountController.signInForm)
+  val SIGN_OUT = new Form("SIGN_OUT", routes.AccountController.signOut, routes.javascript.AccountController.signOutForm)
+  val UPDATE_PROFILE = new Form("UPDATE_PROFILE", routes.AccountController.updateProfile, routes.javascript.AccountController.updateProfileForm)
+  val UPDATE_SOCIAL_PROFILE = new Form("UPDATE_SOCIAL_PROFILE", routes.AccountController.updateSocialProfile, routes.javascript.AccountController.updateSocialProfileForm)
 
   //AssetController
   val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define, routes.javascript.AssetController.defineForm)
@@ -50,9 +45,6 @@ object Form {
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.ContactController.verifyEmailAddress, routes.javascript.ContactController.verifyEmailAddressForm)
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.ContactController.verifyMobileNumber, routes.javascript.ContactController.verifyMobileNumberForm)
 
-  //EntityController
-  val UPSERT_ENTITY_LABEL = new Form("UPSERT_ENTITY_LABEL", routes.EntityController.upsertLabel, routes.javascript.EntityController.upsertLabelForm)
-
   //IdentityController
   val IDENTITY_NUB = new Form("IDENTITY_NUB", routes.IdentityController.nub, routes.javascript.IdentityController.nubForm)
   val IDENTITY_DEFINE = new Form("IDENTITY_DEFINE", routes.IdentityController.define, routes.javascript.IdentityController.defineForm)
@@ -71,9 +63,6 @@ object Form {
   val ORDER_MAKE = new Form("ORDER_MAKE", routes.OrderController.make, routes.javascript.OrderController.makeForm)
   val ORDER_TAKE = new Form("ORDER_TAKE", routes.OrderController.take, routes.javascript.OrderController.takeForm)
   val ORDER_CANCEL = new Form("ORDER_CANCEL", routes.OrderController.cancel, routes.javascript.OrderController.cancelForm)
-
-  //SendCoinController
-  val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin, routes.javascript.SendCoinController.sendCoinForm)
 
   //SplitController
   val SPLIT_SEND = new Form("SPLIT_SEND", routes.SplitController.send, routes.javascript.SplitController.sendForm)

@@ -27,7 +27,6 @@ class AssetBurns @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider,
                             utilitiesNotification: utilities.Notification,
                             masterAccounts: master.Accounts,
-                            masterProperties: master.Properties,
                             blockchainAccounts: blockchain.Accounts
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -185,8 +184,6 @@ class AssetBurns @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val assetBurn = Service.getTransaction(ticketID)
 
-      def deleteProperties(assetBurn: AssetBurn) = masterProperties.Service.deleteAll(entityType = constants.Blockchain.Entity.ASSET, entityID = assetBurn.assetID)
-
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
       def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_BURNED, assetID, txHash)(s"'$txHash'")
@@ -194,7 +191,6 @@ class AssetBurns @Inject()(
       (for {
         _ <- markTransactionSuccessful
         assetBurn <- assetBurn
-        _ <- deleteProperties(assetBurn)
         accountID <- getAccountID(assetBurn.from)
         _ <- sendNotifications(accountID = accountID, assetID = assetBurn.assetID)
       } yield ()).recover {

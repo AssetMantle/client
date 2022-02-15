@@ -1,5 +1,6 @@
 @import views.companion.blockchain.MetaReveal
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(metaRevealForm: Form[MetaReveal.Data] = MetaReveal.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.META_REVEAL, metaRevealForm) {

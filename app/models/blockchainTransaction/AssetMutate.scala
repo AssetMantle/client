@@ -29,7 +29,6 @@ class AssetMutates @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              masterProperties: master.Properties,
                               blockchainAccounts: blockchain.Accounts
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -193,16 +192,13 @@ class AssetMutates @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def updateProperties(assetMutate: AssetMutate) = masterProperties.Utilities.upsertProperties(entityID = assetMutate.assetID, entityType = constants.Blockchain.Entity.ASSET, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = assetMutate.mutableMetaProperties, mutables = assetMutate.mutableProperties)
-
       def sendNotifications(accountID: String, assetID: String) = utilitiesNotification.send(accountID, constants.Notification.ASSET_MUTATED, assetID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         assetMutate <- assetMutate
-        assetID <- updateProperties(assetMutate)
         accountID <- getAccountID(assetMutate.from)
-        _ <- sendNotifications(accountID = accountID, assetID = assetID)
+        _ <- sendNotifications(accountID = accountID, assetID = assetMutate.assetID)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

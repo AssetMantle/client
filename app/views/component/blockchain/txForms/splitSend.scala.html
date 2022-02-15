@@ -1,5 +1,6 @@
 @import views.companion.blockchain.SplitSend
-@import views.html.base._
+@import views.html.base.form._
+@import views.html.base.buttons._
 
 @(splitSendForm: Form[SplitSend.Data] = SplitSend.form, ownableID: String, fromID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonForm(constants.Form.SPLIT_SEND, splitSendForm) {

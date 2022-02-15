@@ -23,8 +23,9 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
 
   def apply(f: ⇒ Option[LoginState] => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
-      val username = Future(request.session.get(constants.Security.USERNAME))
-      val sessionToken = Future(request.session.get(constants.Security.TOKEN))
+      val username = request.session.get(constants.Security.USERNAME)
+      val sessionToken = request.session.get(constants.Security.TOKEN)
+      val identityID = request.session.get(constants.Security.IDENTITY_ID)
 
       def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String]) = {
         username match {
@@ -38,7 +39,7 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
               _ <- tokenTimeVerify
               userType <- userType
               address <- address
-              result <- f(Some(LoginState(username, userType, address)))(request)
+              result <- f(Some(LoginState(username = username, userType = userType, address = address, identityID = identityID.getOrElse(""))))(request)
             } yield result
           }
           case None => f(None)(request)
@@ -46,8 +47,6 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
       }
 
       (for {
-        username <- username
-        sessionToken <- sessionToken
         result <- verifySessionTokenUserTypeAndGetResult(username, sessionToken)
       } yield result).recover {
         case baseException: BaseException =>

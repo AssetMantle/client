@@ -3,23 +3,21 @@ package constants
 import models.common.DataValue
 import play.api.data.validation._
 import views.companion.blockchain._
-import views.companion.master.{ChangePassword, SignUp}
+import views.companion.master._
 
 object FormConstraint {
   //TODO: Error Response through Messages
   val signUpConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUp")({ signUpData: SignUp.Data =>
     val errors = {
-      if (signUpData.password != signUpData.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
-      else if (!signUpData.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
+      if (signUpData.username == utilities.Bech32.convertAccountPublicKeyToAccountAddress(signUpData.publicKey)) Seq(ValidationError(constants.Response.USERNAME_SAME_AS_WALLET_ADDRESS.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val changePasswordConstraint: Constraint[ChangePassword.Data] = Constraint("constraints.changePassword")({ changePasswordData: ChangePassword.Data =>
+  val updateSocialProfileConstraint: Constraint[UpdateSocialProfile.Data] = Constraint("constraints.updateSocialProfile")({ updateSocialProfileData: UpdateSocialProfile.Data =>
     val errors = {
-      if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
-      else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      if (!constants.SocialProfile.List.contains(updateSocialProfileData.platform)) Seq(ValidationError(constants.Response.UNKOWN_SOCIAL_PLATFORM.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

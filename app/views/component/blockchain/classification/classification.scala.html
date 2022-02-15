@@ -1,0 +1,23 @@
+@import models.blockchain.{Classification, Maintainer}
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.component.blockchain.identity._
+
+@(classification: Classification, maintainers: Seq[Maintainer])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.CLASSIFICATION) {
+    <span class="stringEllipse" title="@classification.id.asString">@classification.id.asString</span>
+} {
+    @views.html.component.blockchain.properties(mutableProperties = classification.mutableTraits.properties.propertyList, immutableProperties = classification.immutableTraits.properties.propertyList)
+    @maintainers.map { maintainer =>
+        @commonIdentityIDInfo(maintainer.id.identityID)
+        @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(maintainer.addMaintainer))
+        @commonBooleanInfo(constants.View.REMOVE_MAINTAINER, Option(maintainer.removeMaintainer))
+        @commonBooleanInfo(constants.View.MUTATE_MAINTAINER, Option(maintainer.mutateMaintainer))
+        @views.html.component.blockchain.properties(mutableProperties = maintainer.maintainedTraits.properties.propertyList, immutableProperties = Seq())
+    }
+}
+
+<script>
+        checkAndPushState(jsRoutes.controllers.ViewController.classification().url, '@classification.id.asString', "classification");
+</script>

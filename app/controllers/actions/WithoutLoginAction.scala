@@ -23,11 +23,12 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
 
   def apply(f: ⇒ Option[LoginState] => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     withActionAsyncLoggingFilter.next { implicit request ⇒
-      val username = Future(request.session.get(constants.Security.USERNAME))
-      val sessionToken = Future(request.session.get(constants.Security.TOKEN))
+      val username = request.session.get(constants.Security.USERNAME)
+      val sessionToken = request.session.get(constants.Security.TOKEN)
+      val identityID = request.session.get(constants.Security.IDENTITY_ID)
 
 
-      def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String]) = {
+      def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String], identityID: Option[String]) = {
         username match {
           case Some(username) => {
             val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken.getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
@@ -39,16 +40,14 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
               _ <- tokenTimeVerify
               userType <- userType
               address <- address
-            } yield f(Some(LoginState(username, userType, address)))(request)
+            } yield f(Some(LoginState(username = username, userType = userType, address = address, identityID = identityID.getOrElse(""))))(request)
           }
           case None => Future(f(None)(request))
         }
       }
 
       (for {
-        username <- username
-        sessionToken <- sessionToken
-        result <- verifySessionTokenUserTypeAndGetResult(username, sessionToken)
+        result <- verifySessionTokenUserTypeAndGetResult(username, sessionToken, identityID)
       } yield result).recover {
         case baseException: BaseException =>
           Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession

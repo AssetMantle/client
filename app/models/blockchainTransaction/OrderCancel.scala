@@ -28,7 +28,6 @@ class OrderCancels @Inject()(
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
                               blockchainAccounts: blockchain.Accounts,
-                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class OrderCancelSerialized(from: String, fromID: String, orderID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -185,8 +184,6 @@ class OrderCancels @Inject()(
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, txHash)
       val orderCancel = Service.getTransaction(ticketID)
 
-      def deleteProperties(orderCancel: OrderCancel) = masterProperties.Service.deleteAll(entityType = constants.Blockchain.Entity.ORDER, entityID = orderCancel.orderID)
-
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
       def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_CANCELLED, orderID, txHash)(s"'$txHash'")
@@ -194,7 +191,6 @@ class OrderCancels @Inject()(
       (for {
         _ <- markTransactionSuccessful
         orderCancel <- orderCancel
-        _ <- deleteProperties(orderCancel)
         accountID <- getAccountID(orderCancel.from)
         _ <- sendNotifications(accountID = accountID, orderID = orderCancel.orderID)
       } yield ()).recover {

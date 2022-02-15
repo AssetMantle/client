@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.{ClassificationID, IdentityID}
 import models.common.Serializable.{BaseProperty, Immutables, Mutables, Properties}
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -30,7 +31,6 @@ class IdentityNubs @Inject()(
                               masterAccounts: master.Accounts,
                               blockchainAccounts: blockchain.Accounts,
                               blockchainIdentities: blockchain.Identities,
-                              masterProperties: master.Properties
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class IdentityNubSerialized(from: String, nubID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
@@ -188,21 +188,17 @@ class IdentityNubs @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertClassificationProperties(identityNub: IdentityNub) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty))),
-        entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = Seq.empty, immutables = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None)), mutableMetas = Seq.empty, mutables = Seq.empty)
+      def getClassificationID(identityNub: IdentityNub) = ClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty)))
 
-      def insertIdentityProperties(identityNub: IdentityNub, classificationID: String) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = classificationID, Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData())))),
-        entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = Some(identityNub.nubID))), immutables = Seq.empty, mutableMetas = Seq.empty, mutables = Seq.empty)
+      def getIdentityID(identityNub: IdentityNub, classificationID: ClassificationID) = IdentityID(classificationID = classificationID, hashID = Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData()))).getHashID)
 
       def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_NUB, identityID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         identityNub <- identityNub
-        classificationID <- insertClassificationProperties(identityNub)
-        identityID <- insertIdentityProperties(identityNub, classificationID)
         accountID <- getAccountID(identityNub.from)
-        _ <- sendNotifications(accountID = accountID, identityID = identityID)
+        _ <- sendNotifications(accountID = accountID, identityID = getIdentityID(identityNub, getClassificationID(identityNub)).asString)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

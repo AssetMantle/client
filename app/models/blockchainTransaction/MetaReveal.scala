@@ -29,7 +29,6 @@ class MetaReveals @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              utilitiesNotification: utilities.Notification,
                              masterAccounts: master.Accounts,
-                             masterProperties: master.Properties,
                              blockchainAccounts: blockchain.Accounts
                            )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 

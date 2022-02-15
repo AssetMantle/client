@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.ClassificationID
 import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -29,7 +30,6 @@ class IdentityDefines @Inject()(
                                  protected val databaseConfigProvider: DatabaseConfigProvider,
                                  utilitiesNotification: utilities.Notification,
                                  masterAccounts: master.Accounts,
-                                 masterProperties: master.Properties,
                                  blockchainAccounts: blockchain.Accounts
                                )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -196,20 +196,15 @@ class IdentityDefines @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, immutableMetas = identityDefine.immutableMetaTraits, immutables = identityDefine.immutableTraits, mutableMetas = identityDefine.mutableMetaTraits, mutables = identityDefine.mutableTraits)
-
-      def insertMaintainerProperties(classificationID: String, identityDefine: IdentityDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = identityDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits)
+      def getClassificationID(identityDefine: IdentityDefine) = ClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((identityDefine.immutableMetaTraits ++ identityDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((identityDefine.mutableMetaTraits ++ identityDefine.mutableTraits).map(_.toProperty))))
 
       def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         identityDefine <- identityDefine
-        classificationID <- insertProperties(identityDefine)
-        maintainerID <- insertMaintainerProperties(classificationID, identityDefine)
         accountID <- getAccountID(identityDefine.from)
-        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+        _ <- sendNotifications(accountID = accountID, classificationID = getClassificationID(identityDefine).asString)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

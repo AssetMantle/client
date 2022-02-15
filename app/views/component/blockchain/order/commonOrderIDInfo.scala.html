@@ -1,0 +1,7 @@
+@import models.common.ID.OrderID
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(orderID: OrderID)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.ORDER_ID, commonJavascriptLink(orderID.asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.order('${orderID.asString}'))")))

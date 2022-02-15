@@ -2,7 +2,7 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.DataValue
+import models.common.ID.MetaID
 import models.common.Serializable._
 import models.common.TransactionMessages.MetaReveal
 import org.postgresql.util.PSQLException
@@ -16,7 +16,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Meta(id: String, dataType: String, dataValue: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Meta(id: MetaID, dataValue: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Metas @Inject()(
@@ -37,47 +37,51 @@ class Metas @Inject()(
 
   private[models] val metaTable = TableQuery[MetaTable]
 
-  private def add(meta: Meta): Future[String] = db.run((metaTable returning metaTable.map(_.id) += meta).asTry).map {
+  case class MetaSerialized(typeID: String, hashID: String, dataValue: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Meta = Meta(id = MetaID(typeID = typeID, hashID = hashID), dataValue = dataValue, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  }
+
+  def serialize(meta: Meta): MetaSerialized = MetaSerialized(typeID = meta.id.typeID, hashID = meta.id.hashID, dataValue = meta.dataValue, createdBy = meta.createdBy, createdOn = meta.createdOn, createdOnTimeZone = meta.createdOnTimeZone, updatedBy = meta.updatedBy, updatedOn = meta.updatedOn, updatedOnTimeZone = meta.updatedOnTimeZone)
+
+  private def add(meta: Meta): Future[String] = db.run((metaTable returning metaTable.map(_.hashID) += serialize(meta)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.META_INSERT_FAILED, psqlException)
     }
   }
 
-  private def addMultiple(metas: Seq[Meta]): Future[Seq[String]] = db.run((metaTable returning metaTable.map(_.id) ++= metas).asTry).map {
+  private def addMultiple(metas: Seq[Meta]): Future[Seq[String]] = db.run((metaTable returning metaTable.map(_.hashID) ++= metas.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.META_INSERT_FAILED, psqlException)
     }
   }
 
-  private def upsert(meta: Meta): Future[Int] = db.run(metaTable.insertOrUpdate(meta).asTry).map {
+  private def upsert(meta: Meta): Future[Int] = db.run(metaTable.insertOrUpdate(serialize(meta)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.META_UPSERT_FAILED, psqlException)
     }
   }
 
-  private def tryGetByIDAndDataType(id: String, dataType: String) = db.run(metaTable.filter(x => x.id === id && x.dataType === dataType).result.head.asTry).map {
+  private def tryGetByTypeIDAndHashType(typeID: String, hashID: String) = db.run(metaTable.filter(x => x.typeID === typeID && x.hashID === hashID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.META_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def getByIDAndDataType(id: String, dataType: String) = db.run(metaTable.filter(x => x.id === id && x.dataType === dataType).result.headOption)
+  private def getByTypeIDAndHashID(typeID: String, hashID: String) = db.run(metaTable.filter(x => x.typeID === typeID && x.hashID === hashID).result.headOption)
 
-  private def getByIDs(ids: Seq[String]) = db.run(metaTable.filter(_.id.inSet(ids)).result)
+  private def checkIfExistsByIDAndDataType(typeID: String, hashID: String) = db.run(metaTable.filter(x => x.typeID === typeID && x.hashID === hashID).exists.result)
 
-  private def checkIfExistsByIDAndDataType(id: String, dataType: String) = db.run(metaTable.filter(x => x.id === id && x.dataType === dataType).exists.result)
+  private[models] class MetaTable(tag: Tag) extends Table[MetaSerialized](tag, "Meta_BC") {
 
-  private[models] class MetaTable(tag: Tag) extends Table[Meta](tag, "Meta_BC") {
+    def * = (typeID, hashID, dataValue, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MetaSerialized.tupled, MetaSerialized.unapply)
 
-    def * = (id, dataType, dataValue, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Meta.tupled, Meta.unapply)
+    def typeID = column[String]("typeID", O.PrimaryKey)
 
-    def id = column[String]("id", O.PrimaryKey)
-
-    def dataType = column[String]("dataType", O.PrimaryKey)
+    def hashID = column[String]("hashID", O.PrimaryKey)
 
     def dataValue = column[String]("dataValue")
 
@@ -96,33 +100,27 @@ class Metas @Inject()(
 
   object Service {
 
-    def create(data: Data): Future[String] = add(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
+    def create(data: Data): Future[String] = add(Meta(MetaID(typeID = data.dataType, hashID = data.value.generateHash), dataValue = data.value.asString))
 
     def create(meta: Meta): Future[String] = add(meta)
 
-    def tryGet(id: String, dataType: String): Future[Meta] = tryGetByIDAndDataType(id = id, dataType = dataType)
+    def tryGet(id: MetaID): Future[Meta] = tryGetByTypeIDAndHashType(typeID = id.typeID, hashID = id.hashID).map(_.deserialize)
 
-    def tryGetData(id: String, dataType: String): Future[Data] = tryGetByIDAndDataType(id = id, dataType = dataType).map(x => DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))
+    def tryGetData(id: MetaID): Future[Data] = tryGetByTypeIDAndHashType(typeID = id.typeID, hashID = id.hashID).map(x => Data(dataType = x.typeID, dataValue = Option(x.dataValue)))
 
-    def get(id: String, dataType: String): Future[Option[Meta]] = getByIDAndDataType(id = id, dataType = dataType)
+    def get(id: MetaID): Future[Option[Meta]] = getByTypeIDAndHashID(typeID = id.typeID, hashID = id.hashID).map(_.map(_.deserialize))
 
-    def getData(id: String, dataType: String): Future[Option[Data]] = getByIDAndDataType(id = id, dataType = dataType).map(metaOption => metaOption.fold[Option[Data]](None)(x => Option(DataValue.getData(dataType = x.dataType, dataValue = Option(x.dataValue)))))
-
-    def get(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
-
-    def getDataList(ids: Seq[String]): Future[Seq[Data]] = getByIDs(ids.filter(x => x != "")).map(_.map(meta => DataValue.getData(dataType = meta.dataType, dataValue = Option(meta.dataValue))))
-
-    def getList(ids: Seq[String]): Future[Seq[Meta]] = getByIDs(ids.filter(x => x != ""))
+    def getData(id: MetaID): Future[Option[Data]] = getByTypeIDAndHashID(typeID = id.typeID, hashID = id.hashID).map(metaOption => metaOption.fold[Option[Data]](None)(x => Option(Data(dataType = x.typeID, dataValue = Option(x.dataValue)))))
 
     def insertMultiple(metaList: Seq[Meta]): Future[Seq[String]] = addMultiple(metaList)
 
-    def insertMultipleData(dataList: Seq[Data]): Future[Seq[String]] = addMultiple(dataList.map(x => Meta(id = x.value.generateHash, dataType = x.dataType, dataValue = x.value.asString)))
+    def insertMultipleData(dataList: Seq[Data]): Future[Seq[String]] = addMultiple(dataList.map(x => Meta(id = MetaID(typeID = x.dataType, hashID = x.value.generateHash), dataValue = x.value.asString)))
 
     def insertOrUpdate(meta: Meta): Future[Int] = upsert(meta)
 
-    def insertOrUpdate(data: Data): Future[Int] = upsert(Meta(id = data.value.generateHash, dataType = data.dataType, dataValue = data.value.asString))
+    def insertOrUpdate(data: Data): Future[Int] = upsert(Meta(id = MetaID(typeID = data.dataType, hashID = data.value.generateHash), dataValue = data.value.asString))
 
-    def checkIfExists(id: String, dataType: String): Future[Boolean] = checkIfExistsByIDAndDataType(id = id, dataType = dataType)
+    def checkIfExists(id: MetaID): Future[Boolean] = checkIfExistsByIDAndDataType(typeID = id.typeID, hashID = id.hashID)
 
   }
 

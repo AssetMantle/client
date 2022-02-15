@@ -31,7 +31,6 @@ class OrderMakes @Inject()(
                             masterAccounts: master.Accounts,
                             blockchainAccounts: blockchain.Accounts,
                             blockchainTransactions: blockchain.Transactions,
-                            masterProperties: master.Properties
                           )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class PropertiesSerialized(immutableMetaProperties: String, immutableProperties: String, mutableMetaProperties: String, mutableProperties: String)
@@ -232,24 +231,14 @@ class OrderMakes @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(orderMake: OrderMake) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getOrderID(classificationID = orderMake.classificationID, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, immutables = Immutables(Properties((orderMake.immutableMetaProperties ++ orderMake.immutableProperties).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.ORDER, immutableMetas = orderMake.immutableMetaProperties, immutables = orderMake.immutableProperties, mutableMetas = orderMake.mutableMetaProperties, mutables = orderMake.mutableProperties)
-
-      def updateExpiry(orderID: String, height: Int, orderMake: OrderMake) = masterProperties.Service.insertOrUpdate(master.Property(entityID = orderID, entityType = constants.Blockchain.Entity.ORDER, name = constants.Blockchain.Properties.Expiry, value = Option((height + orderMake.expiresIn).toString), dataType = constants.Blockchain.DataType.HEIGHT_DATA, isMeta = true, isMutable = true, hashID = utilities.Hash.getHash((height + orderMake.expiresIn).toString)))
-
-      def updateMakerOwnableSplit(orderID: String, orderMake: OrderMake) = masterProperties.Service.insertOrUpdate(master.Property(entityID = orderID, entityType = constants.Blockchain.Entity.ORDER, name = constants.Blockchain.Properties.MakerOwnableSplit, value = Option(orderMake.makerOwnableSplit.toString), dataType = constants.Blockchain.DataType.DEC_DATA, isMeta = true, isMutable = true, hashID = utilities.Hash.getHash(orderMake.makerOwnableSplit.toString)))
-
       def sendNotifications(accountID: String, orderID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_MADE, orderID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         orderMake <- orderMake
         height <- getTxHeight
-        orderID <- insertProperties(orderMake)
-        _ <- updateExpiry(orderID, height, orderMake)
-        _ <- updateMakerOwnableSplit(orderID, orderMake)
         accountID <- getAccountID(orderMake.from)
-        _ <- sendNotifications(accountID = accountID, orderID = orderID)
+//        _ <- sendNotifications(accountID = accountID, orderID = "orderID")
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

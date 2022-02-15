@@ -21,13 +21,23 @@ object IDGenerator {
 
   def hexadecimal: String = (-Math.abs(Random.nextLong)).toHexString.toUpperCase
 
-  def getClassificationID(chainID: String, immutables: Immutables, mutables: Mutables): String = Seq(chainID, Hash.getHash(Hash.getHash(immutables.properties.propertyList.map(_.id): _*), Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
+  def getChainIDAndHashID(id: String): (String, String) = {
+    val splitString = id.split(constants.RegularExpression.BLOCKCHAIN_ID_SEPARATOR)
+    (splitString(0), splitString(1))
+  }
 
-  def getAssetID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+  def getClassificationIDAndHashID(id: String): (String, String) = {
+    val splitString = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)
+    (splitString(0), splitString(1))
+  }
 
-  def getIdentityID(classificationID: String, immutables: Immutables): String = Seq(classificationID, immutables.getHashID).mkString(constants.Blockchain.FirstOrderCompositeIDSeparator)
+  def getClassificationIDMakerOwnableTakerOwnableIDRateIDCreationIDMakerIDHashID(id: String): (String, String, String, String, String, String, String) = {
+    val splitString = id.split(constants.RegularExpression.BLOCKCHAIN_SECOND_ORDER_COMPOSITE_ID_SEPARATOR)
+    (splitString(0), splitString(1), splitString(2), splitString(3), splitString(4), splitString(5), splitString(6))
+  }
 
-  def getOrderID(classificationID: String, makerOwnableID: String, takerOwnableID: String, makerID: String, immutables: Immutables): String = Seq(classificationID, makerOwnableID, takerOwnableID, makerID, immutables.getHashID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
+  def getClassificationID(chainID: String, immutables: Immutables, mutables: Mutables): String = Seq(chainID,
+    Hash.getHash(Hash.getHash(immutables.properties.propertyList.map(_.id): _*), Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
   def getMaintainerID(classificationID: String, identityID: String): String = Seq(classificationID, identityID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 }

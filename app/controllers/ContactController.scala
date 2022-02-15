@@ -45,7 +45,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           case None => Ok(views.html.component.master.contact.addOrUpdateEmailAddress())
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -75,7 +75,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             emailAddress <- emailAddress
             _ <- addOrUpdateEmailAddress(emailAddress)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_ADDRESS_UPDATED, loginState.username)()
-            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -96,7 +96,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           case None => Ok(views.html.component.master.contact.addOrUpdateMobileNumber())
         }
       }).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -126,7 +126,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
             mobileNumber <- mobileNumber
             _ <- addOrUpdateMobileNumber(mobileNumber)
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.MOBILE_NUMBER_UPDATED, loginState.username)()
-            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.MOBILE_NUMBER_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -164,7 +164,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         otp <- getOTP
         result <- sendOTPAndGetResult(emailAddress = emailAddress, otp = otp)
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -182,11 +182,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyEmailAddress(otpVerified)
-            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.EMAIL_VERIFIED, loginState.username)()
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -204,7 +204,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         _ <- utilitiesNotification.sendSMSToMobileNumber(fromAccountID = loginState.username, mobileNumber = mobileNumber, sms = constants.Notification.VERIFY_PHONE.sms.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), otp)
         result <- withUsernameToken.Ok(views.html.component.master.contact.verifyMobileNumber())
       } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -222,11 +222,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             otpVerified <- verifyOTP
             _ <- verifyMobileNumber(otpVerified)
-            result <- withUsernameToken.Ok(views.html.assetMantle.profile(successes = Seq(constants.Response.SUCCESS)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.PHONE_VERIFIED, loginState.username)()
           } yield result
             ).recover {
-            case baseException: BaseException => InternalServerError(views.html.assetMantle.profile(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

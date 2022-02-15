@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.ClassificationID
 import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -29,7 +30,6 @@ class OrderDefines @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               utilitiesNotification: utilities.Notification,
                               masterAccounts: master.Accounts,
-                              masterProperties: master.Properties,
                               blockchainAccounts: blockchain.Accounts
                             )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -196,20 +196,15 @@ class OrderDefines @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.ORDER_DEFINITION, immutableMetas = orderDefine.immutableMetaTraits, immutables = orderDefine.immutableTraits, mutableMetas = orderDefine.mutableMetaTraits, mutables = orderDefine.mutableTraits)
-
-      def insertMaintainerProperties(classificationID: String, orderDefine: OrderDefine) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = orderDefine.fromID), entityType = constants.Blockchain.Entity.MAINTAINER, immutableMetas = Seq.empty, immutables = Seq.empty, mutableMetas = Seq.empty, mutables = orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits)
+      def getClassificationID(orderDefine: OrderDefine) = ClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties((orderDefine.immutableMetaTraits ++ orderDefine.immutableTraits).map(_.toProperty))), Mutables(Properties((orderDefine.mutableMetaTraits ++ orderDefine.mutableTraits).map(_.toProperty))))
 
       def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.ORDER_DEFINED, classificationID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         orderDefine <- orderDefine
-        classificationID <- insertProperties(orderDefine)
-        maintainerID <- insertMaintainerProperties(classificationID, orderDefine)
         accountID <- getAccountID(orderDefine.from)
-        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+        _ <- sendNotifications(accountID = accountID, classificationID = getClassificationID(orderDefine).asString)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }
