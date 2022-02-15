@@ -513,7 +513,7 @@ object TransactionMessages {
 
   implicit val orderDefineWrites: OWrites[OrderDefine] = Json.writes[OrderDefine]
 
-  case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
+  case class OrderMake(from: String, fromID: String, classificationID: String, makerOwnableID: String, takerOwnableID: String, expiresIn: Int, makerOwnableSplit: BigDecimal, takerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(from)
   }
 
@@ -537,7 +537,7 @@ object TransactionMessages {
 
   implicit val orderCancelWrites: OWrites[OrderCancel] = Json.writes[OrderCancel]
 
-  //meta
+  //metaList
   case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(from)
   }
@@ -633,7 +633,7 @@ object TransactionMessages {
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
-      //meta
+      //metaList
       case constants.Blockchain.TransactionMessage.META_REVEAL => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
       //maintainer
       case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => StdMsg(msgType, utilities.JSON.convertJsonStringToObject[MaintainerDeputize](value.toString))

@@ -4,6 +4,7 @@ import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
+import models.common.ID
 import models.master
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -22,6 +23,7 @@ class ViewController @Inject()(
                                 withLoginActionAsync: WithLoginActionAsync,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
+                                withoutLoginActionAsync: WithoutLoginActionAsync,
                                 cached: Cached
                               )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -54,31 +56,46 @@ class ViewController @Inject()(
       }
   }
 
-  def identity: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.identity())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+  def classification(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.classification(id))
+    }
   }
 
-  def asset: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.asset())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+  def identity(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.identity(id))
+    }
   }
 
-  def order: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.order())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+  def asset(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.asset(id))
+    }
+  }
+
+  def order(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.order(id))
+    }
+  }
+
+  def meta(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.meta(id))
+    }
+  }
+
+  def maintainer(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.maintainer(id))
+    }
   }
 
   def validators(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {

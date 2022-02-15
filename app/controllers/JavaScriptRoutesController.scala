@@ -62,7 +62,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.accountDelegations,
           routes.javascript.ComponentViewController.accountTransactions,
           routes.javascript.ComponentViewController.accountTransactionsPerPage,
-          routes.javascript.ComponentViewController.accountSplits,
 
           routes.javascript.ComponentViewController.blockList,
           routes.javascript.ComponentViewController.blockListPage,
@@ -89,22 +88,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactions,
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
-          routes.javascript.ComponentViewController.provisionedAddresses,
-          routes.javascript.ComponentViewController.unprovisionedAddresses,
-
-          routes.javascript.ComponentViewController.identitiesDefinition,
-          routes.javascript.ComponentViewController.identitiesProvisioned,
-          routes.javascript.ComponentViewController.identitiesUnprovisioned,
-          routes.javascript.ComponentViewController.assetsDefinition,
-          routes.javascript.ComponentViewController.assetsMinted,
-          routes.javascript.ComponentViewController.ordersDefinition,
-          routes.javascript.ComponentViewController.ordersMade,
-          routes.javascript.ComponentViewController.ordersTake,
-          routes.javascript.ComponentViewController.ordersTakePublic,
-          routes.javascript.ComponentViewController.ordersTakePrivate,
-
-          routes.javascript.ComponentViewController.moduleTransactions,
-          routes.javascript.ComponentViewController.getTransaction,
+          routes.javascript.ComponentViewController.classification,
+          routes.javascript.ComponentViewController.identity,
+          routes.javascript.ComponentViewController.asset,
+          routes.javascript.ComponentViewController.order,
+          routes.javascript.ComponentViewController.meta,
+          routes.javascript.ComponentViewController.maintainer,
 
           routes.javascript.ContactController.addOrUpdateEmailAddressForm,
           routes.javascript.ContactController.addOrUpdateMobileNumberForm,
@@ -113,8 +102,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.DocusignController.send,
           routes.javascript.DocusignController.sign,
           routes.javascript.DocusignController.authorization,
-
-          routes.javascript.EntityController.properties,
 
           routes.javascript.FileController.uploadAccountFileForm,
           routes.javascript.FileController.uploadAccountFile,
@@ -151,6 +138,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.identity,
           routes.javascript.ViewController.asset,
           routes.javascript.ViewController.order,
+          routes.javascript.ViewController.classification,
+          routes.javascript.ViewController.meta,
+          routes.javascript.ViewController.maintainer,
           routes.javascript.ViewController.block,
           routes.javascript.ViewController.validator,
           routes.javascript.ViewController.transaction,

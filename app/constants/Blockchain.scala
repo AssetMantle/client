@@ -26,6 +26,7 @@ object Blockchain {
   val OneDec = BigDecimal("1.000000000000000000")
   val ZeroDec = BigDecimal("0.0")
   val SmallestDec = BigDecimal("0.000000000000000001")
+  val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
   val ToHashSeparator = "_"
   val RequestPropertiesSeparator = ","
   val DataNameAndTypeSeparator = ":"
@@ -250,7 +251,7 @@ object Blockchain {
     val ORDER_MAKE = "/xprt/orders/make/request"
     val ORDER_TAKE = "/xprt/orders/take/request"
     val ORDER_CANCEL = "/xprt/orders/cancel/request"
-    //meta
+    //metaList
     val META_REVEAL = "/xprt/metas/reveal/request"
     //maintainer
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/request"
@@ -351,7 +352,7 @@ object Blockchain {
     val ORDER_MAKE = "/xprt/orders/make/message"
     val ORDER_TAKE = "/xprt/orders/take/message"
     val ORDER_CANCEL = "/xprt/orders/cancel/message"
-    //meta
+    //metaList
     val META_REVEAL = "/xprt/metas/reveal/message"
     //maintainer
     val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"

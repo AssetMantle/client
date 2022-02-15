@@ -409,8 +409,8 @@ object TransactionMessageResponses {
 
   implicit val orderDefineReads: Reads[OrderDefine] = Json.reads[OrderDefine]
 
-  case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessageResponse {
-    def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, fromID = fromID.value.idString, classificationID = classificationID.value.idString, makerOwnableID = makerOwnableID.value.idString, takerOwnableID = takerOwnableID.value.idString, expiresIn = expiresIn.toInt, makerOwnableSplit = makerOwnableSplit, immutableMetaProperties = immutableMetaProperties.toMetaProperties, immutableProperties = immutableProperties.toProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
+  case class OrderMake(from: String, fromID: ID, classificationID: ID, makerOwnableID: ID, takerOwnableID: ID, expiresIn: Height, makerOwnableSplit: BigDecimal, takerOwnableSplit: BigDecimal, immutableMetaProperties: MetaProperties, immutableProperties: Properties, mutableMetaProperties: MetaProperties, mutableProperties: Properties) extends TransactionMessageResponse {
+    def toTxMsg: TransactionMessage = TransactionMessages.OrderMake(from = from, fromID = fromID.value.idString, classificationID = classificationID.value.idString, makerOwnableID = makerOwnableID.value.idString, takerOwnableID = takerOwnableID.value.idString, expiresIn = expiresIn.toInt, makerOwnableSplit = makerOwnableSplit, takerOwnableSplit = takerOwnableSplit, immutableMetaProperties = immutableMetaProperties.toMetaProperties, immutableProperties = immutableProperties.toProperties, mutableMetaProperties = mutableMetaProperties.toMetaProperties, mutableProperties = mutableProperties.toProperties)
   }
 
   implicit val orderMakeReads: Reads[OrderMake] = Json.reads[OrderMake]
@@ -427,7 +427,7 @@ object TransactionMessageResponses {
 
   implicit val orderCancelReads: Reads[OrderCancel] = Json.reads[OrderCancel]
 
-  //meta
+  //metaList
   case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessageResponse {
     def toTxMsg: TransactionMessage = TransactionMessages.MetaReveal(from = from, metaFact = metaFact.toMetaFact)
   }
@@ -519,7 +519,7 @@ object TransactionMessageResponses {
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderMake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderTake](value.toString))
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Msg(msgType, utilities.JSON.convertJsonStringToObject[OrderCancel](value.toString))
-      //meta
+      //metaList
       case constants.Blockchain.TransactionMessage.META_REVEAL => Msg(msgType, utilities.JSON.convertJsonStringToObject[MetaReveal](value.toString))
       //maintainer
       case constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE => Msg(msgType, utilities.JSON.convertJsonStringToObject[MaintainerDeputize](value.toString))

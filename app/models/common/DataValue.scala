@@ -155,8 +155,6 @@ object DataValue {
     case _ => false
   }
 
-  def getData(dataType: String, dataValue: Option[String]): Serializable.Data = Serializable.Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))
-
   def getHash(dataValue: DataValue): String = dataValue.dataType match {
     case constants.Blockchain.DataType.STRING_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)
     case constants.Blockchain.DataType.ID_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)

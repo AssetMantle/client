@@ -3,6 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.DataValue.IDDataValue
+import models.common.ID.{ClassificationID, IdentityID}
 import models.common.Serializable._
 import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub}
 import models.master
@@ -18,11 +19,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Identity(id: String, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-  def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(0)
-
-  def getHashID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(1)
-}
+case class Identity(id: IdentityID, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Identities @Inject()(
@@ -46,22 +43,22 @@ class Identities @Inject()(
 
   import databaseConfig.profile.api._
 
-  case class IdentitySerialized(id: String, immutables: String, mutables: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
-    def deserialize: Identity = Identity(id = this.id, immutables = utilities.JSON.convertJsonStringToObject[Immutables](this.immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](this.mutables), createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
+  case class IdentitySerialized(classificationID: String, hashID: String, immutables: String, mutables: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
+    def deserialize: Identity = Identity(id = IdentityID(classificationID = this.classificationID, hashID = this.hashID), immutables = utilities.JSON.convertJsonStringToObject[Immutables](this.immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](this.mutables), createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
   }
 
-  def serialize(identity: Identity): IdentitySerialized = IdentitySerialized(id = identity.id, immutables = Json.toJson(identity.immutables).toString, mutables = Json.toJson(identity.mutables).toString, createdBy = identity.createdBy, createdOn = identity.createdOn, createdOnTimeZone = identity.createdOnTimeZone, updatedBy = identity.updatedBy, updatedOn = identity.updatedOn, updatedOnTimeZone = identity.updatedOnTimeZone)
+  def serialize(identity: Identity): IdentitySerialized = IdentitySerialized(classificationID = identity.id.classificationID.asString, hashID = identity.id.hashID, immutables = Json.toJson(identity.immutables).toString, mutables = Json.toJson(identity.mutables).toString, createdBy = identity.createdBy, createdOn = identity.createdOn, createdOnTimeZone = identity.createdOnTimeZone, updatedBy = identity.updatedBy, updatedOn = identity.updatedOn, updatedOnTimeZone = identity.updatedOnTimeZone)
 
   private[models] val identityTable = TableQuery[IdentityTable]
 
-  private def add(identity: Identity): Future[String] = db.run((identityTable returning identityTable.map(_.id) += serialize(identity)).asTry).map {
+  private def add(identity: Identity): Future[String] = db.run((identityTable returning identityTable.map(_.hashID) += serialize(identity)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.IDENTITY_INSERT_FAILED, psqlException)
     }
   }
 
-  private def addMultiple(identities: Seq[Identity]): Future[Seq[String]] = db.run((identityTable returning identityTable.map(_.id) ++= identities.map(x => serialize(x))).asTry).map {
+  private def addMultiple(identities: Seq[Identity]): Future[Seq[String]] = db.run((identityTable returning identityTable.map(_.hashID) ++= identities.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.IDENTITY_INSERT_FAILED, psqlException)
@@ -75,24 +72,26 @@ class Identities @Inject()(
     }
   }
 
-  private def tryGetByID(id: String) = db.run(identityTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.IDENTITY_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def getByID(id: String) = db.run(identityTable.filter(_.id === id).result.headOption)
+  private def getByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).result.headOption)
 
-  private def checkExistsByID(id: String) = db.run(identityTable.filter(_.id === id).exists.result)
+  private def checkExistsByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).exists.result)
 
-  private def deleteByID(id: String): Future[Int] = db.run(identityTable.filter(_.id === id).delete)
+  private def deleteByID(classificationID: String, hashID: String): Future[Int] = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).delete)
 
   private[models] class IdentityTable(tag: Tag) extends Table[IdentitySerialized](tag, "Identity_BC") {
 
-    def * = (id, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentitySerialized.tupled, IdentitySerialized.unapply)
+    def * = (classificationID, hashID, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentitySerialized.tupled, IdentitySerialized.unapply)
 
-    def id = column[String]("id", O.PrimaryKey)
+    def classificationID = column[String]("classificationID", O.PrimaryKey)
+
+    def hashID = column[String]("hashID", O.PrimaryKey)
 
     def immutables = column[String]("immutables")
 
@@ -115,13 +114,13 @@ class Identities @Inject()(
 
     def insertOrUpdate(identity: Identity): Future[Int] = upsert(identity)
 
-    def tryGet(id: String): Future[Identity] = tryGetByID(id).map(_.deserialize)
+    def tryGet(id: IdentityID): Future[Identity] = tryGetByID(classificationID = id.classificationID.asString, hashID = id.hashID).map(_.deserialize)
 
-    def get(id: String): Future[Option[Identity]] = getByID(id).map(_.map(_.deserialize))
+    def get(id: IdentityID): Future[Option[Identity]] = getByID(classificationID = id.classificationID.asString, hashID = id.hashID).map(_.map(_.deserialize))
 
     def insertMultiple(identities: Seq[Identity]): Future[Seq[String]] = addMultiple(identities)
 
-    def checkExists(id: String): Future[Boolean] = checkExistsByID(id)
+    def checkExists(id: IdentityID): Future[Boolean] = checkExistsByID(classificationID = id.classificationID.asString, hashID = id.hashID)
   }
 
   object Utility {
@@ -134,7 +133,7 @@ class Identities @Inject()(
         val mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityDefine.mutableTraits.propertyList))
         val defineAuxiliary = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityDefine.immutableTraits.propertyList)), mutables = mutables)
 
-        def superAuxiliary(classificationID: String) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = identityDefine.fromID, mutableTraits = mutables)
+        def superAuxiliary(classificationID: ClassificationID) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = IdentityID(identityDefine.fromID), mutableTraits = mutables)
 
         for {
           classificationID <- defineAuxiliary
@@ -142,8 +141,8 @@ class Identities @Inject()(
         } yield classificationID
       }
 
-      def masterOperations(classificationID: String) = {
-        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
+      def masterOperations(classificationID: ClassificationID) = {
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID.asString, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
         for {
           _ <- insert
         } yield ()
@@ -166,7 +165,7 @@ class Identities @Inject()(
 
       def insertOrUpdate(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
         val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityIssue.immutableProperties.propertyList))
-        val identityID = utilities.IDGenerator.getIdentityID(classificationID = identityIssue.classificationID, immutables = immutables)
+        val identityID = IdentityID(classificationID = identityIssue.classificationID, hashID = immutables.getHashID)
         val addIdentityWithProvisionAddress = addIdentityWithProvisionAddresses(identity = Identity(id = identityID, mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityIssue.mutableProperties.propertyList)), immutables = immutables), provisionedAddresses = Seq(identityIssue.to))
 
         for {
@@ -187,40 +186,37 @@ class Identities @Inject()(
     def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
       val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(getNubMetaProperty(identityNub.nubID)))
 
-      def defineAndUpsert(nubProperty: Property) = {
+      def defineAndUpsert(nubProperty: Property): Future[Identity] = {
         val immutables = Immutables(Properties(Seq(nubProperty)))
         val mutables = Mutables(Properties(Seq()))
         val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), mutables)
 
-        def getIdentityID(classificationID: String) = Future(utilities.IDGenerator.getIdentityID(classificationID = classificationID, immutables = immutables))
-
-        def addIdentityWithProvisionAddress(identityID: String) = addIdentityWithProvisionAddresses(identity = Identity(id = identityID, immutables = immutables, mutables = mutables), provisionedAddresses = Seq(identityNub.from))
+        def addIdentityWithProvisionAddress(classificationID: ClassificationID) = addIdentityWithProvisionAddresses(identity = Identity(id = IdentityID(classificationID = classificationID, hashID = immutables.getHashID), immutables = immutables, mutables = mutables), provisionedAddresses = Seq(identityNub.from))
 
         for {
           classificationID <- defineClassification
-          identityID <- getIdentityID(classificationID)
-          _ <- addIdentityWithProvisionAddress(identityID)
-        } yield (classificationID, identityID)
+          identity <- addIdentityWithProvisionAddress(classificationID)
+        } yield identity
       }
 
       (for {
         nubProperty <- nubProperty
-        (classificationID, identityID) <- defineAndUpsert(nubProperty.head)
+        identity <- defineAndUpsert(nubProperty.head)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_NUB + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
     }
 
-    def addIdentityWithProvisionAddresses(identity: Identity, provisionedAddresses: Seq[String]): Future[Unit] = {
+    def addIdentityWithProvisionAddresses(identity: Identity, provisionedAddresses: Seq[String]): Future[Identity] = {
       val upsert = Service.insertOrUpdate(Identity(id = identity.id, mutables = identity.mutables, immutables = identity.immutables))
 
-      def addProvisions() = if (provisionedAddresses.nonEmpty) utilitiesOperations.traverse(provisionedAddresses) { address => blockchainIdentityProvisions.Service.addProvisionAddress(id = identity.id, address = address) } else Future(Seq())
+      def addProvisions() = if (provisionedAddresses.nonEmpty) utilitiesOperations.traverse(provisionedAddresses) { address => blockchainIdentityProvisions.Service.addProvisionAddress(id = identity.id.asString, address = address) } else Future(Seq())
 
       (for {
         _ <- upsert
         _ <- addProvisions()
-      } yield ()
+      } yield identity
         ).recover {
         case baseException: BaseException => throw baseException
       }

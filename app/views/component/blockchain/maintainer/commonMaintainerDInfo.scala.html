@@ -1,0 +1,7 @@
+@import models.common.ID.MaintainerID
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(maintainerID: MaintainerID)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.MAINTAINER_ID, commonJavascriptLink(maintainerID.asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.maintainer('${maintainerID.asString}'))")))

@@ -6,6 +6,8 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models._
 import models.blockchain._
+import models.common.ID
+import models.common.ID.IdentityID
 import models.common.Serializable.Coin
 import models.keyBase.ValidatorAccount
 import play.api.cache.Cached
@@ -23,11 +25,15 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ComponentViewController @Inject()(
                                          blockchainAccounts: blockchain.Accounts,
+                                         blockchainAssets: blockchain.Assets,
                                          blockchainBalances: blockchain.Balances,
                                          blockchainDelegations: blockchain.Delegations,
+                                         blockchainClassifications: blockchain.Classifications,
                                          blockchainIdentities: blockchain.Identities,
                                          blockchainIdentityProvisions: blockchain.IdentityProvisions,
                                          blockchainIdentityUnprovisions: blockchain.IdentityUnprovisions,
+                                         blockchainMaintainers: blockchain.Maintainers,
+                                         blockchainMetas: blockchain.Metas,
                                          blockchainOrders: blockchain.Orders,
                                          blockchainSplits: blockchain.Splits,
                                          blockchainUndelegations: blockchain.Undelegations,
@@ -35,19 +41,6 @@ class ComponentViewController @Inject()(
                                          blockchainBlocks: blockchain.Blocks,
                                          blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
                                          blockchainTransactions: blockchain.Transactions,
-                                         blockchainTransactionsIdentityDefines: blockchainTransaction.IdentityDefines,
-                                         blockchainTransactionsIdentityNubs: blockchainTransaction.IdentityNubs,
-                                         blockchainTransactionsIdentityIssues: blockchainTransaction.IdentityIssues,
-                                         blockchainTransactionsIdentityProvisions: blockchainTransaction.IdentityProvisions,
-                                         blockchainTransactionsIdentityUnprovisions: blockchainTransaction.IdentityUnprovisions,
-                                         blockchainTransactionsAssetDefines: blockchainTransaction.AssetDefines,
-                                         blockchainTransactionsAssetMints: blockchainTransaction.AssetMints,
-                                         blockchainTransactionsAssetMutates: blockchainTransaction.AssetMutates,
-                                         blockchainTransactionsAssetBurns: blockchainTransaction.AssetBurns,
-                                         blockchainTransactionsOrderDefines: blockchainTransaction.OrderDefines,
-                                         blockchainTransactionsOrderMakes: blockchainTransaction.OrderMakes,
-                                         blockchainTransactionsOrderTakes: blockchainTransaction.OrderTakes,
-                                         blockchainTransactionsOrderCancels: blockchainTransaction.OrderCancels,
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainProposals: blockchain.Proposals,
                                          blockchainProposalDeposits: blockchain.ProposalDeposits,
@@ -708,273 +701,115 @@ class ComponentViewController @Inject()(
       }
   }
 
-  def identitiesDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getIdentitiesDefined(identityIDs: Seq[String]) = masterClassifications.Service.getIdentityDefinitionsByIdentityIDs(identityIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        classifications <- getIdentitiesDefined(identityIDs)
-      } yield Ok(views.html.component.master.identity.identitiesDefinition(classifications))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def identitiesProvisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      (for {
-        identityIDs <- identityIDs
-      } yield Ok(views.html.component.master.identity.identitiesProvisioned(identityIDs))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def identitiesUnprovisioned(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityUnprovisions.Service.getAllIDsByUnprovisioned(loginState.address)
-
-      (for {
-        identityIDs <- identityIDs
-      } yield Ok(views.html.component.master.identity.identitiesUnprovisioned(identityIDs))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def assetsDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getAssetsDefined(identityIDs: Seq[String]) = masterClassifications.Service.getAssetDefinitionsByIdentityIDs(identityIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        classifications <- getAssetsDefined(identityIDs)
-      } yield Ok(views.html.component.master.asset.assetsDefinition(classifications))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def assetsMinted(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getAssetSplits(identityIDs: Seq[String]) = masterSplits.Service.getAllAssetsByOwnerIDs(identityIDs)
-
-      def getAssets(assetIDs: Seq[String]) = masterAssets.Service.getAllByIDs(assetIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        splits <- getAssetSplits(identityIDs)
-        assets <- getAssets(splits.map(_.ownableID))
-      } yield Ok(views.html.component.master.asset.assetsMinted(assets, splits))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def ordersDefinition(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getOrdersDefined(identityIDs: Seq[String]) = masterClassifications.Service.getOrderDefinitionsByIdentityIDs(identityIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        classifications <- getOrdersDefined(identityIDs)
-      } yield Ok(views.html.component.master.order.ordersDefinition(classifications))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def ordersMade(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getOrdersMade(identityIDs: Seq[String]) = masterOrders.Service.getAllByMakerIDs(identityIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        orders <- getOrdersMade(identityIDs)
-      } yield Ok(views.html.component.master.order.ordersMade(orders))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def ordersTake(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      Future(Ok(views.html.component.master.order.ordersTake()))
-  }
-
-  def ordersTakePublic(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val publicTakeOrderIDs = blockchainOrders.Service.getAllPublicOrderIDs
-
-      def getPublicOrders(publicOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(publicOrderIDs)
-
-      (for {
-        publicOrderIDs <- publicTakeOrderIDs
-        publicOrders <- getPublicOrders(publicOrderIDs)
-      } yield Ok(views.html.component.master.order.ordersTakePublic(publicOrders = publicOrders))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def ordersTakePrivate(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-
-      def getPrivateOrderIDs(identityIDs: Seq[String]) = blockchainOrders.Service.getAllPrivateOrderIDs(identityIDs)
-
-      def getPrivateOrders(privateOrderIDs: Seq[String]) = masterOrders.Service.getAllByIDs(privateOrderIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        privateOrderIDs <- getPrivateOrderIDs(identityIDs)
-        privateOrders <- getPrivateOrders(privateOrderIDs)
-      } yield Ok(views.html.component.master.order.ordersTakePrivate(privateOrders = privateOrders))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def accountSplits(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val identityIDs = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(loginState.address)
-      val allDenoms = blockchainTokens.Service.getAllDenoms
-
-      def getBlockchainSplits(identityIDs: Seq[String]) = blockchainSplits.Service.getByOwnerIDs(identityIDs)
-
-      def getAssets(splitIDs: Seq[String]) = masterAssets.Service.getAllByIDs(splitIDs)
-
-      (for {
-        identityIDs <- identityIDs
-        splits <- getBlockchainSplits(identityIDs)
-        allDenoms <- allDenoms
-        masterAssets <- getAssets(splits.filterNot(x => allDenoms.contains(x.ownableID)).map(_.ownableID))
-      } yield Ok(views.html.component.master.accountSplits(splits, allDenoms, masterAssets))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
-  def provisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def classification(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val provisionedAddresses = blockchainIdentityProvisions.Service.getAllProvisionAddresses(identityID)
-        (for (
-          provisionedAddresses <- provisionedAddresses
-        ) yield Ok(views.html.component.blockchain.identity.provisionedAddresses(identityID, provisionedAddresses))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
+      implicit request => {
+        val classificationID = ID.getClassificationID(id)
+        if (classificationID.nonEmpty) {
+          val classification = blockchainClassifications.Service.tryGet(classificationID.get)
+          val maintainers = blockchainMaintainers.Service.getByClassificationID(classificationID.get)
+          (for {
+            classification <- classification
+            maintainers <- maintainers
+          } yield Ok(views.html.component.blockchain.classification.classification(classification = classification, maintainers = maintainers))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_CLASSIFICATION_ID))))
+      }
     }
   }
 
-  def unprovisionedAddresses(identityID: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def identity(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val unprovisionedAddresses = blockchainIdentityUnprovisions.Service.getAllUnprovisionAddresses(identityID)
-        (for (
-          unprovisionedAddresses <- unprovisionedAddresses
-        ) yield Ok(views.html.component.blockchain.identity.unprovisionedAddresses(identityID, unprovisionedAddresses))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
+      implicit request => {
+        val identityID = ID.getIdentityID(id)
+        if (identityID.nonEmpty) {
+          val identity = blockchainIdentities.Service.tryGet(identityID.get)
+          val provisioned = blockchainIdentityProvisions.Service.getAllProvisionAddresses(identityID.get.asString)
+          val unprovisioned = blockchainIdentityUnprovisions.Service.getAllUnprovisionAddresses(identityID.get.asString)
+          (for {
+            identity <- identity
+            provisioned <- provisioned
+            unprovisioned <- unprovisioned
+          } yield Ok(views.html.component.blockchain.identity.identity(identity = identity, provisioned = provisioned, unprovisioned = unprovisioned))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_IDENTITY_ID))))
+      }
     }
   }
 
-  def getTransaction(transactionType: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-
-      transactionType match {
-        case constants.Blockchain.TransactionRequest.IDENTITY_NUB =>
-          val nubTransactions = blockchainTransactionsIdentityNubs.Service.getTransactionList(loginState.address)
-          for {
-            nubTransactions <- nubTransactions
-          } yield Ok(views.html.component.blockchain.identity.identityNubTransactions(nubTransactions))
-        case constants.Blockchain.TransactionRequest.IDENTITY_DEFINE =>
-          val identityDefinitionTxs = blockchainTransactionsIdentityDefines.Service.getTransactionList(loginState.address)
-          for {
-            identityDefinitionTxs <- identityDefinitionTxs
-          } yield Ok(views.html.component.blockchain.identity.identityDefineTransactions(identityDefinitionTxs))
-        case constants.Blockchain.TransactionRequest.IDENTITY_ISSUE =>
-          val issueTransaction = blockchainTransactionsIdentityIssues.Service.getTransactionList(loginState.address)
-          for {
-            issueTransaction <- issueTransaction
-          } yield Ok(views.html.component.blockchain.identity.identityIssueTransactions(issueTransaction))
-        case constants.Blockchain.TransactionRequest.IDENTITY_PROVISION =>
-          val provisionTransaction = blockchainTransactionsIdentityProvisions.Service.getTransactionList(loginState.address)
-          for {
-            provisionTransaction <- provisionTransaction
-          } yield Ok(views.html.component.blockchain.identity.identityProvisionTransactions(provisionTransaction))
-        case constants.Blockchain.TransactionRequest.IDENTITY_UNPROVISION =>
-          val unprovisionTransaction = blockchainTransactionsIdentityUnprovisions.Service.getTransactionList(loginState.address)
-          for {
-            unprovisionTransaction <- unprovisionTransaction
-          } yield Ok(views.html.component.blockchain.identity.identityUnprovisionTransactions(unprovisionTransaction))
-        case constants.Blockchain.TransactionRequest.ASSET_DEFINE =>
-          val assetDefineTransactions = blockchainTransactionsAssetDefines.Service.getTransactionList(loginState.address)
-          for {
-            assetDefineTransactions <- assetDefineTransactions
-          } yield Ok(views.html.component.blockchain.asset.assetDefineTransactions(assetDefineTransactions))
-        case constants.Blockchain.TransactionRequest.ASSET_MINT =>
-          val assetMintTransactions = blockchainTransactionsAssetMints.Service.getTransactionList(loginState.address)
-          for {
-            assetMintTransactions <- assetMintTransactions
-          } yield Ok(views.html.component.blockchain.asset.assetMintTransactions(assetMintTransactions))
-        case constants.Blockchain.TransactionRequest.ASSET_MUTATE =>
-          val assetMutateTransactions = blockchainTransactionsAssetMutates.Service.getTransactionList(loginState.address)
-          for {
-            assetMutateTransactions <- assetMutateTransactions
-          } yield Ok(views.html.component.blockchain.asset.assetMutateTransactions(assetMutateTransactions))
-        case constants.Blockchain.TransactionRequest.ASSET_BURN =>
-          val assetBurnTransactions = blockchainTransactionsAssetBurns.Service.getTransactionList(loginState.address)
-          for {
-            assetBurnTransactions <- assetBurnTransactions
-          } yield Ok(views.html.component.blockchain.asset.assetBurnTransactions(assetBurnTransactions))
-        case constants.Blockchain.TransactionRequest.ORDER_DEFINE =>
-          val orderDefineTransactions = blockchainTransactionsOrderDefines.Service.getTransactionList(loginState.address)
-          for {
-            orderDefineTransactions <- orderDefineTransactions
-          } yield Ok(views.html.component.blockchain.order.orderDefineTransactions(orderDefineTransactions))
-        case constants.Blockchain.TransactionRequest.ORDER_MAKE =>
-          val orderMakeTransactions = blockchainTransactionsOrderMakes.Service.getTransactionList(loginState.address)
-          for {
-            orderMakeTransactions <- orderMakeTransactions
-          } yield Ok(views.html.component.blockchain.order.orderMakeTransactions(orderMakeTransactions))
-        case constants.Blockchain.TransactionRequest.ORDER_TAKE =>
-          val orderTakeTransactions = blockchainTransactionsOrderTakes.Service.getTransactionList(loginState.address)
-          for {
-            orderTakeTransactions <- orderTakeTransactions
-          } yield Ok(views.html.component.blockchain.order.orderTakeTransactions(orderTakeTransactions))
-        case constants.Blockchain.TransactionRequest.ORDER_CANCEL =>
-          val orderCancelsTransactions = blockchainTransactionsOrderCancels.Service.getTransactionList(loginState.address)
-          for {
-            orderCancelsTransactions <- orderCancelsTransactions
-          } yield Ok(views.html.component.blockchain.order.orderCancelTransaction(orderCancelsTransactions))
-        case _ => Future(throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND))
+  def asset(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request => {
+        val assetID = ID.getAssetID(id)
+        if (assetID.nonEmpty) {
+          val asset = blockchainAssets.Service.tryGet(assetID.get)
+          val split = blockchainSplits.Service.tryGetByOwnable(assetID.get.asString)
+          (for {
+            asset <- asset
+            split <- split
+          } yield Ok(views.html.component.blockchain.asset.asset(asset = asset, owner = IdentityID(split.ownerID)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_ASSET_ID))))
       }
+    }
   }
 
-  def moduleTransactions(currentModule: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      currentModule match {
-        case constants.View.IDENTITY => Future(Ok(views.html.component.blockchain.identity.identityTransactions()))
-        case constants.View.ASSET => Future(Ok(views.html.component.blockchain.asset.assetTransactions()))
-        case constants.View.ORDER => Future(Ok(views.html.component.blockchain.order.orderTransactions()))
-        case _ => Future(throw new BaseException(constants.Response.TRANSACTION_NOT_FOUND))
+  def order(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request => {
+        val orderID = ID.getOrderID(id)
+        if (orderID.nonEmpty) {
+          val order = blockchainOrders.Service.tryGet(orderID.get)
+          (for {
+            order <- order
+          } yield Ok(views.html.component.blockchain.order.order(order = order))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_ORDER_ID))))
       }
+    }
+  }
+
+  def meta(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request => {
+        val metaID = ID.getMetaID(id)
+        if (metaID.nonEmpty) {
+          val meta = blockchainMetas.Service.tryGet(metaID.get)
+          (for {
+            meta <- meta
+          } yield Ok(views.html.component.blockchain.meta.meta(meta = meta))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_ORDER_ID))))
+      }
+    }
+  }
+
+  def maintainer(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request => {
+        val maintainerID = ID.getMaintainerID(id)
+        if (maintainerID.nonEmpty) {
+          val maintainer = blockchainMaintainers.Service.tryGet(maintainerID.get)
+          (for {
+            maintainer <- maintainer
+          } yield Ok(views.html.component.blockchain.maintainer.maintainer(maintainer = maintainer))
+            ).recover {
+            case baseException: BaseException => InternalServerError(baseException.failure.message)
+          }
+        } else Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_ORDER_ID))))
+      }
+    }
   }
 
 }
+

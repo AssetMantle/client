@@ -69,6 +69,13 @@ class Splits @Inject()(
 
   private def getByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x => x.ownableID === ownableID && x.ownerID === ownerID).result.headOption)
 
+  private def tryGetByOwnableID(ownableID: String) = db.run(splitTable.filter(_.ownableID === ownableID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.SPLIT_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private def tryGetByOwnerAndOwnableID(ownerID: String, ownableID: String) = db.run(splitTable.filter(x => x.ownableID === ownableID && x.ownerID === ownerID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -118,6 +125,8 @@ class Splits @Inject()(
     def getByOwnerIDs(ownerIDs: Seq[String]): Future[Seq[Split]] = getAllByOwnerIDs(ownerIDs)
 
     def getByOwnable(ownableID: String): Future[Seq[Split]] = getByOwnableID(ownableID)
+
+    def tryGetByOwnable(ownableID: String): Future[Split] = tryGetByOwnableID(ownableID)
 
     def getByOwnerOrOwnable(id: String): Future[Seq[Split]] = getByOwnerOrOwnableID(id)
 

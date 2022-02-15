@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import exceptions.BaseException
 import models.Abstract.BaseTransaction
 import models.Trait.Logged
+import models.common.ID.IdentityID
 import models.common.Serializable._
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -29,7 +30,6 @@ class IdentityIssues @Inject()(
                                 protected val databaseConfigProvider: DatabaseConfigProvider,
                                 utilitiesNotification: utilities.Notification,
                                 masterAccounts: master.Accounts,
-                                masterProperties: master.Properties,
                                 blockchainAccounts: blockchain.Accounts
                               )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -199,17 +199,15 @@ class IdentityIssues @Inject()(
 
       def getAccountID(from: String) = blockchainAccounts.Service.tryGetUsername(from)
 
-      def insertProperties(identityIssue: IdentityIssue) = masterProperties.Utilities.upsertProperties(entityID = utilities.IDGenerator.getIdentityID(classificationID = identityIssue.classificationID, Immutables(Properties((identityIssue.immutableMetaProperties ++ identityIssue.immutableProperties).map(_.toProperty)))),
-        entityType = constants.Blockchain.Entity.IDENTITY, immutableMetas = identityIssue.immutableMetaProperties, immutables = identityIssue.immutableProperties, mutableMetas = identityIssue.mutableMetaProperties, mutables = identityIssue.mutableProperties)
+      def getIdentityID(identityIssue: IdentityIssue) = IdentityID(classificationID = identityIssue.classificationID, hashID = Immutables(Properties((identityIssue.immutableMetaProperties ++ identityIssue.immutableProperties).map(_.toProperty))).getHashID)
 
-      def sendNotifications(accountID: String, classificationID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_ISSUED, classificationID, txHash)(s"'$txHash'")
+      def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_ISSUED, identityID, txHash)(s"'$txHash'")
 
       (for {
         _ <- markTransactionSuccessful
         identityIssue <- identityIssue
-        classificationID <- insertProperties(identityIssue)
         accountID <- getAccountID(identityIssue.from)
-        _ <- sendNotifications(accountID = accountID, classificationID = classificationID)
+        _ <- sendNotifications(accountID = accountID, identityID = getIdentityID(identityIssue).asString)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

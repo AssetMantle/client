@@ -28,7 +28,6 @@ class IdentityProvisions @Inject()(
                                     utilitiesNotification: utilities.Notification,
                                     masterAccounts: master.Accounts,
                                     blockchainAccounts: blockchain.Accounts,
-                                    masterProperties: master.Properties
                                   )(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   case class IdentityProvisionSerialized(from: String, to: String, identityID: String, gas: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String], createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {

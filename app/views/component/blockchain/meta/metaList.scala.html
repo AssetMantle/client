@@ -17,7 +17,7 @@
         @metaList.map { meta =>
             <tr>
                 <td>@meta.id</td>
-                <td>@Messages(constants.View.DataTypesMap.getOrElse(meta.dataType, meta.dataType))</td>
+                <td>@Messages(constants.View.DataTypesMap.getOrElse(meta.id.typeID, meta.id.typeID))</td>
                 <td>@meta.dataValue</td>
             </tr>
         }

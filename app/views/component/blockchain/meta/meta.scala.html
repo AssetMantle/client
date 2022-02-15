@@ -1,0 +1,16 @@
+@import models.blockchain.Meta
+@import views.html.base.cards._
+@import views.html.base.infos._
+
+@(meta: Meta)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.META) {
+    <span class="stringEllipse" title="@meta.id.asString">@meta.id.asString</span>
+} {
+    @commonTextInfo(constants.View.DATA_TYPE, constants.View.DataTypesMap.getOrElse(meta.id.typeID, meta.id.typeID))
+    @commonTextInfo(constants.View.DATA_VALUE, meta.dataValue)
+}
+
+<script>
+        checkAndPushState(jsRoutes.controllers.ViewController.meta().url, '@meta.id.asString', "meta");
+</script>

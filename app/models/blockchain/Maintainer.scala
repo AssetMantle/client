@@ -2,6 +2,7 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
+import models.common.ID.{ClassificationID, IdentityID, MaintainerID}
 import models.common.Serializable._
 import models.common.TransactionMessages.MaintainerDeputize
 import models.master
@@ -17,11 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Maintainer(id: String, maintainedTraits: Mutables, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
-  def getClassificationID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(0)
-
-  def getIdentityID: String = id.split(constants.RegularExpression.BLOCKCHAIN_FIRST_ORDER_COMPOSITE_ID_SEPARATOR)(1)
-}
+case class Maintainer(id: MaintainerID, maintainedTraits: Mutables, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Maintainers @Inject()(
@@ -40,22 +37,22 @@ class Maintainers @Inject()(
 
   import databaseConfig.profile.api._
 
-  case class MaintainerSerialized(id: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Maintainer = Maintainer(id = id, maintainedTraits = utilities.JSON.convertJsonStringToObject[Mutables](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class MaintainerSerialized(classificationID: String, identityID: String, maintainedTraits: String, addMaintainer: Boolean, removeMaintainer: Boolean, mutateMaintainer: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Maintainer = Maintainer(id = MaintainerID(classificationID = classificationID, identityID = identityID), maintainedTraits = utilities.JSON.convertJsonStringToObject[Mutables](maintainedTraits), addMaintainer = addMaintainer, removeMaintainer = removeMaintainer, mutateMaintainer = mutateMaintainer, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(maintainer: Maintainer): MaintainerSerialized = MaintainerSerialized(id = maintainer.id, maintainedTraits = Json.toJson(maintainer.maintainedTraits).toString, addMaintainer = maintainer.addMaintainer, removeMaintainer = maintainer.removeMaintainer, mutateMaintainer = maintainer.mutateMaintainer, createdBy = maintainer.createdBy, createdOn = maintainer.createdOn, createdOnTimeZone = maintainer.createdOnTimeZone, updatedBy = maintainer.updatedBy, updatedOn = maintainer.updatedOn, updatedOnTimeZone = maintainer.updatedOnTimeZone)
+  def serialize(maintainer: Maintainer): MaintainerSerialized = MaintainerSerialized(classificationID = maintainer.id.classificationID.asString, identityID = maintainer.id.identityID.asString, maintainedTraits = Json.toJson(maintainer.maintainedTraits).toString, addMaintainer = maintainer.addMaintainer, removeMaintainer = maintainer.removeMaintainer, mutateMaintainer = maintainer.mutateMaintainer, createdBy = maintainer.createdBy, createdOn = maintainer.createdOn, createdOnTimeZone = maintainer.createdOnTimeZone, updatedBy = maintainer.updatedBy, updatedOn = maintainer.updatedOn, updatedOnTimeZone = maintainer.updatedOnTimeZone)
 
   private[models] val maintainerTable = TableQuery[MaintainerTable]
 
-  private def add(maintainer: Maintainer): Future[String] = db.run((maintainerTable returning maintainerTable.map(_.id) += serialize(maintainer)).asTry).map {
+  private def add(maintainer: Maintainer): Future[String] = db.run((maintainerTable returning maintainerTable.map(_.identityID) += serialize(maintainer)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_INSERT_FAILED, psqlException)
     }
   }
 
-  private def addMultiple(maintainers: Seq[Maintainer]): Future[Seq[String]] = db.run((maintainerTable returning maintainerTable.map(_.id) ++= maintainers.map(x => serialize(x))).asTry).map {
+  private def addMultiple(maintainers: Seq[Maintainer]): Future[Seq[String]] = db.run((maintainerTable returning maintainerTable.map(_.identityID) ++= maintainers.map(x => serialize(x))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_INSERT_FAILED, psqlException)
@@ -69,18 +66,20 @@ class Maintainers @Inject()(
     }
   }
 
-  private def tryGetByID(id: String) = db.run(maintainerTable.filter(_.id === id).result.head.asTry).map {
+  private def tryGetByID(classificationID: String, identityID: String) = db.run(maintainerTable.filter(x => x.classificationID === classificationID && x.identityID === identityID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ORDER_NOT_FOUND, noSuchElementException)
     }
   }
 
-  private def getByID(id: String) = db.run(maintainerTable.filter(_.id === id).result.headOption)
+  private def getByID(classificationID: String, identityID: String) = db.run(maintainerTable.filter(x => x.classificationID === classificationID && x.identityID === identityID).result.headOption)
+
+  private def getAllByClassificationID(classificationID: String) = db.run(maintainerTable.filter(_.classificationID === classificationID).result)
 
   private def getAllMaintainers = db.run(maintainerTable.result)
 
-  private def deleteByID(id: String): Future[Int] = db.run(maintainerTable.filter(_.id === id).delete.asTry).map {
+  private def deleteByID(classificationID: String, identityID: String): Future[Int] = db.run(maintainerTable.filter(x => x.classificationID === classificationID && x.identityID === identityID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_DELETE_FAILED, psqlException)
@@ -90,9 +89,11 @@ class Maintainers @Inject()(
 
   private[models] class MaintainerTable(tag: Tag) extends Table[MaintainerSerialized](tag, "Maintainer_BC") {
 
-    def * = (id, maintainedTraits, addMaintainer, removeMaintainer, mutateMaintainer, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MaintainerSerialized.tupled, MaintainerSerialized.unapply)
+    def * = (classificationID, identityID, maintainedTraits, addMaintainer, removeMaintainer, mutateMaintainer, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MaintainerSerialized.tupled, MaintainerSerialized.unapply)
 
-    def id = column[String]("id", O.PrimaryKey)
+    def classificationID = column[String]("classificationID", O.PrimaryKey)
+
+    def identityID = column[String]("identityID", O.PrimaryKey)
 
     def maintainedTraits = column[String]("maintainedTraits")
 
@@ -119,9 +120,9 @@ class Maintainers @Inject()(
 
     def create(maintainer: Maintainer): Future[String] = add(maintainer)
 
-    def tryGet(id: String): Future[Maintainer] = tryGetByID(id).map(_.deserialize)
+    def tryGet(id: MaintainerID): Future[Maintainer] = tryGetByID(classificationID = id.classificationID.asString, identityID = id.identityID.asString).map(_.deserialize)
 
-    def get(id: String): Future[Option[Maintainer]] = getByID(id).map(_.map(_.deserialize))
+    def get(id: MaintainerID): Future[Option[Maintainer]] = getByID(classificationID = id.classificationID.asString, identityID = id.identityID.asString).map(_.map(_.deserialize))
 
     def getAll: Future[Seq[Maintainer]] = getAllMaintainers.map(_.map(_.deserialize))
 
@@ -129,13 +130,15 @@ class Maintainers @Inject()(
 
     def insertOrUpdate(maintainer: Maintainer): Future[Int] = upsert(maintainer)
 
-    def delete(id: String): Future[Int] = deleteByID(id)
+    def getByClassificationID(id: ClassificationID): Future[Seq[Maintainer]] = getAllByClassificationID(classificationID = id.asString).map(_.map(_.deserialize))
+
+    def delete(id: MaintainerID): Future[Int] = deleteByID(classificationID = id.classificationID.asString, identityID = id.identityID.asString)
   }
 
   object Utility {
 
     def onDeputize(maintainerDeputize: MaintainerDeputize)(implicit header: Header): Future[Unit] = {
-      val maintainerID = utilities.IDGenerator.getMaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID)
+      val maintainerID = MaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID)
       val upsert = Service.insertOrUpdate(Maintainer(id = maintainerID, maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
       val masterOperations = {
@@ -157,8 +160,8 @@ class Maintainers @Inject()(
       }
     }
 
-    def auxiliarySuper(classificationID: String, identityID: String, mutableTraits: Mutables): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(Maintainer(id = utilities.IDGenerator.getMaintainerID(classificationID = classificationID, identityID = identityID), maintainedTraits = mutableTraits, addMaintainer = true, removeMaintainer = true, mutateMaintainer = true))
+    def auxiliarySuper(classificationID: ClassificationID, identityID: IdentityID, mutableTraits: Mutables): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(Maintainer(id = MaintainerID(classificationID = classificationID, identityID = identityID), maintainedTraits = mutableTraits, addMaintainer = true, removeMaintainer = true, mutateMaintainer = true))
 
       (for {
         _ <- upsert

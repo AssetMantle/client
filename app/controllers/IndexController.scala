@@ -3,9 +3,8 @@ package controllers
 import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.BaseException
 import models.blockchain
-import models.blockchain.{Maintainer, Meta}
+import models.common.ID._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
@@ -57,40 +56,19 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
         else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
         else {
-          val asset = blockchainAssets.Service.get(query)
-          val splits = blockchainSplits.Service.getByOwnerOrOwnable(query)
-          val identity = blockchainIdentities.Service.get(query)
-          val order = blockchainOrders.Service.get(query)
-          val metaList = blockchainMetas.Service.get(Seq(query))
-          val classification = blockchainClassifications.Service.get(query)
-          val maintainer = blockchainMaintainers.Service.get(query)
-
-          def searchResult(asset: Option[models.blockchain.Asset], splits: Seq[blockchain.Split], identity: Option[blockchain.Identity], order: Option[blockchain.Order], metaList: Seq[Meta], classification: Option[blockchain.Classification], maintainer: Option[Maintainer]) = {
-            if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
-            else {
-              loginState match {
-                case Some(loginState) =>
-                  implicit val loginStateImplicit: LoginState = loginState
-                  if (asset.isEmpty && splits.isEmpty && identity.isEmpty && order.isEmpty && metaList.isEmpty && classification.isEmpty && maintainer.isEmpty) withUsernameToken.Ok(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-                  else withUsernameToken.Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer))
-                case None =>
-                  Future(Ok(views.html.component.blockchain.search(asset, identity, splits, order, metaList, classification, maintainer)))
-              }
-            }
-          }
-
-          (for {
-            asset <- asset
-            splits <- splits
-            identity <- identity
-            order <- order
-            metaList <- metaList
-            classification <- classification
-            maintainer <- maintainer
-            result <- searchResult(asset, splits, identity, order, metaList, classification, maintainer)
-          } yield result).recover {
-            case _: BaseException => Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND)))
-          }
+          val assetID = getAssetID(query)
+          val identityID = getIdentityID(query)
+          val orderID = getOrderID(query)
+          val metaID = getMetaID(query)
+          val classificationID = getClassificationID(query)
+          val maintainerID = getMaintainerID(query)
+          if (assetID.nonEmpty) Future(Redirect(routes.ViewController.asset(assetID.get.asString)))
+          else if (identityID.nonEmpty) Future(Redirect(routes.ViewController.identity(identityID.get.asString)))
+          else if (orderID.nonEmpty) Future(Redirect(routes.ViewController.order(orderID.get.asString)))
+          else if (classificationID.nonEmpty) Future(Redirect(routes.ViewController.classification(classificationID.get.asString)))
+          else if (metaID.nonEmpty) Future(Redirect(routes.ViewController.meta(metaID.get.asString)))
+          else if (maintainerID.nonEmpty) Future(Redirect(routes.ViewController.maintainer(maintainerID.get.asString)))
+          else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
         }
     }
   }

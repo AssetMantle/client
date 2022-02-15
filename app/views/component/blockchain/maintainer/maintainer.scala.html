@@ -1,14 +1,20 @@
+@import models.blockchain.{Classification, Maintainer}
 @import views.html.base.cards._
 @import views.html.base.infos._
-@import models.blockchain.Maintainer
+@import views.html.component.blockchain.identity._
 
 @(maintainer: Maintainer)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.MAINTAINER) {
-    <span class="stringEllipse" title="@maintainer.id">@maintainer.id</span>
+    <span class="stringEllipse" title="@maintainer.id.asString">@maintainer.id.asString</span>
 } {
+    @commonIdentityIDInfo(maintainer.id.identityID)
     @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(maintainer.addMaintainer))
     @commonBooleanInfo(constants.View.REMOVE_MAINTAINER, Option(maintainer.removeMaintainer))
     @commonBooleanInfo(constants.View.MUTATE_MAINTAINER, Option(maintainer.mutateMaintainer))
     @views.html.component.blockchain.properties(mutableProperties = maintainer.maintainedTraits.properties.propertyList, immutableProperties = Seq())
 }
+
+<script>
+        checkAndPushState(jsRoutes.controllers.ViewController.maintainer().url, '@maintainer.id.asString', "maintainer");
+</script>
