@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
+@import views.companion.master.memberCheck.AddUBOMemberCheck
 @import views.html.base.form._
-@import views.companion.master.AddUBOMemberCheck
+@import controllers.actions.LoginState
 
 @(addUBOBackgroundCheckForm: Form[AddUBOMemberCheck.Data] = AddUBOMemberCheck.form, uboID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ADD_UBO_MEMBER_CHECK, addUBOBackgroundCheckForm) {
@@ -8,5 +9,4 @@
   @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
   @commonInputInt(addUBOBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true, 'required -> false)
   @commonCheckbox(addUBOBackgroundCheckForm, constants.FormField.STATUS)
-
 }

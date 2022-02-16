@@ -1,9 +1,9 @@
-package views.companion.master
+package views.companion.master.memberCheck
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.mapping
 
-object MemberCheckCorporateScanResultDecision {
+object MemberCheckVesselScanResultDecision {
 
   val form = Form(
     mapping(
@@ -17,4 +17,3 @@ object MemberCheckCorporateScanResultDecision {
   case class Data(resultID: Int, matchDecision: String, assessedRisk: String, comment: String)
 
 }
-

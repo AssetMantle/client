@@ -69,6 +69,9 @@ object Form {
   val SPLIT_WRAP = new Form("SPLIT_WRAP", routes.SplitController.wrap, routes.javascript.SplitController.wrapForm)
   val SPLIT_UNWRAP = new Form("SPLIT_UNWRAP", routes.SplitController.unwrap, routes.javascript.SplitController.unwrapForm)
 
+  //TransactionController
+  val SEND_COIN = new Form("SEND_COIN", routes.TransactionsController.sendCoin, routes.javascript.TransactionsController.sendCoinForm)
+
   //Western Union - Please Do not change.
   val WU_RTCB_ID = "id"
   val REFERENCE = "reference"

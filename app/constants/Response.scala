@@ -112,6 +112,7 @@ object Response {
 
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
+  val NOT_SUPPORTED = new Failure("NOT_SUPPORTED")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val NO_SUCH_DOCUMENT_TYPE_EXCEPTION = new Failure("NO_SUCH_DOCUMENT_TYPE_EXCEPTION")

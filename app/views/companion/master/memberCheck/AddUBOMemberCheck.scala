@@ -1,7 +1,7 @@
-package views.companion.master
+package views.companion.master.memberCheck
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.{mapping, optional}
 
 object AddUBOMemberCheck {
 
@@ -17,4 +17,3 @@ object AddUBOMemberCheck {
   case class Data(uboID: String, scanID: Int, resultID: Option[Int], status: Boolean)
 
 }
-

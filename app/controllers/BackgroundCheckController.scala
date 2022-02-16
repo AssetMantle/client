@@ -12,6 +12,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.memberCheck.{GetCorporateScan, GetCorporateScanResult, GetMemberScan, GetMemberScanResult}
 import transactions.memberCheck.{CorporateScan, CorporateScanResultDecision, MemberScan, MemberScanResultDecision}
+import views.companion.master.memberCheck.{AddAssetMemberCheck, AddOrganizationMemberCheck, AddUBOMemberCheck, MemberCheckCorporateScan, MemberCheckCorporateScanResultDecision, MemberCheckMemberScan, MemberCheckMemberScanResultDecision, MemberCheckVesselScan, MemberCheckVesselScanResultDecision}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -55,7 +56,7 @@ class BackgroundCheckController @Inject()(
 
   def memberScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckMemberScan.form.bindFromRequest().fold(
+      MemberCheckMemberScan.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckMemberScan(formWithErrors, formWithErrors.data(constants.FormField.UBO_ID.name), formWithErrors.data(constants.FormField.FIRST_NAME.name), formWithErrors.data(constants.FormField.LAST_NAME.name))))
         },
@@ -113,7 +114,7 @@ class BackgroundCheckController @Inject()(
 
   def memberScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckMemberScanResultDecision.form.bindFromRequest().fold(
+      MemberCheckMemberScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckMemberScanSingleResultDecision(formWithErrors, formWithErrors.data(constants.FormField.RESULT_ID.name).toInt)))
         },
@@ -135,7 +136,7 @@ class BackgroundCheckController @Inject()(
 
   def addUBOMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.AddUBOMemberCheck.form.bindFromRequest().fold(
+      AddUBOMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.addUBOMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
@@ -165,7 +166,7 @@ class BackgroundCheckController @Inject()(
 
   def corporateScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckCorporateScan.form.bindFromRequest().fold(
+      MemberCheckCorporateScan.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckCorporateScan(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.COMPANY_NAME.name))))
         },
@@ -223,7 +224,7 @@ class BackgroundCheckController @Inject()(
 
   def corporateScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckCorporateScanResultDecision.form.bindFromRequest().fold(
+      MemberCheckCorporateScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckCorporateScanSingleResultDecision(formWithErrors, formWithErrors.data(constants.FormField.RESULT_ID.name).toInt)))
         },
@@ -246,7 +247,7 @@ class BackgroundCheckController @Inject()(
 
   def addOrganizationMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.AddOrganizationMemberCheck.form.bindFromRequest().fold(
+      AddOrganizationMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.addOrganizationMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },
@@ -273,7 +274,7 @@ class BackgroundCheckController @Inject()(
 
   def vesselScan: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckVesselScan.form.bindFromRequest().fold(
+      MemberCheckVesselScan.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckVesselScan(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name), formWithErrors.data(constants.FormField.VESSEL_NAME.name))))
         },
@@ -330,7 +331,7 @@ class BackgroundCheckController @Inject()(
 
   def vesselScanResultDecision: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.MemberCheckVesselScanResultDecision.form.bindFromRequest().fold(
+      MemberCheckVesselScanResultDecision.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.memberCheckVesselScanSingleResultDecision(formWithErrors, formWithErrors.data(constants.FormField.RESULT_ID.name).toInt)))
         },
@@ -353,7 +354,7 @@ class BackgroundCheckController @Inject()(
 
   def addAssetMemberCheck: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.AddAssetMemberCheck.form.bindFromRequest().fold(
+      AddAssetMemberCheck.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.backgroundCheck.addAssetMemberCheck(formWithErrors, formWithErrors.data(constants.FormField.ASSET_ID.name), formWithErrors.data(constants.FormField.SCAN_ID.name).toInt, Option(formWithErrors.data(constants.FormField.RESULT_ID.name).toInt))))
         },

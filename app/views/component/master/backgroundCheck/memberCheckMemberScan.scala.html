@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.form._
-@import views.companion.master.MemberCheckMemberScan
+@import views.companion.master.memberCheck.MemberCheckMemberScan
 
 @(memberCheckMemberScanForm: Form[MemberCheckMemberScan.Data] = MemberCheckMemberScan.form, uboID: String, firstName: String, lastName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MEMBER_CHECK_MEMBER_SCAN, memberCheckMemberScanForm) {
