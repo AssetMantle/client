@@ -26,7 +26,7 @@ async function sendCoinTx(source, fromAddress) {
         const toAddress = $('#sendCoinToAddress').val();
         const denom = $('#sendCoinDenom').val();
         const amount = $('#sendCoinAmount').val();
-        const msg = SendMsg(fromAddress, toAddress, amount * 1000000, denom);
+        const msg = SendMsg(fromAddress, toAddress, amount * MicroFactor, denom);
         const wallet = await getKeplrWallet();
         const txFee = getTxFee();
         const response = await Transaction(wallet[0], wallet[1], [msg], txFee);

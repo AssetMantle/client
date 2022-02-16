@@ -5,6 +5,7 @@ chainName = "AssetMantle Testnet";
 keplrSet = false;
 stakingDenom = "uatom";
 maxGas = 250000;
+MicroFactor = 1000000;
 
 async function initializeKeplr() {
     if (!window.keplr) {
