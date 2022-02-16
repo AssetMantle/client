@@ -3,7 +3,8 @@ lcd = "http://localhost:1317";
 chainID = "test";
 chainName = "AssetMantle Testnet";
 keplrSet = false;
-accounts = [];
+stakingDenom = "uatom";
+maxGas = 250000;
 
 async function initializeKeplr() {
     if (!window.keplr) {
@@ -25,8 +26,7 @@ async function getKeplrWallet() {
     } else {
         try {
             let offlineSigner = window.keplr.getOfflineSigner(chainID);
-            console.log(offlineSigner);
-            accounts = await offlineSigner.getAccounts();
+            let accounts = await offlineSigner.getAccounts();
             return [offlineSigner, accounts[0].address];
         } catch (e) {
             console.log(e)
@@ -50,8 +50,8 @@ async function signArbitrary(signer, data) {
     }
 }
 
-function fee(amount, gas = 250000, denom) {
-    return {amount: [{amount: String(amount), denom: denom}], gas: String(gas)};
+function getTxFee(amount = 0, gas = maxGas) {
+    return {amount: [{amount: String(amount), denom: stakingDenom}], gas: String(gas)};
 }
 
 async function setChain() {

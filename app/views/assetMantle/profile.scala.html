@@ -20,6 +20,7 @@
                     <div id="profilePhoto" class="cmuk-text-center"></div>
                 </div>
                 <div>
+                    @commonFormButton(constants.Form.SEND_COIN)
                     @commonFormButton(constants.Form.UPDATE_PROFILE)
                     @commonFormButton(constants.Form.UPDATE_SOCIAL_PROFILE)
                     @commonTextInfo(constants.View.NAME, profile.fold("")(_.name))

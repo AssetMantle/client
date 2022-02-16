@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.form._
-@import views.companion.master.MemberCheckVesselScan
+@import views.companion.master.memberCheck.MemberCheckVesselScan
 
 @(memberCheckVesselScanForm: Form[MemberCheckVesselScan.Data] = MemberCheckVesselScan.form, assetID: String, vesselName: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MEMBER_CHECK_VESSEL_SCAN, memberCheckVesselScanForm) {

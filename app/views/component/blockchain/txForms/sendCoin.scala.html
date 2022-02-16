@@ -1,0 +1,13 @@
+@import views.companion.blockchain.SendCoin
+@import views.html.base.form._
+@import views.html.base.infos._
+
+@(sendCoinForm: Form[SendCoin.Data] = SendCoin.form, fromAddress: String, denoms: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.SEND_COIN, sendCoinForm, customSubmit = JavaScript(s"""sendCoinTx(this, '$fromAddress')""")) {
+    <div id="txFields">
+        @commonInputText(sendCoinForm, constants.FormField.TO, 'id -> "sendCoinToAddress")
+        @commonCustomSelect(sendCoinForm, constants.FormField.DENOM, denoms, 'id -> "sendCoinDenom")
+        @commonInputMicroNumber(sendCoinForm, constants.FormField.AMOUNT, 'id -> "sendCoinAmount")
+    </div>
+    @views.html.component.blockchain.txForms.commonTxResponse()
+}

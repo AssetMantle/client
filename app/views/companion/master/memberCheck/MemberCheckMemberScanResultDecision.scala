@@ -1,9 +1,7 @@
-package views.companion.master
-
-import java.util.Date
+package views.companion.master.memberCheck
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.mapping
 
 object MemberCheckMemberScanResultDecision {
 
@@ -19,4 +17,3 @@ object MemberCheckMemberScanResultDecision {
   case class Data(resultID: Int, matchDecision: String, assessedRisk: String, comment: String)
 
 }
-

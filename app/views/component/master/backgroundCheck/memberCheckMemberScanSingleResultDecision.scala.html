@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import views.html.base.form._
-@import views.companion.master.MemberCheckMemberScanResultDecision
+@import views.companion.master.memberCheck.MemberCheckMemberScanResultDecision
 
 @(memberCheckMemberScanResultDecisionForm: Form[MemberCheckMemberScanResultDecision.Data] = MemberCheckMemberScanResultDecision.form, resultID: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION, memberCheckMemberScanResultDecisionForm) {

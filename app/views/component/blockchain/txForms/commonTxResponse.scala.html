@@ -1,0 +1,18 @@
+@import views.html.base.infos._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div id="responseBody" class="hidden">
+    <div id="txSuccessful" class="hidden">
+        @commonBooleanInfo(constants.View.SUCCESS, Option(true))
+    </div>
+    <div id="txFailed" class="hidden">
+    @commonBooleanInfo(constants.View.SUCCESS, Option(false))
+    </div>
+    <div id="txResponse" class="hidden">
+    @commonTextInfo(constants.View.TRANSACTION_HASH, "", 'id -> "txResponseHash")
+    </div>
+    <div id="keplrError" class="hidden">
+    @commonTextInfo(constants.View.KEPLR_ERROR_MESSAGE, "", 'id -> "keplrErrorMessage")
+    </div>
+</div>

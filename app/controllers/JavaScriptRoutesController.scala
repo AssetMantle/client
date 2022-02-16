@@ -134,6 +134,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.SplitController.wrapForm,
           routes.javascript.SplitController.unwrapForm,
 
+          routes.javascript.TransactionsController.sendCoinForm,
+
           routes.javascript.ViewController.profile,
           routes.javascript.ViewController.identity,
           routes.javascript.ViewController.asset,

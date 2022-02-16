@@ -19,7 +19,7 @@ object FormField {
   val PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val MOBILE_NUMBER = new StringFormField("MOBILE_NUMBER", 6, 15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
-  val TO = new StringFormField("TO", 45, 45)
+  val TO = new StringFormField("TO", 39, 50)
   val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 16, RegularExpression.HASH)
   val NAME = new StringFormField("NAME", 2, 100)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
@@ -63,7 +63,6 @@ object FormField {
   val NUB_ID = new StringFormField("NUB_ID", 1, 200)
   val CLASSIFICATION_ID = new StringFormField("CLASSIFICATION_ID", 1, 200)
   val IDENTITY_ID = new StringFormField("IDENTITY_ID", 1, 200)
-  val DENOM = new StringFormField("DENOM", 1, 100)
   val MAKER_OWNABLE_ID = new StringFormField("MAKER_OWNABLE_ID", 1, 200)
   val TAKER_OWNABLE_ID = new StringFormField("TAKER_OWNABLE_ID", 1, 200)
   val ORDER_ID = new StringFormField("ORDER_ID", 1, 500)
@@ -76,6 +75,7 @@ object FormField {
   val DESCRIPTION = new StringFormField("DESCRIPTION", 0, 512)
   val URL = new StringFormField("URL", 10, 100)
   val PLATFORM = new StringFormField("PLATFORM", 2, 100)
+  val DENOM_S = new StringFormField("DENOM", 1, 128)
 
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
@@ -89,6 +89,8 @@ object FormField {
   val TOKEN_DENOM = new SelectFormField("TOKEN_DENOM", Seq.empty)
   val DATA_TYPE = new SelectFormField("DATA_TYPE", constants.SelectFieldOptions.DATA_TYPE)
   val ENTITY_TYPE = new SelectFormField("ENTITY_TYPE", constants.SelectFieldOptions.ENTITY_TYPE)
+
+  val DENOM = new CustomSelectFormField("DENOM")
 
   //IntFormField
   val TRANSACTION_AMOUNT = new IntFormField("TRANSACTION_AMOUNT", 0, Int.MaxValue)
@@ -148,6 +150,11 @@ object FormField {
   class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
+  }
+
+  class CustomSelectFormField(fieldName: String) {
+    val name: String = fieldName
+    val field: Mapping[String] = text
   }
 
   class IntFormField(fieldName: String, val minimumValue: Int, val maximumValue: Int) {
