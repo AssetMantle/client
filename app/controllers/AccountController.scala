@@ -202,7 +202,7 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- deleteSessionToken
             _ <- utilitiesNotification.send(loginState.username, constants.Notification.LOG_OUT, loginState.username)()
-          } yield Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+          } yield PermanentRedirect(routes.IndexController.index.url).withNewSession
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

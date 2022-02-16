@@ -21,8 +21,9 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                 400: function (data) {
                     result.html(data.responseText);
                 },
-                401: function (data) {
+                404: function (data) {
                     replaceDocument(data.responseText);
+                    location.reload();
                 },
                 412: function (data) {
                     replaceDocument(data.responseText);
@@ -36,9 +37,9 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                 206: function (data) {
                     $(target).html(data);
                 },
-                302: function (data) {
-                    $('#commonModal').fadeOut();
-                    window.open(data.responseText);
+                308: function (data) {
+                    replaceDocument(data);
+                    location.reload();
                 },
             }
         }).fail(function (XMLHttpRequest) {
