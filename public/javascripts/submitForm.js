@@ -48,6 +48,10 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                     replaceDocument(data.responseText);
                     location.reload();
                 },
+                500: function (data) {
+                    replaceDocument(data);
+                    location.reload();
+                }
             }
         }).fail(function (XMLHttpRequest) {
             if (XMLHttpRequest.readyState === 0) {
