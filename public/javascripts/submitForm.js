@@ -29,6 +29,7 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                 },
                 500: function (data) {
                     replaceDocument(data.responseText);
+                    location.reload();
                 },
                 200: function (data) {
                     replaceDocument(data);
@@ -44,11 +45,7 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                     replaceDocument(data);
                     location.reload();
                 },
-                404: function (data) {
-                    replaceDocument(data);
-                    location.reload();
-                },
-                500: function (data) {
+                403: function (data) {
                     replaceDocument(data);
                     location.reload();
                 }
