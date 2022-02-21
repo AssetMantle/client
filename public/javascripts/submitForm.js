@@ -44,10 +44,6 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                     replaceDocument(data.responseText);
                     location.reload();
                 },
-                403: function (data) {
-                    replaceDocument(data);
-                    location.reload();
-                },
                 502: function (data) {
                     replaceDocument(data.responseText);
                     location.reload();
