@@ -29,7 +29,6 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                 },
                 500: function (data) {
                     replaceDocument(data.responseText);
-                    location.reload();
                 },
                 200: function (data) {
                     replaceDocument(data);
@@ -41,12 +40,16 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                     $('#commonModal').fadeOut();
                     window.open(data.responseText);
                 },
-                308: function (data) {
-                    replaceDocument(data);
+                201: function (data) {
+                    replaceDocument(data.responseText);
                     location.reload();
                 },
                 403: function (data) {
                     replaceDocument(data);
+                    location.reload();
+                },
+                502: function (data) {
+                    replaceDocument(data.responseText);
                     location.reload();
                 }
             }
