@@ -40,6 +40,14 @@ function submitForm(source, targetID = 'commonModalContent', loadingSpinnerID = 
                     $('#commonModal').fadeOut();
                     window.open(data.responseText);
                 },
+                201: function (data) {
+                    replaceDocument(data.responseText);
+                    location.reload();
+                },
+                502: function (data) {
+                    replaceDocument(data.responseText);
+                    location.reload();
+                }
             }
         }).fail(function (XMLHttpRequest) {
             if (XMLHttpRequest.readyState === 0) {
