@@ -90,48 +90,29 @@ class AccountController @Inject()(
         },
         signUpData => {
           val address = Future(utilities.Bech32.convertAccountPublicKeyToAccountAddress(pubkey = signUpData.publicKey))
+          val identityID = utilities.Blockchain.getNubIdentity(signUpData.username).id.asString
 
-          def getBCAccount(address: String) = blockchainAccounts.Service.get(address)
+          def verifyIdentity(address: String) = blockchainIdentityProvisions.Service.checkExists(id = identityID, address = address)
 
           def validateSignature(address: String) = Future(utilities.Blockchain.verifySecp256k1Signature(publicKey = signUpData.publicKey, data = utilities.Keplr.newArbitraryData(data = signUpData.username, signer = address).getSHA256, signature = signUpData.signature))
 
-          def updateAccountsAndGetResult(validSignature: Boolean, optionalBCAccount: Option[blockchain.Account], address: String) = if (validSignature) {
-            def getIdentityIDList(address: String) = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(address)
-
-            val loginState = optionalBCAccount.fold {
-              val upsertBCAccount = blockchainAccounts.Utility.onKeplrSignUp(address = address, username = signUpData.username, publicKey = signUpData.publicKey)
-
-              def addToMaster() = masterAccounts.Service.upsertOnKeplrSignUp(username = signUpData.username, language = request.lang)
-
-              for {
-                _ <- upsertBCAccount
-                userType <- addToMaster()
-                identityIDs <- getIdentityIDList(address)
-              } yield LoginState(username = signUpData.username, userType = userType, address = address, identityID = identityIDs.headOption.getOrElse(""))
-            } { bcAccount =>
-              if (bcAccount.username == signUpData.username) {
-                val masterAccount = masterAccounts.Service.tryGet(signUpData.username)
-                for {
-                  masterAccount <- masterAccount
-                  identityIDs <- getIdentityIDList(address)
-                } yield LoginState(username = signUpData.username, userType = masterAccount.userType, address = address, identityID = identityIDs.headOption.getOrElse(""))
-              } else throw new BaseException(constants.Response.INCORRECT_USERNAME_OR_WALLET_ADDRESS)
-            }
+          def updateAccountsAndGetResult(validSignature: Boolean, address: String, identityVerified: Boolean) = if (validSignature && identityVerified) {
+            val userType = masterAccounts.Service.addOnKeplrSignUp(username = signUpData.username, language = request.lang)
 
             (for {
-              loginState <- loginState
-              result <- sendNotificationsAndGetResult(loginState = loginState, pushNotificationToken = signUpData.pushNotificationToken)
+              userType <- userType
+              result <- sendNotificationsAndGetResult(loginState = LoginState(username = signUpData.username, userType = userType, address = address, identityID = identityID), pushNotificationToken = signUpData.pushNotificationToken)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
-          } else Future(InternalServerError(views.html.index(failures = Seq(constants.Response.INVALID_SIGNATURE))))
+          } else Future(InternalServerError(views.html.index(failures = Seq(constants.Response.INVALID_SIGNATURE_OR_USERNAME))))
 
           (for {
             address <- address
-            bcAccount <- getBCAccount(address)
+            identityVerified <- verifyIdentity(address)
             validSignature <- validateSignature(address)
-            result <- updateAccountsAndGetResult(validSignature, bcAccount, address)
+            result <- updateAccountsAndGetResult(validSignature, address, identityVerified)
           } yield result).recover {
             case baseException: BaseException => BadGateway(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -152,30 +133,28 @@ class AccountController @Inject()(
         },
         signInData => {
           val address = Future(utilities.Bech32.convertAccountPublicKeyToAccountAddress(pubkey = signInData.publicKey))
-          val bcAccount = blockchainAccounts.Service.tryGetByUsername(signInData.username)
           val masterAccount = masterAccounts.Service.tryGet(signInData.username)
+          val identityID = utilities.Blockchain.getNubIdentity(signInData.username).id.asString
 
           def validateSignature(address: String) = Future(utilities.Blockchain.verifySecp256k1Signature(publicKey = signInData.publicKey, data = utilities.Keplr.newArbitraryData(data = signInData.username, signer = address).getSHA256, signature = signInData.signature))
 
-          def getIdentityIDList(address: String) = blockchainIdentityProvisions.Service.getAllIDsByProvisioned(address)
+          def verifyIdentity(address: String) = blockchainIdentityProvisions.Service.checkExists(id = identityID, address = address)
 
-          def result(validSignature: Boolean, address: String, masterAccount: master.Account, identityIDs: Seq[String]) = if (validSignature) {
-            val loginState = LoginState(username = masterAccount.id, userType = masterAccount.userType, address = address, identityID = identityIDs.headOption.getOrElse(""))
+          def getResult(validSignature: Boolean, address: String, masterAccount: master.Account, identityVerified: Boolean) = if (validSignature && identityVerified) {
             (for {
-              result <- sendNotificationsAndGetResult(loginState = loginState, pushNotificationToken = signInData.pushNotificationToken)
+              result <- sendNotificationsAndGetResult(loginState = LoginState(username = masterAccount.id, userType = masterAccount.userType, address = address, identityID = identityID), pushNotificationToken = signInData.pushNotificationToken)
             } yield result
               ).recover {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
-          } else Future(InternalServerError(views.html.index(failures = Seq(constants.Response.INVALID_SIGNATURE))))
+          } else Future(InternalServerError(views.html.index(failures = Seq(constants.Response.INVALID_SIGNATURE_OR_USERNAME))))
 
           (for {
             address <- address
-            _ <- bcAccount
             masterAccount <- masterAccount
             validSignature <- validateSignature(address)
-            identityIDs <- getIdentityIDList(address)
-            result <- result(validSignature, address, masterAccount, identityIDs)
+            identityVerified <- verifyIdentity(address)
+            result <- getResult(validSignature, address, masterAccount, identityVerified)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -222,31 +201,29 @@ class AccountController @Inject()(
           Future(BadRequest(views.html.component.master.account.updateProfile(formWithErrors)))
         },
         updateProfileData => {
-          if (loginState.identityID != "") {
-            val optionalProfile = masterProfiles.Service.get(loginState.username)
+          val optionalProfile = masterProfiles.Service.get(loginState.username)
 
-            def updateProfileNameDescription(optionalProfile: Option[Profile]) = optionalProfile.fold {
-              masterProfiles.Service.insertOrUpdate(Profile(identityID = loginState.identityID, name = updateProfileData.name, description = updateProfileData.description, socialProfiles = Seq()))
-            } { profile =>
-              masterProfiles.Service.insertOrUpdate(profile.copy(name = updateProfileData.name, description = updateProfileData.description))
-            }
+          def updateProfileNameDescription(optionalProfile: Option[Profile]) = optionalProfile.fold {
+            masterProfiles.Service.insertOrUpdate(Profile(identityID = loginState.identityID, name = updateProfileData.name, description = updateProfileData.description, socialProfiles = Seq()))
+          } { profile =>
+            masterProfiles.Service.insertOrUpdate(profile.copy(name = updateProfileData.name, description = updateProfileData.description))
+          }
 
-            def updatedProfile = masterProfiles.Service.get(loginState.username)
+          def updatedProfile = masterProfiles.Service.get(loginState.username)
 
-            val email = masterEmails.Service.get(loginState.username)
-            val mobile = masterMobiles.Service.get(loginState.username)
+          val email = masterEmails.Service.get(loginState.username)
+          val mobile = masterMobiles.Service.get(loginState.username)
 
-            (for {
-              optionalProfile <- optionalProfile
-              _ <- updateProfileNameDescription(optionalProfile)
-              updatedProfile <- updatedProfile
-              email <- email
-              mobile <- mobile
-            } yield Ok(views.html.assetMantle.profile(profile = updatedProfile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
-              ).recover {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
-          } else Future(InternalServerError(views.html.assetMantle.account(failures = Seq(new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND).failure))))
+          (for {
+            optionalProfile <- optionalProfile
+            _ <- updateProfileNameDescription(optionalProfile)
+            updatedProfile <- updatedProfile
+            email <- email
+            mobile <- mobile
+          } yield Ok(views.html.assetMantle.profile(profile = updatedProfile, email = email.fold("")(_.emailAddress), mobile = mobile.fold("")(_.mobileNumber), successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }

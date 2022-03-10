@@ -184,18 +184,16 @@ class Identities @Inject()(
     }
 
     def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
-      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(getNubMetaProperty(identityNub.nubID)))
+      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(utilities.Blockchain.getNubMetaProperty(identityNub.nubID)))
 
       def defineAndUpsert(nubProperty: Property): Future[Identity] = {
-        val immutables = Immutables(Properties(Seq(nubProperty)))
-        val mutables = Mutables(Properties(Seq()))
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), mutables)
+        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), Mutables(Properties(Seq())))
 
-        def addIdentityWithProvisionAddress(classificationID: ClassificationID) = addIdentityWithProvisionAddresses(identity = Identity(id = IdentityID(classificationID = classificationID, hashID = immutables.getHashID), immutables = immutables, mutables = mutables), provisionedAddresses = Seq(identityNub.from))
+        def addIdentityWithProvisionAddress() = addIdentityWithProvisionAddresses(identity = utilities.Blockchain.getNubIdentity(identityNub.nubID), provisionedAddresses = Seq(identityNub.from))
 
         for {
           classificationID <- defineClassification
-          identity <- addIdentityWithProvisionAddress(classificationID)
+          identity <- addIdentityWithProvisionAddress()
         } yield identity
       }
 
@@ -221,8 +219,6 @@ class Identities @Inject()(
         case baseException: BaseException => throw baseException
       }
     }
-
-    def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(nubID))))
   }
 
 }

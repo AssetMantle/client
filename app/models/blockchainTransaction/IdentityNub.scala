@@ -177,7 +177,7 @@ class IdentityNubs @Inject()(
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
-    def getTransactionList(fromAddress: String) = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
+    def getTransactionList(fromAddress: String): Future[Seq[IdentityNub]] = getTransactionListByFromAddress(fromAddress).map(_.map(_.deserialize))
   }
 
   object Utility {
@@ -190,7 +190,7 @@ class IdentityNubs @Inject()(
 
       def getClassificationID(identityNub: IdentityNub) = ClassificationID(chainID = constants.Blockchain.ChainID, Immutables(Properties(Seq(BaseProperty(dataType = constants.Blockchain.DataType.ID_DATA, dataName = constants.Blockchain.Properties.NubID, dataValue = None).toProperty))), Mutables(Properties(Seq.empty)))
 
-      def getIdentityID(identityNub: IdentityNub, classificationID: ClassificationID) = IdentityID(classificationID = classificationID, hashID = Immutables(Properties(Seq(blockchainIdentities.Utility.getNubMetaProperty(identityNub.nubID).removeData()))).getHashID)
+      def getIdentityID(identityNub: IdentityNub, classificationID: ClassificationID) = IdentityID(classificationID = classificationID, hashID = Immutables(Properties(Seq(utilities.Blockchain.getNubMetaProperty(identityNub.nubID).removeData()))).getHashID)
 
       def sendNotifications(accountID: String, identityID: String) = utilitiesNotification.send(accountID, constants.Notification.IDENTITY_NUB, identityID, txHash)(s"'$txHash'")
 

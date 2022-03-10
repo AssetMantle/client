@@ -137,7 +137,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def upsertOnKeplrSignUp(username: String, language: Lang): Future[String] = add(Account(id = username, language = Option(language), userType = constants.User.USER))
+    def addOnKeplrSignUp(username: String, language: Lang): Future[String] = add(Account(id = username, language = Option(language), userType = constants.User.USER))
 
     def validateUsernamePassword(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
 
