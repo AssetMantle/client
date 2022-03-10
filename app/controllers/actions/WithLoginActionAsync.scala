@@ -14,8 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class WithLoginActionAsync @Inject()(
                                       messagesControllerComponents: MessagesControllerComponents,
                                       withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
-                                      blockchainAccounts: blockchain.Accounts, masterAccounts:
-                                      master.Accounts,
+                                      blockchainAccounts: blockchain.Accounts,
+                                      blockchainIdentityProvision: blockchain.IdentityProvisions,
+                                      masterAccounts: master.Accounts,
                                       masterTransactionSessionTokens: masterTransaction.SessionTokens
                                     )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -27,6 +28,8 @@ class WithLoginActionAsync @Inject()(
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
       val identityID = Future(request.session.get(constants.Security.IDENTITY_ID).getOrElse(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND)))
+
+      def isProvisioned(identityID: String, address: String) = blockchainIdentityProvision.Service.checkExists(id = identityID, address = address)
 
       def verifySessionTokenAndUserType(username: String, sessionToken: String) = {
         val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
@@ -41,14 +44,16 @@ class WithLoginActionAsync @Inject()(
         } yield (userType, address)
       }
 
-      def result(loginState: LoginState): Future[Result] = f(loginState)(request)
+      def getResult(loginState: LoginState, isProvisioned: Boolean): Future[Result] = if (isProvisioned) f(loginState)(request)
+      else Future(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED))
 
       (for {
         username <- username
         sessionToken <- sessionToken
         identityID <- identityID
         (userType, address) <- verifySessionTokenAndUserType(username, sessionToken)
-        result <- result(LoginState(username = username, userType = userType, address = address, identityID = identityID))
+        isProvisioned <- isProvisioned(identityID = identityID, address = address)
+        result <- getResult(LoginState(username = username, userType = userType, address = address, identityID = identityID), isProvisioned)
       } yield {
         result
       }).recover {

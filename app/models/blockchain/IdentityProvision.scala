@@ -55,7 +55,7 @@ class IdentityProvisions @Inject()(
 
   private def getAllProvisionedAddressByID(id: String) = db.run(identityProvisionTable.filter(_.id === id).map(_.address).result)
 
-  private def deleteAllProvisionedAddressesByID(id: String): Future[Int] = db.run(identityProvisionTable.filter(_.id === id).delete)
+  private def exists(id: String, address: String): Future[Boolean] = db.run(identityProvisionTable.filter(x => x.id === id && x.address === address).exists.result)
 
   private def deleteProvisionedAddressByIDAndAddress(id: String, address: String): Future[Int] = db.run(identityProvisionTable.filter(x => x.id === id && x.address === address).delete.asTry).map {
     case Success(result) => result
@@ -95,6 +95,8 @@ class IdentityProvisions @Inject()(
     def addProvisionAddress(id: String, address: String): Future[String] = addProvisionedAddressByID(IdentityProvision(id = id, address = address))
 
     def deleteProvisionAddress(id: String, address: String): Future[Int] = deleteProvisionedAddressByIDAndAddress(id = id, address = address)
+
+    def checkExists(id: String, address: String): Future[Boolean] = exists(id = id, address = address)
   }
 
   object Utility {

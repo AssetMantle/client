@@ -136,6 +136,7 @@ object Response {
   val USERNAME_NOT_FOUND = new Failure("USERNAME_NOT_FOUND", routes.javascript.AccountController.signInForm)
   val TOKEN_NOT_FOUND = new Failure("TOKEN_NOT_FOUND", routes.javascript.AccountController.signInForm)
   val SESSION_IDENTITY_ID_NOT_FOUND = new Failure("SESSION_IDENTITY_ID_NOT_FOUND", routes.javascript.AccountController.signInForm)
+  val SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED = new Failure("SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED", routes.javascript.AccountController.signInForm)
   val TOKEN_TIMEOUT = new Failure("TOKEN_TIMEOUT")
   val INVALID_TOKEN = new Failure("INVALID_TOKEN")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
@@ -199,6 +200,7 @@ object Response {
   val INVALID_HRP_OR_BYTES = new Failure("INVALID_HRP_OR_BYTES")
   val USERNAME_SAME_AS_WALLET_ADDRESS = new Failure("USERNAME_SAME_AS_WALLET_ADDRESS")
   val UNKOWN_SOCIAL_PLATFORM = new Failure("UNKOWN_SOCIAL_PLATFORM")
+  val INVALID_SESSION = new Failure("INVALID_SESSION")
 
   val INDEX_OUT_OF_BOUND = new Failure("INDEX_OUT_OF_BOUND")
   val JSON_UNMARSHALLING_ERROR = new Failure("JSON_UNMARSHALLING_ERROR")

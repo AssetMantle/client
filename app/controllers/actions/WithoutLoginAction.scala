@@ -1,22 +1,22 @@
 package controllers.actions
 
-import controllers.logging.{WithActionAsyncLoggingFilter, WithActionLoggingFilter}
 import constants.AppConfig._
+import controllers.logging.WithActionAsyncLoggingFilter
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                    withActionAsyncLoggingFilter: WithActionAsyncLoggingFilter,
-                                   blockchainAccounts: blockchain.Accounts, masterAccounts:
-                                   master.Accounts,
+                                   blockchainAccounts: blockchain.Accounts,
+                                   blockchainIdentityProvision: blockchain.IdentityProvisions,
+                                   masterAccounts: master.Accounts,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
@@ -27,23 +27,28 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
       val sessionToken = request.session.get(constants.Security.TOKEN)
       val identityID = request.session.get(constants.Security.IDENTITY_ID)
 
+      def isProvisioned(identityID: String, address: String) = blockchainIdentityProvision.Service.checkExists(id = identityID, address = address)
+
+      def getResult(loginState: LoginState, isProvisioned: Boolean): Future[Result] = if (isProvisioned) Future(f(Some(loginState))(request))
+      else Future(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED))
 
       def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String], identityID: Option[String]) = {
-        username match {
-          case Some(username) => {
-            val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken.getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
-            val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
-            val userType = masterAccounts.Service.getUserType(username)
-            val address = blockchainAccounts.Service.tryGetAddress(username)
-            for {
-              _ <- sessionTokenVerify
-              _ <- tokenTimeVerify
-              userType <- userType
-              address <- address
-            } yield f(Some(LoginState(username = username, userType = userType, address = address, identityID = identityID.getOrElse(""))))(request)
-          }
-          case None => Future(f(None)(request))
-        }
+        if (username.nonEmpty && sessionToken.nonEmpty && identityID.nonEmpty) {
+          val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username.get, sessionToken.getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+          val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username.get)
+          val userType = masterAccounts.Service.getUserType(username.get)
+          val address = blockchainAccounts.Service.tryGetAddress(username.get)
+          for {
+            _ <- sessionTokenVerify
+            _ <- tokenTimeVerify
+            userType <- userType
+            address <- address
+            isProvisioned <- isProvisioned(identityID = identityID.get, address = address)
+            result <- getResult(LoginState(username = username.get, userType = userType, address = address, identityID = identityID.get), isProvisioned)
+          } yield result
+        } else if (username.isEmpty && sessionToken.isEmpty && identityID.isEmpty) {
+          Future(f(None)(request))
+        } else Future(throw new BaseException(constants.Response.INVALID_SESSION))
       }
 
       (for {
