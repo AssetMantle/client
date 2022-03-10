@@ -17,5 +17,3 @@ global.window.SetupIbcExtension = stargate.setupIbcExtension;
 global.window.QueryClient = stargate.QueryClient;
 global.window.SigningCosmosClient = launchpad.SigningCosmosClient;
 global.window.SigningStargateClient = stargate.SigningStargateClient;
-
-JSON.stringify()
