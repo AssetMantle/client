@@ -19,14 +19,14 @@ body.darkMode .financialCardSection,
 body.darkMode .documentItem,
 body.darkMode .cmuk-input,
 body.darkMode .cmuk-panel-scrollable, body.darkMode .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body, body.darkMode .cmuk-card-body .uploadDoc, body.darkMode .cmuk-card-body, body.darkMode .cmuk-card-header {
-  border-color: #31323A !important;
+  border-color: #3E3E3E !important;
 }
 
 body .block {
   border: 0;
 }
 body .block .full {
-  background-color: #E50913;
+  background-color: #FFC640;
 }
 
 body .cmuk-card-body {
@@ -39,7 +39,7 @@ body .cmuk-table td {
   font-size: 0.875rem;
   font-family: "Poppins";
   font-weight: 400;
-  color: #272931;
+  color: #1E1E1E;
 }
 
 #blockList_NEXT,
@@ -58,9 +58,9 @@ body .cmuk-table td {
 }
 .cmuk-navbar-nav.top-nav-dropdown li select {
   padding: 0 20px 0 10px;
-  background: #282E38;
+  background: #2C2C2C;
   color: #fff;
-  border: 1px solid #282E38;
+  border: 1px solid #2C2C2C;
   border-radius: 0;
   font-weight: 600;
   height: 35px;
@@ -111,28 +111,31 @@ body.darkMode .leftContainer .cmuk-card-body, body.darkMode .leftContainer .fina
 body.darkMode .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages,
 body.darkMode .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer,
 body.darkMode .documentView .documentList, body.darkMode .switcherCard .cmuk-switcher {
-  scrollbar-color: #484951 #20212A;
+  scrollbar-color: #484951 #1E1E1E;
   scrollbar-width: thin;
 }
+body.darkMode .bodyContainer{
+  background-color: #1E1E1E !important;
+}
 body.darkMode .banner {
-  border-bottom: 1px solid #31323A;
-  background-color: #20212A;
+  border-bottom: 1px solid #3E3E3E;
+  background-color: #1E1E1E;
 }
 body.darkMode .banner .bannerText h3 {
   color: #D0D0D0;
 }
 body.darkMode .tabSection .cmuk-subnav-pill li a {
-  background-color: #282934;
+  background-color: #1E1E1E;
 }
 body.darkMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
-  border-top: 1px solid #31323A;
-  border-bottom: 1px solid #31323A;
+  border-top: 1px solid #3E3E3E;
+  border-bottom: 1px solid #3E3E3E;
 }
 body.darkMode .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
   color: #ffffff;
 }
 body.darkMode .middle .mainTabs .tradeTerms .sellerTerm {
-  background: #282934;
+  background: #1E1E1E;
   border: none;
   filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
 }
@@ -147,25 +150,25 @@ body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel,
   font-weight: bold;
 }
 body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm p {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .infoRowValue {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .infoRowValue p {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode ::-webkit-scrollbar-thumb {
   background: rgba(119, 131, 143, 0.5);
   border: none;
 }
 body.darkMode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #20212A;
-  border-bottom: 1px solid #31323A;
+  background: #1E1E1E;
+  border-bottom: 1px solid #3E3E3E;
 }
 body.darkMode .footer {
-  background: #20212A;
-  border-top: 1px solid #31323A;
+  background: #1E1E1E;
+  border-top: 1px solid #3E3E3E;
 }
 body.darkMode .header .cmuk-navbar-nav > li > a {
   color: #848589;
@@ -177,7 +180,7 @@ body.darkMode .header .cmuk-navbar-nav > li > a.active {
   color: #FFFFFF;
 }
 body.darkMode .header .cmuk-navbar-nav > li > a.active .icon {
-  fill: #FE4350;
+  fill: #FFC640;
 }
 body.darkMode .cmuk-card-header .icon {
   fill: #848589;
@@ -187,13 +190,13 @@ body.darkMode .financialCard .cmuk-card-header .icon {
   stroke: #848589;
 }
 body.darkMode .cmuk-card-body .uploadDoc {
-  background: #282934;
+  background: #1E1E1E;
 }
 body.darkMode .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
-  background: #282934;
+  background: #1E1E1E;
 }
 body.darkMode .commonList {
-  background: #282934 !important;
+  background: #1E1E1E !important;
   border: none;
   filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
 }
@@ -206,13 +209,13 @@ body.darkMode .financialCardSection,
 body.darkMode .documentItem,
 body.darkMode .cmuk-input,
 body.darkMode .cmuk-panel-scrollable {
-  background: #282934 !important;
+  background: #2C2C2C !important;
 }
 body.darkMode .addBalanceButton {
   border: none !important;
 }
 body.darkMode button, body.darkMode .buttonPrimary, body.darkMode .addBalanceButton {
-  background: #383941;
+  background: #3E3E3E;
   color: #FFFFFF;
 }
 body.darkMode table tr td:not(:first-child),
@@ -229,16 +232,16 @@ body.darkMode .listItemChild .listItemChildValue {
   color: #D0D0D0;
 }
 body.darkMode .financial .cmuk-switcher ul li .ctitle, body.darkMode .financial .financialCard ul li .ctitle, body.darkMode .financial .financial ul li .ctitle {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .financial .cmuk-switcher ul li .wallet .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .receivable .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .payable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .payable .cmuk-comment-meta, body.darkMode .financial .financial ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financial ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financial ul li .payable .cmuk-comment-meta {
   color: #FAFAFA;
 }
 body.darkMode .modal .modalContent {
-  background: #282934 !important;
+  background: #1E1E1E !important;
 }
 body.darkMode .modal .modalContent .closeButton:hover {
-  background: #383941;
+  background: #3E3E3E;
 }
 body.darkMode .switcherCard .cmuk-subnav-pill > .cmuk-active > a, body.darkMode .switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
   color: #FFFFFF;
@@ -248,18 +251,18 @@ body.darkMode .switcherCard .cmuk-subnav-pill > * > a:focus, body.darkMode .swit
 }
 body.darkMode .switcherCard .cmuk-switcher li .commonList .buttonPrimary, body.darkMode .switcherCardSecond .cmuk-switcher li .commonList .buttonPrimary {
   background: transparent;
-  border: 1px solid #E50913;
-  color: #E50913;
+  border: 1px solid #FFC640;
+  color: #FFC640;
   border-radius: 5px;
 }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
   color: #D0D0D0;
 }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .salesQuoteCard .salesQuoteCardRight p {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .salesQuoteCard .salesQuoteCardMiddle {
   border-color: #484951;
@@ -268,13 +271,13 @@ body.darkMode .salesQuoteCard .salesQuoteCardMiddle p {
   color: #D0D0D0;
 }
 body.darkMode .salesQuoteCard .salesQuoteCardMiddle p span {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .timeline:before {
   border-color: #4A4B51;
 }
 body.darkMode .timeline .timeline-item .timeline-icon {
-  background: #383941;
+  background: #3E3E3E;
 }
 body.darkMode hr {
   border-color: #4A4B51;
@@ -284,40 +287,40 @@ body.darkMode .comdex input:-webkit-autofill:hover,
 body.darkMode .comdex input:-webkit-autofill:focus,
 body.darkMode .comdex input:-webkit-autofill:active {
   -webkit-text-fill-color: #D0D0D0;
-  -webkit-box-shadow: 0 0 0 30px #282934 inset;
+  -webkit-box-shadow: 0 0 0 30px #1E1E1E inset;
 }
 body.darkMode .toolTip .toolTipText {
-  background-color: #383941;
-  color: #E50913;
+  background-color: #3E3E3E;
+  color: #FFC640;
 }
 body.darkMode .toolTip .toolTipText:after {
-  border-color: #383941 transparent transparent transparent;
+  border-color: #3E3E3E transparent transparent transparent;
 }
 body.darkMode .cmuk-icon-button, body.darkMode .cmuk-icon-button:hover {
-  background: #383941;
+  background: #3E3E3E;
 }
 body.darkMode .chat .partner {
-  background: #383941;
-  color: #E50913;
+  background: #3E3E3E;
+  color: #FFC640;
 }
 body.darkMode .chat .partner:after {
-  border-color: transparent #383941 #383941 transparent;
+  border-color: transparent #3E3E3E #3E3E3E transparent;
 }
 body.darkMode p {
   color: #D0D0D0;
 }
 body.darkMode .documentItem .documentContentTop a {
-  color: #E50913;
+  color: #FFC640;
 }
 body.darkMode .documentView .documentList .docIcon {
-  background-color: #383941;
+  background-color: #3E3E3E;
   border-color: #4A4B51;
 }
 body.darkMode .documentView .documentList .seenIcon {
-  background-color: #383941;
+  background-color: #3E3E3E;
 }
 body.darkMode .documentView .documentList .table-scroll tbody > * {
-  border-color: #31323A;
+  border-color: #3E3E3E;
 }
 body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
   color: #D0D0D0;
@@ -339,23 +342,23 @@ body.darkMode .commodityImage {
   border: 1.51312px solid #838388;
 }
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
-  border-color: #31323A !important;
+  border-color: #3E3E3E !important;
 }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
-  color: #e50913;
+  color: #FFC640;
 }
 body.darkMode .loginForm .formBody .forgotPassword {
   background: none;
   color: #D0D0D0;
 }
 body.darkMode .tableCard table tr {
-  border-bottom: 1px solid #31323A;
+  border-bottom: 1px solid #3E3E3E;
 }
 body.darkMode .tableCard table tr th {
   color: #D0D0D0;
 }
 body.darkMode .tableCard table tr td {
-  color: #60778F;
+  color: #9D9D9D;
 }
 body.darkMode .cmuk-alert-danger {
   background: #7b4852;
@@ -364,11 +367,11 @@ body.darkMode .block {
   border-color: #e5e5e5;
 }
 body.darkMode .block .full {
-  background-color: #e5e5e5;
+  background-color: #FFC640;
 }
 body.darkMode .searchForm dl .cmuk-search-input {
-  background: #282934;
-  border-color: #31323A;
+  background: #2C2C2C;
+  border-color: #3E3E3E;
   color: #D0D0D0;
 }
 body.darkMode table.dataTable.no-footer {
@@ -385,8 +388,8 @@ body.darkMode body #accountDelegations .cmuk-height-medium {
   padding-top: 0;
 }
 body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]) {
-  background: #282934;
-  border-color: #31323A;
+  background: #1E1E1E;
+  border-color: #3E3E3E;
   color: #D0D0D0;
 }
 body.darkMode .cmuk-alert-success {
@@ -399,36 +402,36 @@ body.darkMode .cmuk-alert-warning {
   background: #63472f !important;
 }
 body.darkMode .cmuk-navbar-dropdown {
-  background: #282934;
+  background: #1E1E1E;
 }
 body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
-  background: #282934;
+  background: #1E1E1E;
 }
 body.darkMode .cmuk-navbar-dropdown-nav > li > a {
   color: #D0D0D0;
 }
 body.darkMode .timeline-content:hover {
-  background: #383941;
+  background: #3E3E3E;
 }
 body.darkMode .notification .notificationTime {
   color: #cccccc;
 }
 body.darkMode .cmuk-card-styles {
   color: #666;
-  border: 1px solid #31323A;
-  background: #282934;
+  border: 1px solid #3E3E3E;
+  background: #1E1E1E;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px;
 }
 
 body.lightMode .buttonPrimary {
-  background: #E50913;
+  background: #FFC640;
 }
 body.lightMode .cmuk-input {
   background: #FFFFFF;
 }
 body.lightMode .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #272931;
+  background: #1E1E1E;
 }
 body.lightMode .header .cmuk-navbar-nav > li > a, body.lightMode .header .cmuk-navbar-nav > li > a.active {
   color: #FFFFFF;
@@ -444,7 +447,7 @@ body.lightMode #tokensStatistics {
   height: 100%;
 }
 body.lightMode .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #272931;
+  background: #1E1E1E;
 }
 body.lightMode .tabSection .cmuk-subnav-pill li a {
   background-color: #FAFBFD;
@@ -527,7 +530,7 @@ body.lightMode .notification .notificationTime {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #e5e5e5;
+  background: #C2C2C2;
   border-right: 1px solid white;
 }
 
@@ -682,12 +685,12 @@ body.lightMode .notification .notificationTime {
 
 .toggleElement {
   text-align: center;
-  background-color: #E50913;
+  background-color: #FFC640;
   color: #FFFFFF;
 }
 
 .showToggleElement {
-  background-color: #E50913;
+  background-color: #FFC640;
   cursor: pointer;
   color: #10292e;
 }
@@ -814,7 +817,7 @@ body.lightMode .notification .notificationTime {
   width: 100%;
   padding: 15px 0;
   font-size: 0.875rem;
-  background: #272931;
+  background: #1E1E1E;
 }
 .footer .copyRight {
   margin: 10px 0;
@@ -831,7 +834,7 @@ body.lightMode .notification .notificationTime {
 .footer .darkModeButton {
   outline: none !important;
   padding: 3px 7px 6px 10px;
-  background: #272931;
+  background: #1E1E1E;
 }
 .footer .darkModeButton .dayMode .icon, .footer .darkModeButton .darkMode .icon {
   width: 16px;
@@ -908,7 +911,7 @@ body.lightMode .notification .notificationTime {
 
 .fileName {
   font-size: 0.875rem;
-  color: #E50913;
+  color: #FFC640;
   margin-bottom: 5px;
 }
 
@@ -1062,14 +1065,14 @@ body.lightMode .notification .notificationTime {
   height: 1.5em;
   display: inline-block;
   margin-right: 0.2em;
-  border: 0.1em solid #272931;
-  -webkit-box-shadow: 1px 1px 3px 0 #272931;
-  -moz-box-shadow: 1px 1px 3px 0 #272931;
-  box-shadow: 1px 1px 3px 0 #272931;
+  border: 0.1em solid #1E1E1E;
+  -webkit-box-shadow: 1px 1px 3px 0 #1E1E1E;
+  -moz-box-shadow: 1px 1px 3px 0 #1E1E1E;
+  box-shadow: 1px 1px 3px 0 #1E1E1E;
   border-radius: 3px;
 }
 .block .full {
-  background-color: #272931;
+  background-color: #1E1E1E;
   height: 100%;
   width: 100%;
 }
@@ -1091,13 +1094,13 @@ body.lightMode .notification .notificationTime {
 }
 .comdex .buttonPrimary {
   border-radius: 0;
-  background: #E50913;
+  background: #FFC640;
   color: #FFFFFF;
   font-size: 0.875rem;
   font-weight: bold;
 }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
-  background-color: #272931;
+  background-color: #1E1E1E;
 }
 .comdex .cmuk-input {
   background: #FFFFFF;
@@ -1116,7 +1119,7 @@ body.lightMode .notification .notificationTime {
 }
 .comdex .cmuk-input:focus {
   color: #272829;
-  border: 1px solid #E50913;
+  border: 1px solid #FFC640;
 }
 .comdex input[type=date] {
   padding: 12px 15px;
@@ -1141,7 +1144,7 @@ body.lightMode .notification .notificationTime {
   background-color: #49A948;
 }
 .comdex .cmuk-badge.rejected {
-  background-color: #FE4350;
+  background-color: #FFC640;
 }
 .comdex .cmuk-badge.pending {
   background-color: #faa05a;
@@ -1209,13 +1212,13 @@ body.lightMode .notification .notificationTime {
   cursor: pointer;
 }
 .comdex .cmuk-button-link {
-  color: #E50913;
+  color: #FFC640;
 }
 .comdex .cmuk-button-link:hover, .comdex .cmuk-button-link:focus {
   text-decoration: none;
 }
 .comdex .cmuk-button-primary {
-  background-color: #E50913;
+  background-color: #FFC640;
 }
 .comdex .cmuk-legend {
   font-weight: bold;
@@ -1292,7 +1295,7 @@ body.lightMode .notification .notificationTime {
 .comdex .close svg {
   border-radius: 50%;
   padding: 2px;
-  background: #FE4350;
+  background: #E50913;
   width: 14px;
 }
 .comdex .close svg > * {
@@ -1333,7 +1336,7 @@ body.lightMode .notification .notificationTime {
   padding: 12px 12px;
 }
 .comdex .cmuk-subnav-pill > .cmuk-active > a {
-  background-color: #e50913;
+  background-color: #FFC640;
 }
 .comdex .validatorList .cmuk-subnav li a {
   padding: 5px 20px;
@@ -1352,9 +1355,9 @@ body.lightMode .notification .notificationTime {
 }
 .comdex .searchForm dl .cmuk-search-input {
   padding: 0 40px 0 10px;
-  background: #282E38;
+  background: #2C2C2C;
   color: #fff;
-  border: 1px solid #282E38;
+  border: 1px solid #2C2C2C;
   border-radius: 0;
   font-weight: 500;
   height: 35px;
@@ -1401,10 +1404,13 @@ body.lightMode .notification .notificationTime {
   display: inline-block;
   margin-right: 5px;
 }
+body.darkMode .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
+  color: #F0F0F0;
+}
 .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
   padding: 16px 12px;
   font-weight: 400;
-  color: #272931;
+  color: #2C2C2C;
 }
 .comdex table.dataTable {
   border-collapse: collapse;
@@ -1443,7 +1449,7 @@ body.lightMode .notification .notificationTime {
   display: none;
 }
 .comdex .cmuk-input:focus, .comdex .cmuk-select:focus, .comdex .cmuk-textarea:focus {
-  border-color: #272931;
+  border-color: #1E1E1E;
 }
 
 .profileDropdown {
@@ -1475,10 +1481,10 @@ body.lightMode .notification .notificationTime {
 }
 
 .header {
-  background: #272931;
+  background: #1E1E1E;
 }
 .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #272931;
+  background: #1E1E1E;
   padding: 0 0 0 35px;
 }
 .header .navItemRippleEffect {
@@ -1501,7 +1507,7 @@ body.lightMode .notification .notificationTime {
   padding: 0 25px;
 }
 .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
-  background-color: #FE4350;
+  background-color: #FFC640;
   font-size: 0.875rem;
   font-family: "Montserrat", sans-serif;
   color: #FFFFFF;
@@ -1554,11 +1560,11 @@ body.lightMode .notification .notificationTime {
 }
 .header .cmuk-navbar-nav > li > a.active {
   color: #FFFFFF;
-  border-bottom: 3px solid #e50913;
+  border-bottom: 3px solid #FFC640;
   padding-top: 3px;
 }
 .header .cmuk-navbar-nav > li > a.active .icon {
-  fill: #e50913;
+  fill: #FFC640;
 }
 .header .logoutIcon .icon {
   width: 20px;
@@ -1748,7 +1754,7 @@ form .formBody {
   height: 25px;
 }
 .signUpForm .showPassword .eyeIcon.active .icon {
-  fill: #FE4350;
+  fill: #FFC640;
 }
 
 .logoutContainer form .formBody {
@@ -1944,7 +1950,7 @@ form .formBody {
   padding: 15px 20px;
   font-size: 1.125rem;
   text-transform: capitalize;
-  color: #E50913;
+  color: #FFC640;
   font-weight: bold;
 }
 .tabSection .cmuk-subnav-pill li a:before {
@@ -1958,7 +1964,7 @@ form .formBody {
   padding-left: 25px;
 }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #272931;
+  background: #1E1E1E;
   color: #FFFFFF;
 }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
@@ -1988,7 +1994,7 @@ form .formBody {
   display: flex;
   justify-content: center;
   border-radius: 50%;
-  color: #272931;
+  color: #1E1E1E;
   font-weight: bold;
 }
 .left .quoteIdTitle {
@@ -2149,7 +2155,7 @@ form .formBody {
   margin-bottom: 3px;
 }
 .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-  color: #E50913;
+  color: #FFC640;
   font-size: 0.875rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -2173,7 +2179,7 @@ form .formBody {
 }
 .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms .infoRowLabel {
   width: 250px;
-  color: #061728;
+  color: #FFC640;
   font-size: 0.875rem;
   font-weight: normal;
   text-transform: uppercase;
@@ -2463,14 +2469,14 @@ form .formBody {
   line-height: normal;
   background: rgba(8, 98, 190, 0.1);
   border-radius: 103px;
-  color: #E50913;
+  color: #FFC640;
   margin: 5px;
   border: 0;
 }
 .leftContainer .addBalanceButton .plusIcon .icon {
   width: 10px;
   height: 10px;
-  fill: #E50913;
+  fill: #FFC640;
 }
 .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon {
   bottom: 2px;
@@ -2641,7 +2647,7 @@ form .formBody {
   margin: 10px;
 }
 .documentItem .documentContentTop a {
-  color: #272931;
+  color: #1E1E1E;
   text-decoration: none;
 }
 .documentItem .documentThumbnail {
@@ -2713,7 +2719,7 @@ header:before,
   border-radius: 50%;
 }
 .timeline .timeline-item .timeline-icon .icon {
-  fill: #E50913;
+  fill: #FFC640;
   width: 15px;
   height: 15px;
 }
@@ -2945,7 +2951,7 @@ header:before,
   font-size: 0.875rem;
 }
 .chat .partner .replytoMessage p {
-  border-left: 2px solid #E50913;
+  border-left: 2px solid #FFC640;
   padding: 0 10px;
 }
 .chat .partner .messageContent {
@@ -2954,7 +2960,7 @@ header:before,
 }
 .chat .partner .messageContent p {
   margin: 0;
-  color: #E50913;
+  color: #FFC640;
   text-align: left;
 }
 .chat .partner p {
@@ -2966,7 +2972,7 @@ header:before,
   padding: 10px;
   border-radius: 10px 10px 0 10px;
   margin: 10px;
-  background: #E50913;
+  background: #FFC640;
   color: #fff;
   position: relative;
 }
@@ -2976,8 +2982,8 @@ header:before,
   bottom: 0;
   content: "";
   border-top: 0.5rem solid transparent;
-  border-bottom: 0.5rem solid #E50913;
-  border-left: 0.5rem solid #E50913;
+  border-bottom: 0.5rem solid #FFC640;
+  border-left: 0.5rem solid #FFC640;
   border-right: 0.5rem solid transparent;
 }
 .chat .you .messageInfo {
@@ -3054,7 +3060,7 @@ header:before,
 }
 .commonList .listItemChild .cmuk-button:hover {
   color: #FFFFFF;
-  background: #E50913;
+  background: #FFC640;
 }
 
 .accountName {
@@ -3121,7 +3127,7 @@ header:before,
 .profileContainer .plusIcon .icon {
   width: 11px;
   height: 11px;
-  fill: #E50913;
+  fill: #FFC640;
 }
 
 .profileDetails .cmuk-button-link {
@@ -3224,7 +3230,7 @@ header:before,
   font-size: 12px;
   visibility: hidden;
   width: 55px;
-  background-color: #E50913;
+  background-color: #FFC640;
   color: #fff;
   text-align: center;
   border-radius: 3px;
@@ -3243,7 +3249,7 @@ header:before,
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #E50913 transparent transparent transparent;
+  border-color: #FFC640 transparent transparent transparent;
 }
 
 .toolTip:hover .toolTipText {
@@ -3348,7 +3354,7 @@ dl .info:after {
   background: none;
   color: #061728;
   font-weight: bold;
-  border-bottom: 2px solid #E50913;
+  border-bottom: 2px solid #FFC640;
 }
 .switcherCard .cmuk-subnav-pill li:not(:last-child) {
   border-right: 1px solid #e7eaf3;
@@ -3384,7 +3390,7 @@ dl .info:after {
   color: #636363;
   font-weight: bold;
   font-size: 0.875rem;
-  border-bottom: 2px solid #E50913;
+  border-bottom: 2px solid #FFC640;
   background: none;
 }
 
@@ -3539,7 +3545,7 @@ figure.zoom img {
 }
 .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
   color: #FFFFFF;
-  background: #E50913;
+  background: #FFC640;
 }
 
 .rippleEffect {
@@ -3580,7 +3586,7 @@ figure.zoom img {
   margin-bottom: 10px;
 }
 .transactionMessages .cmuk-card-body .cmuk-card-header {
-  color: #e50913;
+  color: #FFC640;
 }
 .transactionMessages .cmuk-card-body .cmuk-card-body {
   height: auto !important;

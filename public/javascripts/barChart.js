@@ -10,9 +10,9 @@ function barChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
             {
                 label: label,
                 data: valueList,
-                fillColor: "rgba(229,9,19,1)",
-                borderColor: 'rgba(229,9,19,1)',
-                backgroundColor: 'rgba(229,9,19,1)'
+                fillColor: '#FFC640',
+                borderColor: '#FFC640',
+                backgroundColor: '#FFC640'
             }]
     };
     let ctx = $('#' + chartID);
