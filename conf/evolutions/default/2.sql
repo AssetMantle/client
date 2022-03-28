@@ -139,10 +139,6 @@ ALTER TABLE IF EXISTS MASTER."Account"
 ALTER TABLE IF EXISTS MASTER."Account"
     ADD COLUMN IF NOT EXISTS "iterations" INTEGER;
 
-ALTER TABLE MASTER."Profile"
-    ADD CONSTRAINT Profile_Account_id FOREIGN KEY ("identityID") REFERENCES BLOCKCHAIN."Identity_BC" ("id");
-ALTER TABLE MASTER."Watchlist"
-    ADD CONSTRAINT Watchlist_Account_id FOREIGN KEY ("identityID") REFERENCES BLOCKCHAIN."Identity_BC" ("id");
 ALTER TABLE MASTER."Watchlist"
     ADD CONSTRAINT Watchlist_Watched FOREIGN KEY ("watching") REFERENCES MASTER."Account" ("id");
 
