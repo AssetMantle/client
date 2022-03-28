@@ -1,0 +1,18 @@
+:root {
+    font-family: "Montserrat", sans-serif !important;
+    box-sizing: border-box;
+    --primary-color:#FFC640;
+    --bg-light-primary: #F0F0F0;
+    --bg-light-card: #FAFAFA;
+    --dark-1: #1E1E1E;
+    --dark-2: #2C2C2C;
+    --white-font: #FFFFFF;
+    --lightmode-border: #e7eaf3;
+    --darkmode-color-1: #D0D0D0;
+    --darkmode-color-2: #3E3E3E;
+    --darkmode-color-3: #9D9D9D;
+    --darkmode-icon-fill: #848589;
+    --darkmode-border: #E5E5E5;
+    --font-type-1: "Montserrat", sans-serif;
+    --font-type-2: "Poppins";
+}
