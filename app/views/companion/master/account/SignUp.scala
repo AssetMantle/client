@@ -1,9 +1,9 @@
-package views.companion.master
+package views.companion.master.account
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.mapping
 
-object SignIn {
+object SignUp {
 
   val form: Form[Data] = Form(
     mapping(
@@ -12,7 +12,7 @@ object SignIn {
       constants.FormField.PUBLIC_KEY.name -> constants.FormField.PUBLIC_KEY.field,
       constants.FormField.SIGNATURE.name -> constants.FormField.SIGNATURE.field,
       constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> constants.FormField.PUSH_NOTIFICATION_TOKEN.field
-    )(Data.apply)(Data.unapply))
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpConstraint))
 
   case class Data(username: String, publicKeyType: String, publicKey: String, signature: String, pushNotificationToken: String)
 

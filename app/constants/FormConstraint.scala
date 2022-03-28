@@ -4,6 +4,7 @@ import models.common.DataValue
 import play.api.data.validation._
 import views.companion.blockchain._
 import views.companion.master._
+import views.companion.master.account.{SignUp, UpdateSocialProfile}
 
 object FormConstraint {
   //TODO: Error Response through Messages

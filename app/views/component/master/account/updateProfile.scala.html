@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import views.companion.master.UpdateProfile
+@import views.companion.master.account.UpdateProfile
 @import views.html.base.form._
 
 @(updateProfileForm: Form[UpdateProfile.Data] = UpdateProfile.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)

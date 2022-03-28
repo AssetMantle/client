@@ -1,7 +1,7 @@
-package views.companion.master
+package views.companion.master.contact
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.mapping
 
 object AddOrUpdateMobileNumber {
 

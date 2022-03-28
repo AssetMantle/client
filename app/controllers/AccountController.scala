@@ -13,6 +13,7 @@ import play.api.{Configuration, Logger}
 import transactions.blockchain.{AddKey, ChangePassword, ForgotPassword}
 import utilities.KeyStore
 import views.companion.master._
+import views.companion.master.account.{SignIn, SignOut, SignUp, UpdateProfile, UpdateSocialProfile}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

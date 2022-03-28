@@ -1,4 +1,4 @@
-package views.companion.master
+package views.companion.master.account
 
 import play.api.data.Form
 import play.api.data.Forms.mapping

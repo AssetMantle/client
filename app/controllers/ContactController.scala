@@ -1,5 +1,6 @@
 package controllers
 
+import constants.AppConfig._
 import controllers.actions.WithLoginActionAsync
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -9,8 +10,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import constants.AppConfig._
-import views.companion.master.{AddOrUpdateEmailAddress, AddOrUpdateMobileNumber}
+import views.companion.master.contact._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +41,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateEmailAddress(views.companion.master.AddOrUpdateEmailAddress.form.fill(value = views.companion.master.AddOrUpdateEmailAddress.Data(emailAddress = contact.emailAddress))))
+          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateEmailAddress(AddOrUpdateEmailAddress.form.fill(value = AddOrUpdateEmailAddress.Data(emailAddress = contact.emailAddress))))
           case None => Ok(views.html.component.master.contact.addOrUpdateEmailAddress())
         }
       }).recover {
@@ -92,7 +92,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         contact <- contact
       } yield {
         contact match {
-          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateMobileNumber(views.companion.master.AddOrUpdateMobileNumber.form.fill(value = views.companion.master.AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(1), countryCode = contact.mobileNumber.split("-")(0)))))
+          case Some(contact) => Ok(views.html.component.master.contact.addOrUpdateMobileNumber(AddOrUpdateMobileNumber.form.fill(value = AddOrUpdateMobileNumber.Data(mobileNumber = contact.mobileNumber.split("-")(1), countryCode = contact.mobileNumber.split("-")(0)))))
           case None => Ok(views.html.component.master.contact.addOrUpdateMobileNumber())
         }
       }).recover {
@@ -170,7 +170,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyEmailAddress: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
+      VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.contact.verifyEmailAddress(formWithErrors)))
         },
@@ -210,7 +210,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def verifyMobileNumber: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
     implicit request =>
-      views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
+      VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
           Future(BadRequest(views.html.component.master.contact.verifyMobileNumber(formWithErrors)))
         },

@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-@import views.companion.master.SignOut
+@import views.companion.master.account.SignOut
 @import views.html.base.form._
 
 @(signOutForm: Form[SignOut.Data] = SignOut.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
