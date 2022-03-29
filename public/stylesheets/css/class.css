@@ -1139,7 +1139,7 @@ body.lightMode .notification .notificationTime {
   background-color: #49A948;
 }
 .comdex .cmuk-badge.rejected {
-  background-color: var(--primary-color);
+  background-color: #FE4350;
 }
 .comdex .cmuk-badge.pending {
   background-color: #faa05a;
