@@ -7,13 +7,16 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <metaList charset="utf-8">
-            <metaList http-equiv="x-ua-compatible" content="ie=edge">
-                <metaList name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="@routes.Assets.versioned("images/Favicon.ico")"/>
+        <metaList charset="utf-8"/>
+            <metaList http-equiv="x-ua-compatible" content="ie=edge"/>
+                <metaList name="viewport" content="width=device-width, initial-scale=1"/>
                     <metaList content="@Messages(constants.View.META_DESCRIPTION)"
                     name="description" property="og:description"/>
                     <title>@title | @Messages(constants.View.APP_NAME)</title>
-                    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/Favicon.png")">
+
+
+                    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/theme.css")">
                     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/class.css")">
                     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/fonts.css")">
                     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css/tag.css")">
@@ -21,6 +24,7 @@
                     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
                     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/dataTables.min.css")">
                     <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
+                    <script src="@routes.Assets.versioned("javascripts/theme.js")" type="text/javascript"></script>
                     <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
                     <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
                     <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
@@ -49,18 +53,17 @@
 
                     <style>
                             html {
-                                background: #20212A !important;
+                                background: #1E1E1E !important;
                             }
 
                             body.darkMode, .darkMode .bodyContainer {
-                                background-color: #20212A !important;
+                                background-color: #1E1E1E !important;
                             }
 
                             body.lightMode, .lightMode .bodyContainer {
                                 background-color: #F0F0F0 !important;
                             }
                     </style>
-
                     </head>
 <body class="dark" id="body">
     <div class="bodyContainer comdex">
