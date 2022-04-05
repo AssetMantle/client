@@ -16,12 +16,12 @@ body.darkMode .financialCardSection,
 body.darkMode .documentItem,
 body.darkMode .cmuk-input,
 body.darkMode .cmuk-panel-scrollable, body.darkMode .switcherCard .cmuk-subnav, body.darkMode .switcherCard .cmuk-subnav-pill li:not(:last-child), body.darkMode .switcherCardSecond .cmuk-subnav, body.darkMode .switcherCardSecond .cmuk-subnav-pill li:not(:last-child) {
-  border-color: #31323A !important; }
+  border-color: var(--darkmode-color-2) !important; }
 
 body .block {
   border: 0; }
   body .block .full {
-    background-color: #E50913; }
+    background-color: var(--primary-color); }
 
 body .cmuk-card-body {
   padding: 0px;
@@ -30,9 +30,9 @@ body .cmuk-card-body {
 
 body .cmuk-table td {
   font-size: .875rem;
-  font-family: 'Poppins';
+  font-family: var(--font-type-2);
   font-weight: 400;
-  color: #272931; }
+  color: var(--dark-1); }
 
 #blockList_NEXT,
 #transactionList_NEXT,
@@ -48,9 +48,9 @@ body .cmuk-table td {
   padding: 0 40px 0 10px; }
   .cmuk-navbar-nav.top-nav-dropdown li select {
     padding: 0 20px 0 10px;
-    background: #282E38;
-    color: #fff;
-    border: 1px solid #282E38;
+    background: var(--dark-2);
+    color: var(--white-font);
+    border: 1px solid var(--dark-2);
     border-radius: 0;
     font-weight: 600;
     height: 35px;
@@ -91,65 +91,92 @@ body.darkMode .leftContainer .cmuk-card-body, body.darkMode .leftContainer
 .recentActivityContainer .cmuk-card-body .recentActivityMessages,
 body.darkMode .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer,
 body.darkMode .documentView .documentList, body.darkMode .switcherCard .cmuk-switcher {
-  scrollbar-color: #484951 #20212A;
-  scrollbar-width: thin; }
+  scrollbar-color: #484951 var(--dark-1);
+  scrollbar-width: thin;
+}
+body.darkMode .bodyContainer{
+  background-color: var(--dark-1) !important;
+}
 body.darkMode .banner {
-  border-bottom: 1px solid #31323A;
-  background-color: #20212A; }
+  border-bottom: 1px solid var(--darkmode-color-2);
+  background-color: var(--dark-1);
+}
   body.darkMode .banner .bannerText h3 {
-    color: #D0D0D0; }
+    color: var(--darkmode-color-1);
+  }
 body.darkMode .tabSection .cmuk-subnav-pill li a {
-  background-color: #282934; }
+  background-color: var(--dark-1);
+}
 body.darkMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
-  border-top: 1px solid #31323A;
-  border-bottom: 1px solid #31323A; }
+  border-top: 1px solid var(--darkmode-color-2);
+  border-bottom: 1px solid var(--darkmode-color-2);
+}
 body.darkMode .middle .mainTabs .tradeTerms .traderCommodity .tradeName {
-  color: #ffffff; }
+  color: var(--white-font);
+}
 body.darkMode .middle .mainTabs .tradeTerms .sellerTerm {
-  background: #282934;
+  background: var(--dark-1);
   border: none;
-  filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25)); }
+  filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
+}
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .documentTermName, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIdent {
-    color: #D0D0D0; }
+    color: var(--darkmode-color-1);
+  }
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .termIcon .icon {
-    fill: #848589; }
+    fill: var(--darkmode-icon-fill);
+  }
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowLabel, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowLabel {
-    color: #D0D0D0;
-    font-weight: bold; }
+    color: var(--darkmode-color-1);
+    font-weight: bold;
+  }
   body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .subTerms .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm .infoRowValue, body.darkMode .middle .mainTabs .tradeTerms .sellerTerm p {
-    color: #60778F; }
+    color: var(--darkmode-color-3);
+  }
 body.darkMode .infoRowValue {
-  color: #60778F; }
+  color: var(--darkmode-color-3);
+}
   body.darkMode .infoRowValue p {
-    color: #60778F; }
+    color: var(--darkmode-color-3);
+  }
 body.darkMode ::-webkit-scrollbar-thumb {
   background: rgba(119, 131, 143, 0.5);
-  border: none; }
+  border: none;
+}
 body.darkMode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #20212A;
-  border-bottom: 1px solid #31323A; }
+  background: var(--dark-1);
+  border-bottom: 1px solid var(--darkmode-color-2);
+}
 body.darkMode .footer {
-  background: #20212A;
-  border-top: 1px solid #31323A; }
+  background: var(--dark-1);
+  border-top: 1px solid var(--darkmode-color-2);
+}
 body.darkMode .header .cmuk-navbar-nav > li > a {
-  color: #848589; }
+  color: var(--darkmode-icon-fill);
+}
 body.darkMode .header .icon {
-  fill: #848589; }
+  fill: var(--darkmode-icon-fill);
+}
 body.darkMode .header .cmuk-navbar-nav > li > a.active {
-  color: #FFFFFF; }
+  color: var(--white-font);
+}
   body.darkMode .header .cmuk-navbar-nav > li > a.active .icon {
-    fill: #FE4350; }
+    fill: var(--primary-color);
+  }
 body.darkMode .cmuk-card-header .icon {
-  fill: #848589; }
+  fill: var(--darkmode-icon-fill);
+}
 body.darkMode .financialCard .cmuk-card-header .icon {
   fill: none;
-  stroke: #848589; }
+  stroke: var(--darkmode-icon-fill);
+}
 body.darkMode .cmuk-card-body .uploadDoc {
-  background: #282934; }
+  background: var(--dark-1);
+}
 body.darkMode .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
-  background: #282934; }
+  background: var(--dark-1);
+}
 body.darkMode .commonList {
-  background: #282934 !important;
+  background: var(--dark-1) !important;
   border: none;
   filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25)); }
 body.darkMode .cmuk-card-default {
@@ -160,12 +187,12 @@ body.darkMode .financialCardSection,
 body.darkMode .documentItem,
 body.darkMode .cmuk-input,
 body.darkMode .cmuk-panel-scrollable {
-  background: #282934 !important; }
+  background: var(--dark-2) !important; }
 body.darkMode .addBalanceButton {
   border: none !important; }
 body.darkMode button, body.darkMode .buttonPrimary, body.darkMode .addBalanceButton {
-  background: #383941;
-  color: #FFFFFF; }
+  background: var(--darkmode-color-2);
+  color: var(--white-font); }
 body.darkMode table tr td:not(:first-child),
 body.darkMode h1, body.darkMode h2, body.darkMode h3, body.darkMode h4, body.darkMode h5, body.darkMode h6, body.darkMode .cmuk-switcher li, body.darkMode p,
 body.darkMode .cmuk-legend, body.darkMode label,
@@ -177,110 +204,110 @@ body.darkMode .tableViewCard .infoRow .infoRowLabel,
 body.darkMode .cmuk-input:focus,
 body.darkMode .listItemChild .listItemChildTitle,
 body.darkMode .listItemChild .listItemChildValue {
-  color: #D0D0D0; }
+  color: var(--darkmode-color-1); }
 body.darkMode .financial .cmuk-switcher ul li .ctitle, body.darkMode .financial .financialCard ul li .ctitle, body.darkMode .financial .financial ul li .ctitle {
-  color: #60778F; }
+  color: var(--darkmode-color-3); }
 body.darkMode .financial .cmuk-switcher ul li .wallet .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .receivable .cmuk-comment-meta, body.darkMode .financial .cmuk-switcher ul li .payable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financialCard ul li .payable .cmuk-comment-meta, body.darkMode .financial .financial ul li .wallet .cmuk-comment-meta, body.darkMode .financial .financial ul li .receivable .cmuk-comment-meta, body.darkMode .financial .financial ul li .payable .cmuk-comment-meta {
-  color: #FAFAFA; }
+  color: var(--bg-light-card); }
 body.darkMode .modal
 .modalContent {
-  background: #282934 !important; }
+  background: var(--dark-1) !important; }
   body.darkMode .modal
   .modalContent .closeButton:hover {
-    background: #383941; }
+    background: var(--darkmode-color-2); }
 body.darkMode .switcherCard .cmuk-subnav-pill > .cmuk-active > a, body.darkMode .switcherCardSecond .cmuk-subnav-pill > .cmuk-active > a {
-  color: #FFFFFF; }
+  color: var(--white-font); }
 body.darkMode .switcherCard .cmuk-subnav-pill > * > a:focus, body.darkMode .switcherCard .cmuk-subnav-pill > * > a:hover, body.darkMode .switcherCardSecond .cmuk-subnav-pill > * > a:focus, body.darkMode .switcherCardSecond .cmuk-subnav-pill > * > a:hover {
   background-color: transparent; }
 body.darkMode .switcherCard .cmuk-switcher li .commonList .buttonPrimary, body.darkMode .switcherCardSecond .cmuk-switcher li .commonList .buttonPrimary {
   background: transparent;
-  border: 1px solid #E50913;
-  color: #E50913;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   border-radius: 5px; }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
-  color: #D0D0D0; }
+  color: var(--darkmode-color-1); }
 body.darkMode .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-  color: #60778F; }
+  color: var(--darkmode-color-3); }
 body.darkMode .salesQuoteCard .salesQuoteCardRight p {
-  color: #60778F; }
+  color: var(--darkmode-color-3); }
 body.darkMode .salesQuoteCard .salesQuoteCardMiddle {
   border-color: #484951; }
   body.darkMode .salesQuoteCard .salesQuoteCardMiddle p {
-    color: #D0D0D0; }
+    color: var(--darkmode-color-1); }
     body.darkMode .salesQuoteCard .salesQuoteCardMiddle p span {
-      color: #60778F; }
+      color: var(--darkmode-color-3); }
 body.darkMode .timeline:before {
   border-color: #4A4B51; }
 body.darkMode .timeline .timeline-item .timeline-icon {
-  background: #383941; }
+  background: var(--darkmode-color-2); }
 body.darkMode hr {
   border-color: #4A4B51; }
 body.darkMode .comdex input:-webkit-autofill,
 body.darkMode .comdex input:-webkit-autofill:hover,
 body.darkMode .comdex input:-webkit-autofill:focus,
 body.darkMode .comdex input:-webkit-autofill:active {
-  -webkit-text-fill-color: #D0D0D0;
-  -webkit-box-shadow: 0 0 0 30px #282934 inset; }
+  -webkit-text-fill-color: var(--darkmode-color-1);
+  -webkit-box-shadow: 0 0 0 30px var(--dark-1) inset; }
 body.darkMode .toolTip .toolTipText {
-  background-color: #383941;
-  color: #E50913; }
+  background-color: var(--darkmode-color-2);
+  color: var(--primary-color); }
   body.darkMode .toolTip .toolTipText:after {
-    border-color: #383941 transparent transparent transparent; }
+    border-color: var(--darkmode-color-2) transparent transparent transparent; }
 body.darkMode .cmuk-icon-button, body.darkMode .cmuk-icon-button:hover {
-  background: #383941; }
+  background: var(--darkmode-color-2); }
 body.darkMode .chat .partner {
-  background: #383941;
-  color: #E50913; }
+  background: var(--darkmode-color-2);
+  color: var(--primary-color); }
   body.darkMode .chat .partner:after {
-    border-color: transparent #383941  #383941 transparent; }
+    border-color: transparent var(--darkmode-color-2) var(--darkmode-color-2) transparent; }
 body.darkMode p {
-  color: #D0D0D0; }
+  color: var(--darkmode-color-1); }
 body.darkMode .documentItem .documentContentTop a {
-  color: #E50913; }
+  color: var(--primary-color); }
 body.darkMode .documentView .documentList .docIcon {
-  background-color: #383941;
+  background-color: var(--darkmode-color-2);
   border-color: #4A4B51; }
 body.darkMode .documentView .documentList .seenIcon {
-  background-color: #383941; }
+  background-color: var(--darkmode-color-2); }
 body.darkMode .documentView .documentList .table-scroll tbody > * {
-  border-color: #31323A; }
+  border-color: var(--darkmode-color-2); }
 body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child, body.darkMode .documentView .documentList .table-scroll tbody tr td:first-child a {
-  color: #D0D0D0;
+  color: var(--darkmode-color-1);
   font-weight: 600; }
 body.darkMode .cmuk-button-danger:disabled, body.darkMode .cmuk-button-success {
   background-color: #5cb85c;
-  color: #fff; }
+  color: var(--white-font); }
 body.darkMode .cmuk-button-danger {
   background-color: #f0506e;
-  color: #fff; }
+  color: var(--white-font); }
 body.darkMode .logoutContainer form .formBody .commonCheckBox dl {
   border-color: #4A4B51; }
 body.darkMode .commodityImage {
   background: #838388;
   border: 1.51312px solid #838388; }
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
-  border-color: #31323A !important; }
+  border-color: var(--darkmode-color-2) !important; }
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
-  color: #e50913; }
+  color: var(--primary-color); }
 body.darkMode .loginForm .formBody .forgotPassword {
   background: none;
-  color: #D0D0D0; }
+  color: var(--darkmode-color-1); }
 body.darkMode .tableCard table tr {
-  border-bottom: 1px solid #31323A; }
+  border-bottom: 1px solid var(--darkmode-color-2); }
   body.darkMode .tableCard table tr th {
-    color: #D0D0D0; }
+    color: var(--darkmode-color-1); }
   body.darkMode .tableCard table tr td {
-    color: #60778F; }
+      color: var(--darkmode-color-3); }
 body.darkMode .cmuk-alert-danger {
   background: #7b4852; }
 body.darkMode .block {
-  border-color: #e5e5e5; }
+    border-color: var(--darkmode-border); }
   body.darkMode .block .full {
-    background-color: #e5e5e5; }
+      background-color: var(--primary-color); }
 body.darkMode .searchForm dl .cmuk-search-input {
-  background: #282934;
-  border-color: #31323A;
-  color: #D0D0D0; }
+    background: var(--dark-2);
+    border-color: var(--darkmode-color-2);
+    color: var(--darkmode-color-1); }
 body.darkMode table.dataTable.no-footer {
   border-bottom: 1px solid transparent; }
 body.darkMode table.dataTable tbody tr {
@@ -291,9 +318,9 @@ body.darkMode body .cmuk-card-body .cmuk-height-medium {
 body.darkMode body #accountDelegations .cmuk-height-medium {
   padding-top: 0; }
 body.darkMode .comdex .cardSelectHeader .cmuk-select:not([multiple]):not([size]) {
-  background: #282934;
-  border-color: #31323A;
-  color: #D0D0D0; }
+    background: var(--dark-1);
+    border-color: var(--darkmode-color-2);
+    color: var(--darkmode-color-1); }
 body.darkMode .cmuk-alert-success {
   background-color: #338667; }
 body.darkMode .cmuk-alert-danger {
@@ -301,45 +328,45 @@ body.darkMode .cmuk-alert-danger {
 body.darkMode .cmuk-alert-warning {
   background: #63472f !important; }
 body.darkMode .cmuk-navbar-dropdown {
-  background: #282934; }
+    background: var(--dark-1); }
 body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:focus, body.darkMode .profileDropdown .cmuk-navbar-dropdown-nav > li > a:hover {
-  background: #282934; }
+    background: var(--dark-1); }
 body.darkMode .cmuk-navbar-dropdown-nav > li > a {
-  color: #D0D0D0; }
+    color: var(--darkmode-color-1); }
 body.darkMode .timeline-content:hover {
-  background: #383941; }
+    background: var(--darkmode-color-2); }
 body.darkMode .notification .notificationTime {
   color: #cccccc; }
 body.darkMode .cmuk-card-styles {
   color: #666;
-  border: 1px solid #31323A;
-  background: #282934;
+    border: 1px solid var(--darkmode-color-2);
+    background: var(--dark-1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
 
 body.lightMode .buttonPrimary {
-  background: #E50913; }
+    background: var(--primary-color); }
 body.lightMode .cmuk-input {
-  background: #FFFFFF; }
+    background: var(--white-font); }
 body.lightMode .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-  background: #272931; }
+    background: var(--dark-1); }
 body.lightMode .header .cmuk-navbar-nav > li > a, body.lightMode .header .cmuk-navbar-nav > li > a.active {
-  color: #FFFFFF; }
+    color: var(--white-font); }
 body.lightMode .cmuk-card-styles {
   color: #666;
-  border: 1px solid #e7eaf3;
-  background: #FAFAFA;
+    border: 1px solid var(--lightmode-border);
+    background: var(--bg-light-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 0; }
 body.lightMode #tokensStatistics {
   height: 100%; }
 body.lightMode .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #272931; }
+    background: var(--dark-1); }
 body.lightMode .tabSection .cmuk-subnav-pill li a {
   background-color: #FAFBFD; }
 body.lightMode .tabSection .cmuk-subnav-pill li:nth-child(2) {
-  border-top: 1px solid #e7eaf3;
-  border-bottom: 1px solid #e7eaf3; }
+    border-top: 1px solid var(--lightmode-border);
+    border-bottom: 1px solid var(--lightmode-border); }
 body.lightMode .commodityImage {
   background: #F2F2F2;
   border: 1.51312px solid #E3E3E3; }
@@ -350,10 +377,10 @@ body.lightMode .cmuk-alert-danger {
 body.lightMode .cmuk-alert-warning {
   background: #fff6ee; }
 body.lightMode .cmuk-navbar-dropdown {
-  background: #fff;
+    background: var(--white-font);
   color: #666; }
 body.lightMode .timeline-content:hover {
-  background: #e7eaf3; }
+    background: var(--lightmode-border); }
 body.lightMode .notification .notificationTime {
   color: #2E3239; }
 
@@ -368,7 +395,7 @@ body.lightMode .notification .notificationTime {
 .cmuk-card-styles .cmuk-card-body {
   height: calc(100% - 51px) !important; }
 .cmuk-card-styles .cmuk-card-header {
-  border-bottom: 1px solid #e5e5e5; }
+    border-bottom: 1px solid var(--darkmode-border); }
   .cmuk-card-styles .cmuk-card-header p {
     margin: 0; }
 
@@ -382,7 +409,7 @@ body.lightMode .notification .notificationTime {
   word-break: break-word; }
 
 html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .formBody, .modalInfoBlock, .leftContainer .cmuk-card-body, .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages, .rightContainer .chatRoom .cmuk-card-body .chatMessagesContainer, .documentView .documentList, .switcherCard .cmuk-switcher {
-  scrollbar-color: #e5e5e5 #FFFFFF;
+    scrollbar-color: var(--darkmode-border) var(--white-font);
   scrollbar-width: thin; }
 
 ::-webkit-scrollbar {
@@ -422,7 +449,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1rem; }
 
 .pageContainer .middle .cmuk-card-default, .leftContainer .cmuk-card-default {
-  background: #FAFAFA;
+    background: var(--bg-light-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 3px; }
 
@@ -525,17 +552,17 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .toggleElement {
   text-align: center;
-  background-color: #E50913;
-  color: #FFFFFF; }
+    background-color: var(--primary-color);
+    color: var(--white-font); }
 
 .showToggleElement {
-  background-color: #E50913;
+    background-color: var(--primary-color);
   cursor: pointer;
   color: #10292e; }
 
 .toggleElement:hover {
   cursor: pointer;
-  color: #FFFFFF; }
+    color: var(--white-font); }
 
 .leftText {
   text-align: left;
@@ -632,20 +659,20 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100%;
   padding: 15px 0;
   font-size: 0.875rem;
-  background: #272931; }
+    background: var(--dark-1); }
   .footer .copyRight {
     margin: 10px 0;
     font-weight: bold;
-    color: #ffffff; }
+      color: var(--white-font); }
     .footer .copyRight a {
       text-decoration: none;
-      color: #ffffff; }
+        color: var(--white-font); }
   .footer img {
     width: 120px; }
   .footer .darkModeButton {
     outline: none !important;
     padding: 3px 7px 6px 10px;
-    background: #272931; }
+      background: var(--dark-1); }
     .footer .darkModeButton .dayMode .icon, .footer .darkModeButton .darkMode .icon {
       width: 16px;
       height: 15px; }
@@ -662,7 +689,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   background: #d2edef; }
 
 .backButton {
-  background: #fff;
+    background: var(--white-font);
   padding: 2px 10px;
   border-radius: 4px; }
 
@@ -671,12 +698,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   background: #F9F9F9;
   flex-grow: 1;
   padding: 0;
-  color: #Fff;
+    color: var(--white-font);
   border-radius: 3px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
 
 .cmuk-accordion-buttons {
-  background: #fff;
+    background: var(--white-font);
   padding: 10px; }
 
 .passphraseMessage {
@@ -707,7 +734,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .fileName {
   font-size: 0.875rem;
-  color: #E50913;
+    color: var(--primary-color);
   margin-bottom: 5px; }
 
 .checkboxSection {
@@ -766,7 +793,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1.25rem; }
 
 .blockHeightItem {
-  font-family: "Poppins"; }
+    font-family: var(--font-type-2); }
   .blockHeightItem a {
     color: #1A73B4;
     font-weight: 400; }
@@ -781,7 +808,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: .875rem;
-    font-family: "Poppins"; }
+      font-family: var(--font-type-2); }
 
 .chartContainer {
   height: 260px; }
@@ -802,7 +829,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     font-weight: 500;
     color: #8D9CB5;
     width: auto;
-    font-family: "Poppins"; }
+      font-family: var(--font-type-2); }
   .tableViewCard .infoRow .infoRowLabel, .tableViewCard .infoRow .infoRowValue {
     padding: 7px 20px;
     display: table-cell;
@@ -830,13 +857,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   height: 1.5em;
   display: inline-block;
   margin-right: .2em;
-  border: 0.1em solid #272931;
-  -webkit-box-shadow: 1px 1px 3px 0 #272931;
-  -moz-box-shadow: 1px 1px 3px 0 #272931;
-  box-shadow: 1px 1px 3px 0 #272931;
+    border: 0.1em solid var(--dark-1);
+    -webkit-box-shadow: 1px 1px 3px 0 var(--dark-1);
+    -moz-box-shadow: 1px 1px 3px 0 var(--dark-1);
+    box-shadow: 1px 1px 3px 0 var(--dark-1);
   border-radius: 3px; }
   .block .full {
-    background-color: #272931;
+      background-color: var(--dark-1);
     height: 100%;
     width: 100%; }
 
@@ -877,14 +904,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 100% !important; }
 .comdex .buttonPrimary {
   border-radius: 0;
-  background: #E50913;
-  color: #FFFFFF;
+    background: var(--primary-color);
+    color: var(--white-font);
   font-size: 0.875rem;
   font-weight: bold; }
 .comdex .buttonPrimary:active, .comdex .buttonPrimary.cmuk-active {
-  background-color: #272931; }
+    background-color: var(--dark-1); }
 .comdex .cmuk-input {
-  background: #FFFFFF;
+    background: var(--white-font);
   cursor: auto;
   box-sizing: border-box;
   border-radius: 2px;
@@ -898,7 +925,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     letter-spacing: 0.01em; }
   .comdex .cmuk-input:focus {
     color: #272829;
-    border: 1px solid #E50913; }
+      border: 1px solid var(--primary-color); }
 .comdex input[type=date] {
   padding: 12px 15px; }
 .comdex .cmuk-input, .comdex .cmuk-select:not([multiple]):not([size]) {
@@ -922,9 +949,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-button-primary {
   border: none; }
 .comdex .primaryFont {
-  font-family: "Montserrat", sans-serif; }
+    font-family: var(--font-type-1); }
 .comdex .secondaryFont {
-  font-family: "Montserrat", sans-serif; }
+    font-family: var(--font-type-1); }
 .comdex .cmuk-alert-warning p {
   text-decoration: underline;
   cursor: pointer; }
@@ -947,13 +974,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-weight: bold;
   font-size: 0.875rem; }
 .comdex .cmuk-alert-success {
-  color: #FFFFFF; }
+    color: var(--white-font); }
   .comdex .cmuk-alert-success .successIcon .icon {
-    fill: #FFFFFF; }
+      fill: var(--white-font); }
 .comdex .cmuk-card-header {
   color: #313238;
   font-weight: 600;
-  font-family: "Poppins";
+    font-family: var(--font-type-2);
   padding: 15px 20px; }
   .comdex .cmuk-card-header .cmuk-button {
     margin-left: 15px;
@@ -968,11 +995,11 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   outline: none;
   cursor: pointer; }
 .comdex .cmuk-button-link {
-  color: #E50913; }
+    color: var(--primary-color); }
   .comdex .cmuk-button-link:hover, .comdex .cmuk-button-link:focus {
     text-decoration: none; }
 .comdex .cmuk-button-primary {
-  background-color: #E50913; }
+    background-color: var(--primary-color); }
 .comdex .cmuk-legend {
   font-weight: bold;
   text-align: center;
@@ -981,7 +1008,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 1.125rem; }
 .comdex .cmuk-spinner > * > * {
   stroke-width: 2 !important;
-  stroke: #E50913 !important; }
+    stroke: var(--primary-color) !important; }
 .comdex .cmuk-search-icon > * > * {
   stroke-width: 2 !important; }
 .comdex .cmuk-accordion-title::before {
@@ -992,7 +1019,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   text-transform: capitalize; }
 .comdex .cmuk-table th {
   color: #8D9CB5;
-  font-family: "Poppins";
+    font-family: var(--font-type-2);
   font-weight: 500; }
 .comdex .modalBody .cmuk-button {
   margin-bottom: 5px; }
@@ -1006,7 +1033,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   color: #373E46; }
 .comdex .cmuk-accordion-content {
   margin-top: 0;
-  background: #fff;
+    background: var(--white-font);
   color: #272829;
   padding: 8px; }
 .comdex .cmuk-accordion-title:focus,
@@ -1035,10 +1062,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   width: 14px; }
 .comdex .close svg > * {
   stroke-width: 2 !important;
-  stroke: #ffffff !important; }
+    stroke: var(--white-font) !important; }
 .comdex .check > * > * {
   stroke-width: 2 !important;
-  stroke: #ffffff !important; }
+    stroke: var(--white-font) !important; }
 .comdex [class*=cmuk-modal-close-] {
   top: 20px;
   right: 20px; }
@@ -1061,7 +1088,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .comdex .tableCard table td, .comdex .tableCard table tr {
     padding: 12px 12px; }
 .comdex .cmuk-subnav-pill > .cmuk-active > a {
-  background-color: #e50913; }
+    background-color: var(--primary-color); }
 .comdex .validatorList .cmuk-subnav li a {
   padding: 5px 20px;
   font-size: 1rem;
@@ -1075,9 +1102,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       display: none; }
     .comdex .searchForm dl .cmuk-search-input {
       padding: 0 40px 0 10px;
-      background: #282E38;
-      color: #fff;
-      border: 1px solid #282E38;
+        background: var(--dark-2);
+        color: var(--white-font);
+        border: 1px solid var(--dark-2);
       border-radius: 0;
       font-weight: 500;
       height: 35px;
@@ -1087,7 +1114,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
       color: #5F646C;
       font-weight: 500; }
   .comdex .searchForm .cmuk-search-icon {
-    color: #ffffff; }
+      color: var(--white-font); }
 .comdex .dataTables_wrapper .dataTables_filter {
   width: auto;
   margin-bottom: 15px; }
@@ -1097,10 +1124,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     text-transform: capitalize; }
 .comdex .dataTables_wrapper select, .comdex .dataTables_wrapper input {
   width: 250px;
-  background: #fff;
+    background: var(--white-font);
   height: 30px;
   color: #666;
-  border: 1px solid #e5e5e5;
+    border: 1px solid var(--darkmode-border);
   transition: .2s ease-in-out;
   transition-property: color, background-color, border;
   margin-right: 15px;
@@ -1116,19 +1143,22 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     border-radius: 50%;
     display: inline-block;
     margin-right: 5px; }
+body.darkMode .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
+    color: var(--bg-light-primary);
+}
 .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
   padding: 16px 12px;
   font-weight: 400;
-  color: #272931; }
+    color: var(--dark-2); }
 .comdex table.dataTable {
   border-collapse: collapse; }
 .comdex table.dataTable.no-footer {
-  border-bottom: 1px solid #e5e5e5; }
+  border-bottom: 1px solid var(--darkmode-border); }
 .comdex table.dataTable thead th, .comdex table.cmuk-table thead th, .comdex table.cmuk-table tbody th, .comdex table.dataTable tbody th {
   border-bottom: 0;
   color: #8D9CB5;
   font-weight: 500;
-  font-family: "Poppins";
+  font-family: var(--font-type-2);
   font-size: .875rem; }
 .comdex table.dataTable tfoot th {
   border-top: 0; }
@@ -1148,7 +1178,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   margin-bottom: 10px;
   display: none; }
 .comdex .cmuk-input:focus, .comdex .cmuk-select:focus, .comdex .cmuk-textarea:focus {
-  border-color: #272931; }
+  border-color: var(--dark-1); }
 
 .profileDropdown {
   padding: 10px; }
@@ -1173,9 +1203,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     height: 20px; }
 
 .header {
-  background: #272931; }
+  background: var(--dark-1); }
   .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-    background: #272931;
+    background: var(--dark-1);
     padding: 0 0 0 35px; }
   .header .navItemRippleEffect {
     position: relative;
@@ -1192,10 +1222,10 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .cmuk-navbar-right .cmuk-navbar-nav > li > a {
     padding: 0 25px; }
   .header .cmuk-navbar-right .cmuk-navbar-nav .buttonRegister {
-    background-color: #FE4350;
+    background-color: var(--primary-color);
     font-size: 0.875rem;
-    font-family: "Montserrat", sans-serif;
-    color: #FFFFFF;
+    font-family: var(--font-type-1);
+    color: var(--white-font);
     line-height: inherit;
     padding: 5px 30px;
     border-radius: 3px; }
@@ -1207,7 +1237,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding: 0 18px;
     font-weight: 600;
     font-size: 0.875rem;
-    font-family: "Poppins";
+    font-family: var(--font-type-2);
     letter-spacing: 0.4px; }
   .header .dashboardIcon .icon {
     width: 20px;
@@ -1229,15 +1259,15 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   .header .icon {
     width: 20px;
     height: 20px;
-    fill: #FFFFFF; }
+    fill: var(--white-font); }
   .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
-    color: #FFFFFF; }
+    color: var(--white-font); }
   .header .cmuk-navbar-nav > li > a.active {
-    color: #FFFFFF;
-    border-bottom: 3px solid #e50913;
+    color: var(--white-font);
+    border-bottom: 3px solid var(--primary-color);
     padding-top: 3px; }
     .header .cmuk-navbar-nav > li > a.active .icon {
-      fill: #e50913; }
+      fill: var(--primary-color); }
   .header .logoutIcon .icon {
     width: 20px;
     height: 20px; }
@@ -1269,7 +1299,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     top: 15%;
     border-radius: 3px;
     margin: auto;
-    background-color: #FAFAFA;
+    background-color: var(--bg-light-card);
     box-sizing: border-box;
     position: relative;
     max-width: 100%;
@@ -1389,7 +1419,7 @@ form .formBody {
       width: 25px;
       height: 25px; }
   .signUpForm .showPassword .eyeIcon.active .icon {
-    fill: #FE4350; }
+    fill: var(--primary-color); }
 
 .logoutContainer form .formBody {
   padding: 25px 60px 60px 60px; }
@@ -1400,7 +1430,7 @@ form .formBody {
     justify-content: center; }
     .logoutContainer form .formBody .commonCheckBox dl {
       flex-direction: row-reverse;
-      border: 1px solid #e7eaf3;
+      border: 1px solid var(--lightmode-border);
       padding: 5px 15px; }
       .logoutContainer form .formBody .commonCheckBox dl dt {
         width: auto; }
@@ -1440,7 +1470,7 @@ form .formBody {
       color: #061728;
       text-align: center; }
     .MnemonicQuiz .verifyMnemonic .verifyMnemonicButton .mnemonicField {
-      background-color: #FFffff; }
+      background-color: var(--white-font); }
 .MnemonicQuiz .buttonPrimary {
   font-size: 0.875rem; }
 .MnemonicQuiz .mnemonicNote {
@@ -1448,7 +1478,7 @@ form .formBody {
   text-align: justify;
   word-break: break-word;
   letter-spacing: 0.01em;
-  color: #FFFFFF;
+  color: var(--white-font);
   font-weight: bold;
   padding: 15px;
   margin: 20px 0;
@@ -1489,7 +1519,7 @@ form .formBody {
       margin: 0;
       font-size: 45px;
       font-weight: normal;
-      color: #FFFFFF; }
+      color: var(--white-font); }
     .banner .bannerText p {
       font-size: 1.25rem;
       line-height: 172%;
@@ -1508,7 +1538,7 @@ form .formBody {
         height: 0;
         left: -20px;
         top: 7px;
-        border: 3px solid red;
+        border: 3px solid var(--primary-color);
         transform: rotate(-45deg); }
       .banner .cmuk-slider .cmuk-slider-items li span {
         font-size: 0.875rem;
@@ -1519,8 +1549,8 @@ form .formBody {
         color: #6C7883; }
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemValue {
         font-weight: bold;
-        color: #FFFFFF;
-        font-family: "Montserrat", sans-serif; }
+        color: var(--white-font);
+        font-family: var(--font-type-1); }
       .banner .cmuk-slider .cmuk-slider-items li .sliderItemPercentage {
         color: #5EB55C; }
 
@@ -1535,8 +1565,8 @@ form .formBody {
   .tabSection .cmuk-subnav-pill li:first-child a {
     border-radius: 5px 5px 0 0; }
   .tabSection .cmuk-subnav-pill li:nth-child(2) {
-    border-top: 1px solid #e7eaf3;
-    border-bottom: 1px solid #e7eaf3; }
+    border-top: 1px solid var(--lightmode-border);
+    border-bottom: 1px solid var(--lightmode-border); }
   .tabSection .cmuk-subnav-pill li:last-child a {
     border-radius: 0 0 5px 5px; }
   .tabSection .cmuk-subnav-pill li a {
@@ -1544,7 +1574,7 @@ form .formBody {
     padding: 15px 20px;
     font-size: 1.125rem;
     text-transform: capitalize;
-    color: #E50913;
+    color: var(--primary-color);
     font-weight: bold; }
     .tabSection .cmuk-subnav-pill li a:before {
       content: "";
@@ -1556,8 +1586,8 @@ form .formBody {
       background: url(../../images/chevron-down-blue.svg) no-repeat 50% 50%;
       padding-left: 25px; }
 .tabSection .cmuk-subnav-pill > .cmuk-active > a {
-  background: #272931;
-  color: #FFFFFF; }
+  background: var(--dark-1);
+  color: var(--white-font); }
   .tabSection .cmuk-subnav-pill > .cmuk-active > a:before {
     background-image: url(../../images/chevron-right.svg); }
 .tabSection .cmuk-switcher li {
@@ -1581,7 +1611,7 @@ form .formBody {
     display: flex;
     justify-content: center;
     border-radius: 50%;
-    color: #272931;
+    color: var(--dark-1);
     font-weight: bold; }
   .left .quoteIdTitle {
     color: #6C7883;
@@ -1619,7 +1649,7 @@ form .formBody {
   .right .refresh {
     padding: 5px 10px;
     font-size: 10px;
-    background: #FFFFFF;
+    background: var(--white-font);
     border: 0.908233px solid #EDEDED;
     box-sizing: border-box;
     border-radius: 37.2375px;
@@ -1712,7 +1742,7 @@ form .formBody {
         height: 16px;
         margin-bottom: 3px; }
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termName {
-      color: #E50913;
+      color: var(--primary-color);
       font-size: 0.875rem;
       font-weight: bold;
       text-transform: uppercase;
@@ -1732,7 +1762,7 @@ form .formBody {
         margin: 0 0 5px 0; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .creditTerms .infoRowLabel {
         width: 250px;
-        color: #061728;
+        color: var(--primary-color);
         font-size: 0.875rem;
         font-weight: normal;
         text-transform: uppercase;
@@ -1745,7 +1775,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus {
       display: flex;
       align-items: center;
-      font-family: "Montserrat", sans-serif;
+      font-family: var(--font-type-1);
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .termStatus .commonCheckBox dt {
         width: auto;
@@ -1767,7 +1797,7 @@ form .formBody {
       text-indent: 30px;
       margin-top: 10px; }
       .pageContainer .middle .mainTabs .tradeTerms .terms .term .subTerms .infoRowLabel {
-        color: #061728;
+        color: var(--primary-color);
         font-weight: normal;
         width: auto;
         margin: 2px 0 3px 0; }
@@ -1808,7 +1838,7 @@ form .formBody {
       font-size: 0.875rem;
       margin-left: 20px; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .sellerTermStatus {
-      font-family: "Montserrat", sans-serif;
+      font-family: var(--font-type-1);
       color: #061728; }
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .documentTitle {
       color: #061728;
@@ -1842,7 +1872,7 @@ form .formBody {
     .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus {
       display: flex;
       align-items: center;
-      font-family: "Montserrat", sans-serif;
+      font-family: var(--font-type-1);
       color: #061728; }
       .pageContainer .middle .mainTabs .tradeTerms .sellerTerm .termStatus .commonCheckBox dt {
         width: auto;
@@ -1867,14 +1897,14 @@ form .formBody {
   height: calc(100vh - 70px); }
   .leftContainer .cardContainer {
     height: calc(50% - 20px) !important;
-    background: #FFffff;
+    background: var(--white-font);
     overflow: auto; }
   .leftContainer .tableCard table td, .leftContainer .comdex .tableCard table tr {
     padding: 10px;
     font-size: 0.875rem;
     vertical-align: middle;
     color: #2E3239;
-    font-family: "Poppins";
+    font-family: var(--font-type-2);
     font-weight: 600; }
   .leftContainer .financial {
     margin-bottom: 20px; }
@@ -1950,19 +1980,19 @@ form .formBody {
         background: rgba(94, 181, 92, 0.27); }
   .leftContainer .addBalanceButton {
     text-transform: capitalize;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-type-1);
     padding: 8px 8px;
     font-size: 0.875rem;
     line-height: normal;
     background: rgba(8, 98, 190, 0.1);
     border-radius: 103px;
-    color: #E50913;
+    color: var(--primary-color);
     margin: 5px;
     border: 0; }
     .leftContainer .addBalanceButton .plusIcon .icon {
       width: 10px;
       height: 10px;
-      fill: #E50913; }
+      fill: var(--primary-color); }
   .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon {
     bottom: 2px; }
   .leftContainer .icon {
@@ -1971,7 +2001,7 @@ form .formBody {
   .leftContainer .zoneTradeFinancial .cmuk-card-body {
     padding: 0; }
     .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav {
-      border-bottom: 1px solid #e5e5e5; }
+      border-bottom: 1px solid var(--darkmode-border); }
       .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-subnav li {
         padding: 0;
         flex: 1;
@@ -1987,7 +2017,7 @@ form .formBody {
       color: #061728;
       background: none;
       font-weight: bold;
-      border-bottom: 2px solid #E50913; }
+      border-bottom: 2px solid var(--primary-color); }
     .leftContainer .zoneTradeFinancial .cmuk-card-body .cmuk-switcher {
       height: 300px;
       overflow: auto; }
@@ -2040,7 +2070,7 @@ form .formBody {
         margin: 0; }
       .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input {
         outline: none;
-        border-color: #e5e5e5;
+        border-color: var(--darkmode-border);
         height: 40px;
         padding-right: 30px; }
         .rightContainer .chatRoom .cmuk-card-body .chatForm .sendFormField input::placeholder {
@@ -2056,7 +2086,7 @@ form .formBody {
         width: 17px;
         height: 17px; }
     .rightContainer .chatRoom .cmuk-card-body .chatForm .replyBox {
-      background-color: #FFffff;
+      background-color: var(--white-font);
       position: absolute;
       left: 0;
       right: 0;
@@ -2090,12 +2120,12 @@ form .formBody {
   border: 1px solid #EDEDED;
   border-radius: 5px;
   padding: 0 15px;
-  background: #ffffff; }
+  background: var(--white-font); }
   .documentItem .documentContentTop {
     font-size: 1rem;
     margin: 10px; }
     .documentItem .documentContentTop a {
-      color: #272931;
+      color: var(--dark-1);
       text-decoration: none; }
   .documentItem .documentThumbnail {
     margin: 10px; }
@@ -2155,7 +2185,7 @@ header:before,
       overflow: hidden;
       border-radius: 50%; }
     .timeline .timeline-item .timeline-icon .icon {
-      fill: #E50913;
+      fill: var(--primary-color);
       width: 15px;
       height: 15px; }
     .timeline .timeline-item .timeline-content {
@@ -2170,7 +2200,7 @@ header:before,
         color: #2E3239;
         font-size: 0.875rem;
         font-width: 400;
-        font-family: "Poppins";
+        font-family: var(--font-type-2);
         font-size: 0.875rem; }
     .timeline .timeline-item .timeline-content.right {
       float: right; }
@@ -2200,7 +2230,7 @@ header:before,
   vertical-align: top;
   font-size: 0.875rem; }
 .documentView .documentList .docIcon {
-  background: #FFFFFF;
+  background: var(--white-font);
   border: 0.411524px solid #EAEAEA;
   box-sizing: border-box;
   padding: 5px;
@@ -2242,7 +2272,7 @@ header:before,
 .documentView .cmuk-card-body .cmuk-tab {
   width: 100%;
   margin: 0;
-  border-bottom: 1px solid #e5e5e5; }
+  border-bottom: 1px solid var(--darkmode-border); }
   .documentView .cmuk-card-body .cmuk-tab::before {
     border: none; }
   .documentView .cmuk-card-body .cmuk-tab .first {
@@ -2276,7 +2306,7 @@ header:before,
       width: 100%;
       text-transform: capitalize;
       font-size: 0.875rem;
-      font-family: "Montserrat", sans-serif; }
+      font-family: var(--font-type-1); }
 
 .infoRow {
   line-height: 1.8;
@@ -2293,14 +2323,14 @@ header:before,
     color: #2E3239;
     font-weight: 600;
     height: min-content;
-    font-family: "Poppins"; }
+    font-family: var(--font-type-2); }
 
 .chat {
   padding: 0 10px 0 0; }
   .chat .chatMessage {
     font-size: 0.875rem; }
   .chat .chatName {
-    color: #FFFFFF;
+    color: var(--white-font);
     background: #193759;
     display: inline-flex;
     height: 26px;
@@ -2341,14 +2371,14 @@ header:before,
       color: #848A91;
       font-size: 0.875rem; }
     .chat .partner .replytoMessage p {
-      border-left: 2px solid #E50913;
+      border-left: 2px solid var(--primary-color);
       padding: 0 10px; }
     .chat .partner .messageContent {
       color: #061728;
       font-size: 0.875rem; }
       .chat .partner .messageContent p {
         margin: 0;
-        color: #E50913;
+        color: var(--primary-color);
         text-align: left; }
     .chat .partner p {
       word-break: break-word;
@@ -2358,8 +2388,8 @@ header:before,
     padding: 10px;
     border-radius: 10px 10px 0 10px;
     margin: 10px;
-    background: #E50913;
-    color: #fff;
+    background: var(--primary-color);
+    color: var(--white-font);
     position: relative; }
     .chat .you::after {
       position: absolute;
@@ -2367,8 +2397,8 @@ header:before,
       bottom: 0;
       content: "";
       border-top: .5rem solid transparent;
-      border-bottom: 0.5rem solid #E50913;
-      border-left: 0.5rem solid #E50913;
+      border-bottom: 0.5rem solid var(--primary-color);
+      border-left: 0.5rem solid var(--primary-color);
       border-right: .5rem solid transparent; }
     .chat .you .messageInfo {
       color: #6CA8E7;
@@ -2377,7 +2407,7 @@ header:before,
       border-left: 2px solid #6CA8E7;
       padding: 0 10px; }
     .chat .you .messageContent {
-      color: #FFFFFF;
+      color: var(--white-font);
       font-size: 0.875rem; }
       .chat .you .messageContent p {
         margin: 0;
@@ -2397,7 +2427,7 @@ header:before,
   position: relative;
   display: flex;
   justify-content: space-between;
-  background: #FFFFFF;
+  background: var(--white-font);
   border: 1px solid rgba(5, 60, 117, 0.12);
   border-radius: 2px;
   margin-bottom: 5px;
@@ -2425,18 +2455,18 @@ header:before,
       margin-bottom: 0; }
     .commonList .listItemChild button a, .commonList .listItemChild button a:hover {
       text-decoration: none;
-      color: #fff; }
+      color: var(--white-font); }
     .commonList .listItemChild .cmuk-button {
       line-height: 28px; }
       .commonList .listItemChild .cmuk-button:hover {
-        color: #FFFFFF;
-        background: #E50913; }
+        color: var(--white-font);
+        background: var(--primary-color); }
 
 .accountName {
   position: absolute;
   top: 0;
   left: 0;
-  color: #FFFFFF;
+  color: var(--white-font);
   margin: 0;
   width: 0;
   height: 0;
@@ -2473,7 +2503,7 @@ header:before,
   text-align: right; }
 .profileContainer .cmuk-card-body .cmuk-card {
   box-shadow: none;
-  background-color: #FFFFFF;
+  background-color: var(--white-font);
   border: 1px solid rgba(5, 60, 117, 0.12);
   margin-bottom: 5px; }
 .profileContainer .icon {
@@ -2484,7 +2514,7 @@ header:before,
 .profileContainer .plusIcon .icon {
   width: 11px;
   height: 11px;
-  fill: #E50913; }
+  fill: var(--primary-color); }
 
 .profileDetails .cmuk-button-link {
   margin-bottom: 5px; }
@@ -2537,7 +2567,7 @@ header:before,
     .contactDetails .cmuk-card-body .cmuk-card .cmuk-card-body {
       padding: 10px 20px;
       border-radius: 5px;
-      background-color: #FFFFFF; }
+      background-color: var(--white-font); }
 
 .cmuk-card-body.validatorList {
   padding-right: 20px; }
@@ -2563,8 +2593,8 @@ header:before,
     font-size: 12px;
     visibility: hidden;
     width: 55px;
-    background-color: #E50913;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: var(--white-font);
     text-align: center;
     border-radius: 3px;
     position: absolute;
@@ -2581,7 +2611,7 @@ header:before,
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
-      border-color: #E50913 transparent transparent transparent; }
+      border-color: var(--primary-color) transparent transparent transparent; }
 
 .toolTip:hover .toolTipText {
   visibility: visible;
@@ -2639,7 +2669,7 @@ dl .info {
   .tradeList .cmuk-card-body .cmuk-card .cmuk-card-body {
     padding: 20px; }
 .tradeList .cmuk-card-body button a {
-  color: #FFFFFF; }
+  color: var(--white-font); }
 
 .switcherCard {
   margin-bottom: 20px; }
@@ -2652,7 +2682,7 @@ dl .info {
   .switcherCard .cmuk-subnav {
     margin: 0;
     justify-content: center;
-    border-bottom: 1px solid #e7eaf3; }
+    border-bottom: 1px solid var(--lightmode-border); }
     .switcherCard .cmuk-subnav li {
       text-align: center;
       padding: 0;
@@ -2663,9 +2693,9 @@ dl .info {
     background: none;
     color: #061728;
     font-weight: bold;
-    border-bottom: 2px solid #E50913; }
+    border-bottom: 2px solid var(--primary-color); }
   .switcherCard .cmuk-subnav-pill li:not(:last-child) {
-    border-right: 1px solid #e7eaf3; }
+    border-right: 1px solid var(--lightmode-border); }
   .switcherCard .cmuk-subnav-pill > * > :first-child {
     padding: 10px 10px;
     color: #999;
@@ -2677,7 +2707,7 @@ dl .info {
 
 .switcherCardSecond .cmuk-subnav {
   margin: 0;
-  border-bottom: 1px solid #e5e5e5; }
+  border-bottom: 1px solid var(--darkmode-border); }
   .switcherCardSecond .cmuk-subnav li {
     text-align: center;
     padding: 0; }
@@ -2691,7 +2721,7 @@ dl .info {
   color: #636363;
   font-weight: bold;
   font-size: 0.875rem;
-  border-bottom: 2px solid #E50913;
+  border-bottom: 2px solid var(--primary-color);
   background: none; }
 
 .traderRelationList .cmuk-card-header {
@@ -2700,7 +2730,7 @@ dl .info {
 .cmuk-panel {
   padding: 0;
   margin-bottom: 10px;
-  background: #FFFFFF;
+  background: var(--white-font);
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(5, 60, 117, 0.22);
@@ -2711,7 +2741,7 @@ dl .info {
     text-align: left;
     cursor: pointer;
     padding: 10px;
-    background: #e7eaf3; }
+    background: var(--lightmode-border); }
 
 figure.zoom {
   background-position: 50% 50%;
@@ -2754,9 +2784,9 @@ figure.zoom {
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetTitle {
       text-transform: uppercase; }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetQuantity {
-      font-family: "Montserrat", sans-serif; }
+      font-family: var(--font-type-1); }
     .salesQuoteCard .salesQuoteCardLeft .assetInitialData .assetPrice {
-      font-family: "Montserrat", sans-serif;
+      font-family: var(--font-type-1);
       color: #254364; }
   .salesQuoteCard .salesQuoteCardLeft .salesQuoteCategory {
     width: 30px;
@@ -2799,7 +2829,7 @@ figure.zoom {
         height: 25px; }
     .salesQuoteCard .salesQuoteCardMiddle p .lines {
       letter-spacing: 1px;
-      color: #D0D0D0; }
+      color: var(--darkmode-color-1); }
   .salesQuoteCard .salesQuoteCardMiddle .organizationName {
     color: #4B4B4B;
     font-weight: bold;
@@ -2815,8 +2845,8 @@ figure.zoom {
   .salesQuoteCard .salesQuoteCardRight .cmuk-button {
     line-height: 38px; }
     .salesQuoteCard .salesQuoteCardRight .cmuk-button:hover {
-      color: #FFFFFF;
-      background: #E50913; }
+      color: var(--white-font);
+      background: var(--primary-color); }
 
 .rippleEffect {
   position: absolute;
@@ -2846,7 +2876,7 @@ figure.zoom {
   .transactionMessages .cmuk-card-body .cmuk-card {
     margin-bottom: 10px; }
   .transactionMessages .cmuk-card-body .cmuk-card-header {
-    color: #e50913; }
+    color: var(--primary-color); }
   .transactionMessages .cmuk-card-body .cmuk-card-body {
     height: auto !important; }
     .transactionMessages .cmuk-card-body .cmuk-card-body .cmuk-card-body .title {
