@@ -18,9 +18,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val chainID = configuration.get[String]("blockchain.chainID")
 
@@ -28,7 +26,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val path2 = "/transfers"
 
-  private val url = ip + ":" + port + "/" + path1
+  private val url = restURL + "/" + path1
 
   case class Amount(denom: String, amount: MicroNumber)
 

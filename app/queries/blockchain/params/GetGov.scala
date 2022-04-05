@@ -16,9 +16,7 @@ class GetGov @Inject()()(implicit wsClient: WSClient, configuration: Configurati
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val ip = configuration.get[String]("blockchain.ip")
-
-  private val port = configuration.get[String]("blockchain.restPort")
+  private val restURL = configuration.get[String]("blockchain.restURL")
 
   private val path1 = "gov/parameters/voting"
 
@@ -26,11 +24,11 @@ class GetGov @Inject()()(implicit wsClient: WSClient, configuration: Configurati
 
   private val path3 = "gov/parameters/tallying"
 
-  private val url1 = ip + ":" + port + "/" + path1
+  private val url1 = restURL + "/" + path1
 
-  private val url2 = ip + ":" + port + "/" + path2
+  private val url2 = restURL + "/" + path2
 
-  private val url3 = ip + ":" + port + "/" + path3
+  private val url3 = restURL + "/" + path3
 
   private def votingAction(): Future[VotingResponse] = utilities.JSON.getResponseFromJson[VotingResponse](wsClient.url(url1).get)
 

@@ -8,11 +8,9 @@
             <map>
                 <entry key="ASCENDEX_URL" value="https://ascendex.com/api/pro/v1"/>
                 <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org"/>
-                <entry key="BLOCKCHAIN_ABCI_PORT" value="26657"/>
-                <entry key="BLOCKCHAIN_HOST" value="127.0.0.1"/>
-                <entry key="BLOCKCHAIN_REST_PORT" value="1317"/>
-                <entry key="CHAIN_ID" value="test"/>
-                <entry key="COMDEX_URL" value="http://localhost:9000"/>
+                <entry key="BLOCKCHAIN_RPC_URL" value="https://api.testnet.assetmantle.one/rpc"/>
+                <entry key="BLOCKCHAIN_REST_URL" value="https://api.testnet.assetmantle.one/rest"/>
+                <entry key="CHAIN_ID" value="test-mantle-1"/>
                 <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi"/>
                 <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token"/>
                 <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.assetNode/config/genesis.json"/>
@@ -27,7 +25,7 @@
                 <entry key="POSTGRES_PASSWORD" value="persistence"/>
                 <entry key="POSTGRES_USER" value="persistence"/>
                 <entry key="ROOT_FILE_PATH" value="$USER_HOME$/"/>
-                <entry key="STAKING_DENOM" value="stake"/>
+                <entry key="STAKING_DENOM" value="umantle"/>
                 <entry key="TRULIOO_URL" value="https://api.globalgateway.io"/>
                 <entry key="WEB_APP_URL" value="http://localhost:9000"/>
             </map>
