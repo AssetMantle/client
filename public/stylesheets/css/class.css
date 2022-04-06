@@ -1,7 +1,3 @@
-:root {
-  font-family: 'Montserrat', sans-serif !important;
-  box-sizing: border-box; }
-
 *,
 ::after,
 ::before {
@@ -766,7 +762,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
   font-size: 0.875rem;
   background: #e6e6e6;
   width: 220px;
-  color: red; }
+  color: var(--error-color); }
 
 .commonCheckBox dt {
   width: 200px;
@@ -1040,7 +1036,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .comdex .cmuk-accordion-title:hover {
   color: #373E46; }
 .comdex .errorInput {
-  border: 1px solid red; }
+  border: 1px solid var(--error-color); }
 .comdex .cmuk-panel-scrollable {
   resize: none;
   max-height: 100px;
@@ -1454,7 +1450,7 @@ form .formBody {
   font-weight: bold; }
 .MnemonicQuiz .errorMnemonicInput {
   display: none;
-  color: red;
+  color: var(--error-color);
   padding: 10px;
   font-size: 0.875rem; }
 .MnemonicQuiz .verifyMnemonic {
@@ -1499,12 +1495,12 @@ form .formBody {
   .MnemonicQuiz .infoSuccess .icon-success .icon {
     width: 25px;
     height: 25px;
-    fill: #0F9C0C;
+    fill: var(--success-color);
     margin-bottom: 5px; }
   .MnemonicQuiz .infoSuccess p {
     margin: 0;
     font-size: 1.25rem;
-    color: #0F9C0C; }
+    color: var(--success-color); }
 
 .banner {
   background: #031221 url("../../images/bannerImage.svg") no-repeat 80% 8%;
