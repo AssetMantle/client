@@ -1,7 +1,7 @@
 function checkAndPushState(route, parameter, functionName) {
     if (addState === true) {
         if (route === "" && parameter === "") {
-            window.history.pushState(functionName, "persistence", "/");
+            window.history.pushState(functionName, "assetMantle", "/");
         } else {
             let address = "";
             if (parameter !== "") {
@@ -9,7 +9,7 @@ function checkAndPushState(route, parameter, functionName) {
             } else {
                 address = "/" + route.split('/')[1]
             }
-            window.history.pushState(functionName, "persistence", address);
+            window.history.pushState(functionName, "assetMantle", address);
         }
     } else {
         addState = true
