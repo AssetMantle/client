@@ -2,7 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import play.api.Logger
-import utilities.KeyGenerator.BouncyHash
+import utilities.WalletGenerator.BouncyHash
 
 import java.security.MessageDigest
 import java.util.Base64
