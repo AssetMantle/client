@@ -48,7 +48,7 @@ object WalletGenerator {
     )
   }
 
-  def getKey(mnemonics: Seq[String], hdPath: ImmutableList[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Wallet = {
+  def getWallet(mnemonics: Seq[String], hdPath: ImmutableList[ChildNumber] = constants.Blockchain.DefaultHDPath, bip39Passphrase: Option[String] = None): Wallet = {
     val words = mnemonics.mkString(" ")
     if (Bip39.validate(words)) {
       val bitcoinWallet = bitcoinjWallet.fromSeed(
@@ -65,5 +65,7 @@ object WalletGenerator {
       }
     } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
   }
+
+  def getRandomWallet: Wallet = getWallet(Bip39.creatRandomMnemonics())
 
 }

@@ -1,7 +1,6 @@
 package models.common
 
 import models.common.Serializable.{Data, Immutables, Mutables}
-import utilities.Hash
 
 object ID {
 
@@ -18,7 +17,7 @@ object ID {
       ClassificationID(chainID = chainID, hashID = hashID)
     }
 
-    def apply(chainID: String, immutables: Immutables, mutables: Mutables): ClassificationID = ClassificationID(chainID = chainID, hashID = Hash.getHash(Hash.getHash(immutables.properties.propertyList.map(_.id): _*), Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID))
+    def apply(chainID: String, immutables: Immutables, mutables: Mutables): ClassificationID = ClassificationID(chainID = chainID, hashID = utilities.Secrets.getBlockchainHash(utilities.Secrets.getBlockchainHash(immutables.properties.propertyList.map(_.id): _*), utilities.Secrets.getBlockchainHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID))
 
   }
 
