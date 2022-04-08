@@ -1,6 +1,5 @@
 package models.common
 
-import constants.Blockchain.IBCDenoms
 import exceptions.BaseException
 import models.Abstract.DataValue
 import models.common.DataValue._
@@ -52,9 +51,13 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    def ibcDenom: String = IBCDenoms.find(_.hash == denom).fold(denom)(_.name)
+    def isIBCDenom: Boolean = denom.startsWith("ibc/") && denom.length == 68
 
-    def normalizeDenom: String = if (ibcDenom(0) == 'u') ibcDenom.split("u")(1).toUpperCase() else ibcDenom.toUpperCase()
+    def ibcDenomName: String = constants.Blockchain.IBCDenoms.find(_.hash == denom).fold(denom)(_.name)
+
+    def normalizeDenom: String = if (!isIBCDenom) denom.split("u")(1).toUpperCase()
+    else if (ibcDenomName(0) == 'u') ibcDenomName.split("u")(1).toUpperCase()
+    else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 
@@ -211,7 +214,7 @@ object Serializable {
   implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
 
   case class Immutables(properties: Properties) {
-    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.hash): _*)
+    def getHashID: String = utilities.Secrets.getBlockchainHash(properties.propertyList.map(_.fact.hash): _*)
   }
 
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]

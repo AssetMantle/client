@@ -82,6 +82,6 @@ object Bip39 {
   //Generates 24 words mnemonic
   case object Entropy256 extends Entropy(256)
 
-  def getMnemonics(entropy: Entropy = Entropy256): Seq[String] = generate(entropy, constants.Bip39.EnglishWordList, new SecureRandom()).split(" ")
+  def creatRandomMnemonics(entropy: Entropy = Entropy256): Seq[String] = generate(entropy, constants.Bip39.EnglishWordList, new SecureRandom()).split(" ")
 
 }
