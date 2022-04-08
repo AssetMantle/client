@@ -8,12 +8,11 @@ object SignUp {
   val form: Form[Data] = Form(
     mapping(
       constants.FormField.USERNAME.name -> constants.FormField.USERNAME.field,
-      constants.FormField.PUBLIC_KEY_TYPE.name -> constants.FormField.PUBLIC_KEY_TYPE.field,
-      constants.FormField.PUBLIC_KEY.name -> constants.FormField.PUBLIC_KEY.field,
-      constants.FormField.SIGNATURE.name -> constants.FormField.SIGNATURE.field,
-      constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> constants.FormField.PUSH_NOTIFICATION_TOKEN.field
+      constants.FormField.USERNAME_AVAILABLE.name -> constants.FormField.USERNAME_AVAILABLE.field,
+      constants.FormField.SIGNUP_PASSWORD.name -> constants.FormField.SIGNUP_PASSWORD.field,
+      constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field,
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpConstraint))
 
-  case class Data(username: String, publicKeyType: String, publicKey: String, signature: String, pushNotificationToken: String)
+  case class Data(username: String, usernameAvailable: Boolean, password: String, confirmPassword: String)
 
 }

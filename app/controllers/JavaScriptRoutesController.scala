@@ -21,6 +21,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.AccountController.signUpForm,
           routes.javascript.AccountController.signInForm,
           routes.javascript.AccountController.signOutForm,
+          routes.javascript.AccountController.changePasswordForm,
+          routes.javascript.AccountController.forgotPasswordForm,
           routes.javascript.AccountController.checkUsernameAvailable,
           routes.javascript.AccountController.updateProfileForm,
           routes.javascript.AccountController.updateSocialProfileForm,

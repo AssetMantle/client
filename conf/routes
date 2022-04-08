@@ -53,6 +53,12 @@ POST        /account/signIn                                controllers.AccountCo
 GET         /account/signOut                               controllers.AccountController.signOutForm
 POST        /account/signOut                               controllers.AccountController.signOut
 
+GET         /account/changePassword                        controllers.AccountController.changePasswordForm
+POST        /account/changePassword                        controllers.AccountController.changePassword
+
+GET         /account/forgotPassword                        controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                        controllers.AccountController.forgotPassword
+
 GET         /account/checkUsernameAvailable                controllers.AccountController.checkUsernameAvailable(username: String)
 
 GET         /account/updateProfile                         controllers.AccountController.updateProfileForm

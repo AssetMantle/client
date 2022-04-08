@@ -62,7 +62,7 @@ class IdentityController @Inject()(
           Future(BadRequest(blockchainForms.identityNub(formWithErrors)))
         },
         nubData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = nubData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = nubData.password)
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityNub, transactionsIdentityNub.Request](
@@ -80,7 +80,7 @@ class IdentityController @Inject()(
           } else Future(BadRequest(blockchainForms.identityNub(blockchainCompanion.IdentityNub.form.fill(nubData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
@@ -110,7 +110,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = defineData.password.getOrElse(""))
 
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -134,7 +134,7 @@ class IdentityController @Inject()(
             } else Future(BadRequest(blockchainForms.identityDefine(blockchainCompanion.IdentityDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -187,7 +187,7 @@ class IdentityController @Inject()(
               numMutableMetaForms = getNumberOfFields(issueData.addMutableMetaField, issueData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(issueData.addMutableField, issueData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = issueData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = issueData.password.getOrElse(""))
             val immutableMetas = issueData.immutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = issueData.immutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val mutableMetas = issueData.mutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -210,7 +210,7 @@ class IdentityController @Inject()(
             } else Future(BadRequest(blockchainForms.identityIssue(blockchainCompanion.IdentityIssue.form.fill(issueData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), issueData.classificationID)))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -234,7 +234,7 @@ class IdentityController @Inject()(
           Future(BadRequest(blockchainForms.identityProvision(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.IDENTITY_ID.name, ""))))
         },
         provisionData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = provisionData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = provisionData.password)
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityProvision, transactionsIdentityProvision.Request](
@@ -253,7 +253,7 @@ class IdentityController @Inject()(
           } else Future(BadRequest(blockchainForms.identityProvision(blockchainCompanion.IdentityProvision.form.fill(provisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), provisionData.identityID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
@@ -275,7 +275,7 @@ class IdentityController @Inject()(
           Future(BadRequest(blockchainForms.identityUnprovision(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.IDENTITY_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.TO.name, ""))))
         },
         unprovisionData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unprovisionData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = unprovisionData.password)
 
           def broadcastTxAndGetResult(verifyPassword: Boolean) = if (verifyPassword) {
             val broadcastTx = transaction.process[blockchainTransaction.IdentityUnprovision, transactionsIdentityUnprovision.Request](
@@ -294,7 +294,7 @@ class IdentityController @Inject()(
           } else Future(BadRequest(blockchainForms.identityUnprovision(blockchainCompanion.IdentityUnprovision.form.fill(unprovisionData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unprovisionData.identityID, unprovisionData.to)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {

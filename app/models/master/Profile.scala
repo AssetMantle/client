@@ -14,7 +14,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Profile(identityID: String, name: String, description: String, socialProfiles: Seq[SocialProfile], verified: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Profile(accountID: String, name: String, description: String, socialProfiles: Seq[SocialProfile], verified: Boolean = false, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Profiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -31,11 +31,11 @@ class Profiles @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val profileTable = TableQuery[ProfileTable]
 
-  case class ProfileSerialized(identityID: String, name: String, description: String, socialProfiles: String, verified: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Profile = Profile(identityID = identityID, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), verified = verified, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ProfileSerialized(accountID: String, name: String, description: String, socialProfiles: String, verified: Boolean, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Profile = Profile(accountID = accountID, name = name, description = description, socialProfiles = utilities.JSON.convertJsonStringToObject[Seq[SocialProfile]](socialProfiles), verified = verified, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(profile: Profile): ProfileSerialized = ProfileSerialized(identityID = profile.identityID, name = profile.name, description = profile.description, socialProfiles = Json.toJson(profile.socialProfiles).toString, verified = profile.verified, createdBy = profile.createdBy, createdOn = profile.createdOn, createdOnTimeZone = profile.createdOnTimeZone, updatedBy = profile.updatedBy, updatedOn = profile.updatedOn, updatedOnTimeZone = profile.updatedOnTimeZone)
+  def serialize(profile: Profile): ProfileSerialized = ProfileSerialized(accountID = profile.accountID, name = profile.name, description = profile.description, socialProfiles = Json.toJson(profile.socialProfiles).toString, verified = profile.verified, createdBy = profile.createdBy, createdOn = profile.createdOn, createdOnTimeZone = profile.createdOnTimeZone, updatedBy = profile.updatedBy, updatedOn = profile.updatedOn, updatedOnTimeZone = profile.updatedOnTimeZone)
 
   private def add(profile: Profile): Future[String] = db.run((profileTable returning profileTable.map(_.name) += serialize(profile)).asTry).map {
     case Success(result) => result
@@ -51,9 +51,9 @@ class Profiles @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getByID(identityID: String): Future[Option[ProfileSerialized]] = db.run(profileTable.filter(_.identityID === identityID).result.headOption)
+  private def getByID(accountID: String): Future[Option[ProfileSerialized]] = db.run(profileTable.filter(_.accountID === accountID).result.headOption)
 
-  private def tryGetByID(identityID: String): Future[ProfileSerialized] = db.run(profileTable.filter(_.identityID === identityID).result.head.asTry).map {
+  private def tryGetByID(accountID: String): Future[ProfileSerialized] = db.run(profileTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.PROFILE_NOT_FOUND, noSuchElementException)
@@ -62,9 +62,9 @@ class Profiles @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class ProfileTable(tag: Tag) extends Table[ProfileSerialized](tag, "Profile") {
 
-    def * = (identityID, name, description, socialProfiles, verified, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProfileSerialized.tupled, ProfileSerialized.unapply)
+    def * = (accountID, name, description, socialProfiles, verified, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProfileSerialized.tupled, ProfileSerialized.unapply)
 
-    def identityID = column[String]("identityID", O.PrimaryKey)
+    def accountID = column[String]("accountID", O.PrimaryKey)
 
     def name = column[String]("name")
 
@@ -90,9 +90,9 @@ class Profiles @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def get(identityID: String): Future[Option[Profile]] = getByID(identityID).map(_.map(_.deserialize))
+    def get(accountID: String): Future[Option[Profile]] = getByID(accountID).map(_.map(_.deserialize))
 
-    def create(identityID: String, name: String, description: String, socialProfiles: Seq[SocialProfile]): Future[String] = add(Profile(identityID = identityID, name = name, description = description, socialProfiles = socialProfiles))
+    def create(accountID: String, name: String, description: String, socialProfiles: Seq[SocialProfile]): Future[String] = add(Profile(accountID = accountID, name = name, description = description, socialProfiles = socialProfiles))
 
     def insertOrUpdate(profile: Profile): Future[Int] = upsert(profile)
 

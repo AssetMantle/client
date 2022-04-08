@@ -16,6 +16,8 @@ object Form {
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp, routes.javascript.AccountController.signUpForm)
   val SIGN_IN = new Form("SIGN_IN", routes.AccountController.signIn, routes.javascript.AccountController.signInForm)
   val SIGN_OUT = new Form("SIGN_OUT", routes.AccountController.signOut, routes.javascript.AccountController.signOutForm)
+  val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword, routes.javascript.AccountController.changePasswordForm)
+  val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword, routes.javascript.AccountController.forgotPasswordForm)
   val UPDATE_PROFILE = new Form("UPDATE_PROFILE", routes.AccountController.updateProfile, routes.javascript.AccountController.updateProfileForm)
   val UPDATE_SOCIAL_PROFILE = new Form("UPDATE_SOCIAL_PROFILE", routes.AccountController.updateSocialProfile, routes.javascript.AccountController.updateSocialProfileForm)
 

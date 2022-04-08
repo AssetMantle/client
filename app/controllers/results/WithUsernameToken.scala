@@ -17,8 +17,7 @@ class WithUsernameToken @Inject()(masterTransactionSessionTokens: masterTransact
       newToken <- newToken
     } yield Results.Ok(content).withSession(request.session
       - Security.TOKEN + (Security.TOKEN -> newToken)
-      - Security.USERNAME + (Security.USERNAME -> loginState.username)
-      - Security.IDENTITY_ID + (Security.IDENTITY_ID -> loginState.identityID))
+      - Security.USERNAME + (Security.USERNAME -> loginState.username))
   }
 
   def PartialContent[C](content: C)(implicit request: RequestHeader, writeable: Writeable[C], loginState: LoginState): Future[Result] = {
@@ -27,7 +26,6 @@ class WithUsernameToken @Inject()(masterTransactionSessionTokens: masterTransact
       newToken <- newToken
     } yield Results.PartialContent(content).withSession(request.session
       - Security.TOKEN + (Security.TOKEN -> newToken)
-      - Security.USERNAME + (Security.USERNAME -> loginState.username)
-      - Security.IDENTITY_ID + (Security.IDENTITY_ID -> loginState.identityID))
+      - Security.USERNAME + (Security.USERNAME -> loginState.username))
   }
 }

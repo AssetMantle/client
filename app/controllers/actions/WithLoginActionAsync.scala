@@ -27,7 +27,6 @@ class WithLoginActionAsync @Inject()(
 
       val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
       val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
-      val identityID = Future(request.session.get(constants.Security.IDENTITY_ID).getOrElse(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_NOT_FOUND)))
 
       def isProvisioned(identityID: String, address: String) = blockchainIdentityProvision.Service.checkExists(id = identityID, address = address)
 
@@ -44,16 +43,13 @@ class WithLoginActionAsync @Inject()(
         } yield (userType, address)
       }
 
-      def getResult(loginState: LoginState, isProvisioned: Boolean): Future[Result] = if (isProvisioned) f(loginState)(request)
-      else Future(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED))
+      def getResult(loginState: LoginState): Future[Result] = f(loginState)(request)
 
       (for {
         username <- username
         sessionToken <- sessionToken
-        identityID <- identityID
         (userType, address) <- verifySessionTokenAndUserType(username, sessionToken)
-        isProvisioned <- isProvisioned(identityID = identityID, address = address)
-        result <- getResult(LoginState(username = username, userType = userType, address = address, identityID = identityID), isProvisioned)
+        result <- getResult(LoginState(username = username, userType = userType, address = address))
       } yield {
         result
       }).recover {

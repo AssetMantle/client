@@ -77,7 +77,7 @@ class MaintainerController @Inject()(
               fromID = deputizeData.fromID,
               numMaintainedTraitsForm = getNumberOfFields(deputizeData.addMaintainedTraits, deputizeData.maintainedTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = deputizeData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = deputizeData.password.getOrElse(""))
 
             def broadcastTx = transaction.process[blockchainTransaction.MaintainerDeputize, transactionsMaintainerDeputize.Request](
               entity = blockchainTransaction.MaintainerDeputize(from = loginState.address, fromID = deputizeData.fromID, toID = deputizeData.toID, classificationID = deputizeData.classificationID, maintainedTraits = deputizeData.maintainedTraits.fold[Seq[BaseProperty]](Seq.empty)(_.flatten.map(_.toBaseProperty)), addMaintainer = deputizeData.addMaintainer, mutateMaintainer = deputizeData.mutateMaintainer, removeMaintainer = deputizeData.removeMaintainer, gas = deputizeData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -97,7 +97,7 @@ class MaintainerController @Inject()(
             } else Future(BadRequest(blockchainForms.maintainerDeputize(blockchainCompanion.MaintainerDeputize.form.fill(deputizeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), deputizeData.classificationID, deputizeData.fromID, deputizeData.maintainedTraits.fold(0)(_.flatten.length))))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {

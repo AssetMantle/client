@@ -66,7 +66,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -89,7 +89,7 @@ class AssetController @Inject()(
             } else Future(BadRequest(blockchainForms.assetDefine(blockchainCompanion.AssetDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -142,7 +142,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mintData.addMutableMetaField, mintData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mintData.addMutableField, mintData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mintData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = mintData.password.getOrElse(""))
 
             val immutableMetas = mintData.immutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = mintData.immutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -166,7 +166,7 @@ class AssetController @Inject()(
             } else Future(BadRequest(blockchainForms.assetMint(blockchainCompanion.AssetMint.form.fill(mintData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mintData.classificationID)))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -215,7 +215,7 @@ class AssetController @Inject()(
               numMutableMetaForms = getNumberOfFields(mutateData.addMutableMetaField, mutateData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(mutateData.addMutableField, mutateData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = mutateData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = mutateData.password.getOrElse(""))
 
             val mutableMetas = mutateData.mutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val mutables = mutateData.mutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -237,7 +237,7 @@ class AssetController @Inject()(
             } else Future(BadRequest(blockchainForms.assetMutate(blockchainCompanion.AssetMutate.form.fill(mutateData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), mutateData.assetID, mutateData.fromID)))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -260,7 +260,7 @@ class AssetController @Inject()(
           Future(BadRequest(blockchainForms.assetBurn(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ASSET_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.FROM_ID.name, ""))))
         },
         burnData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = burnData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = burnData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.AssetBurn, transactionsAssetBurn.Request](
             entity = blockchainTransaction.AssetBurn(from = loginState.address, fromID = burnData.fromID, assetID = burnData.assetID, gas = burnData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -280,7 +280,7 @@ class AssetController @Inject()(
           } else Future(BadRequest(blockchainForms.assetBurn(blockchainCompanion.AssetBurn.form.fill(burnData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), burnData.assetID, burnData.fromID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
