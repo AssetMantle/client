@@ -37,7 +37,7 @@ object IDGenerator {
   }
 
   def getClassificationID(chainID: String, immutables: Immutables, mutables: Mutables): String = Seq(chainID,
-    Hash.getHash(Hash.getHash(immutables.properties.propertyList.map(_.id): _*), Hash.getHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
+    Secrets.getBlockchainHash(utilities.Secrets.getBlockchainHash(immutables.properties.propertyList.map(_.id): _*), utilities.Secrets.getBlockchainHash(mutables.properties.propertyList.map(_.id): _*), immutables.getHashID)).mkString(constants.Blockchain.IDSeparator)
 
   def getMaintainerID(classificationID: String, identityID: String): String = Seq(classificationID, identityID).mkString(constants.Blockchain.SecondOrderCompositeIDSeparator)
 }

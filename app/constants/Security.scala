@@ -7,4 +7,6 @@ object Security {
   val NOT_LOGGED_IN = "NOT_LOGGED_IN"
   val INVALID_LOG_IN = "INVALID_LOG_IN"
   val IDENTITY_ID = "IDENTITY_ID"
+
+  val DefaultIterations = 10000
 }
