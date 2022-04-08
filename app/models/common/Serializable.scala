@@ -214,7 +214,7 @@ object Serializable {
   implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
 
   case class Immutables(properties: Properties) {
-    def getHashID: String = utilities.Hash.getHash(properties.propertyList.map(_.fact.hash): _*)
+    def getHashID: String = utilities.Secrets.getBlockchainHash(properties.propertyList.map(_.fact.hash): _*)
   }
 
   implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]

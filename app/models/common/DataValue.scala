@@ -156,10 +156,10 @@ object DataValue {
   }
 
   def getHash(dataValue: DataValue): String = dataValue.dataType match {
-    case constants.Blockchain.DataType.STRING_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)
-    case constants.Blockchain.DataType.ID_DATA => if (dataValue.asString == "") "" else utilities.Hash.getHash(dataValue.asString)
-    case constants.Blockchain.DataType.HEIGHT_DATA => if (dataValue.asHeight == constants.Blockchain.HeightDataDefaultValue) "" else utilities.Hash.getHash(dataValue.asString)
-    case constants.Blockchain.DataType.DEC_DATA => if (dataValue.asDec == constants.Blockchain.ZeroDec) "" else utilities.Hash.getHash(dataValue.asString)
+    case constants.Blockchain.DataType.STRING_DATA => if (dataValue.asString == "") "" else utilities.Secrets.getBlockchainHash(dataValue.asString)
+    case constants.Blockchain.DataType.ID_DATA => if (dataValue.asString == "") "" else utilities.Secrets.getBlockchainHash(dataValue.asString)
+    case constants.Blockchain.DataType.HEIGHT_DATA => if (dataValue.asHeight == constants.Blockchain.HeightDataDefaultValue) "" else utilities.Secrets.getBlockchainHash(dataValue.asString)
+    case constants.Blockchain.DataType.DEC_DATA => if (dataValue.asDec == constants.Blockchain.ZeroDec) "" else utilities.Secrets.getBlockchainHash(dataValue.asString)
     case _ => ""
   }
 }
