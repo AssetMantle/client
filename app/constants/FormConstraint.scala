@@ -3,7 +3,7 @@ package constants
 import models.common.DataValue
 import play.api.data.validation._
 import views.companion.blockchain._
-import views.companion.master.account.{SignUp, UpdateSocialProfile}
+import views.companion.master.account.{ChangePassword, ForgotPassword, SignUp, UpdateSocialProfile}
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -11,6 +11,24 @@ object FormConstraint {
     val errors = {
       if (signUpData.password == signUpData.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
       else if (!signUpData.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val changePasswordConstraint: Constraint[ChangePassword.Data] = Constraint("constraints.changePassword")({ changePasswordData: ChangePassword.Data =>
+    val errors = {
+      if (changePasswordData.oldPassword == changePasswordData.newPassword) Seq(ValidationError(constants.Response.NEW_PASSWORD_SAME_AS_OLD_PASSWORD.message))
+      else if (changePasswordData.newPassword != changePasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val forgotPasswordConstraint: Constraint[ForgotPassword.Data] = Constraint("constraints.forgotPassword")({ forgotPasswordData: ForgotPassword.Data =>
+    val errors = {
+      if (forgotPasswordData.newPassword != forgotPasswordData.confirmNewPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else if (forgotPasswordData.mnemonics.split(" ").length != constants.Blockchain.MnemonicShown) Seq(ValidationError(constants.Response.INVALID_MNEMONICS.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

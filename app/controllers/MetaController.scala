@@ -46,7 +46,7 @@ class MetaController @Inject()(
           Future(BadRequest(blockchainForms.metaReveal(formWithErrors)))
         },
         revealData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = revealData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = revealData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.MetaReveal, transactionsMetaReveal.Request](
             entity = blockchainTransaction.MetaReveal(from = loginState.address, metaFact = revealData.revealFact.toMetaFact, gas = revealData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -66,7 +66,7 @@ class MetaController @Inject()(
           } else Future(BadRequest(blockchainForms.metaReveal(blockchainCompanion.MetaReveal.form.fill(revealData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {

@@ -14,12 +14,12 @@
         <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
-        <entry key="ENCRYPTION_KEY" value="ENCRYPTION_KEY" />
         <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.gaia/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
         <entry key="MAILGUN_USER" value="postmaster@dev.comdex.sg" />
+        <entry key="PEPPER" value="PEPPER" />
         <entry key="PLAY_HTTP_SECRET" value="d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x" />
         <entry key="POSTGRES_DB" value="assetMantle" />
         <entry key="POSTGRES_HOST" value="localhost" />

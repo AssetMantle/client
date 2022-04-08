@@ -15,6 +15,7 @@ import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
+import utilities.Wallet
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -85,6 +86,13 @@ class Accounts @Inject()(
     }
   }
 
+  private def updateUsernameByAddress(address: String, username: String): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.username).update(username).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, noSuchElementException)
+    }
+  }
+
   private def findUsernameByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.username).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -145,6 +153,20 @@ class Accounts @Inject()(
   object Service {
 
     def create(address: String, username: String, accountType: String, publicKey: Option[PublicKey]): Future[String] = add(Account(address = address, username = username, accountType = Option(accountType), publicKey = publicKey, accountNumber = -1, sequence = 0, vestingParameters = None))
+
+    def updateOrInsertOnSignUp(wallet: Wallet, username: String, accountType: String): Future[Unit] = {
+      val account = getByAddress(wallet.address).map(_.map(_.deserialize))
+
+      // TODO Generate public key of single type from byte array
+      def upsert(account: Option[Account]) = account.fold[Future[_]] {
+        create(address = wallet.address, username = username, accountType = accountType, publicKey = None)
+      } { acc => insertOrUpdate(acc.copy(username = username, accountType = Option(accountType))) }
+
+      for {
+        account <- account
+        _ <- upsert(account)
+      } yield ()
+    }
 
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 

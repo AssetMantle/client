@@ -69,7 +69,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(defineData.addMutableMetaField, defineData.mutableMetaTraits.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(defineData.addMutableField, defineData.mutableTraits.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = defineData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = defineData.password.getOrElse(""))
             val immutableMetas = defineData.immutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = defineData.immutableTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val mutableMetas = defineData.mutableMetaTraits.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -92,7 +92,7 @@ class OrderController @Inject()(
             } else Future(BadRequest(blockchainForms.orderDefine(blockchainCompanion.OrderDefine.form.fill(defineData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -146,7 +146,7 @@ class OrderController @Inject()(
               numMutableMetaForms = getNumberOfFields(makeData.addMutableMetaField, makeData.mutableMetaProperties.fold(0)(_.flatten.length)),
               numMutableForms = getNumberOfFields(makeData.addMutableField, makeData.mutableProperties.fold(0)(_.flatten.length)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = makeData.password.getOrElse(""))
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = makeData.password.getOrElse(""))
             val immutableMetas = makeData.immutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val immutables = makeData.immutableProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
             val mutableMetas = makeData.mutableMetaProperties.getOrElse(Seq.empty).flatten.map(_.toBaseProperty)
@@ -169,7 +169,7 @@ class OrderController @Inject()(
             } else Future(BadRequest(blockchainForms.orderMake(blockchainCompanion.OrderMake.form.fill(makeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), makeData.classificationID)))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -192,7 +192,7 @@ class OrderController @Inject()(
           Future(BadRequest(blockchainForms.orderTake(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""))))
         },
         takeData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = takeData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = takeData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.OrderTake, transactionsOrderTake.Request](
             entity = blockchainTransaction.OrderTake(from = loginState.address, fromID = takeData.fromID, orderID = takeData.orderID, takerOwnableSplit = takeData.takerOwnableSplit, gas = takeData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -212,7 +212,7 @@ class OrderController @Inject()(
           } else Future(BadRequest(blockchainForms.orderTake(blockchainCompanion.OrderTake.form.fill(takeData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), takeData.orderID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
@@ -234,7 +234,7 @@ class OrderController @Inject()(
           Future(BadRequest(blockchainForms.orderCancel(formWithErrors, formWithErrors.data.getOrElse(constants.FormField.ORDER_ID.name, ""), formWithErrors.data.getOrElse(constants.FormField.FROM_ID.name, ""))))
         },
         cancelData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = cancelData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = cancelData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.OrderCancel, transactionsOrderCancel.Request](
             entity = blockchainTransaction.OrderCancel(from = loginState.address, fromID = cancelData.fromID, orderID = cancelData.orderID, gas = cancelData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -254,7 +254,7 @@ class OrderController @Inject()(
           } else Future(BadRequest(blockchainForms.orderCancel(blockchainCompanion.OrderCancel.form.fill(cancelData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), cancelData.orderID, cancelData.fromID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {

@@ -3,10 +3,10 @@ package models.master
 import exceptions.BaseException
 import models.Trait.Logged
 import org.postgresql.util.PSQLException
-import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.i18n.Lang
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.Wallet
 
@@ -15,10 +15,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, partialMnemonic: Seq[String], encryptedPrivateKeys: Array[Byte], secretHash: String, salt: String, iterations: Int, language: Lang, userType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Account(id: String, partialMnemonic: Seq[String], encryptedPrivateKeys: Array[Byte], secretHash: String, salt: Array[Byte], iterations: Int, language: Lang, userType: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class Accounts @Inject()(
+                          configuration: Configuration,
+                          protected val databaseConfigProvider: DatabaseConfigProvider
+                        )(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
@@ -32,7 +35,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(id: String, partialMnemonic: String, encryptedPrivateKeys: Array[Byte], secretHash: String, salt: String, iterations: Int, language: String, userType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+  private val pepper: String = configuration.get[String]("webApp.pepper")
+
+  case class AccountSerialized(id: String, partialMnemonic: String, encryptedPrivateKeys: Array[Byte], secretHash: String, salt: Array[Byte], iterations: Int, language: String, userType: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
     def deserialize: Account = Account(id = id, partialMnemonic = utilities.JSON.convertJsonStringToObject[Seq[String]](partialMnemonic), encryptedPrivateKeys = encryptedPrivateKeys, secretHash = secretHash, salt = salt, iterations = iterations, language = Lang(language), userType = userType, createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
@@ -41,21 +46,21 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.userType) += serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ACCOUNT_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(account: Account): Future[Int] = db.run(accountTable.insertOrUpdate(serialize(account)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ACCOUNT_UPSERT_FAILED, psqlException)
     }
   }
 
   private def tryGetById(id: String): Future[AccountSerialized] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
 
@@ -64,36 +69,44 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def tryGetLanguageById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
 
   private def getUserTypeById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
-
-  private def validateLoginByIDAndSecretHash(id: String, secretHash: String): Future[Boolean] = db.run(accountTable.filter(x => x.id === id && x.secretHash === secretHash).exists.result)
 
   private def updateUserTypeById(id: String, userType: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType).update(userType).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, psqlException)
     }
   }
 
-  private def updatePasswordByID(id: String, secretHash: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.secretHash).update(secretHash).asTry).map {
+  private def updateWalletKeysByID(id: String, partialMnemonic: String, encryptedPrivateKeys: Array[Byte]): Future[Int] = db.run(accountTable.filter(_.id === id).map(x => (x.partialMnemonic, x.encryptedPrivateKeys)).update((partialMnemonic, encryptedPrivateKeys)).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND)
       case _ => result
     }
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, psqlException)
+    }
+  }
+
+  private def updatePasswordAndPrivateKeysByID(id: String, secretHash: String, encryptedPrivateKeys: Array[Byte]): Future[Int] = db.run(accountTable.filter(_.id === id).map(x => (x.encryptedPrivateKeys, x.secretHash)).update((encryptedPrivateKeys, secretHash)).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, psqlException)
     }
   }
 
@@ -103,7 +116,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ACCOUNT_NOT_FOUND, noSuchElementException)
     }
   }
 
@@ -119,7 +132,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def secretHash = column[String]("secretHash")
 
-    def salt = column[String]("salt")
+    def salt = column[Array[Byte]]("salt")
 
     def iterations = column[Int]("iterations")
 
@@ -143,11 +156,60 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def add(username: String, password: String, wallet: Wallet, language: Lang): Future[String] = Future("")
+    def create(username: String, password: String, language: Lang, userType: String): Future[Wallet] = {
+      val wallet = utilities.WalletGenerator.getRandomWallet
+      val salt = utilities.Secrets.getNewSalt
+      val account = Account(
+        id = username,
+        partialMnemonic = wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown),
+        encryptedPrivateKeys = utilities.Secrets.encryptData(wallet.privateKey, password),
+        secretHash = utilities.Secrets.hashPassword(password = password, salt = salt, pepper = pepper.getBytes, iterations = constants.Security.DefaultIterations),
+        salt = salt,
+        iterations = constants.Security.DefaultIterations,
+        language = language,
+        userType = userType)
+      for {
+        _ <- add(account)
+      } yield wallet
+    }
 
-    def validateUsernamePassword(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
+    def validateUsernamePasswordAndGetAccount(username: String, password: String): Future[(Boolean, Account)] = {
+      val account = tryGet(username)
+      for {
+        account <- account
+      } yield (utilities.Secrets.verifyPassword(password = password, passwordHash = account.secretHash, salt = account.salt, pepper = pepper.getBytes, iterations = account.iterations), account)
+    }
 
-    def updatePassword(username: String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
+
+    def validateAndUpdateWithNewWallet(username: String, password: String): Future[Wallet] = {
+      val account = tryGet(username)
+      val wallet = utilities.WalletGenerator.getRandomWallet
+
+      def verifyAndUpdate(account: Account) = if (utilities.Secrets.verifyPassword(password = password, passwordHash = account.secretHash, salt = account.salt, pepper = pepper.getBytes, iterations = account.iterations)) {
+        updateWalletKeysByID(id = username, partialMnemonic = Json.toJson(wallet.mnemonics.take(wallet.mnemonics.length - constants.Blockchain.MnemonicShown)).toString, encryptedPrivateKeys = utilities.Secrets.encryptData(wallet.privateKey, password))
+      } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
+
+      for {
+        account <- account
+        _ <- verifyAndUpdate(account)
+      } yield wallet
+    }
+
+    def validateAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Future[Unit] = {
+      val account = tryGet(username)
+
+      def verifyAndUpdate(account: Account) = if (utilities.Secrets.verifyPassword(password = oldPassword, passwordHash = account.secretHash, salt = account.salt, pepper = pepper.getBytes, iterations = account.iterations)) {
+        val decryptedPrivateKeys = utilities.Secrets.decryptData(account.encryptedPrivateKeys, oldPassword)
+        updatePasswordAndPrivateKeysByID(id = username, secretHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, pepper = pepper.getBytes, iterations = constants.Security.DefaultIterations), encryptedPrivateKeys = utilities.Secrets.encryptData(decryptedPrivateKeys, newPassword))
+      } else Future(throw new BaseException(constants.Response.INVALID_USERNAME_OR_PASSWORD))
+
+      for {
+        account <- account
+        _ <- verifyAndUpdate(account)
+      } yield ()
+    }
+
+    def updateOnForgotPassword(account: Account, newPassword: String, wallet: Wallet): Future[Int] = updatePasswordAndPrivateKeysByID(id = account.id, secretHash = utilities.Secrets.hashPassword(password = newPassword, salt = account.salt, pepper = pepper.getBytes, iterations = constants.Security.DefaultIterations), encryptedPrivateKeys = utilities.Secrets.encryptData(wallet.privateKey, newPassword))
 
     def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map(!_)
 

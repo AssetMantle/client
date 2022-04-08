@@ -50,7 +50,7 @@ class SplitController @Inject()(
           Future(BadRequest(blockchainForms.splitSend(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name), formWithErrors.data(constants.FormField.FROM_ID.name))))
         },
         sendData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = sendData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = sendData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.SplitSend, transactionsSplitSend.Request](
             entity = blockchainTransaction.SplitSend(from = loginState.address, fromID = sendData.fromID, toID = sendData.toID, ownableID = sendData.ownableID, split = sendData.split, gas = sendData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -70,7 +70,7 @@ class SplitController @Inject()(
           } else Future(BadRequest(blockchainForms.splitSend(blockchainCompanion.SplitSend.form.fill(sendData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), sendData.ownableID, sendData.fromID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {
@@ -95,7 +95,7 @@ class SplitController @Inject()(
           if (wrapData.addField) {
             Future(PartialContent(blockchainForms.splitWrap(splitWrapForm = blockchainCompanion.SplitWrap.form.fill(wrapData.copy(addField = false)))))
           } else {
-            val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = wrapData.password)
+            val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = wrapData.password)
 
             def broadcastTx = transaction.process[blockchainTransaction.SplitWrap, transactionsSplitWrap.Request](
               entity = blockchainTransaction.SplitWrap(from = loginState.address, fromID = wrapData.fromID, coins = wrapData.coins.flatten.map(_.toCoin), gas = wrapData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -115,7 +115,7 @@ class SplitController @Inject()(
             } else Future(BadRequest(blockchainForms.splitWrap(blockchainCompanion.SplitWrap.form.fill(wrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message))))
 
             (for {
-              verifyPassword <- verifyPassword
+              (verifyPassword, _) <- verifyPassword
               result <- broadcastTxAndGetResult(verifyPassword)
             } yield result
               ).recover {
@@ -138,7 +138,7 @@ class SplitController @Inject()(
           Future(BadRequest(blockchainForms.splitUnwrap(formWithErrors, formWithErrors.data(constants.FormField.OWNABLE_ID.name), formWithErrors.data(constants.FormField.FROM_ID.name))))
         },
         unwrapData => {
-          val verifyPassword = masterAccounts.Service.validateUsernamePassword(username = loginState.username, password = unwrapData.password)
+          val verifyPassword = masterAccounts.Service.validateUsernamePasswordAndGetAccount(username = loginState.username, password = unwrapData.password)
 
           def broadcastTx = transaction.process[blockchainTransaction.SplitUnwrap, transactionsSplitUnwrap.Request](
             entity = blockchainTransaction.SplitUnwrap(from = loginState.address, fromID = unwrapData.fromID, ownableID = unwrapData.ownableID, split = unwrapData.split, gas = unwrapData.gas, ticketID = "", mode = constants.Blockchain.TransactionMode),
@@ -158,7 +158,7 @@ class SplitController @Inject()(
           } else Future(BadRequest(blockchainForms.splitUnwrap(blockchainCompanion.SplitUnwrap.form.fill(unwrapData).withError(constants.FormField.PASSWORD.name, constants.Response.INCORRECT_PASSWORD.message), unwrapData.ownableID, unwrapData.fromID)))
 
           (for {
-            verifyPassword <- verifyPassword
+            (verifyPassword, _) <- verifyPassword
             result <- broadcastTxAndGetResult(verifyPassword)
           } yield result
             ).recover {

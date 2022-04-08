@@ -25,15 +25,12 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
     withActionAsyncLoggingFilter.next { implicit request ⇒
       val username = request.session.get(constants.Security.USERNAME)
       val sessionToken = request.session.get(constants.Security.TOKEN)
-      val identityID = request.session.get(constants.Security.IDENTITY_ID)
 
-      def isProvisioned(identityID: String, address: String) = blockchainIdentityProvision.Service.checkExists(id = identityID, address = address)
 
-      def getResult(loginState: LoginState, isProvisioned: Boolean): Future[Result] = if (isProvisioned) f(Some(loginState))(request)
-      else Future(throw new BaseException(constants.Response.SESSION_IDENTITY_ID_ADDRESS_NOT_PROVISIONED))
+      def getResult(loginState: LoginState): Future[Result] = f(Some(loginState))(request)
 
-      def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String], identityID: Option[String]): Future[Result] = {
-        if (username.nonEmpty && sessionToken.nonEmpty && identityID.nonEmpty) {
+      def verifySessionTokenUserTypeAndGetResult(username: Option[String], sessionToken: Option[String]): Future[Result] = {
+        if (username.nonEmpty && sessionToken.nonEmpty) {
           val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username.get, sessionToken.getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
           val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username.get)
           val userType = masterAccounts.Service.getUserType(username.get)
@@ -43,15 +40,14 @@ class WithoutLoginActionAsync @Inject()(messagesControllerComponents: MessagesCo
             _ <- tokenTimeVerify
             userType <- userType
             address <- address
-            isProvisioned <- isProvisioned(identityID = identityID.get, address = address)
-            result <- getResult(LoginState(username = username.get, userType = userType, address = address, identityID = identityID.get), isProvisioned)
+            result <- getResult(LoginState(username = username.get, userType = userType, address = address))
           } yield result
-        } else if (username.isEmpty && sessionToken.isEmpty && identityID.isEmpty) f(None)(request)
+        } else if (username.isEmpty && sessionToken.isEmpty) f(None)(request)
         else Future(throw new BaseException(constants.Response.INVALID_SESSION))
       }
 
       (for {
-        result <- verifySessionTokenUserTypeAndGetResult(username = username, sessionToken = sessionToken, identityID = identityID)
+        result <- verifySessionTokenUserTypeAndGetResult(username = username, sessionToken = sessionToken)
       } yield result).recover {
         case baseException: BaseException =>
           Results.InternalServerError(views.html.index(failures = Seq(baseException.failure))).withNewSession

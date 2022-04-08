@@ -5,7 +5,7 @@
 @import views.html.base.infos._
 @import views.html.base._
 
-@(profile: Option[Profile], email: String, mobile: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, otherApps: Seq[OtherApp], loginState: LoginState)
+@(profile: Option[Profile], failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, otherApps: Seq[OtherApp], loginState: LoginState)
 
 @views.html.base.common(Messages(constants.View.PROFILE), failures, warnings, successes, infos)(left)(center)(right)
 
@@ -20,13 +20,10 @@
                     <div id="profilePhoto" class="cmuk-text-center"></div>
                 </div>
                 <div>
-                    @commonFormButton(constants.Form.SEND_COIN)
                     @commonFormButton(constants.Form.UPDATE_PROFILE)
                     @commonFormButton(constants.Form.UPDATE_SOCIAL_PROFILE)
                     @commonTextInfo(constants.View.NAME, profile.fold("")(_.name))
                     @commonTextInfo(constants.View.DESCRIPTION, profile.fold("")(_.description))
-                    @commonTextInfo(constants.View.EMAIL_ADDRESS, email)
-                    @commonTextInfo(constants.View.MOBILE_NUMBER, mobile)
                 </div>
                 <div>
                     @commonTextInfo(constants.User.USER_NAME, loginState.username)
