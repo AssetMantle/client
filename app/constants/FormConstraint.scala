@@ -3,14 +3,14 @@ package constants
 import models.common.DataValue
 import play.api.data.validation._
 import views.companion.blockchain._
-import views.companion.master._
 import views.companion.master.account.{SignUp, UpdateSocialProfile}
 
 object FormConstraint {
   //TODO: Error Response through Messages
   val signUpConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUp")({ signUpData: SignUp.Data =>
     val errors = {
-      if (signUpData.username == utilities.Bech32.convertAccountPublicKeyToAccountAddress(signUpData.publicKey)) Seq(ValidationError(constants.Response.USERNAME_SAME_AS_WALLET_ADDRESS.message))
+      if (signUpData.password == signUpData.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else if (!signUpData.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
