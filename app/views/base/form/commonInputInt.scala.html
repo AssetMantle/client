@@ -5,7 +5,7 @@
 @(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
 <div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonInputInt")'>
-@defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
+@defining(Seq('type -> "number", '_label -> "", 'placeholder -> "", 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
@@ -35,6 +35,7 @@
         }
     ) { field =>
         @inputText(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, defaultArguments ++ arguments: _*)
+        <span class="input__label">@Messages(formField.name)</span>
     }
 }
 </div>

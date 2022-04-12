@@ -27,3 +27,21 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
         }
     });
 }
+
+function moveLabelTop(current){
+    $(current).parent().parent().parent().find(".input__label").addClass('active');
+
+}
+function moveLabelBottom(current){
+    if(!$(current).val()){
+        $(current).parent().parent().parent().find(".input__label").removeClass('active');
+    }
+}
+
+function openAlternateForm(route, modalContent = '#commonModalContent', modal = '#commonModal', loadingSpinnerID = 'commonSpinner'){
+    $(modal).fadeOut(200);
+    $('.modalContent').removeClass('fadeInEffect');
+    setTimeout(()=>{
+        getForm(route);
+    },500);
+}

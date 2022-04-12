@@ -15,7 +15,7 @@
         <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
         <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
         <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.gaia/config/genesis.json" />
-        <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
+        <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/pClientKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
         <entry key="MAILGUN_USER" value="postmaster@dev.comdex.sg" />

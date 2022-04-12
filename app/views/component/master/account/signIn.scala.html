@@ -8,17 +8,26 @@
     @commonForm(constants.Form.SIGN_IN, signInForm) {
         <div class="inputField">
             <div class="inputFieldBody">
-            @commonInputText(signInForm, constants.FormField.USERNAME)
+            @commonInputText(signInForm, constants.FormField.USERNAME, 'onfocus -> """moveLabelTop(this)""", 'onblur -> """moveLabelBottom(this)""")
             </div>
         </div>
         <div class="inputField">
             <div class="inputFieldBody">
-            @commonInputPassword(signInForm, constants.FormField.PASSWORD)
+            @commonInputPassword(signInForm, constants.FormField.PASSWORD, 'onfocus -> """moveLabelTop(this)""", 'onblur -> """moveLabelBottom(this)""")
             </div>
 @*//            @commonFormButton(constants.Form.FORGOT_PASSWORD, 'class -> "cmuk-button-link forgotPassword")*@
         </div>
         <div class="pushNotification hiddenLabel">
         @commonInputText(signInForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
+        </div>
+
+        <div class="alternateFormText">
+            <div class="forgotPasswordText">
+                <a href="#" class="text">@Messages(constants.View.FORGOT_PASSWORD)</a>
+            </div>
+            <span class="text">@Messages(constants.View.SIGNIN_FORM_SIGNUP_MSG)
+                <a onclick="openAlternateForm(jsRoutes.controllers.AccountController.signUpForm())" class="text formLink">@Messages(constants.View.SIGNIN_FORM_SIGNUP_URL)</a>
+            </span>
         </div>
     }
 </div>

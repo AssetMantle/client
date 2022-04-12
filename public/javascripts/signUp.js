@@ -56,6 +56,8 @@ function checkPasswords() {
 
 function showPassword() {
     $('#showPassword span').toggleClass('active');
+    $('.inputField .eyeIcon.closeEye').toggleClass('hidden');
+    $('.inputField .eyeIcon.openEye').toggleClass('hidden');
     let password = $('#signUpPassword')[0];
     let matchPassword = $('#signUpConfirmPassword')[0];
     if (password.type && matchPassword.type === "password") {

@@ -17,4 +17,6 @@
     --error-color: red;
     --font-type-1: "Montserrat", sans-serif;
     --font-type-2: "Poppins";
+    --form-sub-title: #848484;
+    --size-bezel: 0.5rem;
 }

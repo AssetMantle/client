@@ -5,7 +5,7 @@
 @(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialFormField: Option[Field] = None)
 
 <div id='@arguments.toMap.get('containerDivID).map(_.toString).getOrElse("")' class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("commonSelect")'>
-@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
+@defining(Seq('_label -> "", 'placeholder -> "", 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
     @defining(
         sequentialFormField match {
             case Some(sequentialField: Field) => {
@@ -35,6 +35,7 @@
         }
     ) { field =>
         @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+        <span class="input__label">@Messages(formField.name)</span>
     }
 }
 </div>
