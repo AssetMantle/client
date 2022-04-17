@@ -159,7 +159,7 @@ class Orders @Inject()(
     def getAllPublicOrderIDs: Future[Seq[String]] = getAllOrders.map(_.map(_.deserialize).filter(_.getTakerID.fact.hash == "").map(_.id.asString))
 
     def getAllPrivateOrderIDs(identityIDs: Seq[String]): Future[Seq[String]] = {
-      val hashedIdentityIDs = identityIDs.map(utilities.Hash.getHash(_))
+      val hashedIdentityIDs = identityIDs.map(utilities.Secrets.getBlockchainHash(_))
       getAllOrders.map(_.map(_.deserialize).filter(_.getTakerID.fact.hash.contains(hashedIdentityIDs)).map(_.id.asString))
     }
   }

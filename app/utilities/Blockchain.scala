@@ -41,7 +41,7 @@ object Blockchain {
 
   case class SlashingEvidence(height: Int, time: RFC3339, validatorHexAddress: String, validatorPower: MicroNumber)
 
-  def verifySecp256k1Signature(publicKey: String, data: Array[Byte], signature: String): Boolean = verifySecp256k1Signature(publicKey = utilities.Hash.base64Decoder(publicKey), data, signature = utilities.Hash.base64Decoder(signature))
+  def verifySecp256k1Signature(publicKey: String, data: Array[Byte], signature: String): Boolean = verifySecp256k1Signature(publicKey = utilities.Secrets.base64Decoder(publicKey), data, signature = utilities.Secrets.base64Decoder(signature))
 
   def verifySecp256k1Signature(publicKey: Array[Byte], data: Array[Byte], signature: Array[Byte]): Boolean = {
     try {
