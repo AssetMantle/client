@@ -8,7 +8,7 @@ object TickerResponse {
 
   implicit val dataReads: Reads[Data] = Json.reads[Data]
 
-  case class Response(persistence: Data) extends BaseResponse
+  case class Response(assetmantle: Data) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

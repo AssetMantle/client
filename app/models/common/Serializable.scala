@@ -1,6 +1,5 @@
 package models.common
 
-import constants.Blockchain.IBCDenoms
 import exceptions.BaseException
 import models.Abstract.DataValue
 import models.common.DataValue._
@@ -52,9 +51,13 @@ object Serializable {
 
   case class Coin(denom: String, amount: MicroNumber) {
 
-    def ibcDenom: String = IBCDenoms.find(_.hash == denom).fold(denom)(_.name)
+    def isIBCDenom: Boolean = denom.startsWith("ibc/") && denom.length == 68
 
-    def normalizeDenom: String = if (ibcDenom(0) == 'u') ibcDenom.split("u")(1).toUpperCase() else ibcDenom.toUpperCase()
+    def ibcDenomName: String = constants.Blockchain.IBCDenoms.find(_.hash == denom).fold(denom)(_.name)
+
+    def normalizeDenom: String = if (denom.startsWith("u")) denom.substring(1).toUpperCase()
+    else if (isIBCDenom && ibcDenomName.startsWith("u")) ibcDenomName.substring(1).toUpperCase()
+    else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"
 

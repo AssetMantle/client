@@ -18,7 +18,8 @@ class GetTicker @Inject()()(implicit wsClient: WSClient, configuration: Configur
 
   private val host = configuration.get[String]("blockchain.token.priceURL")
 
-  private val path = "/simple/price?ids=persistence&vs_currencies=usd"
+  // Should not make id as config parameter as response structure has a key name same as id
+  private val path = "/simple/price?ids=assetmantle&vs_currencies=usd"
 
   private val url = host + path
 

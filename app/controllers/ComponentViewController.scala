@@ -292,7 +292,7 @@ class ComponentViewController @Inject()(
 
         def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(constants.Blockchain.StakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
-        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestByTokenPrice(denom = constants.Blockchain.StakingDenom)
+        def getTokenPrice = masterTransactionTokenPrices.Service.getLatestTokenPrice(denom = constants.Blockchain.StakingDenom)
 
         (for {
           operatorAddress <- operatorAddress
