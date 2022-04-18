@@ -55,8 +55,8 @@ object Serializable {
 
     def ibcDenomName: String = constants.Blockchain.IBCDenoms.find(_.hash == denom).fold(denom)(_.name)
 
-    def normalizeDenom: String = if (!isIBCDenom) denom.split("u")(1).toUpperCase()
-    else if (ibcDenomName(0) == 'u') ibcDenomName.split("u")(1).toUpperCase()
+    def normalizeDenom: String = if (denom.startsWith("u")) denom.substring(1).toUpperCase()
+    else if (isIBCDenom && ibcDenomName.startsWith("u")) ibcDenomName.substring(1).toUpperCase()
     else denom.toUpperCase()
 
     def getAmountWithNormalizedDenom(formatted: Boolean = true): String = if (formatted) s"${utilities.NumericOperation.formatNumber(amount)} $normalizeDenom" else s"${amount.toString} $normalizeDenom"

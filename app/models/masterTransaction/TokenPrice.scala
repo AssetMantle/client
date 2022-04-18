@@ -67,12 +67,14 @@ class TokenPrices @Inject()(
     }
   }
 
-  private def getLatestTokenPrice(denom: String): Future[TokenPrice] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).result.head.asTry).map {
+  private def tryGetLatestTokenPriceBySerial(denom: String): Future[TokenPrice] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_NOT_FOUND, noSuchElementException)
     }
   }
+
+  private def getLatestTokenPriceBySerial(denom: String): Future[Option[TokenPrice]] = db.run(tokenPriceTable.filter(_.denom === denom).sortBy(_.serial.desc).result.headOption)
 
   private def getLatestSerial: Future[Int] = db.run(tokenPriceTable.map(_.serial).max.result.asTry).map {
     case Success(result) => result.getOrElse(0)
@@ -112,7 +114,9 @@ class TokenPrices @Inject()(
 
     def getLatestByToken(denom: String, n: Int): Future[Seq[TokenPrice]] = getLatestTokens(denom = denom, n = n)
 
-    def getLatestByTokenPrice(denom: String): Future[TokenPrice] = getLatestTokenPrice(denom = denom)
+    def tryGetLatestTokenPrice(denom: String): Future[TokenPrice] = tryGetLatestTokenPriceBySerial(denom = denom)
+
+    def getLatestTokenPrice(denom: String): Future[TokenPrice] = getLatestTokenPriceBySerial(denom = denom).map(_.getOrElse(TokenPrice(denom = denom, price = 0.0)))
 
     def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
       (for {
@@ -129,7 +133,7 @@ class TokenPrices @Inject()(
     def insertPrice(): Future[Unit] = {
       val tokenTicker = constants.AppConfig.tokenTickers.find(_.denom == constants.Blockchain.StakingDenom)
       if (tokenTicker.isDefined) {
-        val price = getCoingeckoTicker.Service.get().map(_.persistence.usd)
+        val price = getCoingeckoTicker.Service.get().map(_.assetmantle.usd)
         (for {
           price <- price
           _ <- Service.create(denom = constants.Blockchain.StakingDenom, price = price)
@@ -137,7 +141,7 @@ class TokenPrices @Inject()(
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       } else {
-        logger.error(constants.Response.CRYPTO_TOKEN_TICKER_NOT_FOUND.logMessage)
+        logger.warn(constants.Response.CRYPTO_TOKEN_TICKER_NOT_FOUND.logMessage)
         Future()
       }
     }
