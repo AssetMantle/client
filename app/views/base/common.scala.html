@@ -164,6 +164,16 @@
                                             @Messages(constants.Form.SIGN_IN.legend)
                                         </a>
                                     </li>
+                                    <li class="toggle-button">
+                                        <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
+                                            <span class="dayMode hidden">
+                                            @commonIcon("dayMode")
+                                            </span>
+                                            <span class="darkMode">
+                                            @commonIcon("darkMode")
+                                            </span>
+                                        </button>
+                                    </li>
                                 }
                                 case default => {
                                     <li>
@@ -319,14 +329,6 @@
                 <div>
                     <div class="footerLogo">
                         <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
-                        <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
-                            <span class="dayMode">
-                            @commonIcon("dayMode")
-                            </span>
-                            <span class="darkMode hidden">
-                            @commonIcon("darkMode")
-                            </span>
-                        </button>
                     </div>
                 </div>
                 <div class="copyRight">

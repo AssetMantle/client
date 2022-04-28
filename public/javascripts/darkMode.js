@@ -22,16 +22,15 @@ function togglePageContentLightDark() {
 }
 
 function isDarkThemeSelected() {
-    return document.cookie.match(/theme=dark/i) != null
+    return document.cookie.match(/theme=light/i) != null
 }
 
 function setThemeFromCookie() {
     var body = document.getElementById('body')
-    body.className = isDarkThemeSelected() ? 'darkMode' : 'lightMode'
+    body.className = isDarkThemeSelected() ? 'lightMode' : 'darkMode'
 }
 
 (function() {
     setThemeFromCookie()
     isDarkThemeSelected()
-
 })();

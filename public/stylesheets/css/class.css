@@ -188,7 +188,15 @@ body.darkMode .addBalanceButton {
   border: none !important; }
 body.darkMode button, body.darkMode .buttonPrimary, body.darkMode .addBalanceButton {
   background: var(--darkmode-color-2);
+  background: transparent !important;
   color: var(--white-font); }
+body.lightMode .toggle-button button{
+  background-color: transparent !important;
+}
+.toggle-button{
+  display: flex;
+  align-items: center;
+}
 body.darkMode table tr td:not(:first-child),
 body.darkMode h1, body.darkMode h2, body.darkMode h3, body.darkMode h4, body.darkMode h5, body.darkMode h6, body.darkMode .cmuk-switcher li, body.darkMode p,
 body.darkMode .cmuk-legend, body.darkMode label,
