@@ -28,7 +28,7 @@ libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
 
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
 
-libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.3.4"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.1"
 
