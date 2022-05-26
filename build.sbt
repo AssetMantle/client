@@ -68,4 +68,4 @@ libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.16.1"
 
 libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
 
-libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.1"
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
