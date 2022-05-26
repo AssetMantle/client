@@ -1,26 +1,22 @@
 package utilities
 
-import java.util.Arrays
 import com.docusign.esign.api.EnvelopesApi
-import com.docusign.esign.client.ApiClient
+import com.docusign.esign.client.auth.OAuth.OAuthToken
+import com.docusign.esign.client.{ApiClient, ApiException}
 import com.docusign.esign.model.{EnvelopeDefinition, RecipientViewRequest, Recipients, Signer, Document => DocusignDocument, ReturnUrlRequest => CallBackURLRequest}
 import com.sun.jersey.core.util.{Base64 => Base64Docusign}
-import com.docusign.esign.client.ApiException
-import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
-import models.master.Email
-import models.master
-import models.blockchain.Account
-import play.api.i18n.{Lang, MessagesApi}
-import play.api.{Configuration, Logger}
-import java.io.{BufferedOutputStream, FileOutputStream}
-import models.docusign.{OAuthToken => DocusignOAuthToken}
-import com.docusign.esign.client.auth.OAuth.OAuthToken
-import com.sun.jersey.api.client.ClientHandlerException
 import controllers.routes
+import exceptions.BaseException
 import models.Trait.Document
-import org.apache.commons.codec.binary.Base64
+import models.blockchain.Account
 import models.docusign
+import models.docusign.{OAuthToken => DocusignOAuthToken}
+import models.master.Email
+import play.api.{Configuration, Logger}
+
+import java.io.{BufferedOutputStream, FileOutputStream}
+import java.util.{Arrays, Base64}
+import javax.inject.{Inject, Singleton}
 import scala.collection.JavaConverters
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -89,8 +85,6 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.ENVELOPE_CREATION_FAILED)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
-        throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }
 
@@ -112,8 +106,6 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.SENDER_VIEW_CREATION_FAILED)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
-        throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }
 
@@ -136,7 +128,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.RECEPIENT_VIEW_CREATION_FAILED)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }
@@ -145,7 +137,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
 
   def updateSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = fetchAndStoreSignedDocumentList(envelopeID, documentTypeList)
 
-  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]) = {
+  def fetchAndStoreSignedDocumentList(envelopeID: String, documentTypeList: Seq[String]): Future[Seq[String]] = {
     val oauthToken = docusignOAuthTokens.Service.tryGet(accountID)
     (for {
       oauthToken <- oauthToken
@@ -153,7 +145,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
       apiClient.setAccessToken(oauthToken.accessToken, (oauthToken.expiresAt - System.currentTimeMillis()) / 1000.toLong)
       documentTypeList.zipWithIndex.map { case (documentType, index) =>
         val fileByteArray = envelopesApi.getDocument(accountID, envelopeID, (index + 1).toString)
-        val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileByteArray)).toString, constants.File.PDF).mkString(".")
+        val newFileName = List(util.hashing.MurmurHash3.stringHash(Base64.getEncoder.encodeToString(fileByteArray)).toString, constants.File.PDF).mkString(".")
         val file = utilities.FileOperations.newFile(fileResourceManager.getAccountKYCFilePath(documentType), newFileName)
         val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))
         bufferedOutputStream.write(fileByteArray)
@@ -165,7 +157,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.FAILED_TO_FETCH_SIGNED_DOCUMENT)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }
@@ -198,8 +190,6 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
         throw baseException
       case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.ACCESS_TOKEN_GENERATION_FAILED)
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
-        throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }
 
@@ -216,7 +206,7 @@ class Docusign @Inject()(fileResourceManager: utilities.FileResourceManager,
     try {
       apiClient.getAuthorizationUri(integrationKey, Arrays.asList(constants.External.Docusign.SIGNATURE_SCOPE), webAppURL + routes.DocusignController.authorizationCallBack("").url.split("""\?""")(0), constants.External.Docusign.CODE).toString
     } catch {
-      case clientHandlerException: ClientHandlerException => logger.error(clientHandlerException.getMessage, clientHandlerException)
+      case apiException: ApiException => logger.error(apiException.getMessage, apiException)
         throw new BaseException(constants.Response.INVALID_INPUT)
     }
   }

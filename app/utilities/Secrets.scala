@@ -57,7 +57,7 @@ object Secrets {
   }
 
   //apache-codec Base64 encoder was using +/ instead of -_ which is output in BC. So use java.util.Base64
-  def getBlockchainHash(values: String*): String = Base64.getUrlEncoder.encodeToString(Hex.decodeHex(sha1(values.sorted.mkString(constants.Blockchain.ToHashSeparator))))
+  def getBlockchainHash(values: String*): String = Base64.getUrlEncoder.encodeToString(Hex.decodeHex(sha1(values.sorted.mkString(constants.Blockchain.ToHashSeparator)).toCharArray))
 
   def base64URLDecoder(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
