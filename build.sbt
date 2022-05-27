@@ -52,7 +52,7 @@ libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "3.0.
 
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
 
-libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar"))
+libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
 
 libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.18.0"
 
