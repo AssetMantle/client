@@ -58,16 +58,16 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         addOrUpdateEmailAddressData => {
           val emailAddress = masterEmails.Service.get(loginState.username)
 
-          def addEmail: Future[String] = masterEmails.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+          def addEmail(): Future[String] = masterEmails.Service.create(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
-          def updateEmail: Future[Int] = masterEmails.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
+          def updateEmail(): Future[Int] = masterEmails.Service.updateEmailAddress(loginState.username, addOrUpdateEmailAddressData.emailAddress)
 
           def addOrUpdateEmailAddress(emailAddress: Option[Email]): Future[Unit] = {
             emailAddress match {
               case Some(email) => if (email.emailAddress != addOrUpdateEmailAddressData.emailAddress) {
-                for {_ <- updateEmail} yield ()
+                for {_ <- updateEmail()} yield ()
               } else Future()
-              case None => for {_ <- addEmail} yield ()
+              case None => for {_ <- addEmail()} yield ()
             }
           }
 
@@ -109,16 +109,16 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         addOrUpdateMobileNumberData => {
           val mobileNumber = masterMobiles.Service.get(loginState.username)
 
-          def addMobile: Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
+          def addMobile(): Future[String] = masterMobiles.Service.create(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
 
-          def updateMobile: Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
+          def updateMobile(): Future[Int] = masterMobiles.Service.updateMobileNumber(id = loginState.username, mobileNumber = Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-"))
 
           def addOrUpdateMobileNumber(mobileNumber: Option[Mobile]): Future[Unit] = {
             mobileNumber match {
               case Some(mobile) => if (mobile.mobileNumber != Seq(addOrUpdateMobileNumberData.countryCode, addOrUpdateMobileNumberData.mobileNumber).mkString("-")) {
-                for {_ <- updateMobile} yield ()
+                for {_ <- updateMobile()} yield ()
               } else Future()
-              case None => for {_ <- addMobile} yield ()
+              case None => for {_ <- addMobile()} yield ()
             }
           }
 

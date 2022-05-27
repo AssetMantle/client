@@ -21,8 +21,8 @@ class WithoutLoginAction @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
-  def apply(f: ⇒ Option[LoginState] => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
-    withActionAsyncLoggingFilter.next { implicit request ⇒
+  def apply(f: => Option[LoginState] => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
+    withActionAsyncLoggingFilter.next { implicit request =>
       val username = request.session.get(constants.Security.USERNAME)
       val sessionToken = request.session.get(constants.Security.TOKEN)
       val identityID = request.session.get(constants.Security.IDENTITY_ID)

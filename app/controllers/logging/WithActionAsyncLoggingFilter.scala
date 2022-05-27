@@ -15,7 +15,7 @@ class WithActionAsyncLoggingFilter @Inject()(messagesControllerComponents: Messa
 
   private implicit val lang: Lang = Lang(configuration.get[String]("play.log.lang"))
 
-  def next(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request ⇒
+  def next(f: => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = Action.async { implicit request =>
     val startTime = System.currentTimeMillis()
     logger.info(messagesApi(constants.Log.Info.CONTROLLERS_REQUEST, request.method, request.path, request.remoteAddress, request.session.get(constants.Security.USERNAME).getOrElse(constants.View.UNKNOWN)))
     val result = f(request)

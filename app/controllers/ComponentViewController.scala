@@ -393,7 +393,7 @@ class ComponentViewController @Inject()(
           blocks.map { block =>
             val validator = validators.find(_.hexAddress == block.proposerAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))
             block.height -> validator.description.moniker
-          }(collection.breakOut)
+          }.toMap
         }
 
         for {

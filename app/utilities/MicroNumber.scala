@@ -4,8 +4,10 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
+import scala.util.Try
 
 class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConversions with Ordered[MicroNumber] {
 
@@ -49,9 +51,9 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def toBigDecimal: BigDecimal = BigDecimal(this.value) / MicroNumber.factor
 
-  override def byteValue: Byte = intValue().toByte
+  override def byteValue: Byte = intValue.toByte
 
-  override def shortValue: Short = intValue().toShort
+  override def shortValue: Short = intValue.toShort
 
   def toByteArray: Array[Byte] = (this.value / MicroNumber.factor).toByteArray
 
@@ -238,11 +240,11 @@ object MicroNumber {
 
     override def abs(x: MicroNumber): MicroNumber = x.abs
 
-    override def signum(x: MicroNumber): Int = x.signum
-
     override def compare(x: MicroNumber, y: MicroNumber): Int = x.compare(y)
   }
 
-  implicit object MicroNumberIsIntegral extends MicroNumberIsIntegral with Ordering[MicroNumber]
+  implicit object MicroNumberIsIntegral extends MicroNumberIsIntegral with Ordering[MicroNumber] {
+    def parseString(value: String): Option[MicroNumber] = Try(MicroNumber(value)).toOption
+  }
 
 }

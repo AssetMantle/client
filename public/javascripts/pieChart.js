@@ -1,5 +1,5 @@
 function pieChart(chartID, keys, values, showLegend) {
-    let nameList = keys.replace('Set(', '').replace(')', '').split(', ');
+    let nameList = keys.replace('List(', '').replace(')', '').split(', ');
     let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
     let totalValue = 0.0;
     let colors = [theme_colors.primary];

@@ -4,11 +4,11 @@ package utilities
 import com.sksamuel.scrimage
 import com.sksamuel.scrimage.nio.JpegWriter
 import exceptions.BaseException
-import javax.imageio.ImageIO
-import java.util.Base64
 import play.api.Logger
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.Base64
+import javax.imageio.ImageIO
+import scala.concurrent.ExecutionContext
 
 object ImageProcess {
 
@@ -19,8 +19,8 @@ object ImageProcess {
   def convertToThumbnail(name: String, uploadPath: String)(implicit executionContext: ExecutionContext): (String, Option[Array[Byte]]) = {
     try {
       val imageRes = ImageIO.read(FileOperations.newFile(uploadPath, name))
-      implicit val writer: JpegWriter = JpegWriter().withCompression(100)
-      val bytes = FileOperations.convertToByteArray(scrimage.Image.fromFile(FileOperations.newFile(uploadPath, name)).fit(180, (180 * imageRes.getHeight) / imageRes.getWidth).output(FileOperations.newFile(uploadPath, '~' + name)))
+      val writer: JpegWriter = JpegWriter.compression(100)
+      val bytes = FileOperations.convertToByteArray(scrimage.ImmutableImage.loader().fromFile(FileOperations.newFile(uploadPath, name)).fit(180, (180 * imageRes.getHeight) / imageRes.getWidth).output(writer, FileOperations.newFile(uploadPath, '~' + name)))
       FileOperations.deleteFile(uploadPath, '~' + name)
       (List(util.hashing.MurmurHash3.stringHash(Base64.getEncoder.encodeToString(bytes)), FileOperations.fileExtensionFromName(name)).mkString("."), Option(Base64.getEncoder.encode(bytes)))
     } catch {

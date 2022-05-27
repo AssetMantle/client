@@ -16,7 +16,7 @@ object Bech32 {
 
   type Int5 = Byte
   final val CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
-  final val CHARSET_MAP: Map[Char, Int5] = CHARSET.zipWithIndex.toMap.mapValues(_.toByte)
+  final val CHARSET_MAP: Map[Char, Int5] = CHARSET.zipWithIndex.toMap.view.mapValues(_.toByte).toMap
   final val CHARSET_REVERSE_MAP: Map[Int5, Char] = CHARSET_MAP.map(_.swap)
 
   final val SEP = '1'
@@ -83,7 +83,7 @@ object Bech32 {
     for (i <- 0 until (bytes.length - 1) by 2) {
       bytesSeq += Integer.parseInt(bytes.substring(i, i + 2), 16).toByte
     }
-    encode(hrp, to5Bit(bytesSeq)) match {
+    encode(hrp, to5Bit(bytesSeq.toSeq)) match {
       case Success(value: String) => value
       case Failure(exception) => logger.error(exception.getLocalizedMessage)
         throw new BaseException(constants.Response.INVALID_HRP_OR_BYTES)
