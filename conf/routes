@@ -18,7 +18,6 @@ GET         /docusign/callBack                             controllers.DocusignC
 GET         /docusign/authorizationCallBack                controllers.DocusignController.authorizationCallBack(code:String)
 
 GET         /account                                       controllers.ViewController.account
-GET         /profile                                       controllers.ViewController.profile
 GET         /classification                                controllers.ViewController.classification(id: String)
 GET         /meta                                          controllers.ViewController.meta(id: String)
 GET         /identity                                      controllers.ViewController.identity(id: String)
@@ -43,23 +42,6 @@ GET         /validator                                     controllers.Component
 GET         /proposal                                      controllers.ComponentViewController.proposal(id: Int)
 
 GET         /profilePicture                                controllers.ComponentViewController.profilePicture
-
-GET         /account/signUp                                controllers.AccountController.signUpForm
-POST        /account/signUp                                controllers.AccountController.signUp
-
-GET         /account/signIn                                controllers.AccountController.signInForm
-POST        /account/signIn                                controllers.AccountController.signIn
-
-GET         /account/signOut                               controllers.AccountController.signOutForm
-POST        /account/signOut                               controllers.AccountController.signOut
-
-GET         /account/checkUsernameAvailable                controllers.AccountController.checkUsernameAvailable(username: String)
-
-GET         /account/updateProfile                         controllers.AccountController.updateProfileForm
-POST        /account/updateProfile                         controllers.AccountController.updateProfile
-
-GET         /account/updateSocialProfile                   controllers.AccountController.updateSocialProfileForm(platform: String)
-POST        /account/updateSocialProfile                   controllers.AccountController.updateSocialProfile
 
 GET         /asset/define                                  controllers.AssetController.defineForm
 POST        /asset/define                                  controllers.AssetController.define

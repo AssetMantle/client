@@ -12,13 +12,6 @@ class Form(template: String, val route: Call, val get: JavaScriptReverseRoute) {
 
 object Form {
 
-  //AccountController
-  val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp, routes.javascript.AccountController.signUpForm)
-  val SIGN_IN = new Form("SIGN_IN", routes.AccountController.signIn, routes.javascript.AccountController.signInForm)
-  val SIGN_OUT = new Form("SIGN_OUT", routes.AccountController.signOut, routes.javascript.AccountController.signOutForm)
-  val UPDATE_PROFILE = new Form("UPDATE_PROFILE", routes.AccountController.updateProfile, routes.javascript.AccountController.updateProfileForm)
-  val UPDATE_SOCIAL_PROFILE = new Form("UPDATE_SOCIAL_PROFILE", routes.AccountController.updateSocialProfile, routes.javascript.AccountController.updateSocialProfileForm)
-
   //AssetController
   val ASSET_DEFINE = new Form("ASSET_DEFINE", routes.AssetController.define, routes.javascript.AssetController.defineForm)
   val ASSET_MINT = new Form("ASSET_MINT", routes.AssetController.mint, routes.javascript.AssetController.mintForm)

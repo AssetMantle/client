@@ -24,6 +24,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ComponentViewController @Inject()(
+                                         analyticTransactionCounters: analytic.TransactionCounters,
+                                         analyticMessageCounters: analytic.MessageCounters,
                                          blockchainAccounts: blockchain.Accounts,
                                          blockchainAssets: blockchain.Assets,
                                          blockchainBalances: blockchain.Balances,
@@ -226,7 +228,7 @@ class ComponentViewController @Inject()(
 
         (for {
           allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONED), totalValidators = allSortedValidators.length))
+        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONDED), totalValidators = allSortedValidators.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -251,18 +253,23 @@ class ComponentViewController @Inject()(
   def transactionStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
+        val dayEpoch: Long = 24 * 60 * 60
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
-        val totalTxs = blockchainTransactions.Service.getTotalTransactions
-        val latestHeight = blockchainBlocks.Service.getLatestBlockHeight
+        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
 
-        def getTxData(latestHeight: Int) = blockchainTransactions.Service.getTransactionStatisticsData(latestHeight)
+        def getTxData(latestHeightEpoch: Long) = {
+          val endEpoch = (latestHeightEpoch / dayEpoch + 1) * dayEpoch
+          val startEpoch = endEpoch - 11 * dayEpoch
+          analyticTransactionCounters.Utility.getTransactionStatisticsData(startEpoch = startEpoch, endEpoch = endEpoch)
+        }
 
         (for {
           totalAccounts <- totalAccounts
-          totalTxs <- totalTxs
-          latestHeight <- latestHeight
-          txData <- getTxData(latestHeight)
-        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txData, binWidth = transactionsStatisticsBinWidth))
+          latestBlock <- latestBlock
+          messagesData <- messagesData
+          (totalTxs, txStatisticsData) <- getTxData(latestBlock.time.unix)
+        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txStatisticsData, messagesData = messagesData, binWidth = transactionsStatisticsBinWidth))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -622,7 +629,7 @@ class ComponentViewController @Inject()(
           validator <- validator
           totalBondedAmount <- totalBondedAmount
           keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
-        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONED, keyBaseValidator))
+        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

@@ -21,7 +21,7 @@ This project implements explorer and other web2 applications for persistence eco
       3. `echo "deb http://apt.postgresql.org/pub/repos/apt/ ${RELEASE}"-pgdg main | sudo tee  /etc/apt/sources.list.d/pgdg.list`
       4. `sudo apt update`
       5. `sudo apt -y install postgresql-11`
-      6. `sudo su - postgres`
+      6. `sudo su - postgres` or `psql -U postgres`
       7. `psql -c "alter user postgres with password 'postgres'"`
       8. `exit`
 

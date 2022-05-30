@@ -1,7 +1,7 @@
 function lineChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
 
     let nameList = keys.replace('List(', '').replace(')', '').split(', ');
-    let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
+    let valueList = values.replace('Iterable(', '').replace(')', '').split(', ');
 
     Chart.defaults.global.legend.display = showLegend;
     let chartData = {

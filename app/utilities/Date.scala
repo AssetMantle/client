@@ -5,6 +5,7 @@ import play.api.Logger
 import play.api.libs.json._
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.time._
 import java.time.format.DateTimeFormatter
 
@@ -14,7 +15,7 @@ object Date {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val dateTimeFormat: LocalDateTime = LocalDateTime.of(2016, 8, 23, 13, 12, 45)
+  private val dateFormat: SimpleDateFormat = new SimpleDateFormat("dd-MM")
 
   def utilDateToSQLDate(utilDate: java.util.Date): java.sql.Date = new java.sql.Date(utilDate.getTime)
 
@@ -36,6 +37,8 @@ object Date {
       case _ => throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
     }
   }
+
+  def epochToDateString(value: Long): String = dateFormat.format(value)
 
   def isValidRFC3339(x: String): Boolean = try {
     ZonedDateTime.parse(x)

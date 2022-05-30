@@ -1,7 +1,7 @@
 function pieChart(chartID, keys, values, showLegend) {
     let nameList = keys.replace('List(', '').replace(')', '').split(', ');
-    let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
-    let totalValue = 0.0;
+    let valueList = values.replace('Iterable(', '').replace(')', '').split(', ');
+    let totalValue = parseFloat(valueList[0]);
     let colors = [theme_colors.primary];
     let colorPrefixes = ["e", 4, 1, 2, 6, "b", 9, 3, "f", 5, 6, 0, "e", 2, 8, "b", 9, 3, "f", 5, "a", 7, "c", 2, 6, "b", 9, 3, "f", 5, "e", 4, 1, 2, 6, "b", 9, 3, "f", 5, 6, 0, "e", 2, 8, "b", 9, 3, "f", 5];
     for (let i = 1; i < valueList.length; i++) {
@@ -46,7 +46,10 @@ function pieChart(chartID, keys, values, showLegend) {
                 align: 'center',
                 labels: {
                     boxWidth: 10,
-                    boxHeight: 2
+                    boxHeight: 2,
+                    filter: function (legendItem, data) {
+                        return legendItem.index <= 4;
+                    }
                 }
             }
         }

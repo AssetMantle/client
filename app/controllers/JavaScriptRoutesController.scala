@@ -18,13 +18,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         JavaScriptReverseRouter("jsRoutes")(
           routes.javascript.Assets.versioned,
 
-          routes.javascript.AccountController.signUpForm,
-          routes.javascript.AccountController.signInForm,
-          routes.javascript.AccountController.signOutForm,
-          routes.javascript.AccountController.checkUsernameAvailable,
-          routes.javascript.AccountController.updateProfileForm,
-          routes.javascript.AccountController.updateSocialProfileForm,
-
           routes.javascript.AssetController.defineForm,
           routes.javascript.AssetController.mintForm,
           routes.javascript.AssetController.mutateForm,
@@ -136,7 +129,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
           routes.javascript.TransactionsController.sendCoinForm,
 
-          routes.javascript.ViewController.profile,
           routes.javascript.ViewController.identity,
           routes.javascript.ViewController.asset,
           routes.javascript.ViewController.order,

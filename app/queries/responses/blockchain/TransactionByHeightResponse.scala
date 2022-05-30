@@ -5,7 +5,13 @@ import transactions.Abstract.BaseResponse
 
 object TransactionByHeightResponse {
 
-  case class Tx(hash: String, height: String, index: Int)
+  case class TxResult(code: Int)
+
+  implicit val txResultReads: Reads[TxResult] = Json.reads[TxResult]
+
+  case class Tx(hash: String, height: String, index: Int, tx_result: TxResult) {
+    def success: Boolean = this.tx_result.code == 0
+  }
 
   implicit val txReads: Reads[Tx] = Json.reads[Tx]
 
