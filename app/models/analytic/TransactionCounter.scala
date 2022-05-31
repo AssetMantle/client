@@ -83,15 +83,11 @@ class TransactionCounters @Inject()(
   }
 
   object Utility {
-    def getTransactionStatisticsData(startEpoch: Long, endEpoch: Long): Future[(Int, ListMap[String, Double])] = {
+    def getTransactionStatisticsData(startEpoch: Long, endEpoch: Long): Future[ListMap[String, Double]] = {
       val counter = Service.getByStartAndEndEpoch(startEpoch = startEpoch, endEpoch = endEpoch).map(_.map(x => (x.epoch, x.totalTxs)))
-      val totalTxsTillStart = Service.getTotalTxsTill(startEpoch)
       (for {
         counter <- counter
-        totalTxsTillStart <- totalTxsTillStart
-      } yield (totalTxsTillStart + counter.map(_._2).sum,
-        ListMap(counter.groupBy[String](x => utilities.Date.epochToDateString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq: _*)
-      )
+      } yield ListMap(counter.groupBy[String](x => utilities.Date.epochToDateString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq.reverse: _*)
         ).recover {
         case baseException: BaseException => throw baseException
       }

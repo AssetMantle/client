@@ -8,6 +8,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time._
 import java.time.format.DateTimeFormatter
+import java.util.{Date => javaDate}
 
 object Date {
 
@@ -15,7 +16,7 @@ object Date {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val dateFormat: SimpleDateFormat = new SimpleDateFormat("dd-MM")
+  private val dateFormat = new SimpleDateFormat("dd/MM")
 
   def utilDateToSQLDate(utilDate: java.util.Date): java.sql.Date = new java.sql.Date(utilDate.getTime)
 
@@ -38,7 +39,7 @@ object Date {
     }
   }
 
-  def epochToDateString(value: Long): String = dateFormat.format(value)
+  def epochToDateString(value: Long): String = dateFormat.format(javaDate.from(Instant.ofEpochSecond(value)))
 
   def isValidRFC3339(x: String): Boolean = try {
     ZonedDateTime.parse(x)

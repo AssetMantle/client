@@ -257,10 +257,12 @@ class ComponentViewController @Inject()(
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
         val latestBlock = blockchainBlocks.Service.getLatestBlock
         val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
+        val totalTxs = blockchainTransactions.Service.getTotalTransactions
+        val ibcTxsCount = analyticMessageCounters.Service.getByMessageTypes(Seq(constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER), constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)))
 
         def getTxData(latestHeightEpoch: Long) = {
           val endEpoch = (latestHeightEpoch / dayEpoch + 1) * dayEpoch
-          val startEpoch = endEpoch - 11 * dayEpoch
+          val startEpoch = endEpoch - 10 * dayEpoch
           analyticTransactionCounters.Utility.getTransactionStatisticsData(startEpoch = startEpoch, endEpoch = endEpoch)
         }
 
@@ -268,8 +270,17 @@ class ComponentViewController @Inject()(
           totalAccounts <- totalAccounts
           latestBlock <- latestBlock
           messagesData <- messagesData
-          (totalTxs, txStatisticsData) <- getTxData(latestBlock.time.unix)
-        } yield Ok(views.html.component.blockchain.transactionStatistics(totalAccounts = totalAccounts, totalTxs = totalTxs, txData = txStatisticsData, messagesData = messagesData, binWidth = transactionsStatisticsBinWidth))
+          totalTxs <- totalTxs
+          txStatisticsData <- getTxData(latestBlock.time.unix)
+          ibcTxsCount <- ibcTxsCount
+        } yield Ok(views.html.component.blockchain.transactionStatistics(
+          totalAccounts = totalAccounts,
+          totalTxs = totalTxs,
+          ibcIn = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)).fold(0)(_.counter),
+          ibcOut = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER)).fold(0)(_.counter),
+          txData = txStatisticsData,
+          messagesData = messagesData,
+          binWidth = transactionsStatisticsBinWidth))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

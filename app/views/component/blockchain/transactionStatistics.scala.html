@@ -1,11 +1,15 @@
 @import views.html.base.cards._
+@import views.html.base.infos._
 @import views.html.base.charts._
 @import scala.collection.immutable.ListMap
 
-@(totalAccounts: Int, totalTxs: Int, txData: ListMap[String, Double], messagesData: ListMap[String, Double], binWidth: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(totalAccounts: Int, totalTxs: Int, ibcIn: Int, ibcOut: Int, txData: ListMap[String, Double], messagesData: ListMap[String, Double], binWidth: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonCard(constants.View.TRANSACTIONS_TRAFFIC) {
-    @Messages(constants.View.TOTAL_ACCOUNTS): @utilities.NumericOperation.formatNumber(totalAccounts) / @Messages(constants.View.TOTAL_TRANSACTIONS): @utilities.NumericOperation.formatNumber(totalTxs)
 } {
     @commonLineChart("txStatistics", txData, "", showLegend = false, Messages(constants.View.TRANSACTION_STATISTICS_X_LABEL, utilities.NumericOperation.formatNumber(binWidth)), constants.View.NUMBER_OF_TRANSACTIONS)
     @commonPieChart("messagesStatistics", messagesData, showLegend = true)
+    @commonTextInfo(constants.View.TOTAL_ACCOUNTS, utilities.NumericOperation.formatNumber(totalAccounts))
+    @commonTextInfo(constants.View.TOTAL_TRANSACTIONS, utilities.NumericOperation.formatNumber(totalTxs))
+    @commonTextInfo(constants.View.TOTAL_IBC_OUT_TRANSACTIONS, utilities.NumericOperation.formatNumber(ibcOut))
+    @commonTextInfo(constants.View.TOTAL_IBC_IN_TRANSACTIONS, utilities.NumericOperation.formatNumber(ibcIn))
 }
