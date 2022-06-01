@@ -2,6 +2,7 @@ package models.analytic
 
 import exceptions.BaseException
 import models.Trait.Logged
+import models.blockchain.Transaction
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,6 +10,7 @@ import slick.jdbc.JdbcProfile
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
+import scala.collection.MapView
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -48,6 +50,13 @@ class MessageCounters @Inject()(
   }
 
   private def upsert(messageCounter: MessageCounter): Future[Int] = db.run(messageCounterTable.insertOrUpdate(messageCounter).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+    }
+  }
+
+  private def upsertMultiple(messageCounters: Seq[MessageCounter]) = db.run(DBIO.sequence(messageCounters.map(messageCounter => messageCounterTable.insertOrUpdate(messageCounter))).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
@@ -94,6 +103,8 @@ class MessageCounters @Inject()(
 
     def insertOrUpdate(messageType: String, counter: Int): Future[Int] = upsert(MessageCounter(messageType = messageType, counter = counter))
 
+    def insertOrUpdateMultiple(messageCounters: Seq[MessageCounter]): Future[Seq[Int]] = upsertMultiple(messageCounters)
+
     def update(messageType: String, counter: Int): Future[Int] = updateByMessageType(messageType = messageType, counter = counter)
 
     def getByMessageTypes(messageTypes: Seq[String]): Future[Seq[MessageCounter]] = getAllByMessageTypes(messageTypes)
@@ -103,16 +114,17 @@ class MessageCounters @Inject()(
 
   object Utility {
 
-    def updateMessageCounter(updates: Map[String, Int]): Future[Unit] = {
-      val messageCounters = Service.getByMessageTypes(updates.keys.toSeq)
+    def updateMessageCounter(transactions: Seq[Transaction]): Future[Unit] = {
+      val updates = transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).toList.sum)
+      val oldMessageCounters = Service.getByMessageTypes(updates.keys.toSeq)
 
-      def update(messageCounters: Seq[MessageCounter]) = utilitiesOperations.traverse(updates.toSeq) { case (messageType, counter) =>
-        Service.insertOrUpdate(messageType = messageType, counter = messageCounters.find(_.messageType == messageType).fold(0)(_.counter) + counter)
+      def update(oldMessageCounters: Seq[MessageCounter], addCounters: MapView[String, Int]) = {
+        Service.insertOrUpdateMultiple(oldMessageCounters.map(old => MessageCounter(messageType = old.messageType, counter = old.counter + addCounters.getOrElse(old.messageType, 0))))
       }
 
       (for {
-        messageCounters <- messageCounters
-        _ <- update(messageCounters)
+        oldMessageCounters <- oldMessageCounters
+        _ <- update(oldMessageCounters = oldMessageCounters, addCounters = updates)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

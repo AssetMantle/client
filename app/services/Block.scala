@@ -109,7 +109,7 @@ class Block @Inject()(
 
       def updateTransactionCounter() = analyticTransactionCounters.Service.create(epoch = header.time.unix, totalTxs = transactionsHash.length)
 
-      def updateMessageCounter(transactions: Seq[blockchainTransaction]) = analyticMessageCounters.Utility.updateMessageCounter(transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).toList.sum).toMap)
+      def updateMessageCounter(transactions: Seq[blockchainTransaction]) = analyticMessageCounters.Utility.updateMessageCounter(transactions)
 
       def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
