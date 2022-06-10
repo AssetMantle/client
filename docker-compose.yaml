@@ -1,0 +1,57 @@
+version: '3.7'
+services:
+  explorer:
+    image: assetmantle/explorer:edge
+    # image: assetmantle/explorer
+    build:
+      # target: slim
+      context: .
+      dockerfile: Dockerfile
+    container_name: explorer
+    volumes:
+      - ./data/:/data/:ro
+    ports: [9000:9000]
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=assetMantle
+      - POSTGRES_DB=assetMantle
+      - POSTGRES_USER=assetMantle
+      - ASCENDEX_URL=https://ascendex.com/api/pro/v1
+      - BAND_CHAIN_URL=guanyu-devnet.bandchain.org
+      - BLOCKCHAIN_RPC_URL=https://rpc.assetmantle.one:443
+      - BLOCKCHAIN_REST_URL=https://rest.assetmantle.one:443
+      - CHAIN_ID=mantle-1
+      - DOCU_SIGN_BASE_PATH=https://demo.docusign.net/restapi
+      - DOCU_SIGN_OAUTH_BASE_PATH=https://account-d.docusign.com/oauth/token
+      - GENESIS_FILE_PATH=/data/genesis.json
+      - KEY_STORE_FILE_PATH=/data/mantlekeystore
+      - KEY_STORE_PASSWORD=123123123
+      - MAILGUN_PASSWORD=dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs
+      - MAILGUN_USER=postmaster@dev.comdex.sg
+      - MEMBER_CHECK_URL=https://demo.membercheck.com
+      - PLAY_HTTP_SECRET=d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x
+      - ROOT_FILE_PATH=/
+      - STAKING_DENOM=umntl
+      - TRULIOO_URL=https://api.globalgateway.io
+      - WEB_APP_URL=http://localhost:9092
+      - COINGECKO_URL=https://api.coingecko.com/api/v3
+      - BLOCKCHAIN_ACCOUNT_PREFIX=mantle
+    depends_on: [ postgres ]
+    # healthcheck:
+    #   test: curl --fail http://127.0.0.1:9090 || exit 1
+
+  postgres:
+    image: bitnami/postgresql:14
+    restart: always
+    container_name: explorer-postgres
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=postgres
+    volumes:
+      - explorer-postgresql_data:/bitnami/postgresql
+      - ./conf/evolutions/default/0.sql:/docker-entrypoint-initdb.d/0.sql:ro
+
+volumes:
+  explorer-postgresql_data:
+    driver: local

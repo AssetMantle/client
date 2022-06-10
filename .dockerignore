@@ -23,4 +23,7 @@ persistenceclient-1.0
 public/.DS_Store
 keplr/node_modules
 assetmantle.zip
+.gitignore
+.git
+.github
 data/

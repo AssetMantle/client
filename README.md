@@ -110,3 +110,49 @@ This project implements explorer and other web2 applications for persistence eco
   9. Restart sshd to apply changes: `sudo systemctl restart sshd`
   10. Login from user as..
       `sftp -i “private_key_of_authorized_public_key” username@ip`
+
+## Container build
+
+### Local explorer spin-up
+
+> Bulding container image in macos will be slower as there is no native docker support
+
+- Install docker on your machine
+
+  - Macos: [https://docs.docker.com/desktop/mac/install/](https://docs.docker.com/desktop/mac/install/)
+
+  - Linux
+
+  ```shell
+  curl -sL get.docker.com | sudo bash
+  docker version
+  ```
+
+- Install `docker-compose` on your machine
+
+  - Macos: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+
+  - Linux
+
+  ```shell
+  sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d : -f2 | cut -d , -f1 | xargs)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+  docker-compose version
+  ```
+
+- Setup `keystore` and `genesis.json` files in `data` directory. Do respective environment changes in `docker-compose.yaml`
+
+- Run explore
+
+```shell
+docker-compose up
+```
+
+### Generate dist using container
+
+> Only docker with buildx required
+
+```shell
+docker buildx build  --output=type=local,dest=./ --target=dist .
+```

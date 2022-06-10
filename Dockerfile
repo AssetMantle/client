@@ -1,37 +1,50 @@
-FROM openjdk:11
-WORKDIR /opt/docker
-COPY target/docker/stage/opt /opt
-ARG POSTGRES_HOST
-ARG POSTGRES_USER
-ARG POSTGRES_PASSWORD
-ARG POSTGRES_DB
-ARG WEB_APP_URL
-ARG BLOCKCHAIN_HOST
-ARG BLOCKCHAIN_REST_PORT
-ARG BLOCKCHAIN_ABCI_PORT
-ARG ASCENDEX_URL
-ARG BAND_CHAIN_URL
-ARG MAILGUN_USER
-ARG MAILGUN_PASSWORD
-ARG KEY_STORE_FILE_PATH
-ARG KEY_STORE_PASSWORD
-ENV ROOT_FILE_PATH = /opt/docker
-ENV PLAY_SECRET=${PLAY_SECRET}
-ENV ASCENDEX_URL="${ASCENDEX_URL}"
-ENV BAND_CHAIN_URL="${BAND_CHAIN_URL}"
-ENV APPLICATION_FILE=${APPLICATION_FILE}
-ENV POSTGRES_HOST="${POSTGRES_HOST}"
-ENV POSTGRES_USER="${POSTGRES_USER}"
-ENV POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
-ENV POSTGRES_DB="${POSTGRES_DB}"
-ENV WEB_APP_URL="${WEB_APP_URL}"
-ENV GENESIS_FILE_PATH=/opt/docker/genesis.json
-ENV BLOCKCHAIN_HOST="${BLOCKCHAIN_HOST}"
-ENV BLOCKCHAIN_REST_PORT="${BLOCKCHAIN_REST_PORT}"
-ENV BLOCKCHAIN_ABCI_PORT="${BLOCKCHAIN_ABCI_PORT}"
-ENV MAILGUN_USER="${MAILGUN_USER}"
-ENV MAILGUN_PASSWORD="${MAILGUN_PASSWORD}"
-ENV KEY_STORE_FILE_PATH=${KEY_STORE_FILE_PATH}
-ENV KEY_STORE_PASSWORD="${KEY_STORE_PASSWORD}"
-ENTRYPOINT ["/opt/docker/bin/persistenceclient","-Dplay.http.secret.key=${PLAY_SECRET}"]
-CMD []
+# syntax=docker/dockerfile:latest
+FROM openjdk:11-jdk as build
+SHELL [ "/bin/bash", "-cx" ]
+RUN --mount=type=cache,target=/var/lib/cache/ \
+  --mount=type=cache,target=/var/lib/apt/cache \
+  echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list; \
+  echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list; \
+  curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add; \
+  apt-get update; \
+  apt-get install -y sbt unzip
+WORKDIR /app
+COPY . .
+RUN --mount=type=cache,target=/root/.sbt \
+  --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/root/.ivy2 \
+  sbt dist
+
+FROM openjdk:11-jre-slim as zip
+SHELL [ "/bin/bash", "-cx" ]
+WORKDIR /app
+RUN --mount=type=cache,target=/var/lib/apt/cache \
+  --mount=type=cache,target=/var/lib/cache \
+  apt update; \
+  apt install unzip -y
+COPY --from=build /app/target/universal/ /app
+RUN cp *.zip assetmantle.zip; \
+  ls -alt
+
+FROM zip as extract
+RUN unzip assetmantle.zip; \
+  ls -alt; \
+  rm *.zip; \
+  ls -alt; \
+  mv assetmantle* assetmantle; \
+  ls -alt
+
+FROM scratch as dist
+WORKDIR /
+COPY --from=zip /app/assetmantle.zip /assetmantle.zip
+
+FROM openjdk:11-jre-slim
+LABEL org.opencontainers.image.title=explorer
+LABEL org.opencontainers.image.base.name=openjdk-11-jre-slim
+LABEL org.opencontainers.image.description=explorer
+LABEL org.opencontainers.image.source=https://github.com/assetmantle/client
+LABEL org.opencontainers.image.documentation=https://github.com/assetmantle/client
+WORKDIR /assetmantle
+WORKDIR /
+COPY --from=extract /app/assetmantle /assetmantle/explorer
+ENTRYPOINT [ "/assetmantle/explorer/bin/assetmantle" ]
