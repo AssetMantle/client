@@ -27,3 +27,7 @@ assetmantle.zip
 .git
 .github
 data/
+Dockerfile
+.dockerignore
+docker-compose.yaml
+README.md
