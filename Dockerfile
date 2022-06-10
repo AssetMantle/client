@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.ivy2 \
   sbt dist
 
-FROM openjdk:11-jre-slim as zip
+FROM openjdk:11-jre-slim as extract
 SHELL [ "/bin/bash", "-cx" ]
 WORKDIR /app
 RUN --mount=type=cache,target=/var/lib/apt/cache \
@@ -24,10 +24,8 @@ RUN --mount=type=cache,target=/var/lib/apt/cache \
   apt install unzip -y
 COPY --from=build /app/target/universal/ /app
 RUN cp *.zip assetmantle.zip; \
-  ls -alt
-
-FROM zip as extract
-RUN unzip assetmantle.zip; \
+  ls -alt; \
+  unzip assetmantle.zip; \
   ls -alt; \
   rm *.zip; \
   ls -alt; \
@@ -36,7 +34,7 @@ RUN unzip assetmantle.zip; \
 
 FROM scratch as dist
 WORKDIR /
-COPY --from=zip /app/assetmantle.zip /assetmantle.zip
+COPY --from=build /app/target/universal/assetmantle*.zip /assetmantle.zip
 
 FROM openjdk:11-jre-slim
 LABEL org.opencontainers.image.title=explorer
