@@ -149,7 +149,7 @@ This project implements explorer and other web2 applications for persistence eco
 docker-compose up
 ```
 
-### Generate dist using container
+### Generate dist
 
 > Only docker with buildx required
 
