@@ -111,28 +111,28 @@ This project implements explorer and other web2 applications for persistence eco
   10. Login from user as..
       `sftp -i “private_key_of_authorized_public_key” username@ip`
 
-## Container build
+## Container
 
-### Local explorer spin-up
+### Local testnet explorer
 
-> Bulding container image in macos will be slower as there is no native docker support
+> Building container image with docker in macos will be slower as there is no native docker support
 
-- Install docker on your machine
+* Install docker on your machine
 
-  - Macos: [https://docs.docker.com/desktop/mac/install/](https://docs.docker.com/desktop/mac/install/)
+  * Macos: [https://docs.docker.com/desktop/mac/install/](https://docs.docker.com/desktop/mac/install/)
 
-  - Linux
+  * Linux
 
   ```shell
   curl -sL get.docker.com | sudo bash
   docker version
   ```
 
-- Install `docker-compose` on your machine
+* Install `docker-compose` on your machine
 
-  - Macos: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+  * Macos: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 
-  - Linux
+  * Linux
 
   ```shell
   sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d : -f2 | cut -d , -f1 | xargs)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -141,12 +141,33 @@ This project implements explorer and other web2 applications for persistence eco
   docker-compose version
   ```
 
-- Setup `keystore` and `genesis.json` files in `data` directory. Do respective environment changes in `docker-compose.yaml`
+* Setup keystore named `mantlekeystore` in root of the repository
 
-- Run explore
+* Run postgres, testnet and explorer containers
 
 ```shell
-docker-compose up
+# enable buildx
+export COMPOSE_DOCKER_CLI_BUILD=1
+export DOCKER_BUILDKIT=1
+
+# spin up postgres
+docker-compose up -d postgres
+# spin up testnet
+docker-compose up -d testnet
+# spin up explorer
+docker-compose up -d explorer
+```
+
+#### Stop the stack, remove the data
+
+```shell
+# Stop postgres, testnet and explorer containers
+docker-compose down
+
+# Remove testnet data
+docker volume client_testnet-data
+# Remove postgres data
+docker volume client_explorer-postgresql-data
 ```
 
 ### Generate dist
@@ -154,5 +175,5 @@ docker-compose up
 > Only docker with buildx required
 
 ```shell
-docker buildx build  --output=type=local,dest=./ --target=dist .
+docker buildx build --output=type=local,dest=./ --target=dist .
 ```

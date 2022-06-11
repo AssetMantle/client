@@ -13,6 +13,10 @@ COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.ivy2 \
+  --mount=type=cache,target=/app/target/resolution-cache \
+  --mount=type=cache,target=/app/target/streams \
+  --mount=type=cache,target=/app/project/target/resolution-cache \
+  --mount=type=cache,target=/app/project/target/streams \
   sbt dist
 
 FROM openjdk:11-jre-slim as extract
@@ -36,6 +40,14 @@ FROM scratch as dist
 WORKDIR /
 COPY --from=build /app/target/universal/assetmantle*.zip /assetmantle.zip
 
+FROM openjdk:11-jdk as usql
+WORKDIR /workspace
+ARG UNSQL_VERSION=0.10.0
+RUN wget https://github.com/xo/usql/releases/download/v${UNSQL_VERSION}/usql_static-${UNSQL_VERSION}-linux-amd64.tar.bz2; \
+  cp *tar.bz2 usql.tar.bz2; \
+  tar -xf usql.tar.bz2; \
+  ls -alt
+
 FROM openjdk:11-jre-slim
 LABEL org.opencontainers.image.title=explorer
 LABEL org.opencontainers.image.base.name=openjdk-11-jre-slim
@@ -44,5 +56,7 @@ LABEL org.opencontainers.image.source=https://github.com/assetmantle/client
 LABEL org.opencontainers.image.documentation=https://github.com/assetmantle/client
 WORKDIR /assetmantle
 WORKDIR /
+COPY entrypoint.sh /entrypoint.sh
+COPY --from=usql /workspace/usql_static /usr/local/bin/usql
 COPY --from=extract /app/assetmantle /assetmantle/explorer
-ENTRYPOINT [ "/assetmantle/explorer/bin/assetmantle" ]
+CMD [ "/entrypoint.sh" ]
