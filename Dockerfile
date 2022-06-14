@@ -13,10 +13,6 @@ COPY . .
 RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.ivy2 \
-  --mount=type=cache,target=/app/target/resolution-cache \
-  --mount=type=cache,target=/app/target/streams \
-  --mount=type=cache,target=/app/project/target/resolution-cache \
-  --mount=type=cache,target=/app/project/target/streams \
   sbt dist
 
 FROM openjdk:11-jre-slim as extract
