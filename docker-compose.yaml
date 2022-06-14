@@ -11,9 +11,6 @@ services:
       - POSTGRES_PASSWORD=assetMantle
       - POSTGRES_DB=assetMantle
       - POSTGRES_USER=assetMantle
-      - DB_MIGRATION=true
-      - &POSTGRESQL_USERNAME POSTGRESQL_USERNAME=postgres # postgres root for migration
-      - &POSTGRESQL_PASSWORD POSTGRESQL_PASSWORD=postgres # postgres root for migration
       - ASCENDEX_URL=https://ascendex.com/api/pro/v1
       - BAND_CHAIN_URL=guanyu-devnet.bandchain.org
       - BLOCKCHAIN_RPC_URL=http://testnet:26657
@@ -34,6 +31,11 @@ services:
       - WEB_APP_URL=http://localhost:9092
       - COINGECKO_URL=https://api.coingecko.com/api/v3
       - BLOCKCHAIN_ACCOUNT_PREFIX=mantle
+      ## START migrate 0.slq
+      - DB_MIGRATION=true
+      - POSTGRES_ROOT_USERNAME=postgres
+      - POSTGRES_ROOT_PASSWORD=postgres
+      ## END migrate 0.slq
     volumes:
       - testnet-data:/genesis/
       - ./mantlekeystore:/keystore/mantlekeystore
@@ -93,8 +95,8 @@ services:
     container_name: postgres
     # ports: [5432:5432]
     environment:
-      - *POSTGRESQL_USERNAME
-      - *POSTGRESQL_PASSWORD
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
       - POSTGRESQL_DATABASE=postgres
     healthcheck:
       test: ["CMD", "pg_isready", "-h", "postgres", "-U", "postgres"]
