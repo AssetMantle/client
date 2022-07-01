@@ -65,7 +65,7 @@
                 }
         </style>
     </head>
-    <body class="dark" id="body">
+    <body class="darkMode" id="body">
         <div class="bodyContainer comdex">
             @* Header *@
             <div class="header"
@@ -306,10 +306,10 @@
                         <div class="footerLogo">
                             <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
                             <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
-                                <span class="dayMode">
+                                <span class="dayMode hidden">
                                 @commonIcon("dayMode")
                                 </span>
-                                <span class="darkMode hidden">
+                                <span class="darkMode">
                                 @commonIcon("darkMode")
                                 </span>
                             </button>
