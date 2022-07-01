@@ -83,15 +83,31 @@ class TransactionCounters @Inject()(
   }
 
   object Utility {
-    def getTransactionStatisticsData(startEpoch: Long, endEpoch: Long): Future[ListMap[String, Double]] = {
+
+    private var statisticsData: ListMap[String, Double] = ListMap[String, Double]()
+
+    def addStatisticsData(epoch: Long, totalTxs: Int): Future[Long] = {
+      val dateString = utilities.Date.epochToDateString(epoch)
+      statisticsData = statisticsData.map { case (date, totalTxsTill) => if (date == dateString) dateString -> (totalTxsTill + totalTxs.toDouble) else date -> totalTxsTill }
+      statisticsData = ListMap(statisticsData.toSeq.sortBy(_._1): _*)
+      if (statisticsData.keys.size > 10) {
+        statisticsData = statisticsData.takeRight(10)
+      }
+      Service.create(epoch, totalTxs)
+    }
+
+    def getTransactionStatisticsData(startEpoch: Long, endEpoch: Long): Future[ListMap[String, Double]] = if (statisticsData.keys.isEmpty) {
       val counter = Service.getByStartAndEndEpoch(startEpoch = startEpoch, endEpoch = endEpoch).map(_.map(x => (x.epoch, x.totalTxs)))
       (for {
         counter <- counter
-      } yield ListMap(counter.groupBy[String](x => utilities.Date.epochToDateString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq.reverse: _*)
+      } yield {
+        statisticsData = ListMap(counter.groupBy[String](x => utilities.Date.epochToDateString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq.sortBy(_._1): _*)
+        statisticsData
+      }
         ).recover {
         case baseException: BaseException => throw baseException
       }
-    }
+    } else Future(statisticsData)
   }
 
 }
