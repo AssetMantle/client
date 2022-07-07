@@ -39,42 +39,42 @@ class ViewController @Inject()(
       }
   }
 
-  def classification(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def classification(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.classification(id))
     }
   }
 
-  def identity(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def identity(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.identity(id))
     }
   }
 
-  def asset(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def asset(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.asset(id))
     }
   }
 
-  def order(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def order(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.order(id))
     }
   }
 
-  def meta(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def meta(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.meta(id))
     }
   }
 
-  def maintainer(id: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def maintainer(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.maintainer(id))
@@ -88,7 +88,7 @@ class ViewController @Inject()(
     }
   }
 
-  def validator(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def validator(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.validators(Option(address)))
@@ -102,7 +102,7 @@ class ViewController @Inject()(
     }
   }
 
-  def block(height: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def block(height: Int): EssentialAction = cached.apply(req => req.path + "/" + height.toString, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.blocks(Option(height)))
@@ -116,7 +116,7 @@ class ViewController @Inject()(
     }
   }
 
-  def transaction(txHash: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def transaction(txHash: String): EssentialAction = cached.apply(req => req.path + "/" + txHash, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.transactions(Option(txHash)))
@@ -130,14 +130,14 @@ class ViewController @Inject()(
     }
   }
 
-  def proposal(proposalID: Int): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def proposal(proposalID: Int): EssentialAction = cached.apply(req => req.path + "/" + proposalID.toString, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.proposals(Option(proposalID)))
     }
   }
 
-  def wallet(address: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def wallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.wallet(address))
