@@ -107,7 +107,7 @@ class Block @Inject()(
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
 
-      def updateTransactionCounter() = analyticTransactionCounters.Service.create(epoch = header.time.unix, totalTxs = transactionsHash.length)
+      def updateTransactionCounter() = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.unix, totalTxs = transactionsHash.length)
 
       def updateMessageCounter(transactions: Seq[blockchainTransaction]) = analyticMessageCounters.Utility.updateMessageCounter(transactions)
 

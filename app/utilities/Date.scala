@@ -16,7 +16,9 @@ object Date {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val dateFormat = new SimpleDateFormat("dd/MM")
+  private val ddMMDateFormat = new SimpleDateFormat("dd/MM")
+
+  private val MMDDDateFormat = new SimpleDateFormat("MM/dd")
 
   def utilDateToSQLDate(utilDate: java.util.Date): java.sql.Date = new java.sql.Date(utilDate.getTime)
 
@@ -39,7 +41,9 @@ object Date {
     }
   }
 
-  def epochToDateString(value: Long): String = dateFormat.format(javaDate.from(Instant.ofEpochSecond(value)))
+  def epochToDDMMString(value: Long): String = ddMMDateFormat.format(javaDate.from(Instant.ofEpochSecond(value)))
+
+  def epochToMMDDString(value: Long): String = MMDDDateFormat.format(javaDate.from(Instant.ofEpochSecond(value)))
 
   def isValidRFC3339(x: String): Boolean = try {
     ZonedDateTime.parse(x)
