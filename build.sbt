@@ -24,11 +24,11 @@ scalaVersion := "2.13.8"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
-libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.2"
 
-libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2"
 
-libraryDependencies += "org.postgresql" % "postgresql" % "42.3.4"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.3.6"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.1"
 
