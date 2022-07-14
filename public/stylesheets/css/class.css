@@ -2311,7 +2311,7 @@ header:before,
   font-size: 1rem; }
   .infoRow .infoRowLabel {
     color: #4B4B4B;
-    width: 125px;
+    width: 250px;
     height: min-content;
     word-break: break-word; }
   .infoRow .infoRowValue {

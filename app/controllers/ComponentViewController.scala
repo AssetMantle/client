@@ -169,9 +169,9 @@ class ComponentViewController @Inject()(
         loginState match {
           case Some(loginState) => {
             implicit val loginStateImplicit: LoginState = loginState
-            withUsernameToken.Ok(views.html.component.blockchain.dashboard())
+            withUsernameToken.Ok(views.html.component.blockchain.dashboard.dashboard())
           }
-          case None => Future(Ok(views.html.component.blockchain.dashboard()))
+          case None => Future(Ok(views.html.component.blockchain.dashboard.dashboard()))
         }
     }
   }
@@ -243,7 +243,7 @@ class ComponentViewController @Inject()(
 
         (for {
           tokenPrices <- getTokenPrices
-        } yield Ok(views.html.component.blockchain.tokensPrices(tokenPrices, constants.Blockchain.StakingDenom, tokenTickers))
+        } yield Ok(views.html.component.blockchain.dashboard.tokensPrices(tokenPrices, constants.Blockchain.StakingDenom, tokenTickers))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -256,9 +256,7 @@ class ComponentViewController @Inject()(
         val dayEpoch: Long = 24 * 60 * 60
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
         val latestBlock = blockchainBlocks.Service.getLatestBlock
-        val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
         val totalTxs = blockchainTransactions.Service.getTotalTransactions
-        val ibcTxsCount = analyticMessageCounters.Service.getByMessageTypes(Seq(constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER), constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)))
 
         def getTxData(latestHeightEpoch: Long) = {
           val endEpoch = (latestHeightEpoch / dayEpoch + 1) * dayEpoch
@@ -269,18 +267,39 @@ class ComponentViewController @Inject()(
         (for {
           totalAccounts <- totalAccounts
           latestBlock <- latestBlock
-          messagesData <- messagesData
           totalTxs <- totalTxs
           txStatisticsData <- getTxData(latestBlock.time.unix)
-          ibcTxsCount <- ibcTxsCount
-        } yield Ok(views.html.component.blockchain.transactionStatistics(
+        } yield Ok(views.html.component.blockchain.dashboard.transactionStatistics(
           totalAccounts = totalAccounts,
           totalTxs = totalTxs,
+          txData = txStatisticsData))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
+  }
+
+  def transactionMessagesStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
+        val ibcTxsCount = analyticMessageCounters.Service.getByMessageTypes(
+          Seq(constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER),
+            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
+            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
+            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE),
+            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION),
+          ))
+
+        (for {
+          messagesData <- messagesData
+          ibcTxsCount <- ibcTxsCount
+        } yield Ok(views.html.component.blockchain.dashboard.transactionMessagesStatistics(
           ibcIn = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)).fold(0)(_.counter),
           ibcOut = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER)).fold(0)(_.counter),
-          txData = txStatisticsData,
-          messagesData = messagesData,
-          binWidth = transactionsStatisticsBinWidth))
+          delegate = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE)).fold(0)(_.counter),
+          executeAuthorization = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION)).fold(0)(_.counter),
+          messagesData = messagesData))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

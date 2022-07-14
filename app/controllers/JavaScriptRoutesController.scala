@@ -50,6 +50,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
           routes.javascript.ComponentViewController.tokensPrices,
           routes.javascript.ComponentViewController.transactionStatistics,
+          routes.javascript.ComponentViewController.transactionMessagesStatistics,
 
           routes.javascript.ComponentViewController.accountWallet,
           routes.javascript.ComponentViewController.accountDelegations,
