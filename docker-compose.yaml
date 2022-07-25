@@ -6,6 +6,15 @@ services:
       context: .
       dockerfile: Dockerfile
     ports: [9000:9000]
+    entrypoint: /bin/bash
+    command:
+      - -cx
+      - |
+        apt update
+        apt install -y postgresql-client
+        PGPASSWORD=postgres psql "host=postgres user=postgres" </explorer/conf/evolutions/default/0.sql || true
+        apt remove -y postgresql-client
+        /explorer/bin/assetmantle
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PASSWORD=assetMantle
