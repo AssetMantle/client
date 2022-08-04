@@ -358,6 +358,7 @@ OTHER=Other
 FROM_EMAIL_ADDRESS=AssetMantle <{0}>
 
 DASHBOARD=Dashboard
+WALLET=Wallet
 ACCOUNT=Account
 ASSET_MANTLE=AssetMantle
 WALLET_ADDRESS=Wallet Address

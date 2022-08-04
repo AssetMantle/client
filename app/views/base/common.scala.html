@@ -110,13 +110,19 @@
                                 <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
                                 @commonIcon("proposalsIcon")
                                 </span>
-                                        &nbsp;&nbsp;
                                     @Messages(constants.View.PROPOSALS)
                                 </a>
                                 </li>
                             </ul>
                         </div>
                         <div class="cmuk-navbar-right">
+                            <div>
+                                <a href="https://wallet.assetmantle.one" target="_blank">
+                                <button type="button" id='wallet' class='cmuk-button buttonPrimary walletBtn'>
+                                @Messages(constants.View.WALLET)
+                                </button>
+                                </a>
+                            </div>
                             <div class="searchContainer hidden">
                             @searchField("searchInput")
                             </div>

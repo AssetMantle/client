@@ -2923,3 +2923,8 @@ figure.zoom {
       cursor: pointer; }
 
 /*# sourceMappingURL=class.css.map */
+
+.walletBtn{
+  margin-right:12px !important;
+  background-color: var(--primary-color) !important;
+}
