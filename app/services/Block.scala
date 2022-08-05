@@ -6,13 +6,13 @@ import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Valida
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.common.TransactionMessages._
-import models.{blockchain, masterTransaction}
+import models.{analytic, blockchain, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
-import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse}
+import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse, Tx => TransactionByHeightResponseTx}
 import queries.responses.common.ProposalContents.CommunityPoolSpend
 import queries.responses.common.{Event, Header}
 import utilities.Date.RFC3339
@@ -23,6 +23,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Block @Inject()(
+                       analyticTransactionCounters: analytic.TransactionCounters,
+                       analyticMessageCounters: analytic.MessageCounters,
                        blockchainBlocks: blockchain.Blocks,
                        blockchainAccounts: blockchain.Accounts,
                        blockchainAssets: blockchain.Assets,
@@ -80,43 +82,49 @@ class Block @Inject()(
   }
 
   def insertTransactionsOnBlock(header: Header): Future[Seq[blockchainTransaction]] = {
-    val transactionHashes = {
+    val transactionByHeightResponseTxs = {
       val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, perPage = txPerPage, page = 1)
 
-      def getAllTxHashes(transactionsByHeightResponse: TransactionByHeightResponse): Future[Seq[String]] = if (transactionsByHeightResponse.result.total_count.toInt > txPerPage) {
+      def getAllTxHashes(transactionsByHeightResponse: TransactionByHeightResponse): Future[Seq[TransactionByHeightResponseTx]] = if (transactionsByHeightResponse.result.total_count.toInt > txPerPage) {
         val restTxHashes = utilitiesOperations.traverse(Range.inclusive(2, math.ceil(transactionsByHeightResponse.result.total_count.toDouble / txPerPage).toInt)) { page =>
           val transactionsByHeightResponse = getTransactionsByHeight.Service.get(height = header.height, perPage = txPerPage, page = page)
           for {
             transactionsByHeightResponse <- transactionsByHeightResponse
-          } yield transactionsByHeightResponse.result.txs.map(_.hash)
+          } yield transactionsByHeightResponse.result.txs
         }
         for {
           restTxHashes <- restTxHashes
-        } yield transactionsByHeightResponse.result.txs.map(_.hash) ++ restTxHashes.flatten
-      } else Future(transactionsByHeightResponse.result.txs.map(_.hash))
+        } yield transactionsByHeightResponse.result.txs ++ restTxHashes.flatten
+      } else Future(transactionsByHeightResponse.result.txs)
 
       for {
         transactionsByHeightResponse <- transactionsByHeightResponse
-        txHashes <- getAllTxHashes(transactionsByHeightResponse)
-      } yield txHashes
+        allTransactionByHeightResponseTx <- getAllTxHashes(transactionsByHeightResponse)
+      } yield allTransactionByHeightResponseTx
 
     }
 
     def insertTransactions(transactionsHash: Seq[String]): Future[Seq[blockchainTransaction]] = if (transactionsHash.nonEmpty) {
       val transactions = utilitiesOperations.traverse(transactionsHash)(txHash => getTransaction.Service.get(txHash)).map(_.map(_.tx_response.toTransaction))
 
+      def updateTransactionCounter() = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.unix, totalTxs = transactionsHash.length)
+
+      def updateMessageCounter(transactions: Seq[blockchainTransaction]) = analyticMessageCounters.Utility.updateMessageCounter(transactions)
+
       def insertTxs(transactions: Seq[blockchainTransaction]): Future[Seq[Int]] = blockchainTransactions.Service.insertMultiple(transactions)
 
       for {
         transactions <- transactions
-        _ <- actionsOnTransactions(transactions)(header)
         _ <- insertTxs(transactions)
+        _ <- updateTransactionCounter()
+        _ <- updateMessageCounter(transactions)
+        _ <- actionsOnTransactions(transactions)(header)
       } yield transactions
     } else Future(Seq.empty)
 
     (for {
-      transactionHashes <- transactionHashes
-      transactions <- insertTransactions(transactionHashes)
+      transactionByHeightResponseTxs <- transactionByHeightResponseTxs
+      transactions <- insertTransactions(transactionByHeightResponseTxs.map(_.hash))
     } yield transactions
       ).recover {
       case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR || baseException.failure == constants.Response.JSON_PARSE_EXCEPTION) {

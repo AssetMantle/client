@@ -120,7 +120,7 @@ class Proposals @Inject()(
     }
   }
 
-  private def getAllProposals: Future[Seq[ProposalSerialized]] = db.run(proposalTable.result)
+  private def getAllProposals: Future[Seq[ProposalSerialized]] = db.run(proposalTable.sortBy(_.id.desc).result)
 
   private[models] class ProposalTable(tag: Tag) extends Table[ProposalSerialized](tag, "Proposal_BC") {
 

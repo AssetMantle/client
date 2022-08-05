@@ -1,11 +1,11 @@
 @import scala.collection.immutable.ListMap
-@(id: String, data: ListMap[String, Int], Legend: String, showLegend: Boolean, xLabel: String = "", yLabel: String  = "")(implicit messagesProvider: MessagesProvider)
+@(id: String, data: ListMap[String, Int], showLegend: Boolean)(implicit messagesProvider: MessagesProvider)
 <div class="chartContainer">
     <canvas id="@id" width="600" height="400"></canvas>
     <script type="text/javascript" src="@routes.Assets.versioned("javascripts/chart/Chart.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.versioned("javascripts/chart/Chart.bundle.min.js")"></script>
-    <script src="@routes.Assets.versioned("javascripts/chart/barChart.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/chart/horizontalStackedBarChart.js")" type="text/javascript"></script>
     @defining[ListMap[String, Int]](data.map { case (k, v) => Messages(k) -> v }) { transformedData =>
-        <script>barChart('@id', '@transformedData.keys.toString', '@transformedData.values.toString', '@Messages(Legend)', @showLegend, '@Messages(xLabel)', '@Messages(yLabel)')</script>
+        <script>horizontalStackedBarChart('@id', '@transformedData.keys.toString', '@transformedData.values.toString', @showLegend)</script>
     }
 </div>

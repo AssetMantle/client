@@ -85,7 +85,7 @@ class Notification @Inject()(masterTransactionNotifications: masterTransaction.N
       title <- title
       message <- message
       pushNotificationToken <- pushNotificationToken
-      _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future(Unit))
+      _ <- pushNotificationToken.map(token => post(title, message, token)).getOrElse(Future())
     } yield ()
       ).recover {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)

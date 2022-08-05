@@ -205,7 +205,7 @@ class Orders @Inject()(
       val transferAuxiliary = blockchainSplits.Utility.auxiliaryTransfer(fromID = orderMake.fromID, toID = constants.Blockchain.Modules.Orders, ownableID = orderMake.makerOwnableID, splitValue = orderMake.makerOwnableSplit)
       val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(orderMake.immutableMetaProperties.metaPropertyList)
 
-      val exchangeRate = BigDecimal((((orderMake.takerOwnableSplit * constants.Blockchain.SmallestDecReciprocal) / orderMake.makerOwnableSplit) * constants.Blockchain.SmallestDecReciprocal).toBigInt()) * constants.Blockchain.SmallestDec
+      val exchangeRate = BigDecimal((((orderMake.takerOwnableSplit * constants.Blockchain.SmallestDecReciprocal) / orderMake.makerOwnableSplit) * constants.Blockchain.SmallestDecReciprocal).toBigInt) * constants.Blockchain.SmallestDec
 
       def getImmutables(scrubbedImmutableMetaProperties: Seq[Property]) = Future(Immutables(Properties(scrubbedImmutableMetaProperties ++ orderMake.immutableProperties.propertyList)))
 

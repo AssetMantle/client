@@ -3,26 +3,8 @@ package constants
 import models.common.DataValue
 import play.api.data.validation._
 import views.companion.blockchain._
-import views.companion.master._
-import views.companion.master.account.{SignUp, UpdateSocialProfile}
 
 object FormConstraint {
-  //TODO: Error Response through Messages
-  val signUpConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUp")({ signUpData: SignUp.Data =>
-    val errors = {
-      if (signUpData.username == utilities.Bech32.convertAccountPublicKeyToAccountAddress(signUpData.publicKey)) Seq(ValidationError(constants.Response.USERNAME_SAME_AS_WALLET_ADDRESS.message))
-      else Nil
-    }
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
-
-  val updateSocialProfileConstraint: Constraint[UpdateSocialProfile.Data] = Constraint("constraints.updateSocialProfile")({ updateSocialProfileData: UpdateSocialProfile.Data =>
-    val errors = {
-      if (!constants.SocialProfile.List.contains(updateSocialProfileData.platform)) Seq(ValidationError(constants.Response.UNKOWN_SOCIAL_PLATFORM.message))
-      else Nil
-    }
-    if (errors.isEmpty) Valid else Invalid(errors)
-  })
 
   val identityDefine: Constraint[IdentityDefine.Data] = Constraint("constraints.identityDefine")({ identityDefineData: IdentityDefine.Data =>
     val allTraits = identityDefineData.immutableMetaTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.immutableTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.mutableMetaTraits.getOrElse(Seq.empty).flatten ++ identityDefineData.mutableTraits.getOrElse(Seq.empty).flatten

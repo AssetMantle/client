@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 
 case class Validator(operatorAddress: String, hexAddress: String, consensusPublicKey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegatorShares: BigDecimal, description: Description, unbondingHeight: Int, unbondingTime: RFC3339, commission: Commission, minimumSelfDelegation: MicroNumber, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
-  def getTokensFromShares(shares: BigDecimal): MicroNumber = MicroNumber(((shares * BigDecimal(tokens.value)) / delegatorShares).toBigInt())
+  def getTokensFromShares(shares: BigDecimal): MicroNumber = MicroNumber(((shares * BigDecimal(tokens.value)) / delegatorShares).toBigInt)
 
   def removeDelegatorShares(removeDelegatorShares: BigDecimal): (Validator, MicroNumber) = {
     val remainingShares = delegatorShares - removeDelegatorShares
@@ -39,7 +39,7 @@ case class Validator(operatorAddress: String, hexAddress: String, consensusPubli
 
   def isUnbonding: Boolean = status == constants.Blockchain.ValidatorStatus.UNBONDING
 
-  def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONED
+  def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONDED
 
   def isUnbondingMatured(currentTime: RFC3339): Boolean = !unbondingTime.isAfter(currentTime)
 }
@@ -146,7 +146,7 @@ class Validators @Inject()(
 
   private def getValidatorsByStatus(status: String): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === status).result)
 
-  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONED).result)
+  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONDED).result)
 
   private def getValidatorsByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.operatorAddress.inSet(operatorAddresses)).result)
 
@@ -161,7 +161,7 @@ class Validators @Inject()(
     }
   }
 
-  private def getAllVotingPowers: Future[Seq[String]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONED).map(_.tokens).result)
+  private def getAllVotingPowers: Future[Seq[String]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONDED).map(_.tokens).result)
 
   private[models] class ValidatorTable(tag: Tag) extends Table[ValidatorSerialized](tag, "Validator") {
 
@@ -231,7 +231,7 @@ class Validators @Inject()(
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
 
-    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONED).map(_.map(_.deserialize))
+    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONDED).map(_.map(_.deserialize))
 
     def getAllInactiveValidatorList: Future[Seq[Validator]] = getAllInactiveValidators.map(_.map(_.deserialize))
 

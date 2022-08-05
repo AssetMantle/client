@@ -1,6 +1,6 @@
-function lineChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
+function barChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
 
-    let nameList = keys.replace('Set(', '').replace(')', '').split(', ');
+    let nameList = keys.replace('List(', '').replace(')', '').split(', ');
     let valueList = values.replace('MapLike.DefaultValuesIterable(', '').replace(')', '').split(', ');
 
     Chart.defaults.global.legend.display = showLegend;
@@ -10,14 +10,14 @@ function lineChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
             {
                 label: label,
                 data: valueList,
-                fillColor: "rgba(220,220,220,0.2)",
-                borderColor: 'rgba(220,220,220,1)',
-                backgroundColor: 'rgba(220,220,220,0.2)'
+                fillColor: theme_colors.primary,
+                borderColor: theme_colors.primary,
+                backgroundColor: theme_colors.primary
             }]
     };
     let ctx = $('#' + chartID);
     let chart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: chartData,
         options: {
             maintainAspectRatio: false,
@@ -29,6 +29,10 @@ function lineChart(chartID, keys, values, label, showLegend, xLabel, yLabel) {
                     }
                 }],
                 yAxes: [{
+                    display: true,
+                    ticks: {
+                        suggestedMin: 0,
+                    },
                     scaleLabel: {
                         display: true,
                         labelString: yLabel

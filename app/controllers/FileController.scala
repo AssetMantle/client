@@ -43,7 +43,7 @@ class FileController @Inject()(
   }
 
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>
-    FileUpload.form.bindFromRequest.fold(
+    FileUpload.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest
       },

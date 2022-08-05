@@ -1,0 +1,14 @@
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.base.charts._
+@import scala.collection.immutable.ListMap
+
+@(ibcIn: Int, ibcOut: Int, delegate: Int, executeAuthorization: Int, messagesData: ListMap[String, Double])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonCard(constants.View.TRANSACTIONS_MESSAGES_TRAFFIC) {
+} {
+    @commonPieChart("messagesStatistics", messagesData, showLegend = true)
+    @commonTextInfo(constants.View.TOTAL_IBC_OUT_TRANSACTIONS, utilities.NumericOperation.formatNumber(ibcOut))
+    @commonTextInfo(constants.View.TOTAL_IBC_IN_TRANSACTIONS, utilities.NumericOperation.formatNumber(ibcIn))
+    @commonTextInfo(constants.View.TOTAL_EXECUTE_AUTHORIZATION_TRANSACTIONS, utilities.NumericOperation.formatNumber(executeAuthorization))
+    @commonTextInfo(constants.View.TOTAL_DELEGATE_TRANSACTIONS, utilities.NumericOperation.formatNumber(delegate))
+}

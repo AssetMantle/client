@@ -46,10 +46,10 @@
         <script src="@routes.Assets.versioned("javascripts/checkAndPushState.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/backButtonCapture.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/date.js")" type="text/javascript"></script>
-@*        <script src="@routes.Assets.versioned("javascripts/signer.js")" type="text/javascript"></script>*@
-@*        <script src="@routes.Assets.versioned("javascripts/protoMsgHelper.js")" type="text/javascript"></script>*@
-@*        <script src="@routes.Assets.versioned("javascripts/keplr.js")" type="text/javascript"></script>*@
-@*        <script src="@routes.Assets.versioned("javascripts/blockchainTransactions.js")" type="text/javascript"></script>*@
+        @* <script src="@routes.Assets.versioned("javascripts/signer.js")" type="text/javascript"></script>*@
+        @* <script src="@routes.Assets.versioned("javascripts/protoMsgHelper.js")" type="text/javascript"></script>*@
+        @* <script src="@routes.Assets.versioned("javascripts/keplr.js")" type="text/javascript"></script>*@
+        @* <script src="@routes.Assets.versioned("javascripts/blockchainTransactions.js")" type="text/javascript"></script>*@
 
         <style>
                 html {
@@ -65,7 +65,7 @@
                 }
         </style>
     </head>
-    <body class="dark" id="body">
+    <body class="darkMode" id="body">
         <div class="bodyContainer comdex">
             @* Header *@
             <div class="header"
@@ -83,56 +83,46 @@
                                 <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                             </a>
                             <ul class="cmuk-navbar-nav" onclick="setActiveLink(event)">
-                            @loginState match {
-                                case null => {
-                                    <li><a id="dashBoard" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
-                                    @commonIcon("dashBoardIcon")
-                                    </span>
-                                        @Messages(constants.View.DASHBOARD)
-                                    </a>
-                                    </li>
-                                    <li><a id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
-                                    @commonIcon("blocksIcon")
-                                    </span>
-                                        @Messages(constants.View.BLOCKS)
-                                    </a>
-                                    </li>
-                                    <li><a id="transactions" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList())" class="navItemRippleEffect"><span class="transactionsIcon">
-                                    @commonIcon("transactionsIcon")
-                                    </span>
-                                        @Messages(constants.View.TRANSACTIONS)
-                                    </a>
-                                    </li>
-                                    <li><a id="validators" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
-                                    @commonIcon("validatorsIcon")
-                                    </span>
-                                        @Messages(constants.View.VALIDATORS)
-                                    </a>
-                                    </li>
-                                    <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
-                                    @commonIcon("proposalsIcon")
-                                    </span>
-                                            &nbsp;&nbsp;
-                                        @Messages(constants.View.PROPOSALS)
-                                    </a>
-                                    </li>
-                                }
-                                case default => {
-                                    <li><a href="@controllers.routes.ViewController.account" class="navItemRippleEffect">
-                                        <span class="dashboardIcon">@commonIcon("dashboardIcon")</span>
-                                        @Messages(constants.View.ACCOUNT)
-                                    </a>
-                                    </li>
-                                    <li><a href="@controllers.routes.ViewController.profile" class="navItemRippleEffect">
-                                        <span class="dashboardIcon">@commonIcon("dashboardIcon")</span>
-                                        @Messages(constants.View.PROFILE)
-                                    </a>
-                                    </li>
-                                }
-                            }
+                                <li><a id="dashBoard" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
+                                @commonIcon("dashBoardIcon")
+                                </span>
+                                    @Messages(constants.View.DASHBOARD)
+                                </a>
+                                </li>
+                                <li><a id="blocks" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.blockList())" class="navItemRippleEffect"><span class="blocksIcon">
+                                @commonIcon("blocksIcon")
+                                </span>
+                                    @Messages(constants.View.BLOCKS)
+                                </a>
+                                </li>
+                                <li><a id="transactions" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transactionList())" class="navItemRippleEffect"><span class="transactionsIcon">
+                                @commonIcon("transactionsIcon")
+                                </span>
+                                    @Messages(constants.View.TRANSACTIONS)
+                                </a>
+                                </li>
+                                <li><a id="validators" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
+                                @commonIcon("validatorsIcon")
+                                </span>
+                                    @Messages(constants.View.VALIDATORS)
+                                </a>
+                                </li>
+                                <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
+                                @commonIcon("proposalsIcon")
+                                </span>
+                                    @Messages(constants.View.PROPOSALS)
+                                </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="cmuk-navbar-right">
+                            <div>
+                                <a href="https://wallet.assetmantle.one" target="_blank">
+                                <button type="button" id='wallet' class='cmuk-button buttonPrimary walletBtn'>
+                                @Messages(constants.View.WALLET)
+                                </button>
+                                </a>
+                            </div>
                             <div class="searchContainer hidden">
                             @searchField("searchInput")
                             </div>
@@ -322,10 +312,10 @@
                         <div class="footerLogo">
                             <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
                             <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
-                                <span class="dayMode">
+                                <span class="dayMode hidden">
                                 @commonIcon("dayMode")
                                 </span>
-                                <span class="darkMode hidden">
+                                <span class="darkMode">
                                 @commonIcon("darkMode")
                                 </span>
                             </button>

@@ -28,6 +28,8 @@ case class Transaction(hash: String, height: Int, code: Int, rawLog: String, gas
 
   def getFeeGranter: String = fee.granter
 
+  def getMessageCounters: Map[String, Int] = this.messages.map(stdMsg => constants.View.TxMessagesMap.getOrElse(stdMsg.messageType, stdMsg.messageType)).groupBy(identity).view.mapValues(_.size).toMap
+
 }
 
 @Singleton

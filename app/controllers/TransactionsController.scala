@@ -1,15 +1,12 @@
 package controllers
 
-import controllers.actions.{WithLoginActionAsync, WithUserLoginAction, WithoutLoginAction, WithoutLoginActionAsync}
-import controllers.results.WithUsernameToken
+import controllers.actions.WithLoginActionAsync
 import exceptions.BaseException
-import models.{blockchain, master, masterTransaction}
-import play.api.{Configuration, Logger}
+import models.blockchain
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import transactions.blockchain.{AddKey, ChangePassword, ForgotPassword}
-import utilities.KeyStore
+import play.api.{Configuration, Logger}
 import views.companion.blockchain.SendCoin
 
 import javax.inject.{Inject, Singleton}
@@ -17,34 +14,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TransactionsController @Inject()(
-                                   utilitiesNotification: utilities.Notification,
-                                   withLoginActionAsync: WithLoginActionAsync,
-                                   withUserLoginAction: WithUserLoginAction,
-                                   withUsernameToken: WithUsernameToken,
-                                   blockchainBalances: blockchain.Balances,
-                                   blockchainIdentityProvisions: blockchain.IdentityProvisions,
-                                   masterAccounts: master.Accounts,
-                                   masterProfiles: master.Profiles,
-                                   masterTransactionEmailOTP: masterTransaction.EmailOTPs,
-                                   masterTransactionSessionTokens: masterTransaction.SessionTokens,
-                                   masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
-                                   transactionAddKey: AddKey,
-                                   transactionForgotPassword: ForgotPassword,
-                                   transactionChangePassword: ChangePassword,
-                                   messagesControllerComponents: MessagesControllerComponents,
-                                   masterEmails: master.Emails,
-                                   masterMobiles: master.Mobiles,
-                                   masterIdentifications: master.Identifications,
-                                   masterAccountKYCs: master.AccountKYCs,
-                                   withoutLoginAction: WithoutLoginAction,
-                                   withoutLoginActionAsync: WithoutLoginActionAsync,
-                                   keyStore: KeyStore
-                                 )
-                                 (implicit
-                                  executionContext: ExecutionContext,
-                                  configuration: Configuration,
-                                  wsClient: WSClient,
-                                 ) extends AbstractController(messagesControllerComponents) with I18nSupport {
+                                        withLoginActionAsync: WithLoginActionAsync,
+                                        blockchainBalances: blockchain.Balances,
+                                        messagesControllerComponents: MessagesControllerComponents,
+                                      )
+                                      (implicit
+                                       executionContext: ExecutionContext,
+                                       configuration: Configuration,
+                                       wsClient: WSClient,
+                                      ) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
 
   private implicit val module: String = constants.Module.CONTROLLERS_TRANSACTIONS

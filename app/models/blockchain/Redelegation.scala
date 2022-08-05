@@ -206,7 +206,7 @@ class Redelegations @Inject()(
 
           for (
             _ <- unbond
-          ) yield MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
+          ) yield MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt)
         })
         for (
           slashedAmounts <- updateEntries

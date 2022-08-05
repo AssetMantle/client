@@ -13,11 +13,11 @@ object Service {
 
   implicit val materializer: Materializer = Materializer(actorSystem)
 
-  val emailActor: ActorRef = actorSystem.actorOf(props = Props[EmailActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_EMAIL)
+  val emailActor: ActorRef = actorSystem.actorOf(props = Props[EmailActor]().withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_EMAIL)
 
-  val smsActor: ActorRef = actorSystem.actorOf(props = Props[SMSActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_SMS)
+  val smsActor: ActorRef = actorSystem.actorOf(props = Props[SMSActor]().withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_SMS)
 
-  val pushNotificationActor: ActorRef = actorSystem.actorOf(props = Props[PushNotificationActor].withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_PUSH_NOTIFICATION)
+  val pushNotificationActor: ActorRef = actorSystem.actorOf(props = Props[PushNotificationActor]().withDispatcher("akka.actor.default-mailbox"), name = constants.Actor.ACTOR_PUSH_NOTIFICATION)
 
-  val appWebSocketActor: ActorRef = actorSystem.actorOf(props = Props[AppWebSocketActor].withDispatcher("akka.actor.appWebSocketActorMailBox"), name = constants.Actor.ACTOR_APP_WEB_SOCKET)
+  val appWebSocketActor: ActorRef = actorSystem.actorOf(props = Props[AppWebSocketActor]().withDispatcher("akka.actor.appWebSocketActorMailBox"), name = constants.Actor.ACTOR_APP_WEB_SOCKET)
 }

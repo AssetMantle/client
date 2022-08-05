@@ -1,6 +1,3 @@
-import _root_.io.gatling.sbt.GatlingPlugin
-import _root_.sbt.Keys._
-
 name := "assetMantle"
 
 maintainer := "admin@assetmantle.one"
@@ -11,61 +8,64 @@ lazy val GatlingTest = config("gatling") extend Test
 
 GatlingTest / scalaSource  := baseDirectory.value / "gatling/simulation"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
-
 resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
 
-scalaVersion := "2.12.14"
+resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+
+resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
+
+scalaVersion := "2.13.8"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
-libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.2"
 
-libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2"
 
-libraryDependencies += "org.postgresql" % "postgresql" % "42.2.8"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.3.6"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.1"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "8.0.1"
 
-libraryDependencies += "com.twilio.sdk" % "twilio" % "7.49.0"
+libraryDependencies += "com.twilio.sdk" % "twilio" % "8.29.1"
 
-libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.1" % "test"
+libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test"
 
-libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.1.1" % "test"
+libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
 
 Test / unmanagedResourceDirectories  += (baseDirectory.value / "target/web/public/test")
 
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.8"
+libraryDependencies += "com.sksamuel.scrimage" % "scrimage-core" % "4.0.31"
 
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.8"
+libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.31"
 
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
-
-libraryDependencies += "commons-codec" % "commons-codec" % "1.14"
+libraryDependencies += "commons-codec" % "commons-codec" % "20041127.091804"
 
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "3.0.4"
 
-libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.65"
+libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
 
-libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar"))
+libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
 
-libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.5.0-RC1"
+libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.18.0"
 
-libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19"
+libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19.4"
 
-libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.2"
+libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.35"
 
-libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.6"
+libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.31"
 
-libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.0.0"
+libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.2.1"
 
-libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.15.10"
+libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.16.1"
 
 libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
+
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"

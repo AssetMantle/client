@@ -46,7 +46,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  def search(query: String): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+  def search(query: String): EssentialAction = cached.apply(req => req.path + "/" + query, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
 

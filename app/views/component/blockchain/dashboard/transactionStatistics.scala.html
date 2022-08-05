@@ -1,0 +1,11 @@
+@import views.html.base.cards._
+@import views.html.base.infos._
+@import views.html.base.charts._
+@import scala.collection.immutable.ListMap
+
+@(totalAccounts: Int, totalTxs: Int,  txData: ListMap[String, Double])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonCard(constants.View.TRANSACTIONS_TRAFFIC) {
+    @Messages(constants.View.TOTAL_ACCOUNTS): @utilities.NumericOperation.formatNumber(totalAccounts) / @Messages(constants.View.TOTAL_TRANSACTIONS): @utilities.NumericOperation.formatNumber(totalTxs)
+} {
+    @commonLineChart("txStatistics", txData, "", showLegend = false, Messages(constants.View.TRANSACTION_STATISTICS_X_LABEL), constants.View.NUMBER_OF_TRANSACTIONS)
+}

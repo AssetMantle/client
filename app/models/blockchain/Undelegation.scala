@@ -185,7 +185,7 @@ class Undelegations @Inject()(
 
     def slashUndelegation(undelegation: Undelegation, currentBlockTime: RFC3339, infractionHeight: Int, slashingFraction: BigDecimal): Future[Unit] = {
       val updatedEntries = undelegation.entries.map(entry => {
-        val slashAmount = MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt())
+        val slashAmount = MicroNumber((slashingFraction * BigDecimal(entry.initialBalance.value)).toBigInt)
         val unbondingSlashAmount = if (slashAmount < entry.balance) slashAmount else entry.balance
         if (entry.creationHeight >= infractionHeight && !entry.isMature(currentBlockTime) && unbondingSlashAmount != MicroNumber.zero) {
           entry.copy(balance = entry.balance - unbondingSlashAmount)

@@ -3,7 +3,7 @@ package utilities
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
-import org.apache.commons.codec.binary.Base64
+import java.util.Base64
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
              constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE
         => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.getEncoder.encodeToString(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
     }
 
@@ -71,7 +71,7 @@ class FileResourceManager @Inject()(utilitiesLog: utilities.Log)(implicit execut
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG |
              constants.File.JPEG_LOWER_CASE | constants.File.JPG_LOWER_CASE | constants.File.PNG_LOWER_CASE
         => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.getEncoder.encodeToString(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
     }
 
