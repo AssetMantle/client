@@ -98,7 +98,7 @@ class TransactionCounters @Inject()(
     }
 
     def getTransactionStatisticsData(startEpoch: Long, endEpoch: Long): Future[ListMap[String, Double]] = {
-      val data = if (statisticsData.keys.isEmpty) {
+      val data = if (statisticsData.keys.size < 10) {
         val counter = Service.getByStartAndEndEpoch(startEpoch = startEpoch, endEpoch = endEpoch).map(_.map(x => (x.epoch, x.totalTxs)))
         for {
           counter <- counter
