@@ -87,8 +87,9 @@ class TransactionCounters @Inject()(
     private var statisticsData: ListMap[String, Double] = ListMap[String, Double]()
 
     def addStatisticsData(epoch: Long, totalTxs: Int): Future[Long] = {
-      val dateString = utilities.Date.epochToMMDDString(epoch)
-      statisticsData = statisticsData.map { case (date, totalTxsTill) => if (date == dateString) dateString -> (totalTxsTill + totalTxs.toDouble) else date -> totalTxsTill }
+      val dateString = utilities.Date.epochToYYYYMMDDString(epoch)
+      val totalTxOnEpoch = statisticsData.getOrElse(dateString, 0.0) + totalTxs.toDouble
+      statisticsData = statisticsData - dateString + (dateString -> totalTxOnEpoch)
       statisticsData = ListMap(statisticsData.toSeq.sortBy(_._1): _*)
       if (statisticsData.keys.size > 10) {
         statisticsData = statisticsData.takeRight(10)
@@ -102,7 +103,7 @@ class TransactionCounters @Inject()(
         for {
           counter <- counter
         } yield {
-          statisticsData = ListMap(counter.groupBy[String](x => utilities.Date.epochToMMDDString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq.sortBy(_._1): _*)
+          statisticsData = ListMap(counter.groupBy[String](x => utilities.Date.epochToYYYYMMDDString(x._1)).view.mapValues(x => x.map(_._2).sum.toDouble).toSeq.sortBy(_._1): _*)
           statisticsData
         }
       } else Future(statisticsData)
@@ -111,7 +112,7 @@ class TransactionCounters @Inject()(
         data <- data
       } yield data.map { case (key, value) =>
         val dates = key.split("/")
-        Seq(dates.last, dates.head).mkString("/") -> value
+        Seq(dates(2), dates(1)).mkString("/") -> value
       }).recover {
         case baseException: BaseException => throw baseException
       }
