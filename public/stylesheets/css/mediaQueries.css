@@ -134,7 +134,7 @@
     top: 0 !important; }
 
   .comdex .mobileSearch {
-    display: block; } }
+    display: flex; justify-content: end; } }
 @media (max-width: 992px) {
   .MnemonicQuiz .mnemonicNote {
     background-image: none; }
