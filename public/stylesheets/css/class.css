@@ -50,7 +50,7 @@ body .cmuk-table td {
 }
 
 .cmuk-navbar-nav.top-nav-dropdown {
-    padding: 0 40px 0 10px;
+    padding: 0 0px 0 10px;
 }
 
 .cmuk-navbar-nav.top-nav-dropdown li select {
@@ -1570,7 +1570,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .comdex .searchForm {
     width: auto;
-    margin-right: 20px;
+    /*margin-right: 10px;*/
 }
 
 .comdex .searchForm dl {
@@ -4288,6 +4288,14 @@ figure.zoom img {
 /*# sourceMappingURL=class.css.map */
 
 .walletBtn {
+    height: 35px;
+    line-height: 35px;
     margin-right: 12px !important;
     background-color: var(--primary-color) !important;
+}
+.header .cmuk-navbar-right{
+    margin-right: 40px;
+    flex-wrap: nowrap;
+    align-items: end;
+    margin-bottom: 12px;
 }
