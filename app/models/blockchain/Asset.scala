@@ -5,7 +5,6 @@ import models.Trait.Logged
 import models.common.ID.{AssetID, ClassificationID, IdentityID}
 import models.common.Serializable._
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
-import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -28,8 +27,6 @@ class Assets @Inject()(
                         blockchainSplits: Splits,
                         blockchainMetas: Metas,
                         blockchainMaintainers: Maintainers,
-                        masterClassifications: master.Classifications,
-                        masterAssets: master.Assets,
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -154,18 +151,10 @@ class Assets @Inject()(
         } yield classificationID
       }
 
-      def masterOperations(classificationID: ClassificationID) = {
-        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID.asString, entityType = constants.Blockchain.Entity.ASSET_DEFINITION, maintainerID = assetDefine.fromID, status = Option(true))
-        for {
-          _ <- insert
-        } yield ()
-      }
-
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
         classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
-        _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
@@ -218,12 +207,10 @@ class Assets @Inject()(
       val burnAuxiliary = blockchainSplits.Utility.auxiliaryBurn(ownerID = assetBurn.fromID, ownableID = assetBurn.assetID, splitValue = constants.Blockchain.SmallestDec)
       val assetID = AssetID(assetBurn.assetID)
       val deleteAsset = Service.delete(assetID)
-      val masterOperations = masterAssets.Service.delete(assetID.asString)
 
       (for {
         _ <- burnAuxiliary
         _ <- deleteAsset
-        _ <- masterOperations
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ASSET_BURN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)

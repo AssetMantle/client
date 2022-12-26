@@ -58,11 +58,6 @@ class ComponentViewController @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                          masterAccountFiles: master.AccountFiles,
                                          masterAccountKYCs: master.AccountKYCs,
-                                         masterAssets: master.Assets,
-                                         masterOrders: master.Orders,
-                                         masterClassifications: master.Classifications,
-                                         masterSplits: master.Splits,
-                                         masterIdentifications: master.Identifications,
                                          withLoginActionAsync: WithLoginActionAsync,
                                          withUsernameToken: WithUsernameToken,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
