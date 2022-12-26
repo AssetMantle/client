@@ -9,7 +9,7 @@
 @commonModalInfo(constants.View.PROPERTIES) {
     @if(properties.nonEmpty) {
         @properties.map { property =>
-            @defining(metas.exists(_.id == property.hashID)) { isRevealed =>
+            @defining(metas.exists(_.id.hashID == property.hashID)) { isRevealed =>
                 @commonTextInfo(constants.View.NAME, property.name)
                 @if(isOwner || isRevealed) {
                     @commonTextInfo(constants.View.VALUE, property.value.getOrElse(""))
@@ -19,9 +19,6 @@
                 @commonBooleanInfo(constants.View.IS_META, Option(property.isMeta))
                 @commonBooleanInfo(constants.View.IS_MUTABLE, Option(property.isMutable))
                 @commonBooleanInfo(constants.View.IS_REVEALED, Option(isRevealed))
-                @if(!isRevealed && property.hashID != "") {
-                    @commonFormButton(constants.Form.META_REVEAL, 'parameters -> s"'${property.value.getOrElse("")}', '${property.dataType}'")
-                }
             }
             <br>
         }

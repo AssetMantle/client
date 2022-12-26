@@ -87,17 +87,6 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def profilePicture(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
-      (for {
-        profilePicture <- profilePicture
-      } yield Ok(views.html.assetMantle.profilePicture(profilePicture))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
-
   def wallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>

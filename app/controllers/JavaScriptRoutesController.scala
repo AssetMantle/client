@@ -18,18 +18,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         JavaScriptReverseRouter("jsRoutes")(
           routes.javascript.Assets.versioned,
 
-          routes.javascript.AssetController.defineForm,
-          routes.javascript.AssetController.mintForm,
-          routes.javascript.AssetController.mutateForm,
-          routes.javascript.AssetController.burnForm,
-
-          routes.javascript.ChatController.chatRoom,
-          routes.javascript.ChatController.chatWindow,
-          routes.javascript.ChatController.sendMessageForm,
-          routes.javascript.ChatController.loadMoreChats,
-          routes.javascript.ChatController.replyToMessage,
-          routes.javascript.ChatController.markChatAsRead,
-
           routes.javascript.ContactController.verifyEmailAddressForm,
           routes.javascript.ContactController.verifyMobileNumberForm,
 
@@ -41,7 +29,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.proposal,
 
           routes.javascript.ComponentViewController.commonHome,
-          routes.javascript.ComponentViewController.profilePicture,
           routes.javascript.ComponentViewController.recentActivities,
 
           routes.javascript.ComponentViewController.latestBlockHeight,
@@ -93,38 +80,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ContactController.addOrUpdateMobileNumberForm,
           routes.javascript.ContactController.contact,
 
-          routes.javascript.FileController.uploadAccountFileForm,
-          routes.javascript.FileController.uploadAccountFile,
-          routes.javascript.FileController.storeAccountFile,
-          routes.javascript.FileController.updateAccountFileForm,
-          routes.javascript.FileController.updateAccountFile,
-          routes.javascript.FileController.file,
-
-          routes.javascript.IdentityController.nubForm,
-          routes.javascript.IdentityController.defineForm,
-          routes.javascript.IdentityController.issueForm,
-          routes.javascript.IdentityController.provisionForm,
-          routes.javascript.IdentityController.unprovisionForm,
-
           routes.javascript.IndexController.search,
-
-          routes.javascript.MetaController.revealForm,
-          routes.javascript.MaintainerController.deputizeForm,
 
           routes.javascript.NotificationController.recentActivityMessages,
           routes.javascript.NotificationController.unreadNotificationCount,
           routes.javascript.NotificationController.markNotificationRead,
-
-          routes.javascript.OrderController.defineForm,
-          routes.javascript.OrderController.makeForm,
-          routes.javascript.OrderController.takeForm,
-          routes.javascript.OrderController.cancelForm,
-
-          routes.javascript.SplitController.sendForm,
-          routes.javascript.SplitController.wrapForm,
-          routes.javascript.SplitController.unwrapForm,
-
-          routes.javascript.TransactionsController.sendCoinForm,
 
           routes.javascript.ViewController.identity,
           routes.javascript.ViewController.asset,
