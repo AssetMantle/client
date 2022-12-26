@@ -18,17 +18,6 @@ object Form {
   val ASSET_MUTATE = new Form("ASSET_MUTATE", routes.AssetController.mutate, routes.javascript.AssetController.mutateForm)
   val ASSET_BURN = new Form("ASSET_BURN", routes.AssetController.burn, routes.javascript.AssetController.burnForm)
 
-  //BackgroundCheckController
-  val MEMBER_CHECK_MEMBER_SCAN = new Form("MEMBER_CHECK_MEMBER_SCAN", routes.BackgroundCheckController.memberScan, routes.javascript.BackgroundCheckController.memberScanForm)
-  val MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_MEMBER_SCAN_RESULT_DECISION", routes.BackgroundCheckController.memberScanResultDecision, routes.javascript.BackgroundCheckController.memberScanResultDecisionForm)
-  val ADD_UBO_MEMBER_CHECK = new Form("ADD_UBO_MEMBER_CHECK", routes.BackgroundCheckController.addUBOMemberCheck, routes.javascript.BackgroundCheckController.addUBOMemberCheckForm)
-  val MEMBER_CHECK_CORPORATE_SCAN = new Form("MEMBER_CHECK_CORPORATE_SCAN", routes.BackgroundCheckController.corporateScan, routes.javascript.BackgroundCheckController.corporateScanForm)
-  val MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_CORPORATE_SCAN_RESULT_DECISION", routes.BackgroundCheckController.corporateScanResultDecision, routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm)
-  val ADD_ORGANIZATION_MEMBER_CHECK = new Form("ADD_ORGANIZATION_MEMBER_CHECK", routes.BackgroundCheckController.addOrganizationMemberCheck, routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm)
-  val MEMBER_CHECK_VESSEL_SCAN = new Form("MEMBER_CHECK_VESSEL_SCAN", routes.BackgroundCheckController.vesselScan, routes.javascript.BackgroundCheckController.vesselScanForm)
-  val MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION = new Form("MEMBER_CHECK_VESSEL_SCAN_RESULT_DECISION", routes.BackgroundCheckController.vesselScanResultDecision, routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm)
-  val ADD_ASSET_MEMBER_CHECK = new Form("ADD_ASSET_MEMBER_CHECK", routes.BackgroundCheckController.addAssetMemberCheck, routes.javascript.BackgroundCheckController.addAssetMemberCheckForm)
-
   //ChatController
   val SEND_MESSAGE = new Form("SEND_MESSAGE", routes.ChatController.sendMessage, routes.javascript.ChatController.sendMessageForm)
 

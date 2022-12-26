@@ -142,19 +142,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.proposals,
           routes.javascript.ViewController.wallet,
 
-          routes.javascript.BackgroundCheckController.memberScanForm,
-          routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addUBOMemberCheckForm,
-          routes.javascript.BackgroundCheckController.memberScanResult,
-          routes.javascript.BackgroundCheckController.corporateScanForm,
-          routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm,
-          routes.javascript.BackgroundCheckController.corporateScanResult,
-          routes.javascript.BackgroundCheckController.vesselScanForm,
-          routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addAssetMemberCheckForm,
-          routes.javascript.BackgroundCheckController.vesselScanResult,
-
         )
       ).as("text/javascript")
   }

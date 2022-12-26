@@ -155,28 +155,6 @@ GET         /accountUpdate/updateFile                       controllers.FileCont
 GET         /blockchainTransaction/sendCoin                 controllers.TransactionsController.sendCoinForm
 POST        /blockchainTransaction/sendCoin                 controllers.TransactionsController.sendCoin
 
-GET         /background/memberScan                          controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
-POST        /background/memberScan                          controllers.BackgroundCheckController.memberScan
-GET         /background/memberScanResult                    controllers.BackgroundCheckController.memberScanResult(resultID: Int)
-GET         /background/memberScanResultDecision            controllers.BackgroundCheckController.memberScanResultDecisionForm(resultID: Int)
-POST        /background/memberScanResultDecision            controllers.BackgroundCheckController.memberScanResultDecision
-GET         /background/addUBO                              controllers.BackgroundCheckController.addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addUBO                              controllers.BackgroundCheckController.addUBOMemberCheck
-GET         /background/corporateScan                       controllers.BackgroundCheckController.corporateScanForm(organizationID: String, companyName: String)
-POST        /background/corporateScan                       controllers.BackgroundCheckController.corporateScan
-GET         /background/corporateScanResult                 controllers.BackgroundCheckController.corporateScanResult(resultID: Int)
-GET         /background/corporateScanResultDecision         controllers.BackgroundCheckController.corporateScanResultDecisionForm(resultID: Int)
-POST        /background/corporateScanResultDecision         controllers.BackgroundCheckController.corporateScanResultDecision
-GET         /background/addOrganization                     controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addOrganization                     controllers.BackgroundCheckController.addOrganizationMemberCheck
-GET         /background/vesselScan                          controllers.BackgroundCheckController.vesselScanForm(assetID: String, vesselName: String)
-POST        /background/vesselScan                          controllers.BackgroundCheckController.vesselScan
-GET         /background/vesselScanResult                    controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
-GET         /background/vesselScanResultDecision            controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
-POST        /background/vesselScanResultDecision            controllers.BackgroundCheckController.vesselScanResultDecision
-GET         /background/addAsset                            controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addAsset                            controllers.BackgroundCheckController.addAssetMemberCheck
-
 GET         /chat/room                                      controllers.ChatController.chatRoom(negotiationID: String)
 GET         /chat/window                                    controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
 GET         /chat/loadMoreChats                             controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
