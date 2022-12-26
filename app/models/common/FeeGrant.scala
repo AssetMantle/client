@@ -1,7 +1,7 @@
 package models.common
 
 import models.Abstract.{FeeGrant => AbstarctFeeGrant}
-import models.common.Serializable.Coin
+import models.common.Coin
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._

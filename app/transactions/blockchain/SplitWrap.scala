@@ -1,7 +1,7 @@
 package transactions.blockchain
 
 import exceptions.BaseException
-import models.common.Serializable.Coin
+import models.common.Coin
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}

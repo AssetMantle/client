@@ -1,13 +1,12 @@
 package queries.responses.blockchain
 
 import models.blockchain.Transaction
-import models.common.Serializable
 import models.common.TransactionMessages.StdMsg
+import models.common.{Fee => commonFee}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.{PublicKey, TransactionMessageResponse}
 import queries.responses.common.Coin
-import queries.responses.common.PublicKeys._
 import queries.responses.common.TransactionMessageResponses.msgApply
 import transactions.Abstract.BaseResponse
 import utilities.Date.RFC3339
@@ -15,7 +14,7 @@ import utilities.Date.RFC3339
 object TransactionResponse {
 
   case class Fee(amount: Seq[Coin], gas_limit: String, payer: String, granter: String) {
-    def toFee: Serializable.Fee = Serializable.Fee(amount = amount.map(_.toCoin), gasLimit = gas_limit, payer = payer, granter = granter)
+    def toFee: commonFee = commonFee(amount = amount.map(_.toCoin), gasLimit = gas_limit, payer = payer, granter = granter)
   }
 
   implicit val feeReads: Reads[Fee] = Json.reads[Fee]

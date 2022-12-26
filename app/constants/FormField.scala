@@ -85,7 +85,6 @@ object FormField {
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val CURRENCY = new SelectFormField("CURRENCY", constants.SelectFieldOptions.CURRENCIES)
   val TOKEN_DENOM = new SelectFormField("TOKEN_DENOM", Seq.empty)
-  val DATA_TYPE = new SelectFormField("DATA_TYPE", constants.SelectFieldOptions.DATA_TYPE)
   val ENTITY_TYPE = new SelectFormField("ENTITY_TYPE", constants.SelectFieldOptions.ENTITY_TYPE)
 
   val DENOM = new CustomSelectFormField("DENOM")

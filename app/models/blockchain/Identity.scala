@@ -2,9 +2,7 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.DataValue.IDDataValue
-import models.common.ID.{ClassificationID, IdentityID}
-import models.common.Serializable._
+import models.common.BaseData.IDData
 import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub}
 import models.master
 import org.postgresql.util.PSQLException
@@ -187,7 +185,7 @@ class Identities @Inject()(
       val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(utilities.Blockchain.getNubMetaProperty(identityNub.nubID)))
 
       def defineAndUpsert(nubProperty: Property): Future[Identity] = {
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), Mutables(Properties(Seq())))
+        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDData("")))))), Mutables(Properties(Seq())))
 
         def addIdentityWithProvisionAddress() = addIdentityWithProvisionAddresses(identity = utilities.Blockchain.getNubIdentity(identityNub.nubID), provisionedAddresses = Seq(identityNub.from))
 

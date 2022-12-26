@@ -205,11 +205,13 @@ object Blockchain {
     val Orders = "orders"
   }
 
+  case class DataType(blockchainType: String, short: String)
+
   object DataType {
-    val STRING_DATA = "xprt/stringData"
-    val HEIGHT_DATA = "xprt/heightData"
-    val ID_DATA = "xprt/idData"
-    val DEC_DATA = "xprt/decData"
+    val STRING_DATA: DataType = DataType("xprt/stringData", "S")
+    val HEIGHT_DATA: DataType = DataType("xprt/heightData", "H")
+    val ID_DATA: DataType = DataType("xprt/idData", "I")
+    val DEC_DATA: DataType = DataType("xprt/decData", "D")
   }
 
   object FactType {

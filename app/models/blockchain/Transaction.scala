@@ -2,7 +2,7 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logging
-import models.common.Serializable.Fee
+import models.common.Fee
 import models.common.TransactionMessages.StdMsg
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

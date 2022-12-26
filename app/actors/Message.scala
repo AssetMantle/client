@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.ActorRef
-import models.common.Serializable.Fee
+import models.common.Fee
 import play.api.libs.json.{Json, OWrites, Writes}
 
 object Message {

@@ -3,8 +3,7 @@ package queries.responses.common
 import exceptions.BaseException
 import models.Abstract.{PublicKey => SerializablePublicKey}
 import models.blockchain.{Account => BlockchainAccount}
-import models.common.Serializable
-import models.common.Serializable.Vesting.VestingParameters
+import models.common.Vesting.VestingParameters
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.{Account, PublicKey}

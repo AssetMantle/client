@@ -6,9 +6,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import models._
 import models.blockchain._
-import models.common.ID
-import models.common.ID.IdentityID
-import models.common.Serializable.Coin
+import models.common.Coin
 import models.keyBase.ValidatorAccount
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport

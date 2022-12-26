@@ -628,10 +628,10 @@ object View {
   )
 
   val DataTypesMap: Map[String, String] = Map(
-    constants.Blockchain.DataType.STRING_DATA -> "STRING_DATA",
-    constants.Blockchain.DataType.DEC_DATA -> "DECIMAL_DATA",
-    constants.Blockchain.DataType.ID_DATA -> "ID_DATA",
-    constants.Blockchain.DataType.HEIGHT_DATA -> "HEIGHT_DATA",
+    constants.Blockchain.DataType.STRING_DATA.blockchainType -> "STRING_DATA",
+    constants.Blockchain.DataType.DEC_DATA.blockchainType -> "DECIMAL_DATA",
+    constants.Blockchain.DataType.ID_DATA.blockchainType -> "ID_DATA",
+    constants.Blockchain.DataType.HEIGHT_DATA.blockchainType -> "HEIGHT_DATA",
   )
 
   val FactTypesMap: Map[String, String] = Map(

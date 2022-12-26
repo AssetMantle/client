@@ -1,17 +1,17 @@
 package queries.responses.common
 
-import models.common.DataValue._
-import models.common.Serializable
+import models.common.BaseData._
+import models.common.AnyData
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 
 case class Data(dataType: String, value: Data.Value) {
-  def toData: Serializable.Data = dataType match {
-    case constants.Blockchain.DataType.STRING_DATA => Serializable.Data(constants.Blockchain.DataType.STRING_DATA, StringDataValue(value.value))
-    case constants.Blockchain.DataType.ID_DATA => Serializable.Data(constants.Blockchain.DataType.ID_DATA, IDDataValue(value.value))
-    case constants.Blockchain.DataType.HEIGHT_DATA => Serializable.Data(constants.Blockchain.DataType.HEIGHT_DATA, HeightDataValue(value.value.toInt))
-    case constants.Blockchain.DataType.DEC_DATA => Serializable.Data(constants.Blockchain.DataType.DEC_DATA, DecDataValue(BigDecimal(value.value)))
+  def toData: AnyData = dataType match {
+    case constants.Blockchain.DataType.STRING_DATA => AnyData(constants.Blockchain.DataType.STRING_DATA, StringData(value.value))
+    case constants.Blockchain.DataType.ID_DATA => AnyData(constants.Blockchain.DataType.ID_DATA, IDData(value.value))
+    case constants.Blockchain.DataType.HEIGHT_DATA => AnyData(constants.Blockchain.DataType.HEIGHT_DATA, HeightData(value.value.toInt))
+    case constants.Blockchain.DataType.DEC_DATA => AnyData(constants.Blockchain.DataType.DEC_DATA, DecData(BigDecimal(value.value)))
   }
 }
 

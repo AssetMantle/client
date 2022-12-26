@@ -2,8 +2,6 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.ID.MetaID
-import models.common.Serializable._
 import models.common.TransactionMessages.MetaReveal
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

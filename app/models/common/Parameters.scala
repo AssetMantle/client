@@ -1,7 +1,7 @@
 package models.common
 
 import models.Abstract.Parameter
-import models.common.Serializable.Coin
+import models.common.Coin
 import play.api.libs.json.{Json, OWrites, Reads}
 
 object Parameters {

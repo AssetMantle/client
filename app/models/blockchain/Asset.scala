@@ -2,8 +2,8 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.ID.{AssetID, ClassificationID, IdentityID}
-import models.common.Serializable._
+import models.common.BaseID.AssetID
+import models.common.Document
 import models.common.TransactionMessages.{AssetBurn, AssetDefine, AssetMint, AssetMutate}
 import models.master
 import org.postgresql.util.PSQLException
@@ -18,7 +18,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(id: AssetID, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Asset(id: AssetID, document: Document, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
 
 @Singleton
 class Assets @Inject()(

@@ -4,7 +4,7 @@ import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logging
 import models.common.PublicKeys.SinglePublicKey
-import models.common.Serializable.Vesting.VestingParameters
+import models.common.Vesting.VestingParameters
 import models.common.TransactionMessages.CreateVestingAccount
 import models.master
 import org.postgresql.util.PSQLException

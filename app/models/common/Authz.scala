@@ -2,7 +2,7 @@ package models.common
 
 import exceptions.BaseException
 import models.Abstract.{Authz => AuthzAbstract}
-import models.common.Serializable.Coin
+import models.common.Coin
 import models.common.TransactionMessages._
 import play.api.Logger
 import play.api.libs.json._

@@ -2,7 +2,7 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logging
-import models.common.Serializable.Coin
+import models.common.Coin
 import models.common.TransactionMessages.{Acknowledgement, MultiSend, RecvPacket, SendCoin, Timeout, TimeoutOnClose, Transfer}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

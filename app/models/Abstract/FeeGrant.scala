@@ -1,7 +1,7 @@
 package models.Abstract
 
 import models.common.FeeGrant.{AllowedMsgAllowance, BasicAllowance, PeriodicAllowance}
-import models.common.Serializable.Coin
+import models.common.Coin
 import play.api.libs.json.{Json, Writes}
 import utilities.Date.RFC3339
 

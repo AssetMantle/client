@@ -2,7 +2,7 @@ package models.common
 
 import exceptions.BaseException
 import models.Abstract.ProposalContent
-import models.common.Serializable.Coin
+import models.common.Coin
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads, Writes}

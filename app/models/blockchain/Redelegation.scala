@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logged
 import models.common.Parameters.SlashingParameter
-import models.common.Serializable.RedelegationEntry
+import models.common.Staking.RedelegationEntry
 import models.common.TransactionMessages.Redelegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

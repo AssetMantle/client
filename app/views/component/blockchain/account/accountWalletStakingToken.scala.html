@@ -2,7 +2,7 @@
 @import views.html.base.infos._
 @import views.html.base.charts._
 @import scala.collection.immutable.ListMap
-@import models.common.Serializable.Coin
+@import models.common.Coin
 
 @import models.masterTransaction.TokenPrice
 @(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)

@@ -3,7 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Trait.Logged
 import models.common.Parameters.GovernanceParameter
-import models.common.Serializable.Coin
+import models.common.Coin
 import models.common.TransactionMessages.Deposit
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

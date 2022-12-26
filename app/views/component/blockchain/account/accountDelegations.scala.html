@@ -1,13 +1,11 @@
-@import views.html.base.cards._
-@import views.html.base._
-@import scala.collection.immutable.ListMap
-@import models.common.Serializable.UndelegationEntry
-@import views.html.component.blockchain.account.accountDelegationsDelegated
-@import views.html.component.blockchain.account.accountDelegationsUndelegating
+@import models.common.Staking._
 @import utilities.MicroNumber
+@import views.html.base._
+@import views.html.base.cards._
+@import views.html.component.blockchain.account.{accountDelegationsDelegated, accountDelegationsRedelegating, accountDelegationsUndelegating}
 
-@import views.html.component.blockchain.account.accountDelegationsRedelegating
-@import models.common.Serializable.RedelegationEntry
+@import scala.collection.immutable.ListMap
+
 @(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[(String, String), Seq[RedelegationEntry]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.ACCOUNT_DELEGATIONS) {

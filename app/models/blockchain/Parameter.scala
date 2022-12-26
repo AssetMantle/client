@@ -8,7 +8,7 @@ import models.Abstract.{Parameter => abstractParameter}
 import models.Trait.Logged
 import models.common.Parameters._
 import models.common.ProposalContents.ParameterChange
-import models.common.Serializable.Coin
+import models.common.Coin
 import models.common.TransactionMessages._
 import models.masterTransaction
 import org.postgresql.util.PSQLException

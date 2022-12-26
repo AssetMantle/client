@@ -2,7 +2,9 @@ package models.common
 
 import exceptions.BaseException
 import models.Abstract.{ProposalContent, PublicKey, TransactionMessage}
-import models.common.Serializable._
+import models.common.Governance._
+import models.common.IBC._
+import models.common.Coin
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
@@ -538,7 +540,7 @@ object TransactionMessages {
   implicit val orderCancelWrites: OWrites[OrderCancel] = Json.writes[OrderCancel]
 
   //metaList
-  case class MetaReveal(from: String, metaFact: MetaFact) extends TransactionMessage {
+  case class MetaReveal(from: String, data: AnyData) extends TransactionMessage {
     def getSigners: Seq[String] = Seq(from)
   }
 

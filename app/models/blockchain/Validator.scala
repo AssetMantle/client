@@ -3,7 +3,7 @@ package models.blockchain
 import exceptions.BaseException
 import models.Abstract.PublicKey
 import models.Trait.Logged
-import models.common.Serializable.Validator.{Commission, Description}
+import models.common.Validator._
 import models.common.TransactionMessages._
 import models.{keyBase, masterTransaction}
 import org.postgresql.util.PSQLException

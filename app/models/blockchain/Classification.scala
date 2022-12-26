@@ -2,8 +2,6 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.ID.ClassificationID
-import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json

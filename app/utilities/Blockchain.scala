@@ -3,10 +3,9 @@ package utilities
 import exceptions.BaseException
 import models.Abstract.Authz.Authorization
 import models.blockchain.Identity
-import models.common.DataValue.IDDataValue
+import models.common.BaseData.IDData
 import models.common.FeeGrant.Allowance
-import models.common.ID.{ClassificationID, IdentityID}
-import models.common.Serializable.{Coin, Data, Immutables, MetaFact, MetaProperty, Mutables, NewFact, Properties, Property}
+import models.common._
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPublicKeyParameters}
 import org.bouncycastle.crypto.signers.ECDSASigner
@@ -79,7 +78,7 @@ object Blockchain {
     }
   }
 
-  def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDDataValue(nubID))))
+  def getNubMetaProperty(nubID: String): MetaProperty = MetaProperty(id = constants.Blockchain.Properties.NubID, metaFact = MetaFact(Data(dataType = constants.Blockchain.DataType.ID_DATA, value = IDData(nubID))))
 
   def getNubIdentity(nubID: String): Identity = {
     val immutables = Immutables(Properties(Seq(getNubMetaProperty(nubID).removeData())))

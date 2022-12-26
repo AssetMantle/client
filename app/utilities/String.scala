@@ -1,6 +1,6 @@
 package utilities
 
-import models.common.DataValue
+import models.common.BaseData
 import play.api.routing.JavaScriptReverseRoute
 
 import java.security.MessageDigest
@@ -39,7 +39,7 @@ object String {
       .getOrElse("")
   }
 
-  def getPropertyRequestNameAndType(dataType: String, dataName: String): String = Seq(dataName, DataValue.getFactTypeFromDataType(dataType)).mkString(constants.Blockchain.DataNameAndTypeSeparator)
+  def getPropertyRequestNameAndType(dataType: String, dataName: String): String = Seq(dataName, BaseData.getFactTypeFromDataType(dataType)).mkString(constants.Blockchain.DataNameAndTypeSeparator)
 
   def getPropertyRequestWithValue(dataNameWithType: String, dataValue: Option[String]): String = Seq(dataNameWithType, dataValue.getOrElse("")).mkString(constants.Blockchain.DataTypeAndValueSeparator)
 }

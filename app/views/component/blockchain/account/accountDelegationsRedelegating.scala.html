@@ -1,6 +1,6 @@
 @import views.html.base.buttons._
 @import scala.collection.immutable.ListMap
-@import models.common.Serializable.RedelegationEntry
+@import models.common.Staking.RedelegationEntry
 
 @(redelegations: ListMap[(String, String), Seq[RedelegationEntry]], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

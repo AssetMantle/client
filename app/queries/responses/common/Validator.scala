@@ -1,7 +1,7 @@
 package queries.responses.common
 
 import models.blockchain.{Validator => BlockchainValidator}
-import models.common.Serializable
+import models.common.Staking
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import queries.Abstract.PublicKey
@@ -11,7 +11,7 @@ import utilities.MicroNumber
 object Validator {
 
   case class CommissionRates(rate: String, max_rate: String, max_change_rate: String) {
-    def toCommissionRates: Serializable.Validator.CommissionRates = Serializable.Validator.CommissionRates(rate = BigDecimal(rate), maxRate = BigDecimal(max_rate), maxChangeRate = BigDecimal(max_change_rate))
+    def toCommissionRates: Staking.Validator.CommissionRates = Serializable.Validator.CommissionRates(rate = BigDecimal(rate), maxRate = BigDecimal(max_rate), maxChangeRate = BigDecimal(max_change_rate))
   }
 
   implicit val commissionRatesReads: Reads[CommissionRates] = Json.reads[CommissionRates]

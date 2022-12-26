@@ -4,7 +4,6 @@ import constants.AppConfig._
 import controllers.actions._
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
-import models.common.ID
 import models.master
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport

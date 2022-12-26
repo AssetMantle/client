@@ -3,7 +3,7 @@ package models.blockchain
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import models.Trait.Logged
-import models.common.Serializable.UndelegationEntry
+import models.common.Staking.UndelegationEntry
 import models.common.TransactionMessages.Undelegate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

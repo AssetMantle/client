@@ -3,7 +3,8 @@ package models.blockchain
 import exceptions.BaseException
 import models.Abstract.ProposalContent
 import models.Trait.Logged
-import models.common.Serializable.{Coin, FinalTallyResult}
+import models.common.Coin
+import models.common.Governance._
 import models.common.TransactionMessages.SubmitProposal
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider

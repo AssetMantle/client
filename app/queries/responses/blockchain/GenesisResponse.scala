@@ -3,7 +3,7 @@ package queries.responses.blockchain
 import models.Abstract.Parameter
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
 import models.common.Parameters.GovernanceParameter
-import models.common.Serializable
+import models.common.Staking.{RedelegationEntry => StakingRedelegationEntry, UndelegationEntry => StakingUndelegationEntry}
 import queries.responses.common.{Authz => commonAuthz}
 import queries.responses.common.{FeeGrant => commonFeeGrant}
 import play.api.libs.json.{Json, Reads}
@@ -132,7 +132,7 @@ object GenesisResponse {
   object Staking {
 
     case class RedelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, shares_dst: String) {
-      def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
+      def toRedelegationEntry: StakingRedelegationEntry = StakingRedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
     }
 
     implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
@@ -144,7 +144,7 @@ object GenesisResponse {
     implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
     case class UndelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, balance: String) {
-      def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
+      def toUndelegationEntry: StakingUndelegationEntry = StakingUndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
     }
 
     implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
