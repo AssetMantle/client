@@ -162,7 +162,3 @@ GET         /chat/sendMessage                               controllers.ChatCont
 POST        /chat/sendMessage                               controllers.ChatController.sendMessage
 GET         /chat/markChatAsRead                            controllers.ChatController.markChatAsRead(chatID: String)
 GET         /chat/replyToMessage                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
-
-#DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                         controllers.WesternUnionController.westernUnionRTCB
-POST        /wu/portalRedirect                              controllers.WesternUnionController.westernUnionPortalRedirect
