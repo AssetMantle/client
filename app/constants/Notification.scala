@@ -90,9 +90,6 @@ object Notification {
   val MAINTAINER_DEPUTIZED = new Notification(notificationType = "MAINTAINER_DEPUTIZED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ComponentViewController.transaction))
   val META_REVEALED = new Notification(notificationType = "META_REVEALED", sendEmail = false, sendPushNotification = true, sendSMS = false, route = Option(routes.javascript.ComponentViewController.transaction))
 
-  //docusign
-  val DOCUSIGN_AUTHORIZATION_PENDING = new Notification(notificationType = "DOCUSIGN_AUTHORIZATION_PENDING", sendEmail = false, sendPushNotification = true, sendSMS = false)
-
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 

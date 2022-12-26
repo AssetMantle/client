@@ -48,13 +48,17 @@ libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.32"
 
 libraryDependencies += "commons-codec" % "commons-codec" % "20041127.091804"
 
+libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % "2.7.0"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.7.0"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.7.0"
+
 libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "5.0.0"
 
 libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
 
 libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
-
-libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.22.0"
 
 libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19.4"
 

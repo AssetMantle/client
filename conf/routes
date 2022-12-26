@@ -9,14 +9,6 @@ GET         /javascriptRoutes                               controllers.JavaScri
 
 GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /docusign/send                                  controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                  controllers.DocusignController.sign(id:String, documentType: String)
-GET         /docusign/authorization                         controllers.DocusignController.authorization
-
-#DO NOT CHANGE /Docusign CallBack ENDPOINT
-GET         /docusign/callBack                              controllers.DocusignController.callBack(envelopeId:String, event:String)
-GET         /docusign/authorizationCallBack                 controllers.DocusignController.authorizationCallBack(code:String)
-
 GET         /account                                        controllers.ViewController.account
 GET         /classification                                 controllers.ViewController.classification(id: String)
 GET         /meta                                           controllers.ViewController.meta(id: String)

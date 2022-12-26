@@ -93,10 +93,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ContactController.addOrUpdateMobileNumberForm,
           routes.javascript.ContactController.contact,
 
-          routes.javascript.DocusignController.send,
-          routes.javascript.DocusignController.sign,
-          routes.javascript.DocusignController.authorization,
-
           routes.javascript.FileController.uploadAccountFileForm,
           routes.javascript.FileController.uploadAccountFile,
           routes.javascript.FileController.storeAccountFile,
