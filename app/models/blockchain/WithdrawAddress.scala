@@ -4,8 +4,8 @@ import java.sql.Timestamp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
-import models.Trait.Logged
-import models.common.TransactionMessages.SetWithdrawAddress
+import models.Trait.Logging
+import cosmos.distribution.v1beta1.{Tx => distributionTx}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class WithdrawAddresses @Inject()(
@@ -70,23 +70,19 @@ class WithdrawAddresses @Inject()(
 
   private[models] class WithdrawAddressTable(tag: Tag) extends Table[WithdrawAddress](tag, "WithdrawAddress") {
 
-    def * = (delegatorAddress, withdrawAddress, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (WithdrawAddress.tupled, WithdrawAddress.unapply)
+    def * = (delegatorAddress, withdrawAddress, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WithdrawAddress.tupled, WithdrawAddress.unapply)
 
     def delegatorAddress = column[String]("delegatorAddress", O.PrimaryKey)
 
     def withdrawAddress = column[String]("withdrawAddress")
 
-    def createdBy = column[String]("createdBy")
+   def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -104,8 +100,8 @@ class WithdrawAddresses @Inject()(
   }
 
   object Utility {
-    def onSetWithdrawAddress(setWithdrawAddress: SetWithdrawAddress)(implicit header: Header): Future[Unit] = {
-      val insert = Service.insertOrUpdate(WithdrawAddress(delegatorAddress = setWithdrawAddress.delegatorAddress, withdrawAddress = setWithdrawAddress.withdrawAddress))
+    def onSetWithdrawAddress(setWithdrawAddress: distributionTx.MsgSetWithdrawAddress)(implicit header: Header): Future[Unit] = {
+      val insert = Service.insertOrUpdate(WithdrawAddress(delegatorAddress = setWithdrawAddress.getDelegatorAddress, withdrawAddress = setWithdrawAddress.getWithdrawAddress))
 
       (for {
         _ <- insert

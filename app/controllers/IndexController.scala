@@ -17,13 +17,6 @@ import scala.util.Try
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                blockchainAssets: blockchain.Assets,
-                                blockchainSplits: blockchain.Splits,
-                                blockchainMetas: blockchain.Metas,
-                                blockchainIdentities: blockchain.Identities,
-                                blockchainMaintainers: blockchain.Maintainers,
-                                blockchainOrders: blockchain.Orders,
-                                blockchainClassifications: blockchain.Classifications,
                                 withUsernameToken: WithUsernameToken,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,

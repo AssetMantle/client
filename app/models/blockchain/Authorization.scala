@@ -1,9 +1,10 @@
 package models.blockchain
 
+import com.google.protobuf.{Any => protoAny}
+import cosmos.authz.v1beta1.{Tx => authzTx}
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import models.common.Authz
-import models.common.TransactionMessages._
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,12 +13,12 @@ import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.{Failure, Success}
 
-case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Authorizations @Inject()(
@@ -37,11 +38,11 @@ class Authorizations @Inject()(
 
   private[models] val authorizationTable = TableQuery[AuthorizationTable]
 
-  case class AuthorizationSerialized(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: String, expiration: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Authorization = Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = utilities.JSON.convertJsonStringToObject[Authz.Authorization](grantedAuthorization), expiration = RFC3339(expiration), createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class AuthorizationSerialized(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: String, expiration: Long, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Authorization = Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = utilities.JSON.convertJsonStringToObject[Authz.Authorization](grantedAuthorization), expiration = RFC3339(expiration), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(authorization: Authorization): AuthorizationSerialized = AuthorizationSerialized(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.msgTypeURL, grantedAuthorization = Json.toJson(authorization.grantedAuthorization).toString, expiration = authorization.expiration.toString, createdBy = authorization.createdBy, createdOn = authorization.createdOn, createdOnTimeZone = authorization.createdOnTimeZone, updatedBy = authorization.updatedBy, updatedOn = authorization.updatedOn, updatedOnTimeZone = authorization.updatedOnTimeZone)
+  def serialize(authorization: Authorization): AuthorizationSerialized = AuthorizationSerialized(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.msgTypeURL, grantedAuthorization = Json.toJson(authorization.grantedAuthorization).toString, expiration = authorization.expiration.epoch, createdBy = authorization.createdBy, createdOnMillisEpoch = authorization.createdOnMillisEpoch, updatedBy = authorization.updatedBy, updatedOnMillisEpoch = authorization.updatedOnMillisEpoch)
 
   private def add(authorization: Authorization): Future[String] = db.run((authorizationTable returning authorizationTable.map(_.granter) += serialize(authorization)).asTry).map {
     case Success(result) => result
@@ -77,9 +78,9 @@ class Authorizations @Inject()(
 
   private def getByGrantee(grantee: String): Future[Seq[AuthorizationSerialized]] = db.run(authorizationTable.filter(_.grantee === grantee).result)
 
-  private[models] class AuthorizationTable(tag: Tag) extends Table[AuthorizationSerialized](tag, "Authorization_BC") {
+  private[models] class AuthorizationTable(tag: Tag) extends Table[AuthorizationSerialized](tag, "Authorization") {
 
-    def * = (granter, grantee, msgTypeURL, grantedAuthorization, expiration, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AuthorizationSerialized.tupled, AuthorizationSerialized.unapply)
+    def * = (granter, grantee, msgTypeURL, grantedAuthorization, expiration, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AuthorizationSerialized.tupled, AuthorizationSerialized.unapply)
 
     def granter = column[String]("granter", O.PrimaryKey)
 
@@ -89,19 +90,15 @@ class Authorizations @Inject()(
 
     def grantedAuthorization = column[String]("grantedAuthorization")
 
-    def expiration = column[String]("expiration")
+    def expiration = column[Long]("expiration")
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -121,8 +118,8 @@ class Authorizations @Inject()(
 
   object Utility {
 
-    def onGrantAuthorization(grantAuthorization: GrantAuthorization)(implicit header: Header): Future[Unit] = {
-      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.granter, grantee = grantAuthorization.grantee, msgTypeURL = grantAuthorization.grant.authorization.value.getMsgTypeURL, grantedAuthorization = grantAuthorization.grant.authorization, expiration = grantAuthorization.grant.expiration))
+    def onGrantAuthorization(grantAuthorization: authzTx.MsgGrant)(implicit header: Header): Future[Unit] = {
+      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = grantAuthorization.getGrant.authorization.value.getMsgTypeURL, grantedAuthorization = grantAuthorization.grant.authorization, expiration = grantAuthorization.grant.expiration))
       (for {
         _ <- insertOrUpdate
       } yield ()).recover {
@@ -130,8 +127,8 @@ class Authorizations @Inject()(
       }
     }
 
-    def onRevokeAuthorization(revokeAuthorization: RevokeAuthorization)(implicit header: Header): Future[Unit] = {
-      val delete = Service.delete(granter = revokeAuthorization.granter, grantee = revokeAuthorization.grantee, msgTypeURL = revokeAuthorization.messageTypeURL)
+    def onRevokeAuthorization(revokeAuthorization: authzTx.MsgRevoke)(implicit header: Header): Future[Unit] = {
+      val delete = Service.delete(granter = revokeAuthorization.getGranter, grantee = revokeAuthorization.getGrantee, msgTypeURL = revokeAuthorization.getMsgTypeUrl)
       (for {
         _ <- delete
       } yield ()).recover {
@@ -139,15 +136,15 @@ class Authorizations @Inject()(
       }
     }
 
-    def onExecuteAuthorization(executeAuthorization: ExecuteAuthorization)(implicit header: Header): Future[Seq[StdMsg]] = {
-      val execute = utilitiesOperations.traverse(executeAuthorization.messages) { msg =>
+    def onExecuteAuthorization(executeAuthorization: authzTx.MsgExec)(implicit header: Header): Future[Seq[protoAny]] = {
+      val execute = utilitiesOperations.traverse(executeAuthorization.getMsgsList.asScala.toSeq) { msg =>
         val granter = msg.message.getSigners.head
-        if (granter != executeAuthorization.grantee) {
-          val authorization = Service.tryGet(granter = granter, grantee = executeAuthorization.grantee, msgTypeURL = msg.messageType)
+        if (granter != executeAuthorization.getGrantee) {
+          val authorization = Service.tryGet(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
 
           def updateOrDelete(authorization: Authorization) = {
             val response = authorization.grantedAuthorization.value.validate(msg)
-            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.grantee, msgTypeURL = msg.messageType)
+            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
             else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => Authz.Authorization(x.getAuthorizationType, value = x))))
             else Future(0)
 

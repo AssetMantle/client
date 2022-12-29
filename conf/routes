@@ -10,12 +10,6 @@ GET         /javascriptRoutes                               controllers.JavaScri
 GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
 GET         /account                                        controllers.ViewController.account
-GET         /classification                                 controllers.ViewController.classification(id: String)
-GET         /meta                                           controllers.ViewController.meta(id: String)
-GET         /identity                                       controllers.ViewController.identity(id: String)
-GET         /asset                                          controllers.ViewController.asset(id: String)
-GET         /order                                          controllers.ViewController.order(id: String)
-GET         /maintainer                                     controllers.ViewController.maintainer(id: String)
 GET         /validators                                     controllers.ViewController.validators()
 GET         /validators/:address                            controllers.ViewController.validator(address: String)
 GET         /blocks                                         controllers.ViewController.blocks()
@@ -91,10 +85,3 @@ GET         /component/validatorUptime                      controllers.Componen
 GET         /component/validatorDelegations                 controllers.ComponentViewController.validatorDelegations(address: String)
 GET         /component/validatorTransactions                controllers.ComponentViewController.validatorTransactions(address: String)
 GET         /component/validatorTransactionsPerPage         controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
-
-GET         /component/classiification                      controllers.ComponentViewController.classification(id: String)
-GET         /component/identity                             controllers.ComponentViewController.identity(id: String)
-GET         /component/asset                                controllers.ComponentViewController.asset(id: String)
-GET         /component/order                                controllers.ComponentViewController.order(id: String)
-GET         /component/meta                                 controllers.ComponentViewController.meta(id: String)
-GET         /component/maintainer                           controllers.ComponentViewController.maintainer(id: String)

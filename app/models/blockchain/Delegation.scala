@@ -1,21 +1,18 @@
 package models.blockchain
 
-import java.sql.Timestamp
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
-import models.Trait.Logged
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries._
 import queries.blockchain.GetValidatorDelegatorDelegation
 import slick.jdbc.JdbcProfile
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Delegation(delegatorAddress: String, validatorAddress: String, shares: BigDecimal, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Delegation(delegatorAddress: String, validatorAddress: String, shares: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Delegations @Inject()(
@@ -75,7 +72,7 @@ class Delegations @Inject()(
 
   private[models] class DelegationTable(tag: Tag) extends Table[Delegation](tag, "Delegation") {
 
-    def * = (delegatorAddress, validatorAddress, shares, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (Delegation.tupled, Delegation.unapply)
+    def * = (delegatorAddress, validatorAddress, shares, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Delegation.tupled, Delegation.unapply)
 
     def delegatorAddress = column[String]("delegatorAddress", O.PrimaryKey)
 
@@ -85,15 +82,11 @@ class Delegations @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

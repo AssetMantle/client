@@ -1,8 +1,8 @@
 package models.blockchain
 
+import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
 import exceptions.BaseException
-import models.Trait.Logged
-import models.common.TransactionMessages._
+import models.Trait.Logging
 import models.common.{FeeGrant => commonFeeGrant}
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -11,12 +11,11 @@ import play.api.libs.json.Json
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class FeeGrant(granter: String, grantee: String, allowance: commonFeeGrant.Allowance, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class FeeGrant(granter: String, grantee: String, allowance: commonFeeGrant.Allowance, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class FeeGrants @Inject()(
@@ -36,11 +35,11 @@ class FeeGrants @Inject()(
 
   private[models] val feeGrantTable = TableQuery[FeeGrantTable]
 
-  case class FeeGrantSerialized(granter: String, grantee: String, allowance: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: FeeGrant = FeeGrant(granter = granter, grantee = grantee, allowance = utilities.JSON.convertJsonStringToObject[commonFeeGrant.Allowance](allowance), createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class FeeGrantSerialized(granter: String, grantee: String, allowance: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: FeeGrant = FeeGrant(granter = granter, grantee = grantee, allowance = utilities.JSON.convertJsonStringToObject[commonFeeGrant.Allowance](allowance), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(feeGrant: FeeGrant): FeeGrantSerialized = FeeGrantSerialized(granter = feeGrant.granter, grantee = feeGrant.grantee, allowance = Json.toJson(feeGrant.allowance).toString, createdBy = feeGrant.createdBy, createdOn = feeGrant.createdOn, createdOnTimeZone = feeGrant.createdOnTimeZone, updatedBy = feeGrant.updatedBy, updatedOn = feeGrant.updatedOn, updatedOnTimeZone = feeGrant.updatedOnTimeZone)
+  def serialize(feeGrant: FeeGrant): FeeGrantSerialized = FeeGrantSerialized(granter = feeGrant.granter, grantee = feeGrant.grantee, allowance = Json.toJson(feeGrant.allowance).toString, createdBy = feeGrant.createdBy, createdOnMillisEpoch = feeGrant.createdOnMillisEpoch, updatedBy = feeGrant.updatedBy, updatedOnMillisEpoch = feeGrant.updatedOnMillisEpoch)
 
   private def add(feeGrant: FeeGrant): Future[String] = db.run((feeGrantTable returning feeGrantTable.map(_.granter) += serialize(feeGrant)).asTry).map {
     case Success(result) => result
@@ -76,9 +75,9 @@ class FeeGrants @Inject()(
 
   private def getByGrantee(grantee: String): Future[Seq[FeeGrantSerialized]] = db.run(feeGrantTable.filter(_.grantee === grantee).result)
 
-  private[models] class FeeGrantTable(tag: Tag) extends Table[FeeGrantSerialized](tag, "FeeGrant_BC") {
+  private[models] class FeeGrantTable(tag: Tag) extends Table[FeeGrantSerialized](tag, "FeeGrant") {
 
-    def * = (granter, grantee, allowance, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (FeeGrantSerialized.tupled, FeeGrantSerialized.unapply)
+    def * = (granter, grantee, allowance, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (FeeGrantSerialized.tupled, FeeGrantSerialized.unapply)
 
     def granter = column[String]("granter", O.PrimaryKey)
 
@@ -88,15 +87,11 @@ class FeeGrants @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -116,8 +111,8 @@ class FeeGrants @Inject()(
 
   object Utility {
 
-    def onFeeGrantAllowance(feeGrantAllowance: FeeGrantAllowance)(implicit header: Header): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(FeeGrant(granter = feeGrantAllowance.granter, grantee = feeGrantAllowance.grantee, allowance = feeGrantAllowance.allowance))
+    def onFeeGrantAllowance(feeGrantAllowance: feegrantTx.MsgGrantAllowance)(implicit header: Header): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(FeeGrant(granter = feeGrantAllowance.getGranter, grantee = feeGrantAllowance.getGrantee, allowance = feeGrantAllowance.getAllowance))
       (for {
         _ <- upsert
       } yield ()).recover {
@@ -125,8 +120,8 @@ class FeeGrants @Inject()(
       }
     }
 
-    def onFeeRevokeAllowance(feeRevokeAllowance: FeeRevokeAllowance)(implicit header: Header): Future[Unit] = {
-      val delete = Service.delete(granter = feeRevokeAllowance.granter, grantee = feeRevokeAllowance.grantee)
+    def onFeeRevokeAllowance(feeRevokeAllowance: feegrantTx.MsgRevokeAllowance)(implicit header: Header): Future[Unit] = {
+      val delete = Service.delete(granter = feeRevokeAllowance.getGranter, grantee = feeRevokeAllowance.getGrantee)
 
       (for {
         _ <- delete

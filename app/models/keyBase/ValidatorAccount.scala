@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
-import models.Trait.Logged
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -18,7 +18,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ValidatorAccount(address: String, identity: String, username: Option[String], pictureURL: Option[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ValidatorAccount(address: String, identity: String, username: Option[String], pictureURL: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class ValidatorAccounts @Inject()(
@@ -93,7 +93,7 @@ class ValidatorAccounts @Inject()(
 
   private[models] class ValidatorAccountTable(tag: Tag) extends Table[ValidatorAccount](tag, "ValidatorAccount") {
 
-    def * = (address, identity, username.?, pictureURL.?, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ValidatorAccount.tupled, ValidatorAccount.unapply)
+    def * = (address, identity, username.?, pictureURL.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ValidatorAccount.tupled, ValidatorAccount.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -103,17 +103,13 @@ class ValidatorAccounts @Inject()(
 
     def pictureURL = column[String]("pictureURL")
 
-    def createdBy = column[String]("createdBy")
+   def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
 

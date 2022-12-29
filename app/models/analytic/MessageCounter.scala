@@ -1,7 +1,7 @@
 package models.analytic
 
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import models.blockchain.Transaction
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -15,7 +15,7 @@ import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class MessageCounter(messageType: String, counter: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class MessageCounter(messageType: String, counter: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class MessageCounters @Inject()(
@@ -76,23 +76,19 @@ class MessageCounters @Inject()(
 
   private[models] class MessageCounterTable(tag: Tag) extends Table[MessageCounter](tag, "MessageCounter") {
 
-    def * = (messageType, counter, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MessageCounter.tupled, MessageCounter.unapply)
+    def * = (messageType, counter, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MessageCounter.tupled, MessageCounter.unapply)
 
     def messageType = column[String]("messageType", O.PrimaryKey)
 
     def counter = column[Int]("counter")
 
-    def createdBy = column[String]("createdBy")
+   def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

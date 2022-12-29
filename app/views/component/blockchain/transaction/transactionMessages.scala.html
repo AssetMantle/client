@@ -1,6 +1,6 @@
-@import models.common.TransactionMessages.StdMsg
+@import models.blockchain.Transaction
 @import views.html.component.blockchain.txMessages.stdMsgs
 
-@(txHash: String, messages: Seq[StdMsg])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(txHash: String, transaction: Transaction)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @stdMsgs(title = constants.View.TRANSACTION_MESSAGES, txHash = txHash, messages = messages)

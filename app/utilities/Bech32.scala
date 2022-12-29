@@ -40,11 +40,7 @@ object Bech32 {
   }
 
   def convertAccountPublicKeyToAccountAddress(pubkey: String): String = {
-    encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_")))))) match {
-      case Success(address) => address
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
-    }
+    encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(Base64.getUrlDecoder.decode(pubkey.replace("+", "-").replace("/", "_"))))))
   }
 
   def convertAccountAddressToOperatorAddress(accountAddress: String, hrp: String = constants.Blockchain.ValidatorPrefix): String = {
@@ -53,11 +49,7 @@ object Bech32 {
       case Failure(exception) => logger.error(exception.getLocalizedMessage)
         throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
     }
-    encode(hrp, byteSeq) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_ACCOUNT_ADDRESS)
-    }
+    encode(hrp, byteSeq)
   }
 
   //probably byteSeq converts operatorAddress to hexAddress and then encode converts into wallet address
@@ -67,11 +59,7 @@ object Bech32 {
       case Failure(exception) => logger.error(exception.getLocalizedMessage)
         throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
     }
-    encode(hrp, byteSeq) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_OPERATOR_ADDRESS)
-    }
+    encode(hrp, byteSeq)
   }
 
   def pubKeyToBech32(pubKey: String): String = {
@@ -83,17 +71,13 @@ object Bech32 {
     for (i <- 0 until (bytes.length - 1) by 2) {
       bytesSeq += Integer.parseInt(bytes.substring(i, i + 2), 16).toByte
     }
-    encode(hrp, to5Bit(bytesSeq.toSeq)) match {
-      case Success(value: String) => value
-      case Failure(exception) => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_HRP_OR_BYTES)
-    }
+    encode(hrp, to5Bit(bytesSeq.toSeq))
   }
 
-  final def encode(hrp: String, data: Seq[Int5]): Try[String] = Try {
+  final def encode(hrp: String, data: Seq[Int5]): String = try {
     require(hrp.nonEmpty, s"Invalid hrp length ${hrp.length}.")
     hrp + SEP + (data ++ createChecksum(hrp, data)).map(CHARSET_REVERSE_MAP).mkString
-  }.recover {
+  } catch {
     case _: java.util.NoSuchElementException =>
       throw new IllegalArgumentException(s"requirement failed: Invalid data: $data. Valid data should contain only UInt5 values.")
     case t =>

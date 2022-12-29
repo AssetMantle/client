@@ -1,8 +1,8 @@
 package models.blockchain
 
+import cosmos.gov.v1beta1.{Tx => govTx}
 import exceptions.BaseException
-import models.Trait.Logged
-import models.common.TransactionMessages.Vote
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -11,12 +11,11 @@ import queries.responses.blockchain.ProposalVoteResponse.{Response => ProposalVo
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ProposalVote(proposalID: Int, voter: String, option: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ProposalVote(proposalID: Int, voter: String, option: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class ProposalVotes @Inject()(
@@ -61,9 +60,9 @@ class ProposalVotes @Inject()(
 
   private def getByID(proposalID: Int): Future[Seq[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result)
 
-  private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote_BC") {
+  private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote") {
 
-    def * = (proposalID, voter, option, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalVote.tupled, ProposalVote.unapply)
+    def * = (proposalID, voter, option, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProposalVote.tupled, ProposalVote.unapply)
 
     def proposalID = column[Int]("proposalID", O.PrimaryKey)
 
@@ -73,15 +72,11 @@ class ProposalVotes @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -95,8 +90,8 @@ class ProposalVotes @Inject()(
 
   object Utility {
 
-    def onVote(vote: Vote)(implicit header: Header): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(ProposalVote(proposalID = vote.proposalID, voter = vote.voter, option = vote.option))
+    def onVote(vote: govTx.MsgVote)(implicit header: Header): Future[Unit] = {
+      val upsert = Service.insertOrUpdate(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString))
 
       (for {
         _ <- upsert

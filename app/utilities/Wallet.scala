@@ -28,10 +28,9 @@ object WalletGenerator {
       Security.addProvider(new BouncyCastleProvider())
     }
 
-    def genInstance(algorithm: String): MessageDigest = MessageDigest.getInstance(algorithm, "BC")
+    def sha256: MessageDigest = MessageDigest.getInstance("SHA-256", "BC")
 
-    val sha256: MessageDigest = genInstance("SHA-256")
-    val ripemd160: MessageDigest = genInstance("RipeMD160")
+    def ripemd160: MessageDigest = MessageDigest.getInstance("RipeMD160", "BC")
 
     def kec256(bytes: ByteVector): Array[Byte] = new Keccak.Digest256().digest(bytes.toArray)
 

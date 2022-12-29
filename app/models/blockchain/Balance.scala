@@ -1,9 +1,11 @@
 package models.blockchain
 
+import cosmos.bank.v1beta1.{Tx => bankTx}
+import ibc.core.channel.v1.{Tx => channelTx}
+import ibc.applications.transfer.v1.{Tx => transferTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.Coin
-import models.common.TransactionMessages.{Acknowledgement, MultiSend, RecvPacket, SendCoin, Timeout, TimeoutOnClose, Transfer}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -16,6 +18,7 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
 case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
@@ -73,7 +76,7 @@ class Balances @Inject()(
 
   private def getListByAddress(addresses: Seq[String]): Future[Seq[BalanceSerialized]] = db.run(balanceTable.filter(_.address.inSet(addresses)).result)
 
-  private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance_BC") {
+  private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance") {
 
     def * = (address, coins, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
 
@@ -107,10 +110,10 @@ class Balances @Inject()(
 
   object Utility {
 
-    def onSendCoin(sendCoin: SendCoin)(implicit header: Header): Future[Unit] = {
-      val fromAccount = insertOrUpdateBalance(sendCoin.fromAddress)
+    def onSendCoin(sendCoin: bankTx.MsgSend)(implicit header: Header): Future[Unit] = {
+      val fromAccount = insertOrUpdateBalance(sendCoin.getFromAddress)
 
-      def toAccount = insertOrUpdateBalance(sendCoin.toAddress)
+      def toAccount = insertOrUpdateBalance(sendCoin.getToAddress)
 
       (for {
         _ <- fromAccount
@@ -120,10 +123,10 @@ class Balances @Inject()(
       }
     }
 
-    def onMultiSend(multiSend: MultiSend)(implicit header: Header): Future[Unit] = {
-      val inputAccounts = utilitiesOperations.traverse(multiSend.inputs)(input => insertOrUpdateBalance(input.address))
+    def onMultiSend(multiSend: bankTx.MsgMultiSend)(implicit header: Header): Future[Unit] = {
+      val inputAccounts = utilitiesOperations.traverse(multiSend.getInputsList.asScala.toSeq)(input => insertOrUpdateBalance(input.getAddress))
 
-      def outputAccounts = utilitiesOperations.traverse(multiSend.outputs)(output => insertOrUpdateBalance(output.address))
+      def outputAccounts = utilitiesOperations.traverse(multiSend.getOutputsList.asScala.toSeq)(output => insertOrUpdateBalance(output.getAddress))
 
       (for {
         _ <- inputAccounts
@@ -133,8 +136,8 @@ class Balances @Inject()(
       }
     }
 
-    def onRecvPacket(recvPacket: RecvPacket)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = recvPacket.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+    def onRecvPacket(recvPacket: channelTx.MsgRecvPacket)(implicit header: Header): Future[Unit] = {
+      val isSenderOnChain = recvPacket.getPacket.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val isReceiverOnChain = recvPacket.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val updateSender = if (isSenderOnChain) insertOrUpdateBalance(recvPacket.packet.data.sender) else Future()
       val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(recvPacket.packet.data.receiver) else Future()
@@ -148,7 +151,7 @@ class Balances @Inject()(
       }
     }
 
-    def onTimeout(timeout: Timeout)(implicit header: Header): Future[Unit] = {
+    def onTimeout(timeout: channelTx.MsgTimeout)(implicit header: Header): Future[Unit] = {
       val isSenderOnChain = timeout.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val isReceiverOnChain = timeout.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val updateSender = if (isSenderOnChain) insertOrUpdateBalance(timeout.packet.data.sender) else Future()
@@ -163,7 +166,7 @@ class Balances @Inject()(
       }
     }
 
-    def onTimeoutOnClose(timeoutOnClose: TimeoutOnClose)(implicit header: Header): Future[Unit] = {
+    def onTimeoutOnClose(timeoutOnClose: channelTx.MsgTimeoutOnClose)(implicit header: Header): Future[Unit] = {
       val isSenderOnChain = timeoutOnClose.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val isReceiverOnChain = timeoutOnClose.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val updateSender = if (isSenderOnChain) insertOrUpdateBalance(timeoutOnClose.packet.data.sender) else Future()
@@ -178,7 +181,7 @@ class Balances @Inject()(
       }
     }
 
-    def onAcknowledgement(acknowledgement: Acknowledgement)(implicit header: Header): Future[Unit] = {
+    def onAcknowledgement(acknowledgement: channelTx.MsgAcknowledgement)(implicit header: Header): Future[Unit] = {
       val isSenderOnChain = acknowledgement.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val isReceiverOnChain = acknowledgement.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
       val updateSender = if (isSenderOnChain) insertOrUpdateBalance(acknowledgement.packet.data.sender) else Future()
@@ -193,11 +196,11 @@ class Balances @Inject()(
       }
     }
 
-    def onIBCTransfer(transfer: Transfer)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = transfer.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = transfer.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(transfer.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(transfer.receiver) else Future()
+    def onIBCTransfer(transfer: transferTx.MsgTransfer)(implicit header: Header): Future[Unit] = {
+      val isSenderOnChain = transfer.getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = transfer.getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(transfer.getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(transfer.getReceiver) else Future()
 
       (for {
         _ <- updateSender

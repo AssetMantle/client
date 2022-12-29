@@ -1,5 +1,6 @@
 package models.common
 
+import cosmos.base.v1beta1.CoinOuterClass
 import exceptions.BaseException
 import models.Abstract.DataValue
 import models.common.DataValue._
@@ -81,6 +82,11 @@ object Serializable {
       }
       result
     }
+  }
+
+  object Coin {
+    def apply(coinProto: CoinOuterClass.Coin): Coin = Coin(denom = coinProto.getDenom, amount = MicroNumber(BigInt(coinProto.getAmount)))
+
   }
 
   def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
