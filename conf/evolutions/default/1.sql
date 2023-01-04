@@ -34,9 +34,12 @@ CREATE TABLE IF NOT EXISTS ANALYTICS."MessageCounter"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account"
 (
     "address"              VARCHAR NOT NULL,
+    "accountType"          VARCHAR NOT NULL,
     "accountNumber"        INTEGER NOT NULL,
     "sequence"             INTEGER NOT NULL,
     "vestingParameters"    VARCHAR,
+    "publicKey"            BYTEA,
+    "publicKeyType"        VARCHAR,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -49,7 +52,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Authorization"
     "granter"              VARCHAR NOT NULL,
     "grantee"              VARCHAR NOT NULL,
     "msgTypeURL"           VARCHAR NOT NULL,
-    "grantedAuthorization" VARCHAR NOT NULL,
+    "grantedAuthorization" BYTEA   NOT NULL,
     "expiration"           BIGINT  NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
@@ -98,7 +101,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."FeeGrant"
 (
     "granter"              VARCHAR NOT NULL,
     "grantee"              VARCHAR NOT NULL,
-    "allowance"            VARCHAR NOT NULL,
+    "allowance"            BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -120,14 +123,14 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Parameter"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Proposal"
 (
     "id"                   INTEGER NOT NULL,
-    "content"              VARCHAR NOT NULL,
+    "content"              BYTEA   NOT NULL,
     "status"               VARCHAR NOT NULL,
     "finalTallyResult"     VARCHAR NOT NULL,
-    "submitTime"           VARCHAR NOT NULL,
-    "depositEndTime"       VARCHAR NOT NULL,
+    "submitTime"           BIGINT  NOT NULL,
+    "depositEndTime"       BIGINT  NOT NULL,
     "totalDeposit"         VARCHAR NOT NULL,
-    "votingStartTime"      VARCHAR NOT NULL,
-    "votingEndTime"        VARCHAR NOT NULL,
+    "votingStartTime"      BIGINT  NOT NULL,
+    "votingEndTime"        BIGINT  NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -152,6 +155,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ProposalVote"
     "proposalID"           INTEGER NOT NULL,
     "voter"                VARCHAR NOT NULL,
     "option"               VARCHAR NOT NULL,
+    "weight"               NUMERIC NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -220,10 +224,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Validator"
 (
     "operatorAddress"       VARCHAR NOT NULL,
     "hexAddress"            VARCHAR NOT NULL UNIQUE,
-    "consensusPublicKey"    VARCHAR NOT NULL UNIQUE,
     "jailed"                BOOLEAN NOT NULL,
     "status"                VARCHAR NOT NULL,
-    "tokens"                VARCHAR NOT NULL,
+    "tokens"                NUMERIC NOT NULL,
     "delegatorShares"       NUMERIC NOT NULL,
     "description"           VARCHAR NOT NULL,
     "unbondingHeight"       INTEGER NOT NULL,
@@ -290,26 +293,26 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."TokenPrice"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."ValidatorTransaction"
 (
-    "validatorAddress"     VARCHAR NOT NULL,
+    "address"     VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL,
     "height"               INTEGER,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("validatorAddress", "txHash")
+    PRIMARY KEY ("address", "txHash")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WalletTransaction"
 (
-    "walletAddress"        VARCHAR NOT NULL,
+    "address"              VARCHAR NOT NULL,
     "txHash"               VARCHAR NOT NULL,
     "height"               INTEGER,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("walletAddress", "txHash")
+    PRIMARY KEY ("address", "txHash")
 );
 
 ALTER TABLE BLOCKCHAIN."Delegation"

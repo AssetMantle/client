@@ -1,0 +1,18 @@
+@import ibc.core.channel.v1.ChannelOuterClass.Channel
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(key: String, channel: Channel)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.STATE, channel.getState.toString)
+    @commonTextInfo(constants.View.ORDERING, channel.getOrdering.toString)
+    <div>
+        @Messages(constants.View.COUNTERPARTY):
+        @commonTextInfo(constants.View.PORT_ID, channel.getCounterparty.getPortId)
+        @commonTextInfo(constants.View.CHANNEL_ID, channel.getCounterparty.getChannelId)
+    </div>
+    @commonTextInfo(constants.View.CONNECTION_HOPS, channel.getConnectionHopsList.mkString(", "))
+    @commonTextInfo(constants.View.VERSION, channel.getVersion)
+</div>

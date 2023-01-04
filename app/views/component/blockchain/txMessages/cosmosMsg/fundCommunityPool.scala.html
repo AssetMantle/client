@@ -1,0 +1,9 @@
+@import views.html.base.infos._
+@import views.html.base.buttons._
+@import cosmos.distribution.v1beta1.{Tx => distributionTx}
+@import models.common.Serializable.Coin
+
+@(msg: distributionTx.MsgFundCommunityPool)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @commonHtmlInfo(constants.View.DEPOSITOR, commonJavascriptLink(msg.getDepositor, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getDepositor}'))")))
+    @commonTextInfo(constants.View.AMOUNTS, msg.getAmountList.map(amt => Coin(amt).getAmountWithNormalizedDenom()).mkString(", "))

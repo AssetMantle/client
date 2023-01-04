@@ -44,6 +44,8 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
   }
 
   def getMessageCounters: Map[String, Int] = parsedTx.getBody.getMessagesList.asScala.toSeq.map(stdMsg => constants.View.TxMessagesMap.getOrElse(stdMsg.getTypeUrl, stdMsg.getTypeUrl)).groupBy(identity).view.mapValues(_.size).toMap
+
+  def getMemo: String = parsedTx.getBody.getMemo
 }
 
 @Singleton
@@ -127,6 +129,8 @@ class Transactions @Inject()(
 
   private def getTransactionsByHeight(height: Int): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.height === height).result)
 
+  private def getTransactionsByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.hash.inSet(hashes)).result)
+
   private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = db.run(transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result)
 
   private[models] class TransactionTable(tag: Tag) extends Table[Transaction](tag, "Transaction") {
@@ -168,6 +172,8 @@ class Transactions @Inject()(
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash)
 
     def getTransactions(height: Int): Future[Seq[Transaction]] = getTransactionsByHeight(height)
+
+    def get(hashes: Seq[String]): Future[Seq[Transaction]] = getTransactionsByHashes(hashes)
 
     def getNumberOfTransactions(height: Int): Future[Int] = getNumberOfTransactionsByHeight(height)
 

@@ -1,0 +1,19 @@
+@import views.html.base.infos._
+@import views.html.base.buttons._
+@import cosmos.staking.v1beta1.{Tx => stakingTx}
+@import models.common.Serializable.Coin
+
+@(msg: stakingTx.MsgCreateValidator)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(msg.getDelegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getDelegatorAddress}'))")))
+@commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddress}'))")))
+@commonTextInfo(constants.View.AMOUNT, Coin(msg.getValue).getAmountWithNormalizedDenom())
+@commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, utilities.NumericOperation.formatNumber(msg.getMinSelfDelegation))
+@commonTextInfo(constants.View.VALIDATOR_MONIKER, msg.getDescription.getMoniker)
+@commonTextInfo(constants.View.VALIDATOR_IDENTITY, msg.getDescription.getIdentity)
+@commonTextInfo(constants.View.VALIDATOR_WEBSITE, msg.getDescription.getWebsite)
+@commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, msg.getDescription.getSecurityContact)
+@commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, msg.getDescription.getDetails)
+@commonTextInfo(constants.View.COMMISSION_RATE, s"${utilities.NumericOperation.formatNumber(msg.getCommission.getRate.toDoubleOption.getOrElse(0.0) * 100)} %")
+@commonTextInfo(constants.View.MAXIMUM_RATE, s"${utilities.NumericOperation.formatNumber(msg.getCommission.getMaxRate.toDoubleOption.getOrElse(0.0) * 100)} %")
+@commonTextInfo(constants.View.MAXIMUM_CHANGE_RATE, s"${utilities.NumericOperation.formatNumber(msg.getCommission.getMaxChangeRate.toDoubleOption.getOrElse(0.0) * 100)} %")

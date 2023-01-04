@@ -1,10 +1,6 @@
 package models.keyBase
 
-import java.net.ConnectException
-import java.sql.Timestamp
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,6 +10,7 @@ import queries.keyBase.GetValidatorKeyBaseAccount
 import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.{Response => ValidatorKeyBaseAccountResponse}
 import slick.jdbc.JdbcProfile
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -30,7 +27,7 @@ class ValidatorAccounts @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT_FILE
+  private implicit val module: String = constants.Module.KEY_BASE_VALIDATOR_ACCOUNT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -103,7 +100,7 @@ class ValidatorAccounts @Inject()(
 
     def pictureURL = column[String]("pictureURL")
 
-   def createdBy = column[String]("createdBy")
+    def createdBy = column[String]("createdBy")
 
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 

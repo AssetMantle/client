@@ -2,8 +2,6 @@ package controllers
 
 import constants.AppConfig._
 import controllers.actions._
-import controllers.results.WithUsernameToken
-import exceptions.BaseException
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -15,8 +13,6 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ViewController @Inject()(
                                 messagesControllerComponents: MessagesControllerComponents,
-                                withLoginActionAsync: WithLoginActionAsync,
-                                withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 cached: Cached
@@ -25,15 +21,6 @@ class ViewController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
-
-  def account: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.account())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
 
   def validators(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>

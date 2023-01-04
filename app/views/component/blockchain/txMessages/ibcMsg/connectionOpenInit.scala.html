@@ -1,0 +1,11 @@
+@import ibc.core.connection.v1.{Tx => connectionTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(msg: connectionTx.MsgConnectionOpenInit)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.CLIENT_ID, msg.getClientId)
+@views.html.component.blockchain.txMessages.ibcMsg.commonConnectionCounterparty(constants.View.COUNTERPARTY, msg.getCounterparty)
+@views.html.component.blockchain.txMessages.ibcMsg.commonVersion(constants.View.VERSION, msg.getVersion)
+@commonTextInfo(constants.View.DELAY_PERIOD, msg.getDelayPeriod.toString)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

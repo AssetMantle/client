@@ -111,7 +111,7 @@ class ProposalDeposits @Inject()(
 
   object Utility {
 
-    def onDeposit(deposit: govTx.MsgDeposit)(implicit header: Header): Future[Unit] = {
+    def onDeposit(deposit: govTx.MsgDeposit)(implicit header: Header): Future[String] = {
       val proposal = blockchainProposals.Service.tryGet(deposit.getProposalId.toInt)
       val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
       val proposalDeposit = Service.get(deposit.getProposalId.toInt, deposit.getDepositor)
@@ -124,7 +124,7 @@ class ProposalDeposits @Inject()(
         } else blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))
       }
 
-      def upsertDeposit(proposalDeposit: Option[ProposalDeposit]) = proposalDeposit.fold(Service.insertOrUpdate(ProposalDeposit(proposalID = deposit.getProposalId.toInt, depositor = deposit.getDepositor, amount = deposit.getAmountList.asScala.toSeq.map(x => Coin(x)))))(x => Service.insertOrUpdate(x.copy(amount = utilities.Blockchain.addCoins(oldCoins = x.amount, add = deposit.amount))))
+      def upsertDeposit(proposalDeposit: Option[ProposalDeposit]) = proposalDeposit.fold(Service.insertOrUpdate(ProposalDeposit(proposalID = deposit.getProposalId.toInt, depositor = deposit.getDepositor, amount = deposit.getAmountList.asScala.toSeq.map(x => Coin(x)))))(x => Service.insertOrUpdate(x.copy(amount = utilities.Blockchain.addCoins(oldCoins = x.amount, add = deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))))
 
       (for {
         proposal <- proposal
@@ -133,8 +133,9 @@ class ProposalDeposits @Inject()(
         _ <- updateAccountBalance()
         _ <- updateProposal(proposal, governanceParameters)
         _ <- upsertDeposit(proposalDeposit)
-      } yield ()).recover {
+      } yield deposit.getDepositor).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          deposit.getDepositor
       }
     }
 

@@ -136,7 +136,7 @@ class Redelegations @Inject()(
 
   object Utility {
 
-    def onRedelegation(redelegate: stakingTx.MsgBeginRedelegate)(implicit header: Header): Future[Unit] = {
+    def onRedelegation(redelegate: stakingTx.MsgBeginRedelegate)(implicit header: Header): Future[String] = {
       val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = redelegate.getDelegatorAddress, sourceValidatorAddress = redelegate.getValidatorSrcAddress, destinationValidatorAddress = redelegate.getValidatorDstAddress)
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = redelegate.getDelegatorAddress, validatorAddress = redelegate.getValidatorSrcAddress)
       val updateDstValidatorDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = redelegate.getDelegatorAddress, validatorAddress = redelegate.getValidatorSrcAddress)
@@ -162,8 +162,9 @@ class Redelegations @Inject()(
         _ <- withdrawAddressBalanceUpdate
         _ <- updateValidators
         _ <- updateActiveValidatorSet()
-      } yield ()).recover {
+      } yield redelegate.getDelegatorAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          redelegate.getDelegatorAddress
       }
     }
 

@@ -13,7 +13,6 @@ import play.api.Logger
 import scodec.bits.ByteVector
 
 import java.security.{MessageDigest, Security}
-import scala.util.{Failure, Success}
 
 case class Wallet(address: String, hdPath: String, publicKey: Array[Byte], privateKey: Array[Byte], mnemonics: Seq[String])
 
@@ -57,11 +56,8 @@ object WalletGenerator {
         hdPath
       )
 
-      utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPath).getPubKey)))) match {
-        case Success(address) => Wallet(address = address, hdPath = hdPath.toString, publicKey = bitcoinWallet.getKeyByPath(hdPath).getPubKey, privateKey = bitcoinWallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
-        case Failure(exception) => logger.error(exception.getLocalizedMessage)
-          throw new BaseException(constants.Response.KEY_GENERATION_FAILED)
-      }
+      val address = utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPath).getPubKey))))
+      Wallet(address = address, hdPath = hdPath.toString, publicKey = bitcoinWallet.getKeyByPath(hdPath).getPubKey, privateKey = bitcoinWallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
     } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
   }
 

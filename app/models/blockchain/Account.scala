@@ -17,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Account(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], publicKey: Option[Array[Byte]], publicKeyType: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Accounts @Inject()(
@@ -40,8 +40,8 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Account = Account(address = address, accountType = accountType, accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class AccountSerialized(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], publicKey: Option[Array[Byte]], publicKeyType: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Account = Account(address = address, accountType = accountType, accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), publicKey = publicKey, publicKeyType = publicKeyType, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
@@ -51,7 +51,7 @@ class Accounts @Inject()(
     }
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, accountType = account.accountType, accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), createdBy = account.createdBy, createdOnMillisEpoch = account.createdOnMillisEpoch, updatedBy = account.updatedBy, updatedOnMillisEpoch = account.updatedOnMillisEpoch)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, accountType = account.accountType, accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), publicKey = account.publicKey, publicKeyType = account.publicKeyType, createdBy = account.createdBy, createdOnMillisEpoch = account.createdOnMillisEpoch, updatedBy = account.updatedBy, updatedOnMillisEpoch = account.updatedOnMillisEpoch)
 
   private def upsert(account: Account): Future[Int] = db.run(accountTable.insertOrUpdate(serialize(account)).asTry).map {
     case Success(result) => result
@@ -73,7 +73,7 @@ class Accounts @Inject()(
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") {
 
-    def * = (address, accountType.?, accountNumber, sequence, vestingParameters.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (address, accountType.?, accountNumber, sequence, vestingParameters.?, publicKey.?, publicKeyType.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -85,6 +85,10 @@ class Accounts @Inject()(
 
     def vestingParameters = column[String]("vestingParameters")
 
+    def publicKey = column[Array[Byte]]("publicKey")
+
+    def publicKeyType = column[String]("publicKeyType")
+
     def createdBy = column[String]("createdBy")
 
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
@@ -95,9 +99,6 @@ class Accounts @Inject()(
   }
 
   object Service {
-
-    def create(address: String, accountType: String): Future[String] = add(Account(address = address, accountType = Option(accountType), accountNumber = -1, sequence = 0, vestingParameters = None))
-
     def tryGet(address: String): Future[Account] = tryGetByAddress(address).map(_.deserialize)
 
     def insertOrUpdate(account: Account): Future[Int] = upsert(account)
@@ -110,15 +111,16 @@ class Accounts @Inject()(
 
   object Utility {
 
-    def onCreateVestingAccount(createVestingAccount: Tx.MsgCreateVestingAccount)(implicit header: Header): Future[Unit] = {
+    def onCreateVestingAccount(createVestingAccount: Tx.MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
       val insert = insertOrUpdateAccountWithoutAnyTx(createVestingAccount.getToAddress)
       val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.getToAddress)
 
       (for {
         _ <- insert
         _ <- insertBalance
-      } yield ()).recover {
+      } yield createVestingAccount.getFromAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          createVestingAccount.getFromAddress
       }
     }
 
@@ -160,30 +162,6 @@ class Accounts @Inject()(
         bcAccount <- bcAccount
         updatedAccount <- getUpdatedAccount(bcAccount)
         _ <- update(updatedAccount)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
-    def onKeplrSignUp(address: String, username: String): Future[Unit] = {
-      val optionalAccountResponse = {
-        val accountResponse = getAccount.Service.get(address)
-        (for {
-          accountResponse <- accountResponse
-        } yield Option(accountResponse)).recover {
-          case baseException: BaseException => if (baseException.failure.logMessage == s"LOG.rpc error: code = NotFound desc = account ${address} not found: key not found") {
-            None
-          } else throw baseException
-        }
-      }
-
-      def upsert(optionalAccountResponse: Option[AccountResponse]) = optionalAccountResponse.fold {
-        Service.insertOrUpdate(Account(address = address, accountType = None, accountNumber = -1, sequence = 0, vestingParameters = None))
-      } { accountResponse => Service.insertOrUpdate(accountResponse.account.toSerializableAccount(username)) }
-
-      (for {
-        optionalAccountResponse <- optionalAccountResponse
-        _ <- upsert(optionalAccountResponse)
       } yield ()).recover {
         case baseException: BaseException => throw baseException
       }

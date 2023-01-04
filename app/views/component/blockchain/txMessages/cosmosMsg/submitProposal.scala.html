@@ -1,0 +1,13 @@
+@import cosmos.gov.v1beta1.{Tx => govTx}
+@import models.Abstract.ProposalContent
+@import models.common.Serializable.Coin
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: govTx.MsgSubmitProposal)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(msg.getProposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getProposer}'))")))
+@commonTextInfo(constants.View.TITLE, ProposalContent(msg.getContent).title)
+@commonTextInfo(constants.View.DESCRIPTION, ProposalContent(msg.getContent).description)
+@commonTextInfo(constants.View.TYPE, msg.getContent.getTypeUrl)
+@commonTextInfo(constants.View.INITIAL_DEPOSIT, msg.getInitialDepositList.map(amt => Coin(amt).getAmountWithNormalizedDenom()).mkString(", "))

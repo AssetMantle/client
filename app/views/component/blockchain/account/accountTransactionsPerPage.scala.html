@@ -1,7 +1,8 @@
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
 
-@(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transactions: Seq[Transaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, getMessagesProvider: MessagesProvider)
 
 @if(transactions.nonEmpty) {
     <table class="cmuk-table cmuk-table-striped">
@@ -23,11 +24,11 @@
                 <td>
                     @commonJavascriptLink(tx.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${tx.height}))"))
                 </td>
-                <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.messages.length == 1) {
-                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+                <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.getMessages.length == 1) {
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
                 } else {
-                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
-                    (+@(tx.messages.length - 1))
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
+                    (+@(tx.getMessages.length - 1))
                 }</td>
                 <td>
                 @if(tx.status) {
@@ -38,7 +39,7 @@
                 </td>
                 <td id="accountTxDate_@tx.hash">
                     <script>
-                            convertUTCDateToLocalDate('@tx.timestamp.toString', "accountTxDate_@tx.hash")
+                            fromEpochDateToLocal('@blocks.find(_.height == tx.height).fold(0L)(_.time)', "accountTxDate_@tx.hash")
                     </script>
                 </td>
             </tr>

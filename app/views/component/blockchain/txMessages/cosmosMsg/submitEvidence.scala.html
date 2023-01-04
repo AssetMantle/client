@@ -1,0 +1,7 @@
+@import cosmos.evidence.v1beta1.{Tx => evidenceTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: evidenceTx.MsgSubmitEvidence)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.SUBMITTER, commonJavascriptLink(msg.getSubmitter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSubmitter}'))")))

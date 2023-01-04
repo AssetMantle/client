@@ -10,7 +10,6 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
-import scala.collection.Seq
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 

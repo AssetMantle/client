@@ -16,13 +16,11 @@ class GetProposalVote @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val path1 = "cosmos/gov/v1beta1/votes"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/gov/v1beta1/proposals"
 
-  private val path2 = "/deposits/"
+  private val path = "/votes/"
 
-  private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
-
-  private def action(id: String, address: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + id + path2 + address).get)
+  private def action(id: String, address: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + id + path + address).get)
 
   object Service {
 

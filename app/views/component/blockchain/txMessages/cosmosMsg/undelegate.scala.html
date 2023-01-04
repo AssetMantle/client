@@ -1,0 +1,10 @@
+@import cosmos.staking.v1beta1.{Tx => stakingTx}
+@import models.common.Serializable.Coin
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: stakingTx.MsgUndelegate)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(msg.getDelegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getDelegatorAddress}'))")))
+@commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddress}'))")))
+@commonTextInfo(constants.View.AMOUNTS, Coin(msg.getAmount).getAmountWithNormalizedDenom())

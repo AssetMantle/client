@@ -1,0 +1,14 @@
+@import ibc.applications.transfer.v1.{Tx => transferTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+@import models.common.Serializable.Coin
+
+@(msg: transferTx.MsgTransfer)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.SOURCE_PORT, msg.getSourcePort)
+@commonTextInfo(constants.View.SOURCE_CHANNEL, msg.getSourceChannel)
+@commonTextInfo(constants.View.TOKEN, Coin(msg.getToken).getMicroAmountWithDenom)
+@commonHtmlInfo(constants.View.SENDER, commonJavascriptLink(msg.getSender, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSender}'))")))
+@commonTextInfo(constants.View.RECEIVER, msg.getReceiver)
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.TIMEOUT_HEIGHT, msg.getTimeoutHeight)
+@commonEpochInfo(constants.View.TIMEOUT_TIMESTAMP, msg.getTimeoutTimestamp)

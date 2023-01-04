@@ -11,7 +11,7 @@
         @commonTextInfo(constants.View.ID, proposal.id.toString)
         @commonTextInfo(constants.View.TITLE, proposal.content.title)
         @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
-        @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
+        @commonTextInfo(constants.View.TYPE, proposal.content.toProto.getTypeUrl)
         @commonTextInfo(constants.View.STATUS, Messages(proposal.status))
         @commonRFC3339Info(constants.View.SUBMIT_TIME, proposal.submitTime, "proposalSubmitTime")
         @commonRFC3339Info(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime, "proposalDepositEndTime")
@@ -27,7 +27,7 @@
         </div>
         <div>
             @Messages(constants.View.CONTENT):
-            @proposal.content.proposalContentType match {
+            @proposal.content.toProto.getTypeUrl match {
                 case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
                     @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
                         views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
@@ -44,7 +44,7 @@
                     @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
                         commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
                         commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
-                        commonRFC3339Info(constants.View.TIME, softwareUpgrade.plan.time, "softwareUpgradePlanTime")
+                        commonEpochInfo(constants.View.TIME, softwareUpgrade.plan.time)
                         commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
                     })
                 }

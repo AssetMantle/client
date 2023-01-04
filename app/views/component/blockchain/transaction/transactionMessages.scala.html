@@ -3,4 +3,4 @@
 
 @(txHash: String, transaction: Transaction)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@stdMsgs(title = constants.View.TRANSACTION_MESSAGES, txHash = txHash, messages = messages)
+@stdMsgs(title = constants.View.TRANSACTION_MESSAGES, txHash = txHash, messages = transaction.getMessages)

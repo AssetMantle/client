@@ -1,61 +1,60 @@
 package models.common
 
-import models.Abstract.{FeeGrant => AbstarctFeeGrant}
+import com.google.protobuf.{Any => protoAny, Duration => protoDuration, Timestamp => protoTimestamp}
+import cosmos.feegrant.v1beta1.{Feegrant => protoFeeGrant}
+import models.Abstract.FeeAllowance
 import models.common.Serializable.Coin
-import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json._
-import utilities.Blockchain.{FeeGrant => utilitiesFeeGrant}
 import utilities.Date.RFC3339
 
+import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava}
+
 object FeeGrant {
+  case class BasicAllowance(spendLimit: Seq[Coin], expiration: Long) extends FeeAllowance {
 
-  private implicit val module: String = constants.Module.TRANSACTION_MESSAGE_FEE_GRANT
-
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  case class Allowance(allowanceType: String, value: AbstarctFeeGrant.FeeAllowance) {
-    def validate(blockTime: RFC3339, fees: Seq[Coin]): utilitiesFeeGrant.ValidateResponse = {
-      val (delete, updatedAllowanceValue) = this.value.deleteAndUpdate(blockTime, fees)
-      utilitiesFeeGrant.ValidateResponse(delete = delete, updated = this.copy(value = updatedAllowanceValue))
-    }
-  }
-
-  implicit val allowanceReads: Reads[Allowance] = (
-    (JsPath \ "allowanceType").read[String] and
-      (JsPath \ "value").read[JsObject]
-    ) (allowanceApply _)
-
-  implicit val allowanceWrites: Writes[Allowance] = Json.writes[Allowance]
-
-  case class BasicAllowance(spendLimit: Seq[Coin], expiration: Option[RFC3339]) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[RFC3339] = expiration
-
-    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (this.getExpiration.fold(false)(_.isBefore(blockTime))) (true, this)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, FeeAllowance) = {
+      if (this.expiration < blockTime.epoch) (true, this)
       else if (spendLimit.nonEmpty) {
         val (left, _) = utilities.Blockchain.subtractCoins(spendLimit, fees)
         (left.exists(_.isZero), this.copy(spendLimit = left))
       } else (false, this)
     }
+
+    def toProtoBasicAllowance: protoFeeGrant.BasicAllowance = if (this.expiration != 0) {
+      protoFeeGrant.BasicAllowance.newBuilder()
+        .addAllSpendLimit(this.spendLimit.map(_.toProtoCoin).asJava)
+        .setExpiration(protoTimestamp.newBuilder().setSeconds(this.expiration))
+        .build()
+    } else {
+      protoFeeGrant.BasicAllowance.newBuilder()
+        .addAllSpendLimit(this.spendLimit.map(_.toProtoCoin).asJava)
+        .build()
+    }
+
+    def toProto: protoAny = {
+      val protoFeeGrantValue = this.toProtoBasicAllowance
+      protoAny.newBuilder()
+        .setTypeUrl(constants.Blockchain.FeeGrant.BASIC_ALLOWANCE)
+        .setValue(protoFeeGrantValue.toByteString)
+        .build()
+    }
+
   }
 
-  implicit val basicAllowanceReads: Reads[BasicAllowance] = Json.reads[BasicAllowance]
+  object BasicAllowance {
+    def apply(protoBasicAllowance: protoFeeGrant.BasicAllowance): BasicAllowance = BasicAllowance(spendLimit = protoBasicAllowance.getSpendLimitList.asScala.toSeq.map(x => Coin(x)), expiration = protoBasicAllowance.getExpiration.getSeconds)
+  }
 
-  implicit val basicAllowanceWrites: Writes[BasicAllowance] = Json.writes[BasicAllowance]
+  case class PeriodicAllowance(basicAllowance: BasicAllowance, period: Long, periodSpendLimit: Seq[Coin], periodCanSpend: Seq[Coin], periodReset: Long) extends FeeAllowance {
 
-  case class PeriodicAllowance(basicAllowance: BasicAllowance, period: String, periodSpendLimit: Seq[Coin], periodCanSpend: Seq[Coin], periodReset: RFC3339) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[RFC3339] = basicAllowance.getExpiration
-
-    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = {
-      if (getExpiration.fold(false)(_.isBefore(blockTime))) (true, this)
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, FeeAllowance) = {
+      if (this.basicAllowance.expiration < blockTime.epoch) (true, this)
       else {
-        val (resetPeriodCanSpend, updatedPeriodReset) = if (!blockTime.isBefore(this.periodReset)) {
+        val (resetPeriodCanSpend, updatedPeriodReset) = if (!(blockTime.epoch < this.periodReset)) {
           val (_, isNeg) = utilities.Blockchain.subtractCoins(fromCoins = this.basicAllowance.spendLimit, amount = this.periodSpendLimit)
           val resetPeriodCanSpend = if (isNeg && this.basicAllowance.spendLimit.nonEmpty) this.basicAllowance.spendLimit else this.periodSpendLimit
           val updatedPeriodReset = {
-            val addPeriod = this.periodReset.addEpoch(utilities.Date.getEpoch(this.period))
-            if (blockTime.isAfter(addPeriod)) blockTime.addEpoch(utilities.Date.getEpoch(this.period)) else addPeriod
+            val addPeriod = this.periodReset + this.period
+            if (blockTime.epoch > addPeriod) (blockTime.epoch + this.period) else addPeriod
           }
           (resetPeriodCanSpend, updatedPeriodReset)
         } else (this.periodCanSpend, this.periodReset)
@@ -66,27 +65,35 @@ object FeeGrant {
         } else (false, this.copy(periodCanSpend = updatedPeriodCanSpend, periodReset = updatedPeriodReset))
       }
     }
-  }
 
-  implicit val periodicAllowanceReads: Reads[PeriodicAllowance] = Json.reads[PeriodicAllowance]
-
-  implicit val periodicAllowanceWrites: Writes[PeriodicAllowance] = Json.writes[PeriodicAllowance]
-
-  case class AllowedMsgAllowance(allowance: Allowance, allowedMessages: Seq[String]) extends AbstarctFeeGrant.FeeAllowance {
-    def getExpiration: Option[RFC3339] = allowance.value.getExpiration
-
-    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, AbstarctFeeGrant.FeeAllowance) = this.allowance.value.deleteAndUpdate(blockTime, fees)
-  }
-
-  implicit val allowedMsgAllowanceReads: Reads[AllowedMsgAllowance] = Json.reads[AllowedMsgAllowance]
-
-  implicit val allowedMsgAllowanceWrites: Writes[AllowedMsgAllowance] = Json.writes[AllowedMsgAllowance]
-
-  def allowanceApply(allowanceType: String, value: JsObject): Allowance = {
-    allowanceType match {
-      case constants.Blockchain.FeeGrant.BASIC_ALLOWANCE => Allowance(allowanceType, utilities.JSON.convertJsonStringToObject[BasicAllowance](value.toString))
-      case constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE => Allowance(allowanceType, utilities.JSON.convertJsonStringToObject[PeriodicAllowance](value.toString))
-      case constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE => Allowance(allowanceType, utilities.JSON.convertJsonStringToObject[AllowedMsgAllowance](value.toString))
+    def toProto: protoAny = {
+      val protoFeeGrantValue = protoFeeGrant.PeriodicAllowance.newBuilder()
+        .setBasic(this.basicAllowance.toProtoBasicAllowance)
+        .setPeriodReset(protoTimestamp.newBuilder().setSeconds(this.periodReset).build())
+        .addAllPeriodCanSpend(this.periodCanSpend.map(_.toProtoCoin).asJava)
+        .addAllPeriodSpendLimit(this.periodSpendLimit.map(_.toProtoCoin).asJava)
+        .setPeriod(protoDuration.newBuilder().setSeconds(this.period))
+        .build()
+      protoAny.newBuilder()
+        .setTypeUrl(constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE)
+        .setValue(protoFeeGrantValue.toByteString)
+        .build()
     }
   }
+  case class AllowedMsgAllowance(allowance: FeeAllowance, allowedMessages: Seq[String]) extends FeeAllowance {
+    def deleteAndUpdate(blockTime: RFC3339, fees: Seq[Coin]): (Boolean, FeeAllowance) = this.allowance.deleteAndUpdate(blockTime, fees)
+
+    def toProto: protoAny = {
+      val protoFeeGrantValue = protoFeeGrant.AllowedMsgAllowance.newBuilder()
+        .addAllAllowedMessages(this.allowedMessages.asJava)
+        .setAllowance(this.allowance.toProto)
+        .build()
+      protoAny.newBuilder()
+        .setTypeUrl(constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE)
+        .setValue(protoFeeGrantValue.toByteString)
+        .build()
+    }
+
+  }
+
 }

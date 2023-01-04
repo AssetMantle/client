@@ -1,15 +1,17 @@
 package queries.responses.common
 
 import exceptions.BaseException
+import models.Abstract.{Authorization => commonAuthzAbstract}
 import models.common.{Serializable, Authz => SerializableAuthz}
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Format, JsObject, JsPath, Json, Reads}
+import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.{Authz => AuthzAbstract}
+import utilities.MicroNumber
 
 object Authz {
 
-  implicit val module: String = constants.Module.TRANSACTION_MESSAGE_RESPONSES_AUTHZ
+  implicit val module: String = constants.Module.RESPONSES_AUTHZ
 
   implicit val logger: Logger = Logger(this.getClass)
 
@@ -35,7 +37,7 @@ object Authz {
 
   //authz
   case class GenericAuthorization(msg: String) extends AuthzAbstract.Authorization {
-    def toSerializable: SerializableAuthz.GenericAuthorization = SerializableAuthz.GenericAuthorization(message = msg)
+    def toSerializable: SerializableAuthz.GenericAuthorization = SerializableAuthz.GenericAuthorization(msg = msg)
   }
 
   implicit val genericAuthorizationReads: Reads[GenericAuthorization] = Json.reads[GenericAuthorization]
@@ -48,13 +50,13 @@ object Authz {
   implicit val stakeAuthorizationValidatorsReads: Reads[StakeAuthorizationValidators] = Json.reads[StakeAuthorizationValidators]
 
   case class StakeAuthorization(max_tokens: Option[Coin], allow_list: Option[StakeAuthorizationValidators], deny_list: Option[StakeAuthorizationValidators], authorization_type: String) extends AuthzAbstract.Authorization {
-    def toSerializable: SerializableAuthz.StakeAuthorization = SerializableAuthz.StakeAuthorization(maxTokens = max_tokens.fold[Option[Serializable.Coin]](None)(x => Option(x.toCoin)), allowList = allow_list.fold[Option[SerializableAuthz.StakeAuthorizationValidators]](None)(x => Option(x.toSerializable)), denyList = deny_list.fold[Option[SerializableAuthz.StakeAuthorizationValidators]](None)(x => Option(x.toSerializable)), authorizationType = authorization_type)
+    def toSerializable: SerializableAuthz.StakeAuthorization = SerializableAuthz.StakeAuthorization(maxTokens = this.max_tokens.fold(Serializable.Coin("", MicroNumber.zero))(_.toCoin), allowList = this.allow_list.fold(SerializableAuthz.StakeAuthorizationValidators(Seq.empty))(_.toSerializable), denyList = this.deny_list.fold(SerializableAuthz.StakeAuthorizationValidators(Seq()))(_.toSerializable), authorizationType = authorization_type)
   }
 
   implicit val stakeAuthorizationReads: Reads[StakeAuthorization] = Json.reads[StakeAuthorization]
 
   case class Authorization(authorizationType: String, value: AuthzAbstract.Authorization) {
-    def toSerializable: SerializableAuthz.Authorization = SerializableAuthz.Authorization(authorizationType = authorizationType, value = value.toSerializable)
+    def toSerializable: commonAuthzAbstract = this.value.toSerializable
   }
 
   implicit val authorizationReads: Reads[Authorization] = (

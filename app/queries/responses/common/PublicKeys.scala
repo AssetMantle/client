@@ -1,16 +1,16 @@
 package queries.responses.common
 
-import play.api.libs.json.{JsObject, JsPath, Json, OFormat, Reads}
+import play.api.libs.json.{Json, OFormat, Reads}
 import queries.Abstract.PublicKey
-import models.common.{PublicKeys => SeriliazablePublicKeys}
-import play.api.libs.functional.syntax._
-import models.Abstract.{PublicKey => SerializablePublicKey}
-import play.api.Logger
 
 object PublicKeys {
 
   case class SinglePublicKey(`@type`: String, key: String) extends PublicKey {
-    def toSerializablePublicKey: SerializablePublicKey = SeriliazablePublicKeys.SinglePublicKey(publicKeyType = `@type`, key = key)
+
+    def getType: String = this.`@type`
+
+    def getBytes: Array[Byte] = utilities.Secrets.base64Decoder(this.key)
+
   }
 
   implicit val singlePublicKeyReads: Reads[SinglePublicKey] = Json.reads[SinglePublicKey]
@@ -18,11 +18,9 @@ object PublicKeys {
   implicit val singleSigPublicKeyFormat: OFormat[SinglePublicKey] = Json.format[SinglePublicKey]
 
   case class MultiSigPublicKey(`@type`: String, threshold: Int, public_keys: Seq[SinglePublicKey]) extends PublicKey {
-    def toSerializablePublicKey: SerializablePublicKey = SeriliazablePublicKeys.MultiSigPublicKey(
-      publicKeyType = `@type`,
-      threshold = threshold,
-      publicKeys = public_keys.map(x => SeriliazablePublicKeys.SinglePublicKey(publicKeyType = x.`@type`, key = x.key))
-    )
+    def getType: String = this.`@type`
+
+    def getBytes: Array[Byte] = Array()
   }
 
   implicit val multiSigPublicKeyReads: Reads[MultiSigPublicKey] = Json.reads[MultiSigPublicKey]

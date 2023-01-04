@@ -1,7 +1,6 @@
 @import views.html.base.cards._
-@import utilities.Date.RFC3339
 
-@(blockHeight: Int, proposer: String, time: RFC3339, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockHeight: Int, proposer: String, time: Long, averageBlockTime: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
 } {
@@ -24,13 +23,9 @@
             <th>@Messages(constants.View.AVERAGE_BLOCK_TIME)</th>
             <td id="latestBlockHeight_averageBlockTime">@(s"${averageBlockTime}s")</td>
         </tr>
-        <tr>
-            <th>@Messages(constants.View.CHAIN_ID)</th>
-            <td>@chainID</td>
-        </tr>
     }
 }
 
 <script>
-    convertUTCDateToLocalDate("@time.toString", "latestBlockHeight_time")
+    fromEpochDateToLocal(@time, "latestBlockHeight_time")
 </script>

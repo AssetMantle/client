@@ -16,9 +16,7 @@ class GetProposal @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val path = "cosmos/gov/v1beta1/proposals"
-
-  private val url = constants.Blockchain.RestEndPoint + "/" + path + "/"
+  private val url = constants.Blockchain.RestEndPoint + "/cosmos/gov/v1beta1/proposals/"
 
   private def action(id: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + id).get)
 

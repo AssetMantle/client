@@ -1,0 +1,10 @@
+@import cosmos.bank.v1beta1.{Tx => bankTx}
+@import models.common.Serializable.Coin
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: bankTx.MsgSend)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFromAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFromAddress}'))")))
+@commonHtmlInfo(constants.View.TO, commonJavascriptLink(msg.getToAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getToAddress}'))")))
+@commonTextInfo(constants.View.AMOUNTS, msg.getAmountList.map(amt => Coin(amt).getAmountWithNormalizedDenom()).mkString(", "))

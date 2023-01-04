@@ -1,0 +1,10 @@
+@import ibc.core.connection.v1.Connection.Version
+@import views.html.base.infos._
+
+@(key: String, version: Version)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.IDENTIFIER, version.getIdentifier)
+    @commonTextInfo(constants.View.FEATURES, version.getFeaturesList.mkString(", "))
+</div>

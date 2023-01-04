@@ -136,7 +136,7 @@ class Undelegations @Inject()(
 
   object Utility {
 
-    def onUndelegation(undelegate: stakingTx.MsgUndelegate)(implicit header: Header): Future[Unit] = {
+    def onUndelegation(undelegate: stakingTx.MsgUndelegate)(implicit header: Header): Future[String] = {
       val undelegationsResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
       val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.getValidatorAddress)
@@ -153,8 +153,9 @@ class Undelegations @Inject()(
         _ <- withdrawAddressBalanceUpdate
         _ <- updateOrDeleteDelegation
         _ <- updateActiveValidatorSet()
-      } yield ()).recover {
+      } yield undelegate.getDelegatorAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          undelegate.getDelegatorAddress
       }
     }
 

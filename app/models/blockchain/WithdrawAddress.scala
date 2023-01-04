@@ -100,13 +100,14 @@ class WithdrawAddresses @Inject()(
   }
 
   object Utility {
-    def onSetWithdrawAddress(setWithdrawAddress: distributionTx.MsgSetWithdrawAddress)(implicit header: Header): Future[Unit] = {
+    def onSetWithdrawAddress(setWithdrawAddress: distributionTx.MsgSetWithdrawAddress)(implicit header: Header): Future[String] = {
       val insert = Service.insertOrUpdate(WithdrawAddress(delegatorAddress = setWithdrawAddress.getDelegatorAddress, withdrawAddress = setWithdrawAddress.getWithdrawAddress))
 
       (for {
         _ <- insert
-      } yield ()).recover {
+      } yield setWithdrawAddress.getDelegatorAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          setWithdrawAddress.getDelegatorAddress
       }
     }
 

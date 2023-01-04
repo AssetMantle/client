@@ -1,0 +1,9 @@
+@import ibc.core.connection.v1.{Tx => connectionTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(msg: connectionTx.MsgConnectionOpenConfirm)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.CONNECTION_ID, msg.getConnectionId)
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.PROOF_HEIGHT, msg.getProofHeight)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

@@ -1,0 +1,12 @@
+@import ibc.core.channel.v1.{Tx => channelTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(msg: channelTx.MsgChannelOpenTry)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.PORT_ID, msg.getPortId)
+@commonTextInfo(constants.View.PREVIOUS_CHANNEL_ID, msg.getPreviousChannelId)
+@views.html.component.blockchain.txMessages.ibcMsg.commonChannel(constants.View.CHANNEL, msg.getChannel)
+@commonTextInfo(constants.View.COUNTERPARTY_VERSION, msg.getCounterpartyVersion)
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.PROOF_HEIGHT, msg.getProofHeight)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

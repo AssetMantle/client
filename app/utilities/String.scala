@@ -1,6 +1,5 @@
 package utilities
 
-import models.common.DataValue
 import play.api.routing.JavaScriptReverseRoute
 
 import java.math.BigInteger
@@ -10,7 +9,7 @@ import java.security.MessageDigest
 
 object String {
 
-  def getJsRouteString(route: JavaScriptReverseRoute, parameters: String): String = if (route != null) {
+  def getJsRouteString(route: JavaScriptReverseRoute, parameters: String = ""): String = if (route != null) {
     s"jsRoutes.${route.name}(${parameters})"
   } else {
     "#"
@@ -38,8 +37,4 @@ object String {
       }
       .getOrElse("")
   }
-
-  def getPropertyRequestNameAndType(dataType: String, dataName: String): String = Seq(dataName, DataValue.getFactTypeFromDataType(dataType)).mkString(constants.Blockchain.DataNameAndTypeSeparator)
-
-  def getPropertyRequestWithValue(dataNameWithType: String, dataValue: Option[String]): String = Seq(dataNameWithType, dataValue.getOrElse("")).mkString(constants.Blockchain.DataTypeAndValueSeparator)
 }

@@ -1,5 +1,6 @@
 package utilities
 
+import com.google.protobuf.{Timestamp => protoTimestamp}
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
@@ -25,6 +26,8 @@ object Date {
   def sqlDateToUtilDate(sqlDate: java.sql.Date): java.util.Date = new java.util.Date(sqlDate.getTime)
 
   def getTimeFromSqlTimestamp(sqlTime: java.sql.Timestamp): String = ZonedDateTime.parse(sqlTime.toInstant.toString).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+
+  def getTimeFromEpoch(value: Long): String = ZonedDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
   def stringDateToTimeStamp(stringDate: String): Timestamp = try {
     Timestamp.valueOf(stringDate)
@@ -112,6 +115,8 @@ object Date {
     }
 
     def difference(that: RFC3339): Duration = Duration.between(this.zonedDateTime, that.zonedDateTime)
+
+    def toProtoTimestamp: protoTimestamp = protoTimestamp.newBuilder().setSeconds(this.epoch).build()
 
   }
 

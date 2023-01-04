@@ -31,8 +31,7 @@ object Validator {
   case class Result(operator_address: String, consensus_pubkey: PublicKey, jailed: Boolean, status: String, tokens: MicroNumber, delegator_shares: BigDecimal, description: Description, unbonding_height: String, unbonding_time: RFC3339, commission: Commission, min_self_delegation: String) {
     def toValidator: BlockchainValidator = BlockchainValidator(
       operatorAddress = operator_address,
-      hexAddress = utilities.Bech32.convertValidatorPublicKeyToHexAddress(consensus_pubkey.toSerializablePublicKey.value),
-      consensusPublicKey = consensus_pubkey.toSerializablePublicKey,
+      hexAddress = utilities.Secrets.sha256Hash(consensus_pubkey.getBytes).slice(0, 20).map("%02x".format(_)).mkString.toUpperCase,
       jailed = jailed,
       status = status,
       tokens = tokens,

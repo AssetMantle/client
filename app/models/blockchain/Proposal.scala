@@ -15,6 +15,7 @@ import queries.responses.blockchain.ProposalResponse.{Response => ProposalRespon
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
+import com.google.protobuf.{Any => protoAny}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,11 +83,11 @@ class Proposals @Inject()(
 
   private[models] val proposalTable = TableQuery[ProposalTable]
 
-  case class ProposalSerialized(id: Int, content: String, status: String, finalTallyResult: String, submitTime: String, depositEndTime: String, totalDeposit: String, votingStartTime: String, votingEndTime: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Proposal = Proposal(id = id, content = utilities.JSON.convertJsonStringToObject[ProposalContent](content), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = RFC3339(submitTime), depositEndTime = RFC3339(depositEndTime), totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = RFC3339(votingStartTime), votingEndTime = RFC3339(votingEndTime), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class ProposalSerialized(id: Int, content: Array[Byte], status: String, finalTallyResult: String, submitTime: Long, depositEndTime: Long, totalDeposit: String, votingStartTime: Long, votingEndTime: Long, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Proposal = Proposal(id = id, content = ProposalContent(protoAny.parseFrom(this.content)), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = RFC3339(submitTime), depositEndTime = RFC3339(depositEndTime), totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = RFC3339(votingStartTime), votingEndTime = RFC3339(votingEndTime), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = Json.toJson(proposal.content).toString, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime.toString, depositEndTime = proposal.depositEndTime.toString, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime.toString, votingEndTime = proposal.votingEndTime.toString, createdBy = proposal.createdBy, createdOnMillisEpoch = proposal.createdOnMillisEpoch, updatedBy = proposal.updatedBy, updatedOnMillisEpoch = proposal.updatedOnMillisEpoch)
+  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = proposal.content.toProto.toByteArray, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime.epoch, depositEndTime = proposal.depositEndTime.epoch, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime.epoch, votingEndTime = proposal.votingEndTime.epoch, createdBy = proposal.createdBy, createdOnMillisEpoch = proposal.createdOnMillisEpoch, updatedBy = proposal.updatedBy, updatedOnMillisEpoch = proposal.updatedOnMillisEpoch)
 
   private def add(proposal: Proposal): Future[Int] = db.run((proposalTable returning proposalTable.map(_.id) += serialize(proposal)).asTry).map {
     case Success(result) => result
@@ -128,21 +129,21 @@ class Proposals @Inject()(
 
     def id = column[Int]("id", O.PrimaryKey)
 
-    def content = column[String]("content")
+    def content = column[Array[Byte]]("content")
 
     def status = column[String]("status")
 
     def finalTallyResult = column[String]("finalTallyResult")
 
-    def submitTime = column[String]("submitTime")
+    def submitTime = column[Long]("submitTime")
 
-    def depositEndTime = column[String]("depositEndTime")
+    def depositEndTime = column[Long]("depositEndTime")
 
     def totalDeposit = column[String]("totalDeposit")
 
-    def votingStartTime = column[String]("votingStartTime")
+    def votingStartTime = column[Long]("votingStartTime")
 
-    def votingEndTime = column[String]("votingEndTime")
+    def votingEndTime = column[Long]("votingEndTime")
 
     def createdBy = column[String]("createdBy")
 
@@ -171,7 +172,7 @@ class Proposals @Inject()(
 
   object Utility {
 
-    def onSubmitProposal(submitProposal: govTx.MsgSubmitProposal)(implicit header: Header): Future[Unit] = {
+    def onSubmitProposal(submitProposal: govTx.MsgSubmitProposal)(implicit header: Header): Future[String] = {
       val latestProposalID = Service.getLatestProposalID
 
       def upsert(latestProposalID: Int) = insertOrUpdateProposal(latestProposalID + startingProposalID)
@@ -179,8 +180,9 @@ class Proposals @Inject()(
       (for {
         latestProposalID <- latestProposalID
         _ <- upsert(latestProposalID)
-      } yield ()).recover {
+      } yield submitProposal.getProposer).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          submitProposal.getProposer
       }
     }
 

@@ -1,0 +1,9 @@
+@import cosmos.gov.v1beta1.{Tx => govTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: govTx.MsgVote)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.VOTER, commonJavascriptLink(msg.getVoter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getVoter}'))")))
+@commonTextInfo(constants.View.PROPOSAL_ID, msg.getProposalId.toString)
+@commonTextInfo(constants.View.VOTE, msg.getOption.toString)
