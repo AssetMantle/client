@@ -263,7 +263,7 @@ class Validators @Inject()(
 
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(stakingTx.MsgDelegate.newBuilder()
-          .setDelegatorAddress(utilities.Bech32.convertOperatorAddressToAccountAddress(createValidator.getValidatorAddress))
+          .setDelegatorAddress(utilities.Crypto.convertOperatorAddressToAccountAddress(createValidator.getValidatorAddress))
           .setValidatorAddress(createValidator.getValidatorAddress)
           .setAmount(createValidator.getValue).build())
         val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.getDescription.getMoniker)(s"'${createValidator.getValidatorAddress}'")
@@ -297,9 +297,9 @@ class Validators @Inject()(
         validator <- upsertValidator
         _ <- addEvent(validator)
         - <- insertKeyBaseAccount(validator)
-      } yield utilities.Bech32.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)).recover {
+      } yield utilities.Crypto.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          utilities.Bech32.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)
+          utilities.Crypto.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)
       }
     }
 
@@ -312,9 +312,9 @@ class Validators @Inject()(
         validator <- upsertValidator
         _ <- updateActiveValidatorSet()
         _ <- addEvent(validator)
-      } yield utilities.Bech32.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)).recover {
+      } yield utilities.Crypto.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          utilities.Bech32.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)
+          utilities.Crypto.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)
       }
     }
 
@@ -348,14 +348,14 @@ class Validators @Inject()(
     }
 
     def onWithdrawValidatorCommission(withdrawValidatorCommission: distributionTx.MsgWithdrawValidatorCommission)(implicit header: Header): Future[String] = {
-      val accountAddress = utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
+      val accountAddress = utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
       val withdrawBalance = blockchainWithdrawAddresses.Utility.withdrawRewards(accountAddress)
 
       (for {
         _ <- withdrawBalance
-      } yield utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)).recover {
+      } yield utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          utilities.Bech32.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
+          utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
       }
     }
 
@@ -379,7 +379,7 @@ class Validators @Inject()(
       def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
         if (header.height >= unbondingValidator.unbondingHeight && unbondingValidator.isUnbondingMatured(header.time)) {
           val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
-          val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Bech32.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
+          val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
 
           for {
             _ <- updateOrDeleteValidator
