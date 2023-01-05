@@ -182,8 +182,7 @@ body.darkMode ::-webkit-scrollbar-thumb {
 }
 
 body.darkMode .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
-    background: var(--dark-1);
-    border-bottom: 1px solid var(--darkmode-color-2);
+    background: var(--header-bg);
 }
 
 body.darkMode .footer {
@@ -192,7 +191,7 @@ body.darkMode .footer {
 }
 
 body.darkMode .header .cmuk-navbar-nav > li > a {
-    color: var(--darkmode-icon-fill);
+    color: var(--gray);
 }
 
 body.darkMode .header .icon {
@@ -200,7 +199,7 @@ body.darkMode .header .icon {
 }
 
 body.darkMode .header .cmuk-navbar-nav > li > a.active {
-    color: var(--white-font);
+    color: var(--primary-color);
 }
 
 body.darkMode .header .cmuk-navbar-nav > li > a.active .icon {
@@ -448,9 +447,10 @@ body.darkMode .block .full {
 }
 
 body.darkMode .searchForm dl .cmuk-search-input {
-    background: var(--dark-2);
-    border-color: var(--darkmode-color-2);
-    color: var(--darkmode-color-1);
+    background: var(--header-bg);
+    border-color: var(--text-medium);
+    color: var(--text-medium);
+    border-radius: 8px;
 }
 
 body.darkMode table.dataTable.no-footer {
@@ -1582,24 +1582,32 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .comdex .searchForm dl .cmuk-search-input {
-    padding: 0 40px 0 10px;
+    padding: 0 10px 0 40px;
     background: var(--dark-2);
-    color: var(--white-font);
     border: 1px solid var(--dark-2);
     border-radius: 0;
-    font-weight: 500;
     height: 35px;
     width: 450px;
-    font-size: 0.875rem !important;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px !important;
+    color: var(--text-medium);
+
 }
 
 .comdex .searchForm dl .cmuk-search-input::placeholder {
-    color: #5F646C;
+    color: var(--text-medium);
     font-weight: 500;
+}
+
+.comdex .searchForm dl .cmuk-search-input:focus{
+    border-color: var(--primary-color);
+    color: var(--mantle-off-white);
 }
 
 .comdex .searchForm .cmuk-search-icon {
     color: var(--white-font);
+    left: 0;
 }
 
 .comdex .dataTables_wrapper .dataTables_filter {
@@ -1781,44 +1789,42 @@ body.darkMode .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody t
 }
 
 .header .cmuk-navbar-nav > li > a {
-    padding: 0 18px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    font-family: var(--font-type-2);
-    letter-spacing: 0.4px;
+    padding: 0 0px;
+    font-family: var(--font-type-1);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: var(--primary-color);
 }
 
-.header .dashboardIcon .icon {
+.header .dashboardIcon,
+.header .blocksIcon,
+.header .traderIcon,
+.header .accountIcon,
+.header .transactionsIcon,
+.header .validatorsIcon,
+.header .singUpIcon,
+.header .loginIcon,
+.header .proposalsIcon,
+.header .walletIcon{
+    margin-right: 6px;
     width: 20px;
     height: 20px;
-    margin-bottom: -2px;
 }
 
-.header .dashboardIcon, .header .blocksIcon, .header .traderIcon, .header .accountIcon, .header .transactionsIcon, .header .validatorsIcon, .header .singUpIcon, .header .loginIcon {
-    margin-right: 5px;
-    width: 20px;
-    height: 20px;
+.header .walletLinkIcon{
+    margin-left: 4px;
 }
 
-.header .loginIcon .icon {
-    margin-bottom: -5px;
-}
-
-.header .blocksIcon .icon {
-    width: 20px;
-    height: 25px;
-}
-
-.header .transactionsIcon .icon {
-    width: 16px;
-    margin-bottom: -3px;
-    height: 16px;
-}
-
-.header .icon {
+.header .icon{
     width: 20px;
     height: 20px;
     fill: var(--white-font);
+}
+
+.header .cmuk-navbar-nav{
+    gap: 48px;
 }
 
 .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {

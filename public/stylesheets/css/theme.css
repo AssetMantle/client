@@ -15,6 +15,10 @@
     --darkmode-border: #E5E5E5;
     --success-color: #0F9C0C;
     --error-color: red;
-    --font-type-1: "Montserrat", sans-serif;
-    --font-type-2: "Poppins";
+    --font-type-1: "Work Sans";
+    --font-type-2: "Lato";
+    --header-bg: rgba(4, 4, 4, 0.8);
+    --text-medium: rgba(255, 253, 250, 0.75);
+    --gray: #B0B0B0;
+    --mantle-off-white: #FFFDFA;
 }

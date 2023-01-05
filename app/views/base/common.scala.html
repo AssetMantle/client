@@ -113,35 +113,39 @@
                                     @Messages(constants.View.PROPOSALS)
                                 </a>
                                 </li>
+                                <li>
+                                    <a id="wallet" href="https://wallet.assetmantle.one" class="navItemRippleEffect" target="_blank">
+                                        <span class="walletIcon">
+                                            @commonIcon("walletIcon")
+                                        </span>
+                                        @Messages(constants.View.WALLET)
+                                        <span class="walletLinkIcon">
+                                            @commonIcon("walletLinkIcon")
+                                        </span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="cmuk-navbar-right">
-                            <div>
-                                <a href="https://wallet.assetmantle.one" target="_blank">
-                                <button type="button" id='wallet' class='cmuk-button buttonPrimary walletBtn'>
-                                @Messages(constants.View.WALLET)
-                                </button>
-                                </a>
-                            </div>
                             <div class="searchContainer hidden">
                             @searchField("searchInput")
                             </div>
-                            <ul class="cmuk-navbar-nav top-nav-dropdown">
-                                <li>
-                                    <select class="uk-select" onchange="location = this.value;">
-                                    @if(otherApps.nonEmpty) {
-                                        @otherApps.zipWithIndex.map { case (otherApp, index) =>
-                                            @if(index == 0) {
-                                                <option selected value="">@otherApp.name</option>
-                                            } else {
-                                                <option value="@otherApp.url">@otherApp.name</option>
-                                            }
-                                        }
-                                    } else {
-                                        <option selected value="">@constants.Blockchain.ChainID</option>
-                                    }
-                                    </select>
-                                </li>
+@*                            <ul class="cmuk-navbar-nav top-nav-dropdown">*@
+@*                                <li>*@
+@*                                    <select class="uk-select" onchange="location = this.value;">*@
+@*                                    @if(otherApps.nonEmpty) {*@
+@*                                        @otherApps.zipWithIndex.map { case (otherApp, index) =>*@
+@*                                            @if(index == 0) {*@
+@*                                                <option selected value="">@otherApp.name</option>*@
+@*                                            } else {*@
+@*                                                <option value="@otherApp.url">@otherApp.name</option>*@
+@*                                            }*@
+@*                                        }*@
+@*                                    } else {*@
+@*                                        <option selected value="">@constants.Blockchain.ChainID</option>*@
+@*                                    }*@
+@*                                    </select>*@
+@*                                </li>*@
                                 @* @loginState match {*@
                                 @* case null => {*@
                                 @* <li>*@
@@ -195,7 +199,7 @@
                                 @* </li>*@
                                 @* }*@
                                 @* }*@
-                            </ul>
+@*                            </ul>*@
                         </div>
                     </div>
                 </nav>
