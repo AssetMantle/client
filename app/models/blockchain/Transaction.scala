@@ -27,7 +27,7 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
 
   // Since Seq in scala is by default immutable and ordering is maintained, we can use these methods directly
   def getSigners: Seq[String] = parsedTx.getAuthInfo.getSignerInfosList.asScala.toSeq.map { signerInfo =>
-    utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(secp256k1.Keys.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray))))
+    commonUtilities.Bech32.encode(constants.Blockchain.AccountPrefix, commonUtilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(secp256k1.Keys.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray))))
   }
 
   def getFeePayer: String = if (parsedTx.getAuthInfo.getFee.getPayer != "") parsedTx.getAuthInfo.getFee.getPayer else getSigners.headOption.getOrElse("")

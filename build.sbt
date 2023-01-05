@@ -9,7 +9,7 @@ lazy val GatlingTest = config("gatling") extend Test
 GatlingTest / scalaSource := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file("."))
-  .dependsOn(RootProject(uri("https://github.com/AssetMantle/clientTools.git#v0.0.1")))
+  .dependsOn(RootProject(uri("ssh://git@github.com/AssetMantle/clientTools.git")))
   .enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)
   .configs(GatlingTest)

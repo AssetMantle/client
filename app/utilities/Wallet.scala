@@ -56,7 +56,7 @@ object WalletGenerator {
         hdPath
       )
 
-      val address = utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPath).getPubKey))))
+      val address = commonUtilities.Bech32.encode(constants.Blockchain.AccountPrefix, commonUtilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(bitcoinWallet.getKeyByPath(hdPath).getPubKey))))
       Wallet(address = address, hdPath = hdPath.toString, publicKey = bitcoinWallet.getKeyByPath(hdPath).getPubKey, privateKey = bitcoinWallet.getKeyByPath(hdPath).getPrivKeyBytes, mnemonics = mnemonics)
     } else throw new BaseException(constants.Response.INVALID_MNEMONICS)
   }
