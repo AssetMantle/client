@@ -31,13 +31,6 @@ body .cmuk-card-body {
     padding-left: 20px;
 }
 
-body .cmuk-table td {
-    font-size: .875rem;
-    font-family: var(--font-type-2);
-    font-weight: 400;
-    color: var(--dark-1);
-}
-
 #blockList_NEXT,
 #transactionList_NEXT,
 #transactionList_BACK,
@@ -120,7 +113,7 @@ body.darkMode .documentView .documentList, body.darkMode .switcherCard .cmuk-swi
 }
 
 body.darkMode .bodyContainer {
-    background-color: var(--dark-1) !important;
+    background-color: #111111 !important;
 }
 
 body.darkMode .banner {
@@ -229,12 +222,10 @@ body.darkMode .commonList {
     filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
 }
 
-body.darkMode .cmuk-card-default {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+body.darkMode .cmuk-card-default{
+    border: none;
 }
 
-body.darkMode .cmuk-card-default,
 body.darkMode .financialCardSection,
 body.darkMode .documentItem,
 body.darkMode .cmuk-input,
@@ -423,15 +414,34 @@ body.darkMode .loginForm .formBody .forgotPassword {
 }
 
 body.darkMode .tableCard table tr {
-    border-bottom: 1px solid var(--darkmode-color-2);
+    border:none !important;
 }
 
 body.darkMode .tableCard table tr th {
     color: var(--darkmode-color-1);
 }
 
-body.darkMode .tableCard table tr td {
-    color: var(--darkmode-color-3);
+body.darkMode .tableCard table td .tableField{
+    display: flex;
+    flex-direction: column;
+}
+
+body.darkMode .tableCard table td .tableFieldTitle{
+    font-family: var(--font-type-1);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 19px;
+    color: var(--gray);
+}
+
+body.darkMode .tableCard table td .tableFieldValue{
+    font-family: var(--font-type-1);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 19px;
+    color: var(--mantle-off-white);
+    letter-spacing: 0.08em;
+    text-transform: capitalize;
 }
 
 body.darkMode .cmuk-alert-danger {
@@ -509,11 +519,8 @@ body.darkMode .notification .notificationTime {
 }
 
 body.darkMode .cmuk-card-styles {
-    color: #666;
-    border: 1px solid var(--darkmode-color-2);
-    background: var(--dark-1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+    background: var(--card-color);
+    border-radius: 20px;
 }
 
 body.lightMode .buttonPrimary {
@@ -729,7 +736,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .headerFontSize {
-    font-size: 1rem;
+    font-family: var(--font-type-1);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: var(--dark);
 }
 
 .title {
@@ -1379,10 +1391,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .comdex .cmuk-card-header {
-    color: #313238;
-    font-weight: 600;
-    font-family: var(--font-type-2);
-    padding: 15px 20px;
+    padding: 16px 24px;
 }
 
 .comdex .cmuk-card-header .cmuk-button {
@@ -1542,8 +1551,19 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: 150px;
 }
 
+.cmuk-card-default .cmuk-card-header{
+    border: none !important;
+}
+
 .comdex .tableCard .cmuk-card-body {
-    padding: 10px;
+    padding: 0 16px 16px 16px;
+
+}
+
+.comdex .tableCard .cmuk-card-body .productTable{
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+    padding: 16px 24px;
 }
 
 .comdex .tableCard .cmuk-card-body .cmuk-card-header {
@@ -1552,10 +1572,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .comdex .tableCard table {
     margin: 0;
-}
-
-.comdex .tableCard table td, .comdex .tableCard table tr {
-    padding: 12px 12px;
 }
 
 .comdex .cmuk-subnav-pill > .cmuk-active > a {
@@ -1648,14 +1664,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     margin-right: 5px;
 }
 
-body.darkMode .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
-    color: var(--bg-light-primary);
+.comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
+    padding: 0;
+    padding-bottom: 15px;
 }
 
-.comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
-    padding: 16px 12px;
-    font-weight: 400;
-    color: var(--dark-2);
+.comdex table.dataTable tbody tr:last-child td, .comdex table.cmuk-table tbody tr:last-child td{
+    padding-bottom: 0;
 }
 
 .comdex table.dataTable {
@@ -2770,15 +2785,6 @@ form .formBody {
     height: calc(50% - 20px) !important;
     background: var(--white-font);
     overflow: auto;
-}
-
-.leftContainer .tableCard table td, .leftContainer .comdex .tableCard table tr {
-    padding: 10px;
-    font-size: 0.875rem;
-    vertical-align: middle;
-    color: #2E3239;
-    font-family: var(--font-type-2);
-    font-weight: 600;
 }
 
 .leftContainer .financial {
