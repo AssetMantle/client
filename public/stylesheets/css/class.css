@@ -25,12 +25,6 @@ body .block .full {
     background-color: var(--primary-color);
 }
 
-body .cmuk-card-body {
-    padding: 0px;
-    padding-top: 20px;
-    padding-left: 20px;
-}
-
 #blockList_NEXT,
 #transactionList_NEXT,
 #transactionList_BACK,
@@ -3011,6 +3005,16 @@ form .formBody {
     font-size: 1rem;
 }
 
+.rightContainer .votingPowerContainer .votingPowerContent{
+    background-color: var(--bg-popup);
+    padding: 32px 0px;
+    border-radius: 10px;
+}
+
+.rightContainer .votingPowerContainer .cmuk-card-body{
+    padding: 0 16px 16px 16px;
+}
+
 .rightContainer .chatRoom .cmuk-card-header .icon {
     width: 18px;
     height: 18px;
@@ -3767,10 +3771,6 @@ header:before{
 
 #validatorList .cmuk-switcher {
     overflow-x: scroll;
-}
-
-#votingPowers {
-    height: 100%;
 }
 
 .toolTip {
