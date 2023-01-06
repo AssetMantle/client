@@ -313,14 +313,6 @@ body.darkMode .salesQuoteCard .salesQuoteCardMiddle p span {
     color: var(--darkmode-color-3);
 }
 
-body.darkMode .timeline:before {
-    border-color: #4A4B51;
-}
-
-body.darkMode .timeline .timeline-item .timeline-icon {
-    background: var(--darkmode-color-2);
-}
-
 body.darkMode hr {
     border-color: #4A4B51;
 }
@@ -510,14 +502,6 @@ body.darkMode .cmuk-navbar-dropdown-nav > li > a {
     color: var(--darkmode-color-1);
 }
 
-body.darkMode .timeline-content:hover {
-    background: var(--darkmode-color-2);
-}
-
-body.darkMode .notification .notificationTime {
-    color: #cccccc;
-}
-
 body.darkMode .cmuk-card-styles {
     background: var(--card-color);
     border-radius: 20px;
@@ -703,7 +687,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     align-items: center;
 }
 
-.commodityImage img, .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon, .timeline .timeline-item .timeline-icon .icon {
+.commodityImage img, .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon{
     position: absolute;
     left: 0;
     right: 0;
@@ -2995,7 +2979,7 @@ form .formBody {
 }
 
 .rightContainer .recentActivityContainer {
-    height: calc(50% - 20px) !important;
+    /*height: calc(50% - 20px) !important;*/
     margin-bottom: 20px;
 }
 
@@ -3015,8 +2999,11 @@ form .formBody {
 }
 
 .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
-    height: 300px;
-    padding: 0 15px;
+    max-height: 300px;
+    margin: 0 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
     overflow: auto;
 }
 
@@ -3167,9 +3154,7 @@ form .formBody {
     display: none;
 }
 
-.timeline .timeline-item:after,
-header:before,
-.timeline .timeline-item:before {
+header:before{
     content: '';
     display: block;
     width: 100%;
@@ -3182,69 +3167,59 @@ header:before,
     -webkit-transition: all 0.4s ease;
     -moz-transition: all 0.4s ease;
     -ms-transition: all 0.4s ease;
-    margin: 10px 0;
     transition: all 0.4s ease;
-}
-
-.timeline:before {
-    content: "";
-    width: 0;
-    height: 100%;
-    border-right: 2px dashed #CECECE;
-    left: 29px;
-    top: 5px;
-    position: absolute;
 }
 
 .timeline .timeline-item {
     margin-bottom: 20px;
-    height: 55px;
     position: relative;
+    display: flex;
+    gap: 4px;
 }
 
 .timeline .timeline-item .timeline-icon {
-    background: #E4EBF2;
-    width: 40px;
-    height: 40px;
-    position: relative;
-    top: 5px;
+    width: 22px;
+    height: 22px;
     display: inline-block;
-    left: 10px;
     overflow: hidden;
-    border-radius: 50%;
 }
 
 .timeline .timeline-item .timeline-icon .icon {
-    fill: var(--primary-color);
-    width: 15px;
-    height: 15px;
+    fill: var(--mantle-off-white);
+    width: 24px;
+    height: 24px;
 }
 
 .timeline .timeline-item .timeline-content {
     cursor: pointer;
-    width: 80%;
-    padding: 5px 10px;
-    position: relative;
     -webkit-transition: all 0.3s ease;
     -moz-transition: all 0.3s ease;
     transition: all 0.3s ease;
 }
 
-.timeline .timeline-item .timeline-content .activityContent {
-    color: #2E3239;
-    font-size: 0.875rem;
-    font-width: 400;
+.timeline .timeline-item .timeline-content .activityContent  .timelineItemTitle{
     font-family: var(--font-type-2);
-    font-size: 0.875rem;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
 }
 
-.timeline .timeline-item .timeline-content.right {
-    float: right;
+.timeline .timeline-item .timeline-content .activityContent  .timelineItemMessage{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 17px;
+    color: var(--inactive-grey);
 }
 
-.timeline .timeline-item .timeline-content.right:before {
-    left: -5px;
-    right: inherit;
+.timeline .timeline-item .timeline-content .activityContent  .timelineItemTime{
+    font-family: var(--font-type-2);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 14px;
+    color: var(--disabled);
 }
 
 .timeline .notification > div {
@@ -3792,10 +3767,6 @@ header:before,
 
 #validatorList .cmuk-switcher {
     overflow-x: scroll;
-}
-
-.recentActivityContainer {
-    height: 50%;
 }
 
 #votingPowers {
