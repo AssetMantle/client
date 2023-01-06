@@ -621,7 +621,7 @@ body.lightMode .notification .notificationTime {
 }
 
 .containerHeight {
-    height: calc(50% - 20px) !important;
+    /*height: calc(50% - 20px) !important;*/
 }
 
 .cmuk-table-striped tbody tr:nth-of-type(odd), .cmuk-table-striped > tr:nth-of-type(odd), table.dataTable tbody tr {
@@ -1666,7 +1666,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .comdex table.dataTable tbody td, .comdex table.cmuk-table tbody td {
     padding: 0;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
 }
 
 .comdex table.dataTable tbody tr:last-child td, .comdex table.cmuk-table tbody tr:last-child td{
