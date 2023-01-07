@@ -91,6 +91,19 @@ body .block .full {
     height: 50%;
 }
 
+#tokensPrices .cmuk-card-body{
+    margin: 0px 16px 16px 16px;
+    padding: 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#tokensPrices .cmuk-card-body .chartContainer{
+    padding: 16px;
+    background-color: var(--card-color);
+    border-radius: 10px;
+}
+
 body.darkMode ::-webkit-scrollbar-track {
     background-color: transparent;
 }
@@ -596,6 +609,12 @@ body.lightMode .notification .notificationTime {
 
 .cmuk-card-styles .cmuk-card-header p {
     margin: 0;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--dark);
+
 }
 
 .containerHeight {
@@ -1126,7 +1145,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .chartContainer {
-    height: 260px;
+    height: 300px;
 }
 
 .cardSelectHeader dl {
@@ -4281,4 +4300,9 @@ figure.zoom img {
     flex-wrap: nowrap;
     align-items: end;
     margin-bottom: 12px;
+}
+
+#explorerContent{
+    background-color: red;
+    border-radius: 20px;
 }
