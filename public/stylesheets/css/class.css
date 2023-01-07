@@ -92,7 +92,7 @@ body .block .full {
 }
 
 #tokensPrices .cmuk-card-body{
-    margin: 0px 16px 16px 16px;
+    margin: 0px 16px 0px 16px;
     padding: 16px;
     background-color: var(--bg-popup);
     border-radius: 10px;
@@ -4305,4 +4305,22 @@ figure.zoom img {
 #explorerContent{
     background-color: red;
     border-radius: 20px;
+}
+
+.cmuk-grid+.cmuk-grid {
+    margin-top: 0px !important;
+}
+
+#transactionStatistics .cmuk-card-body{
+    height: calc(100% - 56px) !important;
+    margin: 0px 16px 0px 16px;
+    padding: 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#transactionStatistics .cmuk-card-body .chartContainer{
+    padding: 16px;
+    background-color: var(--card-color);
+    border-radius: 10px;
 }
