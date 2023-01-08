@@ -25,10 +25,8 @@ body .block .full {
     background-color: var(--primary-color);
 }
 
-#blockList_NEXT,
 #transactionList_NEXT,
 #transactionList_BACK,
-#blockList_BACK,
 #validatorTransactions_NEXT,
 #validatorTransactions_BACK,
 #accountTransactions_NEXT, #accountTransactions_BACK {
@@ -400,11 +398,15 @@ body.darkMode .commodityImage {
 }
 
 body.darkMode .cmuk-table-striped tbody tr:nth-of-type(odd), body.darkMode .cmuk-table-striped > tr:nth-of-type(odd) {
-    border-color: var(--darkmode-color-2) !important;
+    border: none !important;
 }
 
 body.darkMode .blockHeightItem .listItemChild p, body.darkMode .blockHeightItem a {
     color: var(--primary-color);
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
 }
 
 body.darkMode .loginForm .formBody .forgotPassword {
@@ -677,9 +679,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .pageContainer .middle .cmuk-card-default, .leftContainer .cmuk-card-default {
-    background: var(--bg-light-card);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+    background: var(--card-color);
+    border-radius: 20px;
+    box-shadow: none;
 }
 
 .profileDetails .cmuk-button-link, .contactDetails .cmuk-button-link {
@@ -1647,11 +1649,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding-left: 10px;
 }
 
-.comdex table.dataTable tbody td.blockHeightItem, .comdex table.cmuk-table tbody td.blockHeightItem {
-    display: flex;
-    align-items: center;
-}
-
 .comdex table.dataTable tbody td.blockHeightItem img, .comdex table.cmuk-table tbody td.blockHeightItem img {
     width: 25px;
     height: 25px;
@@ -1679,11 +1676,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .comdex table.dataTable thead th, .comdex table.cmuk-table thead th, .comdex table.cmuk-table tbody th, .comdex table.dataTable tbody th {
-    border-bottom: 0;
-    color: #8D9CB5;
-    font-weight: 500;
+    border-bottom: 1px solid var(--line);
     font-family: var(--font-type-2);
-    font-size: .875rem;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
+    padding: 0px 0px 16px 0px ;
 }
 
 .comdex table.dataTable tfoot th {
@@ -4250,8 +4250,10 @@ figure.zoom img {
 }
 
 .transactionsList .cmuk-card-body, .blocksList .cmuk-card-body {
-    padding-top: 0px;
-    padding-right: 20px;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
 }
 
 .transactionsList .cmuk-card-body table tbody tr:first-child, .blocksList .cmuk-card-body table tbody tr:first-child {
@@ -4455,4 +4457,57 @@ figure .chart {
     background-color: #FFB400;
     position: absolute;
     left: 0;
+}
+
+.blocksList .leftText{
+    font-family: var(--font-type-1);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: var(--dark);
+}
+
+.blocksList .cmuk-table{
+    margin-bottom: 0px;
+}
+
+.blocksList table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+}
+
+.paginationButton{
+    font-family: var(--font-type-1);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+.paginationButton .buttonContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+.paginationButton.small .icon{
+    width: 14px;
+    height: 14px;
+    fill: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.paginationButtonContainer{
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
 }

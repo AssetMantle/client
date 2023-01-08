@@ -1,0 +1,15 @@
+@import views.html.base._
+
+@(name: String, function: JavaScript, icon: String, size: String, iconFirst: Boolean, arguments: (Symbol, Any)*)(implicit messagesProvider: MessagesProvider)
+
+<div class="@Seq("paginationButton", arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse(""), size).mkString(" ")" id='@arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse("")' onclick="@function">
+    <div class="buttonContainer">
+    @if(iconFirst) {
+        @commonIcon(icon)
+        @Messages(name)
+    } else {
+        @Messages(name)
+        @commonIcon(icon)
+    }
+    </div>
+</div>

@@ -5,19 +5,19 @@
 @(blocks: Seq[Block], numberOfTxs: Map[Int, Int], proposersList: Map[Int, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <tr>
-    <th>@Messages(constants.View.HEIGHT)</th>
+    <th style="text-align: center;">@Messages(constants.View.HEIGHT)</th>
     <th>@Messages(constants.View.PROPOSER)</th>
-    <th>@Messages(constants.View.NUMBER_OF_TRANSACTIONS)</th>
-    <th>@Messages(constants.View.TIME)</th>
+    <th style="text-align: center;">@Messages(constants.View.NUMBER_OF_TRANSACTIONS)</th>
+    <th style="text-align: center;">@Messages(constants.View.TIME)</th>
 </tr>
 @blocks.zipWithIndex.map { case (block, index) =>
 <tr>
-    <td class="blockHeightItem">
+    <td class="blockHeightItem" align="center">
         @commonVerticalIntInfo(constants.View.HEIGHT, block.height, 'id -> ("blockListPageItemHeight_" + index), 'class -> "cmuk-link", 'onclick -> s"getExplorerContent(${utilities.String.getJsRouteFunction(routes.javascript.ComponentViewController.block)}, '${"blockListPageItemHeight_" + index}')")
     </td>
     <td id="blockListPageItemProposer_@index">@proposersList.getOrElse(block.height, "")</td>
-    <td id="blockListPageItemNumTxs_@index">@numberOfTxs.getOrElse(block.height, 0)</td>
-    <td id="blockListPageItemTime_@index">
+    <td id="blockListPageItemNumTxs_@index" align="center">@numberOfTxs.getOrElse(block.height, 0)</td>
+    <td id="blockListPageItemTime_@index" align="center">
         <script>
              convertUTCDateToLocalDate('@block.time.toString',"blockListPageItemTime_@index")
         </script>
