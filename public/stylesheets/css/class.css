@@ -4260,7 +4260,7 @@ figure.zoom img {
     border-top: 0px solid;
 }
 
-.validatorTransactions .cmuk-card-body, .blockTransactions .cmuk-card-body, .accountTransactions .cmuk-card-body {
+.validatorTransactions .cmuk-card-body, .accountTransactions .cmuk-card-body {
     padding-top: 0px !important;
     padding-right: 20px;
 }
@@ -4514,7 +4514,7 @@ figure .chart {
 
 #blockDetails .cmuk-card-body{
     height: auto;
-    margin: 0px 16px 16px 16px;
+    margin: 0px 16px 0px 16px;
     padding: 16px 24px;
     background-color: var(--bg-popup);
     border-radius: 10px;
@@ -4522,6 +4522,10 @@ figure .chart {
 
 #blockDetails .cmuk-card-body .productTable{
     padding: 0px;
+}
+
+#blockDetails .cmuk-card-body .productTable td{
+    padding-bottom: 12px;
 }
 
 #blockDetails .cmuk-card-body .productTable .tableFieldTitle{
@@ -4544,4 +4548,58 @@ figure .chart {
 
 #blockDetails .cmuk-card-body .productTable .tableFieldValue a{
     color: var(--primary-color);
+}
+
+#blockTransactions .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#blockTransactions .cmuk-card-body .emptyBlockTransaction{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--disabled);
+}
+
+#blockTransactions table.cmuk-table thead th{
+    text-align: center;
+}
+
+#blockTransactions table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    text-align: center;
+}
+
+#blockTransactions table.cmuk-table tbody td.blockHeightItem{
+    width: 180px;
+}
+
+#blockTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+    width: 180px;
+}
+
+#blockTransactions table.cmuk-table tbody td .check svg{
+    background: transparent;
+}
+
+#blockTransactions table.cmuk-table tbody td .statusCheck .icon{
+    height: 16px;
+    width: 16px;
+    fill: var(--success-color);
+}
+
+#blockTransactions table.cmuk-table tbody td .statusClose .icon{
+    height: 16px;
+    width: 16px;
+    fill: var(--error-color);
 }
