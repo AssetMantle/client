@@ -4511,3 +4511,37 @@ figure .chart {
     gap: 16px;
     padding: 16px;
 }
+
+#blockDetails .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#blockDetails .cmuk-card-body .productTable{
+    padding: 0px;
+}
+
+#blockDetails .cmuk-card-body .productTable .tableFieldTitle{
+    font-family: var(--font-type-2);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
+}
+
+#blockDetails .cmuk-card-body .productTable .tableFieldValue{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--text-medium);
+    margin-top:4px;
+}
+
+#blockDetails .cmuk-card-body .productTable .tableFieldValue a{
+    color: var(--primary-color);
+}
