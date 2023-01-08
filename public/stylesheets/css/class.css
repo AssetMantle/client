@@ -4459,7 +4459,8 @@ figure .chart {
     left: 0;
 }
 
-.blocksList .leftText{
+.blocksList .leftText,
+.transactionsList .leftText{
     font-family: var(--font-type-1);
     font-weight: 600;
     font-size: 16px;
@@ -4599,6 +4600,36 @@ figure .chart {
 }
 
 #blockTransactions table.cmuk-table tbody td .statusClose .icon{
+    height: 16px;
+    width: 16px;
+    fill: var(--error-color);
+}
+
+.transactionsList table.cmuk-table .tableHead th{
+    text-align: center;
+}
+
+.transactionsList table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    text-align: center;
+}
+
+.transactionsList table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+    width: 140px;
+}
+
+.transactionsList table.cmuk-table tbody td .statusCheck .icon{
+    height: 16px;
+    width: 16px;
+    fill: var(--success-color);
+}
+
+.transactionsList table.cmuk-table tbody td .statusClose .icon{
     height: 16px;
     width: 16px;
     fill: var(--error-color);
