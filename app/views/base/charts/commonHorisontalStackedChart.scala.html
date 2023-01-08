@@ -1,0 +1,44 @@
+@()(implicit messagesProvider: MessagesProvider)
+<figure class="chartContainer">
+    <div class="graphic">
+        <div class="row">
+            <div class="chart">
+                <span class="block" title="@Messages(constants.View.LEGEND_EXECUTE_AUTHORIZATION)">
+                   <span class="value">50%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_WITHDRAW_REWARD)">
+                    <span class="value">13%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_WITHDRAW_COMMISSION)">
+                    <span class="value">8%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_DELEGATE)">
+                    <span class="value">12%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_SEND_COIN)">
+                    <span class="value">6%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_IBC_TRANSFER)">
+                    <span class="value">4%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_IBC_UPDATE_CLIENT)">
+                    <span class="value">4%</span>
+                </span>
+                <span class="block" title="@Messages(constants.View.LEGEND_IBC_ACKNOWLEDGEMENT)">
+                    <span class="value">3%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="legend">
+        <div class="legendItem sectionOne">@Messages(constants.View.LEGEND_EXECUTE_AUTHORIZATION)</div>
+        <div class="legendItem sectionOne">@Messages(constants.View.LEGEND_WITHDRAW_REWARD)</div>
+        <div class="legendItem sectionOne">@Messages(constants.View.LEGEND_WITHDRAW_COMMISSION)</div>
+        <div class="legendItem sectionTwo">@Messages(constants.View.LEGEND_DELEGATE)</div>
+        <div class="legendItem sectionTwo">@Messages(constants.View.LEGEND_SEND_COIN)</div>
+        <div class="legendItem sectionTwo">@Messages(constants.View.LEGEND_IBC_TRANSFER)</div>
+        <div class="legendItem sectionThree">@Messages(constants.View.LEGEND_IBC_UPDATE_CLIENT)</div>
+        <div class="legendItem sectionThree">@Messages(constants.View.LEGEND_IBC_ACKNOWLEDGEMENT)</div>
+    </div>
+</figure>
+<script src="@routes.Assets.versioned("javascripts/chart/horizontalStackedChart.js")"></script>

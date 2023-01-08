@@ -1,7 +1,7 @@
 @import scala.collection.immutable.ListMap
 
 @(id: String, data: ListMap[String, Double], showLegend: Boolean)(implicit messagesProvider: MessagesProvider)
-   <div style="position: relative; height: 196px">
+   <div style="position: relative; height: 196px" class="chartContainer">
     <canvas id="@id"></canvas>
    </div>
     <script type="text/javascript" src="@routes.Assets.versioned("javascripts/chart/Chart.min.js")"></script>
