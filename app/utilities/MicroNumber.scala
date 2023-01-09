@@ -1,7 +1,7 @@
 package utilities
 
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
 
 import scala.language.implicitConversions
@@ -182,7 +182,7 @@ object MicroNumber {
 
   private val module: String = constants.Module.UTILITIES_MICRO_NUMBER
 
-  private val logger: Logger = Logger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   val zero = new MicroNumber(0)
 

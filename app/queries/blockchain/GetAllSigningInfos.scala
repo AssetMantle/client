@@ -2,7 +2,8 @@ package queries.blockchain
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.responses.blockchain.AllSigningInfosResponse.Response
 
 import java.net.ConnectException
@@ -14,7 +15,7 @@ class GetAllSigningInfos @Inject()()(implicit wsClient: WSClient, configuration:
 
   private implicit val module: String = constants.Module.QUERIES_GET_ALL_SIGNING_INFOS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val path = "slashing/signing_infos"
 

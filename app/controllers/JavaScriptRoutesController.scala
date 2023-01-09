@@ -3,14 +3,15 @@ package controllers
 import controllers.actions.WithoutLoginAction
 import play.api.mvc._
 import play.api.routing._
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents, withoutLoginAction: WithoutLoginAction)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def javascriptRoutes = withoutLoginAction { implicit loginState =>
     implicit request =>

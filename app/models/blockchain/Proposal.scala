@@ -9,7 +9,8 @@ import models.common.Serializable.{Coin, FinalTallyResult}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetProposal
 import queries.responses.blockchain.ProposalResponse.{Response => ProposalResponse}
 import queries.responses.common.Header
@@ -73,7 +74,7 @@ class Proposals @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_PROPOSAL
 
@@ -87,7 +88,7 @@ class Proposals @Inject()(
     def deserialize: Proposal = Proposal(id = id, content = ProposalContent(protoAny.parseFrom(this.content)), status = status, finalTallyResult = utilities.JSON.convertJsonStringToObject[FinalTallyResult](finalTallyResult), submitTime = RFC3339(submitTime), depositEndTime = RFC3339(depositEndTime), totalDeposit = utilities.JSON.convertJsonStringToObject[Seq[Coin]](totalDeposit), votingStartTime = RFC3339(votingStartTime), votingEndTime = RFC3339(votingEndTime), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = proposal.content.toProto.toByteArray, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime.epoch, depositEndTime = proposal.depositEndTime.epoch, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime.epoch, votingEndTime = proposal.votingEndTime.epoch, createdBy = proposal.createdBy, createdOnMillisEpoch = proposal.createdOnMillisEpoch, updatedBy = proposal.updatedBy, updatedOnMillisEpoch = proposal.updatedOnMillisEpoch)
+  def serialize(proposal: Proposal): ProposalSerialized = ProposalSerialized(id = proposal.id, content = proposal.content.toProto.toByteString.toByteArray, status = proposal.status, finalTallyResult = Json.toJson(proposal.finalTallyResult).toString, submitTime = proposal.submitTime.epoch, depositEndTime = proposal.depositEndTime.epoch, totalDeposit = Json.toJson(proposal.totalDeposit).toString, votingStartTime = proposal.votingStartTime.epoch, votingEndTime = proposal.votingEndTime.epoch, createdBy = proposal.createdBy, createdOnMillisEpoch = proposal.createdOnMillisEpoch, updatedBy = proposal.updatedBy, updatedOnMillisEpoch = proposal.updatedOnMillisEpoch)
 
   private def add(proposal: Proposal): Future[Int] = db.run((proposalTable returning proposalTable.map(_.id) += serialize(proposal)).asTry).map {
     case Success(result) => result

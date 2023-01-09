@@ -2,7 +2,8 @@ package queries.keyBase
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.Response
 
 import java.net.ConnectException
@@ -14,7 +15,7 @@ class GetValidatorKeyBaseAccount @Inject()()(implicit wsClient: WSClient, config
 
   private implicit val module: String = constants.Module.QUERIES_GET_VALIDATOR_KEY_BASE_ACCOUNT
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val path = "&fields=basics&fields=pictures"
 

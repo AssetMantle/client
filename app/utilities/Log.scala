@@ -2,7 +2,8 @@ package utilities
 
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import scala.concurrent.ExecutionContext
 
 @Singleton

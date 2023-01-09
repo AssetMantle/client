@@ -17,12 +17,14 @@ import ibc.applications.transfer.v1.{Tx => transferTx}
 import ibc.core.channel.v1.{Tx => channelTx}
 import ibc.core.client.v1.{Tx => clientTx}
 import ibc.core.connection.v1.{Tx => connectionTx}
+import com.metas.{transactions => metasTransactions}
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
@@ -46,6 +48,7 @@ class Block @Inject()(
                        blockchainProposalDeposits: blockchain.ProposalDeposits,
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
+                       blockchainMetaDatas: blockchain.MetaDatas,
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
                        blockchainParameters: blockchain.Parameters,
@@ -67,7 +70,7 @@ class Block @Inject()(
 
   private implicit val module: String = constants.Module.SERVICES_BLOCK
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val webSocketMessageLang: Lang = Lang(configuration.get[String]("blockchain.explorer.webSocketMessageLang"))
 
@@ -202,7 +205,7 @@ class Block @Inject()(
         def updateOrDeleteFeeGrant(feeGrant: FeeGrant) = {
           val response = feeGrant.getAllowance.validate(blockTime = header.time, fees = transaction.getFee.amount)
           if (response.delete) blockchainFeeGrants.Service.delete(granter = transaction.getFeeGranter, grantee = grantee)
-          else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated.toProto.toByteArray))
+          else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated.toProto.toByteString.toByteArray))
         }
 
         for {
@@ -308,6 +311,8 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue))
       //ibc-transfer
       case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
+      //metas
+      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }

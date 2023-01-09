@@ -5,7 +5,8 @@ import exceptions.BaseException
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetProposalVote
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -29,7 +30,7 @@ class ProposalVotes @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_PROPOSAL_VOTE
 

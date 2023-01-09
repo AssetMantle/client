@@ -2,9 +2,9 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import constants.Response.Failure
+import response.Failure
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
 import transactions.Abstract.BaseResponse

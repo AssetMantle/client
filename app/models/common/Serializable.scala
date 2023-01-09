@@ -2,7 +2,7 @@ package models.common
 
 import cosmos.base.v1beta1.CoinOuterClass
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import utilities.Date.RFC3339
@@ -12,7 +12,7 @@ object Serializable {
 
   private implicit val module: String = constants.Module.SERIALIZABLE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   case class SocialProfile(platform: String, username: String, url: String)
 

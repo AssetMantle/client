@@ -5,16 +5,12 @@
     <option name="enableSbtGlobalPlugins" value="false" />
     <option name="play2EnvVariables">
       <map>
-        <entry key="ASCENDEX_URL" value="https://ascendex.com/api/pro/v1" />
-        <entry key="BAND_CHAIN_URL" value="guanyu-devnet.bandchain.org" />
         <entry key="BLOCKCHAIN_ACCOUNT_PREFIX" value="mantle" />
-        <entry key="BLOCKCHAIN_REST_URL" value="http://49.12.21.158:1317" />
-        <entry key="BLOCKCHAIN_RPC_URL" value="http://49.12.21.158:26657" />
-        <entry key="CHAIN_ID" value="mantle-1" />
+        <entry key="BLOCKCHAIN_REST_URL" value="http://localhost:1317" />
+        <entry key="BLOCKCHAIN_RPC_URL" value="http://localhost:26657" />
+        <entry key="CHAIN_ID" value="test" />
         <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
-        <entry key="DOCU_SIGN_BASE_PATH" value="https://demo.docusign.net/restapi" />
-        <entry key="DOCU_SIGN_OAUTH_BASE_PATH" value="https://account-d.docusign.com/oauth/token" />
-        <entry key="GENESIS_FILE_PATH" value="/Users/abhinav/go/src/github.com/AssetMantle/genesisTransactions/mantle-1/final_genesis.json" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.AssetMantle/Node/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
@@ -26,7 +22,6 @@
         <entry key="POSTGRES_USER" value="assetMantle" />
         <entry key="ROOT_FILE_PATH" value="$USER_HOME$/" />
         <entry key="STAKING_DENOM" value="umntl" />
-        <entry key="TRULIOO_URL" value="https://api.globalgateway.io" />
         <entry key="WEB_APP_URL" value="http://localhost:9000" />
       </map>
     </option>
@@ -43,7 +38,7 @@
     </option>
     <option name="play2NeedOpenInBrowser" value="true" />
     <option name="play2NonDefaultInstallDir" value="" />
-    <option name="play2OpenUrl" value="http://localhost:9001" />
+    <option name="play2OpenUrl" value="http://localhost:9000" />
     <option name="play2isAutoReloadEnabled" value="true" />
     <option name="projectPathOnTarget" />
     <option name="selectedOptions">
@@ -51,6 +46,7 @@
     </option>
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="MakeProject" enabled="true" />
     </method>
   </configuration>
 </component>

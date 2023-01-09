@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
@@ -14,7 +14,7 @@ object BlockResponse {
 
   private implicit val module: String = constants.Module.BLOCK_RESPONSE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   case class Vote(`type`: Int, height: String, round: Int, timestamp: RFC3339, validator_address: String, validator_index: Int, signature: String)
 

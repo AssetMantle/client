@@ -6,7 +6,7 @@ import exceptions.BaseException
 import models.Abstract.{FeeAllowance => AbstractFeeAllowance}
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -31,7 +31,7 @@ class FeeGrants @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
 
@@ -94,7 +94,7 @@ class FeeGrants @Inject()(
 
   object Service {
 
-    def create(granter: String, grantee: String, allowance: AbstractFeeAllowance): Future[String] = add(FeeGrant(granter = granter, grantee = grantee, allowance = allowance.toProto.toByteArray))
+    def create(granter: String, grantee: String, allowance: AbstractFeeAllowance): Future[String] = add(FeeGrant(granter = granter, grantee = grantee, allowance = allowance.toProto.toByteString.toByteArray))
 
     def tryGet(granter: String, grantee: String): Future[FeeGrant] = findByGranterGranteeAndMsgType(granter = granter, grantee = grantee)
 
@@ -110,7 +110,7 @@ class FeeGrants @Inject()(
   object Utility {
 
     def onFeeGrantAllowance(feeGrantAllowance: feegrantTx.MsgGrantAllowance)(implicit header: Header): Future[String] = {
-      val upsert = Service.insertOrUpdate(FeeGrant(granter = feeGrantAllowance.getGranter, grantee = feeGrantAllowance.getGrantee, allowance = AbstractFeeAllowance(feeGrantAllowance.getAllowance).toProto.toByteArray))
+      val upsert = Service.insertOrUpdate(FeeGrant(granter = feeGrantAllowance.getGranter, grantee = feeGrantAllowance.getGrantee, allowance = AbstractFeeAllowance(feeGrantAllowance.getAllowance).toProto.toByteString.toByteArray))
       (for {
         _ <- upsert
       } yield feeGrantAllowance.getGranter).recover {

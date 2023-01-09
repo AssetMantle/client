@@ -2,7 +2,8 @@ package queries.trulioo
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.responses.trulioo.TruliooAuthenticationResponse.Response
 import utilities.KeyStore
 
@@ -15,7 +16,7 @@ class GetTruliooAuthentication @Inject()(wsClient: WSClient, keyStore: KeyStore)
 
   private implicit val module: String = constants.Module.QUERIES_GET_TRULIOO_AUTHENTICATION
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 

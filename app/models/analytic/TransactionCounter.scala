@@ -3,7 +3,7 @@ package models.analytic
 import exceptions.BaseException
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -25,7 +25,7 @@ class TransactionCounters @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.ANALYTIC_TRANSACTION_COUNTER
 

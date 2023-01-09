@@ -6,7 +6,7 @@ import exceptions.BaseException
 import models.Abstract.{Authorization => AbstractAuthorization}
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -33,7 +33,7 @@ class Authorizations @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
 
@@ -100,7 +100,7 @@ class Authorizations @Inject()(
 
   object Service {
 
-    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: protoAny, expiration: RFC3339): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization.toByteArray, expiration = expiration.epoch))
+    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: protoAny, expiration: RFC3339): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization.toByteString.toByteArray, expiration = expiration.epoch))
 
     def tryGet(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = findByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL)
 
@@ -117,7 +117,7 @@ class Authorizations @Inject()(
 
     def onGrantAuthorization(grantAuthorization: authzTx.MsgGrant)(implicit header: Header): Future[String] = {
       val authorization = AbstractAuthorization(grantAuthorization.getGrant.getAuthorization)
-      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = authorization.getMsgTypeURL, grantedAuthorization = authorization.toProto.toByteArray, expiration = grantAuthorization.getGrant.getExpiration.getSeconds))
+      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = authorization.getMsgTypeURL, grantedAuthorization = authorization.toProto.toByteString.toByteArray, expiration = grantAuthorization.getGrant.getExpiration.getSeconds))
       (for {
         _ <- insertOrUpdate
       } yield grantAuthorization.getGranter).recover {
@@ -144,7 +144,7 @@ class Authorizations @Inject()(
           def updateOrDelete(authorization: Authorization) = {
             val response = authorization.getAuthorization.validate(msg)
             val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
-            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => x.toProto.toByteArray)))
+            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => x.toProto.toByteString.toByteArray)))
             else Future(0)
 
             for {

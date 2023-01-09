@@ -5,11 +5,14 @@ import controllers.actions._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
+import schema.data.base.StringData
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -17,15 +20,19 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 cached: Cached,
+                                blockchainMetaDatas: models.blockchain.MetaDatas,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
+        val a = Await.result(blockchainMetaDatas.Service.fetchAll, Duration.Inf)
+        println(a.head.data.getType.value)
+        println(StringData(a.head.data.toAnyData.getStringData).value)
         Future(Ok(views.html.index()))
     }
   }
