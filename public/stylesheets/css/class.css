@@ -25,8 +25,6 @@ body .block .full {
     background-color: var(--primary-color);
 }
 
-#transactionList_NEXT,
-#transactionList_BACK,
 #validatorTransactions_NEXT,
 #validatorTransactions_BACK,
 #accountTransactions_NEXT, #accountTransactions_BACK {
@@ -4513,7 +4511,8 @@ figure .chart {
     padding: 16px;
 }
 
-#blockDetails .cmuk-card-body{
+#blockDetails .cmuk-card-body,
+#transactionDetails .cmuk-card-body{
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4521,15 +4520,21 @@ figure .chart {
     border-radius: 10px;
 }
 
-#blockDetails .cmuk-card-body .productTable{
+#blockDetails .cmuk-card-body .productTable,
+#transactionDetails .cmuk-card-body .productTable
+{
     padding: 0px;
 }
 
-#blockDetails .cmuk-card-body .productTable td{
+#blockDetails .cmuk-card-body .productTable td,
+#transactionDetails .cmuk-card-body .productTable td
+{
     padding-bottom: 12px;
 }
 
-#blockDetails .cmuk-card-body .productTable .tableFieldTitle{
+#blockDetails .cmuk-card-body .productTable .tableFieldTitle,
+#transactionDetails .cmuk-card-body .productTable .tableFieldTitle
+{
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 14px;
@@ -4538,7 +4543,9 @@ figure .chart {
     color: var(--mantle-off-white);
 }
 
-#blockDetails .cmuk-card-body .productTable .tableFieldValue{
+#blockDetails .cmuk-card-body .productTable .tableFieldValue,
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue
+{
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -4547,7 +4554,9 @@ figure .chart {
     margin-top:4px;
 }
 
-#blockDetails .cmuk-card-body .productTable .tableFieldValue a{
+#blockDetails .cmuk-card-body .productTable .tableFieldValue a,
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue a
+{
     color: var(--primary-color);
 }
 
@@ -4593,13 +4602,19 @@ figure .chart {
     background: transparent;
 }
 
-#blockTransactions table.cmuk-table tbody td .statusCheck .icon{
+#blockTransactions table.cmuk-table tbody td .statusCheck .icon,
+.transactionsList table.cmuk-table tbody td .statusCheck .icon,
+#transactionDetails table.cmuk-table tbody td .statusCheck .icon
+{
     height: 16px;
     width: 16px;
     fill: var(--success-color);
 }
 
-#blockTransactions table.cmuk-table tbody td .statusClose .icon{
+#blockTransactions table.cmuk-table tbody td .statusClose .icon,
+.transactionsList table.cmuk-table tbody td .statusClose .icon,
+#transactionDetails table.cmuk-table tbody td .statusClose .icon
+{
     height: 16px;
     width: 16px;
     fill: var(--error-color);
@@ -4623,14 +4638,69 @@ figure .chart {
     width: 140px;
 }
 
-.transactionsList table.cmuk-table tbody td .statusCheck .icon{
-    height: 16px;
-    width: 16px;
-    fill: var(--success-color);
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowLabel{
+    display: none;
 }
 
-.transactionsList table.cmuk-table tbody td .statusClose .icon{
-    height: 16px;
-    width: 16px;
-    fill: var(--error-color);
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowValue{
+    padding: 0px;
+}
+
+#transactionMessages .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card{
+    height: auto;
+    margin: 0px;
+    padding: 16px 0px 0 0;
+    background-color:var(--card-color);
+    border-radius: 10px;
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-header{
+    padding: 0px 16px 6px 16px;
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card  .headerFontSize{
+    font-family: var(--font-type-2);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+    text-transform: capitalize;
+    color: var(--mantle-off-white);
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body{
+    height: auto;
+    margin: 0px;
+    padding: 0px;
+    background-color: var(--card-color);
+    border-radius: 10px;
+
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowLabel{
+    font-family: var(--font-type-2);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--text-medium);
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+}
+
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue a{
+    color: var(--primary-color);
 }
