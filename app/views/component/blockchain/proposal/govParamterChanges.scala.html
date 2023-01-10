@@ -4,9 +4,28 @@
 @(parameterChange: ParameterChange)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @parameterChange.changes.map { change =>
-    <div>
-        @commonTextInfo(constants.View.SUBSPACE, change.subspace)
-        @commonTextInfo(constants.View.KEY, change.key)
-        @commonTextInfo(constants.View.VALUE, change.value)
-    </div>
+    <tr>
+        <td>
+            <div class="tableField">
+                <div class="tableFieldTitle">@Messages(constants.View.SUBSPACE)</div>
+                <div class="tableFieldValue">@change.subspace</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="tableField">
+                <div class="tableFieldTitle">@Messages(constants.View.KEY)</div>
+                <div class="tableFieldValue">@change.key</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="tableField">
+                <div class="tableFieldTitle">@Messages(constants.View.VALUE)</div>
+                <div class="tableFieldValue">@change.value</div>
+            </div>
+        </td>
+    </tr>
 }

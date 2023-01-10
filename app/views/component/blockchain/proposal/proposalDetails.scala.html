@@ -7,51 +7,165 @@
 
 @commonCard(constants.View.PROPOSAL) {
 } {
-    @commonInfoBox() {
-        @commonTextInfo(constants.View.ID, proposal.id.toString)
-        @commonTextInfo(constants.View.TITLE, proposal.content.title)
-        @commonTextInfo(constants.View.DESCRIPTION, proposal.content.description)
-        @commonTextInfo(constants.View.TYPE, proposal.content.proposalContentType)
-        @commonTextInfo(constants.View.STATUS, Messages(proposal.status))
-        @commonRFC3339Info(constants.View.SUBMIT_TIME, proposal.submitTime, "proposalSubmitTime")
-        @commonRFC3339Info(constants.View.DEPOSIT_END_TIME, proposal.depositEndTime, "proposalDepositEndTime")
-        @commonTextInfo(constants.View.TOTAL_DEPOSIT, proposal.totalDeposit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
-        @commonRFC3339Info(constants.View.VOTING_START, proposal.votingStartTime, "proposalVotingStartTime")
-        @commonRFC3339Info(constants.View.VOTING_END, proposal.votingEndTime, "proposalVotingEndTime")
-        <div>
-            @Messages(constants.View.FINAL_TALLY_RESULTS):
-            @commonTextInfo(constants.View.YES, proposal.finalTallyResult.yes.toString())
-            @commonTextInfo(constants.View.NO, proposal.finalTallyResult.no.toString())
-            @commonTextInfo(constants.View.NO_WITH_VETO, proposal.finalTallyResult.noWithVeto.toString())
-            @commonTextInfo(constants.View.ABSTAIN, proposal.finalTallyResult.abstain.toString())
-        </div>
-        <div>
-            @Messages(constants.View.CONTENT):
-            @proposal.content.proposalContentType match {
-                case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
-                    @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
-                        views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
-                    })
-                }
-                case constants.Blockchain.Proposal.TEXT => {}
-                case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => {
-                    @defining(proposal.content.asInstanceOf[CommunityPoolSpend])(communityPoolSpend => {
-                        commonTextInfo(constants.View.RECIPIENT, communityPoolSpend.recipient)
-                        commonTextInfo(constants.View.AMOUNT, communityPoolSpend.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
-                    })
-                }
-                case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => {
-                    @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
-                        commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
-                        commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
-                        commonRFC3339Info(constants.View.TIME, softwareUpgrade.plan.time, "softwareUpgradePlanTime")
-                        commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
-                    })
-                }
-                case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {}
-                case _ => {}
+    @commonTable(id = "blockDetail", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.ID)</div>
+                    <div class="tableFieldValue">@proposal.id.toString</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TITLE)</div>
+                    <div class="tableFieldValue">@proposal.content.title</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.DESCRIPTION)</div>
+                    <div class="tableFieldValue">@proposal.content.description</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TYPE)</div>
+                    <div class="tableFieldValue">@proposal.content.proposalContentType</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.STATUS)</div>
+                    <div class="tableFieldValue">@Messages(proposal.status)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.SUBMIT_TIME)</div>
+                    <div id="proposalSubmitTime" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.DEPOSIT_END_TIME)</div>
+                    <div id="proposalDepositEndTime" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TOTAL_DEPOSIT)</div>
+                    <div class="tableFieldValue">@proposal.totalDeposit.map(_.getAmountWithNormalizedDenom()).mkString(", ")</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VOTING_START)</div>
+                    <div id="proposalVotingStartTime" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VOTING_END)</div>
+                    <div id="proposalVotingEndTime" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="separator"></div>
+                <div class="tableSubHeading">
+                @Messages(constants.View.FINAL_TALLY_RESULTS)
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.YES)</div>
+                    <div class="tableFieldValue">@proposal.finalTallyResult.yes.toString()</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.NO)</div>
+                    <div class="tableFieldValue">@proposal.finalTallyResult.no.toString()</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.NO_WITH_VETO)</div>
+                    <div class="tableFieldValue">@proposal.finalTallyResult.noWithVeto.toString()</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.ABSTAIN)</div>
+                    <div class="tableFieldValue">@proposal.finalTallyResult.abstain.toString()</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="separator"></div>
+                <div class="tableSubHeading">
+                @Messages(constants.View.CONTENT)
+                </div>
+            </td>
+        </tr>
+        @proposal.content.proposalContentType match {
+            case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
+                @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
+                    views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
+                })
             }
-        </div>
+            case constants.Blockchain.Proposal.TEXT => {}
+            case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => {
+                @defining(proposal.content.asInstanceOf[CommunityPoolSpend])(communityPoolSpend => {
+                    commonTextInfo(constants.View.RECIPIENT, communityPoolSpend.recipient)
+                    commonTextInfo(constants.View.AMOUNT, communityPoolSpend.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
+                })
+            }
+            case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => {
+                @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
+                    commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
+                    commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
+                    commonRFC3339Info(constants.View.TIME, softwareUpgrade.plan.time, "softwareUpgradePlanTime")
+                    commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
+                })
+            }
+            case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {}
+            case _ => {}
+        }
     }
-
 }
+<script>
+        convertUTCDateToLocalDate("@proposal.submitTime.toString", "proposalSubmitTime");
+        convertUTCDateToLocalDate("@proposal.depositEndTime.toString", "proposalDepositEndTime");
+        convertUTCDateToLocalDate("@proposal.votingStartTime.toString", "proposalVotingStartTime");
+        convertUTCDateToLocalDate("@proposal.votingEndTime.toString", "proposalVotingEndTime");
+</script>
