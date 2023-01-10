@@ -1,6 +1,6 @@
 package models.blockchain
 
-import cosmos.staking.v1beta1.{Tx => stakingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.RedelegationEntry

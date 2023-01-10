@@ -1,6 +1,6 @@
 package models.blockchain
 
-import cosmos.bank.v1beta1.{Tx => bankTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
 import exceptions.BaseException
 import ibc.applications.transfer.v1.{Tx => transferTx}
 import ibc.applications.transfer.v2.Packet.FungibleTokenPacketData

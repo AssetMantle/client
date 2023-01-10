@@ -1,8 +1,8 @@
 package models.blockchain
 
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
-import cosmos.slashing.v1beta1.{Tx => slashingTx}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
+import com.cosmos.slashing.{v1beta1 => slashingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.Validator.{Commission, Description}

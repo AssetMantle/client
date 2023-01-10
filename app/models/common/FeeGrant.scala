@@ -1,7 +1,7 @@
 package models.common
 
 import com.google.protobuf.{Any => protoAny, Duration => protoDuration, Timestamp => protoTimestamp}
-import cosmos.feegrant.v1beta1.{Feegrant => protoFeeGrant}
+import com.cosmos.feegrant.{v1beta1 => protoFeeGrant}
 import models.Abstract.FeeAllowance
 import models.common.Serializable.Coin
 import utilities.Date.RFC3339

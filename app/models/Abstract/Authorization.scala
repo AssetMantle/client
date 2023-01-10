@@ -19,14 +19,14 @@ abstract class Authorization {
 object Authorization {
   def apply(authzAny: protoAny): Authorization = authzAny.getTypeUrl match {
     case constants.Blockchain.Authz.SEND_AUTHORIZATION => {
-      val protoSend = cosmos.bank.v1beta1.Authz.SendAuthorization.parseFrom(authzAny.getValue)
+      val protoSend = com.cosmos.bank.v1beta1.SendAuthorization.parseFrom(authzAny.getValue)
       SendAuthorization(spendLimit = protoSend.getSpendLimitList.asScala.toSeq.map(x => Coin(x)))
     }
     case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => {
-      GenericAuthorization(cosmos.authz.v1beta1.Authz.GenericAuthorization.parseFrom(authzAny.getValue).getMsg)
+      GenericAuthorization(com.cosmos.authz.v1beta1.GenericAuthorization.parseFrom(authzAny.getValue).getMsg)
     }
     case constants.Blockchain.Authz.STAKE_AUTHORIZATION => {
-      val protoStakeAuthorization = cosmos.staking.v1beta1.Authz.StakeAuthorization.parseFrom(authzAny.getValue)
+      val protoStakeAuthorization = com.cosmos.staking.v1beta1.StakeAuthorization.parseFrom(authzAny.getValue)
       StakeAuthorization(
         maxTokens = Coin(protoStakeAuthorization.getMaxTokens),
         allowList = StakeAuthorizationValidators(protoStakeAuthorization.getAllowList.getAddressList.asScala.toSeq),

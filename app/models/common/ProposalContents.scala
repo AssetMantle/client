@@ -1,10 +1,10 @@
 package models.common
 
+import com.cosmos.distribution.{v1beta1 => distributionProto}
+import com.cosmos.gov.{v1beta1 => govProto}
+import com.cosmos.params.{v1beta1 => paramsProto}
+import com.cosmos.upgrade.{v1beta1 => upgradeProto}
 import com.google.protobuf.{Any => protoAny, Timestamp => protoTimestamp}
-import cosmos.distribution.v1beta1.{Distribution => distributionProto}
-import cosmos.gov.v1beta1.{Gov => govProto}
-import cosmos.params.v1beta1.{Params => paramsProto}
-import cosmos.upgrade.v1beta1.{Upgrade => upgradeProto}
 import models.Abstract.ProposalContent
 import models.common.Serializable.Coin
 

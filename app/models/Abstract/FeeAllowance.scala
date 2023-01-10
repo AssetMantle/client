@@ -1,7 +1,7 @@
 package models.Abstract
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.feegrant.v1beta1.{Feegrant => protoFeeGrant}
+import com.cosmos.feegrant.{v1beta1 => protoFeeGrant}
 import models.common.FeeGrant._
 import models.common.Serializable.Coin
 import utilities.Blockchain.{FeeGrant => utilitiesFeeGrant}

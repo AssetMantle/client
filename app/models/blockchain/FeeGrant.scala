@@ -1,7 +1,7 @@
 package models.blockchain
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
+import com.cosmos.feegrant.{v1beta1 => feegrantTx}
 import exceptions.BaseException
 import models.Abstract.{FeeAllowance => AbstractFeeAllowance}
 import models.Trait.Logging

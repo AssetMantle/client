@@ -1,6 +1,6 @@
 @import views.html.base.infos._
 @import views.html.base.buttons._
-@import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
+@import com.cosmos.feegrant.{v1beta1 => feegrantTx}
 
 @(msg: feegrantTx.MsgRevokeAllowance)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

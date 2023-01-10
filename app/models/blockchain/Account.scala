@@ -1,6 +1,6 @@
 package models.blockchain
 
-import cosmos.vesting.v1beta1.Tx
+import com.cosmos.vesting.v1beta1._
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.Vesting.VestingParameters
@@ -112,7 +112,7 @@ class Accounts @Inject()(
 
   object Utility {
 
-    def onCreateVestingAccount(createVestingAccount: Tx.MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
+    def onCreateVestingAccount(createVestingAccount: MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
       val insert = insertOrUpdateAccountWithoutAnyTx(createVestingAccount.getToAddress)
       val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.getToAddress)
 

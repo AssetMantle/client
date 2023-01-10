@@ -1,7 +1,7 @@
 package models.blockchain
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.authz.v1beta1.{Tx => authzTx}
+import com.cosmos.authz.{v1beta1 => authzTx}
 import exceptions.BaseException
 import models.Abstract.{Authorization => AbstractAuthorization}
 import models.Trait.Logging

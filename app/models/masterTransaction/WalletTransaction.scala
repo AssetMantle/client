@@ -1,15 +1,15 @@
 package models.masterTransaction
 
-import cosmos.authz.v1beta1.{Tx => authzTx}
-import cosmos.bank.v1beta1.{Tx => bankTx}
-import cosmos.crisis.v1beta1.{Tx => crisisTx}
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
-import cosmos.evidence.v1beta1.{Tx => evidenceTx}
-import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
-import cosmos.gov.v1beta1.{Tx => govTx}
-import cosmos.slashing.v1beta1.{Tx => slashingTx}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
-import cosmos.vesting.v1beta1.{Tx => VestingTx}
+import com.cosmos.authz.{v1beta1 => authzTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
+import com.cosmos.crisis.{v1beta1 => crisisTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
+import com.cosmos.evidence.{v1beta1 => evidenceTx}
+import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+import com.cosmos.gov.{v1beta1 => govTx}
+import com.cosmos.slashing.{v1beta1 => slashingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
+import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
 import ibc.applications.transfer.v1.{Tx => transferTx}
 import ibc.core.channel.v1.{Tx => channelTx}
