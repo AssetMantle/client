@@ -21,10 +21,6 @@ body .block {
     border: 0;
 }
 
-body .block .full {
-    background-color: var(--primary-color);
-}
-
 #validatorTransactions_NEXT,
 #validatorTransactions_BACK,
 #accountTransactions_NEXT, #accountTransactions_BACK {
@@ -57,11 +53,6 @@ body .block .full {
 
 #validatorDetails {
     overflow: hidden;
-}
-
-#validatorDetails .cmuk-height-medium {
-    padding-top: 20px;
-    padding-bottom: 20px;
 }
 
 #validatorDetails img {
@@ -451,10 +442,6 @@ body.darkMode .block {
     border-color: var(--darkmode-border);
 }
 
-body.darkMode .block .full {
-    background-color: var(--primary-color);
-}
-
 body.darkMode .searchForm dl .cmuk-search-input {
     background: var(--header-bg);
     border-color: var(--text-medium);
@@ -689,9 +676,14 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .comdex .cmuk-badge.verified, .comdex .cmuk-badge.rejected, .comdex .cmuk-badge.pending, .profileDetails .cmuk-badge {
-    font-weight: bold;
-    border-radius: 5px;
+    border-radius: 4px;
+    background-color: var(--dark);
+    font-family: var(--font-type-2);
+    font-weight: 700;
     font-size: 10px;
+    line-height: 12px;
+    color: var(--button-text);
+    padding: 8px 12px;
 }
 
 .centerScreen, .MnemonicQuiz form .formBody .commonInputPassword, .banner, .salesQuoteCard .salesQuoteCardLeft .assetIcon, .salesQuoteCard .salesQuoteCardRight {
@@ -1207,24 +1199,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     margin: 0;
 }
 
-.block {
-    width: 1.5em;
-    height: 1.5em;
-    display: inline-block;
-    margin-right: .2em;
-    border: 0.1em solid var(--dark-1);
-    -webkit-box-shadow: 1px 1px 3px 0 var(--dark-1);
-    -moz-box-shadow: 1px 1px 3px 0 var(--dark-1);
-    box-shadow: 1px 1px 3px 0 var(--dark-1);
-    border-radius: 3px;
-}
-
-.block .full {
-    background-color: var(--dark-1);
-    height: 100%;
-    width: 100%;
-}
-
 .cardHeaderSelect {
     position: absolute;
     right: 10px;
@@ -1325,15 +1299,15 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .comdex .cmuk-badge.verified {
-    background-color: #49A948;
+    background-color: var(--dark);
 }
 
 .comdex .cmuk-badge.rejected {
-    background-color: #FE4350;
+    background-color: var(--error-color);
 }
 
 .comdex .cmuk-badge.pending {
-    background-color: #faa05a;
+    background-color: var(--inactive-grey);
 }
 
 .comdex .cmuk-button-primary {
@@ -4362,7 +4336,7 @@ figure .chart {
 .row + .row + .row .chart {
     animation-delay: .4s;
 }
-.block {
+figure .block {
     display: block;
     height: 80px;
     float: left;
@@ -4380,35 +4354,35 @@ figure .chart {
     line-height: 14px;
     color: var(--mantle-off-white);
 }
-.block:nth-of-type(2),
+figure .block:nth-of-type(2),
 .legend .legendItem:nth-of-type(2):before {
     background-color: #006CAF;
 }
-.block:nth-of-type(3),
+figure .block:nth-of-type(3),
 .legend .legendItem:nth-of-type(3):before {
     background-color: #D7E9BD;
 }
-.block:nth-of-type(4),
+figure .block:nth-of-type(4),
 .legend .legendItem:nth-of-type(4):before {
     background-color: #FFBFC2;
 }
-.block:nth-of-type(5),
+figure .block:nth-of-type(5),
 .legend .legendItem:nth-of-type(5):before {
     background-color: #55B9A9;
 }
-.block:nth-of-type(6),
+figure .block:nth-of-type(6),
 .legend .legendItem:nth-of-type(6):before {
     background-color: #D5DB48;
 }
-.block:nth-of-type(7),
+figure .block:nth-of-type(7),
 .legend .legendItem:nth-of-type(7):before {
     background-color: #FF3F00;
 }
-.block:nth-of-type(8),
+figure .block:nth-of-type(8),
 .legend .legendItem:nth-of-type(8):before {
     background-color: #007C7B;
 }
-.block:hover {
+figure .block:hover {
     opacity: .65;
 }
 .value {
@@ -4514,7 +4488,7 @@ figure .chart {
 
 #blockDetails .cmuk-card-body,
 #transactionDetails .cmuk-card-body,
-#validatorsList .cmuk-card-body{
+#validatorDetails .cmuk-card-body{
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4523,19 +4497,22 @@ figure .chart {
 }
 
 #blockDetails .cmuk-card-body .productTable,
-#transactionDetails .cmuk-card-body .productTable
+#transactionDetails .cmuk-card-body .productTable,
+#validatorDetails .cmuk-card-body .productTable
 {
     padding: 0px;
 }
 
 #blockDetails .cmuk-card-body .productTable td,
-#transactionDetails .cmuk-card-body .productTable td
+#transactionDetails .cmuk-card-body .productTable td,
+#validatorDetails .cmuk-card-body .productTable td
 {
     padding-bottom: 12px;
 }
 
 #blockDetails .cmuk-card-body .productTable .tableFieldTitle,
-#transactionDetails .cmuk-card-body .productTable .tableFieldTitle
+#transactionDetails .cmuk-card-body .productTable .tableFieldTitle,
+#validatorDetails .cmuk-card-body .productTable .tableFieldTitle
 {
     font-family: var(--font-type-2);
     font-weight: 700;
@@ -4546,7 +4523,8 @@ figure .chart {
 }
 
 #blockDetails .cmuk-card-body .productTable .tableFieldValue,
-#transactionDetails .cmuk-card-body .productTable .tableFieldValue
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue,
+#validatorDetails .cmuk-card-body .productTable .tableFieldValue
 {
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4557,7 +4535,8 @@ figure .chart {
 }
 
 #blockDetails .cmuk-card-body .productTable .tableFieldValue a,
-#transactionDetails .cmuk-card-body .productTable .tableFieldValue a
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue a,
+#validatorDetails .cmuk-card-body .productTable .tableFieldValue a
 {
     color: var(--primary-color);
 }
@@ -4606,7 +4585,8 @@ figure .chart {
 
 #blockTransactions table.cmuk-table tbody td .statusCheck .icon,
 .transactionsList table.cmuk-table tbody td .statusCheck .icon,
-#transactionDetails table.cmuk-table tbody td .statusCheck .icon
+#transactionDetails table.cmuk-table tbody td .statusCheck .icon,
+#validatorsList table.cmuk-table tbody td .statusCheck .icon
 {
     height: 16px;
     width: 16px;
@@ -4615,7 +4595,8 @@ figure .chart {
 
 #blockTransactions table.cmuk-table tbody td .statusClose .icon,
 .transactionsList table.cmuk-table tbody td .statusClose .icon,
-#transactionDetails table.cmuk-table tbody td .statusClose .icon
+#transactionDetails table.cmuk-table tbody td .statusClose .icon,
+#validatorsList table.cmuk-table tbody td .statusClose .icon
 {
     height: 16px;
     width: 16px;
@@ -4789,7 +4770,7 @@ figure .chart {
 #validatorsList table.dataTable tbody td.blockHeightItem{
     display: flex;
     align-items: center;
-    gap: 8px;
+    /*gap: 8px;*/
 }
 
 #validatorsList table.dataTable tbody td.blockHeightItem img{
@@ -4806,4 +4787,44 @@ figure .chart {
 
 #validatorsList .cmuk-card{
     padding-bottom: 16px;
+}
+
+#validatorUptime .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px;
+    padding: 16px 16px 10px 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#validatorUptime .cmuk-card-body #missingBlocksCounter{
+    align-items: center;
+    justify-content: end;
+}
+
+#validatorUptime .cmuk-card-body .block {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#validatorUptime .cmuk-card-body .block .full{
+    height: 100%;
+    width: 100%;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+#validatorUptime .cmuk-card-body .block .empty{
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+}
+
+#validatorUptime .cmuk-card-body .block .empty .emptyBlock .icon
+{
+    margin-top:-5px;
+    height: 14px;
+    fill: var(--primary-color);
 }
