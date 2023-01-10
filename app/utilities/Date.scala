@@ -1,7 +1,8 @@
 package utilities
 
+import com.google.protobuf.{Timestamp => protoTimestamp}
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
 
 import java.sql.Timestamp
@@ -14,7 +15,7 @@ object Date {
 
   private implicit val module: String = constants.Module.UTILITIES_DATE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val ddMMDateFormat = new SimpleDateFormat("dd/MM")
 
@@ -25,6 +26,8 @@ object Date {
   def sqlDateToUtilDate(sqlDate: java.sql.Date): java.util.Date = new java.util.Date(sqlDate.getTime)
 
   def getTimeFromSqlTimestamp(sqlTime: java.sql.Timestamp): String = ZonedDateTime.parse(sqlTime.toInstant.toString).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+
+  def getTimeFromEpoch(value: Long): String = ZonedDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 
   def stringDateToTimeStamp(stringDate: String): Timestamp = try {
     Timestamp.valueOf(stringDate)
@@ -59,7 +62,7 @@ object Date {
 
     def zonedDateTime: ZonedDateTime = ZonedDateTime.parse(this.timestamp)
 
-    def unix: Long = zonedDateTime.toEpochSecond
+    def epoch: Long = zonedDateTime.toEpochSecond
 
     override def toString: String = this.timestamp
 
@@ -98,14 +101,14 @@ object Date {
     }
 
     def addEpoch(epoch: Long): RFC3339 = try {
-      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.unix + epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.epoch + epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         throw new BaseException(constants.Response.INVALID_DATA_TYPE)
     }
 
     def add(that: RFC3339): RFC3339 = try {
-      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.unix + that.unix), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+      RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.epoch + that.epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
         throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
@@ -113,11 +116,15 @@ object Date {
 
     def difference(that: RFC3339): Duration = Duration.between(this.zonedDateTime, that.zonedDateTime)
 
+    def toProtoTimestamp: protoTimestamp = protoTimestamp.newBuilder().setSeconds(this.epoch).build()
+
   }
 
   object RFC3339 {
 
     def apply(value: String): RFC3339 = if (isValidRFC3339(value)) new RFC3339(value) else throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+
+    def apply(value: Long): RFC3339 = new RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.of("UTC")).toString)
 
     implicit val rfc3339Writes: Writes[RFC3339] = (rfc3339: RFC3339) => Json.toJson(rfc3339.toString)
 

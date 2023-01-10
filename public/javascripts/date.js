@@ -11,3 +11,10 @@ function convertUTCDateToLocalDate(date, id) {
     $('#' + id).html(newDate.toLocaleDateString("en", options));
 }
 
+function fromEpochDateToLocal(epochValue, id) {
+    console.log(id);
+    console.log(epochValue);
+    let millis = epochValue * 1000;
+    let dateTime = new Date(millis);
+    $('#' + id).html(dateTime.toLocaleDateString() + " " + dateTime.toLocaleTimeString());
+}

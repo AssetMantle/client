@@ -1,0 +1,15 @@
+@import com.cosmos.distribution.{v1beta1 => distributionTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+
+@(msg: distributionTx.MsgWithdrawDelegatorReward, txHash: String, index: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(msg.getDelegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getDelegatorAddress}'))")))
+@commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddress}'))")))
+@if(txHash != "") {
+    @commonTextInfo(constants.View.AMOUNT, "", Symbol("id") -> s"""withDrawRewardAmount_${index}""")
+    <script>
+            componentResource('withDrawRewardAmount_@index', jsRoutes.controllers.ComponentViewController.withdrawRewardAmount('@txHash', @index))
+    </script>
+}

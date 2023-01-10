@@ -1,7 +1,0 @@
-@import .AssetID
-@import views.html.base.infos._
-@import views.html.base.buttons._
-
-@(assetID: AssetID)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@commonHtmlInfo(constants.View.ASSET_ID, commonJavascriptLink(assetID.asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.asset('${assetID.asString}'))")))

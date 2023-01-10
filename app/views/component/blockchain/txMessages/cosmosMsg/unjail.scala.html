@@ -1,0 +1,8 @@
+@import com.cosmos.slashing.{v1beta1 => slashingTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: slashingTx.MsgUnjail)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+
+@commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddr, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddr}'))")))

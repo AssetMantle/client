@@ -3,23 +3,21 @@ package controllers
 import controllers.actions.WithoutLoginAction
 import play.api.mvc._
 import play.api.routing._
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents, withoutLoginAction: WithoutLoginAction)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def javascriptRoutes = withoutLoginAction { implicit loginState =>
     implicit request =>
       Ok(
         JavaScriptReverseRouter("jsRoutes")(
           routes.javascript.Assets.versioned,
-
-          routes.javascript.ContactController.verifyEmailAddressForm,
-          routes.javascript.ContactController.verifyMobileNumberForm,
 
           routes.javascript.ComponentViewController.dashboard,
           routes.javascript.ComponentViewController.block,
@@ -28,7 +26,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.wallet,
           routes.javascript.ComponentViewController.proposal,
 
-          routes.javascript.ComponentViewController.commonHome,
           routes.javascript.ComponentViewController.recentActivities,
 
           routes.javascript.ComponentViewController.latestBlockHeight,
@@ -69,29 +66,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactions,
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
-          routes.javascript.ComponentViewController.classification,
-          routes.javascript.ComponentViewController.identity,
-          routes.javascript.ComponentViewController.asset,
-          routes.javascript.ComponentViewController.order,
-          routes.javascript.ComponentViewController.meta,
-          routes.javascript.ComponentViewController.maintainer,
-
-          routes.javascript.ContactController.addOrUpdateEmailAddressForm,
-          routes.javascript.ContactController.addOrUpdateMobileNumberForm,
-          routes.javascript.ContactController.contact,
-
           routes.javascript.IndexController.search,
 
           routes.javascript.NotificationController.recentActivityMessages,
-          routes.javascript.NotificationController.unreadNotificationCount,
-          routes.javascript.NotificationController.markNotificationRead,
 
-          routes.javascript.ViewController.identity,
-          routes.javascript.ViewController.asset,
-          routes.javascript.ViewController.order,
-          routes.javascript.ViewController.classification,
-          routes.javascript.ViewController.meta,
-          routes.javascript.ViewController.maintainer,
           routes.javascript.ViewController.block,
           routes.javascript.ViewController.validator,
           routes.javascript.ViewController.transaction,

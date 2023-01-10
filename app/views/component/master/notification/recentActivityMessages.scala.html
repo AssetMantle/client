@@ -16,7 +16,8 @@
                             <span class="cmuk-text-bolder">@Messages(notification.title)</span>
                             @Messages(notification.template, notification.notificationTemplate.parameters: _*)
                         </div>
-                        <div class="notificationTime">@notification.createdOn @notification.createdOnTimeZone</div>
+                        <div id="time_@notification.id" class="notificationTime">@notification.createdOnMillisEpoch</div>
+                        <script>fromEpochDateToLocal(@notification.createdOnMillisEpoch, 'time_@notification.id')</script>
                     </div>
                 </div>
             </div>

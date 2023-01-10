@@ -2,13 +2,10 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import transactions.Abstract.BaseResponse
-import models.blockchain.{ProposalVote => BlockchainProposalVote}
 
 object ProposalVoteResponse {
 
-  case class Vote(proposal_id: String, voter: String, option: String) {
-    def toSerializableProposalVote: BlockchainProposalVote = BlockchainProposalVote(proposalID = proposal_id.toInt, voter = voter, option = option)
-  }
+  case class Vote(proposal_id: String, voter: String, option: String)
 
   implicit val voteReads: Reads[Vote] = Json.reads[Vote]
 

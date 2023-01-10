@@ -1,0 +1,9 @@
+@import com.cosmos.authz.{v1beta1 => authzTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: authzTx.MsgRevoke)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(msg.getGranter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getGranter}'))")))
+@commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(msg.getGrantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getGrantee}'))")))
+@commonTextInfo(constants.View.MESSAGES_TYPE, constants.View.TxMessagesMap.getOrElse(msg.getMsgTypeUrl, msg.getMsgTypeUrl))

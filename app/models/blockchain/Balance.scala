@@ -1,13 +1,17 @@
 package models.blockchain
 
+import com.cosmos.bank.{v1beta1 => bankTx}
 import exceptions.BaseException
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+import com.ibc.core.channel.{v1 => channelTx}
 import models.Trait.Logging
-import models.common.Coin
-import models.common.TransactionMessages.{Acknowledgement, MultiSend, RecvPacket, SendCoin, Timeout, TimeoutOnClose, Transfer}
+import models.common.Serializable.Coin
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetBalance
 import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
 import queries.responses.common.Header
@@ -16,6 +20,7 @@ import slick.jdbc.JdbcProfile
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
 case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
@@ -32,7 +37,7 @@ class Balances @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
 
@@ -73,7 +78,7 @@ class Balances @Inject()(
 
   private def getListByAddress(addresses: Seq[String]): Future[Seq[BalanceSerialized]] = db.run(balanceTable.filter(_.address.inSet(addresses)).result)
 
-  private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance_BC") {
+  private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance") {
 
     def * = (address, coins, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
 
@@ -107,104 +112,106 @@ class Balances @Inject()(
 
   object Utility {
 
-    def onSendCoin(sendCoin: SendCoin)(implicit header: Header): Future[Unit] = {
-      val fromAccount = insertOrUpdateBalance(sendCoin.fromAddress)
+    def onSendCoin(sendCoin: bankTx.MsgSend)(implicit header: Header): Future[String] = {
+      val fromAccount = insertOrUpdateBalance(sendCoin.getFromAddress)
 
-      def toAccount = insertOrUpdateBalance(sendCoin.toAddress)
+      def toAccount = insertOrUpdateBalance(sendCoin.getToAddress)
 
       (for {
         _ <- fromAccount
         _ <- toAccount
-      } yield ()).recover {
+      } yield sendCoin.getFromAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SEND_COIN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          sendCoin.getFromAddress
       }
     }
 
-    def onMultiSend(multiSend: MultiSend)(implicit header: Header): Future[Unit] = {
-      val inputAccounts = utilitiesOperations.traverse(multiSend.inputs)(input => insertOrUpdateBalance(input.address))
+    def onMultiSend(multiSend: bankTx.MsgMultiSend)(implicit header: Header): Future[String] = {
+      val inputAccounts = utilitiesOperations.traverse(multiSend.getInputsList.asScala.toSeq)(input => insertOrUpdateBalance(input.getAddress))
 
-      def outputAccounts = utilitiesOperations.traverse(multiSend.outputs)(output => insertOrUpdateBalance(output.address))
+      def outputAccounts = utilitiesOperations.traverse(multiSend.getOutputsList.asScala.toSeq)(output => insertOrUpdateBalance(output.getAddress))
 
       (for {
         _ <- inputAccounts
         _ <- outputAccounts
-      } yield ()).recover {
+      } yield multiSend.getInputs(0).getAddress).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.MULTI_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          multiSend.getInputs(0).getAddress
       }
     }
 
-    def onRecvPacket(recvPacket: RecvPacket)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = recvPacket.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = recvPacket.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(recvPacket.packet.data.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(recvPacket.packet.data.receiver) else Future()
+    def onRecvPacket(recvPacket: channelTx.MsgRecvPacket)(implicit header: Header): Future[String] = {
+      val isSenderOnChain = FungibleTokenPacketData.parseFrom(recvPacket.getPacket.getData).getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = FungibleTokenPacketData.parseFrom(recvPacket.getPacket.getData).getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(recvPacket.getPacket.getData).getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(recvPacket.getPacket.getData).getReceiver) else Future()
 
       (for {
         _ <- updateSender
         _ <- updateReceiver
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Blockchain.TransactionMessage.RECV_PACKET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+      } yield recvPacket.getSigner).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.RECV_PACKET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          recvPacket.getSigner
       }
     }
 
-    def onTimeout(timeout: Timeout)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = timeout.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = timeout.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(timeout.packet.data.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(timeout.packet.data.receiver) else Future()
+    def onTimeout(timeout: channelTx.MsgTimeout)(implicit header: Header): Future[String] = {
+      val isSenderOnChain = FungibleTokenPacketData.parseFrom(timeout.getPacket.getData).getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = FungibleTokenPacketData.parseFrom(timeout.getPacket.getData).getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(timeout.getPacket.getData).getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(timeout.getPacket.getData).getReceiver) else Future()
 
       (for {
         _ <- updateSender
         _ <- updateReceiver
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Blockchain.TransactionMessage.TIMEOUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+      } yield timeout.getSigner).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TIMEOUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          timeout.getSigner
       }
     }
 
-    def onTimeoutOnClose(timeoutOnClose: TimeoutOnClose)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = timeoutOnClose.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = timeoutOnClose.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(timeoutOnClose.packet.data.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(timeoutOnClose.packet.data.receiver) else Future()
+    def onTimeoutOnClose(timeoutOnClose: channelTx.MsgTimeoutOnClose)(implicit header: Header): Future[String] = {
+      val isSenderOnChain = FungibleTokenPacketData.parseFrom(timeoutOnClose.getPacket.getData).getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = FungibleTokenPacketData.parseFrom(timeoutOnClose.getPacket.getData).getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(timeoutOnClose.getPacket.getData).getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(timeoutOnClose.getPacket.getData).getReceiver) else Future()
 
       (for {
         _ <- updateSender
         _ <- updateReceiver
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+      } yield timeoutOnClose.getSigner).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          timeoutOnClose.getSigner
       }
     }
 
-    def onAcknowledgement(acknowledgement: Acknowledgement)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = acknowledgement.packet.data.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = acknowledgement.packet.data.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(acknowledgement.packet.data.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(acknowledgement.packet.data.receiver) else Future()
+    def onAcknowledgement(acknowledgement: channelTx.MsgAcknowledgement)(implicit header: Header): Future[String] = {
+      val isSenderOnChain = FungibleTokenPacketData.parseFrom(acknowledgement.getPacket.getData).getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = FungibleTokenPacketData.parseFrom(acknowledgement.getPacket.getData).getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(acknowledgement.getPacket.getData).getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(FungibleTokenPacketData.parseFrom(acknowledgement.getPacket.getData).getReceiver) else Future()
 
       (for {
         _ <- updateSender
         _ <- updateReceiver
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+      } yield acknowledgement.getSigner).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          acknowledgement.getSigner
       }
     }
 
-    def onIBCTransfer(transfer: Transfer)(implicit header: Header): Future[Unit] = {
-      val isSenderOnChain = transfer.sender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val isReceiverOnChain = transfer.receiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
-      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(transfer.sender) else Future()
-      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(transfer.receiver) else Future()
+    def onIBCTransfer(transfer: transferTx.MsgTransfer)(implicit header: Header): Future[String] = {
+      val isSenderOnChain = transfer.getSender.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val isReceiverOnChain = transfer.getReceiver.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)
+      val updateSender = if (isSenderOnChain) insertOrUpdateBalance(transfer.getSender) else Future()
+      val updateReceiver = if (isReceiverOnChain) insertOrUpdateBalance(transfer.getReceiver) else Future()
 
       (for {
         _ <- updateSender
         _ <- updateReceiver
-      } yield ()).recover {
-        case _: BaseException => logger.error(constants.Response.IBC_BALANCE_UPDATE_FAILED.logMessage)
-          logger.error(constants.Blockchain.TransactionMessage.TRANSFER + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+      } yield transfer.getSender).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TRANSFER + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          transfer.getSender
       }
 
     }

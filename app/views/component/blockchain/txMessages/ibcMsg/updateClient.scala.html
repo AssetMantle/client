@@ -1,0 +1,8 @@
+@import com.ibc.core.client.{v1 => clientTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: clientTx.MsgUpdateClient)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.CLIENT_ID, msg.getClientId)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

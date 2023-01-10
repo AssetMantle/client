@@ -1,17 +1,16 @@
 package utilities
 
-import models.common.BaseData
 import play.api.routing.JavaScriptReverseRoute
 
-import java.security.MessageDigest
 import java.math.BigInteger
 import java.net.URLEncoder
+import java.security.MessageDigest
 
 
 object String {
 
-  def getJsRouteString(route: JavaScriptReverseRoute, parameters: String*): String = if (route != null) {
-    s"jsRoutes.${route.name}(${parameters.mkString(",")})"
+  def getJsRouteString(route: JavaScriptReverseRoute, parameters: String = ""): String = if (route != null) {
+    s"jsRoutes.${route.name}(${parameters})"
   } else {
     "#"
   }
@@ -24,7 +23,7 @@ object String {
 
   def nestedFormField(fieldName: String)(implicit prefix: String): String = Seq(prefix, fieldName).mkString(".")
 
-  def sha256Sum(text: String) : String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(text.getBytes("UTF-8"))))
+  def sha256Sum(text: String): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(text.getBytes("UTF-8"))))
 
   def queryURLGenerator(baseURL: String, parameters: Map[String, Seq[String]]): String = {
     baseURL + Option(parameters)
@@ -38,8 +37,4 @@ object String {
       }
       .getOrElse("")
   }
-
-  def getPropertyRequestNameAndType(dataType: String, dataName: String): String = Seq(dataName, BaseData.getFactTypeFromDataType(dataType)).mkString(constants.Blockchain.DataNameAndTypeSeparator)
-
-  def getPropertyRequestWithValue(dataNameWithType: String, dataValue: Option[String]): String = Seq(dataNameWithType, dataValue.getOrElse("")).mkString(constants.Blockchain.DataTypeAndValueSeparator)
 }

@@ -1,0 +1,7 @@
+@import com.cosmos.distribution.{v1beta1 => distributionTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: distributionTx.MsgWithdrawValidatorCommission)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddress}'))")))

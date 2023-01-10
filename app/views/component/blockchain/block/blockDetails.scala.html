@@ -8,7 +8,7 @@
 @commonCard(constants.View.BLOCK_HEADER) {
 } {
     @commonIntInfo(constants.View.HEIGHT, block.height)
-    @commonRFC3339Info(constants.View.TIME, block.time, "blockDetailsTime")
+    @commonEpochInfo(constants.View.TIME, block.time)
     @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))")))
     @commonIntInfo(constants.View.NUMBER_OF_TRANSACTIONS, numTxs)
 }

@@ -3,42 +3,26 @@ package queries.responses.blockchain
 import models.Abstract.Parameter
 import models.blockchain.{Redelegation => BlockchainRedelegation, Undelegation => BlockchainUndelegation, WithdrawAddress => BlockchainWithdrawAddress}
 import models.common.Parameters.GovernanceParameter
-import models.common.Staking.{RedelegationEntry => StakingRedelegationEntry, UndelegationEntry => StakingUndelegationEntry}
-import queries.responses.common.{Authz => commonAuthz}
-import queries.responses.common.{FeeGrant => commonFeeGrant}
+import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
-import queries.responses.blockchain.TransactionResponse._
 import queries.responses.blockchain.params._
-import queries.responses.common.{Coin, Delegation, Validator}
+import queries.responses.common.{Coin, Delegation, Validator, Authz => commonAuthz, FeeGrant => commonFeeGrant}
 import transactions.Abstract.BaseResponse
 import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 object GenesisResponse {
 
-  case class GenTxBody(messages: Seq[Msg], memo: String)
+  case class MsgCreateValidator(delegator_address: String, validator_address: String)
+
+  implicit val msgCreateValidatorReads: Reads[MsgCreateValidator] = Json.reads[MsgCreateValidator]
+
+  case class GenTxBody(messages: Seq[MsgCreateValidator])
 
   implicit val genTxBodyReads: Reads[GenTxBody] = Json.reads[GenTxBody]
 
-  case class GenTx(body: GenTxBody, auth_info: AuthInfo) {
-    def getSigners: Seq[String] = {
-      var seen: Map[String, Boolean] = Map()
-      var signers: Seq[String] = Seq()
-      body.messages.foreach(message => message.toStdMsg.getSigners.foreach(signer => {
-        if (!seen.getOrElse(signer, false)) {
-          signers = signers :+ signer
-          seen = seen + (signer -> true)
-        }
-      }))
-      signers
-    }
-
-    def getFeePayer: String = {
-      val signers = getSigners
-      if (signers.nonEmpty) signers.head else ""
-    }
-  }
+  case class GenTx(body: GenTxBody)
 
   implicit val genTxReads: Reads[GenTx] = Json.reads[GenTx]
 
@@ -132,7 +116,7 @@ object GenesisResponse {
   object Staking {
 
     case class RedelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, shares_dst: String) {
-      def toRedelegationEntry: StakingRedelegationEntry = StakingRedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
+      def toRedelegationEntry: Serializable.RedelegationEntry = Serializable.RedelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), sharesDestination = BigDecimal(shares_dst))
     }
 
     implicit val redelegationEntryReads: Reads[RedelegationEntry] = Json.reads[RedelegationEntry]
@@ -144,7 +128,7 @@ object GenesisResponse {
     implicit val redelegationReads: Reads[Redelegation] = Json.reads[Redelegation]
 
     case class UndelegationEntry(creation_height: String, completion_time: RFC3339, initial_balance: String, balance: String) {
-      def toUndelegationEntry: StakingUndelegationEntry = StakingUndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
+      def toUndelegationEntry: Serializable.UndelegationEntry = Serializable.UndelegationEntry(creationHeight = creation_height.toInt, completionTime = completion_time, initialBalance = MicroNumber(BigInt(initial_balance)), balance = MicroNumber(BigInt(balance)))
     }
 
     implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]

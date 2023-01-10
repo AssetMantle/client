@@ -1,144 +1,89 @@
 package models.blockchain
 
-import exceptions.BaseException
-import models.Trait.Logged
-import org.postgresql.util.PSQLException
+import modelTraits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
-import slick.jdbc.JdbcProfile
+import schema.property.base.{MetaProperty, MesaProperty}
+import schema.property.{Property => abstractProperty}
+import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Classification(id: ClassificationID, immutableTraits: Immutables, mutableTraits: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]]
 
-@Singleton
-class Classifications @Inject()(
-                                 protected val databaseConfigProvider: DatabaseConfigProvider,
-                                 configuration: Configuration,
-                               )(implicit executionContext: ExecutionContext) {
+object Classifications {
 
-  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+  implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
 
-  val db = databaseConfig.db
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  class DataTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
+    def * = (id, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
 
-  import databaseConfig.profile.api._
+    def id = column[Array[Byte]]("id", O.PrimaryKey)
 
-  case class ClassificationSerialized(chainID: String, hashID: String, immutableTraits: String, mutableTraits: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Classification = Classification(id = ClassificationID(chainID = chainID, hashID = hashID), immutableTraits = utilities.JSON.convertJsonStringToObject[Immutables](immutableTraits), mutableTraits = utilities.JSON.convertJsonStringToObject[Mutables](mutableTraits), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
-  }
+    def immutables = column[Array[Byte]]("immutables")
 
-  def serialize(classification: Classification): ClassificationSerialized = ClassificationSerialized(chainID = classification.id.chainID, hashID = classification.id.hashID, immutableTraits = Json.toJson(classification.immutableTraits).toString, mutableTraits = Json.toJson(classification.mutableTraits).toString, createdBy = classification.createdBy, createdOn = classification.createdOn, createdOnTimeZone = classification.createdOnTimeZone, updatedBy = classification.updatedBy, updatedOn = classification.updatedOn, updatedOnTimeZone = classification.updatedOnTimeZone)
-
-  private[models] val classificationTable = TableQuery[ClassificationTable]
-
-  private def add(classification: Classification): Future[String] = db.run((classificationTable returning classificationTable.map(_.hashID) += serialize(classification)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_INSERT_FAILED, psqlException)
-    }
-  }
-
-  private def addMultiple(classifications: Seq[Classification]): Future[Seq[String]] = db.run((classificationTable returning classificationTable.map(_.hashID) ++= classifications.map(x => serialize(x))).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_INSERT_FAILED, psqlException)
-    }
-  }
-
-  private def upsert(classification: Classification): Future[Int] = db.run(classificationTable.insertOrUpdate(serialize(classification)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_UPSERT_FAILED, psqlException)
-    }
-  }
-
-  private def tryGetByID(chainID: String, hashID: String) = db.run(classificationTable.filter(x => x.chainID === chainID && x.hashID === hashID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ORDER_NOT_FOUND, noSuchElementException)
-    }
-  }
-
-  private def getByID(chainID: String, hashID: String) = db.run(classificationTable.filter(x => x.chainID === chainID && x.hashID === hashID).result.headOption)
-
-  private def checkExistsByID(chainID: String, hashID: String) = db.run(classificationTable.filter(x => x.chainID === chainID && x.hashID === hashID).exists.result)
-
-  private def getAllClassifications = db.run(classificationTable.result)
-
-  private def deleteByID(chainID: String, hashID: String): Future[Int] = db.run(classificationTable.filter(x => x.chainID === chainID && x.hashID === hashID).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.ORDER_DELETE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.ORDER_DELETE_FAILED, noSuchElementException)
-    }
-  }
-
-  private[models] class ClassificationTable(tag: Tag) extends Table[ClassificationSerialized](tag, "Classification_BC") {
-
-    def * = (chainID, hashID, immutableTraits, mutableTraits, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ClassificationSerialized.tupled, ClassificationSerialized.unapply)
-
-    def chainID = column[String]("chainID", O.PrimaryKey)
-
-    def hashID = column[String]("hashID", O.PrimaryKey)
-
-    def immutableTraits = column[String]("immutableTraits")
-
-    def mutableTraits = column[String]("mutableTraits")
+    def mutables = column[Array[Byte]]("mutables")
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
+
+  val TableQuery = new TableQuery(tag => new DataTable(tag))
+
+}
+
+@Singleton
+class Classifications @Inject()(
+                                 protected val databaseConfigProvider: DatabaseConfigProvider
+                               )(implicit override val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Classifications.DataTable, Classification, Array[Byte]](
+    databaseConfigProvider,
+    Classifications.TableQuery,
+    executionContext,
+    Classifications.module,
+    Classifications.logger
+  ) {
 
   object Service {
 
-    def create(classification: Classification): Future[String] = add(classification)
+    def add(classification: Classification): Future[String] = create(classification).map(x => commonUtilities.Secrets.base64URLEncoder(x))
 
-    def tryGet(id: ClassificationID): Future[Classification] = tryGetByID(chainID = id.chainID, hashID = id.hashID).map(_.deserialize)
+    def get(id: String): Future[Option[Classification]] = getById(commonUtilities.Secrets.base64URLDecode(id))
 
-    def get(id: ClassificationID): Future[Option[Classification]] = getByID(chainID = id.chainID, hashID = id.hashID).map(_.map(_.deserialize))
+    def get(id: Array[Byte]): Future[Option[Classification]] = getById(id)
 
-    def getAll: Future[Seq[Classification]] = getAllClassifications.map(_.map(_.deserialize))
+    def tryGet(id: String): Future[Classification] = tryGetById(commonUtilities.Secrets.base64URLDecode(id))
 
-    def insertMultiple(classifications: Seq[Classification]): Future[Seq[String]] = addMultiple(classifications)
+    def tryGet(id: Array[Byte]): Future[Classification] = tryGetById(id)
 
-    def insertOrUpdate(classification: Classification): Future[Int] = upsert(classification)
 
-    def delete(id: ClassificationID): Future[Int] = deleteByID(chainID = id.chainID, hashID = id.hashID)
-
-    def checkExists(id: ClassificationID): Future[Boolean] = checkExistsByID(chainID = id.chainID, hashID = id.hashID)
   }
 
   object Utility {
 
-    //Insert in master.Classification happens in respective txs
-    def auxiliaryDefine(immutables: Immutables, mutables: Mutables): Future[ClassificationID] = {
-      val classificationID = ClassificationID(chainID = constants.Blockchain.ChainID, immutables = immutables, mutables = mutables)
-      val upsert = Service.insertOrUpdate(Classification(id = classificationID, immutableTraits = immutables, mutableTraits = mutables))
+    def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
+      val immutableMetas = msg.getImmutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
+      val immutableMesas = msg.getImmutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
+      val mutableMetas = msg.getMutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
+      val mutableMesas = msg.getMutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
+      val classification = Classification()
+      val add = Service.add()
 
-      (for {
-        _ <- upsert
-      } yield classificationID
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
+      for {
+        _ <- add
+      } yield msg.getFrom
     }
-  }
 
+  }
 }

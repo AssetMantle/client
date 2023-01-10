@@ -1,9 +1,9 @@
 package models.analytic
 
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TransactionCounter(epoch: Long, totalTxs: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class TransactionCounter(epoch: Long, totalTxs: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class TransactionCounters @Inject()(
@@ -25,7 +25,7 @@ class TransactionCounters @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.ANALYTIC_TRANSACTION_COUNTER
 
@@ -53,23 +53,19 @@ class TransactionCounters @Inject()(
 
   private[models] class TransactionCounterTable(tag: Tag) extends Table[TransactionCounter](tag, "TransactionCounter") {
 
-    def * = (epoch, totalTxs, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TransactionCounter.tupled, TransactionCounter.unapply)
+    def * = (epoch, totalTxs, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TransactionCounter.tupled, TransactionCounter.unapply)
 
     def epoch = column[Long]("epoch", O.PrimaryKey)
 
     def totalTxs = column[Int]("totalTxs")
 
-    def createdBy = column[String]("createdBy")
+   def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

@@ -1,0 +1,9 @@
+@import views.html.base.infos._
+@import views.html.base.buttons._
+@import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+
+@(msg: feegrantTx.MsgGrantAllowance, index: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.GRANTER, commonJavascriptLink(msg.getGranter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getGranter}'))")))
+@commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(msg.getGrantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getGrantee}'))")))
+@views.html.component.blockchain.feeGrantAllowance(msg.getAllowance, index)

@@ -5,7 +5,8 @@ import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
@@ -13,7 +14,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Block(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Block(height: Int, time: Long, proposerAddress: String, validators: Seq[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Blocks @Inject()(
@@ -25,7 +26,7 @@ class Blocks @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
 
@@ -39,11 +40,11 @@ class Blocks @Inject()(
 
   private[models] val blockTable = TableQuery[BlockTable]
 
-  case class BlockSerialized(height: Int, time: String, proposerAddress: String, validators: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Block = Block(height = height, time = RFC3339(time), proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class BlockSerialized(height: Int, time: Long, proposerAddress: String, validators: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Block = Block(height = height, time = time, proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(block: Block): BlockSerialized = BlockSerialized(height = block.height, time = block.time.toString, proposerAddress = block.proposerAddress, validators = Json.toJson(block.validators).toString, createdBy = block.createdBy, createdOnMillisEpoch = block.createdOnMillisEpoch, updatedBy = block.updatedBy, updatedOnMillisEpoch = block.updatedOnMillisEpoch)
+  def serialize(block: Block): BlockSerialized = BlockSerialized(height = block.height, time = block.time, proposerAddress = block.proposerAddress, validators = Json.toJson(block.validators).toString, createdBy = block.createdBy, createdOnMillisEpoch = block.createdOnMillisEpoch, updatedBy = block.updatedBy, updatedOnMillisEpoch = block.updatedOnMillisEpoch)
 
   private def add(block: Block): Future[String] = db.run((blockTable returning blockTable.map(_.height) += serialize(block)).asTry).map {
     case Success(result) => result.toString
@@ -87,6 +88,8 @@ class Blocks @Inject()(
     }
   }
 
+  private def getByList(heights: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height.inSet(heights)).result)
+
   private def getBlocksByHeightRange(heightRange: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet heightRange).sortBy(_.time.desc).result)
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") {
@@ -95,7 +98,7 @@ class Blocks @Inject()(
 
     def height = column[Int]("height", O.PrimaryKey)
 
-    def time = column[String]("time")
+    def time = column[Long]("time")
 
     def proposerAddress = column[String]("proposerAddress")
 
@@ -112,13 +115,15 @@ class Blocks @Inject()(
 
   object Service {
 
-    def create(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
+    def create(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String]): Future[String] = add(Block(height = height, time = time.epoch, proposerAddress = proposerAddress, validators = validators))
 
-    def insertOrUpdate(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time, proposerAddress = proposerAddress, validators = validators))
+    def insertOrUpdate(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time.epoch, proposerAddress = proposerAddress, validators = validators))
 
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
     def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
+
+    def get(heights: Seq[Int]): Future[Seq[Block]] = getByList(heights).map(_.map(_.deserialize))
 
     def getLatestBlockHeight: Future[Int] = tryGetLatestBlockHeight
 
@@ -159,7 +164,7 @@ class Blocks @Inject()(
       (for {
         lastBlock <- lastBlock
         firstBlock <- getFirstBlock(lastBlock)
-      } yield utilities.NumericOperation.roundOff(lastBlock.time.difference(firstBlock.time).abs().toSeconds.toDouble / (lastBlock.height - firstBlock.height))
+      } yield utilities.NumericOperation.roundOff((lastBlock.time - firstBlock.time).abs.toDouble / (lastBlock.height - firstBlock.height))
         ).recover {
         case baseException: BaseException => throw baseException
       }

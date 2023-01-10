@@ -1,25 +1,25 @@
 package models.blockchain
 
+import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import models.common.Parameters.GovernanceParameter
-import models.common.Coin
-import models.common.TransactionMessages.Deposit
+import models.common.Serializable.Coin
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetProposalDeposit
-import queries.responses.blockchain.ProposalDepositResponse.{depositReads, Response => ProposalDepositResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class ProposalDeposit(proposalID: Int, depositor: String, amount: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ProposalDeposit(proposalID: Int, depositor: String, amount: Seq[Coin], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class ProposalDeposits @Inject()(
@@ -36,7 +36,7 @@ class ProposalDeposits @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_PROPOSAL_DEPOSIT
 
@@ -44,11 +44,11 @@ class ProposalDeposits @Inject()(
 
   private[models] val proposalTable = TableQuery[ProposalDepositTable]
 
-  case class ProposalDepositSerialized(proposalID: Int, depositor: String, amount: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: ProposalDeposit = ProposalDeposit(proposalID = proposalID, depositor = depositor, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ProposalDepositSerialized(proposalID: Int, depositor: String, amount: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: ProposalDeposit = ProposalDeposit(proposalID = proposalID, depositor = depositor, amount = utilities.JSON.convertJsonStringToObject[Seq[Coin]](amount), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(proposalDeposit: ProposalDeposit): ProposalDepositSerialized = ProposalDepositSerialized(proposalID = proposalDeposit.proposalID, depositor = proposalDeposit.depositor, amount = Json.toJson(proposalDeposit.amount).toString, createdBy = proposalDeposit.createdBy, createdOn = proposalDeposit.createdOn, createdOnTimeZone = proposalDeposit.createdOnTimeZone, updatedBy = proposalDeposit.updatedBy, updatedOn = proposalDeposit.updatedOn, updatedOnTimeZone = proposalDeposit.updatedOnTimeZone)
+  def serialize(proposalDeposit: ProposalDeposit): ProposalDepositSerialized = ProposalDepositSerialized(proposalID = proposalDeposit.proposalID, depositor = proposalDeposit.depositor, amount = Json.toJson(proposalDeposit.amount).toString, createdBy = proposalDeposit.createdBy, createdOnMillisEpoch = proposalDeposit.createdOnMillisEpoch, updatedBy = proposalDeposit.updatedBy, updatedOnMillisEpoch = proposalDeposit.updatedOnMillisEpoch)
 
   private def add(proposalDeposit: ProposalDeposit): Future[Int] = db.run((proposalTable returning proposalTable.map(_.proposalID) += serialize(proposalDeposit)).asTry).map {
     case Success(result) => result
@@ -77,9 +77,9 @@ class ProposalDeposits @Inject()(
 
   private def deleteByID(proposalID: Int): Future[Int] = db.run(proposalTable.filter(_.proposalID === proposalID).delete)
 
-  private[models] class ProposalDepositTable(tag: Tag) extends Table[ProposalDepositSerialized](tag, "ProposalDeposit_BC") {
+  private[models] class ProposalDepositTable(tag: Tag) extends Table[ProposalDepositSerialized](tag, "ProposalDeposit") {
 
-    def * = (proposalID, depositor, amount, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalDepositSerialized.tupled, ProposalDepositSerialized.unapply)
+    def * = (proposalID, depositor, amount, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProposalDepositSerialized.tupled, ProposalDepositSerialized.unapply)
 
     def proposalID = column[Int]("proposalID", O.PrimaryKey)
 
@@ -89,15 +89,11 @@ class ProposalDeposits @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -116,20 +112,20 @@ class ProposalDeposits @Inject()(
 
   object Utility {
 
-    def onDeposit(deposit: Deposit)(implicit header: Header): Future[Unit] = {
-      val proposal = blockchainProposals.Service.tryGet(deposit.proposalID)
+    def onDeposit(deposit: govTx.MsgDeposit)(implicit header: Header): Future[String] = {
+      val proposal = blockchainProposals.Service.tryGet(deposit.getProposalId.toInt)
       val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
-      val proposalDeposit = Service.get(deposit.proposalID, deposit.depositor)
+      val proposalDeposit = Service.get(deposit.getProposalId.toInt, deposit.getDepositor)
 
-      def updateAccountBalance() = blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor)
+      def updateAccountBalance() = blockchainBalances.Utility.insertOrUpdateBalance(deposit.getDepositor)
 
       def updateProposal(proposal: Proposal, governanceParameters: GovernanceParameter) = {
         if (proposal.status == constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD && proposal.isTotalDepositGTEMinimum(governanceParameters.minDeposit)) {
-          blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.amount).activateVotingPeriod(currentTime = header.time, votingPeriod = governanceParameters.votingPeriod))
-        } else blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.amount))
+          blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.getAmountList.asScala.toSeq.map(x => Coin(x))).activateVotingPeriod(currentTime = header.time, votingPeriod = governanceParameters.votingPeriod))
+        } else blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))
       }
 
-      def upsertDeposit(proposalDeposit: Option[ProposalDeposit]) = proposalDeposit.fold(Service.insertOrUpdate(ProposalDeposit(proposalID = deposit.proposalID, depositor = deposit.depositor, amount = deposit.amount)))(x => Service.insertOrUpdate(x.copy(amount = utilities.Blockchain.addCoins(oldCoins = x.amount, add = deposit.amount))))
+      def upsertDeposit(proposalDeposit: Option[ProposalDeposit]) = proposalDeposit.fold(Service.insertOrUpdate(ProposalDeposit(proposalID = deposit.getProposalId.toInt, depositor = deposit.getDepositor, amount = deposit.getAmountList.asScala.toSeq.map(x => Coin(x)))))(x => Service.insertOrUpdate(x.copy(amount = utilities.Blockchain.addCoins(oldCoins = x.amount, add = deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))))
 
       (for {
         proposal <- proposal
@@ -138,8 +134,9 @@ class ProposalDeposits @Inject()(
         _ <- updateAccountBalance()
         _ <- updateProposal(proposal, governanceParameters)
         _ <- upsertDeposit(proposalDeposit)
-      } yield ()).recover {
+      } yield deposit.getDepositor).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          deposit.getDepositor
       }
     }
 
