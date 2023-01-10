@@ -4428,7 +4428,8 @@ figure .block:hover {
 
 .blocksList .leftText,
 .transactionsList .leftText,
-#validatorsList .leftText{
+#validatorsList .leftText,
+.proposals .leftText{
     font-family: var(--font-type-1);
     font-weight: 600;
     font-size: 16px;
@@ -4876,4 +4877,34 @@ figure .block:hover {
 
 #validatorTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link{
     width: 150px;
+}
+
+.proposals{
+    padding-bottom: 1px;
+}
+
+.proposals .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 16px 16px 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+.proposals table.cmuk-table thead th{
+    padding-right: 8px;
+}
+
+.proposals table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    padding-right: 8px;
+}
+
+.proposals table.cmuk-table tbody td .cmuk-link{
+    color: var(--primary-color);
 }
