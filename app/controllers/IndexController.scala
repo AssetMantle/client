@@ -2,17 +2,15 @@ package controllers
 
 import constants.AppConfig._
 import controllers.actions._
+import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
-import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
-import schema.data.base.StringData
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -30,9 +28,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val a = Await.result(blockchainMetaDatas.Service.fetchAll, Duration.Inf)
-        println(a.head.data.getType.value)
-        println(StringData(a.head.data.toAnyData.getStringData).value)
         Future(Ok(views.html.index()))
     }
   }

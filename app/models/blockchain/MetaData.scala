@@ -22,7 +22,7 @@ case class MetaData(dataTypeID: String, dataHashID: Array[Byte], dataBytes: Arra
 
 object MetaDatas {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_DATA
+  implicit val module: String = constants.Module.BLOCKCHAIN_META_DATA
 
   implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -65,9 +65,6 @@ class MetaDatas @Inject()(
     MetaDatas.module,
     MetaDatas.logger
   ) {
-
-  private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
-
   object Service {
 
     def add(data: abstractData): Future[Unit] = create(MetaData(dataTypeID = data.getType.value, dataHashID = data.generateHashID.getBytes, dataBytes = data.getProtoBytes))
@@ -75,8 +72,6 @@ class MetaDatas @Inject()(
     def get(id: DataID): Future[Option[MetaData]] = getById(id1 = id.typeID.value, id2 = id.hashID.getBytes)
 
     def tryGet(id: DataID): Future[MetaData] = tryGetById1AndId2(id1 = id.typeID.value, id2 = id.hashID.getBytes)
-
-    def fetchAll = getAll
 
   }
 
