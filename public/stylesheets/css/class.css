@@ -4917,7 +4917,7 @@ figure .block:hover {
 
 #proposalDetails .cmuk-card-body.cmuk-height-medium{
     height: auto;
-    margin: 0px 16px 16px 16px;
+    margin: 0px 16px 0px 16px;
     padding: 16px 24px;
     background-color: var(--bg-popup);
     border-radius: 10px;
@@ -4937,4 +4937,26 @@ figure .block:hover {
     line-height: 17px;
     text-transform: capitalize;
     color: var(--inactive-grey);
+}
+
+#proposalDeposits .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 0px 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#proposalDeposits table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    padding-right: 8px;
+}
+
+#proposalDeposits  table.cmuk-table tbody td .cmuk-link{
+    color: var(--primary-color);
 }
