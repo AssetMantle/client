@@ -9,8 +9,10 @@
 } {
     <div id="validatorTxs"></div>
     @commonSpinner("validatorTransactionsPageChangeSpinner")
-    @commonJavascriptButton(constants.View.BACK, JavaScript(s"getValidatorTxs('${address}', -1)"), 'id -> "validatorTransactions_BACK")
-    @commonJavascriptButton(constants.View.NEXT, JavaScript(s"getValidatorTxs('${address}', 1)"), 'id -> "validatorTransactions_NEXT")
+    <div class="paginationButtonContainer">
+        @commonPaginationButton(constants.View.BACK, JavaScript(s"getValidatorTxs('${address}', -1)"), icon = "backArrow", size = "small", iconFirst = true, Symbol("id") -> "validatorTransactions_BACK")
+        @commonPaginationButton(constants.View.NEXT, JavaScript(s"getValidatorTxs('${address}', 1)"), icon = "nextArrow", size = "small", iconFirst = false, Symbol("id") -> "validatorTransactions_NEXT")
+    </div>
     <script>
             componentResource('validatorTxs', jsRoutes.controllers.ComponentViewController.validatorTransactionsPerPage('@address', 1), 'validatorTransactionsPageChangeSpinner', 'pageChange');
     </script>

@@ -4232,11 +4232,6 @@ figure.zoom img {
     border-top: 0px solid;
 }
 
-.validatorTransactions .cmuk-card-body, .accountTransactions .cmuk-card-body {
-    padding-top: 0px !important;
-    padding-right: 20px;
-}
-
 .validatorTransactions .cmuk-card-body table thead tr:first-child, .blockTransactions .cmuk-card-body table thead tr:first-child, .accountTransactions .cmuk-card-body table thead tr:first-child {
     border-top: 0px solid;
 }
@@ -4586,7 +4581,8 @@ figure .block:hover {
 #blockTransactions table.cmuk-table tbody td .statusCheck .icon,
 .transactionsList table.cmuk-table tbody td .statusCheck .icon,
 #transactionDetails table.cmuk-table tbody td .statusCheck .icon,
-#validatorsList table.cmuk-table tbody td .statusCheck .icon
+#validatorsList table.cmuk-table tbody td .statusCheck .icon,
+#validatorTransactions table.cmuk-table tbody td .statusCheck .icon
 {
     height: 16px;
     width: 16px;
@@ -4596,7 +4592,8 @@ figure .block:hover {
 #blockTransactions table.cmuk-table tbody td .statusClose .icon,
 .transactionsList table.cmuk-table tbody td .statusClose .icon,
 #transactionDetails table.cmuk-table tbody td .statusClose .icon,
-#validatorsList table.cmuk-table tbody td .statusClose .icon
+#validatorsList table.cmuk-table tbody td .statusClose .icon,
+#validatorTransactions table.cmuk-table tbody td .statusClose .icon
 {
     height: 16px;
     width: 16px;
@@ -4839,4 +4836,44 @@ figure .block:hover {
 
 .validatorDelegation{
     padding-left: 0px !important;
+}
+
+#validatorTransactions .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px 0px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#validatorTransactions .cmuk-card-body .emptyBlockTransaction{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--disabled);
+    padding-top: 16px;
+    text-align: center;
+}
+
+#validatorTransactions table.cmuk-table thead th{
+    text-align: center;
+}
+
+#validatorTransactions table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    text-align: center;
+}
+
+#validatorTransactions table.cmuk-table tbody td .cmuk-link{
+    color: var(--primary-color);
+}
+
+#validatorTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+    width: 150px;
 }
