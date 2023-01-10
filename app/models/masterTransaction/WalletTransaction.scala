@@ -11,10 +11,10 @@ import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.core.channel.v1.{Tx => channelTx}
-import ibc.core.client.v1.{Tx => clientTx}
-import ibc.core.connection.v1.{Tx => connectionTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.core.channel.{v1 => channelTx}
+import com.ibc.core.client.{v1 => clientTx}
+import com.ibc.core.connection.{v1 => connectionTx}
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -154,7 +154,7 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
             case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => Seq(channelTx.MsgChannelCloseInit.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => Seq(channelTx.MsgChannelCloseConfirm.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.RECV_PACKET => val msg = channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue)
-              Seq(msg.getSigner, ibc.applications.transfer.v2.Packet.FungibleTokenPacketData.parseFrom(msg.getPacket.getData.toByteArray).getReceiver)
+              Seq(msg.getSigner, com.ibc.applications.transfer.v2.FungibleTokenPacketData.parseFrom(msg.getPacket.getData.toByteArray).getReceiver)
             case constants.Blockchain.TransactionMessage.TIMEOUT => Seq(channelTx.MsgTimeout.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => Seq(channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => Seq(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue).getSigner)

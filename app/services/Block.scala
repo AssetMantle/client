@@ -13,10 +13,10 @@ import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.core.channel.v1.{Tx => channelTx}
-import ibc.core.client.v1.{Tx => clientTx}
-import ibc.core.connection.v1.{Tx => connectionTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.core.channel.{v1 => channelTx}
+import com.ibc.core.client.{v1 => clientTx}
+import com.ibc.core.connection.{v1 => connectionTx}
 import com.metas.{transactions => metasTransactions}
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter

@@ -1,6 +1,6 @@
 @import views.html.base.infos._
-@import ibc.core.channel.v1.ChannelOuterClass.Packet
-@import ibc.applications.transfer.v2.Packet.FungibleTokenPacketData
+@import com.ibc.core.channel.v1.Packet
+@import com.ibc.applications.transfer.v2.FungibleTokenPacketData
 
 @(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

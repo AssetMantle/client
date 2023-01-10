@@ -80,61 +80,61 @@
                     @views.html.component.blockchain.txMessages.cosmosMsg.undelegate(com.cosmos.staking.v1beta1.MsgUndelegate.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CREATE_CLIENT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.createClient(ibc.core.client.v1.Tx.MsgCreateClient.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.createClient(com.ibc.core.client.v1.MsgCreateClient.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.UPDATE_CLIENT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.updateClient(ibc.core.client.v1.Tx.MsgUpdateClient.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.updateClient(com.ibc.core.client.v1.MsgUpdateClient.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.UPGRADE_CLIENT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.upgradeClient(ibc.core.client.v1.Tx.MsgUpgradeClient.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.upgradeClient(com.ibc.core.client.v1.MsgUpgradeClient.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.submitMisbehaviour(ibc.core.client.v1.Tx.MsgSubmitMisbehaviour.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.submitMisbehaviour(com.ibc.core.client.v1.MsgSubmitMisbehaviour.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenInit(ibc.core.connection.v1.Tx.MsgConnectionOpenInit.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenInit(com.ibc.core.connection.v1.MsgConnectionOpenInit.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenTry(ibc.core.connection.v1.Tx.MsgConnectionOpenTry.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenTry(com.ibc.core.connection.v1.MsgConnectionOpenTry.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenAck(ibc.core.connection.v1.Tx.MsgConnectionOpenAck.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenAck(com.ibc.core.connection.v1.MsgConnectionOpenAck.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenConfirm(ibc.core.connection.v1.Tx.MsgConnectionOpenConfirm.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.connectionOpenConfirm(com.ibc.core.connection.v1.MsgConnectionOpenConfirm.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenInit(ibc.core.channel.v1.Tx.MsgChannelOpenInit.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenInit(com.ibc.core.channel.v1.MsgChannelOpenInit.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenTry(ibc.core.channel.v1.Tx.MsgChannelOpenTry.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenTry(com.ibc.core.channel.v1.MsgChannelOpenTry.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenAck(ibc.core.channel.v1.Tx.MsgChannelOpenAck.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenAck(com.ibc.core.channel.v1.MsgChannelOpenAck.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenConfirm(ibc.core.channel.v1.Tx.MsgChannelOpenConfirm.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelOpenConfirm(com.ibc.core.channel.v1.MsgChannelOpenConfirm.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelCloseInit(ibc.core.channel.v1.Tx.MsgChannelCloseInit.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelCloseInit(com.ibc.core.channel.v1.MsgChannelCloseInit.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.channelCloseConfirm(ibc.core.channel.v1.Tx.MsgChannelCloseConfirm.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.channelCloseConfirm(com.ibc.core.channel.v1.MsgChannelCloseConfirm.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.RECV_PACKET => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.recvPacket(ibc.core.channel.v1.Tx.MsgRecvPacket.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.recvPacket(com.ibc.core.channel.v1.MsgRecvPacket.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.TIMEOUT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.timeout(ibc.core.channel.v1.Tx.MsgTimeout.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.timeout(com.ibc.core.channel.v1.MsgTimeout.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.timeoutOnClose(ibc.core.channel.v1.Tx.MsgTimeoutOnClose.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.timeoutOnClose(com.ibc.core.channel.v1.MsgTimeoutOnClose.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.acknowledgement(ibc.core.channel.v1.Tx.MsgAcknowledgement.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.acknowledgement(com.ibc.core.channel.v1.MsgAcknowledgement.parseFrom(msg.getValue))
                 }
                 case constants.Blockchain.TransactionMessage.TRANSFER => {
-                    @views.html.component.blockchain.txMessages.ibcMsg.transfer(ibc.applications.transfer.v1.Tx.MsgTransfer.parseFrom(msg.getValue))
+                    @views.html.component.blockchain.txMessages.ibcMsg.transfer(com.ibc.applications.transfer.v1.MsgTransfer.parseFrom(msg.getValue))
                 }
                 case _ => {
 
