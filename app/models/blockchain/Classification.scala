@@ -3,11 +3,13 @@ package models.blockchain
 import modelTraits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
-import schema.data.{Data => abstractData}
+import schema.property.base.{MetaProperty, MesaProperty}
+import schema.property.{Property => abstractProperty}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]]
 
@@ -71,7 +73,16 @@ class Classifications @Inject()(
   object Utility {
 
     def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
-      Future(msg.getFrom)
+      val immutableMetas = msg.getImmutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
+      val immutableMesas = msg.getImmutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
+      val mutableMetas = msg.getMutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
+      val mutableMesas = msg.getMutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
+      val classification = Classification()
+      val add = Service.add()
+
+      for {
+        _ <- add
+      } yield msg.getFrom
     }
 
   }
