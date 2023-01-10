@@ -4828,3 +4828,15 @@ figure .block:hover {
     height: 14px;
     fill: var(--primary-color);
 }
+
+#validatorDelegations .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px;
+    padding: 16px 16px 10px 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+.validatorDelegation{
+    padding-left: 0px !important;
+}
