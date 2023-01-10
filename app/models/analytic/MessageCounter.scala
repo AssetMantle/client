@@ -8,7 +8,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.collection.MapView
 import scala.collection.immutable.ListMap
@@ -82,7 +81,7 @@ class MessageCounters @Inject()(
 
     def counter = column[Int]("counter")
 
-   def createdBy = column[String]("createdBy")
+    def createdBy = column[String]("createdBy")
 
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
@@ -111,11 +110,11 @@ class MessageCounters @Inject()(
   object Utility {
 
     def updateMessageCounter(transactions: Seq[Transaction]): Future[Unit] = {
-      val updates = transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).toList.sum)
-      val oldMessageCounters = Service.getByMessageTypes(updates.keys.toSeq)
+      val updates = transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).sum)
+      val oldMessageCounters = Service.getByMessageTypes(updates.keys.toSeq.distinct)
 
       def update(oldMessageCounters: Seq[MessageCounter], addCounters: MapView[String, Int]) = {
-        Service.insertOrUpdateMultiple(oldMessageCounters.map(old => MessageCounter(messageType = old.messageType, counter = old.counter + addCounters.getOrElse(old.messageType, 0))))
+        Service.insertOrUpdateMultiple(addCounters.map(addCounter => MessageCounter(messageType = addCounter._1, counter = oldMessageCounters.find(_.messageType == addCounter._1).fold(0)(_.counter) + addCounter._2)).toSeq)
       }
 
       (for {

@@ -1,0 +1,9 @@
+@import views.html.base.infos._
+@import com.identities.transactions.provision.Message
+@import schema.id.base._
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.FROM, msg.getFrom)
+@commonTextInfo(constants.View.IDENTITY_ID, IdentityID(msg.getIdentityID).asString)
+@commonTextInfo(constants.View.TO, msg.getTo)

@@ -1,7 +1,7 @@
 package services
 
 import actors.{Message => actorsMessage}
-import com.google.protobuf.{Any => protoAny}
+import com.assets.{transactions => assetsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -12,19 +12,23 @@ import com.cosmos.gov.{v1beta1 => govTx}
 import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import com.cosmos.vesting.{v1beta1 => VestingTx}
-import exceptions.BaseException
+import com.google.protobuf.{Any => protoAny}
 import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
+import com.identities.{transactions => identitiesTransactions}
 import com.metas.{transactions => metasTransactions}
+import com.orders.{transactions => ordersTransactions}
+import com.splits.{transactions => splitsTransactions}
+import exceptions.BaseException
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
-import play.api.i18n.{Lang, MessagesApi}
-import play.api.Configuration
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
+import play.api.i18n.{Lang, MessagesApi}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
@@ -48,6 +52,7 @@ class Block @Inject()(
                        blockchainProposalDeposits: blockchain.ProposalDeposits,
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
+                       blockchainClassifications: blockchain.Classifications,
                        blockchainMetaDatas: blockchain.MetaDatas,
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
@@ -121,9 +126,9 @@ class Block @Inject()(
       val bcTxs = transactions.map(_.toTransaction)
       val insertTxs = blockchainTransactions.Service.insertMultiple(bcTxs)
 
-      val updateTransactionCounter = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length)
+      val updateTransactionCounter = if (transactions.nonEmpty) analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length) else Future(0L)
 
-      val updateMessageCounter = analyticMessageCounters.Utility.updateMessageCounter(bcTxs)
+      val updateMessageCounter = if (transactions.nonEmpty) analyticMessageCounters.Utility.updateMessageCounter(bcTxs) else Future()
 
       for {
         _ <- insertTxs
@@ -311,8 +316,39 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue))
       //ibc-transfer
       case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
+      //assets
+      case constants.Blockchain.TransactionMessage.ASSET_BURN => Future(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => Future(assetsTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => Future(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_MINT => Future(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_MUTATE => Future(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => Future(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_REVOKE => Future(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      //identities
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => Future(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Future(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Future(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Future(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => Future(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => Future(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => Future(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => Future(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => Future(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue).getFrom)
+      //orders
+      case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Future(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => Future(ordersTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => Future(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_MAKE => Future(ordersTransactions.make.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_MODIFY => Future(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_REVOKE => Future(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_TAKE => Future(ordersTransactions.take.Message.parseFrom(stdMsg.getValue).getFrom)
       //metas
       case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
+      // splits
+      case constants.Blockchain.TransactionMessage.SPLIT_SEND => Future(splitsTransactions.send.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.SPLIT_WRAP => Future(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => Future(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue).getFrom)
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }

@@ -1,5 +1,6 @@
 package models.masterTransaction
 
+import com.assets.{transactions => assetsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -10,16 +11,20 @@ import com.cosmos.gov.{v1beta1 => govTx}
 import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import com.cosmos.vesting.{v1beta1 => VestingTx}
-import exceptions.BaseException
 import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
+import com.identities.{transactions => identitiesTransactions}
+import com.metas.{transactions => metasTransactions}
+import com.orders.{transactions => ordersTransactions}
+import com.splits.{transactions => splitsTransactions}
+import exceptions.BaseException
 import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
+import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -94,7 +99,7 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
 
     def addForTransactions(txs: Seq[models.blockchain.Transaction], height: Int): Future[Unit] = {
       val walletTransactions = txs.map { tx =>
-        val txAddresses = tx.getMessages.map { stdMsg =>
+        val txAddresses: Seq[Seq[String]] = tx.getMessages.map { stdMsg =>
           stdMsg.getTypeUrl match {
             //auth
             case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => val msg = VestingTx.MsgCreateVestingAccount.parseFrom(stdMsg.getValue)
@@ -160,6 +165,42 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
             case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => Seq(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue).getSigner)
             //ibc-transfer
             case constants.Blockchain.TransactionMessage.TRANSFER => Seq(transferTx.MsgTransfer.parseFrom(stdMsg.getValue).getSender)
+            //assets
+            case constants.Blockchain.TransactionMessage.ASSET_BURN => Seq(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_DEFINE => Seq(assetsTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => Seq(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_MINT => Seq(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_MUTATE => Seq(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => Seq(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ASSET_REVOKE => Seq(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+            //identities
+            case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => Seq(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Seq(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => val msg = identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue)
+              Seq(msg.getFrom, msg.getTo)
+            case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Seq(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_NUB => Seq(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => val msg = identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue)
+              Seq(msg.getFrom, msg.getTo)
+            case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => Seq(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => Seq(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => val msg = identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue)
+              Seq(msg.getFrom, msg.getTo)
+            //orders
+            case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Seq(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_DEFINE => Seq(ordersTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => Seq(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Seq(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_MAKE => Seq(ordersTransactions.make.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_MODIFY => Seq(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_REVOKE => Seq(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.ORDER_TAKE => Seq(ordersTransactions.take.Message.parseFrom(stdMsg.getValue).getFrom)
+            //metas
+            case constants.Blockchain.TransactionMessage.META_REVEAL => Seq(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue).getFrom)
+            // splits
+            case constants.Blockchain.TransactionMessage.SPLIT_SEND => Seq(splitsTransactions.send.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.SPLIT_WRAP => Seq(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue).getFrom)
+            case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => Seq(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue).getFrom)
             case _ => Seq()
           }
         }

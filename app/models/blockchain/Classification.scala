@@ -3,15 +3,22 @@ package models.blockchain
 import modelTraits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
-import schema.property.base.{MetaProperty, MesaProperty}
-import schema.property.{Property => abstractProperty}
+import schema.list.PropertyList
+import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]]
+case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+
+  def idString: String = commonUtilities.Secrets.base64URLEncoder(this.id)
+
+  def immutableList: Immutables = Immutables(this.immutables)
+
+  def mutableList: Mutables = Mutables(this.immutables)
+
+}
 
 object Classifications {
 
@@ -67,23 +74,50 @@ class Classifications @Inject()(
 
     def tryGet(id: Array[Byte]): Future[Classification] = tryGetById(id)
 
+    def fetchAll: Future[Seq[Classification]] = getAll
+
 
   }
 
   object Utility {
 
     def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
-      val immutableMetas = msg.getImmutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
-      val immutableMesas = msg.getImmutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
-      val mutableMetas = msg.getMutableMetaProperties.getPropertyListList.asScala.toSeq.map(x => MetaProperty(x.getMetaProperty))
-      val mutableMesas = msg.getMutableProperties.getPropertyListList.asScala.toSeq.map(x => MesaProperty(x.getMesaProperty))
-      val classification = Classification()
-      val add = Service.add()
+      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
+      val add = Service.add(classification)
 
       for {
         _ <- add
       } yield msg.getFrom
     }
+
+    def onDefineIdentity(msg: com.identities.transactions.define.Message): Future[String] = {
+      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
+      val add = Service.add(classification)
+
+      for {
+        _ <- add
+      } yield msg.getFrom
+    }
+
+    def onDefineOrder(msg: com.orders.transactions.define.Message): Future[String] = {
+      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
+      val add = Service.add(classification)
+
+      for {
+        _ <- add
+      } yield msg.getFrom
+    }
+
+
 
   }
 }

@@ -56,6 +56,7 @@ object View {
   val FOOTER_LOGO = "FOOTER_LOGO"
   val FROM = "FROM"
   val TO = "TO"
+  val NUB_ID = "NUB_ID"
 
   val BLOCKS = "BLOCKS"
   val TRANSACTION_STATISTICS_X_LABEL = "TRANSACTION_STATISTICS_X_LABEL"
@@ -99,6 +100,10 @@ object View {
   val TOP_VALIDATORS = "TOP_VALIDATORS"
   val ACCOUNT_WALLET = "ACCOUNT_WALLET"
   val TOKEN_PRICE = "TOKEN_PRICE"
+  val IMMUTABLE_META_PROPERTIES = "IMMUTABLE_META_PROPERTIES"
+  val IMMUTABLE_MESA_PROPERTIES = "IMMUTABLE_MESA_PROPERTIES"
+  val MUTABLE_META_PROPERTIES = "MUTABLE_META_PROPERTIES"
+  val MUTABLE_MESA_PROPERTIES = "MUTABLE_MESA_PROPERTIES"
 
   val PROPOSAL = "PROPOSAL"
   val PROPOSAL_DEPOSITS = "PROPOSAL_DEPOSITS"
@@ -212,7 +217,19 @@ object View {
   val COIN = "COIN"
   val FROM_ID = "FROM_ID"
   val TO_ID = "TO_ID"
+  val OWNABLE_ID = "OWNABLE_ID"
+  val CLASSIFICATION_ID = "CLASSIFICATION_ID"
+  val MAINTAINED_PROPERTIES = "MAINTAINED_PROPERTIES"
+  val TAKER_ID = "TAKER_ID"
+  val MAKER_OWNABLE_ID = "MAKER_OWNABLE_ID"
+  val TAKER_OWNABLE_ID = "TAKER_OWNABLE_ID"
   val AMOUNTS = "AMOUNTS"
+  val MINT = "MINT"
+  val BURN = "BURN"
+  val ADD_MAINTAINER = "ADD_MAINTAINER"
+  val MUTATE_MAINTAINER = "MUTATE_MAINTAINER"
+  val REMOVE_MAINTAINER = "REMOVE_MAINTAINER"
+  val RENUMERATE = "RENUMERATE"
   val LATEST_BLOCKS = "LATEST_BLOCKS"
   val COPY = "COPY"
   val END_TIME = "END_TIME"
@@ -230,6 +247,9 @@ object View {
   val CONNECTION_ID = "CONNECTION_ID"
   val VERSION = "VERSION"
   val IDENTIFIER = "IDENTIFIER"
+  val IDENTITY_ID = "IDENTITY_ID"
+  val ASSET_ID = "ASSET_ID"
+  val ORDER_ID = "ORDER_ID"
   val FEATURES = "FEATURES"
   val DELAY_PERIOD = "DELAY_PERIOD"
   val CLIENT_HEIGHT = "CLIENT_HEIGHT"
@@ -276,6 +296,8 @@ object View {
   val GRANTEE = "GRANTEE"
   val ALLOWANCE = "ALLOWANCE"
   val EXPIRATION = "EXPIRATION"
+  val MAKER_OWNABLE_SPLIT = "MAKER_OWNABLE_SPLIT"
+  val TAKER_OWNABLE_SPLIT = "TAKER_OWNABLE_SPLIT"
   val SPEND_LIMITS = "SPEND_LIMITS"
   val MAX_TOKENS = "MAX_TOKENS"
   val ALLOW_LIST = "ALLOW_LIST"
@@ -291,6 +313,7 @@ object View {
   val STAKE_AUTHORIZATION_TYPE = "STAKE_AUTHORIZATION_TYPE"
   val NO_EXPIRY_DATE = "NO_EXPIRY_DATE"
   val PLATFORM_NAME = "PLATFORM_NAME"
+  val PROPERTY_ID = "PROPERTY_ID"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
@@ -357,11 +380,17 @@ object View {
     constants.Blockchain.TransactionMessage.ASSET_MINT -> "MESSAGE_ASSET_MINT",
     constants.Blockchain.TransactionMessage.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
     constants.Blockchain.TransactionMessage.ASSET_BURN -> "MESSAGE_ASSET_BURN",
+    constants.Blockchain.TransactionMessage.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
+    constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE -> "MESSAGE_ASSET_DEPUTIZE",
+    constants.Blockchain.TransactionMessage.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
     constants.Blockchain.TransactionMessage.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     constants.Blockchain.TransactionMessage.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
     constants.Blockchain.TransactionMessage.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
     constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
     constants.Blockchain.TransactionMessage.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    constants.Blockchain.TransactionMessage.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",
+    constants.Blockchain.TransactionMessage.IDENTITY_REVOKE -> "MESSAGE_IDENTITY_REVOKE",
+    constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
     constants.Blockchain.TransactionMessage.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
     constants.Blockchain.TransactionMessage.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
     constants.Blockchain.TransactionMessage.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
@@ -369,8 +398,11 @@ object View {
     constants.Blockchain.TransactionMessage.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
     constants.Blockchain.TransactionMessage.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
     constants.Blockchain.TransactionMessage.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
+    constants.Blockchain.TransactionMessage.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
+    constants.Blockchain.TransactionMessage.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
+    constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE -> "MESSAGE_ORDER_DEPUTIZE",
+    constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE -> "MESSAGE_ORDER_IMMEDIATE",
     constants.Blockchain.TransactionMessage.META_REVEAL -> "MESSAGE_META_REVEAL",
-    constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE -> "MESSAGE_MAINTAINER_DEPUTIZE",
   )
 
 }

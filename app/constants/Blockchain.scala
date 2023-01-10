@@ -266,29 +266,38 @@ object Blockchain {
     //ibc-transfer
     val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
+    val ASSET_BURN = "/assets.transactions.burn.Message"
     val ASSET_DEFINE = "/assets.transactions.define.Message"
+    val ASSET_DEPUTIZE = "/assets.transactions.deputize.Message"
     val ASSET_MINT = "/assets.transactions.mint.Message"
     val ASSET_MUTATE = "/assets.transactions.mutate.Message"
-    val ASSET_BURN = "/assets.transactions.burn.Message"
+    val ASSET_RENUMERATE = "/assets.transactions.renumerate.Message"
+    val ASSET_REVOKE = "/assets.transactions.revoke.Message"
     //identity
-    val IDENTITY_DEFINE = "/xprt/identities/define/message"
-    val IDENTITY_ISSUE = "/xprt/identities/issue/message"
-    val IDENTITY_PROVISION = "/xprt/identities/provision/message"
-    val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/message"
-    val IDENTITY_NUB = "/xprt/identities/nub/message"
+    val IDENTITY_DEFINE = "/identities.transactions.define.Message"
+    val IDENTITY_DEPUTIZE = "/identities.transactions.deputize.Message"
+    val IDENTITY_ISSUE = "/identities.transactions.issue.Message"
+    val IDENTITY_MUTATE = "/identities.transactions.mutate.Message"
+    val IDENTITY_NUB = "/identities.transactions.nub.Message"
+    val IDENTITY_PROVISION = "/identities.transactions.provision.Message"
+    val IDENTITY_QUASH = "/identities.transactions.quash.Message"
+    val IDENTITY_REVOKE = "/identities.transactions.revoke.Message"
+    val IDENTITY_UNPROVISION = "/identities.transactions.unprovision.Message"
     //split
-    val SPLIT_SEND = "/xprt/splits/send/message"
-    val SPLIT_WRAP = "/xprt/splits/wrap/message"
-    val SPLIT_UNWRAP = "/xprt/splits/unwrap/message"
+    val SPLIT_SEND = "/splits.transactions.send.Message"
+    val SPLIT_WRAP = "/splits.transactions.wrap.Message"
+    val SPLIT_UNWRAP = "/splits.transactions.unwrap.Message"
     //order
-    val ORDER_DEFINE = "/xprt/orders/define/message"
-    val ORDER_MAKE = "/xprt/orders/make/message"
-    val ORDER_TAKE = "/xprt/orders/take/message"
-    val ORDER_CANCEL = "/xprt/orders/cancel/message"
+    val ORDER_CANCEL = "/orders.transactions.cancel.Message"
+    val ORDER_DEFINE = "/orders.transactions.define.Message"
+    val ORDER_DEPUTIZE = "/orders.transactions.deputize.Message"
+    val ORDER_IMMEDIATE = "/orders.transactions.immediate.Message"
+    val ORDER_MAKE = "/orders.transactions.make.Message"
+    val ORDER_MODIFY = "/orders.transactions.modify.Message"
+    val ORDER_REVOKE = "/orders.transactions.revoke.Message"
+    val ORDER_TAKE = "/orders.transactions.take.Message"
     //metaList
     val META_REVEAL = "/metas.transactions.reveal.Message"
-    //maintainer
-    val MAINTAINER_DEPUTIZE = "/maintainers.transactions.deputize.Message"
   }
 
 

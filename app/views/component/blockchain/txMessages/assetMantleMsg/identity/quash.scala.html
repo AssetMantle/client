@@ -1,0 +1,10 @@
+@import views.html.base.infos._
+@import com.identities.transactions.quash.Message
+@import schema.id.base._
+@import views.html.component.blockchain.txMessages.common._
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.FROM, msg.getFrom)
+@commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
+@commonTextInfo(constants.View.IDENTITY_ID, IdentityID(msg.getIdentityID).asString)
