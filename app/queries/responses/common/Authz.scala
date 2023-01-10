@@ -3,7 +3,7 @@ package queries.responses.common
 import exceptions.BaseException
 import models.Abstract.{Authorization => commonAuthzAbstract}
 import models.common.{Serializable, Authz => SerializableAuthz}
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.{Authz => AuthzAbstract}
@@ -13,7 +13,7 @@ object Authz {
 
   implicit val module: String = constants.Module.RESPONSES_AUTHZ
 
-  implicit val logger: Logger = Logger(this.getClass)
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def authorizationApply(authorizationType: String, value: JsObject): Authorization = try {
     authorizationType match {

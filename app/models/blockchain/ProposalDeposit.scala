@@ -1,6 +1,6 @@
 package models.blockchain
 
-import cosmos.gov.v1beta1.{Tx => govTx}
+import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Parameters.GovernanceParameter
@@ -8,7 +8,8 @@ import models.common.Serializable.Coin
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetProposalDeposit
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -35,7 +36,7 @@ class ProposalDeposits @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_PROPOSAL_DEPOSIT
 

@@ -1,18 +1,17 @@
 package models.blockchain
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.crypto.secp256k1
-import cosmos.tx.v1beta1.TxOuterClass
+import com.cosmos.crypto.secp256k1
+import com.cosmos.tx.v1beta1.Tx
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.{Coin, Fee}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import slick.jdbc.JdbcProfile
-import utilities.WalletGenerator.BouncyHash
 
-import java.security.MessageDigest
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,13 +20,13 @@ import scala.util.{Failure, Success}
 
 case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  val parsedTx: TxOuterClass.Tx = TxOuterClass.Tx.parseFrom(txBytes)
+  lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
 
   def status: Boolean = code == 0
 
   // Since Seq in scala is by default immutable and ordering is maintained, we can use these methods directly
   def getSigners: Seq[String] = parsedTx.getAuthInfo.getSignerInfosList.asScala.toSeq.map { signerInfo =>
-    utilities.Bech32.encode(constants.Blockchain.AccountPrefix, utilities.Bech32.to5Bit(BouncyHash.ripemd160.digest(MessageDigest.getInstance("SHA-256").digest(secp256k1.Keys.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray))))
+    utilities.Crypto.convertAccountAddressBytesToBech32Address(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
   }
 
   def getFeePayer: String = if (parsedTx.getAuthInfo.getFee.getPayer != "") parsedTx.getAuthInfo.getFee.getPayer else getSigners.headOption.getOrElse("")
@@ -59,7 +58,7 @@ class Transactions @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
 

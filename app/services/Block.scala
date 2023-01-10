@@ -2,27 +2,29 @@ package services
 
 import actors.{Message => actorsMessage}
 import com.google.protobuf.{Any => protoAny}
-import cosmos.authz.v1beta1.{Tx => authzTx}
-import cosmos.bank.v1beta1.{Tx => bankTx}
-import cosmos.crisis.v1beta1.{Tx => crisisTx}
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
-import cosmos.evidence.v1beta1.{Tx => evidenceTx}
-import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
-import cosmos.gov.v1beta1.{Tx => govTx}
-import cosmos.slashing.v1beta1.{Tx => slashingTx}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
-import cosmos.vesting.v1beta1.{Tx => VestingTx}
+import com.cosmos.authz.{v1beta1 => authzTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
+import com.cosmos.crisis.{v1beta1 => crisisTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
+import com.cosmos.evidence.{v1beta1 => evidenceTx}
+import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+import com.cosmos.gov.{v1beta1 => govTx}
+import com.cosmos.slashing.{v1beta1 => slashingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
+import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.core.channel.v1.{Tx => channelTx}
-import ibc.core.client.v1.{Tx => clientTx}
-import ibc.core.connection.v1.{Tx => connectionTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.core.channel.{v1 => channelTx}
+import com.ibc.core.client.{v1 => clientTx}
+import com.ibc.core.connection.{v1 => connectionTx}
+import com.metas.{transactions => metasTransactions}
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
@@ -46,6 +48,7 @@ class Block @Inject()(
                        blockchainProposalDeposits: blockchain.ProposalDeposits,
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
+                       blockchainMetaDatas: blockchain.MetaDatas,
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
                        blockchainParameters: blockchain.Parameters,
@@ -67,7 +70,7 @@ class Block @Inject()(
 
   private implicit val module: String = constants.Module.SERVICES_BLOCK
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val webSocketMessageLang: Lang = Lang(configuration.get[String]("blockchain.explorer.webSocketMessageLang"))
 
@@ -202,7 +205,7 @@ class Block @Inject()(
         def updateOrDeleteFeeGrant(feeGrant: FeeGrant) = {
           val response = feeGrant.getAllowance.validate(blockTime = header.time, fees = transaction.getFee.amount)
           if (response.delete) blockchainFeeGrants.Service.delete(granter = transaction.getFeeGranter, grantee = grantee)
-          else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated.toProto.toByteArray))
+          else blockchainFeeGrants.Service.insertOrUpdate(feeGrant.copy(allowance = response.updated.toProto.toByteString.toByteArray))
         }
 
         for {
@@ -308,6 +311,8 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue))
       //ibc-transfer
       case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
+      //metas
+      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }
@@ -329,7 +334,7 @@ class Block @Inject()(
       val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == constants.Blockchain.Event.Attribute.Reason))) { slashingEvent =>
         slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
           val slashingReason = Future(slashingReasonAttribute.value.getOrElse(throw new BaseException(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND)))
-          val hexAddress = utilities.Bech32.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
+          val hexAddress = commonUtilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
@@ -399,7 +404,7 @@ class Block @Inject()(
     def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
       val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
       val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
-      val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Bech32.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
+      val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(commonUtilities.Crypto.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
 
       (for {
         validator <- validator

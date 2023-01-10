@@ -1,8 +1,8 @@
 package models.common
 
-import cosmos.base.v1beta1.CoinOuterClass
+import com.cosmos.base.v1beta1.{Coin => protoCoin}
 import exceptions.BaseException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import utilities.Date.RFC3339
@@ -12,7 +12,7 @@ object Serializable {
 
   private implicit val module: String = constants.Module.SERIALIZABLE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   case class SocialProfile(platform: String, username: String, url: String)
 
@@ -80,11 +80,11 @@ object Serializable {
       result
     }
 
-    def toProtoCoin: CoinOuterClass.Coin = cosmos.base.v1beta1.CoinOuterClass.Coin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
+    def toProtoCoin: protoCoin = protoCoin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
   }
 
   object Coin {
-    def apply(coinProto: CoinOuterClass.Coin): Coin = Coin(denom = coinProto.getDenom, amount = MicroNumber(BigInt(coinProto.getAmount)))
+    def apply(coinProto: protoCoin): Coin = Coin(denom = coinProto.getDenom, amount = MicroNumber(BigInt(coinProto.getAmount)))
 
   }
 

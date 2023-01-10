@@ -6,7 +6,8 @@ import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.Abstract.Account
 import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
@@ -54,7 +55,7 @@ class Startup @Inject()(
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 
@@ -216,7 +217,7 @@ class Startup @Inject()(
   })
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
-    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteArray, expiration = authorization.expiration.epoch))
+    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
     (for {
       _ <- insert
     } yield ()
@@ -226,7 +227,7 @@ class Startup @Inject()(
   })
 
   def insertFeeGrantsOnStart(allowances: Seq[FeeGrant.Allowance]): Future[Seq[Unit]] = utilitiesOperations.traverse(allowances)(allowance => {
-    val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.value.toSerializable.toProto.toByteArray))
+    val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.value.toSerializable.toProto.toByteString.toByteArray))
     (for {
       _ <- insert
     } yield ()

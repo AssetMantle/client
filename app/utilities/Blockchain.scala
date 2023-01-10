@@ -1,20 +1,20 @@
 package utilities
 
-import cosmos.authz.v1beta1.{Tx => authzTx}
-import cosmos.bank.v1beta1.{Tx => bankTx}
-import cosmos.crisis.v1beta1.{Tx => crisisTx}
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
-import cosmos.evidence.v1beta1.{Tx => evidenceTx}
-import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
-import cosmos.gov.v1beta1.{Tx => govTx}
-import cosmos.slashing.v1beta1.{Tx => slashingTx}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
-import cosmos.vesting.v1beta1.{Tx => VestingTx}
+import com.cosmos.authz.{v1beta1 => authzTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
+import com.cosmos.crisis.{v1beta1 => crisisTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
+import com.cosmos.evidence.{v1beta1 => evidenceTx}
+import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+import com.cosmos.gov.{v1beta1 => govTx}
+import com.cosmos.slashing.{v1beta1 => slashingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
+import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.core.channel.v1.{Tx => channelTx}
-import ibc.core.client.v1.{Tx => clientTx}
-import ibc.core.connection.v1.{Tx => connectionTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.core.channel.{v1 => channelTx}
+import com.ibc.core.client.{v1 => clientTx}
+import com.ibc.core.connection.{v1 => connectionTx}
 import models.Abstract.{Authorization, FeeAllowance}
 import models.blockchain.Transaction
 import models.common.Serializable.Coin
@@ -22,7 +22,7 @@ import models.masterTransaction.WalletTransaction
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPublicKeyParameters}
 import org.bouncycastle.crypto.signers.ECDSASigner
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import utilities.Date.RFC3339
 
 import java.math.BigInteger
@@ -30,7 +30,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object Blockchain {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.UTILITIES_BLOCKCHAIN
 

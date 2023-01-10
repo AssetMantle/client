@@ -1,9 +1,9 @@
 @import views.html.base.infos._
 @import views.html.base.buttons._
-@import cosmos.vesting.v1beta1.Tx
+@import com.cosmos.vesting.v1beta1._
 @import models.common.Serializable.Coin
 
-@(msg: Tx.MsgCreateVestingAccount)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(msg: MsgCreateVestingAccount)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFromAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFromAddress}'))")))
 @commonHtmlInfo(constants.View.TO, commonJavascriptLink(msg.getToAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getToAddress}'))")))

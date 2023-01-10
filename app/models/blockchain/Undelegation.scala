@@ -1,14 +1,15 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import cosmos.staking.v1beta1.{Tx => stakingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.UndelegationEntry
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetValidatorDelegatorUndelegation
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import queries.responses.common.Header
@@ -39,7 +40,7 @@ class Undelegations @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_UNDELEGATION
 
@@ -197,7 +198,7 @@ class Undelegations @Inject()(
 
     def unbond(delegation: Delegation, validator: Validator, shares: BigDecimal): Future[MicroNumber] = {
       if (delegation.validatorAddress == validator.operatorAddress && delegation.shares >= shares) {
-        val isDelegatorValidator = utilities.Bech32.convertOperatorAddressToAccountAddress(validator.operatorAddress) == delegation.delegatorAddress
+        val isDelegatorValidator = commonUtilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress) == delegation.delegatorAddress
 
         val withdrawDelegatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(delegation.delegatorAddress)
 
@@ -214,7 +215,7 @@ class Undelegations @Inject()(
         val deleteOrUpdateValidator = if (deleteValidator) blockchainValidators.Service.delete(validator.operatorAddress)
         else blockchainValidators.Service.insertOrUpdate(updatedValidator)
 
-        val withdrawValidatorRewards = if (deleteValidator) blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Bech32.convertOperatorAddressToAccountAddress(delegation.validatorAddress)) else Future()
+        val withdrawValidatorRewards = if (deleteValidator) blockchainWithdrawAddresses.Utility.withdrawRewards(commonUtilities.Crypto.convertOperatorAddressToAccountAddress(delegation.validatorAddress)) else Future()
 
         (for {
           _ <- withdrawDelegatorRewards

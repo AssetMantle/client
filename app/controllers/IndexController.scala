@@ -2,10 +2,11 @@ package controllers
 
 import constants.AppConfig._
 import controllers.actions._
+import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -19,7 +20,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 cached: Cached,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 

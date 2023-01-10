@@ -2,7 +2,8 @@ package queries.blockchain
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.responses.blockchain.ProposalVoteResponse.Response
 
 import java.net.ConnectException
@@ -14,7 +15,7 @@ class GetProposalVote @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private implicit val module: String = constants.Module.QUERIES_GET_PROPOSAL_VOTE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val url = constants.Blockchain.RestEndPoint + "/cosmos/gov/v1beta1/proposals"
 

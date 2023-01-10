@@ -1,7 +1,7 @@
 package models.common
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
 import models.Abstract.Authorization
 import models.common.Serializable.Coin
 import utilities.Blockchain.Authz.ValidateResponse
@@ -17,14 +17,14 @@ object Authz {
     def getMsgTypeURL: String = constants.Blockchain.TransactionMessage.SEND_COIN
 
     def validate(stdMsg: protoAny): ValidateResponse = {
-      val (limitLeft, _) = utilities.Blockchain.subtractCoins(spendLimit, cosmos.bank.v1beta1.Tx.MsgSend.parseFrom(stdMsg.getValue).getAmountList.asScala.toSeq.map(x => Coin(x)))
+      val (limitLeft, _) = utilities.Blockchain.subtractCoins(spendLimit, com.cosmos.bank.v1beta1.MsgSend.parseFrom(stdMsg.getValue).getAmountList.asScala.toSeq.map(x => Coin(x)))
       if (limitLeft.exists(_.isZero)) ValidateResponse(accept = true, delete = true, updated = None)
       else ValidateResponse(accept = true, delete = false, updated = Option(SendAuthorization(spendLimit = limitLeft)))
     }
 
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(constants.Blockchain.Authz.SEND_AUTHORIZATION)
-      .setValue(cosmos.bank.v1beta1.Authz.SendAuthorization.newBuilder()
+      .setValue(com.cosmos.bank.v1beta1.SendAuthorization.newBuilder()
         .addAllSpendLimit(spendLimit.map(_.toProtoCoin).asJava)
         .build()
         .toByteString
@@ -40,7 +40,7 @@ object Authz {
 
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(constants.Blockchain.Authz.GENERIC_AUTHORIZATION)
-      .setValue(cosmos.authz.v1beta1.Authz.GenericAuthorization.newBuilder()
+      .setValue(com.cosmos.authz.v1beta1.GenericAuthorization.newBuilder()
         .setMsg(this.msg)
         .build()
         .toByteString
@@ -52,7 +52,7 @@ object Authz {
   case class StakeAuthorizationValidators(address: Seq[String])
 
   object StakeAuthorizationValidators {
-    def fromProtoAny(protoValidators: cosmos.staking.v1beta1.Authz.StakeAuthorization.Validators): StakeAuthorizationValidators = StakeAuthorizationValidators(protoValidators.getAddressList.asScala.toSeq)
+    def fromProtoAny(protoValidators: com.cosmos.staking.v1beta1.StakeAuthorization.Validators): StakeAuthorizationValidators = StakeAuthorizationValidators(protoValidators.getAddressList.asScala.toSeq)
   }
 
   case class StakeAuthorization(maxTokens: Coin, allowList: StakeAuthorizationValidators, denyList: StakeAuthorizationValidators, authorizationType: String) extends Authorization {
@@ -60,7 +60,7 @@ object Authz {
       case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => constants.Blockchain.TransactionMessage.DELEGATE
       case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => constants.Blockchain.TransactionMessage.UNDELEGATE
       case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_REDELEGATE => constants.Blockchain.TransactionMessage.REDELEGATE
-      case _ => cosmos.staking.v1beta1.Authz.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED.toString
+      case _ => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED.toString
     }
 
     def validate(stdMsg: protoAny): ValidateResponse = if (maxTokens.denom == "") {
@@ -78,9 +78,9 @@ object Authz {
 
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(constants.Blockchain.Authz.STAKE_AUTHORIZATION)
-      .setValue(cosmos.staking.v1beta1.Authz.StakeAuthorization.newBuilder()
+      .setValue(com.cosmos.staking.v1beta1.StakeAuthorization.newBuilder()
         .setMaxTokens(this.maxTokens.toProtoCoin)
-        .setAuthorizationType(cosmos.staking.v1beta1.Authz.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED)
+        .setAuthorizationType(com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED)
         .build()
         .toByteString
       ).build()

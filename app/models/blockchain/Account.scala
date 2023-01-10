@@ -1,13 +1,14 @@
 package models.blockchain
 
-import cosmos.vesting.v1beta1.Tx
+import com.cosmos.vesting.v1beta1._
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Serializable.Vesting.VestingParameters
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import queries.responses.common.Header
@@ -32,7 +33,7 @@ class Accounts @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ACCOUNT
 
@@ -111,7 +112,7 @@ class Accounts @Inject()(
 
   object Utility {
 
-    def onCreateVestingAccount(createVestingAccount: Tx.MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
+    def onCreateVestingAccount(createVestingAccount: MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
       val insert = insertOrUpdateAccountWithoutAnyTx(createVestingAccount.getToAddress)
       val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.getToAddress)
 

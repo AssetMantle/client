@@ -1,6 +1,6 @@
 @import views.html.base.infos._
 @import views.html.base.buttons._
-@import cosmos.staking.v1beta1.{Tx => stakingTx}
+@import com.cosmos.staking.{v1beta1 => stakingTx}
 @import models.common.Serializable.Coin
 
 @(msg: stakingTx.MsgDelegate)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)

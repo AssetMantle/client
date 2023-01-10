@@ -1,7 +1,6 @@
 package constants
 
-
-import play.api.routing.JavaScriptReverseRoute
+import response._
 
 object Response {
 
@@ -133,26 +132,4 @@ object Response {
   val AUTHORIZATION_DELETE_FAILED = new Failure("AUTHORIZATION_DELETE_FAILED")
   val GRANT_AUTHORIZATION_NOT_FOUND = new Failure("GRANT_AUTHORIZATION_NOT_FOUND")
   val EMPTY_QUERY = new Failure("EMPTY_QUERY")
-
-  class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
-    val message: String = PREFIX + FAILURE_PREFIX + response
-    val action: String = utilities.String.getJsRouteString(actionController)
-    val logMessage: String = LOG_PREFIX + response
-  }
-
-  class Warning(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
-    val message: String = PREFIX + WARNING_PREFIX + response
-    val action: String = utilities.String.getJsRouteString(actionController)
-  }
-
-  class Success(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
-    val message: String = Response.PREFIX + Response.SUCCESS_PREFIX + response
-    val action: String = utilities.String.getJsRouteString(actionController)
-  }
-
-  class Info(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
-    val message: String = PREFIX + INFO_PREFIX + response
-    val action: String = utilities.String.getJsRouteString(actionController)
-  }
-
 }

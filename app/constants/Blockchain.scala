@@ -266,10 +266,10 @@ object Blockchain {
     //ibc-transfer
     val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
-    val ASSET_DEFINE = "/xprt/assets/define/message"
-    val ASSET_MINT = "/xprt/assets/mint/message"
-    val ASSET_MUTATE = "/xprt/assets/mutate/message"
-    val ASSET_BURN = "/xprt/assets/burn/message"
+    val ASSET_DEFINE = "/assets.transactions.define.Message"
+    val ASSET_MINT = "/assets.transactions.mint.Message"
+    val ASSET_MUTATE = "/assets.transactions.mutate.Message"
+    val ASSET_BURN = "/assets.transactions.burn.Message"
     //identity
     val IDENTITY_DEFINE = "/xprt/identities/define/message"
     val IDENTITY_ISSUE = "/xprt/identities/issue/message"
@@ -286,9 +286,9 @@ object Blockchain {
     val ORDER_TAKE = "/xprt/orders/take/message"
     val ORDER_CANCEL = "/xprt/orders/cancel/message"
     //metaList
-    val META_REVEAL = "/xprt/metas/reveal/message"
+    val META_REVEAL = "/metas.transactions.reveal.Message"
     //maintainer
-    val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
+    val MAINTAINER_DEPUTIZE = "/maintainers.transactions.deputize.Message"
   }
 
 
