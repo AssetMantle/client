@@ -29,6 +29,7 @@ class Identities @Inject()(
                             blockchainMetas: Metas,
                             blockchainClassifications: Classifications,
                             blockchainMaintainers: Maintainers,
+                            masterClassifications: master.Classifications,
                             utilitiesOperations: utilities.Operations
                           )(implicit executionContext: ExecutionContext) {
 
@@ -140,10 +141,18 @@ class Identities @Inject()(
         } yield classificationID
       }
 
+      def masterOperations(classificationID: ClassificationID) = {
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID.asString, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
+        for {
+          _ <- insert
+        } yield ()
+      }
+
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
         classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)

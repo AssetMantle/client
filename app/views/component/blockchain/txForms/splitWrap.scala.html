@@ -1,0 +1,11 @@
+@import views.companion.blockchain.SplitWrap
+@import views.html.base.form._
+@import views.html.base.buttons._
+
+@(splitWrapForm: Form[SplitWrap.Data] = SplitWrap.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.SPLIT_WRAP, splitWrapForm) {
+    @commonInputText(splitWrapForm, constants.FormField.FROM_ID)
+    @commonInputMicroNumber(splitWrapForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addCoins(splitWrapForm, constants.FormField.COINS, constants.FormField.ADD_FIELD)
+    @commonInputPassword(splitWrapForm, constants.FormField.PASSWORD)
+}

@@ -1,0 +1,14 @@
+@import views.companion.blockchain.OrderDefine
+@import views.html.base.form._
+@import views.html.base.buttons._
+
+@(orderDefineForm: Form[OrderDefine.Data] = OrderDefine.form, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ORDER_DEFINE, orderDefineForm) {
+    @commonInputText(orderDefineForm, constants.FormField.FROM_ID)
+    @commonInputMicroNumber(orderDefineForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.IMMUTABLE_META_TRAITS, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.IMMUTABLE_TRAITS, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.MUTABLE_META_TRAITS, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(orderDefineForm, constants.FormField.MUTABLE_TRAITS, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
+    @commonInputPassword(orderDefineForm, constants.FormField.PASSWORD, 'required -> false)
+}

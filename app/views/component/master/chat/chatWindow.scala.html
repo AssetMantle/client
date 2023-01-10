@@ -1,0 +1,32 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.{Message, MessageRead}
+@import views.companion.master.SendMessage
+@import views.html.component.master.chat.sendMessage
+
+@(sendMessageForm: Form[SendMessage.Data] = SendMessage.form, chats: Seq[Message], readChats: Seq[MessageRead], chatID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState)
+@if(chats.nonEmpty) {
+    @if(!readChats.exists(x => x.messageID == chats.head.id && x.accountID == loginState.username) && chats.head.fromAccountID != loginState.username) {
+        <div onclick="markChatRead(jsRoutes.controllers.ChatController.markChatAsRead('@chatID'))" style="font-size: 12px;">
+        }
+}
+<div id="@chatID"></div>
+<div id="chatMessages" class="chat chatMessagesContainer">
+    <script>
+            componentResource('chatMessages', jsRoutes.controllers.ChatController.loadMoreChats('@chatID', 0), 'CHAT_LOADING', 'chat')
+    </script>
+</div>
+
+<div>
+@if(chats.nonEmpty) {
+    <div style="font-size: 12px;">@Messages(constants.View.READ_BY)
+        : @readChats.filter(_.messageID == chats.head.id).map(_.accountID).mkString</div>
+}
+</div>
+<div class="chatForm">
+@sendMessage(sendMessageForm)
+</div>
+</div>
+<script>
+        loadMoreChatsOnScroll('@chatID');
+</script>
+

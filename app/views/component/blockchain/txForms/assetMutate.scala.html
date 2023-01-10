@@ -1,0 +1,13 @@
+@import views.companion.blockchain.AssetMutate
+@import views.html.base.form._
+@import views.html.base.buttons._
+
+@(assetMutateForm: Form[AssetMutate.Data] = AssetMutate.form, assetID: String, fromID: String, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonForm(constants.Form.ASSET_MUTATE, assetMutateForm) {
+    @commonInputText(assetMutateForm, constants.FormField.FROM_ID, 'value -> fromID, 'readonly -> true)
+    @commonInputText(assetMutateForm, constants.FormField.ASSET_ID, 'value -> assetID, 'readonly -> true)
+    @commonInputMicroNumber(assetMutateForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(assetMutateForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
+    @commonInputPassword(assetMutateForm, constants.FormField.PASSWORD, 'required -> false)
+}

@@ -1,0 +1,79 @@
+@import controllers.actions.LoginState
+@import views.html.base.infos._
+@import queries.responses.memberCheck.CorporateScanResultResponse
+@(response: CorporateScanResultResponse.Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<legend class="cmuk-legend">
+    @Messages(constants.View.MEMBER_CHECK_CORPORATE_SCAN_RESULT)
+</legend>
+<hr>
+    @commonIntInfo(constants.View.ID, response.id)
+    @commonIntInfo(constants.View.UNIQUE_ID, response.entity.uniqueId)
+    @commonTextInfo(constants.View.CATEGORIES, response.entity.categories)
+    @commonTextInfo(constants.View.SUBCATEGORY, response.entity.subcategory.getOrElse(""))
+    @commonTextInfo(constants.View.PRIMARY_NAME, response.entity.primaryName)
+    @commonTextInfo(constants.View.PRIMARY_LOCATION, response.entity.primaryLocation.getOrElse(""))
+    @Messages(constants.View.GENERAL_INFO) : @response.entity.generalInfo
+    @commonTextInfo(constants.View.FURTHER_INFORMATION, response.entity.furtherInformation.getOrElse(""))
+    @Messages(constants.View.XML_FURTHER_INFORMATION) : @response.entity.xmlFurtherInformation
+    @commonTextInfo(constants.View.ENTER_DATE, response.entity.enterDate.getOrElse(""))
+    @commonTextInfo(constants.View.LAST_REVIEWED, response.entity.lastReviewed.getOrElse(""))
+<div class="cmuk-text-left title">@Messages(constants.View.DESCRIPTIONS)</div>
+    @response.entity.descriptions.map {description =>
+        @commonTextInfo(constants.View.DESCRIPTION_1, description.description1)
+        @commonTextInfo(constants.View.DESCRIPTION_2, description.description2)
+        @commonTextInfo(constants.View.DESCRIPTION_3, description.description3)
+    }
+<div class="cmuk-text-left title">@Messages(constants.View.NAME_DETAILS)</div>
+    @response.entity.nameDetails.map {nameDetail =>
+        @commonTextInfo(constants.View.NAME_TYPE, nameDetail.nameType)
+        @commonTextInfo(constants.View.ENTITY_NAME, nameDetail.entityName)
+    }
+    @Messages(constants.View.ORIGINAL_SCRIPT_NAMES) : @response.entity.originalScriptNames
+<div class="cmuk-text-left title"> @Messages(constants.View.LOCATIONS)</div>
+    @response.entity.locations.map {location =>
+        @commonTextInfo(constants.View.COUNTRY, location.country)
+        @commonTextInfo(constants.View.CITY, location.city.getOrElse(""))
+        @commonTextInfo(constants.View.ADDRESS, location.address)
+    }
+<div class="cmuk-text-left title">@Messages(constants.View.COUNTRIES)</div>
+    @response.entity.countries.map {country =>
+        @commonTextInfo(constants.View.COUNTRY_TYPE, country.countryType)
+        @commonTextInfo(constants.View.COUNTRY_VALUE, country.countryValue)
+    }
+<div class="cmuk-text-left title">@Messages(constants.View.OFFICIAL_LISTS)</div>
+    @response.entity.officialLists.map {officialList =>
+        @commonTextInfo(constants.View.KEYWORD, officialList.keyword)
+        @commonTextInfo(constants.View.CATEGORY, officialList.category)
+        @commonTextInfo(constants.View.DESCRIPTION, officialList.description)
+        @commonTextInfo(constants.View.COUNTRY, officialList.country)
+        @commonBooleanInfo(constants.View.IS_CURRENT, Some(officialList.isCurrent))
+    }
+<div class="cmuk-text-left title">@Messages(constants.View.ID_NUMBERS)</div>
+    @response.entity.idNumbers.map {idNumber =>
+        @commonTextInfo(constants.View.TYPE, idNumber.`type`)
+        @commonTextInfo(constants.View.ID_NOTES, idNumber.idNotes)
+        @commonTextInfo(constants.View.NUMBER, idNumber.number)
+    }
+<div class="cmuk-text-left title">@Messages(constants.View.SOURCES)</div>
+    @response.entity.sources.map {source =>
+        @commonTextInfo(constants.View.URL, source.url)
+        @commonTextInfo(constants.View.CATEGORIES, source.categories)
+        @commonTextInfo(constants.View.DATES, source.dates)
+    }
+    <div class="cmuk-text-left title">@Messages(constants.View.LINKED_INDIVIDUALS)</div>
+    @response.entity.linkedIndividuals.map {linkedIndividual =>
+        @commonTextInfo(constants.View.FIRST_NAME, linkedIndividual.firstName)
+        @commonTextInfo(constants.View.MIDDLE_NAME, linkedIndividual.middleName.getOrElse(""))
+        @commonTextInfo(constants.View.LAST_NAME, linkedIndividual.lastName)
+        @commonTextInfo(constants.View.OTHER_CATEGORIES, linkedIndividual.otherCategories)
+        @commonTextInfo(constants.View.SUB_CATEGORIES, linkedIndividual.subcategories.getOrElse(""))
+        @commonTextInfo(constants.View.DESCRIPTIONS, linkedIndividual.description.getOrElse(""))
+    }
+
+<div class="cmuk-text-left title">@Messages(constants.View.LINKED_COMPANIES)</div>
+    @response.entity.linkedCompanies.map {linkedCompany =>
+        @commonTextInfo(constants.View.NAME, linkedCompany.name)
+        @commonTextInfo(constants.View.CATEGORIES, linkedCompany.categories)
+        @commonTextInfo(constants.View.SUB_CATEGORIES, linkedCompany.subcategories.getOrElse(""))
+        @commonTextInfo(constants.View.DESCRIPTIONS, linkedCompany.description.getOrElse(""))
+    }

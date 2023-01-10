@@ -1,7 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
-import models.Trait.Logging
+import models.Trait.Logged
 import models.common.Serializable.Fee
 import models.common.TransactionMessages.StdMsg
 import org.postgresql.util.PSQLException
@@ -11,12 +11,13 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
+import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Transaction(hash: String, height: Int, code: Int, rawLog: String, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: RFC3339, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Transaction(hash: String, height: Int, code: Int, rawLog: String, gasWanted: String, gasUsed: String, messages: Seq[StdMsg], fee: Fee, memo: String, timestamp: RFC3339, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged {
 
   def status: Boolean = code == 0
 
@@ -60,11 +61,11 @@ class Transactions @Inject()(
 
   private[models] val transactionTable = TableQuery[TransactionTable]
 
-  case class TransactionSerialized(hash: String, height: Int, code: Int, rawLog: String, gasWanted: String, gasUsed: String, messages: String, fee: String, memo: String, timestamp: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), memo = memo, timestamp = RFC3339(timestamp), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class TransactionSerialized(hash: String, height: Int, code: Int, rawLog: String, gasWanted: String, gasUsed: String, messages: String, fee: String, memo: String, timestamp: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
+    def deserialize: Transaction = Transaction(hash = hash, height = height, code = code, rawLog = rawLog, gasWanted = gasWanted, gasUsed = gasUsed, messages = utilities.JSON.convertJsonStringToObject[Seq[StdMsg]](messages), fee = utilities.JSON.convertJsonStringToObject[Fee](fee), memo = memo, timestamp = RFC3339(timestamp), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
   }
 
-  def serialize(transaction: Transaction): TransactionSerialized = TransactionSerialized(hash = transaction.hash, height = transaction.height, code = transaction.code, rawLog = transaction.rawLog, gasWanted = transaction.gasWanted, gasUsed = transaction.gasUsed, messages = Json.toJson(transaction.messages).toString, fee = Json.toJson(transaction.fee).toString, memo = transaction.memo, timestamp = transaction.timestamp.toString, createdBy = transaction.createdBy, createdOnMillisEpoch = transaction.createdOnMillisEpoch, updatedBy = transaction.updatedBy, updatedOnMillisEpoch = transaction.updatedOnMillisEpoch)
+  def serialize(transaction: Transaction): TransactionSerialized = TransactionSerialized(hash = transaction.hash, height = transaction.height, code = transaction.code, rawLog = transaction.rawLog, gasWanted = transaction.gasWanted, gasUsed = transaction.gasUsed, messages = Json.toJson(transaction.messages).toString, fee = Json.toJson(transaction.fee).toString, memo = transaction.memo, timestamp = transaction.timestamp.toString, createdBy = transaction.createdBy, createdOn = transaction.createdOn, createdOnTimeZone = transaction.createdOnTimeZone, updatedBy = transaction.updatedBy, updatedOn = transaction.updatedOn, updatedOnTimeZone = transaction.updatedOnTimeZone)
 
   private def add(transaction: Transaction): Future[Int] = db.run((transactionTable returning transactionTable.map(_.height) += serialize(transaction)).asTry).map {
     case Success(result) => result
@@ -133,7 +134,7 @@ class Transactions @Inject()(
 
   private[models] class TransactionTable(tag: Tag) extends Table[TransactionSerialized](tag, "Transaction") {
 
-    def * = (hash, height, code, rawLog, gasWanted, gasUsed, messages, fee, memo, timestamp, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
+    def * = (hash, height, code, rawLog, gasWanted, gasUsed, messages, fee, memo, timestamp, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (TransactionSerialized.tupled, TransactionSerialized.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 
@@ -157,11 +158,15 @@ class Transactions @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
+    def createdOn = column[Timestamp]("createdOn")
+
+    def createdOnTimeZone = column[String]("createdOnTimeZone")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
+    def updatedOn = column[Timestamp]("updatedOn")
+
+    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
 
   object Service {

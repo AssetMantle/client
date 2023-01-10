@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Split
-@import models.blockchain.Asset
+@import models.master.Asset
 @import views.html.base.form._
 @import views.html.base.cards._
 @import views.html.base.infos._
@@ -9,6 +9,7 @@
 @(splits: Seq[Split], allDenoms: Seq[String], assets: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState)
 
 @commonCard(constants.View.ACCOUNT_SPLITS) {
+    @commonFormButton(constants.Form.SPLIT_WRAP)
 } {
     @splits.map { split =>
         @commonVerticalInfoBox() {
@@ -17,6 +18,14 @@
                 @commonVerticalTextInfo(constants.View.ENTITY_TYPE, entityType)
                 @commonVerticalTextInfo(constants.View.OWNER_ID, split.ownerID)
                 @commonVerticalDoubleInfo(constants.View.AMOUNT, split.split.toDouble)
+                @if(entityType != constants.Blockchain.Entity.ASSET) {
+                    <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_UNWRAP, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                    </div>
+                }
+                <div class="listItemChild cmuk-flex cmuk-flex-middle">
+                    @commonFormButton(constants.Form.SPLIT_SEND, 'parameters -> s"'${split.ownableID}', '${split.ownerID}'")
+                </div>
             }
         }
     }

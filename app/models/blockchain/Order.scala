@@ -6,6 +6,7 @@ import models.common.DataValue._
 import models.common.ID.{ClassificationID, IdentityID, OrderID}
 import models.common.Serializable._
 import models.common.TransactionMessages.{OrderCancel, OrderDefine, OrderMake, OrderTake}
+import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -38,6 +39,8 @@ class Orders @Inject()(
                         blockchainMetas: Metas,
                         blockchainClassifications: Classifications,
                         blockchainMaintainers: Maintainers,
+                        masterClassifications: master.Classifications,
+                        masterOrders: master.Orders,
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -179,10 +182,19 @@ class Orders @Inject()(
         } yield classificationID
       }
 
+      def masterOperations(classificationID: ClassificationID) = {
+        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID.asString, entityType = constants.Blockchain.Entity.ORDER_DEFINITION, maintainerID = orderDefine.fromID, status = Option(true))
+
+        for {
+          _ <- insert
+        } yield ()
+      }
+
       (for {
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
         scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
         classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
+        _ <- masterOperations(classificationID)
       } yield ()
         ).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
@@ -226,6 +238,14 @@ class Orders @Inject()(
         oldOrder.fold(Service.insertOrUpdate(Order(id = orderID, mutables = mutables, immutables = immutables)))(x => Service.insertOrUpdate(x.copy(mutables = x.mutables.mutate(mutables.properties.propertyList))))
       }
 
+      def masterOperations(orderID: OrderID) = {
+        val insert = masterOrders.Service.insertOrUpdate(master.Order(id = orderID.asString, makerOwnableID = orderMake.makerOwnableID, takerOwnableID = orderMake.takerOwnableID, makerID = orderMake.fromID, status = Option(true)))
+
+        for {
+          _ <- insert
+        } yield ()
+      }
+
       (for {
         _ <- transferAuxiliary
         scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
@@ -235,6 +255,7 @@ class Orders @Inject()(
         makerOwnableSplit <- getNewMakerOwnableSplit(oldOrder)
         (scrubbedMutableMetaProperties, mutableMetaProperties) <- scrubMutableMetaProperties(makerOwnableSplit)
         _ <- upsertOrder(oldOrder, scrubbedMutableMetaProperties, orderID, immutables)
+        _ <- masterOperations(orderID)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_MAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
@@ -295,11 +316,19 @@ class Orders @Inject()(
         } yield ()
       }
 
+      def masterOperations(orderID: String, orderDeleted: Boolean, metaMutables: Seq[MetaProperty]): Future[Unit] = if (orderDeleted) {
+        val deleteOrder = masterOrders.Service.delete(orderID)
+        for {
+          _ <- deleteOrder
+        } yield ()
+      } else Future()
+
       (for {
         oldOrder <- oldOrder
         (makerOwnableSplit, exchangeRate, takerID) <- getData(oldOrder)
         (sendMakerOwnableSplit, sendTakerOwnableSplit, orderDeleted, metaMutables) <- updateOrRemoveOrder(oldOrder = oldOrder, makerOwnableSplit = makerOwnableSplit, exchangeRate = exchangeRate)
         _ <- transferSplits(oldOrder = oldOrder, sendTakerOwnableSplit = sendTakerOwnableSplit, sendMakerOwnableSplit = sendMakerOwnableSplit)
+        _ <- masterOperations(orderID = orderTake.orderID, orderDeleted = orderDeleted, metaMutables = metaMutables)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_TAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }
@@ -315,11 +344,19 @@ class Orders @Inject()(
 
       def removeOrder() = Service.delete(orderID)
 
+      def masterOperations(orderID: String): Future[Unit] = {
+        val deleteOrder = masterOrders.Service.delete(orderID)
+        for {
+          _ <- deleteOrder
+        } yield ()
+      }
+
       (for {
         oldOrder <- oldOrder
         makerOwnableSplitData <- getMakerOwnableSplitData(oldOrder)
         _ <- auxiliaryTransfer(oldOrder, makerOwnableSplitData.value.asDec)
         _ <- removeOrder()
+        _ <- masterOperations(orderCancel.orderID)
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ORDER_CANCEL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }

@@ -80,6 +80,8 @@ object FormField {
   //SelectFormField
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
   val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
+  val MATCH_DECISION = new SelectFormField("MATCH_DECISION", constants.SelectFieldOptions.MATCH_DECISION)
+  val ASSESSED_RISK = new SelectFormField("ASSESSED_RISK", constants.SelectFieldOptions.ASSESSED_RISK)
   val REGISTERED_COUNTRY = new SelectFormField("REGISTERED_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val POSTAL_COUNTRY = new SelectFormField("POSTAL_COUNTRY", constants.SelectFieldOptions.COUNTRIES)
   val COUNTRY = new SelectFormField("COUNTRY", constants.SelectFieldOptions.COUNTRIES)
