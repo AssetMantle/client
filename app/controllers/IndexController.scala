@@ -18,7 +18,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 cached: Cached,
-                                blockchainMetaDatas: models.blockchain.MetaDatas,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)

@@ -1,10 +1,10 @@
 package models.blockchain
 
-import cosmos.bank.v1beta1.{Tx => bankTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.applications.transfer.v2.Packet.FungibleTokenPacketData
-import ibc.core.channel.v1.{Tx => channelTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+import com.ibc.core.channel.{v1 => channelTx}
 import models.Trait.Logging
 import models.common.Serializable.Coin
 import org.postgresql.util.PSQLException

@@ -5,7 +5,7 @@ import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
 import models.Trait.Logging
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.Configuration

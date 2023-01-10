@@ -1,6 +1,6 @@
 package models.blockchain
 
-import cosmos.gov.v1beta1.{Tx => govTx}
+import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
 import models.Trait.Logging
 import models.common.Parameters.GovernanceParameter

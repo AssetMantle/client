@@ -1,16 +1,15 @@
 package models.Abstract
 
 import com.google.protobuf.{Any => protoAny}
-import cosmos.distribution.v1beta1.{Distribution => distributionProto}
-import cosmos.gov.v1beta1.{Gov => govProto}
-import cosmos.params.v1beta1.{Params => paramsProto}
-import cosmos.upgrade.v1beta1.{Upgrade => upgradeProto}
+import com.cosmos.distribution.{v1beta1 => distributionProto}
+import com.cosmos.gov.{v1beta1 => govProto}
+import com.cosmos.params.{v1beta1 => paramsProto}
+import com.cosmos.upgrade.{v1beta1 => upgradeProto}
 import models.common.ProposalContents._
 import models.common.Serializable.Coin
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
-
 
 abstract class ProposalContent {
   val title: String

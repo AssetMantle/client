@@ -2,21 +2,21 @@ package services
 
 import actors.{Message => actorsMessage}
 import com.google.protobuf.{Any => protoAny}
-import cosmos.authz.v1beta1.{Tx => authzTx}
-import cosmos.bank.v1beta1.{Tx => bankTx}
-import cosmos.crisis.v1beta1.{Tx => crisisTx}
-import cosmos.distribution.v1beta1.{Tx => distributionTx}
-import cosmos.evidence.v1beta1.{Tx => evidenceTx}
-import cosmos.feegrant.v1beta1.{Tx => feegrantTx}
-import cosmos.gov.v1beta1.{Tx => govTx}
-import cosmos.slashing.v1beta1.{Tx => slashingTx}
-import cosmos.staking.v1beta1.{Tx => stakingTx}
-import cosmos.vesting.v1beta1.{Tx => VestingTx}
+import com.cosmos.authz.{v1beta1 => authzTx}
+import com.cosmos.bank.{v1beta1 => bankTx}
+import com.cosmos.crisis.{v1beta1 => crisisTx}
+import com.cosmos.distribution.{v1beta1 => distributionTx}
+import com.cosmos.evidence.{v1beta1 => evidenceTx}
+import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+import com.cosmos.gov.{v1beta1 => govTx}
+import com.cosmos.slashing.{v1beta1 => slashingTx}
+import com.cosmos.staking.{v1beta1 => stakingTx}
+import com.cosmos.vesting.{v1beta1 => VestingTx}
 import exceptions.BaseException
-import ibc.applications.transfer.v1.{Tx => transferTx}
-import ibc.core.channel.v1.{Tx => channelTx}
-import ibc.core.client.v1.{Tx => clientTx}
-import ibc.core.connection.v1.{Tx => connectionTx}
+import com.ibc.applications.transfer.{v1 => transferTx}
+import com.ibc.core.channel.{v1 => channelTx}
+import com.ibc.core.client.{v1 => clientTx}
+import com.ibc.core.connection.{v1 => connectionTx}
 import com.metas.{transactions => metasTransactions}
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
