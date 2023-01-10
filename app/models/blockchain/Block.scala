@@ -1,7 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -9,12 +9,11 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Block(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Block(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Blocks @Inject()(
@@ -40,11 +39,11 @@ class Blocks @Inject()(
 
   private[models] val blockTable = TableQuery[BlockTable]
 
-  case class BlockSerialized(height: Int, time: String, proposerAddress: String, validators: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Block = Block(height = height, time = RFC3339(time), proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class BlockSerialized(height: Int, time: String, proposerAddress: String, validators: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Block = Block(height = height, time = RFC3339(time), proposerAddress = proposerAddress, validators = utilities.JSON.convertJsonStringToObject[Seq[String]](validators), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(block: Block): BlockSerialized = BlockSerialized(height = block.height, time = block.time.toString, proposerAddress = block.proposerAddress, validators = Json.toJson(block.validators).toString, createdBy = block.createdBy, createdOn = block.createdOn, createdOnTimeZone = block.createdOnTimeZone, updatedBy = block.updatedBy, updatedOn = block.updatedOn, updatedOnTimeZone = block.updatedOnTimeZone)
+  def serialize(block: Block): BlockSerialized = BlockSerialized(height = block.height, time = block.time.toString, proposerAddress = block.proposerAddress, validators = Json.toJson(block.validators).toString, createdBy = block.createdBy, createdOnMillisEpoch = block.createdOnMillisEpoch, updatedBy = block.updatedBy, updatedOnMillisEpoch = block.updatedOnMillisEpoch)
 
   private def add(block: Block): Future[String] = db.run((blockTable returning blockTable.map(_.height) += serialize(block)).asTry).map {
     case Success(result) => result.toString
@@ -92,7 +91,7 @@ class Blocks @Inject()(
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, "Block") {
 
-    def * = (height, time, proposerAddress, validators, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (BlockSerialized.tupled, BlockSerialized.unapply)
+    def * = (height, time, proposerAddress, validators, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BlockSerialized.tupled, BlockSerialized.unapply)
 
     def height = column[Int]("height", O.PrimaryKey)
 
@@ -104,15 +103,11 @@ class Blocks @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

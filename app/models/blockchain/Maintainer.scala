@@ -24,7 +24,6 @@ case class Maintainer(id: MaintainerID, maintainedTraits: Mutables, addMaintaine
 class Maintainers @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
-                             masterClassifications: master.Classifications
                            )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -141,20 +140,8 @@ class Maintainers @Inject()(
       val maintainerID = MaintainerID(classificationID = maintainerDeputize.classificationID, identityID = maintainerDeputize.toID)
       val upsert = Service.insertOrUpdate(Maintainer(id = maintainerID, maintainedTraits = Mutables(maintainerDeputize.maintainedTraits), addMaintainer = maintainerDeputize.addMaintainer, removeMaintainer = maintainerDeputize.removeMaintainer, mutateMaintainer = maintainerDeputize.mutateMaintainer))
 
-      val masterOperations = {
-        val entityType = masterClassifications.Service.tryGetEntityType(id = maintainerDeputize.classificationID, maintainerID = maintainerDeputize.fromID)
-
-        def insertClassification(entityType: String) = masterClassifications.Service.insertOrUpdate(id = maintainerDeputize.classificationID, entityType = entityType, maintainerID = maintainerDeputize.toID, status = Option(true))
-
-        for {
-          entityType <- entityType
-          _ <- insertClassification(entityType)
-        } yield ()
-      }
-
       (for {
         _ <- upsert
-        _ <- masterOperations
       } yield ()).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.MAINTAINER_DEPUTIZE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
       }

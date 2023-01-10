@@ -9,14 +9,6 @@ GET         /javascriptRoutes                               controllers.JavaScri
 
 GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /docusign/send                                  controllers.DocusignController.send(id:String, documentType: String)
-GET         /docusign/sign                                  controllers.DocusignController.sign(id:String, documentType: String)
-GET         /docusign/authorization                         controllers.DocusignController.authorization
-
-#DO NOT CHANGE /Docusign CallBack ENDPOINT
-GET         /docusign/callBack                              controllers.DocusignController.callBack(envelopeId:String, event:String)
-GET         /docusign/authorizationCallBack                 controllers.DocusignController.authorizationCallBack(code:String)
-
 GET         /account                                        controllers.ViewController.account
 GET         /classification                                 controllers.ViewController.classification(id: String)
 GET         /meta                                           controllers.ViewController.meta(id: String)
@@ -40,50 +32,6 @@ GET         /block                                          controllers.Componen
 GET         /transaction                                    controllers.ComponentViewController.transaction(txHash: String)
 GET         /validator                                      controllers.ComponentViewController.validator(address: String)
 GET         /proposal                                       controllers.ComponentViewController.proposal(id: Int)
-
-GET         /profilePicture                                 controllers.ComponentViewController.profilePicture
-
-GET         /asset/define                                   controllers.AssetController.defineForm
-POST        /asset/define                                   controllers.AssetController.define
-GET         /asset/mint                                     controllers.AssetController.mintForm(classificationID: String)
-POST        /asset/mint                                     controllers.AssetController.mint
-GET         /asset/mutate                                   controllers.AssetController.mutateForm(assetID: String, fromID: String)
-POST        /asset/mutate                                   controllers.AssetController.mutate
-GET         /asset/burn                                     controllers.AssetController.burnForm(assetID: String, fromID: String)
-POST        /asset/burn                                     controllers.AssetController.burn
-
-GET         /identity/nub                                   controllers.IdentityController.nubForm
-POST        /identity/nub                                   controllers.IdentityController.nub
-GET         /identity/issue                                 controllers.IdentityController.issueForm(classificationID: String)
-POST        /identity/issue                                 controllers.IdentityController.issue
-GET         /identity/define                                controllers.IdentityController.defineForm
-POST        /identity/define                                controllers.IdentityController.define
-GET         /identity/provision                             controllers.IdentityController.provisionForm(identityID: String)
-POST        /identity/provision                             controllers.IdentityController.provision
-GET         /identity/unprovision                           controllers.IdentityController.unprovisionForm(identityID: String, address: String)
-POST        /identity/unprovision                           controllers.IdentityController.unprovision
-
-GET         /meta/reveal                                    controllers.MetaController.revealForm
-POST        /meta/reveal                                    controllers.MetaController.reveal
-
-GET         /maintainer/deputize                            controllers.MaintainerController.deputizeForm(classificationID: String, entityType: String)
-POST        /maintainer/deputize                            controllers.MaintainerController.deputize
-
-GET         /order/define                                   controllers.OrderController.defineForm
-POST        /order/define                                   controllers.OrderController.define
-GET         /order/make                                     controllers.OrderController.makeForm(classificationID: String)
-POST        /order/make                                     controllers.OrderController.make
-GET         /order/take                                     controllers.OrderController.takeForm(orderID: String)
-POST        /order/take                                     controllers.OrderController.take
-GET         /order/cancel                                   controllers.OrderController.cancelForm(orderID: String, makerID: String)
-POST        /order/cancel                                   controllers.OrderController.cancel
-
-GET         /split/send                                     controllers.SplitController.sendForm(ownableID: String, fromID: String)
-POST        /split/send                                     controllers.SplitController.send
-GET         /split/wrap                                     controllers.SplitController.wrapForm
-POST        /split/wrap                                     controllers.SplitController.wrap
-GET         /split/unwrap                                   controllers.SplitController.unwrapForm(ownableID: String, fromID: String)
-POST        /split/unwrap                                   controllers.SplitController.unwrap
 
 GET         /contact                                        controllers.ContactController.contact
 
@@ -150,49 +98,3 @@ GET         /component/asset                                controllers.Componen
 GET         /component/order                                controllers.ComponentViewController.order(id: String)
 GET         /component/meta                                 controllers.ComponentViewController.meta(id: String)
 GET         /component/maintainer                           controllers.ComponentViewController.maintainer(id: String)
-
-
-GET         /master/file                                    controllers.FileController.file(fileName: String, documentType: String)
-
-GET         /accountUpload                                  controllers.FileController.uploadAccountFileForm(documentType: String)
-POST        /accountUpload/file                             controllers.FileController.uploadAccountFile(documentType: String)
-GET         /accountUpload/storeFile                        controllers.FileController.storeAccountFile(name: String, documentType: String)
-GET         /accountUpdate                                  controllers.FileController.updateAccountFileForm(documentType: String)
-GET         /accountUpdate/updateFile                       controllers.FileController.updateAccountFile(name: String, documentType: String)
-
-GET         /blockchainTransaction/sendCoin                 controllers.TransactionsController.sendCoinForm
-POST        /blockchainTransaction/sendCoin                 controllers.TransactionsController.sendCoin
-
-GET         /background/memberScan                          controllers.BackgroundCheckController.memberScanForm(uboID: String, firstName: String, lastName: String)
-POST        /background/memberScan                          controllers.BackgroundCheckController.memberScan
-GET         /background/memberScanResult                    controllers.BackgroundCheckController.memberScanResult(resultID: Int)
-GET         /background/memberScanResultDecision            controllers.BackgroundCheckController.memberScanResultDecisionForm(resultID: Int)
-POST        /background/memberScanResultDecision            controllers.BackgroundCheckController.memberScanResultDecision
-GET         /background/addUBO                              controllers.BackgroundCheckController.addUBOMemberCheckForm(uboID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addUBO                              controllers.BackgroundCheckController.addUBOMemberCheck
-GET         /background/corporateScan                       controllers.BackgroundCheckController.corporateScanForm(organizationID: String, companyName: String)
-POST        /background/corporateScan                       controllers.BackgroundCheckController.corporateScan
-GET         /background/corporateScanResult                 controllers.BackgroundCheckController.corporateScanResult(resultID: Int)
-GET         /background/corporateScanResultDecision         controllers.BackgroundCheckController.corporateScanResultDecisionForm(resultID: Int)
-POST        /background/corporateScanResultDecision         controllers.BackgroundCheckController.corporateScanResultDecision
-GET         /background/addOrganization                     controllers.BackgroundCheckController.addOrganizationMemberCheckForm(organizationID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addOrganization                     controllers.BackgroundCheckController.addOrganizationMemberCheck
-GET         /background/vesselScan                          controllers.BackgroundCheckController.vesselScanForm(assetID: String, vesselName: String)
-POST        /background/vesselScan                          controllers.BackgroundCheckController.vesselScan
-GET         /background/vesselScanResult                    controllers.BackgroundCheckController.vesselScanResult(resultID: Int)
-GET         /background/vesselScanResultDecision            controllers.BackgroundCheckController.vesselScanResultDecisionForm(resultID: Int)
-POST        /background/vesselScanResultDecision            controllers.BackgroundCheckController.vesselScanResultDecision
-GET         /background/addAsset                            controllers.BackgroundCheckController.addAssetMemberCheckForm(assetID: String, scanID: Int, resultID: Option[Int])
-POST        /background/addAsset                            controllers.BackgroundCheckController.addAssetMemberCheck
-
-GET         /chat/room                                      controllers.ChatController.chatRoom(negotiationID: String)
-GET         /chat/window                                    controllers.ChatController.chatWindow(chatID: String ,pageNumber: Int)
-GET         /chat/loadMoreChats                             controllers.ChatController.loadMoreChats(chatID: String ,pageNumber: Int)
-GET         /chat/sendMessage                               controllers.ChatController.sendMessageForm
-POST        /chat/sendMessage                               controllers.ChatController.sendMessage
-GET         /chat/markChatAsRead                            controllers.ChatController.markChatAsRead(chatID: String)
-GET         /chat/replyToMessage                            controllers.ChatController.replyToMessage(chatID: String, messageID: String)
-
-#DO NOT CHANGE /wurtcb ENDPOINT
-POST        /wurtcb                                         controllers.WesternUnionController.westernUnionRTCB
-POST        /wu/portalRedirect                              controllers.WesternUnionController.westernUnionPortalRedirect
