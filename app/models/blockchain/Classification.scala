@@ -71,11 +71,7 @@ class Classifications @Inject()(
   object Utility {
 
     def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
-      val add = Service.add()
-
-      for {
-        _ <- add
-      } yield msg.getFrom
+      Future(msg.getFrom)
     }
 
   }
