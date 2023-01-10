@@ -1,0 +1,17 @@
+@import views.companion.blockchain.IdentityIssue
+@import views.html.base.form._
+@import views.html.base.buttons._
+
+@(identityIssueForm: Form[IdentityIssue.Data] = IdentityIssue.form, classificationID: String, numImmutableMetaForms: Int = 0, numImmutableForms: Int = 0, numMutableMetaForms: Int = 0, numMutableForms: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonForm(constants.Form.IDENTITY_ISSUE, identityIssueForm) {
+    @commonInputText(identityIssueForm, constants.FormField.FROM_ID)
+    @commonInputText(identityIssueForm, constants.FormField.CLASSIFICATION_ID, 'value -> classificationID, 'readonly -> true)
+    @commonInputText(identityIssueForm, constants.FormField.TO)
+    @commonInputMicroNumber(identityIssueForm, constants.FormField.GAS)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_META_PROPERTIES, constants.FormField.ADD_IMMUTABLE_META_FIELD, numImmutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.IMMUTABLE_PROPERTIES, constants.FormField.ADD_IMMUTABLE_FIELD, numImmutableForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_META_PROPERTIES, constants.FormField.ADD_MUTABLE_META_FIELD, numMutableMetaForms, addFields = true, deleteFields = true)
+    @views.html.component.blockchain.txForms.addProperties(identityIssueForm, constants.FormField.MUTABLE_PROPERTIES, constants.FormField.ADD_MUTABLE_FIELD, numMutableForms, addFields = true, deleteFields = true)
+    @commonInputPassword(identityIssueForm, constants.FormField.PASSWORD, 'required -> false)
+}

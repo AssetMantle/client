@@ -200,6 +200,14 @@ object SelectFieldOptions {
     "Zimbabwe")
   val MODE: Seq[String] = Seq("async", "sync", "block")
 
+  //memberCheck
+  val MATCH_TYPE: Seq[String] = Seq("Exact", "Close")
+  val WHITELIST: Seq[String] = Seq("Apply", "Ignore")
+  val RESIDENCE: Seq[String] = Seq("ApplyPEP", "ApplyAll", "Ignore", "ApplySIP", "ApplyRCA")
+  val PEP_JURISDICTION: Seq[String] = Seq("Apply", "Ignore")
+  val MATCH_DECISION: Seq[String] = Seq("Match", "NoMatch", "NotSure", "NotReviewed", "Invalid")
+  val ASSESSED_RISK: Seq[String] = Seq("Unallocated", "Low", "Med", "High", "Invalid")
+
   val COUNTRY_CODES: Seq[String] = Seq(
     "+1",
     "+1340",

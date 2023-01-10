@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import views.html.base.form._
+@import views.companion.master.memberCheck.AddOrganizationMemberCheck
+
+@(addOrganizationBackgroundCheckForm: Form[AddOrganizationMemberCheck.Data] = AddOrganizationMemberCheck.form, organizationID: String, scanID: Int, resultID: Option[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_ORGANIZATION_MEMBER_CHECK, addOrganizationBackgroundCheckForm) {
+  @commonInputText(addOrganizationBackgroundCheckForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID, 'readonly -> true)
+  @commonInputInt(addOrganizationBackgroundCheckForm, constants.FormField.SCAN_ID, 'value -> scanID, 'readonly -> true)
+  @commonInputInt(addOrganizationBackgroundCheckForm, constants.FormField.RESULT_ID, 'value -> resultID.getOrElse(""), 'readonly -> true, 'required -> false)
+  @commonCheckbox(addOrganizationBackgroundCheckForm, constants.FormField.STATUS)
+}

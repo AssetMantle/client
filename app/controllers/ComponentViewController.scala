@@ -58,6 +58,11 @@ class ComponentViewController @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                          masterAccountFiles: master.AccountFiles,
                                          masterAccountKYCs: master.AccountKYCs,
+                                         masterAssets: master.Assets,
+                                         masterOrders: master.Orders,
+                                         masterClassifications: master.Classifications,
+                                         masterSplits: master.Splits,
+                                         masterIdentifications: master.Identifications,
                                          withLoginActionAsync: WithLoginActionAsync,
                                          withUsernameToken: WithUsernameToken,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -80,6 +85,17 @@ class ComponentViewController @Inject()(
       implicit request =>
         Ok(views.html.component.master.notification.recentActivities())
     }
+  }
+
+  def profilePicture(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
+    implicit request =>
+      val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
+      (for {
+        profilePicture <- profilePicture
+      } yield Ok(views.html.assetMantle.profilePicture(profilePicture))
+        ).recover {
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
+      }
   }
 
   def wallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {

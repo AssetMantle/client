@@ -1,0 +1,28 @@
+@import constants.FormField.{BooleanFormField, NestedFormField}
+@import helper._
+@import views.html.base.form._
+@import views.html.base.buttons._
+@(form: Form[_], nestedFormField: NestedFormField, addField: BooleanFormField, numForms: Int, addFields: Boolean, deleteFields: Boolean, target: String = "commonModalContent")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @Messages(nestedFormField.name):
+    @defining(Option(nestedFormField)) { implicit optionalNestedFormField =>
+        @repeatWithIndex(form(nestedFormField.name), min = numForms) { (immutableMetaTraitForm, i) =>
+            @defining(Option(immutableMetaTraitForm)) { implicit immutableMetaTraitFormField =>
+                <div id='@Seq(nestedFormField.name, i).mkString("_")'>
+                    @commonSelect(form, constants.FormField.DATA_TYPE)
+                    @commonInputText(form, constants.FormField.DATA_NAME)
+                    @commonInputText(form, constants.FormField.DATA_VALUE, 'required -> false)
+                    @if(deleteFields) {
+                        @commonJavascriptButton(constants.View.DELETE, JavaScript("""deleteElementBySource(this)"""), 'class -> "cmuk-button-link")
+                    }
+                </div>
+            }
+        }
+    }
+<br>
+    @if(addFields) {
+        @commonCheckbox(form, addField, 'id -> s"${addField.name}", 'containerDivClass -> "hidden")
+        @commonJavascriptButton(addField.name, JavaScript(s"addField(this, '${addField.name}', '${target}')"))
+    }
+<script src="@routes.Assets.versioned("../../../../../../public/javascripts/addField.js")" type="text/javascript"></script>
+</div>
