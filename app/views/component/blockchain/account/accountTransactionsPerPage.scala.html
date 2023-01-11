@@ -1,5 +1,6 @@
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
+@import views.html.base._
 
 @(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -31,9 +32,9 @@
                 }</td>
                 <td>
                 @if(tx.status) {
-                    <span cmuk-icon="check" class="check"></span>
+                    <span class="statusCheck">@commonIcon("check")</span>
                 } else {
-                    <span cmuk-icon="close" class="close"></span>
+                    <span class="statusClose">@commonIcon("close")</span>
                 }
                 </td>
                 <td id="accountTxDate_@tx.hash">
@@ -46,7 +47,7 @@
         </tbody>
     </table>
 } else {
-    @Messages(constants.View.NO_TRANSACTIONS_FOUND)
+    <div class="emptyBlockTransaction">@Messages(constants.View.NO_TRANSACTIONS_FOUND)</div>
     <script>hideElement('accountTransactions_NEXT');</script>
 
 }

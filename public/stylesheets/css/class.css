@@ -4597,7 +4597,8 @@ figure .block:hover {
 .transactionsList table.cmuk-table tbody td .statusCheck .icon,
 #transactionDetails table.cmuk-table tbody td .statusCheck .icon,
 #validatorsList table.cmuk-table tbody td .statusCheck .icon,
-#validatorTransactions table.cmuk-table tbody td .statusCheck .icon
+#validatorTransactions table.cmuk-table tbody td .statusCheck .icon,
+#accountTransactions table.cmuk-table tbody td .statusCheck .icon
 {
     height: 16px;
     width: 16px;
@@ -4608,7 +4609,8 @@ figure .block:hover {
 .transactionsList table.cmuk-table tbody td .statusClose .icon,
 #transactionDetails table.cmuk-table tbody td .statusClose .icon,
 #validatorsList table.cmuk-table tbody td .statusClose .icon,
-#validatorTransactions table.cmuk-table tbody td .statusClose .icon
+#validatorTransactions table.cmuk-table tbody td .statusClose .icon,
+#accountTransactions table.cmuk-table tbody td .statusClose .icon
 {
     height: 16px;
     width: 16px;
@@ -4869,7 +4871,9 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#validatorTransactions .cmuk-card-body .emptyBlockTransaction{
+#validatorTransactions .cmuk-card-body .emptyBlockTransaction,
+#accountTransactions .cmuk-card-body .emptyBlockTransaction
+{
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 14px;
@@ -5109,4 +5113,26 @@ figure .block:hover {
     line-height: 14px;
     color: var(--gray);
     padding: 16px 0 0 0;
+}
+
+#accountTransactions .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px 0px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#accountTransactions table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    padding-right: 8px;
+}
+
+#accountTransactions  table.cmuk-table tbody td .cmuk-link{
+    color: var(--primary-color);
 }
