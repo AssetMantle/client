@@ -4505,7 +4505,8 @@ figure .block:hover {
 #transactionDetails .cmuk-card-body .productTable td,
 #validatorDetails .cmuk-card-body .productTable td,
 #proposalDetails .cmuk-card-body .productTable td,
-#accountWallet .cmuk-card-body .productTable td
+#accountWallet .cmuk-card-body .productTable td,
+#accountDelegations .cmuk-card-body .productTable td
 {
     padding-bottom: 12px;
 }
@@ -4514,7 +4515,8 @@ figure .block:hover {
 #transactionDetails .cmuk-card-body .productTable .tableFieldTitle,
 #validatorDetails .cmuk-card-body .productTable .tableFieldTitle,
 #proposalDetails .cmuk-card-body .productTable .tableFieldTitle,
-#accountWallet .cmuk-card-body .productTable .tableFieldTitle
+#accountWallet .cmuk-card-body .productTable .tableFieldTitle,
+#accountDelegations .cmuk-card-body .productTable .tableFieldTitle
 {
     font-family: var(--font-type-2);
     font-weight: 700;
@@ -4528,7 +4530,8 @@ figure .block:hover {
 #transactionDetails .cmuk-card-body .productTable .tableFieldValue,
 #validatorDetails .cmuk-card-body .productTable .tableFieldValue,
 #proposalDetails .cmuk-card-body .productTable .tableFieldValue,
-#accountWallet .cmuk-card-body .productTable .tableFieldValue
+#accountWallet .cmuk-card-body .productTable .tableFieldValue,
+#accountDelegations .cmuk-card-body .productTable .tableFieldValue
 {
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4542,7 +4545,8 @@ figure .block:hover {
 #transactionDetails .cmuk-card-body .productTable .tableFieldValue a,
 #validatorDetails .cmuk-card-body .productTable .tableFieldValue a,
 #proposalDetails .cmuk-card-body .productTable .tableFieldValue a,
-#accountWallet .cmuk-card-body .productTable .tableFieldValue a
+#accountWallet .cmuk-card-body .productTable .tableFieldValue a,
+#accountDelegations .cmuk-card-body .productTable .tableFieldValue a
 {
     color: var(--primary-color);
 }
@@ -5008,20 +5012,27 @@ figure .block:hover {
     cursor: pointer;
 }
 
-#accountWallet .cmuk-subnav{
+#accountWallet .cmuk-subnav,
+#accountDelegations .cmuk-subnav{
     border: none;
     justify-content: start;
     gap: 24px;
     margin-bottom: 12px;
     margin-left: 24px;
 }
-#accountWallet .cmuk-subnav-pill li:not(:last-child){
+#accountWallet .cmuk-subnav-pill li:not(:last-child),
+#accountDelegations .cmuk-subnav-pill li:not(:last-child)
+{
     border: none;
 }
-#accountWallet .cmuk-subnav li{
+#accountWallet .cmuk-subnav li,
+#accountDelegations .cmuk-subnav li
+{
     flex: none;
 }
-#accountWallet .cmuk-subnav li a{
+#accountWallet .cmuk-subnav li a,
+#accountDelegations .cmuk-subnav li a
+{
     font-family: var(--font-type-1);
     font-weight: 500;
     font-size: 14px;
@@ -5029,37 +5040,73 @@ figure .block:hover {
     text-transform: capitalize;
     color: var(--gray);
 }
-#accountWallet .cmuk-subnav-pill > .cmuk-active > a{
+#accountWallet .cmuk-subnav-pill > .cmuk-active > a,
+#accountDelegations .cmuk-subnav-pill > .cmuk-active > a
+{
     font-weight: 700;
     color: var(--primary-color);
     border: none;
 }
-#accountWallet .cmuk-subnav-pill > * > :first-child{
+#accountWallet .cmuk-subnav-pill > * > :first-child,
+#accountDelegations .cmuk-subnav-pill > * > :first-child
+{
     padding: 0px;
 }
-#accountWallet .cmuk-switcher{
+#accountWallet .cmuk-switcher,
+#accountDelegations .cmuk-switcher
+{
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px 4px 24px;
     background-color: var(--bg-popup);
     border-radius: 10px;
 }
-#accountWallet .cmuk-card-body{
+#accountWallet .cmuk-card-body,
+#accountDelegations .cmuk-card-body
+{
     height: auto;
 }
-#accountWallet .cmuk-card-body .productTable{
+#accountWallet .cmuk-card-body .productTable,
+#accountDelegations .cmuk-card-body .productTable
+{
     padding: 0px;
 }
-#accountWallet .pieChartContainer{
+#accountWallet .pieChartContainer,
+#accountDelegations .pieChartContainer
+{
     align-items: center;
 }
-#accountWallet .cmuk-card-body .tableFieldTitle .cmuk-link{
+#accountWallet .cmuk-card-body .tableFieldTitle .cmuk-link,
+#accountDelegations .cmuk-card-body .tableFieldTitle .cmuk-link
+{
     color: var(--primary-color);
 }
-#accountWallet .allTokensContainer{
+#accountWallet .allTokensContainer,
+#accountDelegations .delegationsDelegatedContainer
+{
     display: flex;
     align-items: center;
 }
-#accountWallet .allTokensContainer .ibcDenom{
+#accountWallet .allTokensContainer .ibcDenom,
+#accountDelegations .delegationsDelegatedContainer .delegationInfo
+{
     align-self: start;
+}
+#accountDelegations table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+    width: 180px;
+}
+#accountDelegations table.cmuk-table.cmuk-table-striped{
+    margin-bottom: 16px;
+}
+#accountDelegations table.cmuk-table.cmuk-table-striped thead th{
+    padding: 10px 0px 10px 16px;
+    white-space: nowrap;
+}
+#accountDelegations table.cmuk-table.cmuk-table-striped tbody td{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+    padding: 16px 0 0 0;
 }

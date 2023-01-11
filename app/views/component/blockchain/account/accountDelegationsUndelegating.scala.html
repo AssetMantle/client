@@ -16,7 +16,7 @@
     @undelegations.map { case (validatorAddress, undelegationEntries) =>
         <tr>
             @undelegationEntries.map { undelegationEntry =>
-                <td>
+                <td class="blockHeightItem">
                     @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorAddress}", s"${validatorAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"))
                 </td>
                 <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(undelegationEntry.balance.toDouble))</td>
