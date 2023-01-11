@@ -4960,3 +4960,24 @@ figure .block:hover {
 #proposalDeposits  table.cmuk-table tbody td .cmuk-link{
     color: var(--primary-color);
 }
+
+#proposalVotes .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#proposalVotes table.cmuk-table tbody td{
+    padding: 16px 0px 0px 0px;
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--gray);
+}
+
+#proposalVotes  table.cmuk-table tbody td .cmuk-link{
+    color: var(--primary-color);
+}
