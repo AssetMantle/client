@@ -4504,7 +4504,8 @@ figure .block:hover {
 #blockDetails .cmuk-card-body .productTable td,
 #transactionDetails .cmuk-card-body .productTable td,
 #validatorDetails .cmuk-card-body .productTable td,
-#proposalDetails .cmuk-card-body .productTable td
+#proposalDetails .cmuk-card-body .productTable td,
+#accountWallet .cmuk-card-body .productTable td
 {
     padding-bottom: 12px;
 }
@@ -4512,7 +4513,8 @@ figure .block:hover {
 #blockDetails .cmuk-card-body .productTable .tableFieldTitle,
 #transactionDetails .cmuk-card-body .productTable .tableFieldTitle,
 #validatorDetails .cmuk-card-body .productTable .tableFieldTitle,
-#proposalDetails .cmuk-card-body .productTable .tableFieldTitle
+#proposalDetails .cmuk-card-body .productTable .tableFieldTitle,
+#accountWallet .cmuk-card-body .productTable .tableFieldTitle
 {
     font-family: var(--font-type-2);
     font-weight: 700;
@@ -4525,7 +4527,8 @@ figure .block:hover {
 #blockDetails .cmuk-card-body .productTable .tableFieldValue,
 #transactionDetails .cmuk-card-body .productTable .tableFieldValue,
 #validatorDetails .cmuk-card-body .productTable .tableFieldValue,
-#proposalDetails .cmuk-card-body .productTable .tableFieldValue
+#proposalDetails .cmuk-card-body .productTable .tableFieldValue,
+#accountWallet .cmuk-card-body .productTable .tableFieldValue
 {
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4538,7 +4541,8 @@ figure .block:hover {
 #blockDetails .cmuk-card-body .productTable .tableFieldValue a,
 #transactionDetails .cmuk-card-body .productTable .tableFieldValue a,
 #validatorDetails .cmuk-card-body .productTable .tableFieldValue a,
-#proposalDetails .cmuk-card-body .productTable .tableFieldValue a
+#proposalDetails .cmuk-card-body .productTable .tableFieldValue a,
+#accountWallet .cmuk-card-body .productTable .tableFieldValue a
 {
     color: var(--primary-color);
 }
@@ -4793,6 +4797,14 @@ figure .block:hover {
     padding-bottom: 16px;
 }
 
+#validatorsList .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px;
+    padding: 16px 16px 10px 16px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
 #validatorUptime .cmuk-card-body{
     height: auto;
     margin: 0px 16px;
@@ -4980,4 +4992,74 @@ figure .block:hover {
 
 #proposalVotes  table.cmuk-table tbody td .cmuk-link{
     color: var(--primary-color);
+}
+
+#accountWallet .walletAddress{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#accountWallet .walletAddress .icon
+{
+    height: 16px;
+    width: 16px;
+    fill: var(--primary-color);
+    cursor: pointer;
+}
+
+#accountWallet .cmuk-subnav{
+    border: none;
+    justify-content: start;
+    gap: 24px;
+    margin-bottom: 12px;
+    margin-left: 24px;
+}
+#accountWallet .cmuk-subnav-pill li:not(:last-child){
+    border: none;
+}
+#accountWallet .cmuk-subnav li{
+    flex: none;
+}
+#accountWallet .cmuk-subnav li a{
+    font-family: var(--font-type-1);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    text-transform: capitalize;
+    color: var(--gray);
+}
+#accountWallet .cmuk-subnav-pill > .cmuk-active > a{
+    font-weight: 700;
+    color: var(--primary-color);
+    border: none;
+}
+#accountWallet .cmuk-subnav-pill > * > :first-child{
+    padding: 0px;
+}
+#accountWallet .cmuk-switcher{
+    height: auto;
+    margin: 0px 16px 0px 16px;
+    padding: 16px 24px 4px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+#accountWallet .cmuk-card-body{
+    height: auto;
+}
+#accountWallet .cmuk-card-body .productTable{
+    padding: 0px;
+}
+#accountWallet .pieChartContainer{
+    align-items: center;
+}
+#accountWallet .cmuk-card-body .tableFieldTitle .cmuk-link{
+    color: var(--primary-color);
+}
+#accountWallet .allTokensContainer{
+    display: flex;
+    align-items: center;
+}
+#accountWallet .allTokensContainer .ibcDenom{
+    align-self: start;
 }
