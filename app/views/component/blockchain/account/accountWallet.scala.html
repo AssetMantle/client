@@ -10,7 +10,7 @@
     @commonCard(constants.View.ACCOUNT_WALLET) {
         <div class="walletAddress">
             <span class="address clipboardData" data-value="@address">@address</span>
-            <span onclick="copyToClipboard(this)">@commonIcon("copy")</span>
+            <span onclick="copyMessageToClipboard(this)">@commonIcon("copy")</span>
         </div>
     } {
         @commonHorizontalSwitcher(ListMap(

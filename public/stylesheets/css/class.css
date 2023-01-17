@@ -5093,3 +5093,54 @@ figure .block:hover {
 #accountTransactions  table.cmuk-table tbody td .cmuk-link{
     color: var(--primary-color);
 }
+
+#walletDetails .cmuk-card{
+    padding-bottom: 1px;
+}
+
+#walletDetails .cmuk-card-body{
+    height: auto;
+    margin: 0px 16px 16px 16px;
+    padding: 16px 24px 16px 24px;
+    background-color: var(--bg-popup);
+    border-radius: 10px;
+}
+
+#walletDetails .walletDetailsContent{
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#walletDetails .walletDetailsContent .QRContainer{
+    padding: 8px;
+    background-color: var(--card-color);
+    border-radius: 10px;
+}
+#walletDetails .detail .value{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+#walletDetails .detail .title{
+    font-family: var(--font-type-2);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+    text-transform: capitalize;
+    color: var(--primary-color);
+    display: block;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+#walletDetails .detail .value .icon{
+    height: 16px;
+    width: 16px;
+    fill: var(--primary-color);
+    cursor: pointer;
+}

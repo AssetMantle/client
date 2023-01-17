@@ -563,6 +563,7 @@ object View {
   val VALIDATOR_NAME = "VALIDATOR_NAME"
   val TRANSACTION_ANSWER = "TRANSACTION_ANSWER"
   val TRANSACTION_TIME = "TRANSACTION_TIME"
+  val WALLET_DETAILS = "WALLET_DETAILS"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
