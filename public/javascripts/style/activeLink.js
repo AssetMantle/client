@@ -18,6 +18,9 @@ function navBar() {
                 case "transactionList":
                     $('#transactions').addClass('active');
                     break;
+                case "proposalList":
+                    $('#proposals').addClass('active');
+                    break;
                 case "":
                     $('#dashBoard').addClass('active');
                     break;
