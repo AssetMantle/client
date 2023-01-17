@@ -164,7 +164,7 @@ body.darkMode .infoRowValue p {
 }
 
 body.darkMode ::-webkit-scrollbar-thumb {
-    background: rgba(119, 131, 143, 0.5);
+    background: var(--dark);
     border: none;
 }
 
@@ -633,8 +633,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #e5e5e5;
-    border-right: 1px solid white;
+    background: var(--dark);
 }
 
 .leftContainer .financial .cmuk-switcher ul li .wallet .walletIcon, .leftContainer .financial .financialCard ul li .wallet .walletIcon, .leftContainer .financial .cmuk-switcher ul li .payable .payableIcon, .leftContainer .financial .financialCard ul li .payable .payableIcon, .leftContainer .financial .cmuk-switcher ul li .receivable .receivableIcon, .leftContainer .financial .financialCard ul li .receivable .receivableIcon, .leftContainer .financial .cmuk-switcher ul li .leftDays .leftDaysIcon, .leftContainer .financial .financialCard ul li .leftDays .leftDaysIcon {
@@ -716,7 +715,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     min-height: 100vh;
     display: block;
     position: relative;
-    padding-bottom: 115px;
+    padding-bottom: 30px;
 }
 
 .toolTip:hover .toolTipText {
@@ -1773,7 +1772,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 }
 
 .header .cmuk-navbar-nav > li > a {
-    padding: 0 0px;
+    padding: 0px 20px;
     font-family: var(--font-type-1);
     font-weight: 500;
     font-size: 16px;
@@ -1805,10 +1804,6 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: 20px;
     height: 20px;
     fill: var(--white-font);
-}
-
-.header .cmuk-navbar-nav{
-    gap: 48px;
 }
 
 .header .cmuk-navbar-nav > li:hover > a, .header .cmuk-navbar-nav > li > a.cmuk-open, .header .cmuk-navbar-nav > li > a:focus {
@@ -2747,7 +2742,7 @@ form .formBody {
 }
 
 .leftContainer {
-    height: calc(100vh - 70px);
+    height: auto;
 }
 
 .leftContainer .cardContainer {
@@ -2960,7 +2955,7 @@ form .formBody {
 }
 
 .rightContainer {
-    height: calc(100vh - 70px);
+    height: auto;
 }
 
 .rightContainer .recentActivityContainer {
@@ -4349,44 +4344,36 @@ figure .block {
     line-height: 14px;
     color: var(--mantle-off-white);
 }
-figure .block:nth-of-type(2),
-.legend .legendItem:nth-of-type(2):before {
-    background-color: #006CAF;
-}
-figure .block:nth-of-type(3),
-.legend .legendItem:nth-of-type(3):before {
-    background-color: #D7E9BD;
-}
-figure .block:nth-of-type(4),
-.legend .legendItem:nth-of-type(4):before {
-    background-color: #FFBFC2;
-}
-figure .block:nth-of-type(5),
-.legend .legendItem:nth-of-type(5):before {
-    background-color: #55B9A9;
-}
-figure .block:nth-of-type(6),
-.legend .legendItem:nth-of-type(6):before {
-    background-color: #D5DB48;
-}
-figure .block:nth-of-type(7),
-.legend .legendItem:nth-of-type(7):before {
-    background-color: #FF3F00;
-}
-figure .block:nth-of-type(8),
-.legend .legendItem:nth-of-type(8):before {
-    background-color: #007C7B;
-}
+/*figure .block:nth-of-type(2),*/
+/*.legend .legendItem:nth-of-type(2):before {*/
+/*    background-color: #006CAF;*/
+/*}*/
+/*figure .block:nth-of-type(3),*/
+/*.legend .legendItem:nth-of-type(3):before {*/
+/*    background-color: #D7E9BD;*/
+/*}*/
+/*figure .block:nth-of-type(4),*/
+/*.legend .legendItem:nth-of-type(4):before {*/
+/*    background-color: #FFBFC2;*/
+/*}*/
+/*figure .block:nth-of-type(5),*/
+/*.legend .legendItem:nth-of-type(5):before {*/
+/*    background-color: #55B9A9;*/
+/*}*/
+/*figure .block:nth-of-type(6),*/
+/*.legend .legendItem:nth-of-type(6):before {*/
+/*    background-color: #D5DB48;*/
+/*}*/
+/*figure .block:nth-of-type(7),*/
+/*.legend .legendItem:nth-of-type(7):before {*/
+/*    background-color: #FF3F00;*/
+/*}*/
+/*figure .block:nth-of-type(8),*/
+/*.legend .legendItem:nth-of-type(8):before {*/
+/*    background-color: #007C7B;*/
+/*}*/
 figure .block:hover {
     opacity: .65;
-}
-.value {
-    display: block;
-    line-height: 1em;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 .legend {
     padding: 0;
@@ -4397,33 +4384,31 @@ figure .block:hover {
 }
 .legend .legendItem {
     padding: .5em 2em;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.legend .legendItem.section1 {
+    grid-column-start: 1;
+}
+.legend .legendItem.section2 {
+    grid-column-start: 2;
+}
+.legend .legendItem.section3 {
+    grid-column-start: 3;
+}
+.legend .legendItem .legendColor{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: var(--primary-color);
+}
+.legend .legendItem .legendLabel{
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
     line-height: 14px;
     color: var(--gray);
-    position: relative;
-}
-
-.legend .legendItem.sectionOne {
-    grid-column-start: 1;
-}
-
-.legend .legendItem.sectionTwo {
-    grid-column-start: 2;
-}
-
-.legend .legendItem.sectionThree {
-    grid-column-start: 3;
-}
-.legend .legendItem:before {
-    content: "";
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background-color: #FFB400;
-    position: absolute;
-    left: 0;
 }
 
 .blocksList .leftText,
@@ -4820,8 +4805,9 @@ figure .block:hover {
 }
 
 #validatorUptime .cmuk-card-body #missingBlocksCounter{
+    margin-left: 8px;
     align-items: center;
-    justify-content: end;
+    justify-content: center;
 }
 
 #validatorUptime .cmuk-card-body .block {
