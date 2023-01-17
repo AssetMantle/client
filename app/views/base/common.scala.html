@@ -309,30 +309,6 @@
                     </div>
                 </div>
             </div>
-            @* Footer *@
-            <div class="footer">
-                <div class="cmuk-container">
-                    <div>
-                        <div class="footerLogo">
-                            <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
-                            <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
-                                <span class="dayMode hidden">
-                                @commonIcon("dayMode")
-                                </span>
-                                <span class="darkMode">
-                                @commonIcon("darkMode")
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="copyRight">
-                                &copy;
-                        <script>document.write(new Date().getFullYear())</script>
-                        <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>
-                    </div>
-                </div>
-            </div>
-            @* End of Footer *@
             @* End of MainContainer *@
         </div>
         <script src="@routes.Assets.versioned("javascripts/darkMode.js")" type="text/javascript"></script>
