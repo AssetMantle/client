@@ -53,7 +53,8 @@ object Blockchain {
 
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
-    val SINGLE = "/cosmos.crypto.secp256k1.PubKey"
+    val SINGLE_SECP256K1 = "/cosmos.crypto.secp256k1.PubKey"
+    val SINGLE_SECP256R1 = "/cosmos.crypto.secp256r1.PubKey"
     val VALIDATOR = "/cosmos.crypto.ed25519.PubKey"
   }
 
@@ -188,75 +189,6 @@ object Blockchain {
     val LightClientAttackEvidence = "tendermint/LightClientAttackEvidence"
   }
 
-  object Properties {
-    val Burn = "burn"
-    val Creation = "creation"
-    val Expiry = "expiry"
-    val Lock = "lock"
-    val MakerSplit = "makerSplit"
-    val MakerOwnableSplit = "makerOwnableSplit"
-    val TakerID = "takerID"
-    val ExchangeRate = "exchangeRate"
-    val NubID = "nubID"
-  }
-
-  object Modules {
-    val Exchanges = "exchanges"
-    val Orders = "orders"
-  }
-
-  object DataType {
-    val STRING_DATA = "xprt/stringData"
-    val HEIGHT_DATA = "xprt/heightData"
-    val ID_DATA = "xprt/idData"
-    val DEC_DATA = "xprt/decData"
-  }
-
-  object FactType {
-    val STRING = "S"
-    val HEIGHT = "H"
-    val ID = "I"
-    val DEC = "D"
-  }
-
-  object Entity {
-    val IDENTITY_DEFINITION = "IDENTITY_DEFINITION"
-    val IDENTITY = "IDENTITY"
-    val ASSET_DEFINITION = "ASSET_DEFINITION"
-    val ASSET = "ASSET"
-    val ORDER_DEFINITION = "ORDER_DEFINITION"
-    val ORDER = "ORDER"
-    val WRAPPED_COIN = "WRAPPED_COIN"
-    val MAINTAINER = "MAINTAINER"
-  }
-
-  object TransactionRequest {
-    //identity
-    val IDENTITY_NUB = "/xprt/identities/nub/request"
-    val IDENTITY_DEFINE = "/xprt/identities/define/request"
-    val IDENTITY_ISSUE = "/xprt/identities/issue/request"
-    val IDENTITY_PROVISION = "/xprt/identities/provision/request"
-    val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/request"
-    //asset
-    val ASSET_DEFINE = "/xprt/assets/define/request"
-    val ASSET_MINT = "/xprt/assets/mint/request"
-    val ASSET_MUTATE = "/xprt/assets/mutate/request"
-    val ASSET_BURN = "/xprt/assets/burn/request"
-    //split
-    val SPLIT_SEND = "/xprt/splits/send/request"
-    val SPLIT_WRAP = "/xprt/splits/wrap/request"
-    val SPLIT_UNWRAP = "/xprt/splits/unwrap/request"
-    //order
-    val ORDER_DEFINE = "/xprt/orders/define/request"
-    val ORDER_MAKE = "/xprt/orders/make/request"
-    val ORDER_TAKE = "/xprt/orders/take/request"
-    val ORDER_CANCEL = "/xprt/orders/cancel/request"
-    //metaList
-    val META_REVEAL = "/xprt/metas/reveal/request"
-    //maintainer
-    val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/request"
-  }
-
   object Authz {
     val SEND_AUTHORIZATION = "/cosmos.bank.v1beta1.SendAuthorization"
     val GENERIC_AUTHORIZATION = "/cosmos.authz.v1beta1.GenericAuthorization"
@@ -301,6 +233,7 @@ object Blockchain {
     val DEPOSIT = "/cosmos.gov.v1beta1.MsgDeposit"
     val SUBMIT_PROPOSAL = "/cosmos.gov.v1beta1.MsgSubmitProposal"
     val VOTE = "/cosmos.gov.v1beta1.MsgVote"
+    val WEIGHTED_VOTE = "/cosmos.gov.v1beta1.MsgVoteWeighted"
     //slashing
     val UNJAIL = "/cosmos.slashing.v1beta1.MsgUnjail"
     //staking
@@ -333,29 +266,38 @@ object Blockchain {
     //ibc-transfer
     val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
     //asset
-    val ASSET_DEFINE = "/xprt/assets/define/message"
-    val ASSET_MINT = "/xprt/assets/mint/message"
-    val ASSET_MUTATE = "/xprt/assets/mutate/message"
-    val ASSET_BURN = "/xprt/assets/burn/message"
+    val ASSET_BURN = "/assets.transactions.burn.Message"
+    val ASSET_DEFINE = "/assets.transactions.define.Message"
+    val ASSET_DEPUTIZE = "/assets.transactions.deputize.Message"
+    val ASSET_MINT = "/assets.transactions.mint.Message"
+    val ASSET_MUTATE = "/assets.transactions.mutate.Message"
+    val ASSET_RENUMERATE = "/assets.transactions.renumerate.Message"
+    val ASSET_REVOKE = "/assets.transactions.revoke.Message"
     //identity
-    val IDENTITY_DEFINE = "/xprt/identities/define/message"
-    val IDENTITY_ISSUE = "/xprt/identities/issue/message"
-    val IDENTITY_PROVISION = "/xprt/identities/provision/message"
-    val IDENTITY_UNPROVISION = "/xprt/identities/unprovision/message"
-    val IDENTITY_NUB = "/xprt/identities/nub/message"
+    val IDENTITY_DEFINE = "/identities.transactions.define.Message"
+    val IDENTITY_DEPUTIZE = "/identities.transactions.deputize.Message"
+    val IDENTITY_ISSUE = "/identities.transactions.issue.Message"
+    val IDENTITY_MUTATE = "/identities.transactions.mutate.Message"
+    val IDENTITY_NUB = "/identities.transactions.nub.Message"
+    val IDENTITY_PROVISION = "/identities.transactions.provision.Message"
+    val IDENTITY_QUASH = "/identities.transactions.quash.Message"
+    val IDENTITY_REVOKE = "/identities.transactions.revoke.Message"
+    val IDENTITY_UNPROVISION = "/identities.transactions.unprovision.Message"
     //split
-    val SPLIT_SEND = "/xprt/splits/send/message"
-    val SPLIT_WRAP = "/xprt/splits/wrap/message"
-    val SPLIT_UNWRAP = "/xprt/splits/unwrap/message"
+    val SPLIT_SEND = "/splits.transactions.send.Message"
+    val SPLIT_WRAP = "/splits.transactions.wrap.Message"
+    val SPLIT_UNWRAP = "/splits.transactions.unwrap.Message"
     //order
-    val ORDER_DEFINE = "/xprt/orders/define/message"
-    val ORDER_MAKE = "/xprt/orders/make/message"
-    val ORDER_TAKE = "/xprt/orders/take/message"
-    val ORDER_CANCEL = "/xprt/orders/cancel/message"
+    val ORDER_CANCEL = "/orders.transactions.cancel.Message"
+    val ORDER_DEFINE = "/orders.transactions.define.Message"
+    val ORDER_DEPUTIZE = "/orders.transactions.deputize.Message"
+    val ORDER_IMMEDIATE = "/orders.transactions.immediate.Message"
+    val ORDER_MAKE = "/orders.transactions.make.Message"
+    val ORDER_MODIFY = "/orders.transactions.modify.Message"
+    val ORDER_REVOKE = "/orders.transactions.revoke.Message"
+    val ORDER_TAKE = "/orders.transactions.take.Message"
     //metaList
-    val META_REVEAL = "/xprt/metas/reveal/message"
-    //maintainer
-    val MAINTAINER_DEPUTIZE = "/xprt/maintainers/deputize/message"
+    val META_REVEAL = "/metas.transactions.reveal.Message"
   }
 
 

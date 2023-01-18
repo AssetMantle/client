@@ -1,0 +1,10 @@
+@import com.ibc.core.channel.{v1 => channelTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(msg: channelTx.MsgTimeout)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@views.html.component.blockchain.txMessages.ibcMsg.commonPacket(constants.View.PACKET, msg.getPacket)
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.PROOF_HEIGHT, msg.getProofHeight)
+@commonTextInfo(constants.View.NEXT_SEQUENCE_RECV, msg.getNextSequenceRecv.toString)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

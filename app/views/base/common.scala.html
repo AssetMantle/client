@@ -3,7 +3,7 @@
 @import views.html.base._
 @import views.html.component.blockchain._
 
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(title: String, failures: Seq[response.Failure] = Seq(), warnings: Seq[response.Warning] = Seq(), successes: Seq[response.Success] = Seq(), infos: Seq[response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -212,7 +212,7 @@
                 <div class="dataContainer">
                     <div class="cmuk-text-center">
                         @for(failure <- failures) {
-                            <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
+                            <div class="cmuk-alert-danger" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="failureIcon">@commonIcon("fail")</span>
                                     <span class="alertName">@Messages(constants.View.FAILURE):</span>
@@ -220,7 +220,7 @@
                             </div>
                         }
                         @for(warning <- warnings) {
-                            <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
+                            <div class="cmuk-alert-warning" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="warningIcon">@commonIcon("warning")</span>
                                     <span class="alertName">@Messages(constants.View.WARNING):</span>
@@ -228,14 +228,14 @@
                             </div>
                         }
                         @for(success <- successes) {
-                            <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
+                            <div class="cmuk-alert-success" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="successIcon">@commonIcon("success")</span>
                                     @Messages(success.message)</p>
                             </div>
                         }
                         @for(info <- infos) {
-                            <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
+                            <div class="cmuk-alert-primary" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="infoIcon">@commonIcon("info")</span>
                                     <span class="alertName">@Messages(constants.View.INFORMATION):</span>

@@ -1,7 +1,0 @@
-@import models.common.ID.IdentityID
-@import views.html.base.infos._
-@import views.html.base.buttons._
-
-@(identityID: IdentityID)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@commonHtmlInfo(constants.View.IDENTITY_ID, commonJavascriptLink(identityID.asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.identity('${identityID.asString}'))")))

@@ -1,0 +1,8 @@
+@import com.cosmos.distribution.{v1beta1 => distributionTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: distributionTx.MsgSetWithdrawAddress)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.DELEGATOR_ADDRESS, commonJavascriptLink(msg.getDelegatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getDelegatorAddress}'))")))
+@commonHtmlInfo(constants.View.WITHDRAW_ADDRESS, commonJavascriptLink(msg.getWithdrawAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getWithdrawAddress}'))")))

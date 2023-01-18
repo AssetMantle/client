@@ -1,0 +1,14 @@
+@import com.splits.transactions.wrap.Message
+@import models.common.Serializable.Coin
+@import schema.id.base._
+@import views.html.base.infos._
+
+@import scala.jdk.CollectionConverters.CollectionHasAsScala
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.FROM, msg.getFrom)
+@commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
+@defining(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coins: Seq[Coin] =>
+    @commonTextInfo(constants.View.COINS, coins.map(_.getAmountWithNormalizedDenom()).mkString(", "))
+}

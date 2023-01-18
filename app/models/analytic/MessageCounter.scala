@@ -1,21 +1,20 @@
 package models.analytic
 
 import exceptions.BaseException
-import models.Trait.Logged
+import models.Trait.Logging
 import models.blockchain.Transaction
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.collection.MapView
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class MessageCounter(messageType: String, counter: Int, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class MessageCounter(messageType: String, counter: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class MessageCounters @Inject()(
@@ -27,7 +26,7 @@ class MessageCounters @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.ANALYTIC_MESSAGE_COUNTER
 
@@ -76,7 +75,7 @@ class MessageCounters @Inject()(
 
   private[models] class MessageCounterTable(tag: Tag) extends Table[MessageCounter](tag, "MessageCounter") {
 
-    def * = (messageType, counter, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (MessageCounter.tupled, MessageCounter.unapply)
+    def * = (messageType, counter, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (MessageCounter.tupled, MessageCounter.unapply)
 
     def messageType = column[String]("messageType", O.PrimaryKey)
 
@@ -84,15 +83,11 @@ class MessageCounters @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -115,11 +110,11 @@ class MessageCounters @Inject()(
   object Utility {
 
     def updateMessageCounter(transactions: Seq[Transaction]): Future[Unit] = {
-      val updates = transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).toList.sum)
-      val oldMessageCounters = Service.getByMessageTypes(updates.keys.toSeq)
+      val updates = transactions.filter(_.status).flatMap(_.getMessageCounters).groupBy(_._1).view.mapValues(_.map(_._2).sum)
+      val oldMessageCounters = Service.getByMessageTypes(updates.keys.toSeq.distinct)
 
       def update(oldMessageCounters: Seq[MessageCounter], addCounters: MapView[String, Int]) = {
-        Service.insertOrUpdateMultiple(oldMessageCounters.map(old => MessageCounter(messageType = old.messageType, counter = old.counter + addCounters.getOrElse(old.messageType, 0))))
+        Service.insertOrUpdateMultiple(addCounters.map(addCounter => MessageCounter(messageType = addCounter._1, counter = oldMessageCounters.find(_.messageType == addCounter._1).fold(0)(_.counter) + addCounter._2)).toSeq)
       }
 
       (for {

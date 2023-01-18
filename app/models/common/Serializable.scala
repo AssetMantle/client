@@ -1,10 +1,8 @@
 package models.common
 
+import com.cosmos.base.v1beta1.{Coin => protoCoin}
 import exceptions.BaseException
-import models.Abstract.DataValue
-import models.common.DataValue._
-import models.common.ID.MetaID
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import utilities.Date.RFC3339
@@ -14,7 +12,7 @@ object Serializable {
 
   private implicit val module: String = constants.Module.SERIALIZABLE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   case class SocialProfile(platform: String, username: String, url: String)
 
@@ -81,6 +79,13 @@ object Serializable {
       }
       result
     }
+
+    def toProtoCoin: protoCoin = protoCoin.newBuilder().setDenom(this.denom).setAmount(this.amount.toMicroString).build()
+  }
+
+  object Coin {
+    def apply(coinProto: protoCoin): Coin = Coin(denom = coinProto.getDenom, amount = MicroNumber(BigInt(coinProto.getAmount)))
+
   }
 
   def coinApply(denom: String, amount: String): Coin = Coin(denom = denom, amount = MicroNumber(BigInt(amount)))
@@ -122,117 +127,6 @@ object Serializable {
   implicit val undelegationEntryReads: Reads[UndelegationEntry] = Json.reads[UndelegationEntry]
 
   implicit val undelegationEntryWrites: OWrites[UndelegationEntry] = Json.writes[UndelegationEntry]
-
-  case class ID(idString: String)
-
-  implicit val idReads: Reads[ID] = Json.reads[ID]
-
-  implicit val idWrites: OWrites[ID] = Json.writes[ID]
-
-  case class Data(dataType: String, value: DataValue) {
-    def getMetaID: MetaID = MetaID(this)
-  }
-
-  implicit val dataReads: Reads[Data] = (
-    (JsPath \ "dataType").read[String] and
-      (JsPath \ "value").read[JsObject]
-    ) (dataValueApply _)
-
-  implicit val dataWrites: OWrites[Data] = Json.writes[Data]
-
-  object Data {
-
-    def apply(dataType: String, value: DataValue) = new Data(dataType = dataType, value = value)
-
-    def apply(dataType: String, dataValue: Option[String]): Data = Data(dataType = dataType, value = getDataValue(dataType = dataType, dataValue = dataValue))
-
-  }
-
-  case class Fact(factType: String, hash: String) {
-    def getMetaID: MetaID = MetaID(typeID = DataValue.getDataTypeFromFactType(factType), hashID = hash)
-  }
-
-  def NewFact(factType: String, dataValue: DataValue): Fact = Fact(factType = factType, hash = dataValue.generateHash)
-
-  implicit val factReads: Reads[Fact] = Json.reads[Fact]
-
-  implicit val factWrites: OWrites[Fact] = Json.writes[Fact]
-
-  case class Property(id: String, fact: Fact)
-
-  implicit val propertyReads: Reads[Property] = Json.reads[Property]
-
-  implicit val propertyWrites: OWrites[Property] = Json.writes[Property]
-
-  case class Properties(propertyList: Seq[Property]) {
-    def mutate(property: Property): Properties = Properties(propertyList.filterNot(_.id == property.id) :+ property)
-  }
-
-  implicit val propertiesReads: Reads[Properties] = Json.reads[Properties]
-
-  implicit val propertiesWrites: OWrites[Properties] = Json.writes[Properties]
-
-  case class MetaFact(data: Data) {
-    def getHash: String = data.value.generateHash
-
-    def removeData(): Fact = NewFact(DataValue.getFactTypeFromDataType(data.dataType), data.value)
-
-    def getMetaID: MetaID = data.getMetaID
-  }
-
-  implicit val metaFactReads: Reads[MetaFact] = Json.reads[MetaFact]
-
-  implicit val metaFactWrites: OWrites[MetaFact] = Json.writes[MetaFact]
-
-  case class MetaProperty(id: String, metaFact: MetaFact) {
-    def removeData(): Property = Property(id = id, fact = metaFact.removeData())
-  }
-
-  implicit val metaPropertyReads: Reads[MetaProperty] = Json.reads[MetaProperty]
-
-  implicit val metaPropertyWrites: OWrites[MetaProperty] = Json.writes[MetaProperty]
-
-  case class MetaProperties(metaPropertyList: Seq[MetaProperty]) {
-    def removeData(): Properties = Properties(metaPropertyList.map(_.removeData()))
-
-    def mutate(metaProperty: MetaProperty): MetaProperties = MetaProperties(metaPropertyList.filterNot(_.id == metaProperty.id) :+ metaProperty)
-  }
-
-  implicit val metaPropertiesReads: Reads[MetaProperties] = Json.reads[MetaProperties]
-
-  implicit val metaPropertiesWrites: OWrites[MetaProperties] = Json.writes[MetaProperties]
-
-  case class Mutables(properties: Properties) {
-    def mutate(mutatingProperties: Seq[Property]): Mutables = {
-      val mutatingPropertiesID = mutatingProperties.map(_.id)
-      Mutables(Properties(properties.propertyList.filterNot(x => mutatingPropertiesID.contains(x.id)) ++ mutatingProperties))
-    }
-  }
-
-  implicit val mutablesReads: Reads[Mutables] = Json.reads[Mutables]
-
-  implicit val mutablesWrites: OWrites[Mutables] = Json.writes[Mutables]
-
-  case class Immutables(properties: Properties) {
-    def getHashID: String = utilities.Secrets.getBlockchainHash(properties.propertyList.map(_.fact.hash): _*)
-  }
-
-  implicit val immutablesReads: Reads[Immutables] = Json.reads[Immutables]
-
-  implicit val immutablesWrites: OWrites[Immutables] = Json.writes[Immutables]
-
-  case class BaseProperty(dataType: String, dataName: String, dataValue: Option[String]) {
-    def toRequestString: String = utilities.String.getPropertyRequestWithValue(dataNameWithType = utilities.String.getPropertyRequestNameAndType(dataType = dataType, dataName = dataName), dataValue = dataValue)
-
-    def toMetaProperty: MetaProperty = MetaProperty(id = dataName, metaFact = MetaFact(Data(dataType = dataType, dataValue = dataValue)))
-
-    def toProperty: Property = Property(id = dataName, fact = NewFact(factType = DataValue.getFactTypeFromDataType(dataType), dataValue = DataValue.getDataValue(dataType = dataType, dataValue = dataValue)))
-
-  }
-
-  implicit val basePropertyReads: Reads[BaseProperty] = Json.reads[BaseProperty]
-
-  implicit val basePropertyWrites: OWrites[BaseProperty] = Json.writes[BaseProperty]
 
   case class FinalTallyResult(yes: BigDecimal, abstain: BigDecimal, no: BigDecimal, noWithVeto: BigDecimal)
 

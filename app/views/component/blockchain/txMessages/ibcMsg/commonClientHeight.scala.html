@@ -1,0 +1,10 @@
+@import com.ibc.core.client.v1.Height
+@import views.html.base.infos._
+
+@(key: String, clientHeight: Height)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.REVISION_HEIGHT, clientHeight.getRevisionHeight.toString)
+    @commonTextInfo(constants.View.REVISION_NUMBER, clientHeight.getRevisionNumber.toString)
+</div>

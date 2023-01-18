@@ -1,0 +1,19 @@
+@import com.ibc.core.connection.{v1 => connectionTx}
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(msg: connectionTx.MsgConnectionOpenTry)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.CLIENT_ID, msg.getClientId)
+@commonTextInfo(constants.View.PREVIOUS_CONNECTION_ID, msg.getPreviousConnectionId)
+@views.html.component.blockchain.txMessages.ibcMsg.commonConnectionCounterparty(constants.View.COUNTERPARTY, msg.getCounterparty)
+@commonTextInfo(constants.View.DELAY_PERIOD, msg.getDelayPeriod.toString)
+<div>
+@msg.getCounterpartyVersionsList.zipWithIndex.map { case (version, index) => {
+    views.html.component.blockchain.txMessages.ibcMsg.commonVersion(index.toString, version)
+    }
+}
+</div>
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.PROOF_HEIGHT, msg.getProofHeight)
+@views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.CONSENSUS_HEIGHT, msg.getConsensusHeight)
+@commonHtmlInfo(constants.View.SIGNER, commonJavascriptLink(msg.getSigner, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSigner}'))")))

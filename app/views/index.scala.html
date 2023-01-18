@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import constants.AppConfig.OtherApp
 
-@(component: Option[String] = None, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(component: Option[String] = None, failures: Seq[response.Failure] = Seq(), warnings: Seq[response.Warning] = Seq(), successes: Seq[response.Success] = Seq(), infos: Seq[response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
     @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 

@@ -37,7 +37,7 @@
             <td>
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.TYPE)</div>
-                    <div class="tableFieldValue">@proposal.content.proposalContentType</div>
+                    <div class="tableFieldValue">@proposal.content.toProto.getTypeUrl</div>
                 </div>
             </td>
         </tr>
@@ -137,7 +137,7 @@
                 </div>
             </td>
         </tr>
-        @proposal.content.proposalContentType match {
+        @proposal.content.toProto.getTypeUrl match {
             case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
                 @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
                     views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
@@ -154,7 +154,7 @@
                 @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
                     commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
                     commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
-                    commonRFC3339Info(constants.View.TIME, softwareUpgrade.plan.time, "softwareUpgradePlanTime")
+                    commonEpochInfo(constants.View.TIME, softwareUpgrade.plan.time)
                     commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
                 })
             }

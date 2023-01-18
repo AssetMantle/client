@@ -8,7 +8,7 @@ import queries.responses.common.Accounts.accountApply
 abstract class Account {
   val address: String
 
-  def toSerializableAccount(username: String): blockchainAccount
+  def toSerializableAccount: blockchainAccount
 }
 
 object Account {

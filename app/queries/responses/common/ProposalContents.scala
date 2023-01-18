@@ -2,7 +2,7 @@ package queries.responses.common
 
 import exceptions.BaseException
 import models.common.{ProposalContents => SerializableProposalContents}
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads}
 import queries.Abstract.ProposalContent
@@ -11,10 +11,10 @@ import utilities.Date.RFC3339
 object ProposalContents {
   private implicit val module: String = constants.Module.PROPOSAL_CONTENT_RESPONSE
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   case class Plan(name: String, time: RFC3339, height: String, info: String) {
-    def toSerializablePlan: SerializableProposalContents.Plan = SerializableProposalContents.Plan(name = name, time = time, height = height, info = info)
+    def toSerializablePlan: SerializableProposalContents.Plan = SerializableProposalContents.Plan(name = name, time = time.epoch, height = height, info = info)
   }
 
   implicit val plainReads: Reads[Plan] = Json.reads[Plan]

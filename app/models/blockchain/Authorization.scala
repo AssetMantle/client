@@ -1,23 +1,27 @@
 package models.blockchain
 
+import com.google.protobuf.{Any => protoAny}
+import com.cosmos.authz.{v1beta1 => authzTx}
 import exceptions.BaseException
-import models.Trait.Logged
-import models.common.Authz
-import models.common.TransactionMessages._
+import models.Abstract.{Authorization => AbstractAuthorization}
+import models.Trait.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.{Failure, Success}
 
-case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Authorization(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Array[Byte], expiration: Long, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+
+  def getAuthorization: AbstractAuthorization = AbstractAuthorization(protoAny.parseFrom(this.grantedAuthorization))
+
+}
 
 @Singleton
 class Authorizations @Inject()(
@@ -29,7 +33,7 @@ class Authorizations @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_BALANCE
 
@@ -37,20 +41,14 @@ class Authorizations @Inject()(
 
   private[models] val authorizationTable = TableQuery[AuthorizationTable]
 
-  case class AuthorizationSerialized(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: String, expiration: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Authorization = Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = utilities.JSON.convertJsonStringToObject[Authz.Authorization](grantedAuthorization), expiration = RFC3339(expiration), createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
-  }
-
-  def serialize(authorization: Authorization): AuthorizationSerialized = AuthorizationSerialized(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.msgTypeURL, grantedAuthorization = Json.toJson(authorization.grantedAuthorization).toString, expiration = authorization.expiration.toString, createdBy = authorization.createdBy, createdOn = authorization.createdOn, createdOnTimeZone = authorization.createdOnTimeZone, updatedBy = authorization.updatedBy, updatedOn = authorization.updatedOn, updatedOnTimeZone = authorization.updatedOnTimeZone)
-
-  private def add(authorization: Authorization): Future[String] = db.run((authorizationTable returning authorizationTable.map(_.granter) += serialize(authorization)).asTry).map {
+  private def add(authorization: Authorization): Future[String] = db.run((authorizationTable returning authorizationTable.map(_.granter) += authorization).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_INSERT_FAILED, psqlException)
     }
   }
 
-  private def upsert(authorization: Authorization): Future[Int] = db.run(authorizationTable.insertOrUpdate(serialize(authorization)).asTry).map {
+  private def upsert(authorization: Authorization): Future[Int] = db.run(authorizationTable.insertOrUpdate(authorization).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_UPSERT_FAILED, psqlException)
@@ -65,7 +63,7 @@ class Authorizations @Inject()(
     }
   }
 
-  private def findByGranterGranteeAndMsgType(granter: String, grantee: String, msgTypeURL: String): Future[AuthorizationSerialized] = db.run(authorizationTable.filter(x => x.granter === granter && x.grantee === grantee && x.msgTypeURL === msgTypeURL).result.head.asTry).map {
+  private def findByGranterGranteeAndMsgType(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = db.run(authorizationTable.filter(x => x.granter === granter && x.grantee === grantee && x.msgTypeURL === msgTypeURL).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, psqlException)
@@ -73,13 +71,13 @@ class Authorizations @Inject()(
     }
   }
 
-  private def getByGranter(granter: String): Future[Seq[AuthorizationSerialized]] = db.run(authorizationTable.filter(_.granter === granter).result)
+  private def getByGranter(granter: String): Future[Seq[Authorization]] = db.run(authorizationTable.filter(_.granter === granter).result)
 
-  private def getByGrantee(grantee: String): Future[Seq[AuthorizationSerialized]] = db.run(authorizationTable.filter(_.grantee === grantee).result)
+  private def getByGrantee(grantee: String): Future[Seq[Authorization]] = db.run(authorizationTable.filter(_.grantee === grantee).result)
 
-  private[models] class AuthorizationTable(tag: Tag) extends Table[AuthorizationSerialized](tag, "Authorization_BC") {
+  private[models] class AuthorizationTable(tag: Tag) extends Table[Authorization](tag, "Authorization") {
 
-    def * = (granter, grantee, msgTypeURL, grantedAuthorization, expiration, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (AuthorizationSerialized.tupled, AuthorizationSerialized.unapply)
+    def * = (granter, grantee, msgTypeURL, grantedAuthorization, expiration, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Authorization.tupled, Authorization.unapply)
 
     def granter = column[String]("granter", O.PrimaryKey)
 
@@ -87,68 +85,66 @@ class Authorizations @Inject()(
 
     def msgTypeURL = column[String]("msgTypeURL", O.PrimaryKey)
 
-    def grantedAuthorization = column[String]("grantedAuthorization")
+    def grantedAuthorization = column[Array[Byte]]("grantedAuthorization")
 
-    def expiration = column[String]("expiration")
+    def expiration = column[Long]("expiration")
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
 
-    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: Authz.Authorization, expiration: RFC3339): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization, expiration = expiration))
+    def create(granter: String, grantee: String, msgTypeURL: String, grantedAuthorization: protoAny, expiration: RFC3339): Future[String] = add(Authorization(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL, grantedAuthorization = grantedAuthorization.toByteString.toByteArray, expiration = expiration.epoch))
 
-    def tryGet(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = findByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL).map(_.deserialize)
+    def tryGet(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = findByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL)
 
     def insertOrUpdate(authorization: Authorization): Future[Int] = upsert(authorization)
 
-    def getListByGranter(address: String): Future[Seq[Authorization]] = getByGranter(address).map(_.map(_.deserialize))
+    def getListByGranter(address: String): Future[Seq[Authorization]] = getByGranter(address)
 
-    def getListByGrantee(address: String): Future[Seq[Authorization]] = getByGrantee(address).map(_.map(_.deserialize))
+    def getListByGrantee(address: String): Future[Seq[Authorization]] = getByGrantee(address)
 
     def delete(granter: String, grantee: String, msgTypeURL: String): Future[Int] = deleteByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL)
   }
 
   object Utility {
 
-    def onGrantAuthorization(grantAuthorization: GrantAuthorization)(implicit header: Header): Future[Unit] = {
-      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.granter, grantee = grantAuthorization.grantee, msgTypeURL = grantAuthorization.grant.authorization.value.getMsgTypeURL, grantedAuthorization = grantAuthorization.grant.authorization, expiration = grantAuthorization.grant.expiration))
+    def onGrantAuthorization(grantAuthorization: authzTx.MsgGrant)(implicit header: Header): Future[String] = {
+      val authorization = AbstractAuthorization(grantAuthorization.getGrant.getAuthorization)
+      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = authorization.getMsgTypeURL, grantedAuthorization = authorization.toProto.toByteString.toByteArray, expiration = grantAuthorization.getGrant.getExpiration.getSeconds))
       (for {
         _ <- insertOrUpdate
-      } yield ()).recover {
+      } yield grantAuthorization.getGranter).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          grantAuthorization.getGranter
       }
     }
 
-    def onRevokeAuthorization(revokeAuthorization: RevokeAuthorization)(implicit header: Header): Future[Unit] = {
-      val delete = Service.delete(granter = revokeAuthorization.granter, grantee = revokeAuthorization.grantee, msgTypeURL = revokeAuthorization.messageTypeURL)
+    def onRevokeAuthorization(revokeAuthorization: authzTx.MsgRevoke)(implicit header: Header): Future[String] = {
+      val delete = Service.delete(granter = revokeAuthorization.getGranter, grantee = revokeAuthorization.getGrantee, msgTypeURL = revokeAuthorization.getMsgTypeUrl)
       (for {
         _ <- delete
-      } yield ()).recover {
+      } yield revokeAuthorization.getGranter).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          revokeAuthorization.getGranter
       }
     }
 
-    def onExecuteAuthorization(executeAuthorization: ExecuteAuthorization)(implicit header: Header): Future[Seq[StdMsg]] = {
-      val execute = utilitiesOperations.traverse(executeAuthorization.messages) { msg =>
-        val granter = msg.message.getSigners.head
-        if (granter != executeAuthorization.grantee) {
-          val authorization = Service.tryGet(granter = granter, grantee = executeAuthorization.grantee, msgTypeURL = msg.messageType)
+    def onExecuteAuthorization(executeAuthorization: authzTx.MsgExec, granter: String)(implicit header: Header): Future[String] = {
+      val execute = utilitiesOperations.traverse(executeAuthorization.getMsgsList.asScala.toSeq) { msg =>
+        if (granter != executeAuthorization.getGrantee) {
+          val authorization = Service.tryGet(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
 
           def updateOrDelete(authorization: Authorization) = {
-            val response = authorization.grantedAuthorization.value.validate(msg)
-            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.grantee, msgTypeURL = msg.messageType)
-            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => Authz.Authorization(x.getAuthorizationType, value = x))))
+            val response = authorization.getAuthorization.validate(msg)
+            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
+            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => x.toProto.toByteString.toByteArray)))
             else Future(0)
 
             for {
@@ -159,15 +155,15 @@ class Authorizations @Inject()(
           for {
             authorization <- authorization
             _ <- updateOrDelete(authorization)
-          } yield msg
-        } else Future(msg)
+          } yield ()
+        } else Future()
       }
 
       (for {
-        msgs <- execute
-      } yield msgs).recover {
+        _ <- execute
+      } yield executeAuthorization.getGrantee).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          Seq.empty
+          executeAuthorization.getGrantee
       }
     }
 

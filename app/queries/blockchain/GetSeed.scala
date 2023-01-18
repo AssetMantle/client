@@ -2,7 +2,8 @@ package queries.blockchain
 
 import exceptions.BaseException
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import org.slf4j.{Logger, LoggerFactory}
 
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
@@ -13,7 +14,7 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private implicit val module: String = constants.Module.QUERIES_GET_MNEMONIC
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val path = "keys/seed"
 

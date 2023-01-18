@@ -1,7 +1,8 @@
 @import views.html.base._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
 
-@(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transactions: Seq[Transaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <tr class="tableHead">
     <th>@Messages(constants.View.TRANSACTION_HASH)</th>
@@ -21,11 +22,11 @@
             </div>
         </div>
     </td>
-    <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.messages.length == 1) {
-        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+    <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.getMessages.length == 1) {
+        @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
     } else {
-        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
-        (+@(tx.messages.length - 1))
+        @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
+        (+@(tx.getMessages.length - 1))
     }</td>
     <td id="transactionListPageItemTxHeight_@index">@tx.height</td>
     <td id="transactionListPageItemTxStatus_@index">
@@ -39,7 +40,7 @@
     </td>
     <td id="transactionListPageItemTxTime_@index">
          <script>
-             convertUTCDateToLocalDate('@tx.timestamp.toString', "transactionListPageItemTxTime_@index")
+             fromEpochDateToLocal('@blocks.find(_.height == tx.height).fold(0L)(_.time)', "transactionListPageItemTxTime_@index")
         </script>
     </td>
 </tr>

@@ -1,0 +1,9 @@
+@import com.cosmos.crisis.{v1beta1 => crisisTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+
+@(msg: crisisTx.MsgVerifyInvariant)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.SENDER, commonJavascriptLink(msg.getSender, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getSender}'))")))
+@commonTextInfo(constants.View.INVARIANT_MODULE_NAME, msg.getInvariantModuleName)
+@commonTextInfo(constants.View.INVARIANT_ROUTE, msg.getInvariantRoute)

@@ -6,13 +6,13 @@ import akka.dispatch.{PriorityGenerator, UnboundedStablePriorityMailbox}
 import akka.routing.{BroadcastRoutingLogic, Router}
 import com.typesafe.config.Config
 import javax.inject.Singleton
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{Json, OWrites}
 
 @Singleton
 class AppWebSocketActor extends Actor {
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val module: String = constants.Module.ACTOR_APP_WEB_SOCKET
 

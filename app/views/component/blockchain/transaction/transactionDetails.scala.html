@@ -2,8 +2,9 @@
 @import views.html.base.infos._
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
 
-@(transaction: Transaction)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transaction: Transaction, block: Block)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TRANSACTION_DETAILS) {
 } {
@@ -46,8 +47,8 @@
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.TRANSACTION_FEES)</div>
                     <div class="tableFieldValue">
-                        @if(transaction.fee.amount.nonEmpty){
-                            @transaction.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
+                        @if(transaction.getFee.amount.nonEmpty){
+                            @transaction.getFee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
                         }else{
                             0
                         }
@@ -59,7 +60,7 @@
             <td>
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.NUMBER_OF_MESSAGES)</div>
-                    <div class="tableFieldValue">@transaction.messages.length</div>
+                    <div class="tableFieldValue">@transaction.getMessages.length</div>
                 </div>
             </td>
         </tr>
@@ -76,7 +77,7 @@
                 <td>
                     <div class="tableField">
                         <div class="tableFieldTitle">@Messages(constants.View.LOG)</div>
-                        <div class="tableFieldValue">@transaction.rawLog</div>
+                        <div class="tableFieldValue">@transaction.log</div>
                     </div>
                 </td>
             </tr>
@@ -85,12 +86,12 @@
             <td>
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.MEMO)</div>
-                    <div class="tableFieldValue">@transaction.memo</div>
+                    <div class="tableFieldValue">@transaction.getMemo</div>
                 </div>
             </td>
         </tr>
     }
 }
 <script>
-        convertUTCDateToLocalDate("@transaction.timestamp.toString", "transactionDetail_time")
+        convertUTCDateToLocalDate("@block.time.toString", "transactionDetail_time")
 </script>

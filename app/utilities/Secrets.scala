@@ -2,10 +2,11 @@ package utilities
 
 import exceptions.BaseException
 import org.apache.commons.codec.binary.Hex
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.Codecs.sha1
 import sun.nio.cs.ISO_8859_1
 
+import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.{MessageDigest, SecureRandom}
 import java.util
@@ -17,7 +18,7 @@ object Secrets {
 
   private implicit val module: String = constants.Module.UTILITIES_SECRETS
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def encryptData(data: Array[Byte], secret: String): Array[Byte] = {
     val key = MessageDigest.getInstance("SHA-256").digest(secret.getBytes())
@@ -116,5 +117,9 @@ object Secrets {
   }
 
   def sha256Hash(value: String): Array[Byte] = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))
+
+  def sha256Hash(value: Array[Byte]): Array[Byte] = MessageDigest.getInstance("SHA-256").digest(value)
+
+  def sha256HashString(value: Array[Byte]): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value)))
 
 }
