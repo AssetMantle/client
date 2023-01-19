@@ -19,21 +19,71 @@
         }
     </div>
 } {
-    @keyBaseValidatorAccount.flatMap(_.pictureURL) match {
-        case Some(url) => {
-            @commonImageResource(url)
-        }
-        case None => {
-            @commonImage("note.svg")
-        }
+    @commonTable(id = "validatorDetail", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.OPERATOR_ADDRESS)</div>
+                    <div class="tableFieldValue">@validator.operatorAddress</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.WALLET_ADDRESS)</div>
+                    <div class="tableFieldValue">@commonJavascriptLink(selfDelegationAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${selfDelegationAddress}'))"))</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.COMMISSION_RATE)</div>
+                    <div class="tableFieldValue">@utilities.NumericOperation.formatNumber(validator.commission.commissionRates.rate * 100)%</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VOTING_POWER)</div>
+                    <div class="tableFieldValue">@Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" ")</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VALIDATOR_IDENTITY)</div>
+                    <div class="tableFieldValue">@validator.description.identity</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VALIDATOR_WEBSITE)</div>
+                    <div class="tableFieldValue">@validator.description.website</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VALIDATOR_SECURITY_CONTACT)</div>
+                    <div class="tableFieldValue">@validator.description.securityContact</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VALIDATOR_DESCRIPTION_DETAILS)</div>
+                    <div class="tableFieldValue">@validator.description.details</div>
+                </div>
+            </td>
+        </tr>
     }
-
-    @commonTextInfo(constants.View.OPERATOR_ADDRESS, validator.operatorAddress)
-    @commonHtmlInfo(constants.View.WALLET_ADDRESS, commonJavascriptLink(selfDelegationAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${selfDelegationAddress}'))")))
-    @commonTextInfo(constants.View.COMMISSION_RATE, utilities.NumericOperation.formatNumber(validator.commission.commissionRates.rate * 100) + "%")
-    @commonTextInfo(constants.View.VOTING_POWER, Seq(votingPower, "%", s"(${validator.tokens.toString})").mkString(" "))
-    @commonTextInfo(constants.View.VALIDATOR_IDENTITY, validator.description.identity)
-    @commonTextInfo(constants.View.VALIDATOR_WEBSITE, validator.description.website)
-    @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, validator.description.securityContact)
-    @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, validator.description.details)
 }

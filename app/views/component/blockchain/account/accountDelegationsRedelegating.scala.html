@@ -17,10 +17,10 @@
         @redelegations.map { case ((validatorSoruceAddress, validatorDestinationAddress), redelegationEntries) =>
         <tr>
             @redelegationEntries.map { redelegationEntry =>
-                <td>
+                <td class="blockHeightItem">
                     @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorSoruceAddress}", s"${validatorSoruceAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorSoruceAddress}'))"))
                 </td>
-                <td>
+                <td class="blockHeightItem">
                 @commonJavascriptLink(validatorsMoniker.getOrElse(s"${validatorDestinationAddress}", s"${validatorDestinationAddress}"), JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorDestinationAddress}'))"))
                 </td>
                 <td>@utilities.NumericOperation.formatNumber(utilities.NumericOperation.roundOff(redelegationEntry.initialBalance.toDouble))</td>

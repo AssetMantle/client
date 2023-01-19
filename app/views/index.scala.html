@@ -8,7 +8,7 @@
     @left = {
         <div class="leftContainer">
             <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cmuk-card-styles containerHeight"></div>
-            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
+            <div id="tokensStatistics" class="cardSelectHeader tableCard tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
@@ -68,7 +68,7 @@
     @right = {
         <div class="rightContainer">
             <div id="recentActivities" class="recentActivityContainer cmuk-card-styles containerHeight"></div>
-            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
+            <div id="votingPowers" class="votingPowerContainer cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

@@ -1,3 +1,4 @@
+@import views.html.base._
 @import views.html.base.cards._
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
@@ -7,7 +8,7 @@
 @commonCard(constants.View.BLOCK_TRANSACTIONS) {
 } {
     @if(transactions.isEmpty) {
-        <div class="cmuk-text-center">@Messages(constants.View.NO_BLOCK_TRANSACTIONS, height)</div>
+       <div class="cmuk-text-center emptyBlockTransaction">@Messages(constants.View.NO_BLOCK_TRANSACTIONS, height)</div>
     } else {
         <table class="cmuk-table cmuk-table-striped">
             <thead>
@@ -32,9 +33,9 @@
                     }</td>
                     <td>
                     @if(tx.status) {
-                        <span cmuk-icon="check" class="check hidden"></span>
+                        <span class="statusCheck">@commonIcon("check")</span>
                     } else {
-                        <span cmuk-icon="close" class="close hidden"></span>
+                        <span class="statusClose">@commonIcon("close")</span>
                     }
                     </td>
                     <td>@if(tx.getFee.amount.nonEmpty) {

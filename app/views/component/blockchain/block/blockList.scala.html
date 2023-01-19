@@ -18,8 +18,10 @@
         </div>
     </div>
     @commonSpinner("blockListPageChangeSpinner")
-    @commonJavascriptButton(constants.View.BACK, JavaScript("getBlockList(-1)"), 'id -> "blockList_BACK")
-    @commonJavascriptButton(constants.View.NEXT, JavaScript("getBlockList(1)"), 'id -> "blockList_NEXT")
+    <div class="paginationButtonContainer">
+        @commonPaginationButton(constants.View.BACK, JavaScript("getBlockList(-1)"), icon = "backArrow", size = "small", iconFirst = true, Symbol("id") -> "blockList_BACK")
+        @commonPaginationButton(constants.View.NEXT, JavaScript("getBlockList(1)"), icon = "nextArrow", size = "small", iconFirst = false, Symbol("id") -> "blockList_NEXT")
+    </div>
 </div>
 
 <script>

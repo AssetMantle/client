@@ -7,8 +7,42 @@
 
 @commonCard(constants.View.BLOCK_HEADER) {
 } {
-    @commonIntInfo(constants.View.HEIGHT, block.height)
-    @commonEpochInfo(constants.View.TIME, block.time)
-    @commonHtmlInfo(constants.View.PROPOSER, commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))")))
-    @commonIntInfo(constants.View.NUMBER_OF_TRANSACTIONS, numTxs)
+    @commonTable(id = "blockDetail", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.HEIGHT)</div>
+                    <div id="blockDetail_height" class="tableFieldValue">@block.height</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TIME)</div>
+                    <div id="blockDetail_time" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.PROPOSER)</div>
+                    <div id="blockDetail_proposer" class="tableFieldValue">@commonJavascriptLink(proposer, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${block.proposerAddress}'))"))</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.NUMBER_OF_TRANSACTIONS)</div>
+                    <div id="blockDetail_noTransaction" class="tableFieldValue">@numTxs</div>
+                </div>
+            </td>
+        </tr>
+    }
 }
+<script>
+        convertUTCDateToLocalDate("@block.time.toString", "blockDetail_time")
+</script>
