@@ -1,6 +1,6 @@
 @import views.html.base.cards._
 
-@(blockHeight: Int, proposer: String, time: Long, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockHeight: Int, proposer: String, time: Long, averageBlockTime: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
 } {
@@ -36,14 +36,6 @@
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.AVERAGE_BLOCK_TIME)</div>
                     <div id="latestBlockHeight_averageBlockTime" class="tableFieldValue">@(s"${averageBlockTime}s")</div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="tableField">
-                    <div class="tableFieldTitle">@Messages(constants.View.CHAIN_ID)</div>
-                    <div class="tableFieldValue">@chainID</div>
                 </div>
             </td>
         </tr>
