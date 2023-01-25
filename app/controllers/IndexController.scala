@@ -1,5 +1,6 @@
 package controllers
 
+import akka.actor.CoordinatedShutdown
 import constants.AppConfig._
 import controllers.actions._
 import org.slf4j.{Logger, LoggerFactory}
@@ -18,6 +19,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 cached: Cached,
+                                coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -44,5 +46,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
-  startup.start()
+  coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
+  utilities.Scheduler.setShutdownCancellable(startup.start())
 }

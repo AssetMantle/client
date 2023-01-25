@@ -6,8 +6,8 @@ import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
-import play.api.Configuration
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.Configuration
 import queries.Abstract.Account
 import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
@@ -280,7 +280,7 @@ class Startup @Inject()(
   }
 
   private val explorerRunnable = new Runnable {
-    def run(): Unit = {
+    def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
       //TODO java.lang.IllegalStateException: Closed
       //TODO (Runtime Exception) Explorer keeps on working fine
@@ -322,7 +322,7 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    }
+    } else utilities.Scheduler.shutdownThread()
   }
 
   //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
