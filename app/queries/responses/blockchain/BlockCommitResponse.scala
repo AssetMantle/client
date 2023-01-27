@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
 import exceptions.BaseException
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 import queries.responses.common.Header
@@ -11,7 +11,7 @@ object BlockCommitResponse {
 
   implicit val module: String = constants.Module.BLOCK_COMMIT_RESPONSE
 
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class Signature(validator_address: String)
 

@@ -4,12 +4,12 @@ import java.sql.Timestamp
 import exceptions.BaseException
 
 import javax.inject.{Inject, Singleton}
-import models.Trait.Logging
+import models.traits.Logging
 import com.cosmos.distribution.{v1beta1 => distributionTx}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
@@ -29,7 +29,7 @@ class WithdrawAddresses @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_WITHDRAW_ADDRESS
 

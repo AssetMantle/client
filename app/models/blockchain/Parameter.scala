@@ -2,12 +2,12 @@ package models.blockchain
 
 import exceptions.BaseException
 import models.Abstract.{Parameter => abstractParameter}
-import models.Trait.Logging
+import models.traits.Logging
 import models.common.Parameters._
 import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.Coin
 import org.postgresql.util.PSQLException
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import queries.blockchain.params._
@@ -39,7 +39,7 @@ class Parameters @Inject()(
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_PARAMETER
 

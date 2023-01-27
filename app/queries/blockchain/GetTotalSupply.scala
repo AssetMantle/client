@@ -3,7 +3,7 @@ package queries.blockchain
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.TotalSupplyResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetTotalSupply @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private implicit val module: String = constants.Module.QUERIES_GET_TOTAL_SUPPLY
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val url = constants.Blockchain.RestEndPoint + "/cosmos/bank/v1beta1/supply"
 

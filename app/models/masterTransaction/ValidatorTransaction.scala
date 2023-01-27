@@ -4,11 +4,11 @@ import com.cosmos.distribution.{v1beta1 => distributionTx}
 import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
-import models.Trait.Logging
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -26,7 +26,7 @@ class ValidatorTransactions @Inject()(protected val databaseConfigProvider: Data
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 

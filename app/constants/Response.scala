@@ -1,6 +1,7 @@
 package constants
 
-import response._
+import exceptions.BaseException
+import play.api.Logger
 
 object Response {
 
@@ -132,4 +133,24 @@ object Response {
   val AUTHORIZATION_DELETE_FAILED = new Failure("AUTHORIZATION_DELETE_FAILED")
   val GRANT_AUTHORIZATION_NOT_FOUND = new Failure("GRANT_AUTHORIZATION_NOT_FOUND")
   val EMPTY_QUERY = new Failure("EMPTY_QUERY")
+
+  class Failure(private val response: String) {
+    val message: String = PREFIX + FAILURE_PREFIX + response
+    val logMessage: String = LOG_PREFIX + response
+
+    def throwBaseException(exception: Exception = null)(implicit module: String, logger: Logger) = throw new BaseException(this, exception)
+  }
+
+  class Warning(val response: String) {
+    val message: String = PREFIX + WARNING_PREFIX + response
+  }
+
+  class Success(val response: String) {
+    val message: String = PREFIX + SUCCESS_PREFIX + response
+  }
+
+  class Info(val response: String) {
+    val message: String = PREFIX + INFO_PREFIX + response
+  }
+
 }

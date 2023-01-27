@@ -1,7 +1,7 @@
 package models.blockchain
 
-//import modelTraits.{Entity, GenericDaoImpl, Logging, ModelTable}
-//import org.slf4j.{Logger, LoggerFactory}
+//import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+//import play.api.Logger
 //import play.api.db.slick.DatabaseConfigProvider
 //import schema.id.base.ClassificationID
 //import schema.list.PropertyList
@@ -27,7 +27,7 @@ package models.blockchain
 //
 //  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
 //
-//  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+//  implicit val logger: Logger = Logger(this.getClass)
 //
 //  class DataTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
 //

@@ -26,7 +26,7 @@ import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Valida
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
 import queries.blockchain._
@@ -75,7 +75,7 @@ class Block @Inject()(
 
   private implicit val module: String = constants.Module.SERVICES_BLOCK
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val webSocketMessageLang: Lang = Lang(configuration.get[String]("blockchain.explorer.webSocketMessageLang"))
 

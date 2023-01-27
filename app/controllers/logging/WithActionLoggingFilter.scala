@@ -5,7 +5,7 @@ import exceptions.BaseException
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc._
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext

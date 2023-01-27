@@ -8,12 +8,12 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 
 @Singleton
 class KeyStore @Inject()(configuration: Configuration) {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.UTILITIES_KEY_STORE
 

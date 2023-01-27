@@ -6,7 +6,7 @@ import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.Configuration
 import queries.Abstract.Account
 import queries.blockchain._
@@ -55,7 +55,7 @@ class Startup @Inject()(
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val schedulerExecutionContext: ExecutionContext = actors.Service.actorSystem.dispatchers.lookup("akka.actor.scheduler-dispatcher")
 

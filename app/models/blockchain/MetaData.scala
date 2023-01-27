@@ -1,7 +1,7 @@
 package models.blockchain
 
-import modelTraits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
-import org.slf4j.{Logger, LoggerFactory}
+import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.{Data => abstractData}
 import schema.id.base.DataID
@@ -24,7 +24,7 @@ object MetaDatas {
 
   implicit val module: String = constants.Module.BLOCKCHAIN_META_DATA
 
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   class DataTable(tag: Tag) extends Table[MetaData](tag, "MetaData") with ModelTable2[String, Array[Byte]] {
 

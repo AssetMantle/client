@@ -3,7 +3,7 @@ package queries.blockchain
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.DelegatorRewardsResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetDelegatorRewards @Inject()()(implicit wsClient: WSClient, configuration
 
   private implicit val module: String = constants.Module.QUERIES_GET_DELEGATOR_REWARDS
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val path1 = "cosmos/distribution/v1beta1/delegators"
 

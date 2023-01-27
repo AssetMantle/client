@@ -2,7 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import org.apache.commons.codec.binary.Hex
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.Codecs.sha1
 import sun.nio.cs.ISO_8859_1
 
@@ -18,7 +18,7 @@ object Secrets {
 
   private implicit val module: String = constants.Module.UTILITIES_SECRETS
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   def encryptData(data: Array[Byte], secret: String): Array[Byte] = {
     val key = MessageDigest.getInstance("SHA-256").digest(secret.getBytes())

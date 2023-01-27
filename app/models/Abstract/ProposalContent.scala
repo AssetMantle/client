@@ -7,7 +7,7 @@ import com.cosmos.params.{v1beta1 => paramsProto}
 import com.cosmos.upgrade.{v1beta1 => upgradeProto}
 import models.common.ProposalContents._
 import models.common.Serializable.Coin
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
@@ -22,7 +22,7 @@ object ProposalContent {
 
   private implicit val module: String = constants.Module.PROPOSAL_CONTENT
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   def apply(protoProposalContent: protoAny): ProposalContent = protoProposalContent.getTypeUrl match {
     case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {

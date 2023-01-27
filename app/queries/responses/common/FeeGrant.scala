@@ -1,7 +1,7 @@
 package queries.responses.common
 
 import models.common.{FeeGrant => commonFeeGrant}
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsPath, Json, Reads}
 import queries.Abstract.FeeGrant.FeeAllowance
@@ -11,7 +11,7 @@ object FeeGrant {
 
   implicit val module: String = constants.Module.RESPONSES_FEE_GRANT
 
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = Logger(this.getClass)
 
   case class Allowance(allowanceType: String, value: FeeAllowance)
 

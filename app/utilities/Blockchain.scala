@@ -22,7 +22,7 @@ import models.masterTransaction.WalletTransaction
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPublicKeyParameters}
 import org.bouncycastle.crypto.signers.ECDSASigner
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import utilities.Date.RFC3339
 
 import java.math.BigInteger
@@ -30,7 +30,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object Blockchain {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.UTILITIES_BLOCKCHAIN
 

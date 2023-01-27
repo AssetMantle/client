@@ -1,9 +1,10 @@
 @import constants.AppConfig.OtherApp
 @import controllers.actions.LoginState
 @import views.html.base._
+@import constants.Response._
 @import views.html.component.blockchain._
 
-@(title: String, failures: Seq[response.Failure] = Seq(), warnings: Seq[response.Warning] = Seq(), successes: Seq[response.Success] = Seq(), infos: Seq[response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(title: String, failures: Seq[Failure] = Seq(), warnings: Seq[Warning] = Seq(), successes: Seq[Success] = Seq(), infos: Seq[Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
     <head>

@@ -3,7 +3,7 @@ package queries.blockchain.params
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.params.MintResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetMint @Inject()()(implicit wsClient: WSClient, configuration: Configurat
 
   private implicit val module: String = constants.Module.QUERIES_GET_PARAMS_MINT
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val path = "cosmos/mint/v1beta1/params"
 

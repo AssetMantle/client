@@ -11,7 +11,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
 import utilities.MicroNumber
@@ -49,7 +49,7 @@ class ComponentViewController @Inject()(
                                          messagesControllerComponents: MessagesControllerComponents,
                                        )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_COMPONENT_VIEW
 

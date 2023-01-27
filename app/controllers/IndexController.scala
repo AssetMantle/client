@@ -3,7 +3,7 @@ package controllers
 import akka.actor.CoordinatedShutdown
 import constants.AppConfig._
 import controllers.actions._
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.Configuration
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
@@ -22,7 +22,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 

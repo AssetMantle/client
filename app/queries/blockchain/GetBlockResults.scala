@@ -3,7 +3,7 @@ package queries.blockchain
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.BlockResultResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetBlockResults @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private implicit val module: String = constants.Module.QUERIES_GET_BLOCK_RESULTS
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val path = "block_results?height="
 

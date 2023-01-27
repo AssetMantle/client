@@ -2,7 +2,7 @@ package utilities
 
 import com.google.protobuf.{Timestamp => protoTimestamp}
 import exceptions.BaseException
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.json._
 
 import java.sql.Timestamp
@@ -15,7 +15,7 @@ object Date {
 
   private implicit val module: String = constants.Module.UTILITIES_DATE
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val ddMMDateFormat = new SimpleDateFormat("dd/MM")
 

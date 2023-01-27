@@ -4,7 +4,7 @@ import exceptions.BaseException
 import models.blockchain.{Account => BlockchainAccount}
 import models.common.Serializable
 import models.common.Serializable.Vesting.VestingParameters
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.{Account, PublicKey}
 
@@ -12,7 +12,7 @@ object Accounts {
 
   private implicit val module: String = constants.Module.ACCOUNT_RESPONSE
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   case class BaseAccount(address: String, pub_key: Option[PublicKey], account_number: String, sequence: String) extends Account {
     def toSerializableAccount: BlockchainAccount = BlockchainAccount(address = address, accountType = Option(constants.Blockchain.Account.BASE), accountNumber = account_number.toInt, sequence = sequence.toInt, vestingParameters = None, publicKey = this.pub_key.map(_.getBytes), publicKeyType = this.pub_key.map(_.getType))

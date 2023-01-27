@@ -3,7 +3,7 @@ package queries.trulioo
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.trulioo.TruliooCountryCodesResponse.Response
 import utilities.KeyStore
 
@@ -16,7 +16,7 @@ class GetTruliooCountryCodes @Inject()(wsClient: WSClient, keyStore: KeyStore)(i
 
   private implicit val module: String = constants.Module.QUERIES_GET_TRULIOO_COUNTRY_CODES
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val apiKeyName = configuration.get[String]("trulioo.apiKeyName")
 

@@ -3,7 +3,7 @@ package queries.blockchain
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.BalanceResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetBalance @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val module: String = constants.Module.QUERIES_GET_BALANCE
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val path = "cosmos/bank/v1beta1/balances"
 

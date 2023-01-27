@@ -3,7 +3,7 @@ package queries.blockchain.params
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.blockchain.params.HalvingResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetHalving @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val module: String = constants.Module.QUERIES_GET_PARAMS_HALVING
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val path = "persistence/halving/v1beta1/params"
 

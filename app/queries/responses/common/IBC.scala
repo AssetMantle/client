@@ -1,13 +1,13 @@
 package queries.responses.common
 
 import models.common.Serializable
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.libs.json.{Json, Reads}
 import utilities.MicroNumber
 
 object IBC {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(constants.Module.IBC_COMMON_RESPONSES)
+  private implicit val logger: Logger = Logger(constants.Module.IBC_COMMON_RESPONSES)
 
   case class ConnectionCounterparty(client_id: String, connection_id: String) {
     def toSerializableIBCConnectionCounterparty: Serializable.IBC.ConnectionCounterparty = Serializable.IBC.ConnectionCounterparty(connectionID = connection_id, clientID = client_id)

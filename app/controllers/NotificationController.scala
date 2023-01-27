@@ -6,7 +6,7 @@ import models.masterTransaction
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -18,7 +18,7 @@ class NotificationController @Inject()(
                                         withoutLoginActionAsync: WithoutLoginActionAsync
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 

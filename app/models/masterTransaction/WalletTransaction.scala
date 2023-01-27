@@ -20,9 +20,9 @@ import com.metas.{transactions => metasTransactions}
 import com.orders.{transactions => ordersTransactions}
 import com.splits.{transactions => splitsTransactions}
 import exceptions.BaseException
-import models.Trait.Logging
+import models.traits.Logging
 import org.postgresql.util.PSQLException
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import play.api.Configuration
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -43,7 +43,7 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 

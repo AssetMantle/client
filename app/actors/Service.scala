@@ -3,13 +3,13 @@ package actors
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 
 object Service {
 
   implicit val actorSystem: ActorSystem = ActorSystem(constants.Module.ACTOR_SERVICE, ConfigFactory.load)
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   implicit val materializer: Materializer = Materializer(actorSystem)
 

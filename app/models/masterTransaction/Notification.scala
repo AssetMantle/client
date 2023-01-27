@@ -1,13 +1,13 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import models.Trait.Logging
+import models.traits.Logging
 import models.common.Serializable.NotificationTemplate
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +30,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 

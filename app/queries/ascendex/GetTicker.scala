@@ -3,7 +3,7 @@ package queries.ascendex
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.responses.ascendex.TickerResponse.Response
 
 import java.net.ConnectException
@@ -15,7 +15,7 @@ class GetTicker @Inject()()(implicit wsClient: WSClient, configuration: Configur
 
   private implicit val module: String = constants.Module.QUERIES_GET_ASCENDEX_TICKER
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val host = configuration.get[String]("blockchain.token.priceURL")
 

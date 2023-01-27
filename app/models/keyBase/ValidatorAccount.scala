@@ -1,12 +1,12 @@
 package models.keyBase
 
 import exceptions.BaseException
-import models.Trait.Logging
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.Configuration
-import org.slf4j.{Logger, LoggerFactory}
+import play.api.Logger
 import queries.keyBase.GetValidatorKeyBaseAccount
 import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.{Response => ValidatorKeyBaseAccountResponse}
 import slick.jdbc.JdbcProfile
@@ -26,7 +26,7 @@ class ValidatorAccounts @Inject()(
                                    protected val databaseConfigProvider: DatabaseConfigProvider,
                                    configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.KEY_BASE_VALIDATOR_ACCOUNT
 
