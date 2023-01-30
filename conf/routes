@@ -4,6 +4,7 @@ GET        /search                                         controllers.IndexCont
 GET        /websocket                                      controllers.WebSocketController.connect
 
 GET        /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
+GET        /versionedAssets/*file                          controllers.PublicResourceController.versioned(path="/public", file: Asset, version: String)
 
 GET        /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
