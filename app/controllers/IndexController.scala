@@ -4,11 +4,16 @@ import akka.actor.CoordinatedShutdown
 import constants.AppConfig._
 import controllers.actions._
 import models.blockchain
-import play.api.{Configuration, Logger}
+import models.blockchain.Classification
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
+import schema.list.PropertyList
+import schema.qualified.{Immutables, Mutables}
 import services.Startup
+import com.qualified.{Immutables => protoImmutables}
+import schema.id.base.{PropertyID, StringID}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -32,7 +37,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        println(constants.Blockchain.NubClassificationID.asString)
+        val a = Await.result(blockchainClassifications.Service.tryGet(constants.Blockchain.NubClassificationID.getBytes), Duration.Inf)
+        val anyID = protoImmutables.parseFrom(a.immutables).getPropertyList.getPropertyList(0).getMetaProperty.getId
+        println(anyID)
+        println(PropertyID(keyID = StringID(anyID.getKeyID), typeID = StringID(anyID.getTypeID)))
+        println(PropertyID(anyID))
         Future(Ok(views.html.index()))
     }
   }
@@ -40,11 +49,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def search(query: String): EssentialAction = cached.apply(req => req.path + "/" + query, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-
-        val ownerId = IdentityID(HashID(commonUtilities.Secrets.base64URLDecode("S4W0p2S3eT1ruMcSfRz9tJTqRFkrUBrNCqeAK91zEpo=")))
-
-        val a = Await.result(blockchainSplits.Service.getByOwnerID(ownerId), Duration.Inf)
-
 
         if (query == "") Future(Unauthorized(views.html.index(failures = Seq(constants.Response.EMPTY_QUERY))))
         else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ComponentViewController.wallet(query)))
@@ -54,7 +58,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
     }
   }
-  //  blockchainClassifications.Service.insertOrUpdate(Classification(id = constants.Blockchain.NubClassificationID, immutables = Array(), mutables = Array()))
+
+  blockchainClassifications.Service.insertOrUpdate(Classification(
+    id = constants.Blockchain.NubClassificationID.getBytes,
+    immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
+    mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes))
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
   utilities.Scheduler.setShutdownCancellable(startup.start())

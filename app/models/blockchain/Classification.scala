@@ -12,11 +12,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-  def idString: String = commonUtilities.Secrets.base64URLEncoder(this.id)
+  def getID: String = commonUtilities.Secrets.base64URLEncoder(this.id)
 
-  def immutableList: Immutables = Immutables(this.immutables)
+  def getImmutables: Immutables = Immutables(this.immutables)
 
-  def mutableList: Mutables = Mutables(this.immutables)
+  def getMutables: Mutables = Mutables(this.mutables)
 
 }
 

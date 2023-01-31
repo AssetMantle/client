@@ -2,6 +2,7 @@ package constants
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
+import models.blockchain.Classification
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
 import schema.data.base.{IDData, ListData}
@@ -56,9 +57,8 @@ object Blockchain {
   val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
   val nubClassificationID: Array[Byte] = commonUtilities.Secrets.base64Decoder("DtqQ0fXQ45Bm0eavjtbwg3GSHGP+6ylMIILn6WmkY5Y=")
   val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = ListData(Seq()).getType), data = ListData(Seq()).toAnyData)
-  val NubPropertyID: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = IDData(StringID("").toAnyID).getType), data = IDData(StringID("").toAnyID).toAnyData)
-  val NubClassificationID: ClassificationID = commonUtilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubPropertyID))), Mutables(PropertyList(Seq(AuthenticationProperty))))
-
+  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = IDData(StringID("").toAnyID).getType), data = IDData(StringID("").toAnyID).toAnyData)
+  val NubClassificationID: ClassificationID = commonUtilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
     val SINGLE_SECP256K1 = "/cosmos.crypto.secp256k1.PubKey"
