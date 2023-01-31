@@ -5,12 +5,13 @@
     <option name="enableSbtGlobalPlugins" value="false" />
     <option name="play2EnvVariables">
       <map>
+        <entry key="APP_VERSION" value="proto" />
         <entry key="BLOCKCHAIN_ACCOUNT_PREFIX" value="mantle" />
         <entry key="BLOCKCHAIN_REST_URL" value="http://localhost:1317" />
         <entry key="BLOCKCHAIN_RPC_URL" value="http://localhost:26657" />
         <entry key="CHAIN_ID" value="test" />
         <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
-        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.AssetMantle/Node/config/genesis.json" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.mantleNode/Node/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
@@ -46,7 +47,6 @@
     </option>
     <method v="2">
       <option name="Make" enabled="true" />
-      <option name="MakeProject" enabled="true" />
     </method>
   </configuration>
 </component>

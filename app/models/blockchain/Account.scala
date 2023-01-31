@@ -2,13 +2,12 @@ package models.blockchain
 
 import com.cosmos.vesting.v1beta1._
 import exceptions.BaseException
-import models.traits.Logging
 import models.common.Serializable.Vesting.VestingParameters
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import queries.responses.common.Header

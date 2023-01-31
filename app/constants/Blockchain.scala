@@ -4,6 +4,11 @@ import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
+import schema.data.base.{IDData, ListData}
+import schema.id.base.{ClassificationID, PropertyID, StringID}
+import schema.property.base.MetaProperty
+import schema.list._
+import schema.qualified.{Immutables, Mutables}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -49,7 +54,10 @@ object Blockchain {
   val KafkaTxIteratorInitialDelay: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
   val KafkaTxIteratorInterval: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-
+  val nubClassificationID: Array[Byte] = commonUtilities.Secrets.base64Decoder("DtqQ0fXQ45Bm0eavjtbwg3GSHGP+6ylMIILn6WmkY5Y=")
+  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = ListData(Seq()).getType), data = ListData(Seq()).toAnyData)
+  val NubPropertyID: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = IDData(StringID("").toAnyID).getType), data = IDData(StringID("").toAnyID).toAnyData)
+  val NubClassificationID: ClassificationID = commonUtilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubPropertyID))), Mutables(PropertyList(Seq(AuthenticationProperty))))
 
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"

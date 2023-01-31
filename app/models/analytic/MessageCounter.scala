@@ -121,7 +121,16 @@ class MessageCounters @Inject()(
         oldMessageCounters <- oldMessageCounters
         _ <- update(oldMessageCounters = oldMessageCounters, addCounters = updates)
       } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        case baseException: BaseException => {
+          println("here")
+          val a = true
+          throw baseException
+        }
+        case exception: Exception => {
+          println("here")
+          val a = true
+          throw exception
+        }
       }
     }
 

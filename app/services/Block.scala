@@ -26,9 +26,8 @@ import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Valida
 import models.common.Parameters.SlashingParameter
 import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
-import play.api.Logger
-import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
+import play.api.{Configuration, Logger}
 import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
@@ -54,6 +53,7 @@ class Block @Inject()(
                        blockchainBalances: blockchain.Balances,
                        blockchainClassifications: blockchain.Classifications,
                        blockchainMetaDatas: blockchain.MetaDatas,
+                       blockchainSplits: blockchain.Splits,
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
                        blockchainParameters: blockchain.Parameters,
@@ -122,13 +122,13 @@ class Block @Inject()(
 
     }
 
-    def insertTransactions(transactions: Seq[TransactionByHeightResponseTx]) = {
+    def insertTransactions(transactions: Seq[TransactionByHeightResponseTx]): Future[Seq[blockchainTransaction]] = if (transactions.nonEmpty) {
       val bcTxs = transactions.map(_.toTransaction)
       val insertTxs = blockchainTransactions.Service.insertMultiple(bcTxs)
 
-      val updateTransactionCounter = if (transactions.nonEmpty) analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length) else Future(0L)
+      val updateTransactionCounter = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length)
 
-      val updateMessageCounter = if (transactions.nonEmpty) analyticMessageCounters.Utility.updateMessageCounter(bcTxs) else Future()
+      val updateMessageCounter = analyticMessageCounters.Utility.updateMessageCounter(bcTxs)
 
       for {
         _ <- insertTxs
@@ -136,7 +136,7 @@ class Block @Inject()(
         _ <- updateMessageCounter
         _ <- actionsOnTransactions(bcTxs)(header)
       } yield bcTxs
-    }
+    } else Future(Seq())
 
     (for {
       transactionByHeightResponseTxs <- transactionByHeightResponseTxs
@@ -197,8 +197,7 @@ class Block @Inject()(
   }
 
   def actionsOnTransactions(transactions: Seq[blockchainTransaction])(implicit header: Header): Future[Seq[Unit]] = utilitiesOperations.traverse(transactions) { transaction =>
-    val signers = if (transaction.status) utilitiesOperations.traverse(transaction.getMessages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg))
-    else Future(Seq.empty)
+    val signers = if (transaction.status) utilitiesOperations.traverse(transaction.getMessages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg)) else Future(Seq())
     val updateAccount = blockchainAccounts.Utility.incrementSequence(transaction.getSigners.head)
 
     // Should always be called after messages are processed, otherwise can create conflict
@@ -243,7 +242,16 @@ class Block @Inject()(
       _ <- deductFees
       _ <- addAddressTxs
     } yield ()).recover {
-      case baseException: BaseException => throw baseException
+      case baseException: BaseException => {
+        println("here")
+        val a = true
+        throw baseException
+      }
+      case exception: Exception => {
+        val a = true
+        println("here")
+        throw exception
+      }
     }
   }
 
@@ -318,14 +326,14 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
       //assets
       case constants.Blockchain.TransactionMessage.ASSET_BURN => Future(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => Future(assetsTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainClassifications.Utility.onDefineAsset(assetsTransactions.define.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => Future(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ASSET_MINT => Future(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ASSET_MUTATE => Future(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => Future(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ASSET_REVOKE => Future(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
       //identities
-      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => Future(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => blockchainClassifications.Utility.onDefineIdentity(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Future(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Future(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Future(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
@@ -336,7 +344,7 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => Future(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue).getFrom)
       //orders
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Future(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => Future(ordersTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainClassifications.Utility.onDefineOrder(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => Future(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => Future(ordersTransactions.make.Message.parseFrom(stdMsg.getValue).getFrom)
@@ -346,9 +354,9 @@ class Block @Inject()(
       //metas
       case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       // splits
-      case constants.Blockchain.TransactionMessage.SPLIT_SEND => Future(splitsTransactions.send.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.SPLIT_WRAP => Future(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => Future(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }

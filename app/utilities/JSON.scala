@@ -17,14 +17,14 @@ object JSON {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case mainError: JsError => logger.error(mainError.toString)
-          throw new BaseException(new Failure(mainError.toString))
+        case jsError: JsError =>
+          val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
+          logger.error(response.json.toString())
+          throw new BaseException(new Failure(error))
       }
     }.recover {
-      case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
-      case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(constants.Response.NO_RESPONSE)
+      case jsonParseException: JsonParseException => throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION, jsonParseException)
+      case jsonMappingException: JsonMappingException => throw new BaseException(constants.Response.NO_RESPONSE, jsonMappingException)
     }
   }
 

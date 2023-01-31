@@ -66,6 +66,8 @@ class Classifications @Inject()(
 
     def add(classification: Classification): Future[String] = create(classification).map(x => commonUtilities.Secrets.base64URLEncoder(x))
 
+    def insertOrUpdate(classification: Classification): Future[Unit] = upsert(classification)
+
     def get(id: String): Future[Option[Classification]] = getById(commonUtilities.Secrets.base64URLDecode(id))
 
     def get(id: Array[Byte]): Future[Option[Classification]] = getById(id)
@@ -116,7 +118,6 @@ class Classifications @Inject()(
         _ <- add
       } yield msg.getFrom
     }
-
 
 
   }

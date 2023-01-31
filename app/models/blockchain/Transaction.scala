@@ -1,15 +1,14 @@
 package models.blockchain
 
-import com.google.protobuf.{Any => protoAny}
-import com.cosmos.crypto.secp256k1
+import com.cosmos.crypto.{secp256k1, secp256r1}
 import com.cosmos.tx.v1beta1.Tx
+import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
-import models.traits.Logging
 import models.common.Serializable.{Coin, Fee}
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -26,7 +25,11 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
 
   // Since Seq in scala is by default immutable and ordering is maintained, we can use these methods directly
   def getSigners: Seq[String] = parsedTx.getAuthInfo.getSignerInfosList.asScala.toSeq.map { signerInfo =>
-    utilities.Crypto.convertAccountAddressBytesToBech32Address(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
+    signerInfo.getPublicKey.getTypeUrl match {
+      case constants.Blockchain.PublicKey.SINGLE_SECP256K1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
+      case constants.Blockchain.PublicKey.SINGLE_SECP256R1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256r1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
+      case constants.Blockchain.PublicKey.MULTI_SIG => "mantle1glk8f6xhs0u440xwfwqgn68aps6l85v9sn4efz"
+    }
   }
 
   def getFeePayer: String = if (parsedTx.getAuthInfo.getFee.getPayer != "") parsedTx.getAuthInfo.getFee.getPayer else getSigners.headOption.getOrElse("")
