@@ -37,11 +37,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val a = Await.result(blockchainClassifications.Service.tryGet(constants.Blockchain.NubClassificationID.getBytes), Duration.Inf)
-        val anyID = protoImmutables.parseFrom(a.immutables).getPropertyList.getPropertyList(0).getMetaProperty.getId
-        println(anyID)
-        println(PropertyID(keyID = StringID(anyID.getKeyID), typeID = StringID(anyID.getTypeID)))
-        println(PropertyID(anyID))
         Future(Ok(views.html.index()))
     }
   }
