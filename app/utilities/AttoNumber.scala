@@ -1,4 +1,4 @@
-package commonUtilities
+package utilities
 
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
@@ -62,17 +62,17 @@ class AttoNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConvers
 
   def isWhole: Boolean = this.value % AttoNumber.factor == 0
 
-  def roundedUp(precision: Int = 2): AttoNumber = new AttoNumber(commonUtilities.NumericOperation.roundUp(this.toDouble, precision))
+  def roundedUp(precision: Int = 2): AttoNumber = new AttoNumber(utilities.NumericOperation.roundUp(this.toDouble, precision))
 
-  def roundedDown(precision: Int = 2): AttoNumber = new AttoNumber(commonUtilities.NumericOperation.roundDown(this.toDouble, precision))
+  def roundedDown(precision: Int = 2): AttoNumber = new AttoNumber(utilities.NumericOperation.roundDown(this.toDouble, precision))
 
-  def roundedOff(precision: Int = 2): AttoNumber = new AttoNumber(commonUtilities.NumericOperation.roundOff(this.toDouble, precision))
+  def roundedOff(precision: Int = 2): AttoNumber = new AttoNumber(utilities.NumericOperation.roundOff(this.toDouble, precision))
 
-  def toRoundedUpString(precision: Int = 2): String = commonUtilities.NumericOperation.roundUp(this.toDouble, precision).toString
+  def toRoundedUpString(precision: Int = 2): String = utilities.NumericOperation.roundUp(this.toDouble, precision).toString
 
-  def toRoundedDownString(precision: Int = 2): String = commonUtilities.NumericOperation.roundDown(this.toDouble, precision).toString
+  def toRoundedDownString(precision: Int = 2): String = utilities.NumericOperation.roundDown(this.toDouble, precision).toString
 
-  def toRoundedOffString(precision: Int = 2): String = commonUtilities.NumericOperation.roundOff(this.toDouble, precision).toString
+  def toRoundedOffString(precision: Int = 2): String = utilities.NumericOperation.roundOff(this.toDouble, precision).toString
 
   def +(that: AttoNumber): AttoNumber = new AttoNumber(this.value + that.value)
 
@@ -196,7 +196,7 @@ class AttoNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConvers
 
 object AttoNumber {
 
-  private implicit val module: String = commonConstants.Module.COMMON_UTILITIES_ATTO_NUMBER
+  private implicit val module: String = constants.Module.COMMON_UTILITIES_ATTO_NUMBER
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 

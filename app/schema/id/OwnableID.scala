@@ -11,7 +11,7 @@ abstract class OwnableID extends ID {
 
 object OwnableID {
 
-  private implicit val module: String = commonConstants.Module.SCHEMA_OWNABLE_ID
+  private implicit val module: String = constants.Module.SCHEMA_OWNABLE_ID
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 

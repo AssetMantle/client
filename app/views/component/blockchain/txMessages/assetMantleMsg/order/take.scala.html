@@ -1,8 +1,9 @@
 @import views.html.base.infos._
 @import com.orders.transactions.take.Message
 @import schema.id.base._
-@import commonUtilities.AttoNumber
+@import utilities.AttoNumber
 
+@import utilities.AttoNumber
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonTextInfo(constants.View.FROM, msg.getFrom)

@@ -2,8 +2,9 @@
 @import com.splits.transactions.unwrap.Message
 @import schema.id.base._
 @import schema.id.OwnableID
-@import commonUtilities.AttoNumber
+@import utilities.AttoNumber
 
+@import utilities.AttoNumber
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonTextInfo(constants.View.FROM, msg.getFrom)

@@ -53,6 +53,7 @@ class Block @Inject()(
                        blockchainBalances: blockchain.Balances,
                        blockchainClassifications: blockchain.Classifications,
                        blockchainMetaDatas: blockchain.MetaDatas,
+                       blockchainIdentities: blockchain.Identities,
                        blockchainSplits: blockchain.Splits,
                        blockchainFeeGrants: blockchain.FeeGrants,
                        blockchainAuthorizations: blockchain.Authorizations,
@@ -337,7 +338,7 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Future(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Future(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Future(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => Future(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => blockchainIdentities.Utility.onNub(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => Future(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => Future(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => Future(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
@@ -378,7 +379,7 @@ class Block @Inject()(
       val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == constants.Blockchain.Event.Attribute.Reason))) { slashingEvent =>
         slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
           val slashingReason = Future(slashingReasonAttribute.value.getOrElse(throw new BaseException(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND)))
-          val hexAddress = commonUtilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
+          val hexAddress = utilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else Future(throw new BaseException(constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND))
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
@@ -448,7 +449,7 @@ class Block @Inject()(
     def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
       val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
       val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
-      val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(commonUtilities.Crypto.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
+      val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Crypto.convertConsensusAddressToHexAddress(consensusAddress)) else Future(throw new BaseException(constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND))
 
       (for {
         validator <- validator

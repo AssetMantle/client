@@ -7,7 +7,7 @@ case class IdentityID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def asString: String = commonUtilities.Secrets.base64URLEncoder(this.getBytes)
+  def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
   def asProtoIdentityID: protoIdentityID = protoIdentityID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
 

@@ -239,7 +239,7 @@ class ComponentViewController @Inject()(
   def accountWallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val operatorAddress = Future(commonUtilities.Crypto.convertAccountAddressToOperatorAddress(address))
+        val operatorAddress = Future(utilities.Crypto.convertAccountAddressToOperatorAddress(address))
         val balances = blockchainBalances.Service.get(address)
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
         val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
@@ -599,7 +599,7 @@ class ComponentViewController @Inject()(
           validator <- validator
           totalBondedAmount <- totalBondedAmount
           keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
-        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, commonUtilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
+        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -635,7 +635,7 @@ class ComponentViewController @Inject()(
         def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllForValidator(operatorAddress)
 
         def getDelegationsMap(delegations: Seq[Delegation], validator: Validator) = Future {
-          val selfDelegated = delegations.find(x => x.delegatorAddress == commonUtilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
+          val selfDelegated = delegations.find(x => x.delegatorAddress == utilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
           val othersDelegated = validator.delegatorShares - selfDelegated
           val delegationsMap = ListMap(constants.View.SELF_DELEGATED -> selfDelegated.toDouble, constants.View.OTHERS_DELEGATED -> othersDelegated.toDouble)
           (delegationsMap, (selfDelegated * 100.0 / validator.delegatorShares).toDouble, (othersDelegated * 100.0 / validator.delegatorShares).toDouble)

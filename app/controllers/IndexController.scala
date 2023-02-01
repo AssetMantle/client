@@ -12,12 +12,10 @@ import play.api.{Configuration, Logger}
 import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 import services.Startup
-import com.qualified.{Immutables => protoImmutables}
-import schema.id.base.{PropertyID, StringID}
+import utilities.Bech32.from5Bit
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton

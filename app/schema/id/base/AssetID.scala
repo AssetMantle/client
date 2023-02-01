@@ -7,7 +7,7 @@ case class AssetID(hashID: HashID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def asString: String = commonUtilities.Secrets.base64URLEncoder(this.getBytes)
+  def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
   def asProtoAssetID: protoAssetID = protoAssetID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
 

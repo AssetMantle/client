@@ -1,20 +1,20 @@
 package schema.data.base
 
-import commonUtilities.AttoNumber
 import com.data.{AnyData, DecData => protoDecData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
+import utilities.AttoNumber
 
 case class DecData(value: AttoNumber) extends Data {
-  def getType: StringID = commonConstants.DataTypeID.DecDataTypeID
+  def getType: StringID = constants.DataTypeID.DecDataTypeID
 
-  def getID: DataID = DataID(typeID = commonConstants.DataTypeID.DecDataTypeID, hashID = this.generateHashID)
+  def getID: DataID = DataID(typeID = constants.DataTypeID.DecDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = DecData(AttoNumber.zero)
 
   def getBytes: Array[Byte] = this.value.getSortableDecBytes
 
-  def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
   def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toString).build()
 

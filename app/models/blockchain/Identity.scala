@@ -3,6 +3,8 @@ package models.blockchain
 import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.{AccAddressData, IDData, ListData}
+import schema.id.base.StringID
 import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
@@ -12,9 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-  def getID: String = commonUtilities.Secrets.base64URLEncoder(this.id)
+  def getID: String = utilities.Secrets.base64URLEncoder(this.id)
 
-  //  def getClassificationID = ClassificationID(this.classificationID)
+  def getClassificationID: String = utilities.Secrets.base64URLEncoder(this.classificationID)
 
   def getImmutables: Immutables = Immutables(this.immutables)
 
@@ -22,7 +24,7 @@ case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: 
 
 }
 
-object Identitys {
+object Identities {
 
   implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
 
@@ -36,7 +38,7 @@ object Identitys {
 
     def classificationID = column[Array[Byte]]("classificationID")
 
-    def immutables = column[Array[Byte]]("immutableMetas")
+    def immutables = column[Array[Byte]]("immutables")
 
     def mutables = column[Array[Byte]]("mutables")
 
@@ -58,23 +60,23 @@ object Identitys {
 class Identities @Inject()(
                             protected val databaseConfigProvider: DatabaseConfigProvider
                           )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Identitys.DataTable, Identity, Array[Byte]](
+  extends GenericDaoImpl[Identities.DataTable, Identity, Array[Byte]](
     databaseConfigProvider,
-    Identitys.TableQuery,
+    Identities.TableQuery,
     executionContext,
-    Identitys.module,
-    Identitys.logger
+    Identities.module,
+    Identities.logger
   ) {
 
   object Service {
 
-    def add(identity: Identity): Future[String] = create(identity).map(x => commonUtilities.Secrets.base64URLEncoder(x))
+    def add(identity: Identity): Future[String] = create(identity).map(x => utilities.Secrets.base64URLEncoder(x))
 
-    def get(id: String): Future[Option[Identity]] = getById(commonUtilities.Secrets.base64URLDecode(id))
+    def get(id: String): Future[Option[Identity]] = getById(utilities.Secrets.base64URLDecode(id))
 
     def get(id: Array[Byte]): Future[Option[Identity]] = getById(id)
 
-    def tryGet(id: String): Future[Identity] = tryGetById(commonUtilities.Secrets.base64URLDecode(id))
+    def tryGet(id: String): Future[Identity] = tryGetById(utilities.Secrets.base64URLDecode(id))
 
     def tryGet(id: Array[Byte]): Future[Identity] = tryGetById(id)
 
@@ -85,17 +87,17 @@ class Identities @Inject()(
 
   object Utility {
 
-//    def onNub(msg: com.identities.transactions.nub.Message): Future[String] = {
-//      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
-//      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-//      val identityID = commonUtilities.ID.getIdentityID(immutables = immutables, mutables = mutables)
-//      val identity = Identity(identityID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
-//      val add = Service.add(identity)
-//
-//      for {
-//        _ <- add
-//      } yield msg.getFrom
-//    }
+    def onNub(msg: com.identities.transactions.nub.Message): Future[String] = try {
+      val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID).toAnyID).toAnyData))))
+      val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getFrom)).toAnyData)).toAnyData))))
+      val identityID = utilities.ID.getIdentityID(classificationID = constants.Blockchain.NubClassificationID, immutables = immutables)
+      val identity = Identity(id = identityID.getBytes, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val add = Service.add(identity)
+
+      for {
+        _ <- add
+      } yield msg.getFrom
+    }
 
   }
 }

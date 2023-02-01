@@ -26,7 +26,7 @@ abstract class Data {
 
 object Data {
 
-  private implicit val module: String = commonConstants.Module.SCHEMA_DATA
+  private implicit val module: String = constants.Module.SCHEMA_DATA
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -42,12 +42,12 @@ object Data {
   }
 
   def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
-    case commonConstants.DataTypeID.AccAddressDataTypeID.value => AccAddressData(protoBytes)
-    case commonConstants.DataTypeID.BooleanDataTypeID.value => BooleanData(protoBytes)
-    case commonConstants.DataTypeID.HeightDataTypeID.value => HeightData(protoBytes)
-    case commonConstants.DataTypeID.IDDataTypeID.value => IDData(protoBytes)
-    case commonConstants.DataTypeID.StringDataTypeID.value => StringData(protoBytes)
-    case commonConstants.DataTypeID.ListDataTypeID.value => ListData(protoBytes)
+    case constants.DataTypeID.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
+    case constants.DataTypeID.BooleanDataTypeID.value => BooleanData(protoBytes)
+    case constants.DataTypeID.HeightDataTypeID.value => HeightData(protoBytes)
+    case constants.DataTypeID.IDDataTypeID.value => IDData(protoBytes)
+    case constants.DataTypeID.StringDataTypeID.value => StringData(protoBytes)
+    case constants.DataTypeID.ListDataTypeID.value => ListData(protoBytes)
     case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
   }
 

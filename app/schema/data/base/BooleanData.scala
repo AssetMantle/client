@@ -1,14 +1,14 @@
 package schema.data.base
 
-import commonUtilities.AttoNumber
 import com.data.{AnyData, BooleanData => protoBooleanData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
+import utilities.AttoNumber
 
 case class BooleanData(value: Boolean) extends Data {
-  def getType: StringID = commonConstants.DataTypeID.BooleanDataTypeID
+  def getType: StringID = constants.DataTypeID.BooleanDataTypeID
 
-  def getID: DataID = DataID(typeID = commonConstants.DataTypeID.BooleanDataTypeID, hashID = this.generateHashID)
+  def getID: DataID = DataID(typeID = constants.DataTypeID.BooleanDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = DecData(AttoNumber.zero)
 
@@ -17,7 +17,7 @@ case class BooleanData(value: Boolean) extends Data {
     Seq(res).toArray
   }
 
-  def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
   def asProtoBooleanData: protoBooleanData = protoBooleanData.newBuilder().setValue(this.value).build()
 

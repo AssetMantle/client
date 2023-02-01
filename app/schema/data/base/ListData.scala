@@ -9,13 +9,13 @@ import scala.jdk.CollectionConverters._
 
 
 case class ListData(dataList: Seq[AnyData]) extends Data {
-  def getType: StringID = commonConstants.DataTypeID.ListDataTypeID
+  def getType: StringID = constants.DataTypeID.ListDataTypeID
 
-   def getID: DataID = DataID(typeID = commonConstants.DataTypeID.ListDataTypeID, hashID = this.generateHashID)
+   def getID: DataID = DataID(typeID = constants.DataTypeID.ListDataTypeID, hashID = this.generateHashID)
 
    def zeroValue: Data = ListData(dataList = Seq())
 
-   def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+   def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
    def asProtoListData: protoListData = protoListData.newBuilder().addAllDataList(this.dataList.asJava).build()
 

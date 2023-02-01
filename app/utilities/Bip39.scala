@@ -1,6 +1,6 @@
-package commonUtilities
+package utilities
 
-import commonConstants.Bip39.WordList
+import constants.Bip39.WordList
 import scodec.bits.BitVector
 import scorex.crypto.hash.Sha256
 
@@ -37,7 +37,7 @@ object Bip39 {
     } mkString wordList.delimiter
   }
 
-  def validate(mnemonics: Seq[String], wordList: WordList = commonConstants.Bip39.EnglishWordList): Boolean = {
+  def validate(mnemonics: Seq[String], wordList: WordList = constants.Bip39.EnglishWordList): Boolean = {
     require(wordList.words.size == WordListSize, s"WordList should have $WordListSize words")
     if (mnemonics.length % 3 != 0) false
     else {
@@ -81,6 +81,6 @@ object Bip39 {
   //Generates 24 words mnemonic
   case object Entropy256 extends Entropy(256)
 
-  def creatRandomMnemonics(entropy: Entropy = Entropy256): Seq[String] = generate(entropy, commonConstants.Bip39.EnglishWordList, new SecureRandom()).split(" ")
+  def creatRandomMnemonics(entropy: Entropy = Entropy256): Seq[String] = generate(entropy, constants.Bip39.EnglishWordList, new SecureRandom()).split(" ")
 
 }

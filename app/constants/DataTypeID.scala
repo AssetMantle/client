@@ -1,4 +1,4 @@
-package commonConstants
+package constants
 
 import schema.id.base.StringID
 

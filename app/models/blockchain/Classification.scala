@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-  def getID: String = commonUtilities.Secrets.base64URLEncoder(this.id)
+  def getID: String = utilities.Secrets.base64URLEncoder(this.id)
 
   def getImmutables: Immutables = Immutables(this.immutables)
 
@@ -64,15 +64,15 @@ class Classifications @Inject()(
 
   object Service {
 
-    def add(classification: Classification): Future[String] = create(classification).map(x => commonUtilities.Secrets.base64URLEncoder(x))
+    def add(classification: Classification): Future[String] = create(classification).map(x => utilities.Secrets.base64URLEncoder(x))
 
     def insertOrUpdate(classification: Classification): Future[Unit] = upsert(classification)
 
-    def get(id: String): Future[Option[Classification]] = getById(commonUtilities.Secrets.base64URLDecode(id))
+    def get(id: String): Future[Option[Classification]] = getById(utilities.Secrets.base64URLDecode(id))
 
     def get(id: Array[Byte]): Future[Option[Classification]] = getById(id)
 
-    def tryGet(id: String): Future[Classification] = tryGetById(commonUtilities.Secrets.base64URLDecode(id))
+    def tryGet(id: String): Future[Classification] = tryGetById(utilities.Secrets.base64URLDecode(id))
 
     def tryGet(id: Array[Byte]): Future[Classification] = tryGetById(id)
 
@@ -86,7 +86,7 @@ class Classifications @Inject()(
     def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
       val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
       val add = Service.add(classification)
 
@@ -98,7 +98,7 @@ class Classifications @Inject()(
     def onDefineIdentity(msg: com.identities.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
       val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
       val add = Service.add(classification)
 
@@ -110,7 +110,7 @@ class Classifications @Inject()(
     def onDefineOrder(msg: com.orders.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = commonUtilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
+      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
       val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
       val add = Service.add(classification)
 
