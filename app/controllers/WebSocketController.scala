@@ -5,7 +5,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.libs.streams.ActorFlow
 import play.api.mvc.{AbstractController, MessagesControllerComponents, WebSocket}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 
 import scala.concurrent.ExecutionContext
 

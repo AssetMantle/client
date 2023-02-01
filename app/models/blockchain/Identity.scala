@@ -1,224 +1,101 @@
 package models.blockchain
 
-import exceptions.BaseException
-import models.Trait.Logged
-import models.common.DataValue.IDDataValue
-import models.common.ID.{ClassificationID, IdentityID}
-import models.common.Serializable._
-import models.common.TransactionMessages.{IdentityDefine, IdentityIssue, IdentityNub}
-import models.master
-import org.postgresql.util.PSQLException
+import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
-import queries.responses.common.Header
-import slick.jdbc.JdbcProfile
+import schema.list.PropertyList
+import schema.qualified.{Immutables, Mutables}
+import slick.jdbc.H2Profile.api._
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
-case class Identity(id: IdentityID, immutables: Immutables, mutables: Mutables, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-@Singleton
-class Identities @Inject()(
-                            protected val databaseConfigProvider: DatabaseConfigProvider,
-                            blockchainIdentityProvisions: IdentityProvisions,
-                            blockchainIdentityUnprovisions: IdentityUnprovisions,
-                            blockchainMetas: Metas,
-                            blockchainClassifications: Classifications,
-                            blockchainMaintainers: Maintainers,
-                            masterClassifications: master.Classifications,
-                            utilitiesOperations: utilities.Operations
-                          )(implicit executionContext: ExecutionContext) {
+  def getID: String = commonUtilities.Secrets.base64URLEncoder(this.id)
 
-  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+  //  def getClassificationID = ClassificationID(this.classificationID)
 
-  val db = databaseConfig.db
+  def getImmutables: Immutables = Immutables(this.immutables)
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  def getMutables: Mutables = Mutables(this.immutables)
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
+}
 
-  import databaseConfig.profile.api._
+object Identitys {
 
-  case class IdentitySerialized(classificationID: String, hashID: String, immutables: String, mutables: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) {
-    def deserialize: Identity = Identity(id = IdentityID(classificationID = this.classificationID, hashID = this.hashID), immutables = utilities.JSON.convertJsonStringToObject[Immutables](this.immutables), mutables = utilities.JSON.convertJsonStringToObject[Mutables](this.mutables), createdBy = this.createdBy, createdOn = this.createdOn, createdOnTimeZone = this.createdOnTimeZone, updatedBy = this.updatedBy, updatedOn = this.updatedOn, updatedOnTimeZone = this.updatedOnTimeZone)
-  }
+  implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
 
-  def serialize(identity: Identity): IdentitySerialized = IdentitySerialized(classificationID = identity.id.classificationID.asString, hashID = identity.id.hashID, immutables = Json.toJson(identity.immutables).toString, mutables = Json.toJson(identity.mutables).toString, createdBy = identity.createdBy, createdOn = identity.createdOn, createdOnTimeZone = identity.createdOnTimeZone, updatedBy = identity.updatedBy, updatedOn = identity.updatedOn, updatedOnTimeZone = identity.updatedOnTimeZone)
+  implicit val logger: Logger = Logger(this.getClass)
 
-  private[models] val identityTable = TableQuery[IdentityTable]
+  class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
-  private def add(identity: Identity): Future[String] = db.run((identityTable returning identityTable.map(_.hashID) += serialize(identity)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.IDENTITY_INSERT_FAILED, psqlException)
-    }
-  }
+    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
 
-  private def addMultiple(identities: Seq[Identity]): Future[Seq[String]] = db.run((identityTable returning identityTable.map(_.hashID) ++= identities.map(x => serialize(x))).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.IDENTITY_INSERT_FAILED, psqlException)
-    }
-  }
+    def id = column[Array[Byte]]("id", O.PrimaryKey)
 
-  private def upsert(identity: Identity): Future[Int] = db.run(identityTable.insertOrUpdate(serialize(identity)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.IDENTITY_UPSERT_FAILED, psqlException)
-    }
-  }
+    def classificationID = column[Array[Byte]]("classificationID")
 
-  private def tryGetByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.IDENTITY_NOT_FOUND, noSuchElementException)
-    }
-  }
+    def immutables = column[Array[Byte]]("immutableMetas")
 
-  private def getByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).result.headOption)
-
-  private def checkExistsByID(classificationID: String, hashID: String) = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).exists.result)
-
-  private def deleteByID(classificationID: String, hashID: String): Future[Int] = db.run(identityTable.filter(x => x.classificationID === classificationID && x.hashID === hashID).delete)
-
-  private[models] class IdentityTable(tag: Tag) extends Table[IdentitySerialized](tag, "Identity_BC") {
-
-    def * = (classificationID, hashID, immutables, mutables, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (IdentitySerialized.tupled, IdentitySerialized.unapply)
-
-    def classificationID = column[String]("classificationID", O.PrimaryKey)
-
-    def hashID = column[String]("hashID", O.PrimaryKey)
-
-    def immutables = column[String]("immutables")
-
-    def mutables = column[String]("mutables")
+    def mutables = column[Array[Byte]]("mutables")
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
   }
+
+  val TableQuery = new TableQuery(tag => new DataTable(tag))
+
+}
+
+@Singleton
+class Identities @Inject()(
+                            protected val databaseConfigProvider: DatabaseConfigProvider
+                          )(implicit override val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Identitys.DataTable, Identity, Array[Byte]](
+    databaseConfigProvider,
+    Identitys.TableQuery,
+    executionContext,
+    Identitys.module,
+    Identitys.logger
+  ) {
 
   object Service {
 
-    def insertOrUpdate(identity: Identity): Future[Int] = upsert(identity)
+    def add(identity: Identity): Future[String] = create(identity).map(x => commonUtilities.Secrets.base64URLEncoder(x))
 
-    def tryGet(id: IdentityID): Future[Identity] = tryGetByID(classificationID = id.classificationID.asString, hashID = id.hashID).map(_.deserialize)
+    def get(id: String): Future[Option[Identity]] = getById(commonUtilities.Secrets.base64URLDecode(id))
 
-    def get(id: IdentityID): Future[Option[Identity]] = getByID(classificationID = id.classificationID.asString, hashID = id.hashID).map(_.map(_.deserialize))
+    def get(id: Array[Byte]): Future[Option[Identity]] = getById(id)
 
-    def insertMultiple(identities: Seq[Identity]): Future[Seq[String]] = addMultiple(identities)
+    def tryGet(id: String): Future[Identity] = tryGetById(commonUtilities.Secrets.base64URLDecode(id))
 
-    def checkExists(id: IdentityID): Future[Boolean] = checkExistsByID(classificationID = id.classificationID.asString, hashID = id.hashID)
+    def tryGet(id: Array[Byte]): Future[Identity] = tryGetById(id)
+
+    def fetchAll: Future[Seq[Identity]] = getAll
+
+
   }
 
   object Utility {
 
-    def onDefine(identityDefine: IdentityDefine)(implicit header: Header): Future[Unit] = {
-      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityDefine.immutableMetaTraits.metaPropertyList)
-      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityDefine.mutableMetaTraits.metaPropertyList)
+//    def onNub(msg: com.identities.transactions.nub.Message): Future[String] = {
+//      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+//      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+//      val identityID = commonUtilities.ID.getIdentityID(immutables = immutables, mutables = mutables)
+//      val identity = Identity(identityID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
+//      val add = Service.add(identity)
+//
+//      for {
+//        _ <- add
+//      } yield msg.getFrom
+//    }
 
-      def defineAndSuperAuxiliary(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
-        val mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityDefine.mutableTraits.propertyList))
-        val defineAuxiliary = blockchainClassifications.Utility.auxiliaryDefine(immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityDefine.immutableTraits.propertyList)), mutables = mutables)
-
-        def superAuxiliary(classificationID: ClassificationID) = blockchainMaintainers.Utility.auxiliarySuper(classificationID = classificationID, identityID = IdentityID(identityDefine.fromID), mutableTraits = mutables)
-
-        for {
-          classificationID <- defineAuxiliary
-          _ <- superAuxiliary(classificationID)
-        } yield classificationID
-      }
-
-      def masterOperations(classificationID: ClassificationID) = {
-        val insert = masterClassifications.Service.insertOrUpdate(id = classificationID.asString, entityType = constants.Blockchain.Entity.IDENTITY_DEFINITION, maintainerID = identityDefine.fromID, status = Option(true))
-        for {
-          _ <- insert
-        } yield ()
-      }
-
-      (for {
-        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
-        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        classificationID <- defineAndSuperAuxiliary(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
-        _ <- masterOperations(classificationID)
-      } yield ()
-        ).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-      }
-    }
-
-    def onIssue(identityIssue: IdentityIssue)(implicit header: Header): Future[Unit] = {
-      val scrubbedImmutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.immutableMetaProperties.metaPropertyList)
-      val scrubbedMutableMetaProperties = blockchainMetas.Utility.auxiliaryScrub(identityIssue.mutableMetaProperties.metaPropertyList)
-
-      def insertOrUpdate(scrubbedImmutableMetaProperties: Seq[Property], scrubbedMutableMetaProperties: Seq[Property]) = {
-        val immutables = Immutables(Properties(scrubbedImmutableMetaProperties ++ identityIssue.immutableProperties.propertyList))
-        val identityID = IdentityID(classificationID = identityIssue.classificationID, hashID = immutables.getHashID)
-        val addIdentityWithProvisionAddress = addIdentityWithProvisionAddresses(identity = Identity(id = identityID, mutables = Mutables(Properties(scrubbedMutableMetaProperties ++ identityIssue.mutableProperties.propertyList)), immutables = immutables), provisionedAddresses = Seq(identityIssue.to))
-
-        for {
-          _ <- addIdentityWithProvisionAddress
-        } yield identityID
-      }
-
-      (for {
-        scrubbedImmutableMetaProperties <- scrubbedImmutableMetaProperties
-        scrubbedMutableMetaProperties <- scrubbedMutableMetaProperties
-        identityID <- insertOrUpdate(scrubbedImmutableMetaProperties = scrubbedImmutableMetaProperties, scrubbedMutableMetaProperties = scrubbedMutableMetaProperties)
-      } yield ()
-        ).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_ISSUE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-      }
-    }
-
-    def onNub(identityNub: IdentityNub)(implicit header: Header): Future[Unit] = {
-      val nubProperty = blockchainMetas.Utility.auxiliaryScrub(Seq(utilities.Blockchain.getNubMetaProperty(identityNub.nubID)))
-
-      def defineAndUpsert(nubProperty: Property): Future[Identity] = {
-        val defineClassification = blockchainClassifications.Utility.auxiliaryDefine(Immutables(Properties(Seq(Property(constants.Blockchain.Properties.NubID, NewFact(constants.Blockchain.FactType.ID, IDDataValue("")))))), Mutables(Properties(Seq())))
-
-        def addIdentityWithProvisionAddress() = addIdentityWithProvisionAddresses(identity = utilities.Blockchain.getNubIdentity(identityNub.nubID), provisionedAddresses = Seq(identityNub.from))
-
-        for {
-          classificationID <- defineClassification
-          identity <- addIdentityWithProvisionAddress()
-        } yield identity
-      }
-
-      (for {
-        nubProperty <- nubProperty
-        identity <- defineAndUpsert(nubProperty.head)
-      } yield ()
-        ).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.IDENTITY_NUB + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-      }
-    }
-
-    def addIdentityWithProvisionAddresses(identity: Identity, provisionedAddresses: Seq[String]): Future[Identity] = {
-      val upsert = Service.insertOrUpdate(Identity(id = identity.id, mutables = identity.mutables, immutables = identity.immutables))
-
-      def addProvisions() = if (provisionedAddresses.nonEmpty) utilitiesOperations.traverse(provisionedAddresses) { address => blockchainIdentityProvisions.Service.addProvisionAddress(id = identity.id.asString, address = address) } else Future(Seq())
-
-      (for {
-        _ <- upsert
-        _ <- addProvisions()
-      } yield identity
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
   }
-
 }

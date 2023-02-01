@@ -1,14 +1,15 @@
 @import controllers.actions.LoginState
 @import constants.AppConfig.OtherApp
+@import constants.Response._
 
-@(component: Option[String] = None, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(component: Option[String] = None, failures: Seq[Failure] = Seq(), warnings: Seq[Warning] = Seq(), successes: Seq[Success] = Seq(), infos: Seq[Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 
     @views.html.base.common(Messages(constants.View.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
     @left = {
         <div class="leftContainer">
             <div id="latestBlockHeight" class="cmuk-margin-bottom tableCard cmuk-card-styles containerHeight"></div>
-            <div id="tokensStatistics" class="cardSelectHeader tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
+            <div id="tokensStatistics" class="cardSelectHeader tableCard tableViewCard cmuk-margin-bottom cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('latestBlockHeight', jsRoutes.controllers.ComponentViewController.latestBlockHeight());
@@ -68,7 +69,7 @@
     @right = {
         <div class="rightContainer">
             <div id="recentActivities" class="recentActivityContainer cmuk-card-styles containerHeight"></div>
-            <div id="votingPowers" class="cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
+            <div id="votingPowers" class="votingPowerContainer cmuk-margin-bottom tableViewCard cmuk-card-styles containerHeight"></div>
         </div>
         <script>
                 componentResource('recentActivities', jsRoutes.controllers.ComponentViewController.recentActivities());

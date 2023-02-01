@@ -10,7 +10,7 @@
     <p>$@tokenTickers.find(_.denom == stakingDenom).fold(stakingDenom)(_.normalizedDenom)</p>
 } {
     @if(tokenPrices.nonEmpty) {
-        @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOn.fold("")(x => utilities.Date.getTimeFromSqlTimestamp(x)) -> token.price).reverse: _*), tokenTickers.find(_.denom == stakingDenom).fold(stakingDenom)(_.normalizedDenom), showLegend = false, constants.View.TIME, constants.View.USD)
+        @commonLineChart(Seq("tokenPricesChart", stakingDenom).mkString("_"), ListMap(tokenPrices.map(token => token.createdOnMillisEpoch.fold("")(x => utilities.Date.getTimeFromEpoch(x)) -> token.price).reverse: _*), tokenTickers.find(_.denom == stakingDenom).fold(stakingDenom)(_.normalizedDenom), showLegend = false, constants.View.TIME, constants.View.USD)
     }
     @* <script src="@routes.Assets.versioned("javascripts/tokensPrices.js")" type="text/javascript"></script>*@
 }

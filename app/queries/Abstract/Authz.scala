@@ -5,6 +5,7 @@ import models.Abstract
 object Authz {
 
   abstract class Authorization {
-    def toSerializable: Abstract.Authz.Authorization
+    def toSerializable: Abstract.Authorization
   }
 }
+

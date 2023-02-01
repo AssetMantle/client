@@ -1,0 +1,34 @@
+@import views.html.base._
+@import views.html.base.cards._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<script src="@routes.Assets.versioned("javascripts/easy.qrcode.min.js")"></script>
+<div id="walletDetails">
+    @commonCard(constants.View.WALLET_DETAILS) {
+    } {
+        <div class="walletDetailsContent">
+            <div class="QRContainer">
+                <div id="qrcode"></div>
+            </div>
+            <div class="detail">
+                <dis class="title">@Messages(constants.View.WALLET_ADDRESS)</dis>
+                <dis class="value">
+                    <span id="walletDetailsAddress" class="address clipboardData" data-value="@Messages(constants.View.WALLET_ADDRESS)">@Messages(constants.View.WALLET_ADDRESS)</span>
+                    <span onclick="copyMessageToClipboard(this)">@commonIcon("copy")</span>
+                </dis>
+            </div>
+        </div>
+    }
+</div>
+<script src="@routes.Assets.versioned("javascripts/addressShorter.js")"></script>
+<script src="@routes.Assets.versioned("javascripts/copyToClipboard.js")"></script>
+<script>
+    shortAddress('walletDetailsAddress', '@Messages(constants.View.WALLET_ADDRESS)');
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: "@Messages(constants.View.WALLET_ADDRESS)",
+        logo: "@routes.Assets.versioned("images/logo.png")",
+        logoWidth: 40,
+        logoHeight: 40,
+        logoBackgroundTransparent: true
+    });
+</script>

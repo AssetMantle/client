@@ -2,7 +2,7 @@ function pieChart(chartID, keys, values, showLegend) {
     let nameList = keys.replace('List(', '').slice(0, -1).split(', ');
     let valueList = values.replace('Iterable(', '').replace(')', '').split(', ');
     let totalValue = parseFloat(valueList[0]);
-    let colors = [theme_colors.primary];
+    let colors = [theme_colors.primary, theme_colors.line];
     let colorPrefixes = ["e", 4, 1, 2, 6, "b", 9, 3, "f", 5, 6, 0, "e", 2, 8, "b", 9, 3, "f", 5, "a", 7, "c", 2, 6, "b", 9, 3, "f", 5, "e", 4, 1, 2, 6, "b", 9, 3, "f", 5, 6, 0, "e", 2, 8, "b", 9, 3, "f", 5];
     for (let i = 1; i < valueList.length; i++) {
         totalValue = totalValue + parseFloat(valueList[i]);
@@ -21,6 +21,8 @@ function pieChart(chartID, keys, values, showLegend) {
             {
                 data: valueList,
                 backgroundColor: colors,
+                borderColor: theme_colors.disabled,
+                borderWidth: 2,
             }]
     };
     let ctx = $('#' + chartID);
@@ -42,7 +44,7 @@ function pieChart(chartID, keys, values, showLegend) {
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-                position: 'right',
+                position: 'bottom',
                 align: 'center',
                 labels: {
                     boxWidth: 10,

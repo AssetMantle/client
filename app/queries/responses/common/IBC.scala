@@ -7,6 +7,8 @@ import utilities.MicroNumber
 
 object IBC {
 
+  private implicit val logger: Logger = Logger(constants.Module.IBC_COMMON_RESPONSES)
+
   case class ConnectionCounterparty(client_id: String, connection_id: String) {
     def toSerializableIBCConnectionCounterparty: Serializable.IBC.ConnectionCounterparty = Serializable.IBC.ConnectionCounterparty(connectionID = connection_id, clientID = client_id)
   }
@@ -44,7 +46,7 @@ object IBC {
   implicit val fungibleTokenPacketDataReads: Reads[FungibleTokenPacketData] = Json.reads[FungibleTokenPacketData]
 
   case class Packet(sequence: String, source_port: String, source_channel: String, destination_port: String, destination_channel: String, data: String, timeout_height: ClientHeight, timeout_timestamp: String) {
-    def toSerializableIBCPacket: Serializable.IBC.Packet = Serializable.IBC.Packet(sequence = sequence, sourcePort = source_port, sourceChannel = source_channel, destinationPort = destination_port, destinationChannel = destination_channel, data = utilities.JSON.convertJsonStringToObject[FungibleTokenPacketData](utilities.Secrets.base64URLDecoder(data))(module = constants.Module.IBC_COMMON_RESPONSES, logger = Logger(constants.Module.IBC_COMMON_RESPONSES), reads = fungibleTokenPacketDataReads).toSerializableIBCFungibleTokenPacketData, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
+    def toSerializableIBCPacket: Serializable.IBC.Packet = Serializable.IBC.Packet(sequence = sequence, sourcePort = source_port, sourceChannel = source_channel, destinationPort = destination_port, destinationChannel = destination_channel, data = utilities.JSON.convertJsonStringToObject[FungibleTokenPacketData](utilities.Secrets.base64URLDecoder(data))(module = constants.Module.IBC_COMMON_RESPONSES, logger = logger, reads = fungibleTokenPacketDataReads).toSerializableIBCFungibleTokenPacketData, timeoutHeight = timeout_height.toSerializableIBCClientHeight, timeoutTimestamp = timeout_timestamp)
   }
 
   implicit val packetReads: Reads[Packet] = Json.reads[Packet]

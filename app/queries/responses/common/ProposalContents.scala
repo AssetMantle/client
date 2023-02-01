@@ -14,7 +14,7 @@ object ProposalContents {
   private implicit val logger: Logger = Logger(this.getClass)
 
   case class Plan(name: String, time: RFC3339, height: String, info: String) {
-    def toSerializablePlan: SerializableProposalContents.Plan = SerializableProposalContents.Plan(name = name, time = time, height = height, info = info)
+    def toSerializablePlan: SerializableProposalContents.Plan = SerializableProposalContents.Plan(name = name, time = time.epoch, height = height, info = info)
   }
 
   implicit val plainReads: Reads[Plan] = Json.reads[Plan]

@@ -1,0 +1,23 @@
+@import models.common.Serializable.Coin
+@import views.html.base.buttons._
+@import scala.collection.immutable.ListMap
+@import views.html.base.cards._
+
+@(withdrawAddress: String, stakingDenom: String, totalRewards: Coin, validatorRewards: ListMap[String, Coin], validatorsMap: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="tableCard">
+    <div class="cmuk-card-body">
+        @commonTable(id = "accountValidatorsDetail", tableType = "cmuk-table-divider") {
+        } {
+            @validatorRewards.map { case (validatorAddress, amount) =>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress),JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"""))</div>
+                        <div class="tableFieldValue">@Html(amount.getAmountWithNormalizedDenom())</div>
+                    </div>
+                </td>
+            </tr>
+            }
+        }
+    </div>
+</div>

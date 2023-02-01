@@ -1,0 +1,10 @@
+@import com.ibc.core.connection.v1.Counterparty
+@import views.html.base.infos._
+
+@(key: String, connectionCounterparty: Counterparty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.CLIENT_ID, connectionCounterparty.getClientId)
+    @commonTextInfo(constants.View.CONNECTION_ID, connectionCounterparty.getConnectionId)
+</div>

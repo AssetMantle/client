@@ -1,8 +1,0 @@
-@import controllers.actions.LoginState
-@import views.companion.master.contact.AddOrUpdateEmailAddress
-@import views.html.base.form._
-
-@(addOrUpdateEmailAddress: Form[AddOrUpdateEmailAddress.Data] = AddOrUpdateEmailAddress.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@commonForm(constants.Form.ADD_OR_UPDATE_EMAIL_ADDRESS, addOrUpdateEmailAddress) {
-    @commonInputText(addOrUpdateEmailAddress, constants.FormField.EMAIL_ADDRESS)
-}

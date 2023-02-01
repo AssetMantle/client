@@ -8,8 +8,10 @@
 } {
     <div id="accountTxs"></div>
     @commonSpinner("accountTransactionsPageChangeSpinner")
-    @commonJavascriptButton(constants.View.BACK, JavaScript(s"getAccountTxs('${address}', -1)"), 'id -> "accountTransactions_BACK")
-    @commonJavascriptButton(constants.View.NEXT, JavaScript(s"getAccountTxs('${address}', 1)"), 'id -> "accountTransactions_NEXT")
+    <div class="paginationButtonContainer">
+        @commonPaginationButton(constants.View.BACK, JavaScript(s"getAccountTxs('${address}', -1)"), icon = "backArrow", size = "small", iconFirst = true, Symbol("id") -> "accountTransactions_BACK")
+        @commonPaginationButton(constants.View.NEXT, JavaScript(s"getAccountTxs('${address}', 1)"), icon = "nextArrow", size = "small", iconFirst = false, Symbol("id") -> "accountTransactions_NEXT")
+    </div>
     <script>
             componentResource('accountTxs', jsRoutes.controllers.ComponentViewController.accountTransactionsPerPage('@address', 1), 'accountTransactionsPageChangeSpinner', 'pageChange');
     </script>

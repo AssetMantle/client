@@ -1,0 +1,8 @@
+@import views.html.base.infos._
+@import com.metas.transactions.reveal.Message
+@import schema.data.Data
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonTextInfo(constants.View.FROM, msg.getFrom)
+@commonTextInfo(constants.View.DATA, Data(msg.getData).viewString)

@@ -4,6 +4,6 @@ import models.Abstract
 
 object FeeGrant {
   abstract class FeeAllowance {
-    def toSerializable: Abstract.FeeGrant.FeeAllowance
+    def toSerializable: Abstract.FeeAllowance
   }
 }

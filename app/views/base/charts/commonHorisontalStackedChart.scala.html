@@ -1,0 +1,15 @@
+@import scala.collection.immutable.ListMap
+
+@(id: String, data: ListMap[String, Double])(implicit messagesProvider: MessagesProvider)
+<figure class="chartContainer" id="@id">
+    <div class="graphic">
+        <div class="row">
+            <div class="chart"></div>
+        </div>
+    </div>
+    <div class="legend"></div>
+</figure>
+<script src="@routes.Assets.versioned("javascripts/chart/horizontalStackedChart.js")"></script>
+@defining[ListMap[String, Double]](data.map { case (k, v) => Messages(k) -> v }) { transformedData =>
+    <script> horizontalStackedChart('@id', '@transformedData.keys.toString', '@transformedData.values.toString')</script>
+}

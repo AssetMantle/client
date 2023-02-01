@@ -46,7 +46,11 @@ object BlockResponse {
 
   implicit val evidenceReads: Reads[Evidence] = Json.reads[Evidence]
 
-  case class Block(header: Header, evidence: Evidence) // Add last_commit to get signature at previousBlock
+  case class Data(txs: Seq[String])
+
+  implicit val dataReads: Reads[Data] = Json.reads[Data]
+
+  case class Block(header: Header, data: Data, evidence: Evidence) // Add last_commit to get signature at previousBlock
 
   implicit val blockReads: Reads[Block] = Json.reads[Block]
 

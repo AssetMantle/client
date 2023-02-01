@@ -1,7 +1,6 @@
 @import views.html.base.cards._
-@import utilities.Date.RFC3339
 
-@(blockHeight: Int, proposer: String, time: RFC3339, averageBlockTime: Double, chainID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(blockHeight: Int, proposer: String, time: Long, averageBlockTime: Double)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.LATEST_BLOCK_HEIGHT) {
 } {
@@ -9,28 +8,40 @@
         @Messages(constants.View.LATEST_BLOCK_HEIGHT)
     } {
         <tr>
-            <th>@Messages(constants.View.HEIGHT)</th>
-            <td id="latestBlockHeight_height" class="cmuk-text-bold">@blockHeight</td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.HEIGHT)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@blockHeight</div>
+                </div>
+            </td>
         </tr>
         <tr>
-            <th>@Messages(constants.View.PROPOSER)</th>
-            <td id="latestBlockHeight_proposer">@proposer</td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.PROPOSER)</div>
+                    <div id="latestBlockHeight_proposer" class="tableFieldValue">@proposer</div>
+                </div>
+            </td>
         </tr>
         <tr>
-            <th>@Messages(constants.View.TIME)</th>
-            <td id="latestBlockHeight_time"></td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TIME)</div>
+                    <div id="latestBlockHeight_time" class="tableFieldValue"></div>
+                </div>
+            </td>
         </tr>
         <tr>
-            <th>@Messages(constants.View.AVERAGE_BLOCK_TIME)</th>
-            <td id="latestBlockHeight_averageBlockTime">@(s"${averageBlockTime}s")</td>
-        </tr>
-        <tr>
-            <th>@Messages(constants.View.CHAIN_ID)</th>
-            <td>@chainID</td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.AVERAGE_BLOCK_TIME)</div>
+                    <div id="latestBlockHeight_averageBlockTime" class="tableFieldValue">@(s"${averageBlockTime}s")</div>
+                </div>
+            </td>
         </tr>
     }
 }
 
 <script>
-    convertUTCDateToLocalDate("@time.toString", "latestBlockHeight_time")
+    fromEpochDateToLocal(@time, "latestBlockHeight_time")
 </script>

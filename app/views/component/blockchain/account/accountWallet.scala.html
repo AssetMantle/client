@@ -2,17 +2,22 @@
 @import utilities.MicroNumber
 @import views.html.base._
 @import views.html.base.cards._
-@import views.html.component.blockchain.account.{accountWalletAllTokens, accountWalletStakingToken, accountWalletRewards}
+@import views.html.component.blockchain.account.{accountWalletAllTokens, accountWalletStakingToken, accountWalletRewards, accountWalletValidators}
 @import scala.collection.immutable.ListMap
 
 @import models.masterTransaction.TokenPrice
 @(address: String, accountBalances: Seq[Coin], delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, stakingDenom: String, totalTokens: Int, validatorRewards: ListMap[String, Coin], withdrawAddress: String, validatorsMap: Map[String, String], tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
     @commonCard(constants.View.ACCOUNT_WALLET) {
-        @address
+        <div class="walletAddress">
+            <span class="address clipboardData" data-value="@address">@address</span>
+            <span onclick="copyMessageToClipboard(this)">@commonIcon("copy")</span>
+        </div>
     } {
         @commonHorizontalSwitcher(ListMap(
             constants.View.STAKING_TOKEN -> accountWalletStakingToken(available = accountBalances.find(_.denom == stakingDenom).getOrElse(Coin(stakingDenom, MicroNumber.zero)), delegated = delegated, undelegating = undelegating, delegationTotalRewards = delegationTotalRewards, isValidator = isValidator, commissionRewards = commissionRewards, tokenPrice = tokenPrice),
-            constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap),
+            constants.View.REWARDS -> accountWalletRewards(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards),
+            constants.View.VALIDATORS -> accountWalletValidators(withdrawAddress = withdrawAddress, stakingDenom = stakingDenom, totalRewards = delegationTotalRewards, validatorRewards = validatorRewards, validatorsMap = validatorsMap),
             constants.View.ALL_TOKENS -> accountWalletAllTokens(accountBalances)),
         )
     }
+<script src="@routes.Assets.versioned("javascripts/copyToClipboard.js")" type="text/javascript"></script>

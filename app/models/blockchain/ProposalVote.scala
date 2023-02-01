@@ -1,22 +1,22 @@
 package models.blockchain
 
+import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
-import models.Trait.Logged
-import models.common.TransactionMessages.Vote
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 import queries.blockchain.GetProposalVote
-import queries.responses.blockchain.ProposalVoteResponse.{Response => ProposalVoteResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class ProposalVote(proposalID: Int, voter: String, option: String, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class ProposalVote(proposalID: Int, voter: String, option: String, weight: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class ProposalVotes @Inject()(
@@ -38,19 +38,21 @@ class ProposalVotes @Inject()(
 
   private[models] val proposalVoteTable = TableQuery[ProposalVoteTable]
 
-  private def add(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
+  private def create(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable returning proposalVoteTable.map(_.proposalID) += proposalVote).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
 
-  private def upsert(proposalVote: ProposalVote): Future[Int] = db.run(proposalVoteTable.insertOrUpdate(proposalVote).asTry).map {
-    case Success(result) => result
+  private def create(proposalVotes: Seq[ProposalVote]) = db.run((proposalVoteTable ++= proposalVotes).asTry).map {
+    case Success(result) => ()
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
     }
   }
+
+  private def deleteByVoterAndProposal(address: String, proposalID: Int): Future[Int] = db.run(proposalVoteTable.filter(x => x.voter === address && x.proposalID === proposalID).delete)
 
   private def tryGetByID(proposalID: Int): Future[ProposalVote] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result.head.asTry).map {
     case Success(result) => result
@@ -61,9 +63,9 @@ class ProposalVotes @Inject()(
 
   private def getByID(proposalID: Int): Future[Seq[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result)
 
-  private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote_BC") {
+  private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote") {
 
-    def * = (proposalID, voter, option, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ProposalVote.tupled, ProposalVote.unapply)
+    def * = (proposalID, voter, option, weight, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProposalVote.tupled, ProposalVote.unapply)
 
     def proposalID = column[Int]("proposalID", O.PrimaryKey)
 
@@ -71,50 +73,60 @@ class ProposalVotes @Inject()(
 
     def option = column[String]("option")
 
+    def weight = column[BigDecimal]("weight")
+
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
 
     def tryGet(proposalID: Int): Future[ProposalVote] = tryGetByID(proposalID)
 
-    def insertOrUpdate(proposalVote: ProposalVote): Future[Int] = upsert(proposalVote)
+    def add(proposalVote: ProposalVote): Future[Int] = create(proposalVote)
+
+    def add(proposalVotes: Seq[ProposalVote]): Future[Unit] = create(proposalVotes)
 
     def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
+
+    def deleteAllVotesForProposal(address: String, proposalID: Int): Future[Int] = deleteByVoterAndProposal(address = address, proposalID = proposalID)
+
+
   }
 
   object Utility {
 
-    def onVote(vote: Vote)(implicit header: Header): Future[Unit] = {
-      val upsert = Service.insertOrUpdate(ProposalVote(proposalID = vote.proposalID, voter = vote.voter, option = vote.option))
+    def onVote(vote: govTx.MsgVote)(implicit header: Header): Future[String] = {
+      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+
+      def add = Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1))
 
       (for {
-        _ <- upsert
-      } yield ()).recover {
+        _ <- delete
+        _ <- add
+      } yield vote.getVoter).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          vote.getVoter
       }
     }
 
-    def insertOrUpdateProposal(proposalID: String, address: String): Future[Unit] = {
-      val proposalVoteResponse = getProposalVote.Service.get(id = proposalID, address = address)
+    def onWeightedVote(vote: govTx.MsgVoteWeighted)(implicit header: Header): Future[String] = {
+      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+      val proposalVotes = vote.getOptionsList.asScala.toSeq.map(x => ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = x.getOption.toString, weight = BigDecimal(x.getWeight)))
 
-      def upsert(proposalVoteResponse: ProposalVoteResponse) = Service.insertOrUpdate(proposalVoteResponse.vote.toSerializableProposalVote)
+      def addVotes() = Service.add(proposalVotes)
 
       (for {
-        proposalVoteResponse <- proposalVoteResponse
-        _ <- upsert(proposalVoteResponse)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
+        _ <- delete
+        _ <- addVotes()
+      } yield vote.getVoter).recover {
+        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          vote.getVoter
       }
     }
   }

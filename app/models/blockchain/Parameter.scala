@@ -1,30 +1,25 @@
 package models.blockchain
 
-import java.sql.Timestamp
 import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
 import models.Abstract.{Parameter => abstractParameter}
-import models.Trait.Logged
+import models.traits.Logging
 import models.common.Parameters._
 import models.common.ProposalContents.ParameterChange
 import models.common.Serializable.Coin
-import models.common.TransactionMessages._
-import models.masterTransaction
 import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
 import queries.blockchain.params._
-import queries.responses.blockchain.params._
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Parameter(parameterType: String, value: abstractParameter, createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnTimeZone: Option[String] = None, updatedBy: Option[String] = None, updatedOn: Option[Timestamp] = None, updatedOnTimeZone: Option[String] = None) extends Logged
+case class Parameter(parameterType: String, value: abstractParameter, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Parameters @Inject()(
@@ -52,11 +47,11 @@ class Parameters @Inject()(
 
   private[models] val parameterTable = TableQuery[ParameterTable]
 
-  case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOn: Option[Timestamp], createdOnTimeZone: Option[String], updatedBy: Option[String], updatedOn: Option[Timestamp], updatedOnTimeZone: Option[String]) {
-    def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOn = createdOn, createdOnTimeZone = createdOnTimeZone, updatedBy = updatedBy, updatedOn = updatedOn, updatedOnTimeZone = updatedOnTimeZone)
+  case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(parameter: Parameter): ParameterSerialized = ParameterSerialized(parameterType = parameter.parameterType, value = Json.toJson(parameter.value).toString, createdBy = parameter.createdBy, createdOn = parameter.createdOn, createdOnTimeZone = parameter.createdOnTimeZone, updatedBy = parameter.updatedBy, updatedOn = parameter.updatedOn, updatedOnTimeZone = parameter.updatedOnTimeZone)
+  def serialize(parameter: Parameter): ParameterSerialized = ParameterSerialized(parameterType = parameter.parameterType, value = Json.toJson(parameter.value).toString, createdBy = parameter.createdBy, createdOnMillisEpoch = parameter.createdOnMillisEpoch, updatedBy = parameter.updatedBy, updatedOnMillisEpoch = parameter.updatedOnMillisEpoch)
 
   private def add(parameter: Parameter): Future[String] = db.run((parameterTable returning parameterTable.map(_.parameterType) += serialize(parameter)).asTry).map {
     case Success(result) => result
@@ -83,7 +78,7 @@ class Parameters @Inject()(
 
   private[models] class ParameterTable(tag: Tag) extends Table[ParameterSerialized](tag, "Parameter") {
 
-    def * = (parameterType, value, createdBy.?, createdOn.?, createdOnTimeZone.?, updatedBy.?, updatedOn.?, updatedOnTimeZone.?) <> (ParameterSerialized.tupled, ParameterSerialized.unapply)
+    def * = (parameterType, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ParameterSerialized.tupled, ParameterSerialized.unapply)
 
     def parameterType = column[String]("parameterType", O.PrimaryKey)
 
@@ -91,15 +86,11 @@ class Parameters @Inject()(
 
     def createdBy = column[String]("createdBy")
 
-    def createdOn = column[Timestamp]("createdOn")
-
-    def createdOnTimeZone = column[String]("createdOnTimeZone")
+    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 
     def updatedBy = column[String]("updatedBy")
 
-    def updatedOn = column[Timestamp]("updatedOn")
-
-    def updatedOnTimeZone = column[String]("updatedOnTimeZone")
+    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

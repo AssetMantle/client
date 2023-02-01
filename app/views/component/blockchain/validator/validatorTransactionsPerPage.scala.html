@@ -1,15 +1,18 @@
+@import views.html.base._
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
+@import views.html.base.buttons._
 
-@(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transactions: Seq[Transaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @if(transactions.nonEmpty) {
     <table class="cmuk-table cmuk-table-striped">
         <thead>
             <tr>
                 <th>@Messages(constants.View.TRANSACTION_HASH)</th>
-                <th>@Messages(constants.View.HEIGHT)</th>
                 <th>@Messages(constants.View.MESSAGES_TYPE)</th>
+                <th>@Messages(constants.View.HEIGHT)</th>
                 <th>@Messages(constants.View.STATUS)</th>
                 <th>@Messages(constants.View.TIME)</th>
             </tr>
@@ -20,25 +23,25 @@
                 <td class="blockHeightItem">
                     @commonJavascriptLink(tx.hash, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.transaction('${tx.hash}'))"))
                 </td>
+                <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.getMessages.length == 1) {
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
+                } else {
+                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
+                    (+@(tx.getMessages.length - 1))
+                }</td>
                 <td>
                 @commonJavascriptLink(tx.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${tx.height}))"))
                 </td>
-                <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.messages.length == 1) {
-                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
-                } else {
-                    @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
-                    (+@(tx.messages.length - 1))
-                }</td>
                 <td>
                 @if(tx.status) {
-                    <span cmuk-icon="check" class="check"></span>
+                    <span class="statusCheck">@commonIcon("check")</span>
                 } else {
-                    <span cmuk-icon="close" class="close"></span>
+                    <span class="statusClose">@commonIcon("close")</span>
                 }
                 </td>
                 <td id="date_@tx.hash">
                     <script>
-                        convertUTCDateToLocalDate('@tx.timestamp.toString', "date_@tx.hash")
+                            fromEpochDateToLocal('@blocks.find(_.height == tx.height).fold(0L)(_.time)', "date_@tx.hash")
                     </script>
                 </td>
             </tr>
@@ -46,6 +49,6 @@
         </tbody>
     </table>
 } else {
-    @Messages(constants.View.NO_TRANSACTIONS_FOUND)
+    <div class="emptyBlockTransaction">@Messages(constants.View.NO_TRANSACTIONS_FOUND)</div>
    <script>hideElement('validatorTransactions_NEXT');</script>
 }

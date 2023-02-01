@@ -2,20 +2,96 @@
 @import views.html.base.infos._
 @import views.html.base.buttons._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
 
-@(transaction: Transaction)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transaction: Transaction, block: Block)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TRANSACTION_DETAILS) {
 } {
-    @commonTextInfo(constants.View.TRANSACTION_HASH, transaction.hash)
-    @commonHtmlInfo(constants.View.HEIGHT, commonJavascriptLink(transaction.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${transaction.height}))")))
-    @commonBooleanInfo(constants.View.STATUS, Option(transaction.status))
-    @commonRFC3339Info(constants.View.TIME, transaction.timestamp, "transactionDetailsTime")
-    @commonTextInfo(constants.View.TRANSACTION_FEES, if(transaction.fee.amount.nonEmpty) transaction.fee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ") else "0")
-    @commonIntInfo(constants.View.NUMBER_OF_MESSAGES, transaction.messages.length)
-    @if(!transaction.status) {
-        @commonIntInfo(constants.View.CODE, transaction.code)
-        @commonTextInfo(constants.View.LOG, transaction.rawLog)
+    @commonTable(id = "transactionDetail", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TRANSACTION_HASH)</div>
+                    <div class="tableFieldValue">@transaction.hash</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.HEIGHT)</div>
+                    <div class="tableFieldValue">@commonJavascriptLink(transaction.height.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.block(${transaction.height}))"))</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.STATUS)</div>
+                    <div class="tableFieldValue">@commonBooleanInfo("", Option(transaction.status))</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TIME)</div>
+                    <div id="transactionDetail_time" class="tableFieldValue"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TRANSACTION_FEES)</div>
+                    <div class="tableFieldValue">
+                        @if(transaction.getFee.amount.nonEmpty){
+                            @transaction.getFee.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")
+                        }else{
+                            0
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.NUMBER_OF_MESSAGES)</div>
+                    <div class="tableFieldValue">@transaction.getMessages.length</div>
+                </div>
+            </td>
+        </tr>
+        @if(!transaction.status) {
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.CODE)</div>
+                        <div class="tableFieldValue">@transaction.code</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.LOG)</div>
+                        <div class="tableFieldValue">@transaction.log</div>
+                    </div>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MEMO)</div>
+                    <div class="tableFieldValue">@transaction.getMemo</div>
+                </div>
+            </td>
+        </tr>
     }
-    @commonTextInfo(constants.View.MEMO, transaction.memo)
 }
+<script>
+        convertUTCDateToLocalDate("@block.time.toString", "transactionDetail_time")
+</script>

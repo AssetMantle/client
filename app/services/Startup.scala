@@ -3,10 +3,11 @@ package services
 import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
-import models.blockchain.{Token, Transaction => blockchainTransaction}
+import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
-import play.api.{Configuration, Logger}
+import play.api.Logger
+import play.api.Configuration
 import queries.Abstract.Account
 import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
@@ -150,16 +151,23 @@ class Startup @Inject()(
   // IMPORTANT: Assuming all GenTxs are valid txs and successfully goes through
   private def insertGenesisTransactionsOnStart(genTxs: Seq[GenTx], chainID: String, initialHeight: Int, genesisTime: RFC3339): Future[Unit] = {
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
-      val updateTx = utilitiesOperations.traverse(genTx.body.messages)(txMsg => blocksServices.actionOnTxMessages(txMsg.toStdMsg)(Header(chain_id = chainID, height = initialHeight, time = genesisTime, data_hash = "", evidence_hash = "", validators_hash = "", proposer_address = "")))
-      val updateAccount = utilitiesOperations.traverse(genTx.getSigners)(signer => blockchainAccounts.Utility.incrementSequence(signer))
+      val updateTx = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainValidators.Utility.insertOrUpdateValidator(msg.validator_address))
+
+      def insertDelegation() = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = msg.delegator_address, validatorAddress = msg.validator_address))
+
+      def insertKeyBaseAccount(validators: Seq[Validator]) = utilitiesOperations.traverse(validators)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
+
+      def updateAccount(signers: Seq[String]) = utilitiesOperations.traverse(signers)(signer => blockchainAccounts.Utility.incrementSequence(signer))
 
       // Should always be called after messages are processed, otherwise can create conflict
-      def updateBalance() = blockchainBalances.Utility.insertOrUpdateBalance(genTx.getFeePayer)
+      def updateBalance(signers: Seq[String]) = utilitiesOperations.traverse(signers)(signer => blockchainBalances.Utility.insertOrUpdateBalance(signer))
 
       for {
-        _ <- updateTx
-        _ <- updateAccount
-        _ <- updateBalance()
+        validators <- updateTx
+        _ <- insertDelegation()
+        _ <- updateAccount(genTx.body.messages.map(_.delegator_address))
+        _ <- updateBalance(genTx.body.messages.map(_.delegator_address))
+        _ <- insertKeyBaseAccount(validators)
       } yield ()
     }
 
@@ -209,7 +217,7 @@ class Startup @Inject()(
   })
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
-    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.toSerializable.value.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable, expiration = authorization.expiration))
+    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
     (for {
       _ <- insert
     } yield ()
@@ -219,7 +227,7 @@ class Startup @Inject()(
   })
 
   def insertFeeGrantsOnStart(allowances: Seq[FeeGrant.Allowance]): Future[Seq[Unit]] = utilitiesOperations.traverse(allowances)(allowance => {
-    val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.toSerializable))
+    val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.value.toSerializable.toProto.toByteString.toByteArray))
     (for {
       _ <- insert
     } yield ()
@@ -272,7 +280,7 @@ class Startup @Inject()(
   }
 
   private val explorerRunnable = new Runnable {
-    def run(): Unit = {
+    def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
       //TODO java.lang.IllegalStateException: Closed
       //TODO (Runtime Exception) Explorer keeps on working fine
@@ -314,7 +322,7 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    }
+    } else utilities.Scheduler.shutdownThread()
   }
 
   //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.

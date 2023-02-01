@@ -6,7 +6,7 @@ version := "1.0"
 
 lazy val GatlingTest = config("gatling") extend Test
 
-GatlingTest / scalaSource  := baseDirectory.value / "gatling/simulation"
+GatlingTest / scalaSource := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -20,52 +20,49 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 
 resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.10"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
-libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.2"
+libraryDependencies ++= Seq(
+  "com.typesafe.play" %% "play-slick" % "5.1.0",
+  "com.typesafe.play" %% "play-slick-evolutions" % "5.1.0",
+  "org.postgresql" % "postgresql" % "42.5.1"
+)
 
-libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.2"
+libraryDependencies ++= Seq(
+  "com.typesafe.play" %% "play-mailer" % "8.0.1",
+  "com.typesafe.play" %% "play-mailer-guice" % "8.0.1"
+)
 
-libraryDependencies += "org.postgresql" % "postgresql" % "42.3.6"
+libraryDependencies += "com.twilio.sdk" % "twilio" % "9.2.0"
 
-libraryDependencies += "com.typesafe.play" %% "play-mailer" % "8.0.1"
+libraryDependencies ++= Seq(
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.0" % "test",
+  "io.gatling" % "gatling-test-framework" % "3.9.0" % "test"
+)
 
-libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "8.0.1"
+Test / unmanagedResourceDirectories += (baseDirectory.value / "target/web/public/test")
 
-libraryDependencies += "com.twilio.sdk" % "twilio" % "8.29.1"
+libraryDependencies ++= Seq(
+  "com.sksamuel.scrimage" % "scrimage-core" % "4.0.32",
+  "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.32"
+)
 
-libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.7.6" % "test"
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.7.0",
+  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.7.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.7.0",
+  "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "5.0.0"
+)
 
-libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.7.6" % "test"
+libraryDependencies ++= Seq(
+  "org.bouncycastle" % "bcpg-jdk15on" % "1.70",
+  "org.scodec" %% "scodec-bits" % "1.1.34",
+  "org.scorexfoundation" %% "scrypto" % "2.2.1",
+  "org.bitcoinj" % "bitcoinj-core" % "0.16.2"
+)
 
-Test / unmanagedResourceDirectories  += (baseDirectory.value / "target/web/public/test")
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.1"
 
-libraryDependencies += "com.sksamuel.scrimage" % "scrimage-core" % "4.0.31"
-
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-scala" % "4.0.31"
-
-libraryDependencies += "commons-codec" % "commons-codec" % "20041127.091804"
-
-libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "3.0.4"
-
-libraryDependencies += "org.bouncycastle" % "bcpg-jdk15on" % "1.70"
-
-libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
-
-libraryDependencies += "com.docusign" % "docusign-esign-java" % "3.18.0"
-
-libraryDependencies += "com.sun.jersey" % "jersey-core" % "1.19.4"
-
-libraryDependencies += "org.glassfish.jersey.core" % "jersey-common" % "2.35"
-
-libraryDependencies += "org.scodec" %% "scodec-bits" % "1.1.31"
-
-libraryDependencies += "org.scorexfoundation" %% "scrypto" % "2.2.1"
-
-libraryDependencies += "org.bitcoinj" % "bitcoinj-core" % "0.16.1"
-
-libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
-
-libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.3"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.12"

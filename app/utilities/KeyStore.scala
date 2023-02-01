@@ -7,7 +7,8 @@ import exceptions.BaseException
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 
 @Singleton
 class KeyStore @Inject()(configuration: Configuration) {

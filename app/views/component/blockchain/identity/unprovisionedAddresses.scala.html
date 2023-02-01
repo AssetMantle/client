@@ -1,7 +1,0 @@
-@import controllers.actions.LoginState
-
-@(unprovisionedAddresses: Seq[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: Option[LoginState])
-
-    @unprovisionedAddresses.map { address =>
-        @address <br>
-    }

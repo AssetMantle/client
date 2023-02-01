@@ -1,8 +1,10 @@
+@import views.html.base._
 @import models.blockchain.Transaction
+@import models.blockchain.Block
 
-@(transactions: Seq[Transaction])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(transactions: Seq[Transaction], blocks: Seq[Block])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-<tr>
+<tr class="tableHead">
     <th>@Messages(constants.View.TRANSACTION_HASH)</th>
     <th>@Messages(constants.View.MESSAGES_TYPE)</th>
     <th>@Messages(constants.View.HEIGHT)</th>
@@ -20,31 +22,25 @@
             </div>
         </div>
     </td>
-    <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.messages.length == 1) {
-        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
+    <td id="transactionListPageItemTxMessageTypes_@index">@if(tx.getMessages.length == 1) {
+        @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
     } else {
-        @Messages(constants.View.TxMessagesMap.getOrElse(tx.messages.head.messageType, tx.messages.head.messageType))
-        (+@(tx.messages.length - 1))
+        @Messages(constants.View.TxMessagesMap.getOrElse(tx.getMessages.head.getTypeUrl, tx.getMessages.head.getTypeUrl))
+        (+@(tx.getMessages.length - 1))
     }</td>
     <td id="transactionListPageItemTxHeight_@index">@tx.height</td>
     <td id="transactionListPageItemTxStatus_@index">
         <div id="transactionListPageItemTxStatusStatic_@index">
         @if(tx.status) {
-            <span cmuk-icon="check" class="check hidden"></span>
+            <span class="statusCheck">@commonIcon("check")</span>
         } else {
-            <span cmuk-icon="close" class="close hidden"></span>
+            <span class="statusClose">@commonIcon("close")</span>
         }
-        </div>
-        <div class="hidden" id="transactionListPageItemTxStatusTrue_@index">
-            <span cmuk-icon="check" class="check"></span>
-        </div>
-        <div id="transactionListPageItemTxStatusFalse_@index" class="hidden">
-            <span cmuk-icon="close" class="close"></span>
         </div>
     </td>
     <td id="transactionListPageItemTxTime_@index">
          <script>
-             convertUTCDateToLocalDate('@tx.timestamp.toString', "transactionListPageItemTxTime_@index")
+             fromEpochDateToLocal('@blocks.find(_.height == tx.height).fold(0L)(_.time)', "transactionListPageItemTxTime_@index")
         </script>
     </td>
 </tr>

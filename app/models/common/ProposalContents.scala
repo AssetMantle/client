@@ -1,68 +1,93 @@
 package models.common
 
-import exceptions.BaseException
+import com.cosmos.distribution.{v1beta1 => distributionProto}
+import com.cosmos.gov.{v1beta1 => govProto}
+import com.cosmos.params.{v1beta1 => paramsProto}
+import com.cosmos.upgrade.{v1beta1 => upgradeProto}
+import com.google.protobuf.{Any => protoAny, Timestamp => protoTimestamp}
 import models.Abstract.ProposalContent
 import models.common.Serializable.Coin
-import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads, Writes}
-import utilities.Date.RFC3339
+
+import scala.jdk.CollectionConverters.IterableHasAsJava
 
 object ProposalContents {
 
-  private implicit val module: String = constants.Module.PROPOSAL_CONTENT
+  case class Plan(name: String, time: Long, height: String, info: String)
 
-  private implicit val logger: Logger = Logger(this.getClass)
+  case class SoftwareUpgrade(title: String, description: String, plan: Plan) extends ProposalContent {
 
-  case class Plan(name: String, time: RFC3339, height: String, info: String)
-
-  implicit val plainReads: Reads[Plan] = Json.reads[Plan]
-
-  implicit val plainWrites: OWrites[Plan] = Json.writes[Plan]
-
-  case class SoftwareUpgrade(title: String, description: String, plan: Plan, proposalContentType: String = constants.Blockchain.Proposal.SOFTWARE_UPGRADE) extends ProposalContent
-
-  implicit val softwareUpgradeReads: Reads[SoftwareUpgrade] = Json.reads[SoftwareUpgrade]
-
-  implicit val softwareUpgradeWrites: OWrites[SoftwareUpgrade] = Json.writes[SoftwareUpgrade]
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.Proposal.SOFTWARE_UPGRADE)
+      .setValue(
+        upgradeProto.SoftwareUpgradeProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .setPlan(upgradeProto.Plan.newBuilder()
+            .setName(this.plan.name)
+            .setHeight(this.plan.height.toLong)
+            .setInfo(this.plan.info)
+            .setTime(protoTimestamp.newBuilder().setSeconds(this.plan.time))
+            .build()
+          )
+          .build().toByteString
+      )
+      .build()
+  }
 
   case class Change(subspace: String, key: String, value: String)
 
-  implicit val changeReads: Reads[Change] = Json.reads[Change]
-
-  implicit val changeWrites: OWrites[Change] = Json.writes[Change]
-
-  case class ParameterChange(title: String, description: String, changes: Seq[Change], proposalContentType: String = constants.Blockchain.Proposal.PARAMETER_CHANGE) extends ProposalContent
-
-  implicit val parameterChangeReads: Reads[ParameterChange] = Json.reads[ParameterChange]
-
-  implicit val parameterChangeWrites: OWrites[ParameterChange] = Json.writes[ParameterChange]
-
-  case class Text(title: String, description: String, proposalContentType: String = constants.Blockchain.Proposal.TEXT) extends ProposalContent
-
-  implicit val textReads: Reads[Text] = Json.reads[Text]
-
-  implicit val textWrites: OWrites[Text] = Json.writes[Text]
-
-  case class CommunityPoolSpend(title: String, description: String, recipient: String, amount: Seq[Coin], proposalContentType: String = constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND) extends ProposalContent
-
-  implicit val communityPoolSpendReads: Reads[CommunityPoolSpend] = Json.reads[CommunityPoolSpend]
-
-  implicit val communityPoolSpendWrites: OWrites[CommunityPoolSpend] = Json.writes[CommunityPoolSpend]
-
-  case class CancelSoftwareUpgrade(title: String, description: String, proposalContentType: String = constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE) extends ProposalContent
-
-  implicit val cancelSoftwareUpgradeReads: Reads[CancelSoftwareUpgrade] = Json.reads[CancelSoftwareUpgrade]
-
-  implicit val cancelSoftwareUpgradeWrites: OWrites[CancelSoftwareUpgrade] = Json.writes[CancelSoftwareUpgrade]
-
-  def proposalContentApply(proposalContentType: String, value: JsObject): ProposalContent = proposalContentType match {
-    case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => utilities.JSON.convertJsonStringToObject[CancelSoftwareUpgrade](value.toString)
-    case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => utilities.JSON.convertJsonStringToObject[SoftwareUpgrade](value.toString)
-    case constants.Blockchain.Proposal.PARAMETER_CHANGE => utilities.JSON.convertJsonStringToObject[ParameterChange](value.toString)
-    case constants.Blockchain.Proposal.TEXT => utilities.JSON.convertJsonStringToObject[Text](value.toString)
-    case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => utilities.JSON.convertJsonStringToObject[CommunityPoolSpend](value.toString)
-    case _ => throw new BaseException(constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE)
+  object Change {
+    def fromProtoAny(parameterChangeProto: paramsProto.ParamChange): Change = Change(subspace = parameterChangeProto.getSubspace, key = parameterChangeProto.getKey, value = parameterChangeProto.getValue)
   }
 
+  case class ParameterChange(title: String, description: String, changes: Seq[Change]) extends ProposalContent {
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.Proposal.PARAMETER_CHANGE)
+      .setValue(
+        paramsProto.ParameterChangeProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .addAllChanges(this.changes.map(x => paramsProto.ParamChange.newBuilder().setKey(x.key).setValue(x.value).setSubspace(x.subspace).build()).asJava)
+          .build().toByteString
+      )
+      .build()
+  }
+
+  case class Text(title: String, description: String) extends ProposalContent {
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.Proposal.TEXT)
+      .setValue(
+        govProto.TextProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .build().toByteString
+      )
+      .build()
+  }
+
+  case class CommunityPoolSpend(title: String, description: String, recipient: String, amount: Seq[Coin]) extends ProposalContent {
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND)
+      .setValue(
+        distributionProto.CommunityPoolSpendProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .setRecipient(this.recipient)
+          .addAllAmount(this.amount.map(_.toProtoCoin).asJava)
+          .build().toByteString
+      )
+      .build()
+  }
+
+  case class CancelSoftwareUpgrade(title: String, description: String) extends ProposalContent {
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE)
+      .setValue(
+        upgradeProto.CancelSoftwareUpgradeProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .build().toByteString
+      )
+      .build()
+  }
 }

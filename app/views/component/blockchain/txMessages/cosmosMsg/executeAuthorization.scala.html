@@ -1,0 +1,10 @@
+@import com.cosmos.authz.{v1beta1 => authzTx}
+@import views.html.base.buttons._
+@import views.html.base.infos._
+@import views.html.component.blockchain.txMessages.stdMsgs
+@import scala.jdk.CollectionConverters.CollectionHasAsScala
+
+@(msg: authzTx.MsgExec)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.GRANTEE, commonJavascriptLink(msg.getGrantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getGrantee}'))")))
+@stdMsgs(title = constants.View.MESSAGES, txHash = "", messages = msg.getMsgsList.asScala.toSeq)

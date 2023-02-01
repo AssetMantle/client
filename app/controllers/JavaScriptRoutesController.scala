@@ -3,7 +3,8 @@ package controllers
 import controllers.actions.WithoutLoginAction
 import play.api.mvc._
 import play.api.routing._
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 
@@ -18,21 +19,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         JavaScriptReverseRouter("jsRoutes")(
           routes.javascript.Assets.versioned,
 
-          routes.javascript.AssetController.defineForm,
-          routes.javascript.AssetController.mintForm,
-          routes.javascript.AssetController.mutateForm,
-          routes.javascript.AssetController.burnForm,
-
-          routes.javascript.ChatController.chatRoom,
-          routes.javascript.ChatController.chatWindow,
-          routes.javascript.ChatController.sendMessageForm,
-          routes.javascript.ChatController.loadMoreChats,
-          routes.javascript.ChatController.replyToMessage,
-          routes.javascript.ChatController.markChatAsRead,
-
-          routes.javascript.ContactController.verifyEmailAddressForm,
-          routes.javascript.ContactController.verifyMobileNumberForm,
-
           routes.javascript.ComponentViewController.dashboard,
           routes.javascript.ComponentViewController.block,
           routes.javascript.ComponentViewController.transaction,
@@ -40,8 +26,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.wallet,
           routes.javascript.ComponentViewController.proposal,
 
-          routes.javascript.ComponentViewController.commonHome,
-          routes.javascript.ComponentViewController.profilePicture,
           routes.javascript.ComponentViewController.recentActivities,
 
           routes.javascript.ComponentViewController.latestBlockHeight,
@@ -82,60 +66,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactions,
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
-          routes.javascript.ComponentViewController.classification,
-          routes.javascript.ComponentViewController.identity,
-          routes.javascript.ComponentViewController.asset,
-          routes.javascript.ComponentViewController.order,
-          routes.javascript.ComponentViewController.meta,
-          routes.javascript.ComponentViewController.maintainer,
-
-          routes.javascript.ContactController.addOrUpdateEmailAddressForm,
-          routes.javascript.ContactController.addOrUpdateMobileNumberForm,
-          routes.javascript.ContactController.contact,
-
-          routes.javascript.DocusignController.send,
-          routes.javascript.DocusignController.sign,
-          routes.javascript.DocusignController.authorization,
-
-          routes.javascript.FileController.uploadAccountFileForm,
-          routes.javascript.FileController.uploadAccountFile,
-          routes.javascript.FileController.storeAccountFile,
-          routes.javascript.FileController.updateAccountFileForm,
-          routes.javascript.FileController.updateAccountFile,
-          routes.javascript.FileController.file,
-
-          routes.javascript.IdentityController.nubForm,
-          routes.javascript.IdentityController.defineForm,
-          routes.javascript.IdentityController.issueForm,
-          routes.javascript.IdentityController.provisionForm,
-          routes.javascript.IdentityController.unprovisionForm,
-
           routes.javascript.IndexController.search,
 
-          routes.javascript.MetaController.revealForm,
-          routes.javascript.MaintainerController.deputizeForm,
-
           routes.javascript.NotificationController.recentActivityMessages,
-          routes.javascript.NotificationController.unreadNotificationCount,
-          routes.javascript.NotificationController.markNotificationRead,
 
-          routes.javascript.OrderController.defineForm,
-          routes.javascript.OrderController.makeForm,
-          routes.javascript.OrderController.takeForm,
-          routes.javascript.OrderController.cancelForm,
-
-          routes.javascript.SplitController.sendForm,
-          routes.javascript.SplitController.wrapForm,
-          routes.javascript.SplitController.unwrapForm,
-
-          routes.javascript.TransactionsController.sendCoinForm,
-
-          routes.javascript.ViewController.identity,
-          routes.javascript.ViewController.asset,
-          routes.javascript.ViewController.order,
-          routes.javascript.ViewController.classification,
-          routes.javascript.ViewController.meta,
-          routes.javascript.ViewController.maintainer,
           routes.javascript.ViewController.block,
           routes.javascript.ViewController.validator,
           routes.javascript.ViewController.transaction,
@@ -145,19 +79,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.validators,
           routes.javascript.ViewController.proposals,
           routes.javascript.ViewController.wallet,
-
-          routes.javascript.BackgroundCheckController.memberScanForm,
-          routes.javascript.BackgroundCheckController.memberScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addUBOMemberCheckForm,
-          routes.javascript.BackgroundCheckController.memberScanResult,
-          routes.javascript.BackgroundCheckController.corporateScanForm,
-          routes.javascript.BackgroundCheckController.corporateScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addOrganizationMemberCheckForm,
-          routes.javascript.BackgroundCheckController.corporateScanResult,
-          routes.javascript.BackgroundCheckController.vesselScanForm,
-          routes.javascript.BackgroundCheckController.vesselScanResultDecisionForm,
-          routes.javascript.BackgroundCheckController.addAssetMemberCheckForm,
-          routes.javascript.BackgroundCheckController.vesselScanResult,
 
         )
       ).as("text/javascript")

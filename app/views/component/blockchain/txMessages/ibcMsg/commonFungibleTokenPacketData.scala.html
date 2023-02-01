@@ -1,0 +1,13 @@
+@import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+@import views.html.base.infos._
+@import views.html.base.buttons._
+
+@(key: String, fungibleTokenPacketData: FungibleTokenPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.getDenom)
+    @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.getAmount, normalize = false))
+    @commonTextInfo(constants.View.SENDER, fungibleTokenPacketData.getSender)
+    @commonHtmlInfo(constants.View.RECEIVER, commonJavascriptLink(fungibleTokenPacketData.getReceiver, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fungibleTokenPacketData.getReceiver}'))")))
+</div>

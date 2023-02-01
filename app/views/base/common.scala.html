@@ -1,9 +1,10 @@
 @import constants.AppConfig.OtherApp
 @import controllers.actions.LoginState
 @import views.html.base._
+@import constants.Response._
 @import views.html.component.blockchain._
 
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+@(title: String, failures: Seq[Failure] = Seq(), warnings: Seq[Warning] = Seq(), successes: Seq[Success] = Seq(), infos: Seq[Info] = Seq())(left: Html = Html(""))(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -29,23 +30,18 @@
         <script src="@routes.Assets.versioned("javascripts/constants.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/webSocket.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/configuration.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/activitiesBox.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/replaceDocument.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/submitFormOnEnter.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/cookie.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/webSocket.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/activitiesBox.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/componentResource.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/replaceDocument.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/rippleEffect.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/dataTables/dataTables.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/checkAndPushState.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/backButtonCapture.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/date.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/checkAndPushState.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/backButtonCapture.js")" type="text/javascript"></script>
+        <script src="@utilities.PublicResource.getVersionedRoute("javascripts/date.js")" type="text/javascript"></script>
         @* <script src="@routes.Assets.versioned("javascripts/signer.js")" type="text/javascript"></script>*@
         @* <script src="@routes.Assets.versioned("javascripts/protoMsgHelper.js")" type="text/javascript"></script>*@
         @* <script src="@routes.Assets.versioned("javascripts/keplr.js")" type="text/javascript"></script>*@
@@ -113,35 +109,39 @@
                                     @Messages(constants.View.PROPOSALS)
                                 </a>
                                 </li>
+                                <li>
+                                    <a id="wallet" href="https://wallet.assetmantle.one" class="navItemRippleEffect" target="_blank">
+                                        <span class="walletIcon">
+                                            @commonIcon("walletIcon")
+                                        </span>
+                                        @Messages(constants.View.WALLET)
+                                        <span class="walletLinkIcon">
+                                            @commonIcon("walletLinkIcon")
+                                        </span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="cmuk-navbar-right">
-                            <div>
-                                <a href="https://wallet.assetmantle.one" target="_blank">
-                                <button type="button" id='wallet' class='cmuk-button buttonPrimary walletBtn'>
-                                @Messages(constants.View.WALLET)
-                                </button>
-                                </a>
-                            </div>
                             <div class="searchContainer hidden">
                             @searchField("searchInput")
                             </div>
-                            <ul class="cmuk-navbar-nav top-nav-dropdown">
-                                <li>
-                                    <select class="uk-select" onchange="location = this.value;">
-                                    @if(otherApps.nonEmpty) {
-                                        @otherApps.zipWithIndex.map { case (otherApp, index) =>
-                                            @if(index == 0) {
-                                                <option selected value="">@otherApp.name</option>
-                                            } else {
-                                                <option value="@otherApp.url">@otherApp.name</option>
-                                            }
-                                        }
-                                    } else {
-                                        <option selected value="">@constants.Blockchain.ChainID</option>
-                                    }
-                                    </select>
-                                </li>
+@*                            <ul class="cmuk-navbar-nav top-nav-dropdown">*@
+@*                                <li>*@
+@*                                    <select class="uk-select" onchange="location = this.value;">*@
+@*                                    @if(otherApps.nonEmpty) {*@
+@*                                        @otherApps.zipWithIndex.map { case (otherApp, index) =>*@
+@*                                            @if(index == 0) {*@
+@*                                                <option selected value="">@otherApp.name</option>*@
+@*                                            } else {*@
+@*                                                <option value="@otherApp.url">@otherApp.name</option>*@
+@*                                            }*@
+@*                                        }*@
+@*                                    } else {*@
+@*                                        <option selected value="">@constants.Blockchain.ChainID</option>*@
+@*                                    }*@
+@*                                    </select>*@
+@*                                </li>*@
                                 @* @loginState match {*@
                                 @* case null => {*@
                                 @* <li>*@
@@ -195,7 +195,7 @@
                                 @* </li>*@
                                 @* }*@
                                 @* }*@
-                            </ul>
+@*                            </ul>*@
                         </div>
                     </div>
                 </nav>
@@ -208,7 +208,7 @@
                 <div class="dataContainer">
                     <div class="cmuk-text-center">
                         @for(failure <- failures) {
-                            <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
+                            <div class="cmuk-alert-danger" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="failureIcon">@commonIcon("fail")</span>
                                     <span class="alertName">@Messages(constants.View.FAILURE):</span>
@@ -216,7 +216,7 @@
                             </div>
                         }
                         @for(warning <- warnings) {
-                            <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
+                            <div class="cmuk-alert-warning" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="warningIcon">@commonIcon("warning")</span>
                                     <span class="alertName">@Messages(constants.View.WARNING):</span>
@@ -224,14 +224,14 @@
                             </div>
                         }
                         @for(success <- successes) {
-                            <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
+                            <div class="cmuk-alert-success" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="successIcon">@commonIcon("success")</span>
                                     @Messages(success.message)</p>
                             </div>
                         }
                         @for(info <- infos) {
-                            <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
+                            <div class="cmuk-alert-primary" cmuk-alert>
                                 <a class="cmuk-alert-close" cmuk-close></a>
                                 <p><span class="infoIcon">@commonIcon("info")</span>
                                     <span class="alertName">@Messages(constants.View.INFORMATION):</span>
@@ -305,30 +305,6 @@
                     </div>
                 </div>
             </div>
-            @* Footer *@
-            <div class="footer">
-                <div class="cmuk-container">
-                    <div>
-                        <div class="footerLogo">
-                            <img src="@routes.Assets.versioned("images/logo.svg")" alt = "@Messages(constants.View.FOOTER_LOGO)"/>
-                            <button type="button" name="dark_light" class="darkModeButton" id="toggleLightDark" onclick="togglePageContentLightDark()" title="dark/light mode">
-                                <span class="dayMode hidden">
-                                @commonIcon("dayMode")
-                                </span>
-                                <span class="darkMode">
-                                @commonIcon("darkMode")
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="copyRight">
-                                &copy;
-                        <script>document.write(new Date().getFullYear())</script>
-                        <a href="" target="_blank">@Messages(constants.View.FOOTER_TEXT)</a>
-                    </div>
-                </div>
-            </div>
-            @* End of Footer *@
             @* End of MainContainer *@
         </div>
         <script src="@routes.Assets.versioned("javascripts/darkMode.js")" type="text/javascript"></script>

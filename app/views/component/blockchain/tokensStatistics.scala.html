@@ -5,15 +5,56 @@
 @(token: Token, tokenTickers: Seq[constants.AppConfig.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.TOKEN) {
-    <p>$@tokenTickers.find(_.denom == token.denom).fold(token.denom)(_.normalizedDenom)</p>
 } {
-    <div id="@Seq("tokenStatistics", token.denom).mkString("_")">
-        @commonTextInfo(constants.View.INFLATION, s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")
-        @commonTextInfo(constants.View.APY, s"${utilities.NumericOperation.roundOff((token.inflation.toDouble * token.totalSupply.toDouble * 100) / token.bondedAmount.toDouble)} %")
-        @commonTextInfo(constants.View.BONDED_TOKENS, s"${utilities.NumericOperation.roundOff((token.bondedAmount / token.totalSupply).toDouble * 100)} %")
-        @commonTextInfo(constants.View.BONDED_AMOUNT, utilities.NumericOperation.formatNumber(token.bondedAmount))
-        @commonTextInfo(constants.View.TOTAL_SUPPLY, utilities.NumericOperation.formatNumber(token.totalSupply))
-        @commonTextInfo(constants.View.COMMUNITY_POOL, utilities.NumericOperation.formatNumber(token.communityPool))
-    </div>
-    @* <script src="@routes.Assets.versioned("javascripts/tokensStatistics.js")" type="text/javascript"></script>*@
+    @commonTable(id = Seq("tokenStatistics", token.denom).mkString("_"), tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.INFLATION)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@(s"${utilities.NumericOperation.roundOff((token.inflation * 100).toDouble)} %")</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.APY)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@(s"${utilities.NumericOperation.roundOff((token.inflation.toDouble * token.totalSupply.toDouble * 100) / token.bondedAmount.toDouble)} %")</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BONDED_TOKENS)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@(s"${utilities.NumericOperation.roundOff((token.bondedAmount / token.totalSupply).toDouble * 100)} %")</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BONDED_AMOUNT)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.bondedAmount)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.TOTAL_SUPPLY)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.totalSupply)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.COMMUNITY_POOL)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.communityPool)</div>
+                </div>
+            </td>
+        </tr>
+    }
 }

@@ -2,25 +2,18 @@ package controllers
 
 import constants.AppConfig._
 import controllers.actions._
-import controllers.results.WithUsernameToken
-import exceptions.BaseException
-import models.common.ID
-import models.master
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class ViewController @Inject()(
-                                masterMobiles: master.Mobiles,
-                                masterEmails: master.Emails,
                                 messagesControllerComponents: MessagesControllerComponents,
-                                withLoginActionAsync: WithLoginActionAsync,
-                                withUsernameToken: WithUsernameToken,
                                 withoutLoginAction: WithoutLoginAction,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 cached: Cached
@@ -29,57 +22,6 @@ class ViewController @Inject()(
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_VIEW
-
-  def account: Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      (for {
-        result <- withUsernameToken.Ok(views.html.assetMantle.account())
-      } yield result).recover {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def classification(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.classification(id))
-    }
-  }
-
-  def identity(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.identity(id))
-    }
-  }
-
-  def asset(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.asset(id))
-    }
-  }
-
-  def order(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.order(id))
-    }
-  }
-
-  def meta(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.meta(id))
-    }
-  }
-
-  def maintainer(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.explorer.maintainer(id))
-    }
-  }
 
   def validators(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginAction { implicit loginState =>

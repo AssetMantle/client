@@ -1,11 +1,12 @@
 package controllers
 
-import controllers.actions.{WithLoginActionAsync, WithoutLoginActionAsync}
+import controllers.actions.WithoutLoginActionAsync
 import exceptions.BaseException
 import models.masterTransaction
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
+import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -14,7 +15,6 @@ import scala.concurrent.ExecutionContext
 class NotificationController @Inject()(
                                         messagesControllerComponents: MessagesControllerComponents,
                                         masterTransactionNotifications: masterTransaction.Notifications,
-                                        withLoginActionAsync: WithLoginActionAsync,
                                         withoutLoginActionAsync: WithoutLoginActionAsync
                                       )(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -26,7 +26,7 @@ class NotificationController @Inject()(
     implicit request =>
       val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else {
         loginState match {
-          case Some(login) => masterTransactionNotifications.Service.get(accountID = login.username, pageNumber = pageNumber)
+          case Some(login) => masterTransactionNotifications.Service.getPublic(pageNumber = pageNumber)
           case None => masterTransactionNotifications.Service.getPublic(pageNumber)
         }
       }
@@ -39,27 +39,4 @@ class NotificationController @Inject()(
       }
   }
 
-  def unreadNotificationCount(): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
-      (for {
-        unreadNotificationCount <- unreadNotificationCount
-      } yield Ok(unreadNotificationCount.toString)
-        ).recover {
-        case _: BaseException => NoContent
-      }
-  }
-
-  def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val markAsRead = masterTransactionNotifications.Service.markAsRead(notificationID)
-      val unreadNotificationCount = masterTransactionNotifications.Service.getNumberOfUnread(loginState.username)
-      (for {
-        _ <- markAsRead
-        unreadNotificationCount <- unreadNotificationCount
-      } yield Ok(unreadNotificationCount.toString)
-        ).recover {
-        case _: BaseException => NoContent
-      }
-  }
 }

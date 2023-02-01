@@ -18,8 +18,10 @@
         </div>
     </div>
     @commonSpinner("transactionListPageChangeSpinner")
-    @commonJavascriptButton(constants.View.BACK, JavaScript("getTransactionList(-1)"), 'id -> "transactionList_BACK")
-    @commonJavascriptButton(constants.View.NEXT, JavaScript("getTransactionList(1)"), 'id -> "transactionList_NEXT")
+    <div class="paginationButtonContainer">
+        @commonPaginationButton(constants.View.BACK, JavaScript("getTransactionList(-1)"), icon = "backArrow", size = "small", iconFirst = true, Symbol("id") -> "transactionList_BACK")
+        @commonPaginationButton(constants.View.NEXT, JavaScript("getTransactionList(1)"), icon = "nextArrow", size = "small", iconFirst = false, Symbol("id") -> "transactionList_NEXT")
+    </div>
 </div>
 <script>
         componentResource('transactionListPage', jsRoutes.controllers.ComponentViewController.transactionListPage(1), 'transactionListPageChangeSpinner', 'pageChange');

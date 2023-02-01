@@ -3,7 +3,6 @@ package utilities
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
@@ -19,9 +18,13 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def this(value: Double) = this((BigDecimal(value) * MicroNumber.factor).toBigInt)
 
+  def this(value: BigDecimal) = this((value * MicroNumber.factor).toBigInt)
+
   def this(value: Float) = this((BigDecimal(value.toDouble) * MicroNumber.factor).toBigInt)
 
   def toMicroString: String = this.value.toString
+
+  def toMicroBigDecimal: BigDecimal = BigDecimal(this.value)
 
   def toMicroInt: Int = this.value.toInt
 
@@ -114,13 +117,13 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def modInverse(m: MicroNumber): MicroNumber = new MicroNumber(this.value.modInverse(m.value))
 
-  def unary_- : MicroNumber = new MicroNumber(this.value.unary_-)
+  def unary_- : MicroNumber = new MicroNumber(-this.value)
 
   def abs: MicroNumber = new MicroNumber(this.value.abs)
 
   def signum: Int = this.value.signum
 
-  def unary_~ : MicroNumber = new MicroNumber(this.value.unary_~)
+  def unary_~ : MicroNumber = new MicroNumber(~this.value)
 
   override def equals(that: Any): Boolean = that match {
     case that: MicroNumber => this equals that
@@ -171,17 +174,21 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   def isProbablePrime(certainty: Int): Boolean = if (this.isWhole) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
 
   def +(that: String): String = this.toString + that
+
+  def wholePart: BigInt = this.value / MicroNumber.factor
+
+  def decimalPart: Int = (this.value - (wholePart * MicroNumber.factor)).toInt
 }
 
 object MicroNumber {
-
-  private val factor = 1000000
 
   private val module: String = constants.Module.UTILITIES_MICRO_NUMBER
 
   private val logger: Logger = Logger(this.getClass)
 
   val zero = new MicroNumber(0)
+
+  val factor = 1000000
 
   def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 
@@ -195,7 +202,9 @@ object MicroNumber {
 
   def apply(value: String): MicroNumber = new MicroNumber(value)
 
-  def unapply(arg: MicroNumber): Option[String] = Option(arg.toMicroString)
+  def apply(value: BigDecimal): MicroNumber = new MicroNumber(value)
+
+  def unapply(arg: MicroNumber): Option[String] = Option(arg.toString)
 
   //Do not define OWrites and OFormat since it takes a `key` name. Here, MicroNumber(23.5) will serialize to "23.5" and vice versa.
   // The jsObject will not have a key member. Default OFormat will make it {"value": "23.5"}

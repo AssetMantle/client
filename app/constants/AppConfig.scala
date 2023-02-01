@@ -25,4 +25,6 @@ object AppConfig {
 
   val CacheDuration: FiniteDuration = configuration.get[Int]("webApp.cacheDuration").milliseconds
 
+  val AppVersion: String = configuration.get[String]("webApp.version")
+
 }

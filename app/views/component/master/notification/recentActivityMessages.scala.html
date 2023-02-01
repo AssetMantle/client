@@ -8,15 +8,16 @@
         @notifications.map { notification =>
             <div class="timeline-item notification">
                 <div class="timeline-icon">
-                    @commonIcon("contract")
+                    @commonIcon("infoIcon")
                 </div>
-                <div onclick="onNotificationClick(@notification.jsRoute.getOrElse(""), @notification.jsRoute.getOrElse("").split("\\.").contains("ViewController"))" class="timeline-content right">
+                <div onclick="onNotificationClick(@notification.jsRoute.getOrElse(""), @notification.jsRoute.getOrElse("").split("\\.").contains("ViewController"))" class="timeline-content">
                     <div>
                         <div class="textLineOverflow activityContent" title="@Messages(notification.template, notification.notificationTemplate.parameters: _*)">
-                            <span class="cmuk-text-bolder">@Messages(notification.title)</span>
-                            @Messages(notification.template, notification.notificationTemplate.parameters: _*)
+                            <div class="cmuk-text-bolder timelineItemTitle">@Messages(notification.title)</div>
+                            <div class="timelineItemMessage">@Messages(notification.template, notification.notificationTemplate.parameters: _*)</div>
                         </div>
-                        <div class="notificationTime">@notification.createdOn @notification.createdOnTimeZone</div>
+                        <div id="time_@notification.id" class="notificationTime timelineItemTime">@notification.createdOnMillisEpoch</div>
+                        <script>fromEpochDateToLocal(@notification.createdOnMillisEpoch, 'time_@notification.id')</script>
                     </div>
                 </div>
             </div>

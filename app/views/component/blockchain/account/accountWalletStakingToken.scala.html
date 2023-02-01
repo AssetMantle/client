@@ -1,24 +1,73 @@
 @import utilities.MicroNumber
-@import views.html.base.infos._
 @import views.html.base.charts._
 @import scala.collection.immutable.ListMap
 @import models.common.Serializable.Coin
+@import views.html.base.cards._
 
 @import models.masterTransaction.TokenPrice
 @(available: Coin, delegated: Coin, undelegating: Coin, delegationTotalRewards: Coin, isValidator: Boolean, commissionRewards: Coin, tokenPrice: TokenPrice)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="pieChartContainer">
-    <div>
-        @if(isValidator) {
-            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()+ s" ($$${utilities.NumericOperation.formatNumber(((available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount) * tokenPrice.price).floatValue)})")
-        }else {
-            @commonTextInfo(constants.View.TOTAL_VALUE, Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount)).getAmountWithNormalizedDenom()+ s" ($$${utilities.NumericOperation.formatNumber(((available.amount + delegated.amount + delegationTotalRewards.amount) * tokenPrice.price).floatValue)})")
-        }
-        @commonTextInfo(constants.View.AVAILABLE, available.getAmountWithNormalizedDenom())
-        @commonTextInfo(constants.View.DELEGATED, delegated.getAmountWithNormalizedDenom())
-        @commonTextInfo(constants.View.UNDELEGATING, undelegating.getAmountWithNormalizedDenom())
-        @commonTextInfo(constants.View.DELEGATOR_REWARDS, delegationTotalRewards.getAmountWithNormalizedDenom())
-        @if(isValidator) {
-            @commonTextInfo(constants.View.COMMISSION_REWARDS, commissionRewards.getAmountWithNormalizedDenom())
+<div class="pieChartContainer tableCard">
+    <div class="cmuk-card-body">
+        @commonTable(id = "stakingTokenDetail", tableType = "cmuk-table-divider") {
+        } {
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.TOTAL_VALUE)</div>
+                        <div class="tableFieldValue">
+                        @if(isValidator) {
+                            @Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()
+                            ($@utilities.NumericOperation.formatNumber(((available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount) * tokenPrice.price).floatValue))
+                        }else {
+                            @Coin(available.denom, (available.amount + delegated.amount + delegationTotalRewards.amount + commissionRewards.amount)).getAmountWithNormalizedDenom()
+                            ($@utilities.NumericOperation.formatNumber(((available.amount + delegated.amount + delegationTotalRewards.amount) * tokenPrice.price).floatValue))
+                        }
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.AVAILABLE)</div>
+                        <div class="tableFieldValue">@available.getAmountWithNormalizedDenom()</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.DELEGATED)</div>
+                        <div class="tableFieldValue">@delegated.getAmountWithNormalizedDenom()</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.UNDELEGATING)</div>
+                        <div class="tableFieldValue">@undelegating.getAmountWithNormalizedDenom()</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="tableField">
+                        <div class="tableFieldTitle">@Messages(constants.View.DELEGATOR_REWARDS)</div>
+                        <div class="tableFieldValue">@delegationTotalRewards.getAmountWithNormalizedDenom()</div>
+                    </div>
+                </td>
+            </tr>
+            @if(isValidator) {
+                <tr>
+                    <td>
+                        <div class="tableField">
+                            <div class="tableFieldTitle">@Messages(constants.View.COMMISSION_REWARDS)</div>
+                            <div class="tableFieldValue">@commissionRewards.getAmountWithNormalizedDenom()</div>
+                        </div>
+                    </td>
+                </tr>
+            }
         }
     </div>
     @if(available.amount != MicroNumber.zero || delegated.amount != MicroNumber.zero || undelegating.amount != MicroNumber.zero) {

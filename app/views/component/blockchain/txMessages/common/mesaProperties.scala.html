@@ -1,0 +1,12 @@
+@import views.html.base.infos._
+@import schema.property.base.MesaProperty
+@import com.lists.{PropertyList => protoPropertyList}
+@import schema.list.PropertyList
+
+@(protoPropertyList: protoPropertyList)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MesaProperty])){properties =>
+    @properties.map{property =>
+        @commonTextInfo(property.id.asString, property.dataID.asString)
+    }
+}

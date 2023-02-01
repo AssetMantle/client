@@ -1,20 +1,34 @@
-@import views.html.base.infos._
 @import views.html.base.charts._
 @import models.common.Serializable.Coin
 @import scala.collection.immutable.ListMap
+@import views.html.base.cards._
 
 @(accountBalances: Seq[Coin])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="pieChartContainer">
-	@if(accountBalances.nonEmpty) {
-		<div class="ibcDenom">
-		@accountBalances.map { coin =>
-			@commonTextInfo(coin.normalizeDenom, utilities.NumericOperation.formatNumber(coin.amount))
+<div class="pieChartContainer tableCard">
+	<div class="cmuk-card-body">
+		@if(accountBalances.nonEmpty) {
+			<div class="allTokensContainer">
+				<div class="ibcDenom">
+					@commonTable(id = "accountWalletAllTokensDetail", tableType = "cmuk-table-divider") {
+					} {
+						@accountBalances.map { coin =>
+							<tr>
+								<td>
+									<div class="tableField">
+										<div class="tableFieldTitle">@coin.normalizeDenom</div>
+										<div class="tableFieldValue">@utilities.NumericOperation.formatNumber(coin.amount)</div>
+									</div>
+								</td>
+							</tr>
+						}
+					}
+				</div>
+				@defining[ListMap[String, Double]](ListMap(accountBalances.map(x => x.normalizeDenom -> x.amount.toDouble): _*)) { data =>
+					@commonPieChart("accountWalletAllTokensChart", data, showLegend = true)
+				}
+			</div>
+		} else {
+			@Messages(constants.View.EMPTY_WALLET)
 		}
-		</div>
-		@defining[ListMap[String, Double]](ListMap(accountBalances.map(x => x.normalizeDenom -> x.amount.toDouble): _*)) { data =>
-			@commonPieChart("accountWalletAllTokensChart", data, showLegend = false)
-		}
-	} else {
-		@Messages(constants.View.EMPTY_WALLET)
-	}
+	</div>
 </div>
