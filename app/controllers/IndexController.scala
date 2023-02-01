@@ -15,7 +15,8 @@ import services.Startup
 import utilities.Bech32.from5Bit
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -24,6 +25,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 startup: Startup,
                                 blockchainSplits: blockchain.Splits,
                                 blockchainClassifications: blockchain.Classifications,
+                                blockchainIdentities: blockchain.Identities,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {

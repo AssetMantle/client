@@ -16,7 +16,7 @@ case class AccAddressData(value: Array[Byte]) extends Data {
 
   def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
-  def toBech32Address: String = utilities.Crypto.convertAccountAddressBytesToBech32Address(this.value)
+  def toBech32Address: String = utilities.Crypto.convertAccAddressBytesToAddress(this.value)
 
   def asProtoAccAddressData: protoAccAddressData = protoAccAddressData.newBuilder().setValue(ByteString.copyFrom(this.value)).build()
 

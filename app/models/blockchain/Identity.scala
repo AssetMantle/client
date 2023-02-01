@@ -3,9 +3,13 @@ package models.blockchain
 import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.Data
 import schema.data.base.{AccAddressData, IDData, ListData}
-import schema.id.base.StringID
+import schema.document.Document
+import schema.id.base.{ClassificationID, IdentityID, PropertyID, StringID}
 import schema.list.PropertyList
+import schema.property.Property
+import schema.property.base.MetaProperty
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
@@ -16,11 +20,29 @@ case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: 
 
   def getID: String = utilities.Secrets.base64URLEncoder(this.id)
 
-  def getClassificationID: String = utilities.Secrets.base64URLEncoder(this.classificationID)
+  def getClassificationIDString: String = utilities.Secrets.base64URLEncoder(this.classificationID)
+
+  def getClassificationID: ClassificationID = ClassificationID(this.classificationID)
 
   def getImmutables: Immutables = Immutables(this.immutables)
 
-  def getMutables: Mutables = Mutables(this.immutables)
+  def getMutables: Mutables = Mutables(this.mutables)
+
+  def getDocument: Document = Document(this.getClassificationID, this.getImmutables, this.getMutables)
+
+  def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
+
+  def getAuthentication: ListData = {
+    val property = this.getProperty(constants.Blockchain.AuthenticationProperty.getID)
+    if (property.isDefined) {
+      if (property.get.isMeta) ListData(MetaProperty(property.get.getProtoBytes).getData.toAnyData.getListData)
+      else ListData(Seq(constants.Blockchain.AuthenticationProperty.getData.toAnyData))
+    } else ListData(Seq())
+  }
+
+  def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)
+
+  def mutate(properties: Seq[Property]): Identity = this.copy(mutables = Mutables(PropertyList(this.getMutables.mutate(properties))).getProtoBytes)
 
 }
 
@@ -72,22 +94,24 @@ class Identities @Inject()(
 
     def add(identity: Identity): Future[String] = create(identity).map(x => utilities.Secrets.base64URLEncoder(x))
 
+    def insertOrUpdate(identity: Identity): Future[Unit] = upsert(identity)
+
     def get(id: String): Future[Option[Identity]] = getById(utilities.Secrets.base64URLDecode(id))
 
     def get(id: Array[Byte]): Future[Option[Identity]] = getById(id)
 
+    def fetchAll: Future[Seq[Identity]] =  getAll
+
     def tryGet(id: String): Future[Identity] = tryGetById(utilities.Secrets.base64URLDecode(id))
 
     def tryGet(id: Array[Byte]): Future[Identity] = tryGetById(id)
-
-    def fetchAll: Future[Seq[Identity]] = getAll
 
 
   }
 
   object Utility {
 
-    def onNub(msg: com.identities.transactions.nub.Message): Future[String] = try {
+    def onNub(msg: com.identities.transactions.nub.Message): Future[String] = {
       val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID).toAnyID).toAnyData))))
       val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getFrom)).toAnyData)).toAnyData))))
       val identityID = utilities.ID.getIdentityID(classificationID = constants.Blockchain.NubClassificationID, immutables = immutables)
@@ -96,6 +120,34 @@ class Identities @Inject()(
 
       for {
         _ <- add
+      } yield msg.getFrom
+    }
+
+    def onProvision(msg: com.identities.transactions.provision.Message): Future[String] = {
+      val identity = Service.tryGet(IdentityID(msg.getIdentityID).getBytes)
+
+      def update(identity: Identity) = {
+        val updatedList = ListData(identity.getAuthentication.dataList :+ AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData).toAnyData
+        Service.insertOrUpdate(identity.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = updatedList))))
+      }
+
+      for {
+        identity <- identity
+        _ <- update(identity)
+      } yield msg.getFrom
+    }
+
+    def onUnprovision(msg: com.identities.transactions.unprovision.Message): Future[String] = {
+      val identity = Service.tryGet(IdentityID(msg.getIdentityID).getBytes)
+
+      def update(identity: Identity) = {
+        val updatedList = ListData(identity.getAuthentication.dataList.filterNot(x => AccAddressData(x.getAccAddressData).getBytes.sameElements(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).getBytes))).toAnyData
+        Service.insertOrUpdate(identity.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = updatedList))))
+      }
+
+      for {
+        identity <- identity
+        _ <- update(identity)
       } yield msg.getFrom
     }
 

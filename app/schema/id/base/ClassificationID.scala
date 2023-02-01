@@ -19,4 +19,6 @@ case class ClassificationID(hashID: HashID) extends ID {
 
 object ClassificationID {
   def apply(anyID: protoClassificationID): ClassificationID = ClassificationID(HashID(anyID.getHashID))
+
+  def apply(value: Array[Byte]): ClassificationID = ClassificationID(HashID(value))
 }

@@ -25,6 +25,18 @@ case class PropertyList(propertyList: Seq[Property]) {
   })
 
   def getProtoBytes: Array[Byte] = this.asProtoPropertyList.toByteString.toByteArray
+
+  def mutate(properties: Seq[Property]): Seq[Property] = {
+    var updatedList = this.propertyList
+    properties.foreach(x => {
+      val oldProperty = this.propertyList.find(_.getID.getBytes.sameElements(x.getID.getBytes))
+      if (oldProperty.isDefined) {
+        updatedList = updatedList.filterNot(_.getID.getBytes.sameElements(oldProperty.get.getID.getBytes))
+        updatedList = updatedList :+ x
+      }
+    })
+    updatedList
+  }
 }
 
 object PropertyList {

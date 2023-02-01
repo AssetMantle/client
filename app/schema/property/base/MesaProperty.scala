@@ -27,4 +27,6 @@ object MesaProperty {
 
   def apply(value: protoMesaProperty): MesaProperty = MesaProperty(id = PropertyID(value.getId), dataID = schema.id.base.DataID(value.getDataID))
 
+  def apply(protoBytes: Array[Byte]): MesaProperty = MesaProperty(protoMesaProperty.parseFrom(protoBytes))
+
 }
