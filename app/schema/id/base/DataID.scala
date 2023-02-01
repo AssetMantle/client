@@ -13,7 +13,7 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.typeID.getBytes ++ this.hashID.getBytes
 
-  def asString: String = this.getTypeID + constants.Blockchain.IDSeparator + this.getHashIDString
+  def asString: String = this.getTypeID.asString + constants.Blockchain.IDSeparator + this.getHashIDString
 
   def asProtoDataID: protoDataID = protoDataID.newBuilder().setTypeID(this.typeID.asProtoStringID).setHashID(this.hashID.asProtoHashID).build()
 
