@@ -14,8 +14,7 @@ import schema.qualified.{Immutables, Mutables}
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -36,8 +35,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val a = Await.result(blockchainIdentities.Service.fetchAll, Duration.Inf)
-        a.foreach(x => println(x.getIDString))
         Future(Ok(views.html.index()))
     }
   }
