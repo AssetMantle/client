@@ -4,7 +4,7 @@ import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.document.Document
-import schema.id.base.{ClassificationID, PropertyID}
+import schema.id.base._
 import schema.list.PropertyList
 import schema.property.Property
 import schema.qualified.{Immutables, Mutables}
@@ -15,7 +15,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Order(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-  def getID: String = utilities.Secrets.base64URLEncoder(this.id)
+  def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
+
+  def getID: OrderID = OrderID(HashID(this.id))
 
   def getClassificationIDString: String = utilities.Secrets.base64URLEncoder(this.classificationID)
 
@@ -29,7 +31,7 @@ case class Order(id: Array[Byte], classificationID: Array[Byte], immutables: Arr
 
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
-  def mutate(properties: Seq[Property]): Order = this.copy(mutables = Mutables(PropertyList(this.getMutables.mutate(properties))).getProtoBytes)
+  def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 }
 
 object Orders {
@@ -66,6 +68,7 @@ object Orders {
 
 @Singleton
 class Orders @Inject()(
+                        blockchainMaintainers: Maintainers,
                         protected val databaseConfigProvider: DatabaseConfigProvider
                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Orders.DataTable, Order, Array[Byte]](
@@ -95,6 +98,19 @@ class Orders @Inject()(
 
   object Utility {
 
+    def onRevoke(msg: com.orders.transactions.revoke.Message): Future[String] = {
+      val deputize = blockchainMaintainers.Utility.revoke(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
+      for {
+        _ <- deputize
+      } yield msg.getFrom
+    }
+
+    def onDeputize(msg: com.orders.transactions.deputize.Message): Future[String] = {
+      val deputize = blockchainMaintainers.Utility.deputize(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID), maintainedProperties = PropertyList(msg.getMaintainedProperties), canMintAsset = msg.getCanMintAsset, canBurnAsset = msg.getCanBurnAsset, canRenumerateAsset = msg.getCanRenumerateAsset, canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
+      for {
+        _ <- deputize
+      } yield msg.getFrom
+    }
 
   }
 }

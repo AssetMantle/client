@@ -4,11 +4,12 @@ import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
-import schema.data.base.{IDData, ListData}
-import schema.id.base.{ClassificationID, PropertyID, StringID}
+import schema.data.base._
+import schema.id.base.{ClassificationID, HashID, PropertyID, StringID}
 import schema.list._
 import schema.property.base.MetaProperty
 import schema.qualified.{Immutables, Mutables}
+import schema.types.Height
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -54,8 +55,29 @@ object Blockchain {
   val KafkaTxIteratorInitialDelay: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
   val KafkaTxIteratorInterval: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = ListData(Seq()).getType), data = ListData(Seq()).toAnyData)
-  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = IDData(StringID("").toAnyID).getType), data = IDData(StringID("").toAnyID).toAnyData)
+
+  object Document {
+    val ASSET = "ASSET"
+    val IDENTITY = "IDENTITY"
+    val ORDER = "ORDER"
+  }
+
+  val Mint: StringID = StringID("mint")
+  val Burn: StringID = StringID("burn")
+  val Renumerate: StringID = StringID("renumerate")
+  val Add: StringID = StringID("add")
+  val Remove: StringID = StringID("remove")
+  val Mutate: StringID = StringID("mutate")
+
+  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
+  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val SupplyProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("supply"), typeID = constants.DataTypeID.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
+  val BurnHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("burnHeight"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+  val LockProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("lock"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+  val MaintainedClassificationIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedClassificationID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
+  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
+  val MaintainedPropertiesProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedProperties"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
+  val PermissionsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("permissions"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
   val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
 
   object PublicKey {

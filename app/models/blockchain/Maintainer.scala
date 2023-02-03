@@ -3,10 +3,13 @@ package models.blockchain
 import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.Data
+import schema.data.base.{IDData, ListData}
 import schema.document.Document
-import schema.id.base.{ClassificationID, PropertyID}
-import schema.list.PropertyList
+import schema.id.base._
+import schema.list.{IDList, PropertyList}
 import schema.property.Property
+import schema.property.base.MetaProperty
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
@@ -15,11 +18,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Maintainer(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
-  def getID: String = utilities.Secrets.base64URLEncoder(this.id)
+  def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
+
+  def getID: MaintainerID = MaintainerID(HashID(this.id))
 
   def getClassificationIDString: String = utilities.Secrets.base64URLEncoder(this.classificationID)
 
   def getClassificationID: ClassificationID = ClassificationID(this.classificationID)
+
+  def getPermissions: ListData = {
+    val property = this.getProperty(constants.Blockchain.PermissionsProperty.getID)
+    ListData((if (property.isDefined) MetaProperty(property.get.getProtoBytes) else constants.Blockchain.PermissionsProperty).getData.getProtoBytes)
+  }
+
+  def getMaintainedProperties: ListData = {
+    val property = this.getProperty(constants.Blockchain.MaintainedPropertiesProperty.getID)
+    ListData((if (property.isDefined) MetaProperty(property.get.getProtoBytes) else constants.Blockchain.MaintainedPropertiesProperty).getData.getProtoBytes)
+  }
 
   def getImmutables: Immutables = Immutables(this.immutables)
 
@@ -29,7 +44,21 @@ case class Maintainer(id: Array[Byte], classificationID: Array[Byte], immutables
 
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
-  def mutate(properties: Seq[Property]): Maintainer = this.copy(mutables = Mutables(PropertyList(this.getMutables.mutate(properties))).getProtoBytes)
+  def mutate(properties: Seq[Property]): Maintainer = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
+
+  def maintainsProperty(id: PropertyID): Boolean = this.getMaintainedProperties.dataList.exists(x => Data(x).getBytes.sameElements(IDData(id.toAnyID).getBytes))
+
+  def canAdd: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Add.toAnyID).getBytes))
+
+  def canMutate: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Mutate.toAnyID).getBytes))
+
+  def canBurn: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Burn.toAnyID).getBytes))
+
+  def canMint: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Mint.toAnyID).getBytes))
+
+  def canRemove: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Remove.toAnyID).getBytes))
+
+  def canRenumerate: Boolean = this.getPermissions.dataList.exists(x => Data(x).getBytes.sameElements(IDData(constants.Blockchain.Renumerate.toAnyID).getBytes))
 }
 
 object Maintainers {
@@ -66,8 +95,8 @@ object Maintainers {
 
 @Singleton
 class Maintainers @Inject()(
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
+                             protected val databaseConfigProvider: DatabaseConfigProvider
+                           )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Maintainers.DataTable, Maintainer, Array[Byte]](
     databaseConfigProvider,
     Maintainers.TableQuery,
@@ -80,21 +109,111 @@ class Maintainers @Inject()(
 
     def add(maintainer: Maintainer): Future[String] = create(maintainer).map(x => utilities.Secrets.base64URLEncoder(x))
 
+    def update(maintainer: Maintainer): Future[String] = updateById(maintainer).map(_ => maintainer.getIDString)
+
     def get(id: String): Future[Option[Maintainer]] = getById(utilities.Secrets.base64URLDecode(id))
 
-    def get(id: Array[Byte]): Future[Option[Maintainer]] = getById(id)
+    def get(id: MaintainerID): Future[Option[Maintainer]] = getById(id.getBytes)
 
     def tryGet(id: String): Future[Maintainer] = tryGetById(utilities.Secrets.base64URLDecode(id))
 
-    def tryGet(id: Array[Byte]): Future[Maintainer] = tryGetById(id)
+    def tryGet(id: MaintainerID): Future[Maintainer] = tryGetById(id.getBytes)
 
     def fetchAll: Future[Seq[Maintainer]] = getAll
 
+    def delete(id: MaintainerID): Future[Int] = deleteById(id.getBytes)
 
   }
 
   object Utility {
 
+    def superAuxiliary(maintainedClassificationID: ClassificationID, toID: IdentityID, maintainedMutables: Mutables): Future[String] = {
+      val immutables = Immutables(PropertyList(Seq(
+        MetaProperty(id = constants.Blockchain.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID.toAnyID).toAnyData),
+        MetaProperty(id = constants.Blockchain.IdentityIDProperty.id, data = IDData(toID.toAnyID).toAnyData),
+      )))
+      val permissions = getPermissions(canAdd = true, canMutate = true, canBurn = true, canMint = true, canRemove = true, canRenumerate = true)
+      val mutables = Mutables(PropertyList(Seq(
+        MetaProperty(id = constants.Blockchain.MaintainedPropertiesProperty.id, data = ListData(maintainedMutables.propertyList.getPropertyIDList.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+        MetaProperty(id = constants.Blockchain.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+      )))
+      val maintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = immutables)
+      Service.add(Maintainer(id = maintainerID.getBytes, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes))
+    }
+
+    def deputize(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
+      val fromMaintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
+        MetaProperty(id = constants.Blockchain.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID.toAnyID).toAnyData),
+        MetaProperty(id = constants.Blockchain.IdentityIDProperty.id, data = IDData(fromID.toAnyID).toAnyData),
+      ))))
+      val toMaintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
+        MetaProperty(id = constants.Blockchain.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID.toAnyID).toAnyData),
+        MetaProperty(id = constants.Blockchain.IdentityIDProperty.id, data = IDData(toID.toAnyID).toAnyData),
+      ))))
+      val fromMaintainer = Service.tryGet(fromMaintainerID)
+      val toMaintainer = Service.get(toMaintainerID)
+
+      def getRemoveMaintainedPropertyList(fromMaintainer: Maintainer) = {
+        var removeMaintainedPropertyList = fromMaintainer.getMutables.getProperties
+        maintainedProperties.getProperties.foreach(x => {
+          removeMaintainedPropertyList = removeMaintainedPropertyList.filterNot(_.getID.getBytes.sameElements(x.getID.getBytes))
+        })
+        removeMaintainedPropertyList
+      }
+
+      def addOrUpdate(fromMaintainer: Maintainer, toMaintainer: Option[Maintainer]) = {
+        val immutables = Immutables(PropertyList(Seq(
+          MetaProperty(id = constants.Blockchain.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID.toAnyID).toAnyData),
+          MetaProperty(id = constants.Blockchain.IdentityIDProperty.id, data = IDData(toID.toAnyID).toAnyData),
+        )))
+        if (toMaintainer.isEmpty) {
+          val permissions = getPermissions(canAdd = canAddMaintainer, canMutate = canMutateMaintainer, canBurn = canBurnAsset, canMint = canMintAsset, canRemove = canRemoveMaintainer, canRenumerate = canRenumerateAsset)
+          val mutables = Mutables(PropertyList(Seq(
+            MetaProperty(id = constants.Blockchain.MaintainedPropertiesProperty.id, data = ListData(maintainedProperties.getPropertyIDList.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+            MetaProperty(id = constants.Blockchain.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+          )))
+          val toMaintainer = Maintainer(id = toMaintainerID.getBytes, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+          Service.add(toMaintainer)
+        } else {
+          val updatedMaintainedProperties = toMaintainer.get.getMutables.propertyList.add(maintainedProperties.getProperties).remove(getRemoveMaintainedPropertyList(fromMaintainer))
+          val permissions = getPermissions(canAdd = canAddMaintainer, canMutate = canMutateMaintainer, canBurn = canBurnAsset, canMint = canMintAsset, canRemove = canRemoveMaintainer, canRenumerate = canRenumerateAsset)
+          val mutables = Mutables(PropertyList(Seq(
+            MetaProperty(id = constants.Blockchain.MaintainedPropertiesProperty.id, data = ListData(updatedMaintainedProperties.getPropertyIDList.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+            MetaProperty(id = constants.Blockchain.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
+          )))
+          val updatedToMaintainer = Maintainer(id = toMaintainerID.getBytes, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+          Service.update(updatedToMaintainer)
+        }
+      }
+
+      for {
+        fromMaintainer <- fromMaintainer
+        toMaintainer <- toMaintainer
+        _ <- addOrUpdate(fromMaintainer, toMaintainer)
+      } yield ()
+    }
+
+    def revoke(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID): Future[Unit] = {
+      val toMaintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
+        MetaProperty(id = constants.Blockchain.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID.toAnyID).toAnyData),
+        MetaProperty(id = constants.Blockchain.IdentityIDProperty.id, data = IDData(toID.toAnyID).toAnyData),
+      ))))
+
+      for {
+        _ <- Service.delete(toMaintainerID)
+      } yield ()
+    }
+
+    private def getPermissions(canAdd: Boolean, canMutate: Boolean, canBurn: Boolean, canMint: Boolean, canRemove: Boolean, canRenumerate: Boolean) = {
+      var permissions: Seq[StringID] = Seq()
+      if (canAdd) permissions = permissions :+ constants.Blockchain.Add
+      if (canMutate) permissions = permissions :+ constants.Blockchain.Mutate
+      if (canBurn) permissions = permissions :+ constants.Blockchain.Burn
+      if (canMint) permissions = permissions :+ constants.Blockchain.Mint
+      if (canRemove) permissions = permissions :+ constants.Blockchain.Remove
+      if (canRenumerate) permissions = permissions :+ constants.Blockchain.Renumerate
+      IDList(permissions)
+    }
 
   }
 }

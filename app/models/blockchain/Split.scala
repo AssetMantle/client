@@ -75,6 +75,10 @@ class Splits @Inject()(
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes)
 
+    def getByOwnableID(ownableID: OwnableID): Future[Seq[Split]] = filter(_.ownableID === ownableID.getBytes)
+
+    def getTotalSupply(ownableID: OwnableID): Future[BigDecimal] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.value).sum)
+
     def getByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: OwnableID): Future[Option[Split]] = filter(x => x.ownerID === ownerId.getBytes && x.ownableID === ownableID.getBytes).map(_.headOption)
 
     def tryGetByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: OwnableID): Future[Split] = tryGetById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes)
@@ -110,6 +114,32 @@ class Splits @Inject()(
         _ <- updateBalance
         _ <- subtract
       } yield msg.getFrom
+    }
+
+    def mint(ownerID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = addSplit(ownerId = ownerID, ownableID = ownableID, value = value)
+
+    def burn(ownerID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = subtractSplit(ownerId = ownerID, ownableID = ownableID, value = value)
+
+    def renumerate(ownerID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = {
+      val totalSupply = Service.getTotalSupply(ownableID)
+
+      def update(totalSupply: BigDecimal) = if (totalSupply < value) addSplit(ownerId = ownerID, ownableID = ownableID, value = value - totalSupply)
+      else if (totalSupply > value) subtractSplit(ownerId = ownerID, ownableID = ownableID, value = totalSupply - value)
+      else Future()
+
+      for {
+        totalSupply <- totalSupply
+        _ <- update(totalSupply)
+      } yield ()
+    }
+
+    def transfer(fromID: IdentityID, toID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = {
+      val add = addSplit(ownerId = toID, ownableID = ownableID, value = value)
+      val subtract = subtractSplit(ownerId = fromID, ownableID = ownableID, value = value)
+      for {
+        _ <- add
+        _ <- subtract
+      } yield ()
     }
 
     private def addSplit(ownerId: IdentityID, ownableID: OwnableID, value: BigDecimal) = {

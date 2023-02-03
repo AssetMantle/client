@@ -25,7 +25,7 @@ case class Document(classificationID: ClassificationID, immutables: Immutables, 
 
   def getProtoBytes: Array[Byte] = this.asProtoDocument.toByteString.toByteArray
 
-  def mutate(properties: Seq[Property]): Seq[Property] = this.mutables.mutate(properties)
+  def mutate(properties: Seq[Property]): Document = this.copy(mutables = this.mutables.mutate(properties))
 }
 
 object Document {

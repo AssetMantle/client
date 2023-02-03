@@ -47,10 +47,7 @@ abstract class GenericDaoImpl[
   def customQuery[C](query: StreamingProfileAction[C, _, _]) = db.run(query)
 
   def customUpdate[R](updateQuery: DBIOAction[R, NoStream, Effect.Write]): Future[R] = db.run(updateQuery.asTry).map {
-    case Success(result) => result match {
-      case 0 => throw new BaseException(new constants.Response.Failure(module + "_NOT_FOUND"))
-      case _ => result
-    }
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(new constants.Response.Failure(module + "_INSERT_FAILED"), psqlException)
     }

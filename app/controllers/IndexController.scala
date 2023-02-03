@@ -12,7 +12,6 @@ import play.api.{Configuration, Logger}
 import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 import services.Startup
-import utilities.Bech32.from5Bit
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
@@ -37,6 +36,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def index: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
+        val a = Await.result(blockchainIdentities.Service.fetchAll, Duration.Inf)
+        a.foreach(x => println(x.getIDString))
         Future(Ok(views.html.index()))
     }
   }
@@ -50,7 +51,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))
         else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
         else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
-        else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
+        else Future(Redirect(routes.ComponentViewController.document(query)))
     }
   }
 

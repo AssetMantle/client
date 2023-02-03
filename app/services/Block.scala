@@ -52,6 +52,9 @@ class Block @Inject()(
                        blockchainProposalVotes: blockchain.ProposalVotes,
                        blockchainBalances: blockchain.Balances,
                        blockchainClassifications: blockchain.Classifications,
+                       blockchainAssets: blockchain.Assets,
+                       blockchainOrders: blockchain.Orders,
+                       blockchainMaintainers: blockchain.Maintainers,
                        blockchainMetaDatas: blockchain.MetaDatas,
                        blockchainIdentities: blockchain.Identities,
                        blockchainSplits: blockchain.Splits,
@@ -326,31 +329,31 @@ class Block @Inject()(
       //ibc-transfer
       case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
       //assets
-      case constants.Blockchain.TransactionMessage.ASSET_BURN => Future(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_BURN => blockchainAssets.Utility.onBurn(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainClassifications.Utility.onDefineAsset(assetsTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => Future(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ASSET_MINT => Future(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ASSET_MUTATE => Future(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => Future(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ASSET_REVOKE => Future(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => blockchainAssets.Utility.onDeputize(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.ASSET_MUTATE => blockchainAssets.Utility.onMutate(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => blockchainAssets.Utility.onRenumerate(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.ASSET_REVOKE => blockchainAssets.Utility.onRevoke(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       //identities
       case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => blockchainClassifications.Utility.onDefineIdentity(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Future(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => Future(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Future(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => blockchainIdentities.Utility.onDeputize(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => blockchainIdentities.Utility.onMutate(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_NUB => blockchainIdentities.Utility.onNub(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => Future(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => Future(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => blockchainIdentities.Utility.onQuash(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => blockchainIdentities.Utility.onRevoke(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
       //orders
       case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Future(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainClassifications.Utility.onDefineOrder(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => Future(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => blockchainOrders.Utility.onDeputize(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ORDER_MAKE => Future(ordersTransactions.make.Message.parseFrom(stdMsg.getValue).getFrom)
       case constants.Blockchain.TransactionMessage.ORDER_MODIFY => Future(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ORDER_REVOKE => Future(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => Future(ordersTransactions.take.Message.parseFrom(stdMsg.getValue).getFrom)
       //metas
       case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))

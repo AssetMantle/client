@@ -7,6 +7,7 @@ object View {
   val APP_NAME = "APP_NAME"
   val META_DESCRIPTION = "META_DESCRIPTION"
   val STATUS = "STATUS"
+  val DOCUMENT = "DOCUMENT"
 
   val DESCRIPTION = "DESCRIPTION"
   val TYPE = "TYPE"
@@ -320,6 +321,7 @@ object View {
   val TRANSACTION_ANSWER = "TRANSACTION_ANSWER"
   val TRANSACTION_TIME = "TRANSACTION_TIME"
   val WALLET_DETAILS = "WALLET_DETAILS"
+  val DOCUMENT_NOT_FOUND = "DOCUMENT_NOT_FOUND"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",

@@ -131,12 +131,12 @@ object Secrets {
   def base64URLDecodeToString(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
   } catch {
-    case exception: Exception => throw new IllegalArgumentException("INVALID_BASE64_ENCODING")
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLDecode(s: String): Array[Byte] = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_"))
   } catch {
-    case exception: Exception => throw new IllegalArgumentException("INVALID_BASE64_ENCODING")
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 }

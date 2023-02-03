@@ -31,6 +31,9 @@ window.addEventListener('popstate', e => {
         case "wallet":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet(lastPart));
             break;
+        case "document":
+            componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.document(lastPart));
+            break;
         default:
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard());
             break;

@@ -13,6 +13,7 @@ GET        /firebase-messaging-sw.js                       controllers.Assets.at
 GET        /blocks                                         controllers.ViewController.blocks()
 GET        /blocks/:height                                 controllers.ViewController.block(height: Int)
 GET        /transactions                                   controllers.ViewController.transactions()
+GET        /document/:id                                   controllers.ViewController.document(id: String)
 GET        /transactions/:txHash                           controllers.ViewController.transaction(txHash: String)
 GET        /wallet/:address                                controllers.ViewController.wallet(address: String)
 GET        /validators                                     controllers.ViewController.validators()
@@ -27,11 +28,12 @@ GET        /component/transactionMessages                  controllers.Component
 GET        /component/withdrawRewardAmount                 controllers.ComponentViewController.withdrawRewardAmount(txHash: String, msgIndex: Int)
 
 GET        /dashboard                                      controllers.ComponentViewController.dashboard
-GET        /wallet                                         controllers.ComponentViewController.wallet(address: String)
-GET        /block                                          controllers.ComponentViewController.block(height: Int)
-GET        /transaction                                    controllers.ComponentViewController.transaction(txHash: String)
-GET        /validator                                      controllers.ComponentViewController.validator(address: String)
-GET        /proposal                                       controllers.ComponentViewController.proposal(id: Int)
+GET        /documentDetails                                controllers.ComponentViewController.document(id: String)
+GET        /walletAddress                                  controllers.ComponentViewController.wallet(address: String)
+GET        /blockHeight                                    controllers.ComponentViewController.block(height: Int)
+GET        /transactionHash                                controllers.ComponentViewController.transaction(txHash: String)
+GET        /validatorAddress                               controllers.ComponentViewController.validator(address: String)
+GET        /proposalID                                     controllers.ComponentViewController.proposal(id: Int)
 
 GET        /notification/recentActivityMessages            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
 GET        /component/recentActivities                     controllers.ComponentViewController.recentActivities
