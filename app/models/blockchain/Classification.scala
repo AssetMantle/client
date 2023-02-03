@@ -104,7 +104,9 @@ class Classifications @Inject()(
 
     def onDefineIdentity(msg: com.identities.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
+        ++ Seq(constants.Blockchain.AuthenticationProperty)
+        ++ PropertyList(msg.getMutableProperties).propertyList))
       val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
       val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
       val add = Service.add(classification)
