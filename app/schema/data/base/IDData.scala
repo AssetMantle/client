@@ -29,6 +29,8 @@ case class IDData(value: AnyID) extends Data {
   def getProtoBytes: Array[Byte] = this.asProtoIDData.toByteString.toByteArray
 
   def viewString: String = this.asID.asString
+
+  def getAnyID: AnyID = this.value
 }
 
 object IDData {

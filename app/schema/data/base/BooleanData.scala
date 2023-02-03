@@ -3,14 +3,13 @@ package schema.data.base
 import com.data.{AnyData, BooleanData => protoBooleanData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
-import utilities.AttoNumber
 
 case class BooleanData(value: Boolean) extends Data {
   def getType: StringID = constants.DataTypeID.BooleanDataTypeID
 
   def getID: DataID = DataID(typeID = constants.DataTypeID.BooleanDataTypeID, hashID = this.generateHashID)
 
-  def zeroValue: Data = DecData(AttoNumber.zero)
+  def zeroValue: Data = BooleanData(false)
 
   def getBytes: Array[Byte] = {
     val res: Byte = if (this.value) 1 else 0

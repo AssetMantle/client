@@ -347,14 +347,14 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => blockchainIdentities.Utility.onRevoke(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
       //orders
-      case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Future(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainClassifications.Utility.onDefineOrder(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => blockchainOrders.Utility.onDeputize(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ORDER_MAKE => Future(ordersTransactions.make.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ORDER_MODIFY => Future(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(ordersTransactions.make.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.ORDER_MODIFY => blockchainOrders.Utility.onModify(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_TAKE => Future(ordersTransactions.take.Message.parseFrom(stdMsg.getValue).getFrom)
+      case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
       //metas
       case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       // splits
