@@ -10,13 +10,13 @@ case class IDData(value: AnyID) extends Data {
 
   def asID: ID = ID(this.value)
 
-  def getType: StringID = commonConstants.DataTypeID.IDDataTypeID
+  def getType: StringID = constants.DataTypeID.IDDataTypeID
 
-  def getID: DataID = base.DataID(typeID = commonConstants.DataTypeID.IDDataTypeID, hashID = this.generateHashID)
+  def getID: DataID = base.DataID(typeID = constants.DataTypeID.IDDataTypeID, hashID = this.generateHashID)
 
   def getBytes: Array[Byte] = this.asID.getBytes
 
-  def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
   def getProtoDataID: protoDataID = this.getID.asProtoDataID
 
@@ -29,6 +29,8 @@ case class IDData(value: AnyID) extends Data {
   def getProtoBytes: Array[Byte] = this.asProtoIDData.toByteString.toByteArray
 
   def viewString: String = this.asID.asString
+
+  def getAnyID: AnyID = this.value
 }
 
 object IDData {

@@ -1,39 +1,41 @@
 package schema.data.base
-import com.data.AnyData
+
+import com.data.{AnyData, ListData => protoListData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
-import com.data.{ListData => protoListData}
 
 import java.math.BigInteger
 import scala.jdk.CollectionConverters._
 
 
 case class ListData(dataList: Seq[AnyData]) extends Data {
-  def getType: StringID = commonConstants.DataTypeID.ListDataTypeID
+  def getType: StringID = constants.DataTypeID.ListDataTypeID
 
-   def getID: DataID = DataID(typeID = commonConstants.DataTypeID.ListDataTypeID, hashID = this.generateHashID)
+  def getID: DataID = DataID(typeID = constants.DataTypeID.ListDataTypeID, hashID = this.generateHashID)
 
-   def zeroValue: Data = ListData(dataList = Seq())
+ def getAnyDataList: Seq[AnyData] = this.dataList
 
-   def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+  def zeroValue: Data = ListData(dataList = Seq())
 
-   def asProtoListData: protoListData = protoListData.newBuilder().addAllDataList(this.dataList.asJava).build()
+  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
-   def toAnyData: AnyData = AnyData.newBuilder().setListData(this.asProtoListData).build()
+  def asProtoListData: protoListData = protoListData.newBuilder().addAllDataList(this.dataList.asJava).build()
 
-   def getBytes: Array[Byte] = {
-      this.dataList.map(x => Data(x).getBytes).filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten
-   }
+  def toAnyData: AnyData = AnyData.newBuilder().setListData(this.asProtoListData).build()
 
-   def getProtoBytes: Array[Byte] = this.asProtoListData.toByteString.toByteArray
+  def getBytes: Array[Byte] = {
+    this.dataList.map(x => Data(x).getBytes).filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten
+  }
 
- override def viewString: String = this.toString
+  def getProtoBytes: Array[Byte] = this.asProtoListData.toByteString.toByteArray
+
+  override def viewString: String = this.toString
 }
 
 object ListData {
 
- def apply(value: protoListData): ListData = ListData(value.getDataListList.asScala.toSeq)
+  def apply(value: protoListData): ListData = ListData(value.getDataListList.asScala.toSeq)
 
- def apply(protoBytes: Array[Byte]): ListData = ListData(protoListData.parseFrom(protoBytes))
+  def apply(protoBytes: Array[Byte]): ListData = ListData(protoListData.parseFrom(protoBytes))
 
 }

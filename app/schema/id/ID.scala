@@ -18,7 +18,7 @@ abstract class ID {
 
 object ID {
 
-  private implicit val module: String = commonConstants.Module.SCHEMA_ID
+  private implicit val module: String = constants.Module.SCHEMA_ID
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 

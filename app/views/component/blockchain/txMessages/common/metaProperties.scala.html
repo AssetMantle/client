@@ -7,6 +7,6 @@
 
 @defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MetaProperty])){properties =>
     @properties.map{property =>
-        @commonTextInfo(property.id.asString, property.getData.viewString)
+        @commonTextInfo(s"${property.id.keyID.asString} (${property.id.typeID.asString})", property.getData.viewString)
     }
 }

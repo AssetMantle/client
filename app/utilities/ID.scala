@@ -1,11 +1,11 @@
-package commonUtilities
+package utilities
 
 import com.google.protobuf.ByteString
 import com.ids.{HashID => protoHashID}
-import commonConstants.DataTypeID._
 import org.slf4j.{Logger, LoggerFactory}
 import schema.data.Data
 import schema.id.OwnableID
+import constants.DataTypeID._
 import schema.id.base._
 import schema.property.Property
 import schema.qualified.{Immutables, Mutables}
@@ -17,7 +17,7 @@ import scala.util.Random
 
 object ID {
 
-  private implicit val module: String = commonConstants.Module.COMMON_UTILITIES_ID
+  private implicit val module: String = constants.Module.COMMON_UTILITIES_ID
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -45,13 +45,13 @@ object ID {
 
   def generateHashID(bytesList: Array[Byte]*): HashID = if (bytesList.exists(_.length != 0)) {
     HashID(protoHashID.newBuilder().setIDBytes(ByteString.copyFrom(
-      commonUtilities.Secrets.sha256Hash(bytesList.filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten)
+      utilities.Secrets.sha256Hash(bytesList.filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten)
     )).build())
   } else HashID(value = Array[Byte]())
 
   def generateHashIDFromList(bytesList: Seq[Array[Byte]]): HashID = if (bytesList.exists(_.length != 0)) {
     HashID(protoHashID.newBuilder().setIDBytes(ByteString.copyFrom(
-      commonUtilities.Secrets.sha256Hash(bytesList.filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten)
+      utilities.Secrets.sha256Hash(bytesList.filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten)
     )).build())
   } else HashID(value = Array[Byte]())
 

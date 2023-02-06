@@ -2,14 +2,14 @@ package constants
 
 import com.google.common.collect
 import com.google.common.collect.ImmutableList
-import models.blockchain.Classification
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
-import schema.data.base.{IDData, ListData}
-import schema.id.base.{ClassificationID, PropertyID, StringID}
-import schema.property.base.MetaProperty
+import schema.data.base._
+import schema.id.base._
 import schema.list._
+import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
+import schema.types.Height
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -29,9 +29,9 @@ object Blockchain {
   val IDSeparator = "."
   val FirstOrderCompositeIDSeparator = "|"
   val SecondOrderCompositeIDSeparator = "*"
-  val OneDec = BigDecimal("1.000000000000000000")
-  val ZeroDec = BigDecimal("0.0")
-  val SmallestDec = BigDecimal("0.000000000000000001")
+  val OneDec: BigDecimal = BigDecimal("1.000000000000000000")
+  val ZeroDec: BigDecimal = BigDecimal("0.0")
+  val SmallestDec: BigDecimal = BigDecimal("0.000000000000000001")
   val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
   val ToHashSeparator = "_"
   val RequestPropertiesSeparator = ","
@@ -55,10 +55,42 @@ object Blockchain {
   val KafkaTxIteratorInitialDelay: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
   val KafkaTxIteratorInterval: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
-  val nubClassificationID: Array[Byte] = commonUtilities.Secrets.base64Decoder("DtqQ0fXQ45Bm0eavjtbwg3GSHGP+6ylMIILn6WmkY5Y=")
-  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = ListData(Seq()).getType), data = ListData(Seq()).toAnyData)
-  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = IDData(StringID("").toAnyID).getType), data = IDData(StringID("").toAnyID).toAnyData)
-  val NubClassificationID: ClassificationID = commonUtilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
+
+  object Document {
+    val ASSET = "ASSET"
+    val IDENTITY = "IDENTITY"
+    val ORDER = "ORDER"
+  }
+
+  val Mint: StringID = StringID("mint")
+  val Burn: StringID = StringID("burn")
+  val Renumerate: StringID = StringID("renumerate")
+  val Add: StringID = StringID("add")
+  val Remove: StringID = StringID("remove")
+  val Mutate: StringID = StringID("mutate")
+
+  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
+  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val SupplyProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("supply"), typeID = constants.DataTypeID.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
+  val BurnHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("burnHeight"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+  val LockProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("lock"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+  val MaintainedClassificationIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedClassificationID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
+  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
+  val MaintainedPropertiesProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedProperties"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
+  val PermissionsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("permissions"), typeID = constants.DataTypeID.ListDataTypeID), data = ListData(Seq()).toAnyData)
+
+  val ExchangeRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("exchangeRate"), typeID = constants.DataTypeID.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
+  val CreationHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("creationHeight"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+  val MakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val MakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val TakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerOwnableID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val TakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerID"), typeID = constants.DataTypeID.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
+  val MakerOwnableSplitProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableSplit"), typeID = constants.DataTypeID.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
+  val ExpiryHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("expiryHeight"), typeID = constants.DataTypeID.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
+
+  val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
+  val OrderIdentityID: IdentityID = utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getID)))))
+
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
     val SINGLE_SECP256K1 = "/cosmos.crypto.secp256k1.PubKey"

@@ -25,7 +25,7 @@ abstract class Property {
 
 object Property {
 
-  private implicit val module: String = commonConstants.Module.SCHEMA_PROPERTY
+  private implicit val module: String = constants.Module.SCHEMA_PROPERTY
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 

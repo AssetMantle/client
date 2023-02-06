@@ -5,15 +5,15 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class StringData(value: String) extends Data {
-  def getType: StringID = commonConstants.DataTypeID.StringDataTypeID
+  def getType: StringID = constants.DataTypeID.StringDataTypeID
 
-  def getID: DataID = DataID(typeID = commonConstants.DataTypeID.StringDataTypeID, hashID = this.generateHashID)
+  def getID: DataID = DataID(typeID = constants.DataTypeID.StringDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = StringData("")
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def generateHashID: HashID = commonUtilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
   def asProtoStringData: protoStringData = protoStringData.newBuilder().setValue(this.value).build()
 

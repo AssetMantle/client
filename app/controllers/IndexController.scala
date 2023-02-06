@@ -12,12 +12,9 @@ import play.api.{Configuration, Logger}
 import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 import services.Startup
-import com.qualified.{Immutables => protoImmutables}
-import schema.id.base.{PropertyID, StringID}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
@@ -26,6 +23,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 startup: Startup,
                                 blockchainSplits: blockchain.Splits,
                                 blockchainClassifications: blockchain.Classifications,
+                                blockchainIdentities: blockchain.Identities,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -50,7 +48,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))
         else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
         else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
-        else Future(Unauthorized(views.html.index(failures = Seq(constants.Response.SEARCH_QUERY_NOT_FOUND))))
+        else Future(Redirect(routes.ComponentViewController.document(query)))
     }
   }
 

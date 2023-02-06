@@ -85,4 +85,11 @@ class ViewController @Inject()(
         Ok(views.html.explorer.wallet(address))
     }
   }
+
+  def document(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.document(id))
+    }
+  }
 }

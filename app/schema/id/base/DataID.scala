@@ -9,11 +9,11 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
   def getHashID: HashID = this.hashID
 
-  def getHashIDString: String = commonUtilities.Secrets.base64URLEncoder(hashID.getBytes)
+  def getHashIDString: String = utilities.Secrets.base64URLEncoder(hashID.getBytes)
 
   def getBytes: Array[Byte] = this.typeID.getBytes ++ this.hashID.getBytes
 
-  def asString: String = this.getTypeID + commonConstants.Blockchain.IDSeparator + this.getHashIDString
+  def asString: String = this.getTypeID.asString + constants.Blockchain.IDSeparator + this.getHashIDString
 
   def asProtoDataID: protoDataID = protoDataID.newBuilder().setTypeID(this.typeID.asProtoStringID).setHashID(this.hashID.asProtoHashID).build()
 

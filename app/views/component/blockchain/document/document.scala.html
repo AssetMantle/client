@@ -1,0 +1,41 @@
+@import schema.document.Document
+@import schema.list.PropertyList
+@import views.html.base.infos._
+@import views.html.component.blockchain.txMessages.common._
+@import views.html.base.cards.commonCard
+
+@(id: String, document: Option[Document])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="documentDetails">
+            @commonCard(constants.View.DOCUMENT) {
+            } {
+                @if(document.isDefined) {
+                    @commonTextInfo(constants.View.ID, id)
+                    @commonTextInfo(constants.View.CLASSIFICATION_ID, document.get.classificationID.asString)
+                    <br>
+                    @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+                    @metaProperties(PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                    <br>
+                    @Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):
+                    @mesaProperties(PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                    <br>
+                    @Messages(constants.View.MUTABLE_META_PROPERTIES):
+                    @metaProperties(PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                    <br>
+                    @Messages(constants.View.MUTABLE_MESA_PROPERTIES):
+                    @mesaProperties(PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                } else {
+                    @Messages(constants.View.DOCUMENT_NOT_FOUND)
+                }
+            }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        checkAndPushState(jsRoutes.controllers.ViewController.document().url, '@id', "document");
+</script>

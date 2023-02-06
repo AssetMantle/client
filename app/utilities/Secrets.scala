@@ -122,4 +122,21 @@ object Secrets {
 
   def sha256HashString(value: Array[Byte]): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value)))
 
+  def sha256HashString(value: String): String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))))
+
+  def sha256HashHexString(value: Array[Byte]): String = byteArrayToString(sha256Hash(value))
+
+  def byteArrayToString(value: Array[Byte]): String = value.map("%02x".format(_)).mkString.toUpperCase
+
+  def base64URLDecodeToString(s: String): String = try {
+    Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
+  } catch {
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
+  }
+
+  def base64URLDecode(s: String): Array[Byte] = try {
+    Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_"))
+  } catch {
+    case exception: Exception => constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
+  }
 }

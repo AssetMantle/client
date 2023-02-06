@@ -7,6 +7,6 @@
 
 @defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MesaProperty])){properties =>
     @properties.map{property =>
-        @commonTextInfo(property.id.asString, property.dataID.asString)
+        @commonTextInfo(s"${property.id.keyID.asString} (${property.id.typeID.asString})", property.dataID.asString)
     }
 }

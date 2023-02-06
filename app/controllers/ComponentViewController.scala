@@ -10,10 +10,11 @@ import models.keyBase.ValidatorAccount
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
+import schema.document.Document
+import schema.id.base.{AssetID, IdentityID}
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -37,6 +38,9 @@ class ComponentViewController @Inject()(
                                          blockchainProposalDeposits: blockchain.ProposalDeposits,
                                          blockchainProposalVotes: blockchain.ProposalVotes,
                                          blockchainValidators: blockchain.Validators,
+                                         blockchainIdentities: blockchain.Identities,
+                                         blockchainAssets: blockchain.Assets,
+                                         blockchainOrders: blockchain.Orders,
                                          cached: Cached,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
@@ -68,6 +72,26 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.component.blockchain.account.wallet(address)))
+    }
+  }
+
+  def document(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        println(id)
+        val idBytes = utilities.Secrets.base64URLDecode(id)
+        val asset = blockchainAssets.Service.get(idBytes)
+        val identity = blockchainIdentities.Service.get(idBytes)
+        val order = blockchainOrders.Service.get(idBytes)
+
+        for {
+          asset <- asset
+          identity <- identity
+          order <- order
+        } yield {
+          val document: Option[Document] = if (asset.isDefined) Option(asset.get.getDocument) else if (identity.isDefined) Option(identity.get.getDocument) else if (order.isDefined) Option(order.get.getDocument) else None
+          Ok(views.html.component.blockchain.document.document(id, document))
+        }
     }
   }
 
@@ -239,7 +263,7 @@ class ComponentViewController @Inject()(
   def accountWallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val operatorAddress = Future(commonUtilities.Crypto.convertAccountAddressToOperatorAddress(address))
+        val operatorAddress = Future(utilities.Crypto.convertAccountAddressToOperatorAddress(address))
         val balances = blockchainBalances.Service.get(address)
         val delegations = blockchainDelegations.Service.getAllForDelegator(address)
         val undelegations = blockchainUndelegations.Service.getAllByDelegator(address)
@@ -447,7 +471,9 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val transaction = blockchainTransactions.Service.tryGet(txHash)
+
         def block(height: Int) = blockchainBlocks.Service.tryGet(height)
+
         (for {
           transaction <- transaction
           block <- block(transaction.height)
@@ -599,7 +625,7 @@ class ComponentViewController @Inject()(
           validator <- validator
           totalBondedAmount <- totalBondedAmount
           keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
-        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, commonUtilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
+        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -635,7 +661,7 @@ class ComponentViewController @Inject()(
         def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllForValidator(operatorAddress)
 
         def getDelegationsMap(delegations: Seq[Delegation], validator: Validator) = Future {
-          val selfDelegated = delegations.find(x => x.delegatorAddress == commonUtilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
+          val selfDelegated = delegations.find(x => x.delegatorAddress == utilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
           val othersDelegated = validator.delegatorShares - selfDelegated
           val delegationsMap = ListMap(constants.View.SELF_DELEGATED -> selfDelegated.toDouble, constants.View.OTHERS_DELEGATED -> othersDelegated.toDouble)
           (delegationsMap, (selfDelegated * 100.0 / validator.delegatorShares).toDouble, (othersDelegated * 100.0 / validator.delegatorShares).toDouble)
