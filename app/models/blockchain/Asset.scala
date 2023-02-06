@@ -131,8 +131,7 @@ class Assets @Inject()(
       val asset = Asset(id = assetID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(asset)
 
-      val split: BigDecimal = asset.getProperty(constants.Blockchain.SupplyProperty.getID).fold(constants.Blockchain.SmallestDec)(x => DecData(MetaProperty(x.getProtoBytes).getData.getProtoBytes).value.toBigDecimal)
-      val mint = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = split)
+      val mint = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value.toBigDecimal)
 
       for {
         _ <- add

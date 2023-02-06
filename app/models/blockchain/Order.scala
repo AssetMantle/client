@@ -179,9 +179,9 @@ class Orders @Inject()(
         val transferMakerOwnableSplit = BigDecimal(msg.getMakerOwnableSplit) - order.getMakerOwnableSplit
         if (transferMakerOwnableSplit < constants.Blockchain.ZeroDec) {
           blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit.abs)
-        } else {
+        } else if (transferMakerOwnableSplit > constants.Blockchain.ZeroDec) {
           blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit)
-        }
+        } else Future()
       }
 
       def update(order: Order) = Service.update(order.mutate(mutables.getProperties))
