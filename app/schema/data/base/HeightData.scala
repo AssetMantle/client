@@ -4,19 +4,19 @@ import com.data.{AnyData, HeightData => protoHeightData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 import schema.types.Height
-import com.types.{Height => protoHeight}
-import utilities.AttoNumber
 
 case class HeightData(value: Height) extends Data {
-  def getType: StringID = constants.DataTypeID.HeightDataTypeID
+  def getType: StringID = constants.Data.HeightDataTypeID
 
-  def getID: DataID = DataID(typeID = constants.DataTypeID.HeightDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.Data.HeightDataWeight
 
-  def zeroValue: Data = DecData(AttoNumber.zero)
+  def getID: DataID = DataID(typeID = constants.Data.HeightDataTypeID, hashID = this.generateHashID)
+
+  def zeroValue: Data = HeightData(Height(-1))
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value.value == -1) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
   def asProtoHeightData: protoHeightData = protoHeightData.newBuilder().setValue(this.value.asProtoHeight).build()
 

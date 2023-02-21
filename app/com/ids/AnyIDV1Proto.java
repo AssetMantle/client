@@ -40,7 +40,7 @@ public final class AnyIDV1Proto {
       "to\032#schema/ids/base/propertyID.v1.proto\032" +
       " schema/ids/base/splitID.v1.proto\032!schem" +
       "a/ids/base/stringID.v1.proto\032\024gogoproto/" +
-      "gogo.proto\"\273\004\n\005AnyID\022*\n\tasset_i_d\030\001 \001(\0132" +
+      "gogo.proto\"\302\004\n\005AnyID\022*\n\tasset_i_d\030\001 \001(\0132" +
       "\014.ids.AssetIDH\000R\007assetID\022E\n\022classificati" +
       "on_i_d\030\002 \001(\0132\025.ids.ClassificationIDH\000R\020c" +
       "lassificationID\022\'\n\010data_i_d\030\003 \001(\0132\013.ids." +
@@ -49,15 +49,15 @@ public final class AnyIDV1Proto {
       "\017.ids.IdentityIDH\000R\nidentityID\0229\n\016mainta" +
       "iner_i_d\030\006 \001(\0132\021.ids.MaintainerIDH\000R\014mai" +
       "ntainerID\022*\n\torder_i_d\030\007 \001(\0132\014.ids.Order" +
-      "IDH\000R\007orderID\0223\n\013ownable_i_d\030\010 \001(\0132\021.ids" +
-      ".AnyOwnableIDH\000R\townableID\0223\n\014property_i" +
-      "_d\030\t \001(\0132\017.ids.PropertyIDH\000R\npropertyID\022" +
-      "*\n\tsplit_i_d\030\n \001(\0132\014.ids.SplitIDH\000R\007spli" +
-      "tID\022-\n\nstring_i_d\030\013 \001(\0132\r.ids.StringIDH\000" +
-      "R\010stringID:\004\210\240\037\000B\006\n\004implBs\n\007com.idsB\014Any" +
-      "IDV1ProtoP\001Z.github.com/AssetMantle/modu" +
-      "les/schema/ids/base\242\002\003IXX\252\002\003Ids\312\002\003Ids\342\002\017" +
-      "Ids\\GPBMetadata\352\002\003Idsb\006proto3"
+      "IDH\000R\007orderID\022:\n\017any_ownable_i_d\030\010 \001(\0132\021" +
+      ".ids.AnyOwnableIDH\000R\014anyOwnableID\0223\n\014pro" +
+      "perty_i_d\030\t \001(\0132\017.ids.PropertyIDH\000R\nprop" +
+      "ertyID\022*\n\tsplit_i_d\030\n \001(\0132\014.ids.SplitIDH" +
+      "\000R\007splitID\022-\n\nstring_i_d\030\013 \001(\0132\r.ids.Str" +
+      "ingIDH\000R\010stringID:\004\210\240\037\000B\006\n\004implBs\n\007com.i" +
+      "dsB\014AnyIDV1ProtoP\001Z.github.com/AssetMant" +
+      "le/modules/schema/ids/base\242\002\003IXX\252\002\003Ids\312\002" +
+      "\003Ids\342\002\017Ids\\GPBMetadata\352\002\003Idsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -81,7 +81,7 @@ public final class AnyIDV1Proto {
     internal_static_ids_AnyID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ids_AnyID_descriptor,
-        new java.lang.String[] { "AssetID", "ClassificationID", "DataID", "HashID", "IdentityID", "MaintainerID", "OrderID", "OwnableID", "PropertyID", "SplitID", "StringID", "Impl", });
+        new java.lang.String[] { "AssetID", "ClassificationID", "DataID", "HashID", "IdentityID", "MaintainerID", "OrderID", "AnyOwnableID", "PropertyID", "SplitID", "StringID", "Impl", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);

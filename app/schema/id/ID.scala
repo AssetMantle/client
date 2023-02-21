@@ -30,7 +30,7 @@ object ID {
     case 5 => IdentityID(anyID.getIdentityID)
     case 6 => MaintainerID(anyID.getMaintainerID)
     case 7 => OrderID(anyID.getOrderID)
-    case 8 => OwnableID(anyID.getOwnableID)
+    case 8 => OwnableID(anyID.getAnyOwnableID)
     case 9 => PropertyID(anyID.getPropertyID)
     case 10 => SplitID(anyID.getSplitID)
     case 11 => StringID(anyID.getStringID)

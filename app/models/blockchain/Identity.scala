@@ -16,7 +16,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Identity(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -56,9 +56,11 @@ object Identities {
 
   class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -124,7 +126,7 @@ class Identities @Inject()(
       val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID).toAnyID).toAnyData))))
       val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getFrom)).toAnyData)).toAnyData))))
       val identityID = utilities.ID.getIdentityID(classificationID = constants.Blockchain.NubClassificationID, immutables = immutables)
-      val identity = Identity(id = identityID.getBytes, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
       for {
@@ -138,7 +140,7 @@ class Identities @Inject()(
       val identityID = utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
       val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ Seq(authenticationProperty) ++ PropertyList(msg.getMutableProperties).propertyList))
-      val identity = Identity(id = identityID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
       for {

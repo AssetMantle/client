@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Mappable();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.splits.MappableV1Proto.internal_static_splits_Mappable_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.types.SplitOrBuilder getSplitOrBuilder() {
-    return getSplit();
+    return split_ == null ? com.types.Split.getDefaultInstance() : split_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (splitBuilder_ == null) {
-        split_ = null;
-      } else {
-        split_ = null;
+      bitField0_ = 0;
+      split_ = null;
+      if (splitBuilder_ != null) {
+        splitBuilder_.dispose();
         splitBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.splits.Mappable buildPartial() {
       com.splits.Mappable result = new com.splits.Mappable(this);
-      if (splitBuilder_ == null) {
-        result.split_ = split_;
-      } else {
-        result.split_ = splitBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.splits.Mappable result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.split_ = splitBuilder_ == null
+            ? split_
+            : splitBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getSplitFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.types.Split split_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the split field is set.
      */
     public boolean hasSplit() {
-      return splitBuilder_ != null || split_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.types.Split split = 1 [json_name = "split"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         split_ = value;
-        onChanged();
       } else {
         splitBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.types.Split.Builder builderForValue) {
       if (splitBuilder_ == null) {
         split_ = builderForValue.build();
-        onChanged();
       } else {
         splitBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeSplit(com.types.Split value) {
       if (splitBuilder_ == null) {
-        if (split_ != null) {
-          split_ =
-            com.types.Split.newBuilder(split_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          split_ != null &&
+          split_ != com.types.Split.getDefaultInstance()) {
+          getSplitBuilder().mergeFrom(value);
         } else {
           split_ = value;
         }
-        onChanged();
       } else {
         splitBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.types.Split split = 1 [json_name = "split"];</code>
      */
     public Builder clearSplit() {
-      if (splitBuilder_ == null) {
-        split_ = null;
-        onChanged();
-      } else {
-        split_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      split_ = null;
+      if (splitBuilder_ != null) {
+        splitBuilder_.dispose();
         splitBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.types.Split split = 1 [json_name = "split"];</code>
      */
     public com.types.Split.Builder getSplitBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getSplitFieldBuilder().getBuilder();
     }

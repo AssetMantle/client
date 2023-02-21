@@ -14,7 +14,6 @@ import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
 import queries.responses.common.EventWrapper
 import schema.document.Document
-import schema.id.base.{AssetID, IdentityID}
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -41,6 +40,7 @@ class ComponentViewController @Inject()(
                                          blockchainIdentities: blockchain.Identities,
                                          blockchainAssets: blockchain.Assets,
                                          blockchainOrders: blockchain.Orders,
+                                         blockchainClassifications: blockchain.Classifications,
                                          cached: Cached,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
@@ -78,18 +78,23 @@ class ComponentViewController @Inject()(
   def document(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        println(id)
-        val idBytes = utilities.Secrets.base64URLDecode(id)
-        val asset = blockchainAssets.Service.get(idBytes)
-        val identity = blockchainIdentities.Service.get(idBytes)
-        val order = blockchainOrders.Service.get(idBytes)
+        val idBytes = try utilities.Secrets.base64URLDecode(id) catch {
+          case _: Exception => try utilities.Secrets.base64Decoder(id) catch {
+            case _: Exception => Array[Byte]()
+          }
+        }
+        val classification = if (idBytes.nonEmpty) blockchainClassifications.Service.get(idBytes) else Future(None)
+        val asset = if (idBytes.nonEmpty) blockchainAssets.Service.get(idBytes) else Future(None)
+        val identity = if (idBytes.nonEmpty) blockchainIdentities.Service.get(idBytes) else Future(None)
+        val order = if (idBytes.nonEmpty) blockchainOrders.Service.get(idBytes) else Future(None)
 
         for {
           asset <- asset
           identity <- identity
           order <- order
+          classification <- classification
         } yield {
-          val document: Option[Document] = if (asset.isDefined) Option(asset.get.getDocument) else if (identity.isDefined) Option(identity.get.getDocument) else if (order.isDefined) Option(order.get.getDocument) else None
+          val document: Option[Document] = if (asset.isDefined) Option(asset.get.getDocument) else if (identity.isDefined) Option(identity.get.getDocument) else if (order.isDefined) Option(order.get.getDocument) else if (classification.isDefined) Option(classification.get.getDocument) else None
           Ok(views.html.component.blockchain.document.document(id, document))
         }
     }

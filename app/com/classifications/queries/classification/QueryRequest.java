@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new QueryRequest();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.classifications.queries.classification.QueryRequestV1Proto.internal_static_classifications_queries_classification_QueryRequest_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
-    return getClassificationID();
+    return classificationID_ == null ? com.ids.ClassificationID.getDefaultInstance() : classificationID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (classificationIDBuilder_ == null) {
-        classificationID_ = null;
-      } else {
-        classificationID_ = null;
+      bitField0_ = 0;
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
         classificationIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.classifications.queries.classification.QueryRequest buildPartial() {
       com.classifications.queries.classification.QueryRequest result = new com.classifications.queries.classification.QueryRequest(this);
-      if (classificationIDBuilder_ == null) {
-        result.classificationID_ = classificationID_;
-      } else {
-        result.classificationID_ = classificationIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.classifications.queries.classification.QueryRequest result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.classificationID_ = classificationIDBuilder_ == null
+            ? classificationID_
+            : classificationIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getClassificationIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.ClassificationID classificationID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the classificationID field is set.
      */
     public boolean hasClassificationID() {
-      return classificationIDBuilder_ != null || classificationID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         classificationID_ = value;
-        onChanged();
       } else {
         classificationIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.ClassificationID.Builder builderForValue) {
       if (classificationIDBuilder_ == null) {
         classificationID_ = builderForValue.build();
-        onChanged();
       } else {
         classificationIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeClassificationID(com.ids.ClassificationID value) {
       if (classificationIDBuilder_ == null) {
-        if (classificationID_ != null) {
-          classificationID_ =
-            com.ids.ClassificationID.newBuilder(classificationID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          classificationID_ != null &&
+          classificationID_ != com.ids.ClassificationID.getDefaultInstance()) {
+          getClassificationIDBuilder().mergeFrom(value);
         } else {
           classificationID_ = value;
         }
-        onChanged();
       } else {
         classificationIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public Builder clearClassificationID() {
-      if (classificationIDBuilder_ == null) {
-        classificationID_ = null;
-        onChanged();
-      } else {
-        classificationID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
         classificationIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public com.ids.ClassificationID.Builder getClassificationIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getClassificationIDFieldBuilder().getBuilder();
     }

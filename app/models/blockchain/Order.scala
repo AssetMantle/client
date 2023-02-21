@@ -19,7 +19,7 @@ import utilities.AttoNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Order(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -73,9 +73,11 @@ object Orders {
 
   class DataTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Order.tupled, Order.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Order.tupled, Order.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -150,12 +152,12 @@ class Orders @Inject()(
 
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
         ++ Seq(
-        constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiresIn.getValue + header.height.toLong)).toAnyData),
+        constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiryHeight.getValue + header.height.toLong)).toAnyData),
         constants.Blockchain.MakerOwnableSplitProperty.copy(data = AttoNumber(msg.getMakerOwnableSplit).toDecData.toAnyData))
         ++ PropertyList(msg.getMutableProperties).propertyList)
       )
 
-      val order = Order(id = orderID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val order = Order(id = orderID.getBytes, idString = orderID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(order)
       val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = BigDecimal(msg.getMakerOwnableSplit))
 

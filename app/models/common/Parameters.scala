@@ -99,4 +99,54 @@ object Parameters {
   implicit val transferParameterWrites: OWrites[TransferParameter] = Json.writes[TransferParameter]
 
   implicit val transferParameterReads: Reads[TransferParameter] = Json.reads[TransferParameter]
+
+  case class MetaPropertyTypeParameter(id: String, `type`: String, value: String)
+
+  implicit val metaPropertyTypeParameterWrites: OWrites[MetaPropertyTypeParameter] = Json.writes[MetaPropertyTypeParameter]
+
+  implicit val metaPropertyTypeParameterReads: Reads[MetaPropertyTypeParameter] = Json.reads[MetaPropertyTypeParameter]
+
+  case class ClassificationParameter(classificationParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.CLASSIFICATIONS
+
+    def getBondRate: Int = this.classificationParameters.find(_.id == constants.Blockchain.BondRateProperty.id.keyID.value).fold(0)(_.value.toInt)
+
+    def getMaxPropertyCount: Int = this.classificationParameters.find(_.id == constants.Blockchain.MaxPropertyCountProperty.id.keyID.value).fold(0)(_.value.toInt)
+  }
+
+  implicit val classificationParameterWrites: OWrites[ClassificationParameter] = Json.writes[ClassificationParameter]
+
+  implicit val classificationParameterReads: Reads[ClassificationParameter] = Json.reads[ClassificationParameter]
+
+  case class AssetParameter(assetParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.ASSETS
+  }
+
+  implicit val AssetParameterWrites: OWrites[AssetParameter] = Json.writes[AssetParameter]
+
+  implicit val AssetParameterReads: Reads[AssetParameter] = Json.reads[AssetParameter]
+
+  case class IdentityParameter(identityParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.IDENTITIES
+  }
+
+  implicit val IdentityParameterWrites: OWrites[IdentityParameter] = Json.writes[IdentityParameter]
+
+  implicit val IdentityParameterReads: Reads[IdentityParameter] = Json.reads[IdentityParameter]
+
+  case class OrderParameter(orderParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.ORDERS
+  }
+
+  implicit val OrderParameterWrites: OWrites[OrderParameter] = Json.writes[OrderParameter]
+
+  implicit val OrderParameterReads: Reads[OrderParameter] = Json.reads[OrderParameter]
+
+  case class SplitParameter(splitParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.SPLITS
+  }
+
+  implicit val SplitParameterWrites: OWrites[SplitParameter] = Json.writes[SplitParameter]
+
+  implicit val SplitParameterReads: Reads[SplitParameter] = Json.reads[SplitParameter]
 }

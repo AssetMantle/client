@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new QueryRequest();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.assets.queries.asset.QueryRequestV1Proto.internal_static_assets_queries_asset_QueryRequest_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.AssetIDOrBuilder getAssetIDOrBuilder() {
-    return getAssetID();
+    return assetID_ == null ? com.ids.AssetID.getDefaultInstance() : assetID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (assetIDBuilder_ == null) {
-        assetID_ = null;
-      } else {
-        assetID_ = null;
+      bitField0_ = 0;
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
         assetIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.assets.queries.asset.QueryRequest buildPartial() {
       com.assets.queries.asset.QueryRequest result = new com.assets.queries.asset.QueryRequest(this);
-      if (assetIDBuilder_ == null) {
-        result.assetID_ = assetID_;
-      } else {
-        result.assetID_ = assetIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.assets.queries.asset.QueryRequest result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.assetID_ = assetIDBuilder_ == null
+            ? assetID_
+            : assetIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getAssetIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.AssetID assetID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the assetID field is set.
      */
     public boolean hasAssetID() {
-      return assetIDBuilder_ != null || assetID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         assetID_ = value;
-        onChanged();
       } else {
         assetIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.AssetID.Builder builderForValue) {
       if (assetIDBuilder_ == null) {
         assetID_ = builderForValue.build();
-        onChanged();
       } else {
         assetIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeAssetID(com.ids.AssetID value) {
       if (assetIDBuilder_ == null) {
-        if (assetID_ != null) {
-          assetID_ =
-            com.ids.AssetID.newBuilder(assetID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          assetID_ != null &&
+          assetID_ != com.ids.AssetID.getDefaultInstance()) {
+          getAssetIDBuilder().mergeFrom(value);
         } else {
           assetID_ = value;
         }
-        onChanged();
       } else {
         assetIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
     public Builder clearAssetID() {
-      if (assetIDBuilder_ == null) {
-        assetID_ = null;
-        onChanged();
-      } else {
-        assetID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
         assetIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
     public com.ids.AssetID.Builder getAssetIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getAssetIDFieldBuilder().getBuilder();
     }

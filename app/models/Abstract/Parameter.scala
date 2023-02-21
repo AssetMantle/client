@@ -27,6 +27,16 @@ abstract class Parameter {
 
   def asStakingParameter: StakingParameter = this.asInstanceOf[StakingParameter]
 
+  def asClassificationParameter: ClassificationParameter = this.asInstanceOf[ClassificationParameter]
+
+  def asIdentityParameter: IdentityParameter = this.asInstanceOf[IdentityParameter]
+
+  def asOrderParameter: OrderParameter = this.asInstanceOf[OrderParameter]
+
+  def asSplitParameter: SplitParameter = this.asInstanceOf[SplitParameter]
+
+  def asAssetParameter: AssetParameter = this.asInstanceOf[AssetParameter]
+
   def asTransferParameter: TransferParameter = this.asInstanceOf[TransferParameter]
 
 }
@@ -44,6 +54,11 @@ object Parameter {
     case slashingParameter: SlashingParameter => Json.toJson(slashingParameter)
     case stakingParameter: StakingParameter => Json.toJson(stakingParameter)
     case transferParameter: TransferParameter => Json.toJson(transferParameter)
+    case assetParameter: AssetParameter => Json.toJson(assetParameter)
+    case classificationParameter: ClassificationParameter => Json.toJson(classificationParameter)
+    case identityParameter: IdentityParameter => Json.toJson(identityParameter)
+    case orderParameter: OrderParameter => Json.toJson(orderParameter)
+    case splitParameter: SplitParameter => Json.toJson(splitParameter)
   }
 
   implicit val parameterReads: Reads[Parameter] = {
@@ -57,6 +72,11 @@ object Parameter {
       Json.format[MintingParameter].map(x => x: Parameter) or
       Json.format[SlashingParameter].map(x => x: Parameter) or
       Json.format[StakingParameter].map(x => x: Parameter) or
-      Json.format[TransferParameter].map(x => x: Parameter)
+      Json.format[TransferParameter].map(x => x: Parameter) or
+      Json.format[AssetParameter].map(x => x: Parameter) or
+      Json.format[ClassificationParameter].map(x => x: Parameter) or
+      Json.format[IdentityParameter].map(x => x: Parameter) or
+      Json.format[SplitParameter].map(x => x: Parameter) or
+      Json.format[OrderParameter].map(x => x: Parameter)
   }
 }

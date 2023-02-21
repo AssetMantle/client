@@ -6,15 +6,17 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class AccAddressData(value: Array[Byte]) extends Data {
-  def getType: StringID = constants.DataTypeID.AccAddressDataTypeID
+  def getType: StringID = constants.Data.AccAddressDataTypeID
 
-  def getID: DataID = DataID(typeID = constants.DataTypeID.AccAddressDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.Data.AccAddressBondWeight
+
+  def getID: DataID = DataID(typeID = constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = AccAddressData(new Array[Byte](0))
 
   def getBytes: Array[Byte] = this.value
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value.length == 0) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
   def toBech32Address: String = utilities.Crypto.convertAccAddressBytesToAddress(this.value)
 

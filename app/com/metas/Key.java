@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Key();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.metas.KeyV1Proto.internal_static_metas_Key_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.DataIDOrBuilder getDataIDOrBuilder() {
-    return getDataID();
+    return dataID_ == null ? com.ids.DataID.getDefaultInstance() : dataID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (dataIDBuilder_ == null) {
-        dataID_ = null;
-      } else {
-        dataID_ = null;
+      bitField0_ = 0;
+      dataID_ = null;
+      if (dataIDBuilder_ != null) {
+        dataIDBuilder_.dispose();
         dataIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.metas.Key buildPartial() {
       com.metas.Key result = new com.metas.Key(this);
-      if (dataIDBuilder_ == null) {
-        result.dataID_ = dataID_;
-      } else {
-        result.dataID_ = dataIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.metas.Key result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.dataID_ = dataIDBuilder_ == null
+            ? dataID_
+            : dataIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getDataIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.DataID dataID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the dataID field is set.
      */
     public boolean hasDataID() {
-      return dataIDBuilder_ != null || dataID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.DataID data_i_d = 1 [json_name = "dataID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         dataID_ = value;
-        onChanged();
       } else {
         dataIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.DataID.Builder builderForValue) {
       if (dataIDBuilder_ == null) {
         dataID_ = builderForValue.build();
-        onChanged();
       } else {
         dataIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeDataID(com.ids.DataID value) {
       if (dataIDBuilder_ == null) {
-        if (dataID_ != null) {
-          dataID_ =
-            com.ids.DataID.newBuilder(dataID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          dataID_ != null &&
+          dataID_ != com.ids.DataID.getDefaultInstance()) {
+          getDataIDBuilder().mergeFrom(value);
         } else {
           dataID_ = value;
         }
-        onChanged();
       } else {
         dataIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.DataID data_i_d = 1 [json_name = "dataID"];</code>
      */
     public Builder clearDataID() {
-      if (dataIDBuilder_ == null) {
-        dataID_ = null;
-        onChanged();
-      } else {
-        dataID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      dataID_ = null;
+      if (dataIDBuilder_ != null) {
+        dataIDBuilder_.dispose();
         dataIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.DataID data_i_d = 1 [json_name = "dataID"];</code>
      */
     public com.ids.DataID.Builder getDataIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getDataIDFieldBuilder().getBuilder();
     }

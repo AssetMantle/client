@@ -65,6 +65,6 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
 
-libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.21.12"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.22.0"
 
 libraryDependencies += "com.typesafe" % "config" % "1.4.2"

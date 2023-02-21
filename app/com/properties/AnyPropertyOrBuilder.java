@@ -37,5 +37,5 @@ public interface AnyPropertyOrBuilder extends
    */
   com.properties.MetaPropertyOrBuilder getMetaPropertyOrBuilder();
 
-  public com.properties.AnyProperty.ImplCase getImplCase();
+  com.properties.AnyProperty.ImplCase getImplCase();
 }

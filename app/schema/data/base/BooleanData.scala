@@ -5,9 +5,11 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class BooleanData(value: Boolean) extends Data {
-  def getType: StringID = constants.DataTypeID.BooleanDataTypeID
+  def getType: StringID = constants.Data.BooleanDataTypeID
 
-  def getID: DataID = DataID(typeID = constants.DataTypeID.BooleanDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.Data.BooleanBondWeight
+
+  def getID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = BooleanData(false)
 
@@ -16,7 +18,7 @@ case class BooleanData(value: Boolean) extends Data {
     Seq(res).toArray
   }
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (!this.value) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
   def asProtoBooleanData: protoBooleanData = protoBooleanData.newBuilder().setValue(this.value).build()
 

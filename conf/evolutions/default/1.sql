@@ -63,10 +63,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Authorization"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -102,9 +103,10 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Block"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Classification"
 (
-    "id"                   BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -138,10 +140,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."FeeGrant"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Identity"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -179,10 +182,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."MetaData"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,

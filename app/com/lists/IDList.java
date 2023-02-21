@@ -26,11 +26,6 @@ private static final long serialVersionUID = 0L;
     return new IDList();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.lists.IdListV1Proto.internal_static_lists_IDList_descriptor;
@@ -45,6 +40,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int I_D_LIST_FIELD_NUMBER = 1;
+  @SuppressWarnings("serial")
   private java.util.List<com.ids.AnyID> iDList_;
   /**
    * <code>repeated .ids.AnyID i_d_list = 1 [json_name = "iDList"];</code>
@@ -274,6 +270,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       if (iDListBuilder_ == null) {
         iDList_ = java.util.Collections.emptyList();
       } else {
@@ -307,7 +304,13 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.lists.IDList buildPartial() {
       com.lists.IDList result = new com.lists.IDList(this);
-      int from_bitField0_ = bitField0_;
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
+      onBuilt();
+      return result;
+    }
+
+    private void buildPartialRepeatedFields(com.lists.IDList result) {
       if (iDListBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
           iDList_ = java.util.Collections.unmodifiableList(iDList_);
@@ -317,8 +320,10 @@ private static final long serialVersionUID = 0L;
       } else {
         result.iDList_ = iDListBuilder_.build();
       }
-      onBuilt();
-      return result;
+    }
+
+    private void buildPartial0(com.lists.IDList result) {
+      int from_bitField0_ = bitField0_;
     }
 
     @java.lang.Override

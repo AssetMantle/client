@@ -95,19 +95,19 @@ public interface MessageOrBuilder extends
   com.ids.AnyOwnableIDOrBuilder getTakerOwnableIDOrBuilder();
 
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-   * @return Whether the expiresIn field is set.
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+   * @return Whether the expiryHeight field is set.
    */
-  boolean hasExpiresIn();
+  boolean hasExpiryHeight();
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-   * @return The expiresIn.
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+   * @return The expiryHeight.
    */
-  com.types.Height getExpiresIn();
+  com.types.Height getExpiryHeight();
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
    */
-  com.types.HeightOrBuilder getExpiresInOrBuilder();
+  com.types.HeightOrBuilder getExpiryHeightOrBuilder();
 
   /**
    * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>

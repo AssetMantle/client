@@ -117,6 +117,14 @@ class Parameters @Inject()(
 
     def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
+    def tryGetClassificationParameter: Future[ClassificationParameter] = tryGetByType(constants.Blockchain.ParameterType.CLASSIFICATIONS).map(_.deserialize).map(_.value.asClassificationParameter)
+
+    def tryGetIdentityParameter: Future[IdentityParameter] = tryGetByType(constants.Blockchain.ParameterType.IDENTITIES).map(_.deserialize).map(_.value.asIdentityParameter)
+
+    def tryGetOrderParameter: Future[OrderParameter] = tryGetByType(constants.Blockchain.ParameterType.ORDERS).map(_.deserialize).map(_.value.asOrderParameter)
+
+    def tryGetSplitParameter: Future[SplitParameter] = tryGetByType(constants.Blockchain.ParameterType.SPLITS).map(_.deserialize).map(_.value.asSplitParameter)
+
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 
   }

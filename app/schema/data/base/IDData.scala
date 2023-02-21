@@ -10,9 +10,11 @@ case class IDData(value: AnyID) extends Data {
 
   def asID: ID = ID(this.value)
 
-  def getType: StringID = constants.DataTypeID.IDDataTypeID
+  def getBondWeight: Int = constants.Data.IDDataWeight
 
-  def getID: DataID = base.DataID(typeID = constants.DataTypeID.IDDataTypeID, hashID = this.generateHashID)
+  def getType: StringID = constants.Data.IDDataTypeID
+
+  def getID: DataID = base.DataID(typeID = constants.Data.IDDataTypeID, hashID = this.generateHashID)
 
   def getBytes: Array[Byte] = this.asID.getBytes
 

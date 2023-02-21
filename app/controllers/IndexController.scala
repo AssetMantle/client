@@ -54,6 +54,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   blockchainClassifications.Service.insertOrUpdate(Classification(
     id = constants.Blockchain.NubClassificationID.getBytes,
+    idString = constants.Blockchain.NubClassificationID.asString,
     immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
     mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes))
 

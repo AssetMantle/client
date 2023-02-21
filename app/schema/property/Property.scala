@@ -9,6 +9,8 @@ abstract class Property {
 
   def getID: PropertyID
 
+  def getBondedWeight: Int
+
   def getDataID: DataID
 
   def getKey: StringID

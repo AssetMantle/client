@@ -6,8 +6,7 @@ import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters._
 import models.{blockchain, keyBase}
-import play.api.Logger
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
@@ -205,16 +204,24 @@ class Startup @Inject()(
     }
   }
 
-  private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
-    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
+  private def insertParametersOnStart(parameters: Parameter*) = {
+    val classificationParameter = ClassificationParameter(Seq(MetaPropertyTypeParameter("bondRate", "N", "1"), MetaPropertyTypeParameter("maxPropertyCount", "N", "22")))
+    val identityParameter = IdentityParameter(Seq(MetaPropertyTypeParameter("maxProvisionAddressCount", "N", "22")))
+    val orderParameter = OrderParameter(Seq(MetaPropertyTypeParameter("maxOrderLife", "H", "43210")))
+    val splitParameter = SplitParameter(Seq(MetaPropertyTypeParameter("wrapAllowedCoins", "L", Seq("umntl").toString())))
 
-    (for {
-      _ <- insert
-    } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
-  })
+    val allParameters = parameters ++ Seq(classificationParameter, identityParameter, orderParameter, splitParameter)
+    utilitiesOperations.traverse(allParameters)(parameter => {
+      val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
+
+      (for {
+        _ <- insert
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    })
+  }
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
     val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))

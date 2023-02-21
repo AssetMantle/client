@@ -31,14 +31,14 @@ public final class MesaPropertyV1Proto {
       "\n,schema/properties/base/mesaProperty.v1" +
       ".proto\022\nproperties\032#schema/ids/base/prop" +
       "ertyID.v1.proto\032\037schema/ids/base/dataID." +
-      "v1.proto\032\024gogoproto/gogo.proto\"\\\n\014MesaPr" +
-      "operty\022\037\n\002id\030\001 \001(\0132\017.ids.PropertyIDR\002id\022" +
-      "%\n\010data_i_d\030\002 \001(\0132\013.ids.DataIDR\006dataID:\004" +
-      "\210\240\037\000B\244\001\n\016com.propertiesB\023MesaPropertyV1P" +
-      "rotoP\001Z5github.com/AssetMantle/modules/s" +
-      "chema/properties/base\242\002\003PXX\252\002\nProperties" +
-      "\312\002\nProperties\342\002\026Properties\\GPBMetadata\352\002" +
-      "\nPropertiesb\006proto3"
+      "v1.proto\032\024gogoproto/gogo.proto\"]\n\014MesaPr" +
+      "operty\022 \n\003i_d\030\001 \001(\0132\017.ids.PropertyIDR\002iD" +
+      "\022%\n\010data_i_d\030\002 \001(\0132\013.ids.DataIDR\006dataID:" +
+      "\004\210\240\037\000B\244\001\n\016com.propertiesB\023MesaPropertyV1" +
+      "ProtoP\001Z5github.com/AssetMantle/modules/" +
+      "schema/properties/base\242\002\003PXX\252\002\nPropertie" +
+      "s\312\002\nProperties\342\002\026Properties\\GPBMetadata\352" +
+      "\002\nPropertiesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -52,7 +52,7 @@ public final class MesaPropertyV1Proto {
     internal_static_properties_MesaProperty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_properties_MesaProperty_descriptor,
-        new java.lang.String[] { "Id", "DataID", });
+        new java.lang.String[] { "ID", "DataID", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);

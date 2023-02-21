@@ -8,19 +8,19 @@ public interface MesaPropertyOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
-   * @return Whether the id field is set.
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
+   * @return Whether the iD field is set.
    */
-  boolean hasId();
+  boolean hasID();
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
-   * @return The id.
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
+   * @return The iD.
    */
-  com.ids.PropertyID getId();
+  com.ids.PropertyID getID();
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
    */
-  com.ids.PropertyIDOrBuilder getIdOrBuilder();
+  com.ids.PropertyIDOrBuilder getIDOrBuilder();
 
   /**
    * <code>.ids.DataID data_i_d = 2 [json_name = "dataID"];</code>

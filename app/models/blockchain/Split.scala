@@ -135,7 +135,7 @@ class Splits @Inject()(
 
     def transfer(fromID: IdentityID, toID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = {
       val add = addSplit(ownerId = toID, ownableID = ownableID, value = value)
-      val subtract = subtractSplit(ownerId = fromID, ownableID = ownableID, value = value)
+      def subtract = subtractSplit(ownerId = fromID, ownableID = ownableID, value = value)
       for {
         _ <- add
         _ <- subtract

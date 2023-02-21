@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new AnyProperty();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.properties.AnyPropertyV1Proto.internal_static_properties_AnyProperty_descriptor;
@@ -44,6 +39,7 @@ private static final long serialVersionUID = 0L;
   }
 
   private int implCase_ = 0;
+  @SuppressWarnings("serial")
   private java.lang.Object impl_;
   public enum ImplCase
       implements com.google.protobuf.Internal.EnumLite,
@@ -362,6 +358,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       if (mesaPropertyBuilder_ != null) {
         mesaPropertyBuilder_.clear();
       }
@@ -396,23 +393,27 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.properties.AnyProperty buildPartial() {
       com.properties.AnyProperty result = new com.properties.AnyProperty(this);
-      if (implCase_ == 1) {
-        if (mesaPropertyBuilder_ == null) {
-          result.impl_ = impl_;
-        } else {
-          result.impl_ = mesaPropertyBuilder_.build();
-        }
-      }
-      if (implCase_ == 2) {
-        if (metaPropertyBuilder_ == null) {
-          result.impl_ = impl_;
-        } else {
-          result.impl_ = metaPropertyBuilder_.build();
-        }
-      }
-      result.implCase_ = implCase_;
+      if (bitField0_ != 0) { buildPartial0(result); }
+      buildPartialOneofs(result);
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.properties.AnyProperty result) {
+      int from_bitField0_ = bitField0_;
+    }
+
+    private void buildPartialOneofs(com.properties.AnyProperty result) {
+      result.implCase_ = implCase_;
+      result.impl_ = this.impl_;
+      if (implCase_ == 1 &&
+          mesaPropertyBuilder_ != null) {
+        result.impl_ = mesaPropertyBuilder_.build();
+      }
+      if (implCase_ == 2 &&
+          metaPropertyBuilder_ != null) {
+        result.impl_ = metaPropertyBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -542,6 +543,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private int bitField0_;
 
     private com.google.protobuf.SingleFieldBuilderV3<
         com.properties.MesaProperty, com.properties.MesaProperty.Builder, com.properties.MesaPropertyOrBuilder> mesaPropertyBuilder_;
@@ -681,7 +683,7 @@ private static final long serialVersionUID = 0L;
         impl_ = null;
       }
       implCase_ = 1;
-      onChanged();;
+      onChanged();
       return mesaPropertyBuilder_;
     }
 
@@ -823,7 +825,7 @@ private static final long serialVersionUID = 0L;
         impl_ = null;
       }
       implCase_ = 2;
-      onChanged();;
+      onChanged();
       return metaPropertyBuilder_;
     }
     @java.lang.Override

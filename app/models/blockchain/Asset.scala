@@ -15,7 +15,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Asset(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -59,9 +59,11 @@ object Assets {
 
   class DataTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Asset.tupled, Asset.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Asset.tupled, Asset.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -87,6 +89,7 @@ object Assets {
 class Assets @Inject()(
                         blockchainSplits: Splits,
                         blockchainMaintainers: Maintainers,
+                        blockchainClassifications: Classifications,
                         protected val databaseConfigProvider: DatabaseConfigProvider
                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Assets.DataTable, Asset, Array[Byte]](
@@ -128,14 +131,16 @@ class Assets @Inject()(
       val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
 
-      val asset = Asset(id = assetID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val asset = Asset(id = assetID.getBytes, idString = assetID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(asset)
 
       val mint = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value.toBigDecimal)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
 
       for {
         _ <- add
         _ <- mint
+        _ <- bond
       } yield msg.getFrom
     }
 

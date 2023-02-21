@@ -26,11 +26,6 @@ private static final long serialVersionUID = 0L;
     return new AccAddressData();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.data.AccAddressDataV1Proto.internal_static_data_AccAddressData_descriptor;
@@ -45,7 +40,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int VALUE_FIELD_NUMBER = 1;
-  private com.google.protobuf.ByteString value_;
+  private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
   /**
    * <code>bytes value = 1 [json_name = "value"];</code>
    * @return The value.
@@ -243,8 +238,8 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       value_ = com.google.protobuf.ByteString.EMPTY;
-
       return this;
     }
 
@@ -271,9 +266,16 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.data.AccAddressData buildPartial() {
       com.data.AccAddressData result = new com.data.AccAddressData(this);
-      result.value_ = value_;
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.data.AccAddressData result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.value_ = value_;
+      }
     }
 
     @java.lang.Override
@@ -351,7 +353,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               value_ = input.readBytes();
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -369,6 +371,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
     /**
@@ -385,11 +388,9 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setValue(com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       value_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -398,7 +399,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearValue() {
-      
+      bitField0_ = (bitField0_ & ~0x00000001);
       value_ = getDefaultInstance().getValue();
       onChanged();
       return this;

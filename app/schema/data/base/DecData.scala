@@ -6,15 +6,17 @@ import schema.id.base.{DataID, HashID, StringID}
 import utilities.AttoNumber
 
 case class DecData(value: AttoNumber) extends Data {
-  def getType: StringID = constants.DataTypeID.DecDataTypeID
+  def getType: StringID = constants.Data.DecDataTypeID
 
-  def getID: DataID = DataID(typeID = constants.DataTypeID.DecDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.Data.DecDataWeight
+
+  def getID: DataID = DataID(typeID = constants.Data.DecDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = DecData(AttoNumber.zero)
 
   def getBytes: Array[Byte] = this.value.getSortableDecBytes
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value == AttoNumber.zero) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
   def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toString).build()
 

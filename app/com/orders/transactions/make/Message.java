@@ -210,30 +210,30 @@ private static final long serialVersionUID = 0L;
     return takerOwnableID_ == null ? com.ids.AnyOwnableID.getDefaultInstance() : takerOwnableID_;
   }
 
-  public static final int EXPIRES_IN_FIELD_NUMBER = 7;
-  private com.types.Height expiresIn_;
+  public static final int EXPIRY_HEIGHT_FIELD_NUMBER = 7;
+  private com.types.Height expiryHeight_;
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-   * @return Whether the expiresIn field is set.
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+   * @return Whether the expiryHeight field is set.
    */
   @java.lang.Override
-  public boolean hasExpiresIn() {
-    return expiresIn_ != null;
+  public boolean hasExpiryHeight() {
+    return expiryHeight_ != null;
   }
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-   * @return The expiresIn.
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+   * @return The expiryHeight.
    */
   @java.lang.Override
-  public com.types.Height getExpiresIn() {
-    return expiresIn_ == null ? com.types.Height.getDefaultInstance() : expiresIn_;
+  public com.types.Height getExpiryHeight() {
+    return expiryHeight_ == null ? com.types.Height.getDefaultInstance() : expiryHeight_;
   }
   /**
-   * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+   * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
    */
   @java.lang.Override
-  public com.types.HeightOrBuilder getExpiresInOrBuilder() {
-    return expiresIn_ == null ? com.types.Height.getDefaultInstance() : expiresIn_;
+  public com.types.HeightOrBuilder getExpiryHeightOrBuilder() {
+    return expiryHeight_ == null ? com.types.Height.getDefaultInstance() : expiryHeight_;
   }
 
   public static final int MAKER_OWNABLE_SPLIT_FIELD_NUMBER = 8;
@@ -450,8 +450,8 @@ private static final long serialVersionUID = 0L;
     if (takerOwnableID_ != null) {
       output.writeMessage(6, getTakerOwnableID());
     }
-    if (expiresIn_ != null) {
-      output.writeMessage(7, getExpiresIn());
+    if (expiryHeight_ != null) {
+      output.writeMessage(7, getExpiryHeight());
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 8, makerOwnableSplit_);
@@ -503,9 +503,9 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(6, getTakerOwnableID());
     }
-    if (expiresIn_ != null) {
+    if (expiryHeight_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getExpiresIn());
+        .computeMessageSize(7, getExpiryHeight());
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, makerOwnableSplit_);
@@ -571,10 +571,10 @@ private static final long serialVersionUID = 0L;
       if (!getTakerOwnableID()
           .equals(other.getTakerOwnableID())) return false;
     }
-    if (hasExpiresIn() != other.hasExpiresIn()) return false;
-    if (hasExpiresIn()) {
-      if (!getExpiresIn()
-          .equals(other.getExpiresIn())) return false;
+    if (hasExpiryHeight() != other.hasExpiryHeight()) return false;
+    if (hasExpiryHeight()) {
+      if (!getExpiryHeight()
+          .equals(other.getExpiryHeight())) return false;
     }
     if (!getMakerOwnableSplit()
         .equals(other.getMakerOwnableSplit())) return false;
@@ -633,9 +633,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + TAKER_OWNABLE_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getTakerOwnableID().hashCode();
     }
-    if (hasExpiresIn()) {
-      hash = (37 * hash) + EXPIRES_IN_FIELD_NUMBER;
-      hash = (53 * hash) + getExpiresIn().hashCode();
+    if (hasExpiryHeight()) {
+      hash = (37 * hash) + EXPIRY_HEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + getExpiryHeight().hashCode();
     }
     hash = (37 * hash) + MAKER_OWNABLE_SPLIT_FIELD_NUMBER;
     hash = (53 * hash) + getMakerOwnableSplit().hashCode();
@@ -812,10 +812,10 @@ private static final long serialVersionUID = 0L;
         takerOwnableIDBuilder_.dispose();
         takerOwnableIDBuilder_ = null;
       }
-      expiresIn_ = null;
-      if (expiresInBuilder_ != null) {
-        expiresInBuilder_.dispose();
-        expiresInBuilder_ = null;
+      expiryHeight_ = null;
+      if (expiryHeightBuilder_ != null) {
+        expiryHeightBuilder_.dispose();
+        expiryHeightBuilder_ = null;
       }
       makerOwnableSplit_ = "";
       takerOwnableSplit_ = "";
@@ -901,9 +901,9 @@ private static final long serialVersionUID = 0L;
             : takerOwnableIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.expiresIn_ = expiresInBuilder_ == null
-            ? expiresIn_
-            : expiresInBuilder_.build();
+        result.expiryHeight_ = expiryHeightBuilder_ == null
+            ? expiryHeight_
+            : expiryHeightBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.makerOwnableSplit_ = makerOwnableSplit_;
@@ -997,8 +997,8 @@ private static final long serialVersionUID = 0L;
       if (other.hasTakerOwnableID()) {
         mergeTakerOwnableID(other.getTakerOwnableID());
       }
-      if (other.hasExpiresIn()) {
-        mergeExpiresIn(other.getExpiresIn());
+      if (other.hasExpiryHeight()) {
+        mergeExpiryHeight(other.getExpiryHeight());
       }
       if (!other.getMakerOwnableSplit().isEmpty()) {
         makerOwnableSplit_ = other.makerOwnableSplit_;
@@ -1090,7 +1090,7 @@ private static final long serialVersionUID = 0L;
             } // case 50
             case 58: {
               input.readMessage(
-                  getExpiresInFieldBuilder().getBuilder(),
+                  getExpiryHeightFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000040;
               break;
@@ -1817,123 +1817,123 @@ private static final long serialVersionUID = 0L;
       return takerOwnableIDBuilder_;
     }
 
-    private com.types.Height expiresIn_;
+    private com.types.Height expiryHeight_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.types.Height, com.types.Height.Builder, com.types.HeightOrBuilder> expiresInBuilder_;
+        com.types.Height, com.types.Height.Builder, com.types.HeightOrBuilder> expiryHeightBuilder_;
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-     * @return Whether the expiresIn field is set.
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+     * @return Whether the expiryHeight field is set.
      */
-    public boolean hasExpiresIn() {
+    public boolean hasExpiryHeight() {
       return ((bitField0_ & 0x00000040) != 0);
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
-     * @return The expiresIn.
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
+     * @return The expiryHeight.
      */
-    public com.types.Height getExpiresIn() {
-      if (expiresInBuilder_ == null) {
-        return expiresIn_ == null ? com.types.Height.getDefaultInstance() : expiresIn_;
+    public com.types.Height getExpiryHeight() {
+      if (expiryHeightBuilder_ == null) {
+        return expiryHeight_ == null ? com.types.Height.getDefaultInstance() : expiryHeight_;
       } else {
-        return expiresInBuilder_.getMessage();
+        return expiryHeightBuilder_.getMessage();
       }
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public Builder setExpiresIn(com.types.Height value) {
-      if (expiresInBuilder_ == null) {
+    public Builder setExpiryHeight(com.types.Height value) {
+      if (expiryHeightBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        expiresIn_ = value;
+        expiryHeight_ = value;
       } else {
-        expiresInBuilder_.setMessage(value);
+        expiryHeightBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public Builder setExpiresIn(
+    public Builder setExpiryHeight(
         com.types.Height.Builder builderForValue) {
-      if (expiresInBuilder_ == null) {
-        expiresIn_ = builderForValue.build();
+      if (expiryHeightBuilder_ == null) {
+        expiryHeight_ = builderForValue.build();
       } else {
-        expiresInBuilder_.setMessage(builderForValue.build());
+        expiryHeightBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public Builder mergeExpiresIn(com.types.Height value) {
-      if (expiresInBuilder_ == null) {
+    public Builder mergeExpiryHeight(com.types.Height value) {
+      if (expiryHeightBuilder_ == null) {
         if (((bitField0_ & 0x00000040) != 0) &&
-          expiresIn_ != null &&
-          expiresIn_ != com.types.Height.getDefaultInstance()) {
-          getExpiresInBuilder().mergeFrom(value);
+          expiryHeight_ != null &&
+          expiryHeight_ != com.types.Height.getDefaultInstance()) {
+          getExpiryHeightBuilder().mergeFrom(value);
         } else {
-          expiresIn_ = value;
+          expiryHeight_ = value;
         }
       } else {
-        expiresInBuilder_.mergeFrom(value);
+        expiryHeightBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public Builder clearExpiresIn() {
+    public Builder clearExpiryHeight() {
       bitField0_ = (bitField0_ & ~0x00000040);
-      expiresIn_ = null;
-      if (expiresInBuilder_ != null) {
-        expiresInBuilder_.dispose();
-        expiresInBuilder_ = null;
+      expiryHeight_ = null;
+      if (expiryHeightBuilder_ != null) {
+        expiryHeightBuilder_.dispose();
+        expiryHeightBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public com.types.Height.Builder getExpiresInBuilder() {
+    public com.types.Height.Builder getExpiryHeightBuilder() {
       bitField0_ |= 0x00000040;
       onChanged();
-      return getExpiresInFieldBuilder().getBuilder();
+      return getExpiryHeightFieldBuilder().getBuilder();
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
-    public com.types.HeightOrBuilder getExpiresInOrBuilder() {
-      if (expiresInBuilder_ != null) {
-        return expiresInBuilder_.getMessageOrBuilder();
+    public com.types.HeightOrBuilder getExpiryHeightOrBuilder() {
+      if (expiryHeightBuilder_ != null) {
+        return expiryHeightBuilder_.getMessageOrBuilder();
       } else {
-        return expiresIn_ == null ?
-            com.types.Height.getDefaultInstance() : expiresIn_;
+        return expiryHeight_ == null ?
+            com.types.Height.getDefaultInstance() : expiryHeight_;
       }
     }
     /**
-     * <code>.types.Height expires_in = 7 [json_name = "expiresIn"];</code>
+     * <code>.types.Height expiry_height = 7 [json_name = "expiryHeight"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.types.Height, com.types.Height.Builder, com.types.HeightOrBuilder> 
-        getExpiresInFieldBuilder() {
-      if (expiresInBuilder_ == null) {
-        expiresInBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+        getExpiryHeightFieldBuilder() {
+      if (expiryHeightBuilder_ == null) {
+        expiryHeightBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
             com.types.Height, com.types.Height.Builder, com.types.HeightOrBuilder>(
-                getExpiresIn(),
+                getExpiryHeight(),
                 getParentForChildren(),
                 isClean());
-        expiresIn_ = null;
+        expiryHeight_ = null;
       }
-      return expiresInBuilder_;
+      return expiryHeightBuilder_;
     }
 
     private java.lang.Object makerOwnableSplit_ = "";

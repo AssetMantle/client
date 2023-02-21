@@ -1,8 +1,11 @@
 package models.blockchain
 
+import models.common.Parameters.ClassificationParameter
 import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import schema.data.base.NumberData
+import schema.document.Document
 import schema.id.base.{ClassificationID, HashID, IdentityID}
 import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
@@ -11,7 +14,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Classification(id: Array[Byte], idString: String, immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -20,6 +23,8 @@ case class Classification(id: Array[Byte], immutables: Array[Byte], mutables: Ar
   def getImmutables: Immutables = Immutables(this.immutables)
 
   def getMutables: Mutables = Mutables(this.mutables)
+
+  def getDocument: Document = Document(this.getID, this.getImmutables, this.getMutables)
 
 }
 
@@ -31,9 +36,11 @@ object Classifications {
 
   class DataTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
 
-    def * = (id, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
+    def * = (id, idString, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def immutables = column[Array[Byte]]("immutables")
 
@@ -56,6 +63,8 @@ object Classifications {
 @Singleton
 class Classifications @Inject()(
                                  blockchainMaintainers: Maintainers,
+                                 blockchainBalances: Balances,
+                                 blockchainParameters: models.blockchain.Parameters,
                                  protected val databaseConfigProvider: DatabaseConfigProvider
                                )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Classifications.DataTable, Classification, Array[Byte]](
@@ -68,7 +77,7 @@ class Classifications @Inject()(
 
   object Service {
 
-    def add(classification: Classification): Future[String] = create(classification).map(x => utilities.Secrets.base64URLEncoder(x))
+    def add(classification: Classification): Future[Array[Byte]] = create(classification)
 
     def insertOrUpdate(classification: Classification): Future[Unit] = upsert(classification)
 
@@ -90,15 +99,13 @@ class Classifications @Inject()(
     def onDefineAsset(msg: com.assets.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
-      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
-      val add = Service.add(classification)
+      val add = define(mutables, immutables)
 
-      def addMaintainer(): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
+      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
 
       for {
-        _ <- add
-        _ <- addMaintainer()
+        classificationID <- add
+        _ <- addMaintainer(classificationID)
       } yield msg.getFrom
     }
 
@@ -107,31 +114,52 @@ class Classifications @Inject()(
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
         ++ Seq(constants.Blockchain.AuthenticationProperty)
         ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
-      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
-      val add = Service.add(classification)
+      val add = define(mutables, immutables)
 
-      def addMaintainer(): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
+      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
 
       for {
-        _ <- add
-        _ <- addMaintainer()
+        classificationID <- add
+        _ <- addMaintainer(classificationID)
       } yield msg.getFrom
     }
 
     def onDefineOrder(msg: com.orders.transactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ Seq(constants.Blockchain.ExchangeRateProperty, constants.Blockchain.CreationHeightProperty, constants.Blockchain.MakerOwnableIDProperty, constants.Blockchain.TakerOwnableIDProperty, constants.Blockchain.MakerIDProperty, constants.Blockchain.TakerIDProperty) ++ PropertyList(msg.getImmutableProperties).propertyList))
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ Seq(constants.Blockchain.ExpiryHeightProperty, constants.Blockchain.MakerOwnableSplitProperty) ++ PropertyList(msg.getMutableProperties).propertyList))
-      val classificationID = utilities.ID.getClassificationID(immutables = immutables, mutables = mutables)
-      val classification = Classification(classificationID.getBytes, immutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
-      val add = Service.add(classification)
+      val add = define(mutables, immutables)
 
-      def addMaintainer(): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
+      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
 
       for {
-        _ <- add
-        _ <- addMaintainer()
+        classificationID <- add
+        _ <- addMaintainer(classificationID)
       } yield msg.getFrom
+    }
+
+    private def define(mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
+      val classificationParameter = blockchainParameters.Service.tryGetClassificationParameter
+      val totalWeight = mutables.propertyList.propertyList.map(_.getBondedWeight).sum + immutables.propertyList.propertyList.map(_.getBondedWeight).sum
+
+      def add(classificationParameter: ClassificationParameter) = {
+        val updatedImmutables = Immutables(PropertyList(immutables.propertyList.propertyList ++ Seq(constants.Blockchain.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.getBondRate).toAnyData))))
+        val classificationID = utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
+        val classification = Classification(classificationID.getBytes, idString = classificationID.asString, updatedImmutables.asProtoImmutables.toByteString.toByteArray, mutables.asProtoMutables.toByteString.toByteArray)
+        Service.add(classification)
+      }
+
+      for {
+        classificationParameter <- classificationParameter
+        classificationIDBytes <- add(classificationParameter)
+      } yield ClassificationID(HashID(classificationIDBytes))
+    }
+
+    def bondAuxiliary(address: String): Future[Unit] = {
+      blockchainBalances.Utility.insertOrUpdateBalance(address)
+    }
+
+    def unbondAuxiliary(address: String): Future[Unit] = {
+      blockchainBalances.Utility.insertOrUpdateBalance(address)
     }
 
 

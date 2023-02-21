@@ -11,7 +11,7 @@
         <entry key="BLOCKCHAIN_RPC_URL" value="http://localhost:26657" />
         <entry key="CHAIN_ID" value="test" />
         <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
-        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.mantleNode/Node/config/genesis.json" />
+        <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.mantleNode/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
         <entry key="KEY_STORE_PASSWORD" value="123123123" />
         <entry key="MAILGUN_PASSWORD" value="dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs" />
@@ -39,7 +39,7 @@
     </option>
     <option name="play2NeedOpenInBrowser" value="true" />
     <option name="play2NonDefaultInstallDir" value="" />
-    <option name="play2OpenUrl" value="http://localhost:9000" />
+    <option name="play2OpenUrl" value="http://localhost:9001" />
     <option name="play2isAutoReloadEnabled" value="true" />
     <option name="projectPathOnTarget" />
     <option name="selectedOptions">

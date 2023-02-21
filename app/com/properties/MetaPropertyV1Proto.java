@@ -29,38 +29,38 @@ public final class MetaPropertyV1Proto {
   static {
     java.lang.String[] descriptorData = {
       "\n,schema/properties/base/metaProperty.v1" +
-      ".proto\022\nproperties\032#schema/ids/base/prop" +
-      "ertyID.v1.proto\032!schema/data/base/anyDat" +
-      "a.v1.proto\032\024gogoproto/gogo.proto\"_\n\014Meta" +
-      "Property\022\037\n\002id\030\001 \001(\0132\017.ids.PropertyIDR\002i" +
-      "d\022(\n\010any_data\030\002 \001(\0132\r.data.AnyDataR\007anyD" +
-      "ata:\004\210\240\037\000B\244\001\n\016com.propertiesB\023MetaProper" +
-      "tyV1ProtoP\001Z5github.com/AssetMantle/modu" +
-      "les/schema/properties/base\242\002\003PXX\252\002\nPrope" +
-      "rties\312\002\nProperties\342\002\026Properties\\GPBMetad" +
-      "ata\352\002\nPropertiesb\006proto3"
+      ".proto\022\nproperties\032\024gogoproto/gogo.proto" +
+      "\032!schema/data/base/anyData.v1.proto\032#sch" +
+      "ema/ids/base/propertyID.v1.proto\"Y\n\014Meta" +
+      "Property\022 \n\003i_d\030\001 \001(\0132\017.ids.PropertyIDR\002" +
+      "iD\022!\n\004data\030\002 \001(\0132\r.data.AnyDataR\004data:\004\210" +
+      "\240\037\000B\244\001\n\016com.propertiesB\023MetaPropertyV1Pr" +
+      "otoP\001Z5github.com/AssetMantle/modules/sc" +
+      "hema/properties/base\242\002\003PXX\252\002\nProperties\312" +
+      "\002\nProperties\342\002\026Properties\\GPBMetadata\352\002\n" +
+      "Propertiesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.ids.PropertyIDV1Proto.getDescriptor(),
-          com.data.AnyDataV1Proto.getDescriptor(),
           com.gogoproto.GogoProto.getDescriptor(),
+          com.data.AnyDataV1Proto.getDescriptor(),
+          com.ids.PropertyIDV1Proto.getDescriptor(),
         });
     internal_static_properties_MetaProperty_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_properties_MetaProperty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_properties_MetaProperty_descriptor,
-        new java.lang.String[] { "Id", "AnyData", });
+        new java.lang.String[] { "ID", "Data", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.ids.PropertyIDV1Proto.getDescriptor();
-    com.data.AnyDataV1Proto.getDescriptor();
     com.gogoproto.GogoProto.getDescriptor();
+    com.data.AnyDataV1Proto.getDescriptor();
+    com.ids.PropertyIDV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

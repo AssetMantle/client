@@ -27,11 +27,6 @@ private static final long serialVersionUID = 0L;
     return new QueryResponse();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.identities.queries.identity.QueryResponseV1Proto.internal_static_identities_queries_identity_QueryResponse_descriptor;
@@ -46,7 +41,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int SUCCESS_FIELD_NUMBER = 1;
-  private boolean success_;
+  private boolean success_ = false;
   /**
    * <code>bool success = 1 [json_name = "success"];</code>
    * @return The success.
@@ -57,7 +52,8 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int ERROR_FIELD_NUMBER = 2;
-  private volatile java.lang.Object error_;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object error_ = "";
   /**
    * <code>string error = 2 [json_name = "error"];</code>
    * @return The error.
@@ -95,6 +91,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int LIST_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
   private java.util.List<com.identities.Mappable> list_;
   /**
    * <code>repeated .identities.Mappable list = 3 [json_name = "list"];</code>
@@ -346,17 +343,16 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       success_ = false;
-
       error_ = "";
-
       if (listBuilder_ == null) {
         list_ = java.util.Collections.emptyList();
       } else {
         list_ = null;
         listBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000004);
       return this;
     }
 
@@ -383,20 +379,32 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.identities.queries.identity.QueryResponse buildPartial() {
       com.identities.queries.identity.QueryResponse result = new com.identities.queries.identity.QueryResponse(this);
-      int from_bitField0_ = bitField0_;
-      result.success_ = success_;
-      result.error_ = error_;
+      buildPartialRepeatedFields(result);
+      if (bitField0_ != 0) { buildPartial0(result); }
+      onBuilt();
+      return result;
+    }
+
+    private void buildPartialRepeatedFields(com.identities.queries.identity.QueryResponse result) {
       if (listBuilder_ == null) {
-        if (((bitField0_ & 0x00000001) != 0)) {
+        if (((bitField0_ & 0x00000004) != 0)) {
           list_ = java.util.Collections.unmodifiableList(list_);
-          bitField0_ = (bitField0_ & ~0x00000001);
+          bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.list_ = list_;
       } else {
         result.list_ = listBuilder_.build();
       }
-      onBuilt();
-      return result;
+    }
+
+    private void buildPartial0(com.identities.queries.identity.QueryResponse result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.success_ = success_;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.error_ = error_;
+      }
     }
 
     @java.lang.Override
@@ -448,13 +456,14 @@ private static final long serialVersionUID = 0L;
       }
       if (!other.getError().isEmpty()) {
         error_ = other.error_;
+        bitField0_ |= 0x00000002;
         onChanged();
       }
       if (listBuilder_ == null) {
         if (!other.list_.isEmpty()) {
           if (list_.isEmpty()) {
             list_ = other.list_;
-            bitField0_ = (bitField0_ & ~0x00000001);
+            bitField0_ = (bitField0_ & ~0x00000004);
           } else {
             ensureListIsMutable();
             list_.addAll(other.list_);
@@ -467,7 +476,7 @@ private static final long serialVersionUID = 0L;
             listBuilder_.dispose();
             listBuilder_ = null;
             list_ = other.list_;
-            bitField0_ = (bitField0_ & ~0x00000001);
+            bitField0_ = (bitField0_ & ~0x00000004);
             listBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getListFieldBuilder() : null;
@@ -504,12 +513,12 @@ private static final long serialVersionUID = 0L;
               break;
             case 8: {
               success_ = input.readBool();
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 8
             case 18: {
               error_ = input.readStringRequireUtf8();
-
+              bitField0_ |= 0x00000002;
               break;
             } // case 18
             case 26: {
@@ -557,8 +566,9 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setSuccess(boolean value) {
-      
+
       success_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -567,7 +577,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearSuccess() {
-      
+      bitField0_ = (bitField0_ & ~0x00000001);
       success_ = false;
       onChanged();
       return this;
@@ -614,11 +624,9 @@ private static final long serialVersionUID = 0L;
      */
     public Builder setError(
         java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      if (value == null) { throw new NullPointerException(); }
       error_ = value;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -627,8 +635,8 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearError() {
-      
       error_ = getDefaultInstance().getError();
+      bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }
@@ -639,12 +647,10 @@ private static final long serialVersionUID = 0L;
      */
     public Builder setErrorBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
       error_ = value;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -652,9 +658,9 @@ private static final long serialVersionUID = 0L;
     private java.util.List<com.identities.Mappable> list_ =
       java.util.Collections.emptyList();
     private void ensureListIsMutable() {
-      if (!((bitField0_ & 0x00000001) != 0)) {
+      if (!((bitField0_ & 0x00000004) != 0)) {
         list_ = new java.util.ArrayList<com.identities.Mappable>(list_);
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000004;
        }
     }
 
@@ -804,7 +810,7 @@ private static final long serialVersionUID = 0L;
     public Builder clearList() {
       if (listBuilder_ == null) {
         list_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
       } else {
         listBuilder_.clear();
@@ -881,7 +887,7 @@ private static final long serialVersionUID = 0L;
         listBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.identities.Mappable, com.identities.Mappable.Builder, com.identities.MappableOrBuilder>(
                 list_,
-                ((bitField0_ & 0x00000001) != 0),
+                ((bitField0_ & 0x00000004) != 0),
                 getParentForChildren(),
                 isClean());
         list_ = null;

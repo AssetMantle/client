@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Response();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.orders.transactions.take.ResponseV1Proto.internal_static_orders_transactions_take_Response_descriptor;

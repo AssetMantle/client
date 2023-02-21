@@ -8,32 +8,32 @@ public interface MetaPropertyOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
-   * @return Whether the id field is set.
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
+   * @return Whether the iD field is set.
    */
-  boolean hasId();
+  boolean hasID();
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
-   * @return The id.
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
+   * @return The iD.
    */
-  com.ids.PropertyID getId();
+  com.ids.PropertyID getID();
   /**
-   * <code>.ids.PropertyID id = 1 [json_name = "id"];</code>
+   * <code>.ids.PropertyID i_d = 1 [json_name = "iD"];</code>
    */
-  com.ids.PropertyIDOrBuilder getIdOrBuilder();
+  com.ids.PropertyIDOrBuilder getIDOrBuilder();
 
   /**
-   * <code>.data.AnyData any_data = 2 [json_name = "anyData"];</code>
-   * @return Whether the anyData field is set.
+   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
+   * @return Whether the data field is set.
    */
-  boolean hasAnyData();
+  boolean hasData();
   /**
-   * <code>.data.AnyData any_data = 2 [json_name = "anyData"];</code>
-   * @return The anyData.
+   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
+   * @return The data.
    */
-  com.data.AnyData getAnyData();
+  com.data.AnyData getData();
   /**
-   * <code>.data.AnyData any_data = 2 [json_name = "anyData"];</code>
+   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
    */
-  com.data.AnyDataOrBuilder getAnyDataOrBuilder();
+  com.data.AnyDataOrBuilder getDataOrBuilder();
 }
