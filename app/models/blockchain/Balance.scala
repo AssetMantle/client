@@ -1,29 +1,27 @@
 package models.blockchain
 
 import com.cosmos.bank.{v1beta1 => bankTx}
-import exceptions.BaseException
-import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
-import models.traits.Logging
+import exceptions.BaseException
 import models.common.Serializable.Coin
+import models.traits.Logging
 import org.postgresql.util.PSQLException
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.Configuration
-import play.api.Logger
 import queries.blockchain.GetBalance
 import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOn: Option[Timestamp] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Balances @Inject()(
