@@ -1,9 +1,7 @@
 package utilities
 
 import exceptions.BaseException
-import org.apache.commons.codec.binary.Hex
 import play.api.Logger
-import play.api.libs.Codecs.sha1
 import sun.nio.cs.ISO_8859_1
 
 import java.math.BigInteger
@@ -56,9 +54,6 @@ object Secrets {
   def verifyPassword(password: String, passwordHash: String, salt: Array[Byte], pepper: Array[Byte], iterations: Int = constants.Security.DefaultIterations): Boolean = {
     pbkdf2(password, salt ++ pepper, iterations).sameElements(passwordHash)
   }
-
-  //apache-codec Base64 encoder was using +/ instead of -_ which is output in BC. So use java.util.Base64
-  def getBlockchainHash(values: String*): String = Base64.getUrlEncoder.encodeToString(Hex.decodeHex(sha1(values.sorted.mkString(constants.Blockchain.ToHashSeparator)).toCharArray))
 
   def base64URLDecoder(s: String): String = try {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString

@@ -11,8 +11,6 @@ import schema.property.base.{MesaProperty, MetaProperty}
 import schema.qualified.{Immutables, Mutables}
 import schema.types.Height
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
-
 object Blockchain {
   val MnemonicShown = 3
   val FullFundraiserPath = "44'/118'/0'/0/0"
@@ -27,17 +25,10 @@ object Blockchain {
   val NegotiationDefaultTime = 5000000
   val DefaultFaucetTokenAmount = 1
   val IDSeparator = "."
-  val FirstOrderCompositeIDSeparator = "|"
-  val SecondOrderCompositeIDSeparator = "*"
   val OneDec: BigDecimal = BigDecimal("1.000000000000000000")
   val ZeroDec: BigDecimal = BigDecimal("0.0")
   val SmallestDec: BigDecimal = BigDecimal("0.000000000000000001")
   val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
-  val ToHashSeparator = "_"
-  val RequestPropertiesSeparator = ","
-  val DataNameAndTypeSeparator = ":"
-  val DataTypeAndValueSeparator = "|"
-  val MaxTraits = 22
   val HeightDataDefaultValue: Int = -1
   val CoinType = 118
   val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
@@ -50,11 +41,6 @@ object Blockchain {
 
   val RPCEndPoint: String = AppConfig.configuration.get[String]("blockchain.rpcURL")
   val RestEndPoint: String = AppConfig.configuration.get[String]("blockchain.restURL")
-  val TransactionMode: String = AppConfig.configuration.get[String]("blockchain.transaction.mode")
-  val KafkaEnabled: Boolean = AppConfig.configuration.get[Boolean]("blockchain.kafka.enabled")
-  val KafkaTxIteratorInitialDelay: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").second
-  val KafkaTxIteratorInterval: FiniteDuration = AppConfig.configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  val EnableTxSchemaActor: Boolean = AppConfig.configuration.get[Boolean]("blockchain.enableTransactionSchemaActors")
 
   object Document {
     val ASSET = "ASSET"
