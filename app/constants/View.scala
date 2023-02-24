@@ -322,6 +322,7 @@ object View {
   val TRANSACTION_TIME = "TRANSACTION_TIME"
   val WALLET_DETAILS = "WALLET_DETAILS"
   val DOCUMENT_NOT_FOUND = "DOCUMENT_NOT_FOUND"
+  val TOKEN_DETAILS = "TOKEN_DETAILS"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
