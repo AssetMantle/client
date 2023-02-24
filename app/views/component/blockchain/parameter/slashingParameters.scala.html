@@ -1,0 +1,45 @@
+@import views.html.base.cards._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.SLASHING_PARAMETERS) {
+} {
+    @commonTable(id = "slashingParameter", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.SIGNED_BLOCKS_WINDOW):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MIN_SIGNED_PER_WINDOW):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.SLASH_FRACTION_DOWNTIME):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.DOWNTIME_JAIL_DURATION):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.SLASH_FRACTION_DOUBLESIGN):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    }
+}

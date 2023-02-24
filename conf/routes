@@ -69,3 +69,10 @@ GET        /component/validatorUptime                      controllers.Component
 GET        /component/validatorDelegations                 controllers.ComponentViewController.validatorDelegations(address: String)
 GET        /component/validatorTransactions                controllers.ComponentViewController.validatorTransactions(address: String)
 GET        /component/validatorTransactionsPerPage         controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
+
+GET        /component/parameterList                        controllers.ComponentViewController.parameterList
+GET        /component/mintingParameters                    controllers.ComponentViewController.mintingParameters
+GET        /component/stakingParameters                    controllers.ComponentViewController.stakingParameters
+GET        /component/governanceParameters                 controllers.ComponentViewController.governanceParameters
+GET        /component/distributionParameters               controllers.ComponentViewController.distributionParameters
+GET        /component/slashingParameters                   controllers.ComponentViewController.slashingParameters

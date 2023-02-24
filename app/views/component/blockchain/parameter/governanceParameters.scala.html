@@ -1,0 +1,50 @@
+@import views.html.base.cards._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.GOVERNANCE_PARAMETERS) {
+} {
+    @commonTable(id = "governanceParameter", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MIN_DEPOSIT):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VOTING_PERIOD):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.THRESHOLD):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MAX_DEPOSIT_PERIOD):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.QUORUM):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VETO_THRESHOLD):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+        </tr>
+    }
+}

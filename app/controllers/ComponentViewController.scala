@@ -715,5 +715,46 @@ class ComponentViewController @Inject()(
       }
   }
 
+  def parameterList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.parameterList())
+    }
+  }
+
+  def mintingParameters(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.mintingParameters())
+    }
+  }
+
+  def stakingParameters(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.stakingParameters())
+    }
+  }
+
+  def governanceParameters(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.governanceParameters())
+    }
+  }
+
+  def distributionParameters(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.distributionParameters())
+    }
+  }
+
+  def slashingParameters(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.component.blockchain.parameter.slashingParameters())
+    }
+  }
 }
 

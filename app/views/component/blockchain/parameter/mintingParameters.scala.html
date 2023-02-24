@@ -1,0 +1,60 @@
+@import views.html.base.cards._
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.MINTING_PARAMETERS) {
+} {
+    @commonTable(id = "mintingParameter", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BLOCKS_PER_YEAR):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.INFLATION_MAX):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MINT_DECIMAL):</div>
+                    <div class="tableFieldValue">00</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.GOAL_BONDED):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.INFLATION_MIN):</div>
+                    <div class="tableFieldValue">00.00%</div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MINT_DENOM):</div>
+                    <div class="tableFieldValue">--</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.INFLATION_RATE_CHANGE):</div>
+                    <div class="tableFieldValue">00.00</div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    }
+}

@@ -1,0 +1,41 @@
+@import views.html.base._
+@import scala.collection.immutable.ListMap
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="mintingParameters" class="tableViewCard tableCard tableGridLayout"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="stakingParameters" class="tableViewCard tableCard tableGridLayout"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="governanceParameters" class="tableViewCard tableCard tableGridLayout"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="distributionParameters" class="tableViewCard tableCard tableGridLayout"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="slashingParameters" class="tableViewCard tableCard tableGridLayout"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+        componentResource('mintingParameters', jsRoutes.controllers.ComponentViewController.mintingParameters());
+        componentResource('stakingParameters', jsRoutes.controllers.ComponentViewController.stakingParameters());
+        componentResource('governanceParameters', jsRoutes.controllers.ComponentViewController.governanceParameters());
+        componentResource('distributionParameters', jsRoutes.controllers.ComponentViewController.distributionParameters());
+        componentResource('slashingParameters', jsRoutes.controllers.ComponentViewController.slashingParameters());
+        // checkAndPushState(jsRoutes.controllers.ViewController.blocks().url, "" , "blockList");
+</script>

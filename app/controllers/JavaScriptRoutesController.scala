@@ -67,6 +67,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactions,
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
+          routes.javascript.ComponentViewController.parameterList,
+          routes.javascript.ComponentViewController.mintingParameters,
+          routes.javascript.ComponentViewController.stakingParameters,
+          routes.javascript.ComponentViewController.governanceParameters,
+          routes.javascript.ComponentViewController.distributionParameters,
+          routes.javascript.ComponentViewController.slashingParameters,
+
           routes.javascript.IndexController.search,
 
           routes.javascript.NotificationController.recentActivityMessages,
