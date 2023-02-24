@@ -16,7 +16,7 @@
 @commonTextInfo(constants.View.TAKER_ID, IdentityID(msg.getTakerID).asString)
 @commonTextInfo(constants.View.MAKER_OWNABLE_ID, OwnableID(msg.getMakerOwnableID).asString)
 @commonTextInfo(constants.View.TAKER_OWNABLE_ID, OwnableID(msg.getTakerOwnableID).asString)
-@commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiresIn).AsString)
+@commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiryHeight).AsString)
 @commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toString)
 @commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toString)
 @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
