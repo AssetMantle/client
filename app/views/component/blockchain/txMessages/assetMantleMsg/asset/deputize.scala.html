@@ -9,7 +9,7 @@
 @commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
 @commonTextInfo(constants.View.TO_ID, IdentityID(msg.getToID).asString)
 @commonTextInfo(constants.View.CLASSIFICATION_ID, ClassificationID(msg.getClassificationID).asString)
-@Messages(constants.View.MAINTAINED_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.MAINTAINED_PROPERTIES):</span>
 @mesaProperties(msg.getMaintainedProperties)
 @commonBooleanInfo(constants.View.MINT, Option(msg.getCanMintAsset))
 @commonBooleanInfo(constants.View.BURN, Option(msg.getCanBurnAsset))

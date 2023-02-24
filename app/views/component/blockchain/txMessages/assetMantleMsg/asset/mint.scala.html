@@ -9,11 +9,11 @@
 @commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
 @commonTextInfo(constants.View.TO_ID, IdentityID(msg.getToID).asString)
 @commonTextInfo(constants.View.CLASSIFICATION_ID, ClassificationID(msg.getClassificationID).asString)
-@Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.IMMUTABLE_META_PROPERTIES):</span>
 @metaProperties(msg.getImmutableMetaProperties)
-@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):</span>
 @mesaProperties(msg.getImmutableProperties)
-@Messages(constants.View.MUTABLE_META_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
 @metaProperties(msg.getMutableMetaProperties)
-@Messages(constants.View.MUTABLE_MESA_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
 @mesaProperties(msg.getMutableProperties)
