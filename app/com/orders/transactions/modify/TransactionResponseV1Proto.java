@@ -30,35 +30,26 @@ public final class TransactionResponseV1Proto {
     java.lang.String[] descriptorData = {
       "\nHmodules/orders/internal/transactions/m" +
       "odify/transactionResponse.v1.proto\022\032orde" +
-      "rs.transactions.modify\032\024gogoproto/gogo.p" +
-      "roto\"K\n\023TransactionResponse\022\030\n\007success\030\001" +
-      " \001(\010R\007success\022\024\n\005error\030\002 \001(\tR\005error:\004\210\240\037" +
-      "\000B\222\002\n\036com.orders.transactions.modifyB\032Tr" +
-      "ansactionResponseV1ProtoP\001ZJgithub.com/A" +
-      "ssetMantle/modules/modules/orders/intern" +
-      "al/transactions/modify\242\002\003OTM\252\002\032Orders.Tr" +
-      "ansactions.Modify\312\002\032Orders\\Transactions\\" +
-      "Modify\342\002&Orders\\Transactions\\Modify\\GPBM" +
-      "etadata\352\002\034Orders::Transactions::Modifyb\006" +
-      "proto3"
+      "rs.transactions.modify\"\025\n\023TransactionRes" +
+      "ponseB\222\002\n\036com.orders.transactions.modify" +
+      "B\032TransactionResponseV1ProtoP\001ZJgithub.c" +
+      "om/AssetMantle/modules/modules/orders/in" +
+      "ternal/transactions/modify\242\002\003OTM\252\002\032Order" +
+      "s.Transactions.Modify\312\002\032Orders\\Transacti" +
+      "ons\\Modify\342\002&Orders\\Transactions\\Modify\\" +
+      "GPBMetadata\352\002\034Orders::Transactions::Modi" +
+      "fyb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.gogoproto.GogoProto.getDescriptor(),
         });
     internal_static_orders_transactions_modify_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_orders_transactions_modify_TransactionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_orders_transactions_modify_TransactionResponse_descriptor,
-        new java.lang.String[] { "Success", "Error", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.goprotoGetters);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
-    com.gogoproto.GogoProto.getDescriptor();
+        new java.lang.String[] { });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

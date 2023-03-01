@@ -27,26 +27,26 @@ public final class ServiceV1Proto {
       "ancel/service.v1.proto\022\032orders.transacti" +
       "ons.cancel\032\034google/api/annotations.proto" +
       "\032<modules/orders/internal/transactions/c" +
-      "ancel/message.v1.proto\032=modules/orders/i" +
-      "nternal/transactions/cancel/response.v1." +
-      "proto2}\n\007Service\022r\n\006Handle\022#.orders.tran" +
-      "sactions.cancel.Message\032$.orders.transac" +
-      "tions.cancel.Response\"\035\202\323\344\223\002\027\"\025/mantle/o" +
-      "rders/cancelB\206\002\n\036com.orders.transactions" +
-      ".cancelB\016ServiceV1ProtoP\001ZJgithub.com/As" +
-      "setMantle/modules/modules/orders/interna" +
-      "l/transactions/cancel\242\002\003OTC\252\002\032Orders.Tra" +
-      "nsactions.Cancel\312\002\032Orders\\Transactions\\C" +
-      "ancel\342\002&Orders\\Transactions\\Cancel\\GPBMe" +
-      "tadata\352\002\034Orders::Transactions::Cancelb\006p" +
-      "roto3"
+      "ancel/message.v1.proto\032Hmodules/orders/i" +
+      "nternal/transactions/cancel/transactionR" +
+      "esponse.v1.proto2\210\001\n\007Service\022}\n\006Handle\022#" +
+      ".orders.transactions.cancel.Message\032/.or" +
+      "ders.transactions.cancel.TransactionResp" +
+      "onse\"\035\202\323\344\223\002\027\"\025/mantle/orders/cancelB\206\002\n\036" +
+      "com.orders.transactions.cancelB\016ServiceV" +
+      "1ProtoP\001ZJgithub.com/AssetMantle/modules" +
+      "/modules/orders/internal/transactions/ca" +
+      "ncel\242\002\003OTC\252\002\032Orders.Transactions.Cancel\312" +
+      "\002\032Orders\\Transactions\\Cancel\342\002&Orders\\Tr" +
+      "ansactions\\Cancel\\GPBMetadata\352\002\034Orders::" +
+      "Transactions::Cancelb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.orders.transactions.cancel.MessageV1Proto.getDescriptor(),
-          com.orders.transactions.cancel.ResponseV1Proto.getDescriptor(),
+          com.orders.transactions.cancel.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -55,7 +55,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.orders.transactions.cancel.MessageV1Proto.getDescriptor();
-    com.orders.transactions.cancel.ResponseV1Proto.getDescriptor();
+    com.orders.transactions.cancel.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

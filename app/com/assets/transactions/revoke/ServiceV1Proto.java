@@ -27,26 +27,26 @@ public final class ServiceV1Proto {
       "evoke/service.v1.proto\022\032assets.transacti" +
       "ons.revoke\032\034google/api/annotations.proto" +
       "\032<modules/assets/internal/transactions/r" +
-      "evoke/message.v1.proto\032=modules/assets/i" +
-      "nternal/transactions/revoke/response.v1." +
-      "proto2}\n\007Service\022r\n\006Handle\022#.assets.tran" +
-      "sactions.revoke.Message\032$.assets.transac" +
-      "tions.revoke.Response\"\035\202\323\344\223\002\027\"\025/mantle/a" +
-      "ssets/revokeB\206\002\n\036com.assets.transactions" +
-      ".revokeB\016ServiceV1ProtoP\001ZJgithub.com/As" +
-      "setMantle/modules/modules/assets/interna" +
-      "l/transactions/revoke\242\002\003ATR\252\002\032Assets.Tra" +
-      "nsactions.Revoke\312\002\032Assets\\Transactions\\R" +
-      "evoke\342\002&Assets\\Transactions\\Revoke\\GPBMe" +
-      "tadata\352\002\034Assets::Transactions::Revokeb\006p" +
-      "roto3"
+      "evoke/message.v1.proto\032Hmodules/assets/i" +
+      "nternal/transactions/revoke/transactionR" +
+      "esponse.v1.proto2\210\001\n\007Service\022}\n\006Handle\022#" +
+      ".assets.transactions.revoke.Message\032/.as" +
+      "sets.transactions.revoke.TransactionResp" +
+      "onse\"\035\202\323\344\223\002\027\"\025/mantle/assets/revokeB\206\002\n\036" +
+      "com.assets.transactions.revokeB\016ServiceV" +
+      "1ProtoP\001ZJgithub.com/AssetMantle/modules" +
+      "/modules/assets/internal/transactions/re" +
+      "voke\242\002\003ATR\252\002\032Assets.Transactions.Revoke\312" +
+      "\002\032Assets\\Transactions\\Revoke\342\002&Assets\\Tr" +
+      "ansactions\\Revoke\\GPBMetadata\352\002\034Assets::" +
+      "Transactions::Revokeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.assets.transactions.revoke.MessageV1Proto.getDescriptor(),
-          com.assets.transactions.revoke.ResponseV1Proto.getDescriptor(),
+          com.assets.transactions.revoke.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -55,7 +55,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.assets.transactions.revoke.MessageV1Proto.getDescriptor();
-    com.assets.transactions.revoke.ResponseV1Proto.getDescriptor();
+    com.assets.transactions.revoke.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

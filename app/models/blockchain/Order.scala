@@ -152,7 +152,7 @@ class Orders @Inject()(
 
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
         ++ Seq(
-        constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiryHeight.getValue + header.height.toLong)).toAnyData),
+        constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiresIn.getValue + header.height.toLong)).toAnyData),
         constants.Blockchain.MakerOwnableSplitProperty.copy(data = AttoNumber(msg.getMakerOwnableSplit).toDecData.toAnyData))
         ++ PropertyList(msg.getMutableProperties).propertyList)
       )

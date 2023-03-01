@@ -27,26 +27,27 @@ public final class ServiceV1Proto {
       "eputize/service.v1.proto\022\034assets.transac" +
       "tions.deputize\032\034google/api/annotations.p" +
       "roto\032>modules/assets/internal/transactio" +
-      "ns/deputize/message.v1.proto\032?modules/as" +
-      "sets/internal/transactions/deputize/resp" +
-      "onse.v1.proto2\203\001\n\007Service\022x\n\006Handle\022%.as" +
-      "sets.transactions.deputize.Message\032&.ass" +
-      "ets.transactions.deputize.Response\"\037\202\323\344\223" +
-      "\002\031\"\027/mantle/assets/deputizeB\222\002\n com.asse" +
-      "ts.transactions.deputizeB\016ServiceV1Proto" +
-      "P\001ZLgithub.com/AssetMantle/modules/modul" +
-      "es/assets/internal/transactions/deputize" +
-      "\242\002\003ATD\252\002\034Assets.Transactions.Deputize\312\002\034" +
-      "Assets\\Transactions\\Deputize\342\002(Assets\\Tr" +
-      "ansactions\\Deputize\\GPBMetadata\352\002\036Assets" +
-      "::Transactions::Deputizeb\006proto3"
+      "ns/deputize/message.v1.proto\032Jmodules/as" +
+      "sets/internal/transactions/deputize/tran" +
+      "sactionResponse.v1.proto2\217\001\n\007Service\022\203\001\n" +
+      "\006Handle\022%.assets.transactions.deputize.M" +
+      "essage\0321.assets.transactions.deputize.Tr" +
+      "ansactionResponse\"\037\202\323\344\223\002\031\"\027/mantle/asset" +
+      "s/deputizeB\222\002\n com.assets.transactions.d" +
+      "eputizeB\016ServiceV1ProtoP\001ZLgithub.com/As" +
+      "setMantle/modules/modules/assets/interna" +
+      "l/transactions/deputize\242\002\003ATD\252\002\034Assets.T" +
+      "ransactions.Deputize\312\002\034Assets\\Transactio" +
+      "ns\\Deputize\342\002(Assets\\Transactions\\Deputi" +
+      "ze\\GPBMetadata\352\002\036Assets::Transactions::D" +
+      "eputizeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.assets.transactions.deputize.MessageV1Proto.getDescriptor(),
-          com.assets.transactions.deputize.ResponseV1Proto.getDescriptor(),
+          com.assets.transactions.deputize.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -55,7 +56,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.assets.transactions.deputize.MessageV1Proto.getDescriptor();
-    com.assets.transactions.deputize.ResponseV1Proto.getDescriptor();
+    com.assets.transactions.deputize.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

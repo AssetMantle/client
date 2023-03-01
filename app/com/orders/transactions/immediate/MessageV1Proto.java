@@ -35,7 +35,7 @@ public final class MessageV1Proto {
       "o\032#schema/ids/base/identityID.v1.proto\032%" +
       "schema/ids/base/anyOwnableID.v1.proto\032\'s" +
       "chema/lists/base/propertyList.v1.proto\032!" +
-      "schema/types/base/height.v1.proto\"\324\006\n\007Me" +
+      "schema/types/base/height.v1.proto\"\316\006\n\007Me" +
       "ssage\022\022\n\004from\030\001 \001(\tR\004from\022)\n\010from_i_d\030\002 " +
       "\001(\0132\017.ids.IdentityIDR\006fromID\022C\n\022classifi" +
       "cation_i_d\030\003 \001(\0132\025.ids.ClassificationIDR" +
@@ -43,28 +43,28 @@ public final class MessageV1Proto {
       "ds.IdentityIDR\007takerID\022<\n\021maker_ownable_" +
       "i_d\030\005 \001(\0132\021.ids.AnyOwnableIDR\016makerOwnab" +
       "leID\022<\n\021taker_ownable_i_d\030\006 \001(\0132\021.ids.An" +
-      "yOwnableIDR\016takerOwnableID\0222\n\rexpiry_hei" +
-      "ght\030\007 \001(\0132\r.types.HeightR\014expiryHeight\022^" +
-      "\n\023maker_ownable_split\030\010 \001(\tB.\310\336\037\000\332\336\037&git" +
-      "hub.com/cosmos/cosmos-sdk/types.DecR\021mak" +
-      "erOwnableSplit\022^\n\023taker_ownable_split\030\t " +
-      "\001(\tB.\310\336\037\000\332\336\037&github.com/cosmos/cosmos-sd" +
-      "k/types.DecR\021takerOwnableSplit\022O\n\031immuta" +
-      "ble_meta_properties\030\n \001(\0132\023.lists.Proper" +
-      "tyListR\027immutableMetaProperties\022F\n\024immut" +
-      "able_properties\030\013 \001(\0132\023.lists.PropertyLi" +
-      "stR\023immutableProperties\022K\n\027mutable_meta_" +
-      "properties\030\014 \001(\0132\023.lists.PropertyListR\025m" +
-      "utableMetaProperties\022B\n\022mutable_properti" +
-      "es\030\r \001(\0132\023.lists.PropertyListR\021mutablePr" +
-      "opertiesB\230\002\n!com.orders.transactions.imm" +
-      "ediateB\016MessageV1ProtoP\001ZMgithub.com/Ass" +
-      "etMantle/modules/modules/orders/internal" +
-      "/transactions/immediate\242\002\003OTI\252\002\035Orders.T" +
-      "ransactions.Immediate\312\002\035Orders\\Transacti" +
-      "ons\\Immediate\342\002)Orders\\Transactions\\Imme" +
-      "diate\\GPBMetadata\352\002\037Orders::Transactions" +
-      "::Immediateb\006proto3"
+      "yOwnableIDR\016takerOwnableID\022,\n\nexpires_in" +
+      "\030\007 \001(\0132\r.types.HeightR\texpiresIn\022^\n\023make" +
+      "r_ownable_split\030\010 \001(\tB.\310\336\037\000\332\336\037&github.co" +
+      "m/cosmos/cosmos-sdk/types.DecR\021makerOwna" +
+      "bleSplit\022^\n\023taker_ownable_split\030\t \001(\tB.\310" +
+      "\336\037\000\332\336\037&github.com/cosmos/cosmos-sdk/type" +
+      "s.DecR\021takerOwnableSplit\022O\n\031immutable_me" +
+      "ta_properties\030\n \001(\0132\023.lists.PropertyList" +
+      "R\027immutableMetaProperties\022F\n\024immutable_p" +
+      "roperties\030\013 \001(\0132\023.lists.PropertyListR\023im" +
+      "mutableProperties\022K\n\027mutable_meta_proper" +
+      "ties\030\014 \001(\0132\023.lists.PropertyListR\025mutable" +
+      "MetaProperties\022B\n\022mutable_properties\030\r \001" +
+      "(\0132\023.lists.PropertyListR\021mutableProperti" +
+      "esB\230\002\n!com.orders.transactions.immediate" +
+      "B\016MessageV1ProtoP\001ZMgithub.com/AssetMant" +
+      "le/modules/modules/orders/internal/trans" +
+      "actions/immediate\242\002\003OTI\252\002\035Orders.Transac" +
+      "tions.Immediate\312\002\035Orders\\Transactions\\Im" +
+      "mediate\342\002)Orders\\Transactions\\Immediate\\" +
+      "GPBMetadata\352\002\037Orders::Transactions::Imme" +
+      "diateb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -81,7 +81,7 @@ public final class MessageV1Proto {
     internal_static_orders_transactions_immediate_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_orders_transactions_immediate_Message_descriptor,
-        new java.lang.String[] { "From", "FromID", "ClassificationID", "TakerID", "MakerOwnableID", "TakerOwnableID", "ExpiryHeight", "MakerOwnableSplit", "TakerOwnableSplit", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
+        new java.lang.String[] { "From", "FromID", "ClassificationID", "TakerID", "MakerOwnableID", "TakerOwnableID", "ExpiresIn", "MakerOwnableSplit", "TakerOwnableSplit", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.customtype);

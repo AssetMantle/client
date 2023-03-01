@@ -27,27 +27,28 @@ public final class ServiceV1Proto {
       "enumerate/service.v1.proto\022\036assets.trans" +
       "actions.renumerate\032\034google/api/annotatio" +
       "ns.proto\032@modules/assets/internal/transa" +
-      "ctions/renumerate/message.v1.proto\032Amodu" +
+      "ctions/renumerate/message.v1.proto\032Lmodu" +
       "les/assets/internal/transactions/renumer" +
-      "ate/response.v1.proto2\211\001\n\007Service\022~\n\006Han" +
-      "dle\022\'.assets.transactions.renumerate.Mes" +
-      "sage\032(.assets.transactions.renumerate.Re" +
-      "sponse\"!\202\323\344\223\002\033\"\031/mantle/assets/renumerat" +
-      "eB\236\002\n\"com.assets.transactions.renumerate" +
-      "B\016ServiceV1ProtoP\001ZNgithub.com/AssetMant" +
-      "le/modules/modules/assets/internal/trans" +
-      "actions/renumerate\242\002\003ATR\252\002\036Assets.Transa" +
-      "ctions.Renumerate\312\002\036Assets\\Transactions\\" +
-      "Renumerate\342\002*Assets\\Transactions\\Renumer" +
-      "ate\\GPBMetadata\352\002 Assets::Transactions::" +
-      "Renumerateb\006proto3"
+      "ate/transactionResponse.v1.proto2\225\001\n\007Ser" +
+      "vice\022\211\001\n\006Handle\022\'.assets.transactions.re" +
+      "numerate.Message\0323.assets.transactions.r" +
+      "enumerate.TransactionResponse\"!\202\323\344\223\002\033\"\031/" +
+      "mantle/assets/renumerateB\236\002\n\"com.assets." +
+      "transactions.renumerateB\016ServiceV1ProtoP" +
+      "\001ZNgithub.com/AssetMantle/modules/module" +
+      "s/assets/internal/transactions/renumerat" +
+      "e\242\002\003ATR\252\002\036Assets.Transactions.Renumerate" +
+      "\312\002\036Assets\\Transactions\\Renumerate\342\002*Asse" +
+      "ts\\Transactions\\Renumerate\\GPBMetadata\352\002" +
+      " Assets::Transactions::Renumerateb\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.assets.transactions.renumerate.MessageV1Proto.getDescriptor(),
-          com.assets.transactions.renumerate.ResponseV1Proto.getDescriptor(),
+          com.assets.transactions.renumerate.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -56,7 +57,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.assets.transactions.renumerate.MessageV1Proto.getDescriptor();
-    com.assets.transactions.renumerate.ResponseV1Proto.getDescriptor();
+    com.assets.transactions.renumerate.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
