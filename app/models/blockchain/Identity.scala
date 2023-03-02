@@ -85,6 +85,7 @@ object Identities {
 @Singleton
 class Identities @Inject()(
                             blockchainMaintainers: Maintainers,
+                            blockchainClassifications: Classifications,
                             protected val databaseConfigProvider: DatabaseConfigProvider
                           )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Identities.DataTable, Identity, Array[Byte]](
@@ -141,10 +142,12 @@ class Identities @Inject()(
       val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ Seq(authenticationProperty) ++ PropertyList(msg.getMutableProperties).propertyList))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
       val add = Service.add(identity)
 
       for {
         _ <- add
+        _ <- bond
       } yield msg.getFrom
     }
 
@@ -191,8 +194,10 @@ class Identities @Inject()(
 
     def onQuash(msg: com.identities.transactions.quash.Message): Future[String] = {
       val delete = Service.delete(IdentityID(msg.getIdentityID))
+      val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom)
       for {
         _ <- delete
+        _ <- unbond
       } yield msg.getFrom
     }
 

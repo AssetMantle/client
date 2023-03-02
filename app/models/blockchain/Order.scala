@@ -140,7 +140,7 @@ class Orders @Inject()(
 
       val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList
         ++ Seq(
-        constants.Blockchain.ExchangeRateProperty.copy(data = AttoNumber(msg.getTakerOwnableSplit).quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(AttoNumber(msg.getMakerOwnableSplit)).toDecData.toAnyData),
+        constants.Blockchain.ExchangeRateProperty.copy(data = DecData(msg.getTakerOwnableSplit).value.quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(DecData(msg.getMakerOwnableSplit).value).toDecData.toAnyData),
         constants.Blockchain.CreationHeightProperty.copy(data = HeightData(Height(header.height.toLong)).toAnyData),
         constants.Blockchain.MakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getMakerOwnableID).toAnyID).toAnyData),
         constants.Blockchain.TakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getTakerOwnableID).toAnyID).toAnyData),
@@ -153,13 +153,13 @@ class Orders @Inject()(
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
         ++ Seq(
         constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiresIn.getValue + header.height.toLong)).toAnyData),
-        constants.Blockchain.MakerOwnableSplitProperty.copy(data = AttoNumber(msg.getMakerOwnableSplit).toDecData.toAnyData))
+        constants.Blockchain.MakerOwnableSplitProperty.copy(data = DecData(msg.getMakerOwnableSplit).toAnyData))
         ++ PropertyList(msg.getMutableProperties).propertyList)
       )
 
       val order = Order(id = orderID.getBytes, idString = orderID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(order)
-      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = BigDecimal(msg.getMakerOwnableSplit))
+      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = DecData(msg.getMakerOwnableSplit).value.toBigDecimal)
 
       for {
         _ <- add

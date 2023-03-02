@@ -64,7 +64,7 @@ class MessageCounters @Inject()(
 
     def getByMessageTypes(messageTypes: Seq[String]): Future[Seq[MessageCounter]] = filter(_.messageType.inSet(messageTypes))
 
-    def getAll: Future[Seq[MessageCounter]] = getAll.map(_.sortBy(_.counter))
+    def fetchAll: Future[Seq[MessageCounter]] = getAll.map(_.sortBy(_.counter))
   }
 
   object Utility {
@@ -95,7 +95,7 @@ class MessageCounters @Inject()(
     }
 
     def getMessagesStatistics: Future[ListMap[String, Double]] = {
-      val all = Service.getAll
+      val all = Service.fetchAll
       (for {
         all <- all
       } yield ListMap(all.map(x => x.messageType -> x.counter.toDouble): _*)

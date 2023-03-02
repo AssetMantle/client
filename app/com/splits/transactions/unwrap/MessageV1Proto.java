@@ -32,19 +32,18 @@ public final class MessageV1Proto {
       "nwrap/message.v1.proto\022\032splits.transacti" +
       "ons.unwrap\032\024gogoproto/gogo.proto\032#schema" +
       "/ids/base/identityID.v1.proto\032%schema/id" +
-      "s/base/anyOwnableID.v1.proto\"\301\001\n\007Message" +
+      "s/base/anyOwnableID.v1.proto\"\221\001\n\007Message" +
       "\022\022\n\004from\030\001 \001(\tR\004from\022)\n\010from_i_d\030\002 \001(\0132\017" +
       ".ids.IdentityIDR\006fromID\0221\n\013ownable_i_d\030\003" +
-      " \001(\0132\021.ids.AnyOwnableIDR\townableID\022D\n\005va" +
-      "lue\030\004 \001(\tB.\310\336\037\000\332\336\037&github.com/cosmos/cos" +
-      "mos-sdk/types.DecR\005valueB\206\002\n\036com.splits." +
-      "transactions.unwrapB\016MessageV1ProtoP\001ZJg" +
-      "ithub.com/AssetMantle/modules/modules/sp" +
-      "lits/internal/transactions/unwrap\242\002\003STU\252" +
-      "\002\032Splits.Transactions.Unwrap\312\002\032Splits\\Tr" +
-      "ansactions\\Unwrap\342\002&Splits\\Transactions\\" +
-      "Unwrap\\GPBMetadata\352\002\034Splits::Transaction" +
-      "s::Unwrapb\006proto3"
+      " \001(\0132\021.ids.AnyOwnableIDR\townableID\022\024\n\005va" +
+      "lue\030\004 \001(\tR\005valueB\206\002\n\036com.splits.transact" +
+      "ions.unwrapB\016MessageV1ProtoP\001ZJgithub.co" +
+      "m/AssetMantle/modules/modules/splits/int" +
+      "ernal/transactions/unwrap\242\002\003STU\252\002\032Splits" +
+      ".Transactions.Unwrap\312\002\032Splits\\Transactio" +
+      "ns\\Unwrap\342\002&Splits\\Transactions\\Unwrap\\G" +
+      "PBMetadata\352\002\034Splits::Transactions::Unwra" +
+      "pb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -59,12 +58,6 @@ public final class MessageV1Proto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_splits_transactions_unwrap_Message_descriptor,
         new java.lang.String[] { "From", "FromID", "OwnableID", "Value", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.customtype);
-    registry.add(com.gogoproto.GogoProto.nullable);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
     com.ids.IdentityIDV1Proto.getDescriptor();
     com.ids.AnyOwnableIDV1Proto.getDescriptor();

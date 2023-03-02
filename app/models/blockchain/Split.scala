@@ -135,7 +135,9 @@ class Splits @Inject()(
 
     def transfer(fromID: IdentityID, toID: IdentityID, ownableID: OwnableID, value: BigDecimal): Future[Unit] = {
       val add = addSplit(ownerId = toID, ownableID = ownableID, value = value)
+
       def subtract = subtractSplit(ownerId = fromID, ownableID = ownableID, value = value)
+
       for {
         _ <- add
         _ <- subtract
@@ -146,9 +148,8 @@ class Splits @Inject()(
       val ownedSplit = Service.getByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = ownableID)
 
       def addOrUpdate(ownedSplit: Option[Split]) = {
-        val split = if (ownedSplit.isDefined) {
-          ownedSplit.get.copy(value = ownedSplit.get.value + value)
-        } else Split(ownerID = ownerId.getBytes, ownableID = ownableID.getBytes, value = value)
+        val split = if (ownedSplit.isDefined) ownedSplit.get.copy(value = ownedSplit.get.value + value)
+        else Split(ownerID = ownerId.getBytes, ownableID = ownableID.getBytes, value = value)
         Service.insertOrUpdate(split)
       }
 

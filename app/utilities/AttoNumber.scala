@@ -23,6 +23,8 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   override def toString: String = this.value.toString
 
+  def toPlainString: String = this.value.bigDecimal.toPlainString
+
   def intValue: Int = this.value.toInt
 
   def longValue: Long = this.value.toLong

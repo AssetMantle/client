@@ -18,7 +18,7 @@ case class DecData(value: AttoNumber) extends Data {
 
   def generateHashID: HashID = if (this.value == AttoNumber.zero) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
-  def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toString).build()
+  def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.value.toPlainString).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setDecData(this.asProtoDecData).build()
 

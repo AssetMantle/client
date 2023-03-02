@@ -29,13 +29,11 @@ public final class DecDataV1Proto {
   static {
     java.lang.String[] descriptorData = {
       "\n!schema/data/base/decData.v1.proto\022\004dat" +
-      "a\032\024gogoproto/gogo.proto\"U\n\007DecData\022D\n\005va" +
-      "lue\030\001 \001(\tB.\310\336\037\000\332\336\037&github.com/cosmos/cos" +
-      "mos-sdk/types.DecR\005value:\004\210\240\037\000B{\n\010com.da" +
-      "taB\016DecDataV1ProtoP\001Z/github.com/AssetMa" +
-      "ntle/modules/schema/data/base\242\002\003DXX\252\002\004Da" +
-      "ta\312\002\004Data\342\002\020Data\\GPBMetadata\352\002\004Datab\006pro" +
-      "to3"
+      "a\032\024gogoproto/gogo.proto\"%\n\007DecData\022\024\n\005va" +
+      "lue\030\001 \001(\tR\005value:\004\210\240\037\000B{\n\010com.dataB\016DecD" +
+      "ataV1ProtoP\001Z/github.com/AssetMantle/mod" +
+      "ules/schema/data/base\242\002\003DXX\252\002\004Data\312\002\004Dat" +
+      "a\342\002\020Data\\GPBMetadata\352\002\004Datab\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -50,9 +48,7 @@ public final class DecDataV1Proto {
         new java.lang.String[] { "Value", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.customtype);
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
-    registry.add(com.gogoproto.GogoProto.nullable);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();

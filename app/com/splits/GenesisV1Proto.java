@@ -31,29 +31,29 @@ public final class GenesisV1Proto {
       "\n0modules/splits/internal/genesis/genesi" +
       "s.v1.proto\022\006splits\032\024gogoproto/gogo.proto" +
       "\0322modules/splits/internal/mappable/mappa" +
-      "ble.v1.proto\032)schema/parameters/base/par" +
-      "ameter.v1.proto\"v\n\007Genesis\022.\n\tmappables\030" +
-      "\001 \003(\0132\020.splits.MappableR\tmappables\0225\n\npa" +
-      "rameters\030\002 \003(\0132\025.parameters.ParameterR\np" +
-      "arameters:\004\210\240\037\000B\224\001\n\ncom.splitsB\016GenesisV" +
-      "1ProtoP\001Z>github.com/AssetMantle/modules" +
-      "/modules/splits/internal/genesis\242\002\003SXX\252\002" +
-      "\006Splits\312\002\006Splits\342\002\022Splits\\GPBMetadata\352\002\006" +
-      "Splitsb\006proto3"
+      "ble.v1.proto\032-schema/parameters/base/par" +
+      "ameterList.v1.proto\"\200\001\n\007Genesis\022.\n\tmappa" +
+      "bles\030\001 \003(\0132\020.splits.MappableR\tmappables\022" +
+      "?\n\rparameterList\030\002 \001(\0132\031.parameters.Para" +
+      "meterListR\rparameterList:\004\210\240\037\000B\224\001\n\ncom.s" +
+      "plitsB\016GenesisV1ProtoP\001Z>github.com/Asse" +
+      "tMantle/modules/modules/splits/internal/" +
+      "genesis\242\002\003SXX\252\002\006Splits\312\002\006Splits\342\002\022Splits" +
+      "\\GPBMetadata\352\002\006Splitsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
           com.splits.MappableV1Proto.getDescriptor(),
-          com.parameters.ParameterV1Proto.getDescriptor(),
+          com.parameters.ParameterListV1Proto.getDescriptor(),
         });
     internal_static_splits_Genesis_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_splits_Genesis_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_splits_Genesis_descriptor,
-        new java.lang.String[] { "Mappables", "Parameters", });
+        new java.lang.String[] { "Mappables", "ParameterList", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
@@ -61,7 +61,7 @@ public final class GenesisV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
     com.splits.MappableV1Proto.getDescriptor();
-    com.parameters.ParameterV1Proto.getDescriptor();
+    com.parameters.ParameterListV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

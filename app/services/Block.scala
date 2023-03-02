@@ -55,7 +55,7 @@ class Block @Inject()(
                        blockchainAssets: blockchain.Assets,
                        blockchainOrders: blockchain.Orders,
                        blockchainMaintainers: blockchain.Maintainers,
-                       blockchainMetaDatas: blockchain.MetaDatas,
+                       blockchainMetas: blockchain.Metas,
                        blockchainIdentities: blockchain.Identities,
                        blockchainSplits: blockchain.Splits,
                        blockchainFeeGrants: blockchain.FeeGrants,
@@ -356,7 +356,7 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
       //metas
-      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       // splits
       case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))

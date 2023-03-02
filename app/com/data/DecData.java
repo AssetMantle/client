@@ -43,7 +43,7 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings("serial")
   private volatile java.lang.Object value_ = "";
   /**
-   * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string value = 1 [json_name = "value"];</code>
    * @return The value.
    */
   @java.lang.Override
@@ -60,7 +60,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string value = 1 [json_name = "value"];</code>
    * @return The bytes for value.
    */
   @java.lang.Override
@@ -404,7 +404,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object value_ = "";
     /**
-     * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string value = 1 [json_name = "value"];</code>
      * @return The value.
      */
     public java.lang.String getValue() {
@@ -420,7 +420,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string value = 1 [json_name = "value"];</code>
      * @return The bytes for value.
      */
     public com.google.protobuf.ByteString
@@ -437,7 +437,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string value = 1 [json_name = "value"];</code>
      * @param value The value to set.
      * @return This builder for chaining.
      */
@@ -450,7 +450,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string value = 1 [json_name = "value"];</code>
      * @return This builder for chaining.
      */
     public Builder clearValue() {
@@ -460,7 +460,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string value = 1 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string value = 1 [json_name = "value"];</code>
      * @param value The bytes for value to set.
      * @return This builder for chaining.
      */

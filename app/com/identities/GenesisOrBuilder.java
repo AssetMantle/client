@@ -32,26 +32,17 @@ public interface GenesisOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .parameters.Parameter parameters = 2 [json_name = "parameters"];</code>
+   * <code>.parameters.ParameterList parameterList = 2 [json_name = "parameterList"];</code>
+   * @return Whether the parameterList field is set.
    */
-  java.util.List<com.parameters.Parameter> 
-      getParametersList();
+  boolean hasParameterList();
   /**
-   * <code>repeated .parameters.Parameter parameters = 2 [json_name = "parameters"];</code>
+   * <code>.parameters.ParameterList parameterList = 2 [json_name = "parameterList"];</code>
+   * @return The parameterList.
    */
-  com.parameters.Parameter getParameters(int index);
+  com.parameters.ParameterList getParameterList();
   /**
-   * <code>repeated .parameters.Parameter parameters = 2 [json_name = "parameters"];</code>
+   * <code>.parameters.ParameterList parameterList = 2 [json_name = "parameterList"];</code>
    */
-  int getParametersCount();
-  /**
-   * <code>repeated .parameters.Parameter parameters = 2 [json_name = "parameters"];</code>
-   */
-  java.util.List<? extends com.parameters.ParameterOrBuilder> 
-      getParametersOrBuilderList();
-  /**
-   * <code>repeated .parameters.Parameter parameters = 2 [json_name = "parameters"];</code>
-   */
-  com.parameters.ParameterOrBuilder getParametersOrBuilder(
-      int index);
+  com.parameters.ParameterListOrBuilder getParameterListOrBuilder();
 }

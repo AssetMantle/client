@@ -136,7 +136,7 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings("serial")
   private volatile java.lang.Object makerOwnableSplit_ = "";
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
    * @return The makerOwnableSplit.
    */
   @java.lang.Override
@@ -153,7 +153,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
    * @return The bytes for makerOwnableSplit.
    */
   @java.lang.Override
@@ -175,7 +175,7 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings("serial")
   private volatile java.lang.Object takerOwnableSplit_ = "";
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
    * @return The takerOwnableSplit.
    */
   @java.lang.Override
@@ -192,7 +192,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
    * @return The bytes for takerOwnableSplit.
    */
   @java.lang.Override
@@ -1152,7 +1152,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object makerOwnableSplit_ = "";
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
      * @return The makerOwnableSplit.
      */
     public java.lang.String getMakerOwnableSplit() {
@@ -1168,7 +1168,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
      * @return The bytes for makerOwnableSplit.
      */
     public com.google.protobuf.ByteString
@@ -1185,7 +1185,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
      * @param value The makerOwnableSplit to set.
      * @return This builder for chaining.
      */
@@ -1198,7 +1198,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
      * @return This builder for chaining.
      */
     public Builder clearMakerOwnableSplit() {
@@ -1208,7 +1208,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
      * @param value The bytes for makerOwnableSplit to set.
      * @return This builder for chaining.
      */
@@ -1224,7 +1224,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object takerOwnableSplit_ = "";
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
      * @return The takerOwnableSplit.
      */
     public java.lang.String getTakerOwnableSplit() {
@@ -1240,7 +1240,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
      * @return The bytes for takerOwnableSplit.
      */
     public com.google.protobuf.ByteString
@@ -1257,7 +1257,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
      * @param value The takerOwnableSplit to set.
      * @return This builder for chaining.
      */
@@ -1270,7 +1270,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
      * @return This builder for chaining.
      */
     public Builder clearTakerOwnableSplit() {
@@ -1280,7 +1280,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
      * @param value The bytes for takerOwnableSplit to set.
      * @return This builder for chaining.
      */

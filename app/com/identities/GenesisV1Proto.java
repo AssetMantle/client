@@ -31,30 +31,30 @@ public final class GenesisV1Proto {
       "\n4modules/identities/internal/genesis/ge" +
       "nesis.v1.proto\022\nidentities\032\024gogoproto/go" +
       "go.proto\0326modules/identities/internal/ma" +
-      "ppable/mappable.v1.proto\032)schema/paramet" +
-      "ers/base/parameter.v1.proto\"z\n\007Genesis\0222" +
-      "\n\tmappables\030\001 \003(\0132\024.identities.MappableR" +
-      "\tmappables\0225\n\nparameters\030\002 \003(\0132\025.paramet" +
-      "ers.ParameterR\nparameters:\004\210\240\037\000B\254\001\n\016com." +
-      "identitiesB\016GenesisV1ProtoP\001ZBgithub.com" +
-      "/AssetMantle/modules/modules/identities/" +
-      "internal/genesis\242\002\003IXX\252\002\nIdentities\312\002\nId" +
-      "entities\342\002\026Identities\\GPBMetadata\352\002\nIden" +
-      "titiesb\006proto3"
+      "ppable/mappable.v1.proto\032-schema/paramet" +
+      "ers/base/parameterList.v1.proto\"\204\001\n\007Gene" +
+      "sis\0222\n\tmappables\030\001 \003(\0132\024.identities.Mapp" +
+      "ableR\tmappables\022?\n\rparameterList\030\002 \001(\0132\031" +
+      ".parameters.ParameterListR\rparameterList" +
+      ":\004\210\240\037\000B\254\001\n\016com.identitiesB\016GenesisV1Prot" +
+      "oP\001ZBgithub.com/AssetMantle/modules/modu" +
+      "les/identities/internal/genesis\242\002\003IXX\252\002\n" +
+      "Identities\312\002\nIdentities\342\002\026Identities\\GPB" +
+      "Metadata\352\002\nIdentitiesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
           com.identities.MappableV1Proto.getDescriptor(),
-          com.parameters.ParameterV1Proto.getDescriptor(),
+          com.parameters.ParameterListV1Proto.getDescriptor(),
         });
     internal_static_identities_Genesis_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_identities_Genesis_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_identities_Genesis_descriptor,
-        new java.lang.String[] { "Mappables", "Parameters", });
+        new java.lang.String[] { "Mappables", "ParameterList", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
@@ -62,7 +62,7 @@ public final class GenesisV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
     com.identities.MappableV1Proto.getDescriptor();
-    com.parameters.ParameterV1Proto.getDescriptor();
+    com.parameters.ParameterListV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

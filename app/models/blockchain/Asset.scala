@@ -130,17 +130,17 @@ class Assets @Inject()(
       val classificationID = ClassificationID(msg.getClassificationID)
       val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
       val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
-
       val asset = Asset(id = assetID.getBytes, idString = assetID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
-      val add = Service.add(asset)
 
-      val mint = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value.toBigDecimal)
+      val add = Service.add(asset)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
+
+      def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value.toBigDecimal)
 
       for {
         _ <- add
-        _ <- mint
         _ <- bond
+        _ <- mint()
       } yield msg.getFrom
     }
 
@@ -185,11 +185,14 @@ class Assets @Inject()(
 
     def onBurn(msg: com.assets.transactions.burn.Message): Future[String] = {
       val renumerate = blockchainSplits.Utility.renumerate(ownerID = IdentityID(msg.getFromID), ownableID = AssetID(msg.getAssetID), value = constants.Blockchain.ZeroDec)
-      val deleteAsset = Service.delete(AssetID(msg.getAssetID))
+      val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom)
+
+      def deleteAsset() = Service.delete(AssetID(msg.getAssetID))
 
       for {
         _ <- renumerate
-        _ <- deleteAsset
+        _ <- unbond
+        _ <- deleteAsset()
       } yield msg.getFrom
     }
 
