@@ -3,6 +3,7 @@ package utilities
 import schema.data.base.DecData
 
 import java.math.MathContext
+import java.text.DecimalFormat
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 import scala.util.Try
@@ -23,7 +24,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   override def toString: String = this.value.toString
 
-  def toPlainString: String = this.value.bigDecimal.toPlainString
+  def toPlainString: String = AttoNumber.fullFormat.format(this.value)
 
   def intValue: Int = this.value.toInt
 
@@ -150,6 +151,8 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 object AttoNumber {
 
   val factor = 1000000000000000000L
+
+  val fullFormat = new DecimalFormat("#0.000000000000000000")
 
   val precisionContext = new MathContext(18)
 

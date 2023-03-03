@@ -31,7 +31,7 @@ case class ListData(dataList: Seq[AnyData]) extends Data {
 
   def getProtoBytes: Array[Byte] = this.asProtoListData.toByteString.toByteArray
 
-  override def viewString: String = this.toString
+  override def viewString: String = this.dataList.map(x => Data(x).viewString).mkString(", ")
 }
 
 object ListData {
