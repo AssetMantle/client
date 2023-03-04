@@ -42,7 +42,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   override def shortValue: Short = intValue.toShort
 
-  def toByteArray: Array[Byte] = this.getSortableDecBytes
+  def toByteArray: Array[Byte] = this.toPlainString.getBytes
 
   def underlying: AnyRef = value
 
@@ -129,7 +129,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   def validSortable: Boolean = this.abs <= AttoNumber.maxValue
 
-  def getSortableDecBytes: Array[Byte] = {
+  private def getSortableDecBytes: Array[Byte] = {
     if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_ATTONUMBER")
     else {
       if (this == AttoNumber.maxValue) "max".getBytes

@@ -2,11 +2,12 @@
 @import com.identities.transactions.mutate.Message
 @import schema.id.base._
 @import views.html.component.blockchain.txMessages.common._
+@import views.html.base.buttons.commonJavascriptLink
 
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonTextInfo(constants.View.FROM, msg.getFrom)
-@commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
+@commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonTextInfo(constants.View.ASSET_ID, IdentityID(msg.getIdentityID).asString)
 @Messages(constants.View.MUTABLE_META_PROPERTIES):
 @metaProperties(msg.getMutableMetaProperties)
