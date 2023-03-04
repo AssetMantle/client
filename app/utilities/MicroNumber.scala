@@ -4,6 +4,7 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 
+import java.text.DecimalFormat
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 import scala.util.Try
@@ -24,7 +25,7 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def toMicroString: String = this.value.toString
 
-  def toMicroBigDecimal: BigDecimal = BigDecimal(this.value)
+  def toMicroBigDecimal: BigDecimal = BigDecimal(this.toMicroString)
 
   def toMicroInt: Int = this.value.toInt
 
@@ -43,6 +44,8 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
   def toMicroByteArray: Array[Byte] = this.value.toByteArray
 
   override def toString: String = (BigDecimal(this.value) / MicroNumber.factor).toString
+
+  def toPlainString: String = MicroNumber.fullFormat.format(this.toBigDecimal)
 
   def intValue: Int = (this.value / MicroNumber.factor).toInt
 
@@ -186,9 +189,13 @@ object MicroNumber {
 
   private val logger: Logger = Logger(this.getClass)
 
-  val zero = new MicroNumber(0)
-
   val factor = 1000000
+
+  val fullFormat = new DecimalFormat("#0.000000")
+
+  val smallest = new MicroNumber("0.000001")
+
+  val zero = new MicroNumber(0)
 
   def apply(value: BigInt): MicroNumber = new MicroNumber(value)
 
