@@ -159,6 +159,7 @@ class Block @Inject()(
     val halving = blockchainParameters.Utility.onNewBlock(header)
     val tokens = blockchainTokens.Utility.updateAll()
     val validators = blockchainValidators.Utility.onNewBlock(header)
+    val orders = blockchainOrders.Utility.onNewBlock(header)
     // Evidence BeginBlocker is handled via Events
     // Gov EndBlocker is handled via Events
     // Slashing BeginBlocker is handled via Events
@@ -167,6 +168,7 @@ class Block @Inject()(
     (for {
       _ <- halving
       _ <- tokens
+      _ <- orders
       _ <- validators
     } yield ()
       ).recover {

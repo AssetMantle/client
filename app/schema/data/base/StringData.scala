@@ -9,7 +9,7 @@ case class StringData(value: String) extends Data {
 
   def getBondWeight: Int = constants.Data.StringDataWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.StringDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.StringDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = StringData("")
 

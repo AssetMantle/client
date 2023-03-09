@@ -12,7 +12,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Split(ownerID: Array[Byte], ownableID: Array[Byte], value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
+case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
 
   def id1: Array[Byte] = this.ownerID
 
@@ -28,11 +28,17 @@ object Splits {
 
   class DataTable(tag: Tag) extends Table[Split](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
 
-    def * = (ownerID, ownableID, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Split.tupled, Split.unapply)
+    def * = (ownerID, ownableID, protoOwnableID, ownerIDString, ownableIDString, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Split.tupled, Split.unapply)
 
     def ownerID = column[Array[Byte]]("ownerID", O.PrimaryKey)
 
     def ownableID = column[Array[Byte]]("ownableID", O.PrimaryKey)
+
+    def protoOwnableID = column[Array[Byte]]("protoOwnableID")
+
+    def ownerIDString = column[String]("ownerIDString")
+
+    def ownableIDString = column[String]("ownableIDString")
 
     def value = column[BigDecimal]("value")
 
@@ -68,9 +74,6 @@ class Splits @Inject()(
     Splits.logger
   ) {
   object Service {
-
-    def add(splits: Seq[Split]): Future[Unit] = create(splits)
-
     def insertOrUpdate(split: Split): Future[Unit] = upsert(split)
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes)
@@ -149,7 +152,7 @@ class Splits @Inject()(
 
       def addOrUpdate(ownedSplit: Option[Split]) = {
         val split = if (ownedSplit.isDefined) ownedSplit.get.copy(value = ownedSplit.get.value + value)
-        else Split(ownerID = ownerId.getBytes, ownableID = ownableID.getBytes, value = value)
+        else Split(ownerID = ownerId.getBytes, ownableID = ownableID.getBytes, protoOwnableID = ownableID.toAnyOwnableID.toByteArray, ownerIDString = ownerId.asString, ownableIDString = ownableID.asString, value = value)
         Service.insertOrUpdate(split)
       }
 

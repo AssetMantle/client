@@ -10,7 +10,7 @@ case class AccAddressData(value: Array[Byte]) extends Data {
 
   def getBondWeight: Int = constants.Data.AccAddressBondWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = AccAddressData(new Array[Byte](0))
 

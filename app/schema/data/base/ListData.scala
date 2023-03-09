@@ -13,7 +13,7 @@ case class ListData(dataList: Seq[AnyData]) extends Data {
 
   def getBondWeight: Int = constants.Data.ListDataWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.ListDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.ListDataTypeID, hashID = this.generateHashID)
 
   def getAnyDataList: Seq[AnyData] = this.dataList
 

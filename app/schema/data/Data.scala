@@ -9,7 +9,7 @@ abstract class Data {
 
   def getType: StringID
 
-  def getID: DataID
+  def getDataID: DataID
 
   def zeroValue: Data
 

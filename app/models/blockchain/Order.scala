@@ -44,17 +44,22 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getMakerOwnableID: OwnableID = {
     val property = this.getProperty(constants.Blockchain.MakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[OwnableID] else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
   }
 
   def getTakerOwnableID: OwnableID = {
     val property = this.getProperty(constants.Blockchain.TakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[OwnableID] else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
   }
 
   def getExchangeRate: BigDecimal = {
     val property = this.getProperty(constants.Blockchain.ExchangeRateProperty.getID)
     if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.toBigDecimal else constants.Blockchain.SmallestDec
+  }
+
+  def getExpiryHeight: Long = {
+    val property = this.getProperty(constants.Blockchain.ExpiryHeightProperty.getID)
+    if (property.isDefined && property.get.isMeta) HeightData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.value else -1
   }
 
   def getMakerOwnableSplit: BigDecimal = {
@@ -103,6 +108,7 @@ object Orders {
 class Orders @Inject()(
                         blockchainMaintainers: Maintainers,
                         blockchainSplits: Splits,
+                        utilitiesOperations: utilities.Operations,
                         protected val databaseConfigProvider: DatabaseConfigProvider
                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Orders.DataTable, Order, Array[Byte]](
@@ -230,12 +236,12 @@ class Orders @Inject()(
         }
 
         val takerTransfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = order.getMakerID, ownableID = order.getTakerOwnableID, value = makerReceiveTakerOwnableSplit.toBigDecimal)
-        val mekerTransfer = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit.toBigDecimal)
+        val makerTransfer = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit.toBigDecimal)
 
         for {
           _ <- updateOrDelete
           _ <- takerTransfer
-          _ <- mekerTransfer
+          _ <- makerTransfer
         } yield ()
       }
 
@@ -257,6 +263,26 @@ class Orders @Inject()(
       for {
         _ <- deputize
       } yield msg.getFrom
+    }
+
+    def onNewBlock(header: Header): Future[Unit] = {
+      val allOrders = Service.fetchAll
+
+      def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
+        if (header.height.toLong >= order.getExpiryHeight) {
+          val delete = Service.delete(order.getID)
+          val transferAux = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
+          for {
+            _ <- delete
+            _ <- transferAux
+          } yield ()
+        } else Future()
+      }
+
+      for {
+        allOrders <- allOrders
+        _ <- filterAndDelete(allOrders)
+      } yield ()
     }
 
   }

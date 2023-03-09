@@ -14,7 +14,7 @@ case class MetaProperty(id: PropertyID, data: AnyData) extends Property {
 
   def getData: Data = Data(this.data)
 
-  def getDataID: DataID = this.getData.getID
+  def getDataID: DataID = this.getData.getDataID
 
   def getKey: StringID = this.id.keyID
 

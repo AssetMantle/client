@@ -8,19 +8,19 @@ import schema.id.{ID, base}
 
 case class IDData(value: AnyID) extends Data {
 
-  def asID: ID = ID(this.value)
+  def getID: ID = ID(this.value)
 
   def getBondWeight: Int = constants.Data.IDDataWeight
 
   def getType: StringID = constants.Data.IDDataTypeID
 
-  def getID: DataID = base.DataID(typeID = constants.Data.IDDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = base.DataID(typeID = constants.Data.IDDataTypeID, hashID = this.generateHashID)
 
-  def getBytes: Array[Byte] = this.asID.getBytes
+  def getBytes: Array[Byte] = this.getID.getBytes
 
   def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
 
-  def getProtoDataID: protoDataID = this.getID.asProtoDataID
+  def getProtoDataID: protoDataID = this.getDataID.asProtoDataID
 
   def zeroValue: Data = IDData(StringID("").toAnyID)
 
@@ -30,7 +30,7 @@ case class IDData(value: AnyID) extends Data {
 
   def getProtoBytes: Array[Byte] = this.asProtoIDData.toByteString.toByteArray
 
-  def viewString: String = this.asID.asString
+  def viewString: String = this.getID.asString
 
   def getAnyID: AnyID = this.value
 }

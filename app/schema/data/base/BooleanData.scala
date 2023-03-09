@@ -9,7 +9,7 @@ case class BooleanData(value: Boolean) extends Data {
 
   def getBondWeight: Int = constants.Data.BooleanBondWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = BooleanData(false)
 

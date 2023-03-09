@@ -10,7 +10,7 @@ case class HeightData(value: Height) extends Data {
 
   def getBondWeight: Int = constants.Data.HeightDataWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.HeightDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.HeightDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = HeightData(Height(-1))
 

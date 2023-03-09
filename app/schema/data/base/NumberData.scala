@@ -11,7 +11,7 @@ case class NumberData(value: Long) extends Data {
 
   def getBondWeight: Int = constants.Data.NumberDataWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.NumberDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.NumberDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = NumberData(0)
 

@@ -10,7 +10,7 @@ case class DecData(value: AttoNumber) extends Data {
 
   def getBondWeight: Int = constants.Data.DecDataWeight
 
-  def getID: DataID = DataID(typeID = constants.Data.DecDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.Data.DecDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = DecData(AttoNumber.zero)
 

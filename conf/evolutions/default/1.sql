@@ -266,12 +266,16 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Split"
 (
     "ownerID"              BYTEA   NOT NULL,
     "ownableID"            BYTEA   NOT NULL,
+    "protoOwnableID"       BYTEA   NOT NULL,
+    "ownerIDString"        VARCHAR NOT NULL,
+    "ownableIDString"      VARCHAR NOT NULL,
     "value"                NUMERIC NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("ownerID", "ownableID")
+    PRIMARY KEY ("ownerID", "ownableID"),
+    UNIQUE ("ownerIDString", "ownableIDString")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
