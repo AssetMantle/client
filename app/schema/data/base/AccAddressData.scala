@@ -34,4 +34,6 @@ object AccAddressData {
   def apply(value: protoAccAddressData): AccAddressData = AccAddressData(value.getValue.toByteArray)
 
   def fromProtoBytes(protoBytes: Array[Byte]): AccAddressData = AccAddressData(protoAccAddressData.parseFrom(protoBytes))
+
+  def apply(bech32Address: String): AccAddressData = AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(bech32Address))
 }

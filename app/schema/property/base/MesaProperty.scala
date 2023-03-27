@@ -1,6 +1,7 @@
 package schema.property.base
 
 import com.properties.{AnyProperty, MesaProperty => protoMesaProperty}
+import schema.data.Data
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.Property
 
@@ -30,5 +31,7 @@ object MesaProperty {
   def apply(value: protoMesaProperty): MesaProperty = MesaProperty(id = PropertyID(value.getID), dataID = schema.id.base.DataID(value.getDataID))
 
   def apply(protoBytes: Array[Byte]): MesaProperty = MesaProperty(protoMesaProperty.parseFrom(protoBytes))
+
+  def apply(id: PropertyID, data: Data): MesaProperty = MesaProperty(id, data.getDataID)
 
 }
