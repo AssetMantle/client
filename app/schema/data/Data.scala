@@ -47,6 +47,7 @@ object Data {
   def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
     case constants.Data.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
     case constants.Data.BooleanDataTypeID.value => BooleanData(protoBytes)
+    case constants.Data.DecDataTypeID.value => DecData(protoBytes)
     case constants.Data.HeightDataTypeID.value => HeightData(protoBytes)
     case constants.Data.IDDataTypeID.value => IDData(protoBytes)
     case constants.Data.StringDataTypeID.value => StringData(protoBytes)
