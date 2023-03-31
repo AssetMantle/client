@@ -34,4 +34,6 @@ object MesaProperty {
 
   def apply(id: PropertyID, data: Data): MesaProperty = MesaProperty(id, data.getDataID)
 
+  def apply(protoBytes: Array[Byte]): MesaProperty = MesaProperty(protoMesaProperty.parseFrom(protoBytes))
+
 }

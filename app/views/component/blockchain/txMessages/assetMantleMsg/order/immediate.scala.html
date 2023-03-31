@@ -7,6 +7,8 @@
 @import views.html.component.blockchain.txMessages.common._
 @import utilities.AttoNumber
 
+@import utilities.AttoNumber
+@import utilities.AttoNumber
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
