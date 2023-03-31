@@ -92,25 +92,15 @@ object Parameters {
 
   implicit val transferParameterReads: Reads[TransferParameter] = Json.reads[TransferParameter]
 
-  case class MetaPropertyTypeParameter(id: String, `type`: String, value: String)
-
-  implicit val metaPropertyTypeParameterWrites: OWrites[MetaPropertyTypeParameter] = Json.writes[MetaPropertyTypeParameter]
-
-  implicit val metaPropertyTypeParameterReads: Reads[MetaPropertyTypeParameter] = Json.reads[MetaPropertyTypeParameter]
-
-  case class ClassificationParameter(classificationParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+  case class ClassificationParameter(bondRate: Long, maxPropertyCount: Long) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.CLASSIFICATIONS
-
-    def getBondRate: Int = this.classificationParameters.find(_.id == constants.Blockchain.BondRateProperty.id.keyID.value).fold(0)(_.value.toInt)
-
-    def getMaxPropertyCount: Int = this.classificationParameters.find(_.id == constants.Blockchain.MaxPropertyCountProperty.id.keyID.value).fold(0)(_.value.toInt)
   }
 
   implicit val classificationParameterWrites: OWrites[ClassificationParameter] = Json.writes[ClassificationParameter]
 
   implicit val classificationParameterReads: Reads[ClassificationParameter] = Json.reads[ClassificationParameter]
 
-  case class AssetParameter(assetParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+  case class AssetParameter(burnEnabled: Boolean, mintEnabled: Boolean, renumerateEnabled: Boolean) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.ASSETS
   }
 
@@ -118,7 +108,7 @@ object Parameters {
 
   implicit val AssetParameterReads: Reads[AssetParameter] = Json.reads[AssetParameter]
 
-  case class IdentityParameter(identityParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+  case class IdentityParameter(maxProvisionAddressCount: Long) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.IDENTITIES
   }
 
@@ -126,7 +116,24 @@ object Parameters {
 
   implicit val IdentityParameterReads: Reads[IdentityParameter] = Json.reads[IdentityParameter]
 
-  case class OrderParameter(orderParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+  case class MaintainerParameter(deputizeAllowed: Boolean) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.MAINTAINERS
+  }
+
+  implicit val MaintainerParameterWrites: OWrites[MaintainerParameter] = Json.writes[MaintainerParameter]
+
+  implicit val MaintainerParameterReads: Reads[MaintainerParameter] = Json.reads[MaintainerParameter]
+
+  case class MetaParameter(revealEnabled: Boolean) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.METAS
+  }
+
+  implicit val MetaParameterWrites: OWrites[MetaParameter] = Json.writes[MetaParameter]
+
+  implicit val MetaParameterReads: Reads[MetaParameter] = Json.reads[MetaParameter]
+
+
+  case class OrderParameter(maxOrderLife: Long) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.ORDERS
   }
 
@@ -134,7 +141,7 @@ object Parameters {
 
   implicit val OrderParameterReads: Reads[OrderParameter] = Json.reads[OrderParameter]
 
-  case class SplitParameter(splitParameters: Seq[MetaPropertyTypeParameter]) extends Parameter {
+  case class SplitParameter(wrapAllowedCoins: Seq[String]) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.SPLITS
   }
 

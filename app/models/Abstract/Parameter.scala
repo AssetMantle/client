@@ -35,6 +35,10 @@ abstract class Parameter {
 
   def asAssetParameter: AssetParameter = this.asInstanceOf[AssetParameter]
 
+  def asMetaParameter: MetaParameter = this.asInstanceOf[MetaParameter]
+
+  def asMaintainerParameter: MaintainerParameter = this.asInstanceOf[MaintainerParameter]
+
   def asTransferParameter: TransferParameter = this.asInstanceOf[TransferParameter]
 
 }
@@ -54,6 +58,8 @@ object Parameter {
     case assetParameter: AssetParameter => Json.toJson(assetParameter)
     case classificationParameter: ClassificationParameter => Json.toJson(classificationParameter)
     case identityParameter: IdentityParameter => Json.toJson(identityParameter)
+    case maintainerParameter: MaintainerParameter => Json.toJson(maintainerParameter)
+    case metaParameter: MetaParameter => Json.toJson(metaParameter)
     case orderParameter: OrderParameter => Json.toJson(orderParameter)
     case splitParameter: SplitParameter => Json.toJson(splitParameter)
   }
@@ -72,6 +78,8 @@ object Parameter {
       Json.format[AssetParameter].map(x => x: Parameter) or
       Json.format[ClassificationParameter].map(x => x: Parameter) or
       Json.format[IdentityParameter].map(x => x: Parameter) or
+      Json.format[MaintainerParameter].map(x => x: Parameter) or
+      Json.format[MetaParameter].map(x => x: Parameter) or
       Json.format[SplitParameter].map(x => x: Parameter) or
       Json.format[OrderParameter].map(x => x: Parameter)
   }

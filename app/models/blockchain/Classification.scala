@@ -146,7 +146,7 @@ class Classifications @Inject()(
       val totalWeight = mutables.propertyList.propertyList.map(_.getBondedWeight).sum + immutables.propertyList.propertyList.map(_.getBondedWeight).sum
 
       def add(classificationParameter: ClassificationParameter) = {
-        val updatedImmutables = Immutables(PropertyList(immutables.propertyList.propertyList ++ Seq(constants.Blockchain.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.getBondRate).toAnyData))))
+        val updatedImmutables = Immutables(PropertyList(immutables.propertyList.propertyList ++ Seq(constants.Blockchain.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate).toAnyData))))
         val classificationID = utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
         val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = updatedImmutables.asProtoImmutables.toByteString.toByteArray, mutables = mutables.asProtoMutables.toByteString.toByteArray)
         Service.add(classification)

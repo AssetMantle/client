@@ -9,7 +9,6 @@ case class Split(owner_i_d: IdentityID, ownable_i_d: AnyOwnableID, value: String
   }
 }
 
-
 object Split {
   implicit val SplitReads: Reads[Split] = Json.reads[Split]
 }

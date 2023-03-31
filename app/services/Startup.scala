@@ -4,7 +4,6 @@ import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
-import models.common.Parameters._
 import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
@@ -100,7 +99,7 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
+      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter, genesis.app_state.assets.getParameter, genesis.app_state.classifications.getParameter, genesis.app_state.identities.getParameter, genesis.app_state.maintainers.getParameter, genesis.app_state.metas.getParameter, genesis.app_state.orders.getParameter, genesis.app_state.splits.getParameter)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
@@ -239,13 +238,7 @@ class Startup @Inject()(
   }
 
   private def insertParametersOnStart(parameters: Parameter*) = {
-    val classificationParameter = ClassificationParameter(Seq(MetaPropertyTypeParameter("bondRate", "N", "1"), MetaPropertyTypeParameter("maxPropertyCount", "N", "22")))
-    val identityParameter = IdentityParameter(Seq(MetaPropertyTypeParameter("maxProvisionAddressCount", "N", "22")))
-    val orderParameter = OrderParameter(Seq(MetaPropertyTypeParameter("maxOrderLife", "H", "43210")))
-    val splitParameter = SplitParameter(Seq(MetaPropertyTypeParameter("wrapAllowedCoins", "L", Seq("umntl").toString())))
-
-    val allParameters = parameters ++ Seq(classificationParameter, identityParameter, orderParameter, splitParameter)
-    utilitiesOperations.traverse(allParameters)(parameter => {
+    utilitiesOperations.traverse(parameters)(parameter => {
       val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 
       (for {

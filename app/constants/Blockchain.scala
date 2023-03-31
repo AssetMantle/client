@@ -127,6 +127,8 @@ object Blockchain {
     val CLASSIFICATIONS = "classifications"
     val ASSETS = "assets"
     val IDENTITIES = "identities"
+    val MAINTAINERS = "maintainers"
+    val METAS = "metas"
     val ORDERS = "orders"
     val SPLITS = "splits"
   }

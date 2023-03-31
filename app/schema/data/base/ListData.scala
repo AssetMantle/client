@@ -16,6 +16,8 @@ case class ListData(dataList: Seq[AnyData]) extends Data {
 
   def getAnyDataList: Seq[AnyData] = this.dataList
 
+  def getAbstractDataList: Seq[Data] = this.dataList.map(x => Data(x))
+
   def zeroValue: Data = ListData(dataList = Seq())
 
   def generateHashID: HashID = if (this.dataList.isEmpty) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
