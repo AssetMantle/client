@@ -52,14 +52,6 @@ object Parameters {
 
   implicit val governanceParameterReads: Reads[GovernanceParameter] = Json.reads[GovernanceParameter]
 
-  case class HalvingParameter(blockHeight: Int) extends Parameter {
-    val parameterType: String = constants.Blockchain.ParameterType.HALVING
-  }
-
-  implicit val halvingParameterWrites: OWrites[HalvingParameter] = Json.writes[HalvingParameter]
-
-  implicit val halvingParameterReads: Reads[HalvingParameter] = Json.reads[HalvingParameter]
-
   case class IBCParameter(allowedClients: Seq[String]) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.IBC
   }
@@ -99,4 +91,61 @@ object Parameters {
   implicit val transferParameterWrites: OWrites[TransferParameter] = Json.writes[TransferParameter]
 
   implicit val transferParameterReads: Reads[TransferParameter] = Json.reads[TransferParameter]
+
+  case class ClassificationParameter(bondRate: Long, maxPropertyCount: Long) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.CLASSIFICATIONS
+  }
+
+  implicit val classificationParameterWrites: OWrites[ClassificationParameter] = Json.writes[ClassificationParameter]
+
+  implicit val classificationParameterReads: Reads[ClassificationParameter] = Json.reads[ClassificationParameter]
+
+  case class AssetParameter(burnEnabled: Boolean, mintEnabled: Boolean, renumerateEnabled: Boolean) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.ASSETS
+  }
+
+  implicit val AssetParameterWrites: OWrites[AssetParameter] = Json.writes[AssetParameter]
+
+  implicit val AssetParameterReads: Reads[AssetParameter] = Json.reads[AssetParameter]
+
+  case class IdentityParameter(maxProvisionAddressCount: Long) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.IDENTITIES
+  }
+
+  implicit val IdentityParameterWrites: OWrites[IdentityParameter] = Json.writes[IdentityParameter]
+
+  implicit val IdentityParameterReads: Reads[IdentityParameter] = Json.reads[IdentityParameter]
+
+  case class MaintainerParameter(deputizeAllowed: Boolean) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.MAINTAINERS
+  }
+
+  implicit val MaintainerParameterWrites: OWrites[MaintainerParameter] = Json.writes[MaintainerParameter]
+
+  implicit val MaintainerParameterReads: Reads[MaintainerParameter] = Json.reads[MaintainerParameter]
+
+  case class MetaParameter(revealEnabled: Boolean) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.METAS
+  }
+
+  implicit val MetaParameterWrites: OWrites[MetaParameter] = Json.writes[MetaParameter]
+
+  implicit val MetaParameterReads: Reads[MetaParameter] = Json.reads[MetaParameter]
+
+
+  case class OrderParameter(maxOrderLife: Long) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.ORDERS
+  }
+
+  implicit val OrderParameterWrites: OWrites[OrderParameter] = Json.writes[OrderParameter]
+
+  implicit val OrderParameterReads: Reads[OrderParameter] = Json.reads[OrderParameter]
+
+  case class SplitParameter(wrapAllowedCoins: Seq[String]) extends Parameter {
+    val parameterType: String = constants.Blockchain.ParameterType.SPLITS
+  }
+
+  implicit val SplitParameterWrites: OWrites[SplitParameter] = Json.writes[SplitParameter]
+
+  implicit val SplitParameterReads: Reads[SplitParameter] = Json.reads[SplitParameter]
 }

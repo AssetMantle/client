@@ -55,7 +55,7 @@ class Block @Inject()(
                        blockchainAssets: blockchain.Assets,
                        blockchainOrders: blockchain.Orders,
                        blockchainMaintainers: blockchain.Maintainers,
-                       blockchainMetaDatas: blockchain.MetaDatas,
+                       blockchainMetas: blockchain.Metas,
                        blockchainIdentities: blockchain.Identities,
                        blockchainSplits: blockchain.Splits,
                        blockchainFeeGrants: blockchain.FeeGrants,
@@ -156,17 +156,17 @@ class Block @Inject()(
 
   //Should not be called at the same time as when processing txs as it can lead race to update same db table.
   def checksAndUpdatesOnNewBlock(header: Header): Future[Unit] = {
-    val halving = blockchainParameters.Utility.onNewBlock(header)
     val tokens = blockchainTokens.Utility.updateAll()
     val validators = blockchainValidators.Utility.onNewBlock(header)
+    val orders = blockchainOrders.Utility.onNewBlock(header)
     // Evidence BeginBlocker is handled via Events
     // Gov EndBlocker is handled via Events
     // Slashing BeginBlocker is handled via Events
     // Staking Unbonding and Redelegation Completion EndBlocker is handled via Events
 
     (for {
-      _ <- halving
       _ <- tokens
+      _ <- orders
       _ <- validators
     } yield ()
       ).recover {
@@ -356,7 +356,7 @@ class Block @Inject()(
       case constants.Blockchain.TransactionMessage.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
       //metas
-      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetaDatas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
+      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       // splits
       case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
       case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))

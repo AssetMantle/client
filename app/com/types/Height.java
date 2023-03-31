@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Height();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.types.HeightV1Proto.internal_static_types_Height_descriptor;
@@ -44,7 +39,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int VALUE_FIELD_NUMBER = 1;
-  private long value_;
+  private long value_ = 0L;
   /**
    * <code>int64 value = 1 [json_name = "value"];</code>
    * @return The value.
@@ -243,8 +238,8 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
       value_ = 0L;
-
       return this;
     }
 
@@ -271,9 +266,16 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.types.Height buildPartial() {
       com.types.Height result = new com.types.Height(this);
-      result.value_ = value_;
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.types.Height result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.value_ = value_;
+      }
     }
 
     @java.lang.Override
@@ -351,7 +353,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 8: {
               value_ = input.readInt64();
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 8
             default: {
@@ -369,6 +371,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private long value_ ;
     /**
@@ -385,8 +388,9 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setValue(long value) {
-      
+
       value_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -395,7 +399,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearValue() {
-      
+      bitField0_ = (bitField0_ & ~0x00000001);
       value_ = 0L;
       onChanged();
       return this;

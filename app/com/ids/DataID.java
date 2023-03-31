@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new DataID();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.ids.DataIDV1Proto.internal_static_ids_DataID_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.StringIDOrBuilder getTypeIDOrBuilder() {
-    return getTypeID();
+    return typeID_ == null ? com.ids.StringID.getDefaultInstance() : typeID_;
   }
 
   public static final int HASH_I_D_FIELD_NUMBER = 2;
@@ -92,7 +87,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.HashIDOrBuilder getHashIDOrBuilder() {
-    return getHashID();
+    return hashID_ == null ? com.ids.HashID.getDefaultInstance() : hashID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -304,16 +299,15 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (typeIDBuilder_ == null) {
-        typeID_ = null;
-      } else {
-        typeID_ = null;
+      bitField0_ = 0;
+      typeID_ = null;
+      if (typeIDBuilder_ != null) {
+        typeIDBuilder_.dispose();
         typeIDBuilder_ = null;
       }
-      if (hashIDBuilder_ == null) {
-        hashID_ = null;
-      } else {
-        hashID_ = null;
+      hashID_ = null;
+      if (hashIDBuilder_ != null) {
+        hashIDBuilder_.dispose();
         hashIDBuilder_ = null;
       }
       return this;
@@ -342,18 +336,23 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.ids.DataID buildPartial() {
       com.ids.DataID result = new com.ids.DataID(this);
-      if (typeIDBuilder_ == null) {
-        result.typeID_ = typeID_;
-      } else {
-        result.typeID_ = typeIDBuilder_.build();
-      }
-      if (hashIDBuilder_ == null) {
-        result.hashID_ = hashID_;
-      } else {
-        result.hashID_ = hashIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.ids.DataID result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.typeID_ = typeIDBuilder_ == null
+            ? typeID_
+            : typeIDBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.hashID_ = hashIDBuilder_ == null
+            ? hashID_
+            : hashIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -436,14 +435,14 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getTypeIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             case 18: {
               input.readMessage(
                   getHashIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000002;
               break;
             } // case 18
             default: {
@@ -461,6 +460,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.StringID typeID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -470,7 +470,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the typeID field is set.
      */
     public boolean hasTypeID() {
-      return typeIDBuilder_ != null || typeID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.StringID type_i_d = 1 [json_name = "typeID"];</code>
@@ -492,11 +492,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         typeID_ = value;
-        onChanged();
       } else {
         typeIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -506,11 +506,11 @@ private static final long serialVersionUID = 0L;
         com.ids.StringID.Builder builderForValue) {
       if (typeIDBuilder_ == null) {
         typeID_ = builderForValue.build();
-        onChanged();
       } else {
         typeIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -518,38 +518,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeTypeID(com.ids.StringID value) {
       if (typeIDBuilder_ == null) {
-        if (typeID_ != null) {
-          typeID_ =
-            com.ids.StringID.newBuilder(typeID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          typeID_ != null &&
+          typeID_ != com.ids.StringID.getDefaultInstance()) {
+          getTypeIDBuilder().mergeFrom(value);
         } else {
           typeID_ = value;
         }
-        onChanged();
       } else {
         typeIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.StringID type_i_d = 1 [json_name = "typeID"];</code>
      */
     public Builder clearTypeID() {
-      if (typeIDBuilder_ == null) {
-        typeID_ = null;
-        onChanged();
-      } else {
-        typeID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      typeID_ = null;
+      if (typeIDBuilder_ != null) {
+        typeIDBuilder_.dispose();
         typeIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.StringID type_i_d = 1 [json_name = "typeID"];</code>
      */
     public com.ids.StringID.Builder getTypeIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getTypeIDFieldBuilder().getBuilder();
     }
@@ -589,7 +589,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the hashID field is set.
      */
     public boolean hasHashID() {
-      return hashIDBuilder_ != null || hashID_ != null;
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>.ids.HashID hash_i_d = 2 [json_name = "hashID"];</code>
@@ -611,11 +611,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         hashID_ = value;
-        onChanged();
       } else {
         hashIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -625,11 +625,11 @@ private static final long serialVersionUID = 0L;
         com.ids.HashID.Builder builderForValue) {
       if (hashIDBuilder_ == null) {
         hashID_ = builderForValue.build();
-        onChanged();
       } else {
         hashIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -637,38 +637,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeHashID(com.ids.HashID value) {
       if (hashIDBuilder_ == null) {
-        if (hashID_ != null) {
-          hashID_ =
-            com.ids.HashID.newBuilder(hashID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000002) != 0) &&
+          hashID_ != null &&
+          hashID_ != com.ids.HashID.getDefaultInstance()) {
+          getHashIDBuilder().mergeFrom(value);
         } else {
           hashID_ = value;
         }
-        onChanged();
       } else {
         hashIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.HashID hash_i_d = 2 [json_name = "hashID"];</code>
      */
     public Builder clearHashID() {
-      if (hashIDBuilder_ == null) {
-        hashID_ = null;
-        onChanged();
-      } else {
-        hashID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000002);
+      hashID_ = null;
+      if (hashIDBuilder_ != null) {
+        hashIDBuilder_.dispose();
         hashIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.HashID hash_i_d = 2 [json_name = "hashID"];</code>
      */
     public com.ids.HashID.Builder getHashIDBuilder() {
-      
+      bitField0_ |= 0x00000002;
       onChanged();
       return getHashIDFieldBuilder().getBuilder();
     }

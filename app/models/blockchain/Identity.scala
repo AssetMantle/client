@@ -16,7 +16,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Identity(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Identity(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -56,9 +56,11 @@ object Identities {
 
   class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -83,6 +85,7 @@ object Identities {
 @Singleton
 class Identities @Inject()(
                             blockchainMaintainers: Maintainers,
+                            blockchainClassifications: Classifications,
                             protected val databaseConfigProvider: DatabaseConfigProvider
                           )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Identities.DataTable, Identity, Array[Byte]](
@@ -96,6 +99,8 @@ class Identities @Inject()(
   object Service {
 
     def add(identity: Identity): Future[String] = create(identity).map(x => utilities.Secrets.base64URLEncoder(x))
+
+    def add(identities: Seq[Identity]): Future[Unit] = create(identities)
 
     def insertOrUpdate(identity: Identity): Future[Unit] = upsert(identity)
 
@@ -124,7 +129,7 @@ class Identities @Inject()(
       val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID).toAnyID).toAnyData))))
       val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getFrom)).toAnyData)).toAnyData))))
       val identityID = utilities.ID.getIdentityID(classificationID = constants.Blockchain.NubClassificationID, immutables = immutables)
-      val identity = Identity(id = identityID.getBytes, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
       for {
@@ -133,22 +138,24 @@ class Identities @Inject()(
     }
 
     def onIssue(msg: com.identities.transactions.issue.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).propertyList))
       val classificationID = ClassificationID(msg.getClassificationID)
       val identityID = utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
       val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ Seq(authenticationProperty) ++ PropertyList(msg.getMutableProperties).propertyList))
-      val identity = Identity(id = identityID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).propertyList))
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
       val add = Service.add(identity)
 
       for {
         _ <- add
+        _ <- bond
       } yield msg.getFrom
     }
 
     def onMutate(msg: com.identities.transactions.mutate.Message): Future[String] = {
       val identityID = IdentityID(msg.getIdentityID)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
       val identity = Service.tryGet(identityID)
 
       def update(identity: Identity) = Service.update(identity.mutate(mutables.getProperties))
@@ -189,8 +196,10 @@ class Identities @Inject()(
 
     def onQuash(msg: com.identities.transactions.quash.Message): Future[String] = {
       val delete = Service.delete(IdentityID(msg.getIdentityID))
+      val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom)
       for {
         _ <- delete
+        _ <- unbond
       } yield msg.getFrom
     }
 

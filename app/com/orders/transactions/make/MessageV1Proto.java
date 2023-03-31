@@ -30,45 +30,41 @@ public final class MessageV1Proto {
     java.lang.String[] descriptorData = {
       "\n:modules/orders/internal/transactions/m" +
       "ake/message.v1.proto\022\030orders.transaction" +
-      "s.make\032\024gogoproto/gogo.proto\032)schema/ids" +
-      "/base/classificationID.v1.proto\032#schema/" +
-      "ids/base/identityID.v1.proto\032%schema/ids" +
-      "/base/anyOwnableID.v1.proto\032\'schema/list" +
-      "s/base/propertyList.v1.proto\032!schema/typ" +
-      "es/base/height.v1.proto\"\316\006\n\007Message\022\022\n\004f" +
-      "rom\030\001 \001(\tR\004from\022)\n\010from_i_d\030\002 \001(\0132\017.ids." +
-      "IdentityIDR\006fromID\022C\n\022classification_i_d" +
-      "\030\003 \001(\0132\025.ids.ClassificationIDR\020classific" +
-      "ationID\022+\n\ttaker_i_d\030\004 \001(\0132\017.ids.Identit" +
-      "yIDR\007takerID\022<\n\021maker_ownable_i_d\030\005 \001(\0132" +
-      "\021.ids.AnyOwnableIDR\016makerOwnableID\022<\n\021ta" +
-      "ker_ownable_i_d\030\006 \001(\0132\021.ids.AnyOwnableID" +
-      "R\016takerOwnableID\022,\n\nexpires_in\030\007 \001(\0132\r.t" +
-      "ypes.HeightR\texpiresIn\022^\n\023maker_ownable_" +
-      "split\030\010 \001(\tB.\310\336\037\000\332\336\037&github.com/cosmos/c" +
-      "osmos-sdk/types.DecR\021makerOwnableSplit\022^" +
-      "\n\023taker_ownable_split\030\t \001(\tB.\310\336\037\000\332\336\037&git" +
-      "hub.com/cosmos/cosmos-sdk/types.DecR\021tak" +
-      "erOwnableSplit\022O\n\031immutable_meta_propert" +
-      "ies\030\n \001(\0132\023.lists.PropertyListR\027immutabl" +
-      "eMetaProperties\022F\n\024immutable_properties\030" +
-      "\013 \001(\0132\023.lists.PropertyListR\023immutablePro" +
-      "perties\022K\n\027mutable_meta_properties\030\014 \001(\013" +
-      "2\023.lists.PropertyListR\025mutableMetaProper" +
-      "ties\022B\n\022mutable_properties\030\r \001(\0132\023.lists" +
-      ".PropertyListR\021mutablePropertiesB\372\001\n\034com" +
-      ".orders.transactions.makeB\016MessageV1Prot" +
-      "oP\001ZHgithub.com/AssetMantle/modules/modu" +
-      "les/orders/internal/transactions/make\242\002\003" +
-      "OTM\252\002\030Orders.Transactions.Make\312\002\030Orders\\" +
-      "Transactions\\Make\342\002$Orders\\Transactions\\" +
-      "Make\\GPBMetadata\352\002\032Orders::Transactions:" +
-      ":Makeb\006proto3"
+      "s.make\032)schema/ids/base/classificationID" +
+      ".v1.proto\032#schema/ids/base/identityID.v1" +
+      ".proto\032%schema/ids/base/anyOwnableID.v1." +
+      "proto\032\'schema/lists/base/propertyList.v1" +
+      ".proto\032!schema/types/base/height.v1.prot" +
+      "o\"\356\005\n\007Message\022\022\n\004from\030\001 \001(\tR\004from\022)\n\010fro" +
+      "m_i_d\030\002 \001(\0132\017.ids.IdentityIDR\006fromID\022C\n\022" +
+      "classification_i_d\030\003 \001(\0132\025.ids.Classific" +
+      "ationIDR\020classificationID\022+\n\ttaker_i_d\030\004" +
+      " \001(\0132\017.ids.IdentityIDR\007takerID\022<\n\021maker_" +
+      "ownable_i_d\030\005 \001(\0132\021.ids.AnyOwnableIDR\016ma" +
+      "kerOwnableID\022<\n\021taker_ownable_i_d\030\006 \001(\0132" +
+      "\021.ids.AnyOwnableIDR\016takerOwnableID\022,\n\nex" +
+      "pires_in\030\007 \001(\0132\r.types.HeightR\texpiresIn" +
+      "\022.\n\023maker_ownable_split\030\010 \001(\tR\021makerOwna" +
+      "bleSplit\022.\n\023taker_ownable_split\030\t \001(\tR\021t" +
+      "akerOwnableSplit\022O\n\031immutable_meta_prope" +
+      "rties\030\n \001(\0132\023.lists.PropertyListR\027immuta" +
+      "bleMetaProperties\022F\n\024immutable_propertie" +
+      "s\030\013 \001(\0132\023.lists.PropertyListR\023immutableP" +
+      "roperties\022K\n\027mutable_meta_properties\030\014 \001" +
+      "(\0132\023.lists.PropertyListR\025mutableMetaProp" +
+      "erties\022B\n\022mutable_properties\030\r \001(\0132\023.lis" +
+      "ts.PropertyListR\021mutablePropertiesB\372\001\n\034c" +
+      "om.orders.transactions.makeB\016MessageV1Pr" +
+      "otoP\001ZHgithub.com/AssetMantle/modules/mo" +
+      "dules/orders/internal/transactions/make\242" +
+      "\002\003OTM\252\002\030Orders.Transactions.Make\312\002\030Order" +
+      "s\\Transactions\\Make\342\002$Orders\\Transaction" +
+      "s\\Make\\GPBMetadata\352\002\032Orders::Transaction" +
+      "s::Makeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.gogoproto.GogoProto.getDescriptor(),
           com.ids.ClassificationIDV1Proto.getDescriptor(),
           com.ids.IdentityIDV1Proto.getDescriptor(),
           com.ids.AnyOwnableIDV1Proto.getDescriptor(),
@@ -81,13 +77,6 @@ public final class MessageV1Proto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_orders_transactions_make_Message_descriptor,
         new java.lang.String[] { "From", "FromID", "ClassificationID", "TakerID", "MakerOwnableID", "TakerOwnableID", "ExpiresIn", "MakerOwnableSplit", "TakerOwnableSplit", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.customtype);
-    registry.add(com.gogoproto.GogoProto.nullable);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
-    com.gogoproto.GogoProto.getDescriptor();
     com.ids.ClassificationIDV1Proto.getDescriptor();
     com.ids.IdentityIDV1Proto.getDescriptor();
     com.ids.AnyOwnableIDV1Proto.getDescriptor();

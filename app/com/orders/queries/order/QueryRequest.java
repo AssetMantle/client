@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new QueryRequest();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.orders.queries.order.QueryRequestV1Proto.internal_static_orders_queries_order_QueryRequest_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.OrderIDOrBuilder getOrderIDOrBuilder() {
-    return getOrderID();
+    return orderID_ == null ? com.ids.OrderID.getDefaultInstance() : orderID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (orderIDBuilder_ == null) {
-        orderID_ = null;
-      } else {
-        orderID_ = null;
+      bitField0_ = 0;
+      orderID_ = null;
+      if (orderIDBuilder_ != null) {
+        orderIDBuilder_.dispose();
         orderIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.orders.queries.order.QueryRequest buildPartial() {
       com.orders.queries.order.QueryRequest result = new com.orders.queries.order.QueryRequest(this);
-      if (orderIDBuilder_ == null) {
-        result.orderID_ = orderID_;
-      } else {
-        result.orderID_ = orderIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.orders.queries.order.QueryRequest result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.orderID_ = orderIDBuilder_ == null
+            ? orderID_
+            : orderIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getOrderIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.OrderID orderID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the orderID field is set.
      */
     public boolean hasOrderID() {
-      return orderIDBuilder_ != null || orderID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.OrderID order_i_d = 1 [json_name = "orderID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         orderID_ = value;
-        onChanged();
       } else {
         orderIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.OrderID.Builder builderForValue) {
       if (orderIDBuilder_ == null) {
         orderID_ = builderForValue.build();
-        onChanged();
       } else {
         orderIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeOrderID(com.ids.OrderID value) {
       if (orderIDBuilder_ == null) {
-        if (orderID_ != null) {
-          orderID_ =
-            com.ids.OrderID.newBuilder(orderID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          orderID_ != null &&
+          orderID_ != com.ids.OrderID.getDefaultInstance()) {
+          getOrderIDBuilder().mergeFrom(value);
         } else {
           orderID_ = value;
         }
-        onChanged();
       } else {
         orderIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.OrderID order_i_d = 1 [json_name = "orderID"];</code>
      */
     public Builder clearOrderID() {
-      if (orderIDBuilder_ == null) {
-        orderID_ = null;
-        onChanged();
-      } else {
-        orderID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      orderID_ = null;
+      if (orderIDBuilder_ != null) {
+        orderIDBuilder_.dispose();
         orderIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.OrderID order_i_d = 1 [json_name = "orderID"];</code>
      */
     public com.ids.OrderID.Builder getOrderIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getOrderIDFieldBuilder().getBuilder();
     }

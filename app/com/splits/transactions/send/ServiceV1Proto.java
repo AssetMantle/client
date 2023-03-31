@@ -27,25 +27,26 @@ public final class ServiceV1Proto {
       "end/service.v1.proto\022\030splits.transaction" +
       "s.send\032\034google/api/annotations.proto\032:mo" +
       "dules/splits/internal/transactions/send/" +
-      "message.v1.proto\032;modules/splits/interna" +
-      "l/transactions/send/response.v1.proto2w\n" +
-      "\007Service\022l\n\006Handle\022!.splits.transactions" +
-      ".send.Message\032\".splits.transactions.send" +
-      ".Response\"\033\202\323\344\223\002\025\"\023/mantle/splits/sendB\372" +
-      "\001\n\034com.splits.transactions.sendB\016Service" +
-      "V1ProtoP\001ZHgithub.com/AssetMantle/module" +
-      "s/modules/splits/internal/transactions/s" +
-      "end\242\002\003STS\252\002\030Splits.Transactions.Send\312\002\030S" +
-      "plits\\Transactions\\Send\342\002$Splits\\Transac" +
-      "tions\\Send\\GPBMetadata\352\002\032Splits::Transac" +
-      "tions::Sendb\006proto3"
+      "message.v1.proto\032Fmodules/splits/interna" +
+      "l/transactions/send/transactionResponse." +
+      "v1.proto2\202\001\n\007Service\022w\n\006Handle\022!.splits." +
+      "transactions.send.Message\032-.splits.trans" +
+      "actions.send.TransactionResponse\"\033\202\323\344\223\002\025" +
+      "\"\023/mantle/splits/sendB\372\001\n\034com.splits.tra" +
+      "nsactions.sendB\016ServiceV1ProtoP\001ZHgithub" +
+      ".com/AssetMantle/modules/modules/splits/" +
+      "internal/transactions/send\242\002\003STS\252\002\030Split" +
+      "s.Transactions.Send\312\002\030Splits\\Transaction" +
+      "s\\Send\342\002$Splits\\Transactions\\Send\\GPBMet" +
+      "adata\352\002\032Splits::Transactions::Sendb\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.splits.transactions.send.MessageV1Proto.getDescriptor(),
-          com.splits.transactions.send.ResponseV1Proto.getDescriptor(),
+          com.splits.transactions.send.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -54,7 +55,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.splits.transactions.send.MessageV1Proto.getDescriptor();
-    com.splits.transactions.send.ResponseV1Proto.getDescriptor();
+    com.splits.transactions.send.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

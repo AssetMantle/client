@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new MaintainerID();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.ids.MaintainerIDV1Proto.internal_static_ids_MaintainerID_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.HashIDOrBuilder getHashIDOrBuilder() {
-    return getHashID();
+    return hashID_ == null ? com.ids.HashID.getDefaultInstance() : hashID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (hashIDBuilder_ == null) {
-        hashID_ = null;
-      } else {
-        hashID_ = null;
+      bitField0_ = 0;
+      hashID_ = null;
+      if (hashIDBuilder_ != null) {
+        hashIDBuilder_.dispose();
         hashIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.ids.MaintainerID buildPartial() {
       com.ids.MaintainerID result = new com.ids.MaintainerID(this);
-      if (hashIDBuilder_ == null) {
-        result.hashID_ = hashID_;
-      } else {
-        result.hashID_ = hashIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.ids.MaintainerID result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.hashID_ = hashIDBuilder_ == null
+            ? hashID_
+            : hashIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getHashIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.HashID hashID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the hashID field is set.
      */
     public boolean hasHashID() {
-      return hashIDBuilder_ != null || hashID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.HashID hash_i_d = 1 [json_name = "hashID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         hashID_ = value;
-        onChanged();
       } else {
         hashIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.HashID.Builder builderForValue) {
       if (hashIDBuilder_ == null) {
         hashID_ = builderForValue.build();
-        onChanged();
       } else {
         hashIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeHashID(com.ids.HashID value) {
       if (hashIDBuilder_ == null) {
-        if (hashID_ != null) {
-          hashID_ =
-            com.ids.HashID.newBuilder(hashID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          hashID_ != null &&
+          hashID_ != com.ids.HashID.getDefaultInstance()) {
+          getHashIDBuilder().mergeFrom(value);
         } else {
           hashID_ = value;
         }
-        onChanged();
       } else {
         hashIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.HashID hash_i_d = 1 [json_name = "hashID"];</code>
      */
     public Builder clearHashID() {
-      if (hashIDBuilder_ == null) {
-        hashID_ = null;
-        onChanged();
-      } else {
-        hashID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      hashID_ = null;
+      if (hashIDBuilder_ != null) {
+        hashIDBuilder_.dispose();
         hashIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.HashID hash_i_d = 1 [json_name = "hashID"];</code>
      */
     public com.ids.HashID.Builder getHashIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getHashIDFieldBuilder().getBuilder();
     }

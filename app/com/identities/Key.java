@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Key();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.identities.KeyV1Proto.internal_static_identities_Key_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.IdentityIDOrBuilder getIdentityIDOrBuilder() {
-    return getIdentityID();
+    return identityID_ == null ? com.ids.IdentityID.getDefaultInstance() : identityID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (identityIDBuilder_ == null) {
-        identityID_ = null;
-      } else {
-        identityID_ = null;
+      bitField0_ = 0;
+      identityID_ = null;
+      if (identityIDBuilder_ != null) {
+        identityIDBuilder_.dispose();
         identityIDBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.identities.Key buildPartial() {
       com.identities.Key result = new com.identities.Key(this);
-      if (identityIDBuilder_ == null) {
-        result.identityID_ = identityID_;
-      } else {
-        result.identityID_ = identityIDBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.identities.Key result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.identityID_ = identityIDBuilder_ == null
+            ? identityID_
+            : identityIDBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getIdentityIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.IdentityID identityID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the identityID field is set.
      */
     public boolean hasIdentityID() {
-      return identityIDBuilder_ != null || identityID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         identityID_ = value;
-        onChanged();
       } else {
         identityIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.ids.IdentityID.Builder builderForValue) {
       if (identityIDBuilder_ == null) {
         identityID_ = builderForValue.build();
-        onChanged();
       } else {
         identityIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeIdentityID(com.ids.IdentityID value) {
       if (identityIDBuilder_ == null) {
-        if (identityID_ != null) {
-          identityID_ =
-            com.ids.IdentityID.newBuilder(identityID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          identityID_ != null &&
+          identityID_ != com.ids.IdentityID.getDefaultInstance()) {
+          getIdentityIDBuilder().mergeFrom(value);
         } else {
           identityID_ = value;
         }
-        onChanged();
       } else {
         identityIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
     public Builder clearIdentityID() {
-      if (identityIDBuilder_ == null) {
-        identityID_ = null;
-        onChanged();
-      } else {
-        identityID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      identityID_ = null;
+      if (identityIDBuilder_ != null) {
+        identityIDBuilder_.dispose();
         identityIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
     public com.ids.IdentityID.Builder getIdentityIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getIdentityIDFieldBuilder().getBuilder();
     }

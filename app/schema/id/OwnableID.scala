@@ -7,6 +7,8 @@ import schema.id.base.{AssetID, CoinID}
 abstract class OwnableID extends ID {
   def toAnyOwnableID: AnyOwnableID
 
+  def isCoinId: Boolean
+
 }
 
 object OwnableID {

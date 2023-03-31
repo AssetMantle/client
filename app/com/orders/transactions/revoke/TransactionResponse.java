@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private TransactionResponse() {
-    error_ = "";
   }
 
   @java.lang.Override
@@ -26,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new TransactionResponse();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.orders.transactions.revoke.TransactionResponseV1Proto.internal_static_orders_transactions_revoke_TransactionResponse_descriptor;
@@ -42,63 +36,6 @@ private static final long serialVersionUID = 0L;
     return com.orders.transactions.revoke.TransactionResponseV1Proto.internal_static_orders_transactions_revoke_TransactionResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             com.orders.transactions.revoke.TransactionResponse.class, com.orders.transactions.revoke.TransactionResponse.Builder.class);
-  }
-
-  public static final int SUCCESS_FIELD_NUMBER = 1;
-  private boolean success_;
-  /**
-   * <code>bool success = 1 [json_name = "success"];</code>
-   * @return The success.
-   */
-  @java.lang.Override
-  public boolean getSuccess() {
-    return success_;
-  }
-
-  public static final int ERROR_FIELD_NUMBER = 2;
-  private volatile java.lang.Object error_;
-  /**
-   * <pre>
-   * TODO define error object
-   * </pre>
-   *
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The error.
-   */
-  @java.lang.Override
-  public java.lang.String getError() {
-    java.lang.Object ref = error_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      error_ = s;
-      return s;
-    }
-  }
-  /**
-   * <pre>
-   * TODO define error object
-   * </pre>
-   *
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The bytes for error.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getErrorBytes() {
-    java.lang.Object ref = error_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      error_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
   }
 
   private byte memoizedIsInitialized = -1;
@@ -115,12 +52,6 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (success_ != false) {
-      output.writeBool(1, success_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, error_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -130,13 +61,6 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (success_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(1, success_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, error_);
-    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -152,10 +76,6 @@ private static final long serialVersionUID = 0L;
     }
     com.orders.transactions.revoke.TransactionResponse other = (com.orders.transactions.revoke.TransactionResponse) obj;
 
-    if (getSuccess()
-        != other.getSuccess()) return false;
-    if (!getError()
-        .equals(other.getError())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -167,11 +87,6 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + SUCCESS_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getSuccess());
-    hash = (37 * hash) + ERROR_FIELD_NUMBER;
-    hash = (53 * hash) + getError().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -300,10 +215,6 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      success_ = false;
-
-      error_ = "";
-
       return this;
     }
 
@@ -330,8 +241,6 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.orders.transactions.revoke.TransactionResponse buildPartial() {
       com.orders.transactions.revoke.TransactionResponse result = new com.orders.transactions.revoke.TransactionResponse(this);
-      result.success_ = success_;
-      result.error_ = error_;
       onBuilt();
       return result;
     }
@@ -380,13 +289,6 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.orders.transactions.revoke.TransactionResponse other) {
       if (other == com.orders.transactions.revoke.TransactionResponse.getDefaultInstance()) return this;
-      if (other.getSuccess() != false) {
-        setSuccess(other.getSuccess());
-      }
-      if (!other.getError().isEmpty()) {
-        error_ = other.error_;
-        onChanged();
-      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -413,16 +315,6 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 8: {
-              success_ = input.readBool();
-
-              break;
-            } // case 8
-            case 18: {
-              error_ = input.readStringRequireUtf8();
-
-              break;
-            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -436,133 +328,6 @@ private static final long serialVersionUID = 0L;
       } finally {
         onChanged();
       } // finally
-      return this;
-    }
-
-    private boolean success_ ;
-    /**
-     * <code>bool success = 1 [json_name = "success"];</code>
-     * @return The success.
-     */
-    @java.lang.Override
-    public boolean getSuccess() {
-      return success_;
-    }
-    /**
-     * <code>bool success = 1 [json_name = "success"];</code>
-     * @param value The success to set.
-     * @return This builder for chaining.
-     */
-    public Builder setSuccess(boolean value) {
-      
-      success_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool success = 1 [json_name = "success"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearSuccess() {
-      
-      success_ = false;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object error_ = "";
-    /**
-     * <pre>
-     * TODO define error object
-     * </pre>
-     *
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return The error.
-     */
-    public java.lang.String getError() {
-      java.lang.Object ref = error_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        error_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <pre>
-     * TODO define error object
-     * </pre>
-     *
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return The bytes for error.
-     */
-    public com.google.protobuf.ByteString
-        getErrorBytes() {
-      java.lang.Object ref = error_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        error_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <pre>
-     * TODO define error object
-     * </pre>
-     *
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @param value The error to set.
-     * @return This builder for chaining.
-     */
-    public Builder setError(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      error_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * TODO define error object
-     * </pre>
-     *
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearError() {
-      
-      error_ = getDefaultInstance().getError();
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * TODO define error object
-     * </pre>
-     *
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @param value The bytes for error to set.
-     * @return This builder for chaining.
-     */
-    public Builder setErrorBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      error_ = value;
-      onChanged();
       return this;
     }
     @java.lang.Override

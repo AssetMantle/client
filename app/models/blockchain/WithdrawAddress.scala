@@ -1,18 +1,15 @@
 package models.blockchain
 
-import java.sql.Timestamp
-import exceptions.BaseException
-
-import javax.inject.{Inject, Singleton}
-import models.traits.Logging
 import com.cosmos.distribution.{v1beta1 => distributionTx}
+import exceptions.BaseException
+import models.traits.Logging
 import org.postgresql.util.PSQLException
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -77,7 +74,7 @@ class WithdrawAddresses @Inject()(
 
     def withdrawAddress = column[String]("withdrawAddress")
 
-   def createdBy = column[String]("createdBy")
+    def createdBy = column[String]("createdBy")
 
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
 

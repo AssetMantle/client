@@ -98,19 +98,34 @@ public interface AnyDataOrBuilder extends
   com.data.StringDataOrBuilder getStringDataOrBuilder();
 
   /**
-   * <code>.data.ListData list_data = 7 [json_name = "listData", (.gogoproto.customtype) = "ListData"];</code>
+   * <code>.data.NumberData number_data = 7 [json_name = "numberData"];</code>
+   * @return Whether the numberData field is set.
+   */
+  boolean hasNumberData();
+  /**
+   * <code>.data.NumberData number_data = 7 [json_name = "numberData"];</code>
+   * @return The numberData.
+   */
+  com.data.NumberData getNumberData();
+  /**
+   * <code>.data.NumberData number_data = 7 [json_name = "numberData"];</code>
+   */
+  com.data.NumberDataOrBuilder getNumberDataOrBuilder();
+
+  /**
+   * <code>.data.ListData list_data = 8 [json_name = "listData"];</code>
    * @return Whether the listData field is set.
    */
   boolean hasListData();
   /**
-   * <code>.data.ListData list_data = 7 [json_name = "listData", (.gogoproto.customtype) = "ListData"];</code>
+   * <code>.data.ListData list_data = 8 [json_name = "listData"];</code>
    * @return The listData.
    */
   com.data.ListData getListData();
   /**
-   * <code>.data.ListData list_data = 7 [json_name = "listData", (.gogoproto.customtype) = "ListData"];</code>
+   * <code>.data.ListData list_data = 8 [json_name = "listData"];</code>
    */
   com.data.ListDataOrBuilder getListDataOrBuilder();
 
-  public com.data.AnyData.ImplCase getImplCase();
+  com.data.AnyData.ImplCase getImplCase();
 }

@@ -9,7 +9,7 @@ abstract class Data {
 
   def getType: StringID
 
-  def getID: DataID
+  def getDataID: DataID
 
   def zeroValue: Data
 
@@ -22,6 +22,8 @@ abstract class Data {
   def getProtoBytes: Array[Byte]
 
   def viewString: String
+
+  def getBondWeight: Int
 }
 
 object Data {
@@ -37,17 +39,20 @@ object Data {
     case 4 => HeightData(anyData.getHeightData)
     case 5 => IDData(anyData.getIDData)
     case 6 => StringData(anyData.getStringData)
-    case 7 => ListData(anyData.getListData)
+    case 7 => NumberData(anyData.getNumberData)
+    case 8 => ListData(anyData.getListData)
     case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
   }
 
   def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
-    case constants.DataTypeID.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
-    case constants.DataTypeID.BooleanDataTypeID.value => BooleanData(protoBytes)
-    case constants.DataTypeID.HeightDataTypeID.value => HeightData(protoBytes)
-    case constants.DataTypeID.IDDataTypeID.value => IDData(protoBytes)
-    case constants.DataTypeID.StringDataTypeID.value => StringData(protoBytes)
-    case constants.DataTypeID.ListDataTypeID.value => ListData(protoBytes)
+    case constants.Data.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
+    case constants.Data.BooleanDataTypeID.value => BooleanData(protoBytes)
+    case constants.Data.DecDataTypeID.value => DecData(protoBytes)
+    case constants.Data.HeightDataTypeID.value => HeightData(protoBytes)
+    case constants.Data.IDDataTypeID.value => IDData(protoBytes)
+    case constants.Data.StringDataTypeID.value => StringData(protoBytes)
+    case constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
+    case constants.Data.ListDataTypeID.value => ListData(protoBytes)
     case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
   }
 

@@ -30,34 +30,25 @@ public final class TransactionResponseV1Proto {
     java.lang.String[] descriptorData = {
       "\nFmodules/splits/internal/transactions/w" +
       "rap/transactionResponse.v1.proto\022\030splits" +
-      ".transactions.wrap\032\024gogoproto/gogo.proto" +
-      "\"K\n\023TransactionResponse\022\030\n\007success\030\001 \001(\010" +
-      "R\007success\022\024\n\005error\030\002 \001(\tR\005error:\004\210\240\037\000B\206\002" +
-      "\n\034com.splits.transactions.wrapB\032Transact" +
-      "ionResponseV1ProtoP\001ZHgithub.com/AssetMa" +
-      "ntle/modules/modules/splits/internal/tra" +
-      "nsactions/wrap\242\002\003STW\252\002\030Splits.Transactio" +
-      "ns.Wrap\312\002\030Splits\\Transactions\\Wrap\342\002$Spl" +
-      "its\\Transactions\\Wrap\\GPBMetadata\352\002\032Spli" +
-      "ts::Transactions::Wrapb\006proto3"
+      ".transactions.wrap\"\025\n\023TransactionRespons" +
+      "eB\206\002\n\034com.splits.transactions.wrapB\032Tran" +
+      "sactionResponseV1ProtoP\001ZHgithub.com/Ass" +
+      "etMantle/modules/modules/splits/internal" +
+      "/transactions/wrap\242\002\003STW\252\002\030Splits.Transa" +
+      "ctions.Wrap\312\002\030Splits\\Transactions\\Wrap\342\002" +
+      "$Splits\\Transactions\\Wrap\\GPBMetadata\352\002\032" +
+      "Splits::Transactions::Wrapb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.gogoproto.GogoProto.getDescriptor(),
         });
     internal_static_splits_transactions_wrap_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_splits_transactions_wrap_TransactionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_splits_transactions_wrap_TransactionResponse_descriptor,
-        new java.lang.String[] { "Success", "Error", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.goprotoGetters);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
-    com.gogoproto.GogoProto.getDescriptor();
+        new java.lang.String[] { });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

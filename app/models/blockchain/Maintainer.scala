@@ -16,7 +16,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Maintainer(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Maintainer(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -69,9 +69,11 @@ object Maintainers {
 
   class DataTable(tag: Tag) extends Table[Maintainer](tag, "Maintainer") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Maintainer.tupled, Maintainer.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Maintainer.tupled, Maintainer.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -108,6 +110,8 @@ class Maintainers @Inject()(
   object Service {
 
     def add(maintainer: Maintainer): Future[String] = create(maintainer).map(x => utilities.Secrets.base64URLEncoder(x))
+
+    def add(maintainers: Seq[Maintainer]): Future[Unit] = create(maintainers)
 
     def update(maintainer: Maintainer): Future[String] = updateById(maintainer).map(_ => maintainer.getIDString)
 
@@ -190,7 +194,7 @@ class Maintainers @Inject()(
         MetaProperty(id = constants.Blockchain.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x.toAnyID)).map(_.toAnyData)).toAnyData),
       )))
       val maintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = immutables)
-      Maintainer(id = maintainerID.getBytes, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
     }
 
     private def getPermissions(canAdd: Boolean, canMutate: Boolean, canBurn: Boolean, canMint: Boolean, canRemove: Boolean, canRenumerate: Boolean) = {

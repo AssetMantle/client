@@ -8,32 +8,17 @@ public interface ParameterOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.ids.StringID i_d = 1 [json_name = "iD"];</code>
-   * @return Whether the iD field is set.
+   * <code>.properties.MetaProperty meta_property = 1 [json_name = "metaProperty"];</code>
+   * @return Whether the metaProperty field is set.
    */
-  boolean hasID();
+  boolean hasMetaProperty();
   /**
-   * <code>.ids.StringID i_d = 1 [json_name = "iD"];</code>
-   * @return The iD.
+   * <code>.properties.MetaProperty meta_property = 1 [json_name = "metaProperty"];</code>
+   * @return The metaProperty.
    */
-  com.ids.StringID getID();
+  com.properties.MetaProperty getMetaProperty();
   /**
-   * <code>.ids.StringID i_d = 1 [json_name = "iD"];</code>
+   * <code>.properties.MetaProperty meta_property = 1 [json_name = "metaProperty"];</code>
    */
-  com.ids.StringIDOrBuilder getIDOrBuilder();
-
-  /**
-   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
-   * @return Whether the data field is set.
-   */
-  boolean hasData();
-  /**
-   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
-   * @return The data.
-   */
-  com.data.AnyData getData();
-  /**
-   * <code>.data.AnyData data = 2 [json_name = "data"];</code>
-   */
-  com.data.AnyDataOrBuilder getDataOrBuilder();
+  com.properties.MetaPropertyOrBuilder getMetaPropertyOrBuilder();
 }

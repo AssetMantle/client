@@ -4,32 +4,33 @@ import com.data.{AnyData, ListData => protoListData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
-import java.math.BigInteger
 import scala.jdk.CollectionConverters._
 
 
 case class ListData(dataList: Seq[AnyData]) extends Data {
-  def getType: StringID = constants.DataTypeID.ListDataTypeID
+  def getType: StringID = constants.Data.ListDataTypeID
 
-  def getID: DataID = DataID(typeID = constants.DataTypeID.ListDataTypeID, hashID = this.generateHashID)
+  def getBondWeight: Int = constants.Data.ListDataWeight
 
- def getAnyDataList: Seq[AnyData] = this.dataList
+  def getDataID: DataID = DataID(typeID = constants.Data.ListDataTypeID, hashID = this.generateHashID)
+
+  def getAnyDataList: Seq[AnyData] = this.dataList
+
+  def getAbstractDataList: Seq[Data] = this.dataList.map(x => Data(x))
 
   def zeroValue: Data = ListData(dataList = Seq())
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.dataList.isEmpty) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
   def asProtoListData: protoListData = protoListData.newBuilder().addAllDataList(this.dataList.asJava).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setListData(this.asProtoListData).build()
 
-  def getBytes: Array[Byte] = {
-    this.dataList.map(x => Data(x).getBytes).filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten
-  }
+  def getBytes: Array[Byte] = this.dataList.map(x => Data(x).getBytes).toArray.flatten
 
   def getProtoBytes: Array[Byte] = this.asProtoListData.toByteString.toByteArray
 
-  override def viewString: String = this.toString
+  override def viewString: String = this.dataList.map(x => Data(x).viewString).mkString(", ")
 }
 
 object ListData {

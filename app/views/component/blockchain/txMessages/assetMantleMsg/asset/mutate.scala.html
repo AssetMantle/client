@@ -1,13 +1,14 @@
 @import views.html.base.infos._
 @import com.assets.transactions.mutate.Message
 @import schema.id.base._
+@import views.html.base.buttons.commonJavascriptLink
 @import views.html.component.blockchain.txMessages.common._
 
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonTextInfo(constants.View.FROM, msg.getFrom)
-@commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
-@commonTextInfo(constants.View.ASSET_ID, AssetID(msg.getAssetID).asString)
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
+@commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
+@commonHtmlInfo(constants.View.ASSET_ID, commonJavascriptLink(AssetID(msg.getAssetID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${AssetID(msg.getAssetID).asString}'))")))
 @Messages(constants.View.MUTABLE_META_PROPERTIES):
 @metaProperties(msg.getMutableMetaProperties)
 @Messages(constants.View.MUTABLE_MESA_PROPERTIES):

@@ -19,7 +19,7 @@ import utilities.AttoNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Order(id: Array[Byte], classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -44,17 +44,22 @@ case class Order(id: Array[Byte], classificationID: Array[Byte], immutables: Arr
 
   def getMakerOwnableID: OwnableID = {
     val property = this.getProperty(constants.Blockchain.MakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[OwnableID] else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
   }
 
   def getTakerOwnableID: OwnableID = {
     val property = this.getProperty(constants.Blockchain.TakerOwnableIDProperty.getID)
-    if (property.isDefined && property.get.isMeta) OwnableID(IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getProtoBytes) else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
+    if (property.isDefined && property.get.isMeta) IDData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getID.asInstanceOf[OwnableID] else OwnableID(IDData(StringID("").toAnyID).getProtoBytes)
   }
 
   def getExchangeRate: BigDecimal = {
     val property = this.getProperty(constants.Blockchain.ExchangeRateProperty.getID)
     if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.toBigDecimal else constants.Blockchain.SmallestDec
+  }
+
+  def getExpiryHeight: Long = {
+    val property = this.getProperty(constants.Blockchain.ExpiryHeightProperty.getID)
+    if (property.isDefined && property.get.isMeta) HeightData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.value else -1
   }
 
   def getMakerOwnableSplit: BigDecimal = {
@@ -73,9 +78,11 @@ object Orders {
 
   class DataTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
 
-    def * = (id, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Order.tupled, Order.unapply)
+    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Order.tupled, Order.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
+
+    def idString = column[String]("idString")
 
     def classificationID = column[Array[Byte]]("classificationID")
 
@@ -99,8 +106,10 @@ object Orders {
 
 @Singleton
 class Orders @Inject()(
+                        blockchainClassifications: Classifications,
                         blockchainMaintainers: Maintainers,
                         blockchainSplits: Splits,
+                        utilitiesOperations: utilities.Operations,
                         protected val databaseConfigProvider: DatabaseConfigProvider
                       )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl[Orders.DataTable, Order, Array[Byte]](
@@ -114,6 +123,8 @@ class Orders @Inject()(
   object Service {
 
     def add(order: Order): Future[String] = create(order).map(x => utilities.Secrets.base64URLEncoder(x))
+
+    def add(orders: Seq[Order]): Future[Unit] = create(orders)
 
     def get(id: String): Future[Option[Order]] = getById(utilities.Secrets.base64URLDecode(id))
 
@@ -136,32 +147,32 @@ class Orders @Inject()(
     def onMake(msg: com.orders.transactions.make.Message)(implicit header: Header): Future[String] = {
       val classificationID = ClassificationID(msg.getClassificationID)
 
-      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList
-        ++ Seq(
-        constants.Blockchain.ExchangeRateProperty.copy(data = AttoNumber(msg.getTakerOwnableSplit).quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(AttoNumber(msg.getMakerOwnableSplit)).toDecData.toAnyData),
-        constants.Blockchain.CreationHeightProperty.copy(data = HeightData(Height(header.height.toLong)).toAnyData),
-        constants.Blockchain.MakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getMakerOwnableID).toAnyID).toAnyData),
-        constants.Blockchain.TakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getTakerOwnableID).toAnyID).toAnyData),
-        constants.Blockchain.MakerIDProperty.copy(data = IDData(IdentityID(msg.getFromID).toAnyID).toAnyData),
-        constants.Blockchain.TakerIDProperty.copy(data = IDData(IdentityID(msg.getTakerID).toAnyID).toAnyData))
-        ++ PropertyList(msg.getImmutableProperties).propertyList)
-      )
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties)
+        .add(Seq(
+          constants.Blockchain.ExchangeRateProperty.copy(data = DecData(msg.getTakerOwnableSplit).value.quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(DecData(msg.getMakerOwnableSplit).value).toDecData.toAnyData),
+          constants.Blockchain.CreationHeightProperty.copy(data = HeightData(Height(header.height.toLong)).toAnyData),
+          constants.Blockchain.MakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getMakerOwnableID).toAnyID).toAnyData),
+          constants.Blockchain.TakerOwnableIDProperty.copy(data = IDData(OwnableID(msg.getTakerOwnableID).toAnyID).toAnyData),
+          constants.Blockchain.MakerIDProperty.copy(data = IDData(IdentityID(msg.getFromID).toAnyID).toAnyData),
+          constants.Blockchain.TakerIDProperty.copy(data = IDData(IdentityID(msg.getTakerID).toAnyID).toAnyData)))
+        .add(PropertyList(msg.getImmutableProperties).propertyList))
       val orderID = utilities.ID.getOrderID(classificationID = classificationID, immutables = immutables)
 
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList
-        ++ Seq(
-        constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiresIn.getValue + header.height.toLong)).toAnyData),
-        constants.Blockchain.MakerOwnableSplitProperty.copy(data = AttoNumber(msg.getMakerOwnableSplit).toDecData.toAnyData))
-        ++ PropertyList(msg.getMutableProperties).propertyList)
-      )
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties)
+        .add(Seq(
+          constants.Blockchain.ExpiryHeightProperty.copy(data = HeightData(Height(msg.getExpiresIn.getValue + header.height.toLong)).toAnyData),
+          constants.Blockchain.MakerOwnableSplitProperty.copy(data = DecData(msg.getMakerOwnableSplit).toAnyData)))
+        .add(PropertyList(msg.getMutableProperties).propertyList))
 
-      val order = Order(id = orderID.getBytes, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val order = Order(id = orderID.getBytes, idString = orderID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(order)
-      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = BigDecimal(msg.getMakerOwnableSplit))
+      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = DecData(msg.getMakerOwnableSplit).value.toBigDecimal)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
 
       for {
         _ <- add
         _ <- transfer
+        _ <- bond
       } yield msg.getFrom
     }
 
@@ -228,12 +239,12 @@ class Orders @Inject()(
         }
 
         val takerTransfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = order.getMakerID, ownableID = order.getTakerOwnableID, value = makerReceiveTakerOwnableSplit.toBigDecimal)
-        val mekerTransfer = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit.toBigDecimal)
+        val makerTransfer = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit.toBigDecimal)
 
         for {
           _ <- updateOrDelete
           _ <- takerTransfer
-          _ <- mekerTransfer
+          _ <- makerTransfer
         } yield ()
       }
 
@@ -255,6 +266,26 @@ class Orders @Inject()(
       for {
         _ <- deputize
       } yield msg.getFrom
+    }
+
+    def onNewBlock(header: Header): Future[Unit] = {
+      val allOrders = Service.fetchAll
+
+      def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
+        if (header.height.toLong >= order.getExpiryHeight) {
+          val delete = Service.delete(order.getID)
+          val transferAux = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
+          for {
+            _ <- delete
+            _ <- transferAux
+          } yield ()
+        } else Future()
+      }
+
+      for {
+        allOrders <- allOrders
+        _ <- filterAndDelete(allOrders)
+      } yield ()
     }
 
   }

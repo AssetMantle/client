@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Mappable();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.classifications.MappableV1Proto.internal_static_classifications_Mappable_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.documents.DocumentOrBuilder getClassificationOrBuilder() {
-    return getClassification();
+    return classification_ == null ? com.documents.Document.getDefaultInstance() : classification_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (classificationBuilder_ == null) {
-        classification_ = null;
-      } else {
-        classification_ = null;
+      bitField0_ = 0;
+      classification_ = null;
+      if (classificationBuilder_ != null) {
+        classificationBuilder_.dispose();
         classificationBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.classifications.Mappable buildPartial() {
       com.classifications.Mappable result = new com.classifications.Mappable(this);
-      if (classificationBuilder_ == null) {
-        result.classification_ = classification_;
-      } else {
-        result.classification_ = classificationBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.classifications.Mappable result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.classification_ = classificationBuilder_ == null
+            ? classification_
+            : classificationBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getClassificationFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.documents.Document classification_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the classification field is set.
      */
     public boolean hasClassification() {
-      return classificationBuilder_ != null || classification_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.documents.Document classification = 1 [json_name = "classification"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         classification_ = value;
-        onChanged();
       } else {
         classificationBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.documents.Document.Builder builderForValue) {
       if (classificationBuilder_ == null) {
         classification_ = builderForValue.build();
-        onChanged();
       } else {
         classificationBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeClassification(com.documents.Document value) {
       if (classificationBuilder_ == null) {
-        if (classification_ != null) {
-          classification_ =
-            com.documents.Document.newBuilder(classification_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          classification_ != null &&
+          classification_ != com.documents.Document.getDefaultInstance()) {
+          getClassificationBuilder().mergeFrom(value);
         } else {
           classification_ = value;
         }
-        onChanged();
       } else {
         classificationBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.documents.Document classification = 1 [json_name = "classification"];</code>
      */
     public Builder clearClassification() {
-      if (classificationBuilder_ == null) {
-        classification_ = null;
-        onChanged();
-      } else {
-        classification_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      classification_ = null;
+      if (classificationBuilder_ != null) {
+        classificationBuilder_.dispose();
         classificationBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.documents.Document classification = 1 [json_name = "classification"];</code>
      */
     public com.documents.Document.Builder getClassificationBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getClassificationFieldBuilder().getBuilder();
     }

@@ -4,10 +4,8 @@ import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
-import models.common.Parameters._
 import models.{blockchain, keyBase}
-import play.api.Logger
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
 import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
@@ -20,6 +18,8 @@ import queries.responses.blockchain.MintingInflationResponse.{Response => Mintin
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.common.Header
+import schema.list.PropertyList
+import schema.qualified.{Immutables, Mutables}
 import utilities.Date.RFC3339
 import utilities.MicroNumber
 
@@ -43,6 +43,13 @@ class Startup @Inject()(
                          blockchainRedelegations: blockchain.Redelegations,
                          blockchainUndelegations: blockchain.Undelegations,
                          blockchainWithdrawAddresses: blockchain.WithdrawAddresses,
+                         blockchainAssets: blockchain.Assets,
+                         blockchainClassifications: blockchain.Classifications,
+                         blockchainIdentities: blockchain.Identities,
+                         blockchainOrders: blockchain.Orders,
+                         blockchainMaintainers: blockchain.Maintainers,
+                         blockchainSplits: blockchain.Splits,
+                         blockchainMetas: blockchain.Metas,
                          keyBaseValidatorAccounts: keyBase.ValidatorAccounts,
                          getABCIInfo: GetABCIInfo,
                          getBlockResults: GetBlockResults,
@@ -67,17 +74,32 @@ class Startup @Inject()(
 
   private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
 
+
+  private def insertInitialClassificationIDs() = {
+    val nubClassificationID = models.blockchain.Classification(
+      id = constants.Blockchain.NubClassificationID.getBytes,
+      idString = constants.Blockchain.NubClassificationID.asString,
+      immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
+      mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes)
+    val maintainerClassificationID = models.blockchain.Classification(
+      id = constants.Blockchain.MaintainerClassificationID.getBytes,
+      idString = constants.Blockchain.MaintainerClassificationID.asString,
+      immutables = constants.Blockchain.MaintainerClassificationImmutables.getProtoBytes,
+      mutables = constants.Blockchain.MaintainerClassificationMutables.getProtoBytes)
+
+    blockchainClassifications.Service.add(Seq(nubClassificationID, maintainerClassificationID))
+  }
+
   private def onGenesis(): Future[Unit] = {
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
-      val genesis = utilities.JSON.convertJsonStringToObject[Genesis](genesisSource.mkString)
-      genesisSource.close()
-      genesis
+      val jsonString = try genesisSource.mkString finally genesisSource.close()
+      utilities.JSON.convertJsonStringToObject[Genesis](jsonString)
     }
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.halving.fold[Parameter](HalvingParameter(Int.MaxValue))(_.params.toParameter), genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter)
+      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter, genesis.app_state.assets.getParameter, genesis.app_state.classifications.getParameter, genesis.app_state.identities.getParameter, genesis.app_state.maintainers.getParameter, genesis.app_state.metas.getParameter, genesis.app_state.orders.getParameter, genesis.app_state.splits.getParameter)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
@@ -86,9 +108,19 @@ class Startup @Inject()(
       _ <- insertAllTokensOnStart()
       _ <- insertAuthorizationsOnStart(genesis.app_state.authz.authorization)
       _ <- insertFeeGrantsOnStart(genesis.app_state.feegrant.allowances)
+      _ <- insertMetasOnStart(genesis.app_state.metas.mappables)
+      _ <- insertInitialClassificationIDs()
+      _ <- insertClassificationsOnStart(genesis.app_state.classifications.mappables)
+      _ <- insertMaintainersOnStart(genesis.app_state.maintainers.mappables)
+      _ <- insertAssetsOnStart(genesis.app_state.assets.mappables)
+      _ <- insertIdentitiesOnStart(genesis.app_state.identities.mappables)
+      _ <- insertSplitsOnStart(genesis.app_state.splits.mappables)
+      _ <- insertOrdersOnStart(genesis.app_state.orders.mappables)
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.NO_RESPONSE, exception)
     }
   }
 
@@ -205,16 +237,18 @@ class Startup @Inject()(
     }
   }
 
-  private def insertParametersOnStart(parameters: Parameter*) = utilitiesOperations.traverse(parameters)(parameter => {
-    val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
+  private def insertParametersOnStart(parameters: Parameter*) = {
+    utilitiesOperations.traverse(parameters)(parameter => {
+      val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 
-    (for {
-      _ <- insert
-    } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
-  })
+      (for {
+        _ <- insert
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
+    })
+  }
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
     val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
@@ -235,6 +269,20 @@ class Startup @Inject()(
       case baseException: BaseException => throw baseException
     }
   })
+
+  def insertMetasOnStart(metas: Seq[Meta.Mappable]): Future[Unit] = blockchainMetas.Service.add(metas.map(_.data.toData))
+
+  def insertClassificationsOnStart(classifications: Seq[Classification.Mappable]): Future[Unit] = blockchainClassifications.Service.add(classifications.map(_.classification.toClassification))
+
+  def insertMaintainersOnStart(maintainers: Seq[Maintainer.Mappable]): Future[Unit] = blockchainMaintainers.Service.add(maintainers.map(_.maintainer.toMaintainer))
+
+  def insertAssetsOnStart(assets: Seq[Asset.Mappable]): Future[Unit] = blockchainAssets.Service.add(assets.map(_.asset.toAsset))
+
+  def insertIdentitiesOnStart(identities: Seq[Identity.Mappable]): Future[Unit] = blockchainIdentities.Service.add(identities.map(_.identity.toIdentity))
+
+  def insertSplitsOnStart(splits: Seq[Split.Mappable]): Future[Unit] = blockchainSplits.Service.add(splits.map(_.split.toSplit))
+
+  def insertOrdersOnStart(orders: Seq[Order.Mappable]): Future[Unit] = blockchainOrders.Service.add(orders.map(_.order.toOrder))
 
   private def insertBlock(height: Int): Future[Unit] = {
     val blockCommitResponse = blocksServices.insertOnBlock(height)

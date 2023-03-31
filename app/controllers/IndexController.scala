@@ -4,13 +4,10 @@ import akka.actor.CoordinatedShutdown
 import constants.AppConfig._
 import controllers.actions._
 import models.blockchain
-import models.blockchain.Classification
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import schema.list.PropertyList
-import schema.qualified.{Immutables, Mutables}
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -51,11 +48,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         else Future(Redirect(routes.ComponentViewController.document(query)))
     }
   }
-
-  blockchainClassifications.Service.insertOrUpdate(Classification(
-    id = constants.Blockchain.NubClassificationID.getBytes,
-    immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
-    mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes))
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
   utilities.Scheduler.setShutdownCancellable(startup.start())

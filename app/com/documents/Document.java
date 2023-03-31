@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Document();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.documents.DocumentV1Proto.internal_static_documents_Document_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.ids.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
-    return getClassificationID();
+    return classificationID_ == null ? com.ids.ClassificationID.getDefaultInstance() : classificationID_;
   }
 
   public static final int IMMUTABLES_FIELD_NUMBER = 2;
@@ -92,7 +87,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.qualified.ImmutablesOrBuilder getImmutablesOrBuilder() {
-    return getImmutables();
+    return immutables_ == null ? com.qualified.Immutables.getDefaultInstance() : immutables_;
   }
 
   public static final int MUTABLES_FIELD_NUMBER = 3;
@@ -118,7 +113,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.qualified.MutablesOrBuilder getMutablesOrBuilder() {
-    return getMutables();
+    return mutables_ == null ? com.qualified.Mutables.getDefaultInstance() : mutables_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -346,22 +341,20 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (classificationIDBuilder_ == null) {
-        classificationID_ = null;
-      } else {
-        classificationID_ = null;
+      bitField0_ = 0;
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
         classificationIDBuilder_ = null;
       }
-      if (immutablesBuilder_ == null) {
-        immutables_ = null;
-      } else {
-        immutables_ = null;
+      immutables_ = null;
+      if (immutablesBuilder_ != null) {
+        immutablesBuilder_.dispose();
         immutablesBuilder_ = null;
       }
-      if (mutablesBuilder_ == null) {
-        mutables_ = null;
-      } else {
-        mutables_ = null;
+      mutables_ = null;
+      if (mutablesBuilder_ != null) {
+        mutablesBuilder_.dispose();
         mutablesBuilder_ = null;
       }
       return this;
@@ -390,23 +383,28 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.documents.Document buildPartial() {
       com.documents.Document result = new com.documents.Document(this);
-      if (classificationIDBuilder_ == null) {
-        result.classificationID_ = classificationID_;
-      } else {
-        result.classificationID_ = classificationIDBuilder_.build();
-      }
-      if (immutablesBuilder_ == null) {
-        result.immutables_ = immutables_;
-      } else {
-        result.immutables_ = immutablesBuilder_.build();
-      }
-      if (mutablesBuilder_ == null) {
-        result.mutables_ = mutables_;
-      } else {
-        result.mutables_ = mutablesBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.documents.Document result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.classificationID_ = classificationIDBuilder_ == null
+            ? classificationID_
+            : classificationIDBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.immutables_ = immutablesBuilder_ == null
+            ? immutables_
+            : immutablesBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.mutables_ = mutablesBuilder_ == null
+            ? mutables_
+            : mutablesBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -492,21 +490,21 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getClassificationIDFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             case 18: {
               input.readMessage(
                   getImmutablesFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000002;
               break;
             } // case 18
             case 26: {
               input.readMessage(
                   getMutablesFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000004;
               break;
             } // case 26
             default: {
@@ -524,6 +522,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.ids.ClassificationID classificationID_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -533,7 +532,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the classificationID field is set.
      */
     public boolean hasClassificationID() {
-      return classificationIDBuilder_ != null || classificationID_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
@@ -555,11 +554,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         classificationID_ = value;
-        onChanged();
       } else {
         classificationIDBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -569,11 +568,11 @@ private static final long serialVersionUID = 0L;
         com.ids.ClassificationID.Builder builderForValue) {
       if (classificationIDBuilder_ == null) {
         classificationID_ = builderForValue.build();
-        onChanged();
       } else {
         classificationIDBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -581,38 +580,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeClassificationID(com.ids.ClassificationID value) {
       if (classificationIDBuilder_ == null) {
-        if (classificationID_ != null) {
-          classificationID_ =
-            com.ids.ClassificationID.newBuilder(classificationID_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          classificationID_ != null &&
+          classificationID_ != com.ids.ClassificationID.getDefaultInstance()) {
+          getClassificationIDBuilder().mergeFrom(value);
         } else {
           classificationID_ = value;
         }
-        onChanged();
       } else {
         classificationIDBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public Builder clearClassificationID() {
-      if (classificationIDBuilder_ == null) {
-        classificationID_ = null;
-        onChanged();
-      } else {
-        classificationID_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
         classificationIDBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.ids.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public com.ids.ClassificationID.Builder getClassificationIDBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getClassificationIDFieldBuilder().getBuilder();
     }
@@ -652,7 +651,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the immutables field is set.
      */
     public boolean hasImmutables() {
-      return immutablesBuilder_ != null || immutables_ != null;
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>.qualified.Immutables immutables = 2 [json_name = "immutables"];</code>
@@ -674,11 +673,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         immutables_ = value;
-        onChanged();
       } else {
         immutablesBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -688,11 +687,11 @@ private static final long serialVersionUID = 0L;
         com.qualified.Immutables.Builder builderForValue) {
       if (immutablesBuilder_ == null) {
         immutables_ = builderForValue.build();
-        onChanged();
       } else {
         immutablesBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
@@ -700,38 +699,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeImmutables(com.qualified.Immutables value) {
       if (immutablesBuilder_ == null) {
-        if (immutables_ != null) {
-          immutables_ =
-            com.qualified.Immutables.newBuilder(immutables_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000002) != 0) &&
+          immutables_ != null &&
+          immutables_ != com.qualified.Immutables.getDefaultInstance()) {
+          getImmutablesBuilder().mergeFrom(value);
         } else {
           immutables_ = value;
         }
-        onChanged();
       } else {
         immutablesBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
      * <code>.qualified.Immutables immutables = 2 [json_name = "immutables"];</code>
      */
     public Builder clearImmutables() {
-      if (immutablesBuilder_ == null) {
-        immutables_ = null;
-        onChanged();
-      } else {
-        immutables_ = null;
+      bitField0_ = (bitField0_ & ~0x00000002);
+      immutables_ = null;
+      if (immutablesBuilder_ != null) {
+        immutablesBuilder_.dispose();
         immutablesBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.qualified.Immutables immutables = 2 [json_name = "immutables"];</code>
      */
     public com.qualified.Immutables.Builder getImmutablesBuilder() {
-      
+      bitField0_ |= 0x00000002;
       onChanged();
       return getImmutablesFieldBuilder().getBuilder();
     }
@@ -771,7 +770,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the mutables field is set.
      */
     public boolean hasMutables() {
-      return mutablesBuilder_ != null || mutables_ != null;
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <code>.qualified.Mutables mutables = 3 [json_name = "mutables"];</code>
@@ -793,11 +792,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         mutables_ = value;
-        onChanged();
       } else {
         mutablesBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
@@ -807,11 +806,11 @@ private static final long serialVersionUID = 0L;
         com.qualified.Mutables.Builder builderForValue) {
       if (mutablesBuilder_ == null) {
         mutables_ = builderForValue.build();
-        onChanged();
       } else {
         mutablesBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
@@ -819,38 +818,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeMutables(com.qualified.Mutables value) {
       if (mutablesBuilder_ == null) {
-        if (mutables_ != null) {
-          mutables_ =
-            com.qualified.Mutables.newBuilder(mutables_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000004) != 0) &&
+          mutables_ != null &&
+          mutables_ != com.qualified.Mutables.getDefaultInstance()) {
+          getMutablesBuilder().mergeFrom(value);
         } else {
           mutables_ = value;
         }
-        onChanged();
       } else {
         mutablesBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000004;
+      onChanged();
       return this;
     }
     /**
      * <code>.qualified.Mutables mutables = 3 [json_name = "mutables"];</code>
      */
     public Builder clearMutables() {
-      if (mutablesBuilder_ == null) {
-        mutables_ = null;
-        onChanged();
-      } else {
-        mutables_ = null;
+      bitField0_ = (bitField0_ & ~0x00000004);
+      mutables_ = null;
+      if (mutablesBuilder_ != null) {
+        mutablesBuilder_.dispose();
         mutablesBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.qualified.Mutables mutables = 3 [json_name = "mutables"];</code>
      */
     public com.qualified.Mutables.Builder getMutablesBuilder() {
-      
+      bitField0_ |= 0x00000004;
       onChanged();
       return getMutablesFieldBuilder().getBuilder();
     }

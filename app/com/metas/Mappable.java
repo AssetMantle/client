@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Mappable();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.metas.MappableV1Proto.internal_static_metas_Mappable_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.data.AnyDataOrBuilder getDataOrBuilder() {
-    return getData();
+    return data_ == null ? com.data.AnyData.getDefaultInstance() : data_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (dataBuilder_ == null) {
-        data_ = null;
-      } else {
-        data_ = null;
+      bitField0_ = 0;
+      data_ = null;
+      if (dataBuilder_ != null) {
+        dataBuilder_.dispose();
         dataBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.metas.Mappable buildPartial() {
       com.metas.Mappable result = new com.metas.Mappable(this);
-      if (dataBuilder_ == null) {
-        result.data_ = data_;
-      } else {
-        result.data_ = dataBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.metas.Mappable result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.data_ = dataBuilder_ == null
+            ? data_
+            : dataBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getDataFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.data.AnyData data_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the data field is set.
      */
     public boolean hasData() {
-      return dataBuilder_ != null || data_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.data.AnyData data = 1 [json_name = "data"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         data_ = value;
-        onChanged();
       } else {
         dataBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.data.AnyData.Builder builderForValue) {
       if (dataBuilder_ == null) {
         data_ = builderForValue.build();
-        onChanged();
       } else {
         dataBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeData(com.data.AnyData value) {
       if (dataBuilder_ == null) {
-        if (data_ != null) {
-          data_ =
-            com.data.AnyData.newBuilder(data_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          data_ != null &&
+          data_ != com.data.AnyData.getDefaultInstance()) {
+          getDataBuilder().mergeFrom(value);
         } else {
           data_ = value;
         }
-        onChanged();
       } else {
         dataBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.data.AnyData data = 1 [json_name = "data"];</code>
      */
     public Builder clearData() {
-      if (dataBuilder_ == null) {
-        data_ = null;
-        onChanged();
-      } else {
-        data_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      data_ = null;
+      if (dataBuilder_ != null) {
+        dataBuilder_.dispose();
         dataBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.data.AnyData data = 1 [json_name = "data"];</code>
      */
     public com.data.AnyData.Builder getDataBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getDataFieldBuilder().getBuilder();
     }

@@ -38,12 +38,12 @@ public interface SplitOrBuilder extends
   com.ids.AnyOwnableIDOrBuilder getOwnableIDOrBuilder();
 
   /**
-   * <code>string value = 3 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string value = 3 [json_name = "value"];</code>
    * @return The value.
    */
   java.lang.String getValue();
   /**
-   * <code>string value = 3 [json_name = "value", (.gogoproto.nullable) = false, (.gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];</code>
+   * <code>string value = 3 [json_name = "value"];</code>
    * @return The bytes for value.
    */
   com.google.protobuf.ByteString

@@ -27,25 +27,26 @@ public final class ServiceV1Proto {
       "veal/service.v1.proto\022\031metas.transaction" +
       "s.reveal\032\034google/api/annotations.proto\032;" +
       "modules/metas/internal/transactions/reve" +
-      "al/message.v1.proto\032<modules/metas/inter" +
-      "nal/transactions/reveal/response.v1.prot" +
-      "o2z\n\007Service\022o\n\006Handle\022\".metas.transacti" +
-      "ons.reveal.Message\032#.metas.transactions." +
-      "reveal.Response\"\034\202\323\344\223\002\026\"\024/mantle/metas/r" +
-      "evealB\200\002\n\035com.metas.transactions.revealB" +
-      "\016ServiceV1ProtoP\001ZIgithub.com/AssetMantl" +
-      "e/modules/modules/metas/internal/transac" +
-      "tions/reveal\242\002\003MTR\252\002\031Metas.Transactions." +
-      "Reveal\312\002\031Metas\\Transactions\\Reveal\342\002%Met" +
-      "as\\Transactions\\Reveal\\GPBMetadata\352\002\033Met" +
-      "as::Transactions::Revealb\006proto3"
+      "al/message.v1.proto\032Gmodules/metas/inter" +
+      "nal/transactions/reveal/transactionRespo" +
+      "nse.v1.proto2\205\001\n\007Service\022z\n\006Handle\022\".met" +
+      "as.transactions.reveal.Message\032..metas.t" +
+      "ransactions.reveal.TransactionResponse\"\034" +
+      "\202\323\344\223\002\026\"\024/mantle/metas/revealB\200\002\n\035com.met" +
+      "as.transactions.revealB\016ServiceV1ProtoP\001" +
+      "ZIgithub.com/AssetMantle/modules/modules" +
+      "/metas/internal/transactions/reveal\242\002\003MT" +
+      "R\252\002\031Metas.Transactions.Reveal\312\002\031Metas\\Tr" +
+      "ansactions\\Reveal\342\002%Metas\\Transactions\\R" +
+      "eveal\\GPBMetadata\352\002\033Metas::Transactions:" +
+      ":Revealb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.metas.transactions.reveal.MessageV1Proto.getDescriptor(),
-          com.metas.transactions.reveal.ResponseV1Proto.getDescriptor(),
+          com.metas.transactions.reveal.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -54,7 +55,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.metas.transactions.reveal.MessageV1Proto.getDescriptor();
-    com.metas.transactions.reveal.ResponseV1Proto.getDescriptor();
+    com.metas.transactions.reveal.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

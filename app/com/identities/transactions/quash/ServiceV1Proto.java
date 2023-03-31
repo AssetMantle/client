@@ -27,27 +27,27 @@ public final class ServiceV1Proto {
       "ns/quash/service.v1.proto\022\035identities.tr" +
       "ansactions.quash\032\034google/api/annotations" +
       ".proto\032?modules/identities/internal/tran" +
-      "sactions/quash/message.v1.proto\032@modules" +
+      "sactions/quash/message.v1.proto\032Kmodules" +
       "/identities/internal/transactions/quash/" +
-      "response.v1.proto2\206\001\n\007Service\022{\n\006Handle\022" +
-      "&.identities.transactions.quash.Message\032" +
-      "\'.identities.transactions.quash.Response" +
-      "\" \202\323\344\223\002\032\"\030/mantle/identities/quashB\230\002\n!c" +
-      "om.identities.transactions.quashB\016Servic" +
-      "eV1ProtoP\001ZMgithub.com/AssetMantle/modul" +
-      "es/modules/identities/internal/transacti" +
-      "ons/quash\242\002\003ITQ\252\002\035Identities.Transaction" +
-      "s.Quash\312\002\035Identities\\Transactions\\Quash\342" +
-      "\002)Identities\\Transactions\\Quash\\GPBMetad" +
-      "ata\352\002\037Identities::Transactions::Quashb\006p" +
-      "roto3"
+      "transactionResponse.v1.proto2\222\001\n\007Service" +
+      "\022\206\001\n\006Handle\022&.identities.transactions.qu" +
+      "ash.Message\0322.identities.transactions.qu" +
+      "ash.TransactionResponse\" \202\323\344\223\002\032\"\030/mantle" +
+      "/identities/quashB\230\002\n!com.identities.tra" +
+      "nsactions.quashB\016ServiceV1ProtoP\001ZMgithu" +
+      "b.com/AssetMantle/modules/modules/identi" +
+      "ties/internal/transactions/quash\242\002\003ITQ\252\002" +
+      "\035Identities.Transactions.Quash\312\002\035Identit" +
+      "ies\\Transactions\\Quash\342\002)Identities\\Tran" +
+      "sactions\\Quash\\GPBMetadata\352\002\037Identities:" +
+      ":Transactions::Quashb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.identities.transactions.quash.MessageV1Proto.getDescriptor(),
-          com.identities.transactions.quash.ResponseV1Proto.getDescriptor(),
+          com.identities.transactions.quash.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -56,7 +56,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.identities.transactions.quash.MessageV1Proto.getDescriptor();
-    com.identities.transactions.quash.ResponseV1Proto.getDescriptor();
+    com.identities.transactions.quash.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -25,11 +25,6 @@ private static final long serialVersionUID = 0L;
     return new Mappable();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.identities.MappableV1Proto.internal_static_identities_Mappable_descriptor;
@@ -66,7 +61,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.documents.DocumentOrBuilder getIdentityOrBuilder() {
-    return getIdentity();
+    return identity_ == null ? com.documents.Document.getDefaultInstance() : identity_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -262,10 +257,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (identityBuilder_ == null) {
-        identity_ = null;
-      } else {
-        identity_ = null;
+      bitField0_ = 0;
+      identity_ = null;
+      if (identityBuilder_ != null) {
+        identityBuilder_.dispose();
         identityBuilder_ = null;
       }
       return this;
@@ -294,13 +289,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.identities.Mappable buildPartial() {
       com.identities.Mappable result = new com.identities.Mappable(this);
-      if (identityBuilder_ == null) {
-        result.identity_ = identity_;
-      } else {
-        result.identity_ = identityBuilder_.build();
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.identities.Mappable result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.identity_ = identityBuilder_ == null
+            ? identity_
+            : identityBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -380,7 +380,7 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getIdentityFieldBuilder().getBuilder(),
                   extensionRegistry);
-
+              bitField0_ |= 0x00000001;
               break;
             } // case 10
             default: {
@@ -398,6 +398,7 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+    private int bitField0_;
 
     private com.documents.Document identity_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -407,7 +408,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the identity field is set.
      */
     public boolean hasIdentity() {
-      return identityBuilder_ != null || identity_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.documents.Document identity = 1 [json_name = "identity"];</code>
@@ -429,11 +430,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         identity_ = value;
-        onChanged();
       } else {
         identityBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -443,11 +444,11 @@ private static final long serialVersionUID = 0L;
         com.documents.Document.Builder builderForValue) {
       if (identityBuilder_ == null) {
         identity_ = builderForValue.build();
-        onChanged();
       } else {
         identityBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -455,38 +456,38 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeIdentity(com.documents.Document value) {
       if (identityBuilder_ == null) {
-        if (identity_ != null) {
-          identity_ =
-            com.documents.Document.newBuilder(identity_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          identity_ != null &&
+          identity_ != com.documents.Document.getDefaultInstance()) {
+          getIdentityBuilder().mergeFrom(value);
         } else {
           identity_ = value;
         }
-        onChanged();
       } else {
         identityBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
      * <code>.documents.Document identity = 1 [json_name = "identity"];</code>
      */
     public Builder clearIdentity() {
-      if (identityBuilder_ == null) {
-        identity_ = null;
-        onChanged();
-      } else {
-        identity_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      identity_ = null;
+      if (identityBuilder_ != null) {
+        identityBuilder_.dispose();
         identityBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
      * <code>.documents.Document identity = 1 [json_name = "identity"];</code>
      */
     public com.documents.Document.Builder getIdentityBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getIdentityFieldBuilder().getBuilder();
     }

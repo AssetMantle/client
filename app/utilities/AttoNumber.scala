@@ -3,6 +3,7 @@ package utilities
 import schema.data.base.DecData
 
 import java.math.MathContext
+import java.text.DecimalFormat
 import scala.language.implicitConversions
 import scala.math.{Integral, Ordering, ScalaNumber, ScalaNumericConversions}
 import scala.util.Try
@@ -23,6 +24,8 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   override def toString: String = this.value.toString
 
+  def toPlainString: String = AttoNumber.fullFormat.format(this.value)
+
   def intValue: Int = this.value.toInt
 
   def longValue: Long = this.value.toLong
@@ -39,7 +42,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   override def shortValue: Short = intValue.toShort
 
-  def toByteArray: Array[Byte] = this.getSortableDecBytes
+  def toByteArray: Array[Byte] = this.toPlainString.getBytes
 
   def underlying: AnyRef = value
 
@@ -126,7 +129,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   def validSortable: Boolean = this.abs <= AttoNumber.maxValue
 
-  def getSortableDecBytes: Array[Byte] = {
+  private def getSortableDecBytes: Array[Byte] = {
     if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_ATTONUMBER")
     else {
       if (this == AttoNumber.maxValue) "max".getBytes
@@ -148,6 +151,8 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 object AttoNumber {
 
   val factor = 1000000000000000000L
+
+  val fullFormat = new DecimalFormat("#0.000000000000000000")
 
   val precisionContext = new MathContext(18)
 

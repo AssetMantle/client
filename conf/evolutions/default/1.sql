@@ -63,10 +63,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Authorization"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -102,9 +103,10 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Block"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Classification"
 (
-    "id"                   BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -138,10 +140,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."FeeGrant"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Identity"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -152,10 +155,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Identity"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Maintainer"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -165,10 +169,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Maintainer"
 );
 
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."MetaData"
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Meta"
 (
     "dataTypeID"           VARCHAR NOT NULL,
     "dataHashID"           BYTEA   NOT NULL,
+    "dataHashIDString"     VARCHAR NOT NULL,
     "dataBytes"            BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
@@ -179,10 +184,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."MetaData"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -262,12 +268,16 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Split"
 (
     "ownerID"              BYTEA   NOT NULL,
     "ownableID"            BYTEA   NOT NULL,
+    "protoOwnableID"       BYTEA   NOT NULL,
+    "ownerIDString"        VARCHAR NOT NULL,
+    "ownableIDString"      VARCHAR NOT NULL,
     "value"                NUMERIC NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
     "updatedOnMillisEpoch" BIGINT,
-    PRIMARY KEY ("ownerID", "ownableID")
+    PRIMARY KEY ("ownerID", "ownableID"),
+    UNIQUE ("ownerIDString", "ownableIDString")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
@@ -515,9 +525,9 @@ CREATE TRIGGER MAINTAINER_LOG
     ON BLOCKCHAIN."Maintainer"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
-CREATE TRIGGER META_DATA_LOG
+CREATE TRIGGER META_LOG
     BEFORE INSERT OR UPDATE
-    ON BLOCKCHAIN."MetaData"
+    ON BLOCKCHAIN."Meta"
     FOR EACH ROW
 EXECUTE PROCEDURE PUBLIC.INSERT_OR_UPDATE_EPOCH_LOG();
 CREATE TRIGGER ORDER_LOG
@@ -625,7 +635,7 @@ DROP TRIGGER IF EXISTS DELEGATION_LOG ON BLOCKCHAIN."Delegation" CASCADE;
 DROP TRIGGER IF EXISTS FEE_GRANT_LOG ON BLOCKCHAIN."FeeGrant" CASCADE;
 DROP TRIGGER IF EXISTS IDENTITY_LOG ON BLOCKCHAIN."Identity" CASCADE;
 DROP TRIGGER IF EXISTS MAINTAINER_LOG ON BLOCKCHAIN."Maintainer" CASCADE;
-DROP TRIGGER IF EXISTS META_DATA_LOG ON BLOCKCHAIN."MetaData" CASCADE;
+DROP TRIGGER IF EXISTS META_LOG ON BLOCKCHAIN."Meta" CASCADE;
 DROP TRIGGER IF EXISTS ORDER_LOG ON BLOCKCHAIN."Order" CASCADE;
 DROP TRIGGER IF EXISTS PARAMETER_LOG ON BLOCKCHAIN."Parameter" CASCADE;
 DROP TRIGGER IF EXISTS PROPOSAL_LOG ON BLOCKCHAIN."Proposal" CASCADE;
@@ -659,7 +669,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Delegation" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."FeeGrant" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Identity" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Maintainer" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."MetaData" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Meta" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Parameter" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Proposal" CASCADE;

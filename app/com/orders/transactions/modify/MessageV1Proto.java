@@ -35,26 +35,24 @@ public final class MessageV1Proto {
       "ema/ids/base/identityID.v1.proto\032 schema" +
       "/ids/base/orderID.v1.proto\032\'schema/lists" +
       "/base/propertyList.v1.proto\032!schema/type" +
-      "s/base/height.v1.proto\"\361\003\n\007Message\022\022\n\004fr" +
+      "s/base/height.v1.proto\"\221\003\n\007Message\022\022\n\004fr" +
       "om\030\001 \001(\tR\004from\022)\n\010from_i_d\030\002 \001(\0132\017.ids.I" +
       "dentityIDR\006fromID\022(\n\torder_i_d\030\003 \001(\0132\014.i" +
-      "ds.OrderIDR\007orderID\022^\n\023maker_ownable_spl" +
-      "it\030\004 \001(\tB.\310\336\037\000\332\336\037&github.com/cosmos/cosm" +
-      "os-sdk/types.DecR\021makerOwnableSplit\022^\n\023t" +
-      "aker_ownable_split\030\005 \001(\tB.\310\336\037\000\332\336\037&github" +
-      ".com/cosmos/cosmos-sdk/types.DecR\021takerO" +
-      "wnableSplit\022,\n\nexpires_in\030\006 \001(\0132\r.types." +
-      "HeightR\texpiresIn\022K\n\027mutable_meta_proper" +
-      "ties\030\007 \001(\0132\023.lists.PropertyListR\025mutable" +
-      "MetaProperties\022B\n\022mutable_properties\030\010 \001" +
-      "(\0132\023.lists.PropertyListR\021mutableProperti" +
-      "esB\206\002\n\036com.orders.transactions.modifyB\016M" +
-      "essageV1ProtoP\001ZJgithub.com/AssetMantle/" +
-      "modules/modules/orders/internal/transact" +
-      "ions/modify\242\002\003OTM\252\002\032Orders.Transactions." +
-      "Modify\312\002\032Orders\\Transactions\\Modify\342\002&Or" +
-      "ders\\Transactions\\Modify\\GPBMetadata\352\002\034O" +
-      "rders::Transactions::Modifyb\006proto3"
+      "ds.OrderIDR\007orderID\022.\n\023maker_ownable_spl" +
+      "it\030\004 \001(\tR\021makerOwnableSplit\022.\n\023taker_own" +
+      "able_split\030\005 \001(\tR\021takerOwnableSplit\022,\n\ne" +
+      "xpires_in\030\006 \001(\0132\r.types.HeightR\texpiresI" +
+      "n\022K\n\027mutable_meta_properties\030\007 \001(\0132\023.lis" +
+      "ts.PropertyListR\025mutableMetaProperties\022B" +
+      "\n\022mutable_properties\030\010 \001(\0132\023.lists.Prope" +
+      "rtyListR\021mutablePropertiesB\206\002\n\036com.order" +
+      "s.transactions.modifyB\016MessageV1ProtoP\001Z" +
+      "Jgithub.com/AssetMantle/modules/modules/" +
+      "orders/internal/transactions/modify\242\002\003OT" +
+      "M\252\002\032Orders.Transactions.Modify\312\002\032Orders\\" +
+      "Transactions\\Modify\342\002&Orders\\Transaction" +
+      "s\\Modify\\GPBMetadata\352\002\034Orders::Transacti" +
+      "ons::Modifyb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -72,12 +70,6 @@ public final class MessageV1Proto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_orders_transactions_modify_Message_descriptor,
         new java.lang.String[] { "From", "FromID", "OrderID", "MakerOwnableSplit", "TakerOwnableSplit", "ExpiresIn", "MutableMetaProperties", "MutableProperties", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.customtype);
-    registry.add(com.gogoproto.GogoProto.nullable);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
     com.ids.ClassificationIDV1Proto.getDescriptor();
     com.ids.IdentityIDV1Proto.getDescriptor();

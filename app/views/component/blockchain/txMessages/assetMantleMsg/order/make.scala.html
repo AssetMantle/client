@@ -4,17 +4,20 @@
 @import schema.types.Height
 @import views.html.component.blockchain.txMessages.common._
 @import utilities.AttoNumber
+@import views.html.base.buttons.commonJavascriptLink
 
-@import utilities.AttoNumber
-@import utilities.AttoNumber
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonTextInfo(constants.View.FROM, msg.getFrom)
-@commonTextInfo(constants.View.FROM_ID, IdentityID(msg.getFromID).asString)
-@commonTextInfo(constants.View.CLASSIFICATION_ID, ClassificationID(msg.getClassificationID).asString)
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
+@commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
+@commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
 @commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiresIn).AsString)
-@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toString)
-@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toString)
+@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toPlainString)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toPlainString)
+@Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+@metaProperties(msg.getImmutableMetaProperties)
+@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):
+@mesaProperties(msg.getImmutableProperties)
 @Messages(constants.View.MUTABLE_META_PROPERTIES):
 @metaProperties(msg.getMutableMetaProperties)
 @Messages(constants.View.MUTABLE_MESA_PROPERTIES):

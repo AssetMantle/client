@@ -32,16 +32,19 @@ object JSON {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case errors: JsError => logger.error(errors.toString)
+        case errors: JsError =>
+          logger.error(errors.errors.map(_.toString()).mkString(", "))
           logger.error(jsonString)
           throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       }
-    }
-    catch {
+    } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
         throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.JSON_MAPPING_EXCEPTION)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
     }
   }
 }

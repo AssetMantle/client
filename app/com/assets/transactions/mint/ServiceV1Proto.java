@@ -27,25 +27,26 @@ public final class ServiceV1Proto {
       "int/service.v1.proto\022\030assets.transaction" +
       "s.mint\032\034google/api/annotations.proto\032:mo" +
       "dules/assets/internal/transactions/mint/" +
-      "message.v1.proto\032;modules/assets/interna" +
-      "l/transactions/mint/response.v1.proto2w\n" +
-      "\007Service\022l\n\006Handle\022!.assets.transactions" +
-      ".mint.Message\032\".assets.transactions.mint" +
-      ".Response\"\033\202\323\344\223\002\025\"\023/mantle/assets/mintB\372" +
-      "\001\n\034com.assets.transactions.mintB\016Service" +
-      "V1ProtoP\001ZHgithub.com/AssetMantle/module" +
-      "s/modules/assets/internal/transactions/m" +
-      "int\242\002\003ATM\252\002\030Assets.Transactions.Mint\312\002\030A" +
-      "ssets\\Transactions\\Mint\342\002$Assets\\Transac" +
-      "tions\\Mint\\GPBMetadata\352\002\032Assets::Transac" +
-      "tions::Mintb\006proto3"
+      "message.v1.proto\032Fmodules/assets/interna" +
+      "l/transactions/mint/transactionResponse." +
+      "v1.proto2\202\001\n\007Service\022w\n\006Handle\022!.assets." +
+      "transactions.mint.Message\032-.assets.trans" +
+      "actions.mint.TransactionResponse\"\033\202\323\344\223\002\025" +
+      "\"\023/mantle/assets/mintB\372\001\n\034com.assets.tra" +
+      "nsactions.mintB\016ServiceV1ProtoP\001ZHgithub" +
+      ".com/AssetMantle/modules/modules/assets/" +
+      "internal/transactions/mint\242\002\003ATM\252\002\030Asset" +
+      "s.Transactions.Mint\312\002\030Assets\\Transaction" +
+      "s\\Mint\342\002$Assets\\Transactions\\Mint\\GPBMet" +
+      "adata\352\002\032Assets::Transactions::Mintb\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.assets.transactions.mint.MessageV1Proto.getDescriptor(),
-          com.assets.transactions.mint.ResponseV1Proto.getDescriptor(),
+          com.assets.transactions.mint.TransactionResponseV1Proto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
@@ -54,7 +55,7 @@ public final class ServiceV1Proto {
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
     com.assets.transactions.mint.MessageV1Proto.getDescriptor();
-    com.assets.transactions.mint.ResponseV1Proto.getDescriptor();
+    com.assets.transactions.mint.TransactionResponseV1Proto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

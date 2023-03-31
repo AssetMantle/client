@@ -30,17 +30,16 @@ public final class QueryResponseV1Proto {
     java.lang.String[] descriptorData = {
       "\n>modules/splits/internal/queries/ownabl" +
       "e/queryResponse.v1.proto\022\026splits.queries" +
-      ".ownable\032\024gogoproto/gogo.proto\"\213\001\n\rQuery" +
-      "Response\022\030\n\007success\030\001 \001(\010R\007success\022\024\n\005er" +
-      "ror\030\002 \001(\tR\005error\022D\n\005value\030\003 \001(\tB.\310\336\037\000\332\336\037" +
-      "&github.com/cosmos/cosmos-sdk/types.DecR" +
-      "\005value:\004\210\240\037\000B\364\001\n\032com.splits.queries.owna" +
-      "bleB\024QueryResponseV1ProtoP\001ZFgithub.com/" +
-      "AssetMantle/modules/modules/splits/inter" +
-      "nal/queries/ownable\242\002\003SQO\252\002\026Splits.Queri" +
-      "es.Ownable\312\002\026Splits\\Queries\\Ownable\342\002\"Sp" +
-      "lits\\Queries\\Ownable\\GPBMetadata\352\002\030Split" +
-      "s::Queries::Ownableb\006proto3"
+      ".ownable\032\024gogoproto/gogo.proto\"[\n\rQueryR" +
+      "esponse\022\030\n\007success\030\001 \001(\010R\007success\022\024\n\005err" +
+      "or\030\002 \001(\tR\005error\022\024\n\005value\030\003 \001(\tR\005value:\004\210" +
+      "\240\037\000B\364\001\n\032com.splits.queries.ownableB\024Quer" +
+      "yResponseV1ProtoP\001ZFgithub.com/AssetMant" +
+      "le/modules/modules/splits/internal/queri" +
+      "es/ownable\242\002\003SQO\252\002\026Splits.Queries.Ownabl" +
+      "e\312\002\026Splits\\Queries\\Ownable\342\002\"Splits\\Quer" +
+      "ies\\Ownable\\GPBMetadata\352\002\030Splits::Querie" +
+      "s::Ownableb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -55,9 +54,7 @@ public final class QueryResponseV1Proto {
         new java.lang.String[] { "Success", "Error", "Value", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.customtype);
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
-    registry.add(com.gogoproto.GogoProto.nullable);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
