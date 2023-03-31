@@ -155,10 +155,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Identity"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Maintainer"
 (
-    "id"                   BYTEA NOT NULL,
-    "classificationID"     BYTEA NOT NULL,
-    "immutables"           BYTEA NOT NULL,
-    "mutables"             BYTEA NOT NULL,
+    "id"                   BYTEA   NOT NULL,
+    "idString"             VARCHAR NOT NULL,
+    "classificationID"     BYTEA   NOT NULL,
+    "immutables"           BYTEA   NOT NULL,
+    "mutables"             BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -172,6 +173,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Meta"
 (
     "dataTypeID"           VARCHAR NOT NULL,
     "dataHashID"           BYTEA   NOT NULL,
+    "dataHashIDString"     VARCHAR NOT NULL,
     "dataBytes"            BYTEA   NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,

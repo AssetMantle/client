@@ -104,6 +104,8 @@ class Assets @Inject()(
 
     def add(asset: Asset): Future[String] = create(asset).map(x => utilities.Secrets.base64URLEncoder(x))
 
+    def add(assets: Seq[Asset]): Future[Unit] = create(assets)
+
     def update(asset: Asset): Future[Unit] = updateById(asset)
 
     def get(id: String): Future[Option[Asset]] = getById(utilities.Secrets.base64URLDecode(id))
@@ -126,10 +128,10 @@ class Assets @Inject()(
   object Utility {
 
     def onMint(msg: com.assets.transactions.mint.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).propertyList))
       val classificationID = ClassificationID(msg.getClassificationID)
       val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
       val asset = Asset(id = assetID.getBytes, idString = assetID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
 
       val add = Service.add(asset)
@@ -146,7 +148,7 @@ class Assets @Inject()(
 
     def onMutate(msg: com.assets.transactions.mutate.Message): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
       val asset = Service.tryGet(assetID)
 
       def updateAsset(asset: Asset) = Service.update(asset.mutate(mutables.getProperties))

@@ -10,7 +10,7 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Meta(dataTypeID: String, dataHashID: Array[Byte], dataBytes: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, Array[Byte]] {
+case class Meta(dataTypeID: String, dataHashID: Array[Byte], dataHashIDString: String, dataBytes: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, Array[Byte]] {
 
   lazy val data: abstractData = abstractData(this.dataTypeID, this.dataBytes)
 
@@ -28,11 +28,13 @@ object Metas {
 
   class DataTable(tag: Tag) extends Table[Meta](tag, "Meta") with ModelTable2[String, Array[Byte]] {
 
-    def * = (dataTypeID, dataHashID, dataBytes, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Meta.tupled, Meta.unapply)
+    def * = (dataTypeID, dataHashID, dataHashIDString, dataBytes, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Meta.tupled, Meta.unapply)
 
     def dataTypeID = column[String]("dataTypeID", O.PrimaryKey)
 
     def dataHashID = column[Array[Byte]]("dataHashID", O.PrimaryKey)
+
+    def dataHashIDString = column[String]("dataHashIDString")
 
     def dataBytes = column[Array[Byte]]("dataBytes")
 
@@ -56,8 +58,8 @@ object Metas {
 
 @Singleton
 class Metas @Inject()(
-                           protected val databaseConfigProvider: DatabaseConfigProvider
-                         )(implicit override val executionContext: ExecutionContext)
+                       protected val databaseConfigProvider: DatabaseConfigProvider
+                     )(implicit override val executionContext: ExecutionContext)
   extends GenericDaoImpl2[Metas.DataTable, Meta, String, Array[Byte]](
     databaseConfigProvider,
     Metas.TableQuery,
@@ -67,7 +69,9 @@ class Metas @Inject()(
   ) {
   object Service {
 
-    def add(data: abstractData): Future[Unit] = create(Meta(dataTypeID = data.getType.value, dataHashID = data.generateHashID.getBytes, dataBytes = data.getProtoBytes))
+    def add(data: abstractData): Future[Unit] = create(Meta(dataTypeID = data.getType.value, dataHashID = data.generateHashID.getBytes, dataHashIDString = data.generateHashID.asString, dataBytes = data.getProtoBytes))
+
+    def add(datas: Seq[abstractData]): Future[Unit] = create(datas.map(x => Meta(dataTypeID = x.getType.value, dataHashID = x.generateHashID.getBytes, dataHashIDString = x.generateHashID.asString, dataBytes = x.getProtoBytes)))
 
     def get(id: DataID): Future[Option[Meta]] = getById(id1 = id.typeID.value, id2 = id.hashID.getBytes)
 

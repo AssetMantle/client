@@ -6,6 +6,8 @@ import models.common.Parameters.GovernanceParameter
 import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
+import queries.responses.blockchain.common.Data._
+import queries.responses.blockchain.common.{Document, Split}
 import queries.responses.blockchain.params._
 import queries.responses.common.{Coin, Delegation, Validator, Authz => commonAuthz, FeeGrant => commonFeeGrant}
 import transactions.Abstract.BaseResponse
@@ -29,6 +31,16 @@ object GenesisResponse {
   case class GenUtil(gen_txs: Seq[GenTx])
 
   implicit val genUtilReads: Reads[GenUtil] = Json.reads[GenUtil]
+
+  object Asset {
+    case class Mappable(asset: Document)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+  }
 
   object Auth {
 
@@ -63,6 +75,16 @@ object GenesisResponse {
     implicit val bankModuleReads: Reads[Module] = Json.reads[Module]
   }
 
+  object Classification {
+    case class Mappable(classification: Document)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+  }
+
   object Distribution {
 
     case class WithdrawAddress(delegator_address: String, withdraw_address: String) {
@@ -87,11 +109,37 @@ object GenesisResponse {
     implicit val feeGrantReads: Reads[Module] = Json.reads[Module]
   }
 
-  object Halving {
+  object Identity {
+    case class Mappable(identity: Document)
 
-    case class Module(params: HalvingResponse.Params)
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    implicit val moduleReads: Reads[Module] = Json.reads[Module]
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+  }
+
+  object Maintainer {
+    case class Mappable(maintainer: Document)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+  }
+
+
+  object Meta {
+
+    case class Mappable(data: AnyData)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+
   }
 
   object Mint {
@@ -105,12 +153,32 @@ object GenesisResponse {
     implicit val mintReads: Reads[Module] = Json.reads[Module]
   }
 
+  object Order {
+    case class Mappable(order: Document)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
+  }
+
   object Slashing {
 
     case class Module(params: SlashingResponse.Params)
 
     implicit val slashingReads: Reads[Module] = Json.reads[Module]
 
+  }
+
+  object Split {
+    case class Mappable(split: Split)
+
+    implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+    case class Module(mappables: Seq[Mappable])
+
+    implicit val metaReads: Reads[Module] = Json.reads[Module]
   }
 
   object Staking {
@@ -166,7 +234,7 @@ object GenesisResponse {
     implicit val govReads: Reads[Module] = Json.reads[Module]
   }
 
-  case class AppState(auth: Auth.Module, authz: Authz.Module, bank: Bank.Module, distribution: Distribution.Module, feegrant: FeeGrant.Module, genutil: GenUtil, gov: Gov.Module, halving: Option[Halving.Module], mint: Mint.Module, slashing: Slashing.Module, staking: Staking.Module)
+  case class AppState(assets: Asset.Module, auth: Auth.Module, authz: Authz.Module, bank: Bank.Module, distribution: Distribution.Module, classifications: Classification.Module, feegrant: FeeGrant.Module, genutil: GenUtil, gov: Gov.Module, identities: Identity.Module, maintainers: Maintainer.Module, metas: Meta.Module, mint: Mint.Module, orders: Order.Module, slashing: Slashing.Module, splits: Split.Module, staking: Staking.Module)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 

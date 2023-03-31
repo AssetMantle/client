@@ -100,6 +100,8 @@ class Identities @Inject()(
 
     def add(identity: Identity): Future[String] = create(identity).map(x => utilities.Secrets.base64URLEncoder(x))
 
+    def add(identities: Seq[Identity]): Future[Unit] = create(identities)
+
     def insertOrUpdate(identity: Identity): Future[Unit] = upsert(identity)
 
     def get(id: String): Future[Option[Identity]] = getById(utilities.Secrets.base64URLDecode(id))
@@ -136,11 +138,11 @@ class Identities @Inject()(
     }
 
     def onIssue(msg: com.identities.transactions.issue.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(PropertyList(msg.getImmutableMetaProperties).propertyList ++ PropertyList(msg.getImmutableProperties).propertyList))
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).propertyList))
       val classificationID = ClassificationID(msg.getClassificationID)
       val identityID = utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
       val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ Seq(authenticationProperty) ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).propertyList))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
       val add = Service.add(identity)
@@ -153,7 +155,7 @@ class Identities @Inject()(
 
     def onMutate(msg: com.identities.transactions.mutate.Message): Future[String] = {
       val identityID = IdentityID(msg.getIdentityID)
-      val mutables = Mutables(PropertyList(PropertyList(msg.getMutableMetaProperties).propertyList ++ PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
       val identity = Service.tryGet(identityID)
 
       def update(identity: Identity) = Service.update(identity.mutate(mutables.getProperties))

@@ -63,7 +63,7 @@ object Blockchain {
   val ExpiryHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("expiryHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
   val ExchangeRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("exchangeRate"), typeID = constants.Data.DecDataTypeID), data = DecData(AttoNumber(ZeroDec)).toAnyData)
   val CreationHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("creationHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.Data.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
+  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.Data.IDDataTypeID), data = IDData(IdentityID(HashID(Array[Byte]())).toAnyID).toAnyData)
   val LockProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("lock"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
   val MaintainedPropertiesProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedProperties"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
   val MaintainedClassificationIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedClassificationID"), typeID = constants.Data.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
@@ -81,6 +81,11 @@ object Blockchain {
   val WrapAllowedCoinsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("wrapAllowedCoins"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
 
   val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
+
+  val MaintainerClassificationImmutables: Immutables = Immutables(PropertyList(Seq(IdentityIDProperty, MaintainedClassificationIDProperty)))
+  val MaintainerClassificationMutables: Mutables = Mutables(PropertyList(Seq(MaintainedPropertiesProperty, PermissionsProperty)))
+  val MaintainerClassificationID: ClassificationID = utilities.ID.getClassificationID(MaintainerClassificationImmutables, MaintainerClassificationMutables)
+
   val OrderIdentityID: IdentityID = utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getDataID)))))
 
   object PublicKey {
@@ -114,7 +119,6 @@ object Blockchain {
     val CRISIS = "crisis"
     val DISTRIBUTION = "distribution"
     val GOVERNANCE = "gov"
-    val HALVING = "halving"
     val IBC = "ibc"
     val MINT = "mint"
     val SLASHING = "slashing"

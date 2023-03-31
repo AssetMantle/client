@@ -76,6 +76,8 @@ class Splits @Inject()(
   object Service {
     def insertOrUpdate(split: Split): Future[Unit] = upsert(split)
 
+    def add(splits: Seq[Split]): Future[Unit] = create(splits)
+
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes)
 
     def getByOwnableID(ownableID: OwnableID): Future[Seq[Split]] = filter(_.ownableID === ownableID.getBytes)

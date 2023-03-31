@@ -17,8 +17,6 @@ abstract class Parameter {
 
   def asGovernanceParameter: GovernanceParameter = this.asInstanceOf[GovernanceParameter]
 
-  def asHalvingParameter: HalvingParameter = this.asInstanceOf[HalvingParameter]
-
   def asIBCParameter: IBCParameter = this.asInstanceOf[IBCParameter]
 
   def asMintingParameter: MintingParameter = this.asInstanceOf[MintingParameter]
@@ -48,7 +46,6 @@ object Parameter {
     case crisisParameter: CrisisParameter => Json.toJson(crisisParameter)
     case distributionParameter: DistributionParameter => Json.toJson(distributionParameter)
     case governanceParameter: GovernanceParameter => Json.toJson(governanceParameter)
-    case halvingParameter: HalvingParameter => Json.toJson(halvingParameter)
     case ibcParameter: IBCParameter => Json.toJson(ibcParameter)
     case mintingParameter: MintingParameter => Json.toJson(mintingParameter)
     case slashingParameter: SlashingParameter => Json.toJson(slashingParameter)
@@ -67,7 +64,6 @@ object Parameter {
       Json.format[CrisisParameter].map(x => x: Parameter) or
       Json.format[DistributionParameter].map(x => x: Parameter) or
       Json.format[GovernanceParameter].map(x => x: Parameter) or
-      Json.format[HalvingParameter].map(x => x: Parameter) or
       Json.format[IBCParameter].map(x => x: Parameter) or
       Json.format[MintingParameter].map(x => x: Parameter) or
       Json.format[SlashingParameter].map(x => x: Parameter) or

@@ -4,7 +4,6 @@ import com.data.{AnyData, ListData => protoListData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
-import java.math.BigInteger
 import scala.jdk.CollectionConverters._
 
 
@@ -25,9 +24,7 @@ case class ListData(dataList: Seq[AnyData]) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setListData(this.asProtoListData).build()
 
-  def getBytes: Array[Byte] = {
-    this.dataList.map(x => Data(x).getBytes).filter(_.length != 0).sortWith((x, y) => new BigInteger(x).compareTo(new BigInteger(y)) == -1).toArray.flatten
-  }
+  def getBytes: Array[Byte] = this.dataList.map(x => Data(x).getBytes).toArray.flatten
 
   def getProtoBytes: Array[Byte] = this.asProtoListData.toByteString.toByteArray
 

@@ -14,6 +14,10 @@
 @commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiresIn).AsString)
 @commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toPlainString)
 @commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toPlainString)
+@Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+@metaProperties(msg.getImmutableMetaProperties)
+@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):
+@mesaProperties(msg.getImmutableProperties)
 @Messages(constants.View.MUTABLE_META_PROPERTIES):
 @metaProperties(msg.getMutableMetaProperties)
 @Messages(constants.View.MUTABLE_MESA_PROPERTIES):

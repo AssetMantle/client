@@ -52,14 +52,6 @@ object Parameters {
 
   implicit val governanceParameterReads: Reads[GovernanceParameter] = Json.reads[GovernanceParameter]
 
-  case class HalvingParameter(blockHeight: Int) extends Parameter {
-    val parameterType: String = constants.Blockchain.ParameterType.HALVING
-  }
-
-  implicit val halvingParameterWrites: OWrites[HalvingParameter] = Json.writes[HalvingParameter]
-
-  implicit val halvingParameterReads: Reads[HalvingParameter] = Json.reads[HalvingParameter]
-
   case class IBCParameter(allowedClients: Seq[String]) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.IBC
   }
