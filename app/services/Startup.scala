@@ -99,7 +99,7 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter, genesis.app_state.assets.getParameter, genesis.app_state.classifications.getParameter, genesis.app_state.identities.getParameter, genesis.app_state.maintainers.getParameter, genesis.app_state.metas.getParameter, genesis.app_state.orders.getParameter, genesis.app_state.splits.getParameter)
+      _ <- insertParametersOnStart(Seq(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter) ++ Seq(genesis.app_state.assets.map(_.getParameter), genesis.app_state.classifications.map(_.getParameter), genesis.app_state.identities.map(_.getParameter), genesis.app_state.maintainers.map(_.getParameter), genesis.app_state.metas.map(_.getParameter), genesis.app_state.orders.map(_.getParameter), genesis.app_state.splits.map(_.getParameter)).flatten)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
@@ -108,14 +108,14 @@ class Startup @Inject()(
       _ <- insertAllTokensOnStart()
       _ <- insertAuthorizationsOnStart(genesis.app_state.authz.authorization)
       _ <- insertFeeGrantsOnStart(genesis.app_state.feegrant.allowances)
-      _ <- insertMetasOnStart(genesis.app_state.metas.mappables)
+      _ <- if (genesis.app_state.metas.isDefined) insertMetasOnStart(genesis.app_state.metas.get.mappables) else Future()
       _ <- insertInitialClassificationIDs()
-      _ <- insertClassificationsOnStart(genesis.app_state.classifications.mappables)
-      _ <- insertMaintainersOnStart(genesis.app_state.maintainers.mappables)
-      _ <- insertAssetsOnStart(genesis.app_state.assets.mappables)
-      _ <- insertIdentitiesOnStart(genesis.app_state.identities.mappables)
-      _ <- insertSplitsOnStart(genesis.app_state.splits.mappables)
-      _ <- insertOrdersOnStart(genesis.app_state.orders.mappables)
+      _ <- if (genesis.app_state.classifications.isDefined) insertClassificationsOnStart(genesis.app_state.classifications.get.mappables) else Future()
+      _ <- if (genesis.app_state.maintainers.isDefined) insertMaintainersOnStart(genesis.app_state.maintainers.get.mappables) else Future()
+      _ <- if (genesis.app_state.assets.isDefined) insertAssetsOnStart(genesis.app_state.assets.get.mappables) else Future()
+      _ <- if (genesis.app_state.identities.isDefined) insertIdentitiesOnStart(genesis.app_state.identities.get.mappables) else Future()
+      _ <- if (genesis.app_state.splits.isDefined) insertSplitsOnStart(genesis.app_state.splits.get.mappables) else Future()
+      _ <- if (genesis.app_state.orders.isDefined) insertOrdersOnStart(genesis.app_state.orders.get.mappables) else Future()
     } yield ()
       ).recover {
       case baseException: BaseException => throw baseException
@@ -239,7 +239,7 @@ class Startup @Inject()(
     }
   }
 
-  private def insertParametersOnStart(parameters: Parameter*) = {
+  private def insertParametersOnStart(parameters: Seq[Parameter]) = {
     utilitiesOperations.traverse(parameters)(parameter => {
       val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 

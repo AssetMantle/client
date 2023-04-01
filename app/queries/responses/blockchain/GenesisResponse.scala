@@ -260,7 +260,7 @@ object GenesisResponse {
     implicit val govReads: Reads[Module] = Json.reads[Module]
   }
 
-  case class AppState(assets: Asset.Module, auth: Auth.Module, authz: Authz.Module, bank: Bank.Module, distribution: Distribution.Module, classifications: Classification.Module, feegrant: FeeGrant.Module, genutil: GenUtil, gov: Gov.Module, identities: Identity.Module, maintainers: Maintainer.Module, metas: Meta.Module, mint: Mint.Module, orders: Order.Module, slashing: Slashing.Module, splits: Split.Module, staking: Staking.Module)
+  case class AppState(assets: Option[Asset.Module], auth: Auth.Module, authz: Authz.Module, bank: Bank.Module, distribution: Distribution.Module, classifications: Option[Classification.Module], feegrant: FeeGrant.Module, genutil: GenUtil, gov: Gov.Module, identities: Option[Identity.Module], maintainers: Option[Maintainer.Module], metas: Option[Meta.Module], mint: Mint.Module, orders: Option[Order.Module], slashing: Slashing.Module, splits: Option[Split.Module], staking: Staking.Module)
 
   implicit val appStateReads: Reads[AppState] = Json.reads[AppState]
 
