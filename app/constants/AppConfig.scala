@@ -27,4 +27,9 @@ object AppConfig {
 
   val AppVersion: String = configuration.get[String]("webApp.version")
 
+  object Telegram {
+    val BotToken: String = configuration.get[String]("telegram.botToken")
+    val ChatId: String = configuration.get[String]("telegram.chatId")
+  }
+
 }
