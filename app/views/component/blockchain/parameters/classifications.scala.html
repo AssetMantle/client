@@ -1,0 +1,25 @@
+@import views.html.base.cards._
+@import models.common.Parameters.ClassificationParameter
+
+@(classificationParameter: ClassificationParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.CLASSIFICATIONS_PARAMETER) {
+} {
+    @commonTable(id = "classificationsParameters", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BOND_RATE):</div>
+                    <div class="tableFieldValue">@classificationParameter.bondRate<div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MAX_PROPERTY):</div>
+                    <div class="tableFieldValue">@classificationParameter.maxPropertyCount</div>
+                </div>
+            </td>
+        </tr>
+    }
+}

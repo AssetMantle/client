@@ -34,6 +34,7 @@ class ComponentViewController @Inject()(
                                          blockchainTransactions: blockchain.Transactions,
                                          blockchainTokens: blockchain.Tokens,
                                          blockchainProposals: blockchain.Proposals,
+                                         blockchainParameters: blockchain.Parameters,
                                          blockchainProposalDeposits: blockchain.ProposalDeposits,
                                          blockchainProposalVotes: blockchain.ProposalVotes,
                                          blockchainValidators: blockchain.Validators,
@@ -104,6 +105,17 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         Future(Ok(views.html.component.blockchain.block.block(height)))
+    }
+  }
+
+  def parameters: EssentialAction = cached.apply(req => req.path, 3600) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val parameters = blockchainParameters.Service.getAll
+
+        for {
+          parameters <- parameters
+        } yield Ok(views.html.component.blockchain.parameters.paramaters(parameters))
     }
   }
 

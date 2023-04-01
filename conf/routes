@@ -20,6 +20,7 @@ GET        /validators                                     controllers.ViewContr
 GET        /validators/:address                            controllers.ViewController.validator(address: String)
 GET        /proposals                                      controllers.ViewController.proposals()
 GET        /proposals/:proposalID                          controllers.ViewController.proposal(proposalID: Int)
+GET        /parameters                                     controllers.ViewController.parameters()
 
 GET        /component/transactionList                      controllers.ComponentViewController.transactionList
 GET        /component/transactionListPage                  controllers.ComponentViewController.transactionListPage(pageNumber: Int)
@@ -69,3 +70,5 @@ GET        /component/validatorUptime                      controllers.Component
 GET        /component/validatorDelegations                 controllers.ComponentViewController.validatorDelegations(address: String)
 GET        /component/validatorTransactions                controllers.ComponentViewController.validatorTransactions(address: String)
 GET        /component/validatorTransactionsPerPage         controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
+
+GET        /component/parameters                           controllers.ComponentViewController.parameters

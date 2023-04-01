@@ -34,6 +34,9 @@ window.addEventListener('popstate', e => {
         case "document":
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.document(lastPart));
             break;
+        case "parameters":
+            componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.parameters());
+            break;
         default:
             componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard());
             break;

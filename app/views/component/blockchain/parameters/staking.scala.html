@@ -1,0 +1,46 @@
+@import views.html.base.cards._
+@import models.common.Parameters.StakingParameter
+
+@(stakingParameter: StakingParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.STAKING_PARAMETERS) {
+} {
+    @commonTable(id = "stakingParameter", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.UNBONDING_TIME):</div>
+                    <div class="tableFieldValue">@(stakingParameter.unbondingTime / 86400) days</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.HISTORICAL_ENTRIES):</div>
+                    <div class="tableFieldValue">@stakingParameter.historicalEntries</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MAX_ENTRIES):</div>
+                    <div class="tableFieldValue">@stakingParameter.maxEntries</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MAX_VALIDATORS):</div>
+                    <div class="tableFieldValue">@stakingParameter.maxValidators</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BOND_DENOM):</div>
+                    <div class="tableFieldValue">@stakingParameter.bondDenom</div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    }
+}

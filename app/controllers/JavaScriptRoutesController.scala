@@ -67,6 +67,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.validatorTransactions,
           routes.javascript.ComponentViewController.validatorTransactionsPerPage,
 
+          routes.javascript.ComponentViewController.parameters,
+
           routes.javascript.IndexController.search,
 
           routes.javascript.NotificationController.recentActivityMessages,
@@ -81,6 +83,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.proposals,
           routes.javascript.ViewController.wallet,
           routes.javascript.ViewController.document,
+          routes.javascript.ViewController.parameters,
 
         )
       ).as("text/javascript")
