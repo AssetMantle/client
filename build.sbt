@@ -48,9 +48,9 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.0",
-  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.8.0",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.8.0",
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.7.0",
+  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.7.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.7.0",
   "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "5.0.0"
 )
 
