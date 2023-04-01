@@ -221,7 +221,9 @@ class Startup @Inject()(
         bondedAmount = if (x.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
         notBondedAmount = if (x.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
         communityPool = communityPoolResponse.pool.find(_.denom == x.denom).fold(MicroNumber.zero)(_.amount),
-        inflation = if (x.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
+        inflation = if (x.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0),
+        totalLocked = MicroNumber.zero,
+        totalBurnt = MicroNumber.zero
       )))
     }
 

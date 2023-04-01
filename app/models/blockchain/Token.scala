@@ -4,8 +4,7 @@ import exceptions.BaseException
 import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
@@ -18,7 +17,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Token(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Token(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal, totalLocked: MicroNumber, totalBurnt: MicroNumber, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
 
 @Singleton
 class Tokens @Inject()(
@@ -42,11 +41,11 @@ class Tokens @Inject()(
 
   private[models] val tokenTable = TableQuery[TokenTable]
 
-  case class TokenSerialized(denom: String, totalSupply: BigDecimal, bondedAmount: BigDecimal, notBondedAmount: BigDecimal, communityPool: BigDecimal, inflation: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Token = Token(denom = denom, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class TokenSerialized(denom: String, totalSupply: BigDecimal, bondedAmount: BigDecimal, notBondedAmount: BigDecimal, communityPool: BigDecimal, inflation: BigDecimal, totalLocked: BigDecimal, totalBurnt: BigDecimal, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
+    def deserialize: Token = Token(denom = denom, totalSupply = new MicroNumber(totalSupply), bondedAmount = new MicroNumber(bondedAmount), notBondedAmount = new MicroNumber(notBondedAmount), communityPool = new MicroNumber(communityPool), inflation = inflation, totalLocked = new MicroNumber(totalLocked), totalBurnt = new MicroNumber(totalBurnt), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
   }
 
-  def serialize(token: Token): TokenSerialized = TokenSerialized(denom = token.denom, totalSupply = token.totalSupply.toBigDecimal, bondedAmount = token.bondedAmount.toBigDecimal, notBondedAmount = token.notBondedAmount.toBigDecimal, communityPool = token.communityPool.toBigDecimal, inflation = token.inflation, createdBy = token.createdBy, createdOnMillisEpoch = token.createdOnMillisEpoch, updatedBy = token.updatedBy, updatedOnMillisEpoch = token.updatedOnMillisEpoch)
+  def serialize(token: Token): TokenSerialized = TokenSerialized(denom = token.denom, totalSupply = token.totalSupply.toBigDecimal, bondedAmount = token.bondedAmount.toBigDecimal, notBondedAmount = token.notBondedAmount.toBigDecimal, communityPool = token.communityPool.toBigDecimal, inflation = token.inflation, totalLocked = token.totalLocked.toBigDecimal, totalBurnt = token.totalBurnt.toBigDecimal, createdBy = token.createdBy, createdOnMillisEpoch = token.createdOnMillisEpoch, updatedBy = token.updatedBy, updatedOnMillisEpoch = token.updatedOnMillisEpoch)
 
   private def add(token: Token): Future[String] = db.run((tokenTable returning tokenTable.map(_.denom) += serialize(token)).asTry).map {
     case Success(result) => result
@@ -87,7 +86,7 @@ class Tokens @Inject()(
     }
   }
 
-  private def updateBydenom(token: Token): Future[Int] = db.run(tokenTable.filter(_.denom === token.denom).update(serialize(token)).asTry).map {
+  private def updateExceptBurnAndLock(denom: String, totalSupply: BigDecimal, bondedAmount: BigDecimal, notBondedAmount: BigDecimal, communityPool: BigDecimal, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.bondedAmount, x.notBondedAmount, x.communityPool, x.inflation)).update((totalSupply, bondedAmount, notBondedAmount, communityPool, inflation)).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
@@ -107,7 +106,7 @@ class Tokens @Inject()(
     }
   }
 
-  private def updateTotalSupplyAndInflationByDenom(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.inflation)).update((totalSupply.toBigDecimal, inflation)).asTry).map {
+  private def updateTotalLockedByDenom(denom: String, totalLocked: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(_.totalLocked).update(totalLocked).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case _ => result
@@ -117,9 +116,20 @@ class Tokens @Inject()(
     }
   }
 
+  private def updateTotalBurntByDenom(denom: String, totalBurnt: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(_.totalBurnt).update(totalBurnt).asTry).map {
+    case Success(result) => result match {
+      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case _ => result
+    }
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.CRYPTO_TOKEN_UPDATE_FAILED, noSuchElementException)
+    }
+  }
+
+
   private[models] class TokenTable(tag: Tag) extends Table[TokenSerialized](tag, "Token") {
 
-    def * = (denom, totalSupply, bondedAmount, notBondedAmount, communityPool, inflation, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TokenSerialized.tupled, TokenSerialized.unapply)
+    def * = (denom, totalSupply, bondedAmount, notBondedAmount, communityPool, inflation, totalLocked, totalBurnt, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TokenSerialized.tupled, TokenSerialized.unapply)
 
     def denom = column[String]("denom", O.PrimaryKey)
 
@@ -133,6 +143,10 @@ class Tokens @Inject()(
 
     def inflation = column[BigDecimal]("inflation")
 
+    def totalLocked = column[BigDecimal]("totalLocked")
+
+    def totalBurnt = column[BigDecimal]("totalBurnt")
+
     def createdBy = column[String]("createdBy")
 
     def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
@@ -144,8 +158,6 @@ class Tokens @Inject()(
 
   object Service {
 
-    def create(token: Token): Future[String] = add(token)
-
     def get(denom: String): Future[Token] = findByDenom(denom).map(_.deserialize)
 
     def getAll: Future[Seq[Token]] = getAllTokens.map(_.map(_.deserialize))
@@ -156,11 +168,42 @@ class Tokens @Inject()(
 
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
-    def insertOrUpdate(token: Token): Future[Int] = upsert(token)
+    def updateOnNewBlock(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal): Future[Int] = updateExceptBurnAndLock(denom = denom, totalSupply = totalSupply.toBigDecimal, bondedAmount = bondedAmount.toBigDecimal, notBondedAmount = notBondedAmount.toBigDecimal, communityPool = communityPool.toBigDecimal, inflation = inflation)
 
     def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 
-    def updateTotalSupplyAndInflation(denom: String, totalSupply: MicroNumber, inflation: BigDecimal): Future[Int] = updateTotalSupplyAndInflationByDenom(denom = denom, totalSupply = totalSupply, inflation = inflation)
+    def addTotalLocked(denom: String, locked: MicroNumber): Future[Int] = {
+      val token = get(denom)
+
+      def update(token: Token) = updateTotalLockedByDenom(denom = denom, totalLocked = (token.totalLocked + locked).toBigDecimal)
+
+      for {
+        token <- token
+        result <- update(token)
+      } yield result
+    }
+
+    def subtractTotalLocked(denom: String, locked: MicroNumber): Future[Int] = {
+      val token = get(denom)
+
+      def update(token: Token) = updateTotalLockedByDenom(denom = denom, totalLocked = (token.totalLocked - locked).toBigDecimal)
+
+      for {
+        token <- token
+        result <- update(token)
+      } yield result
+    }
+
+    def addTotalBurnt(denom: String, burnt: MicroNumber): Future[Int] = {
+      val token = get(denom)
+
+      def update(token: Token) = updateTotalBurntByDenom(denom = denom, totalBurnt = (token.totalBurnt + burnt).toBigDecimal)
+
+      for {
+        token <- token
+        result <- update(token)
+      } yield result
+    }
 
     def getTotalBondedAmount: Future[MicroNumber] = getTotalBondedTokenAmount.map(x => new MicroNumber(x))
   }
@@ -188,12 +231,14 @@ class Tokens @Inject()(
       val communityPoolResponse = getCommunityPool.Service.get
 
       def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.supply) { token =>
-        Service.insertOrUpdate(Token(denom = token.denom, totalSupply = token.amount,
+        Service.updateOnNewBlock(
+          denom = token.denom,
+          totalSupply = token.amount,
           bondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
           notBondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
           communityPool = communityPoolResponse.pool.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
           inflation = if (token.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
-        ))
+        )
       }
 
       (for {
