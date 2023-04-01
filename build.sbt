@@ -27,15 +27,13 @@ libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.1.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "5.1.0",
-  "org.postgresql" % "postgresql" % "42.5.3"
+  "org.postgresql" % "postgresql" % "42.5.4"
 )
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
   "com.typesafe.play" %% "play-mailer-guice" % "8.0.1"
 )
-
-libraryDependencies += "com.twilio.sdk" % "twilio" % "9.2.3"
 
 libraryDependencies ++= Seq(
   "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.0" % "test",
@@ -50,21 +48,21 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.7.0",
-  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.7.0",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.7.0",
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.0",
+  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.8.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.8.0",
   "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % "5.0.0"
 )
 
 libraryDependencies ++= Seq(
   "org.bouncycastle" % "bcpg-jdk15on" % "1.70",
-  "org.scodec" %% "scodec-bits" % "1.1.35",
-  "org.scorexfoundation" %% "scrypto" % "2.2.1",
+  "org.scodec" %% "scodec-bits" % "1.1.37",
+  "org.scorexfoundation" %% "scrypto" % "2.3.0",
   "org.bitcoinj" % "bitcoinj-core" % "0.16.2"
 )
 
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
 
-libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.22.0"
+libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.22.2"
 
 libraryDependencies += "com.typesafe" % "config" % "1.4.2"
