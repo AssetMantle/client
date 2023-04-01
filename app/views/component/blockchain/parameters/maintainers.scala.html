@@ -1,0 +1,26 @@
+@import views.html.base.cards._
+@import models.common.Parameters.MaintainerParameter
+@import views.html.base.commonIcon
+
+@(maintainerParameter: MaintainerParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.MAINTAINERS_PARAMETER) {
+} {
+    @commonTable(id = "maintainersParameters", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.DEPTUZIE_ALLOWED):</div>
+                    <div class="tableFieldValue">
+                    @if(maintainerParameter.deputizeAllowed) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}

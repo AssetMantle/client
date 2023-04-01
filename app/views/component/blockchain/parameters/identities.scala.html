@@ -1,0 +1,19 @@
+@import views.html.base.cards._
+@import models.common.Parameters.IdentityParameter
+
+@(identityParameter: IdentityParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.IDENTITIES_PARAMETER) {
+} {
+    @commonTable(id = "identitiesParameters", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MAX_PROVISIONED_ADDRESSES):</div>
+                    <div class="tableFieldValue">@identityParameter.maxProvisionAddressCount<div>
+                </div>
+            </td>
+        </tr>
+    }
+}

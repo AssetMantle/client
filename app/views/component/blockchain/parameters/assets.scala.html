@@ -1,0 +1,50 @@
+@import views.html.base.cards._
+@import models.common.Parameters.AssetParameter
+@import views.html.base.commonIcon
+
+@(assetParameter: AssetParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.ASSETS_PARAMETER) {
+} {
+    @commonTable(id = "assetsParameters", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.MINT_ASSET):</div>
+                    <div class="tableFieldValue">
+                    @if(assetParameter.mintEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BURN_ASSET):</div>
+                    <div class="tableFieldValue">
+                    @if(assetParameter.burnEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.RENUMERATE_ASSET):</div>
+                    <div class="tableFieldValue">
+                    @if(assetParameter.renumerateEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}

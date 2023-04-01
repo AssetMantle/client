@@ -1,0 +1,11 @@
+@import controllers.actions.LoginState
+@import constants.AppConfig.OtherApp
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, otherApps: Seq[OtherApp], loginState: LoginState = null)
+
+@views.html.index(Option(constants.View.PARAMETERS))
+<script>
+        componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.parameters())
+</script>
+
+

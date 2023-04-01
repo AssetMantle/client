@@ -1,0 +1,96 @@
+@import models.blockchain.Parameter
+@import models.common.Parameters._
+@import views.html.component.blockchain.parameters._
+
+@(parameters: Seq[Parameter])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<div class="cmuk-container cmuk-margin-bottom">
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="mintingParameters" class="tableViewCard tableCard tableGridLayout">
+            @minting(parameters.find(_.parameterType == constants.Blockchain.ParameterType.MINT).get.value.asInstanceOf[MintingParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="stakingParameters" class="tableViewCard tableCard tableGridLayout">
+            @staking(parameters.find(_.parameterType == constants.Blockchain.ParameterType.STAKING).get.value.asInstanceOf[StakingParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="governanceParameters" class="tableViewCard tableCard tableGridLayout">
+            @governance(parameters.find(_.parameterType == constants.Blockchain.ParameterType.GOVERNANCE).get.value.asInstanceOf[GovernanceParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="distributionParameters" class="tableViewCard tableCard tableGridLayout">
+            @distribution(parameters.find(_.parameterType == constants.Blockchain.ParameterType.DISTRIBUTION).get.value.asInstanceOf[DistributionParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="slashingParameters" class="tableViewCard tableCard tableGridLayout">
+            @slashing(parameters.find(_.parameterType == constants.Blockchain.ParameterType.SLASHING).get.value.asInstanceOf[SlashingParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="assetsParameters" class="tableViewCard tableCard tableGridLayout">
+            @assets(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ASSETS).get.value.asInstanceOf[AssetParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="classificationsParameters" class="tableViewCard tableCard tableGridLayout">
+            @classifications(parameters.find(_.parameterType == constants.Blockchain.ParameterType.CLASSIFICATIONS).get.value.asInstanceOf[ClassificationParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="identitiesParameters" class="tableViewCard tableCard tableGridLayout">
+            @identities(parameters.find(_.parameterType == constants.Blockchain.ParameterType.IDENTITIES).get.value.asInstanceOf[IdentityParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="maintainersParameters" class="tableViewCard tableCard tableGridLayout">
+            @maintainers(parameters.find(_.parameterType == constants.Blockchain.ParameterType.MAINTAINERS).get.value.asInstanceOf[MaintainerParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="metasParameters" class="tableViewCard tableCard tableGridLayout">
+            @metas(parameters.find(_.parameterType == constants.Blockchain.ParameterType.METAS).get.value.asInstanceOf[MetaParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="ordersParameters" class="tableViewCard tableCard tableGridLayout">
+            @orders(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ORDERS).get.value.asInstanceOf[OrderParameter])
+            </div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="splitsParameters" class="tableViewCard tableCard tableGridLayout">
+            @splits(parameters.find(_.parameterType == constants.Blockchain.ParameterType.SPLITS).get.value.asInstanceOf[SplitParameter])
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        checkAndPushState(jsRoutes.controllers.ViewController.parameters().url, "", "parameters");
+</script>

@@ -1,0 +1,19 @@
+@import views.html.base.cards._
+@import models.common.Parameters.SplitParameter
+
+@(splitParameter: SplitParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.SPLITS_PARAMETER) {
+} {
+    @commonTable(id = "splitsParameters", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.WRAPPING_ALLOWED_DENOMS):</div>
+                    <div class="tableFieldValue">@splitParameter.wrapAllowedCoins.mkString(", ")<div>
+                </div>
+            </td>
+        </tr>
+    }
+}

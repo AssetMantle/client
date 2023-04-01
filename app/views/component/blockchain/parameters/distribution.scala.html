@@ -1,0 +1,46 @@
+@import models.common.Parameters.DistributionParameter
+@import views.html.base.cards._
+@import views.html.base.commonIcon
+
+@(distributionParameter: DistributionParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.DISTRIBUTION_PARAMETERS) {
+} {
+    @commonTable(id = "distributionParameter", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BASE_PROPOSER_REWARD):</div>
+                    <div class="tableFieldValue">@(distributionParameter.baseProposerReward * 100) %</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.COMMUNITY_TAX):</div>
+                    <div class="tableFieldValue">@(distributionParameter.communityTax * 100) %</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BONUS_PROPOSER_REWARD):</div>
+                    <div class="tableFieldValue">@(distributionParameter.bonusProposerReward * 100) %</div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.WITHDRAW_ADDR_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(distributionParameter.withdrawAddrEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}

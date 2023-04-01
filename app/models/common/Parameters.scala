@@ -132,7 +132,6 @@ object Parameters {
 
   implicit val MetaParameterReads: Reads[MetaParameter] = Json.reads[MetaParameter]
 
-
   case class OrderParameter(maxOrderLife: Long) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.ORDERS
   }
