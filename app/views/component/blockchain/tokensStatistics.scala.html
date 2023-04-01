@@ -35,8 +35,8 @@
         <tr>
             <td>
                 <div class="tableField">
-                    <div class="tableFieldTitle">@Messages(constants.View.BONDED_AMOUNT)</div>
-                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.bondedAmount)</div>
+                    <div class="tableFieldTitle">@Messages(constants.View.LOCKED_AMOUNT)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.totalLocked)</div>
                 </div>
             </td>
         </tr>
@@ -45,6 +45,14 @@
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.TOTAL_SUPPLY)</div>
                     <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.totalSupply)</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.BURNED_AMOUNT)</div>
+                    <div id="latestBlockHeight_height" class="tableFieldValue">@utilities.NumericOperation.formatNumber(token.totalBurnt)</div>
                 </div>
             </td>
         </tr>

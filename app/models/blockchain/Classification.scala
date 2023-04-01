@@ -6,10 +6,13 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.NumberData
 import schema.document.Document
-import schema.id.base.{ClassificationID, HashID, IdentityID}
+import schema.id.base.{ClassificationID, HashID, IdentityID, PropertyID}
 import schema.list.PropertyList
+import schema.property.Property
+import schema.property.base.MetaProperty
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
+import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +28,13 @@ case class Classification(id: Array[Byte], idString: String, immutables: Array[B
   def getMutables: Mutables = Mutables(this.mutables)
 
   def getDocument: Document = Document(this.getID, this.getImmutables, this.getMutables)
+
+  def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
+
+  def getBondAmount: MicroNumber = {
+    val property = this.getProperty(constants.Blockchain.BondAmountProperty.getID)
+    MicroNumber(BigInt((if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes) else NumberData(0)).value))
+  }
 
 }
 
@@ -64,6 +74,7 @@ object Classifications {
 class Classifications @Inject()(
                                  blockchainMaintainers: Maintainers,
                                  blockchainBalances: Balances,
+                                 blockchainTokens: Tokens,
                                  blockchainParameters: models.blockchain.Parameters,
                                  protected val databaseConfigProvider: DatabaseConfigProvider
                                )(implicit override val executionContext: ExecutionContext)
@@ -158,14 +169,42 @@ class Classifications @Inject()(
       } yield ClassificationID(HashID(classificationIDBytes))
     }
 
-    def bondAuxiliary(address: String): Future[Unit] = {
-      blockchainBalances.Utility.insertOrUpdateBalance(address)
+    def bondAuxiliary(address: String, classificationID: ClassificationID): Future[Unit] = {
+      val addressBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
+      val classification = tryGetById(classificationID.getBytes)
+
+      def locked(classification: Classification) = blockchainTokens.Service.addTotalLocked(denom = constants.Blockchain.StakingDenom, locked = classification.getBondAmount)
+
+      for {
+        _ <- addressBalance
+        classification <- classification
+        _ <- locked(classification)
+      } yield ()
     }
 
-    def unbondAuxiliary(address: String): Future[Unit] = {
-      blockchainBalances.Utility.insertOrUpdateBalance(address)
+    def unbondAuxiliary(address: String, classificationID: ClassificationID): Future[Unit] = {
+      val addressBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
+      val classification = tryGetById(classificationID.getBytes)
+
+      def unlocked(classification: Classification) = blockchainTokens.Service.subtractTotalLocked(denom = constants.Blockchain.StakingDenom, locked = classification.getBondAmount)
+
+      for {
+        _ <- addressBalance
+        classification <- classification
+        _ <- unlocked(classification)
+      } yield ()
     }
 
+    def burnAuxiliary(classificationID: ClassificationID): Future[Unit] = {
+      val classification = tryGetById(classificationID.getBytes)
 
+      def burn(classification: Classification) = blockchainTokens.Service.addTotalBurnt(denom = constants.Blockchain.StakingDenom, burnt = classification.getBondAmount)
+
+      for {
+        classification <- classification
+        _ <- burn(classification)
+      } yield ()
+
+    }
   }
 }

@@ -288,6 +288,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Token"
     "notBondedAmount"      NUMERIC NOT NULL,
     "communityPool"        NUMERIC NOT NULL,
     "inflation"            NUMERIC NOT NULL,
+    "totalLocked"          NUMERIC NOT NULL,
+    "totalBurnt"           NUMERIC NOT NULL,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,

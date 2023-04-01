@@ -167,7 +167,7 @@ class Orders @Inject()(
       val order = Order(id = orderID.getBytes, idString = orderID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(order)
       val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = constants.Blockchain.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = DecData(msg.getMakerOwnableSplit).value.toBigDecimal)
-      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
 
       for {
         _ <- add
@@ -210,12 +210,19 @@ class Orders @Inject()(
 
       def transfer(order: Order) = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
 
-      def delete = Service.delete(orderID)
+      def updateUnbondAndDelete(order: Order) = {
+        val delete = Service.delete(order.getID)
+        val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom, order.getClassificationID)
+        for {
+          _ <- delete
+          _ <- unbond
+        } yield ()
+      }
 
       for {
         order <- order
         _ <- transfer(order)
-        _ <- delete
+        _ <- updateUnbondAndDelete(order)
       } yield msg.getFrom
     }
 
@@ -224,6 +231,7 @@ class Orders @Inject()(
       val order = Service.tryGet(orderID)
 
       def update(order: Order) = {
+        val burn = blockchainClassifications.Utility.burnAuxiliary(order.getClassificationID)
         var makerReceiveTakerOwnableSplit = AttoNumber(order.getMakerOwnableSplit).multiplyTruncate(AttoNumber(order.getExchangeRate)).multiplyTruncate(AttoNumber(constants.Blockchain.SmallestDec))
         var takerReceiveMakerOwnableSplit = AttoNumber(msg.getTakerOwnableSplit).quotientTruncate(AttoNumber(constants.Blockchain.SmallestDec)).quotientTruncate(AttoNumber(order.getExchangeRate))
 
@@ -245,6 +253,7 @@ class Orders @Inject()(
           _ <- updateOrDelete
           _ <- takerTransfer
           _ <- makerTransfer
+          _ <- burn
         } yield ()
       }
 

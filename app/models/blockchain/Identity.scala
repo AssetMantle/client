@@ -144,7 +144,7 @@ class Identities @Inject()(
       val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).propertyList))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
-      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
       val add = Service.add(identity)
 
       for {
@@ -195,11 +195,20 @@ class Identities @Inject()(
     }
 
     def onQuash(msg: com.identities.transactions.quash.Message): Future[String] = {
-      val delete = Service.delete(IdentityID(msg.getIdentityID))
-      val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom)
+      val identity = Service.tryGet(IdentityID(msg.getIdentityID))
+
+      def updateUnbondAndDelete(identity: Identity) = {
+        val delete = Service.delete(identity.getID)
+        val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom, identity.getClassificationID)
+        for {
+          _ <- delete
+          _ <- unbond
+        } yield ()
+      }
+
       for {
-        _ <- delete
-        _ <- unbond
+        identity <- identity
+        _ <- updateUnbondAndDelete(identity)
       } yield msg.getFrom
     }
 
