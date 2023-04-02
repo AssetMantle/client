@@ -31,10 +31,9 @@ case class PropertyList(propertyList: Seq[Property]) {
   def add(properties: Seq[Property]): PropertyList = {
     var updatedList = this.propertyList
     properties.foreach(x => {
-      val oldProperty = this.propertyList.find(_.getID.getBytes.sameElements(x.getID.getBytes))
-      if (oldProperty.isEmpty) {
-        updatedList = updatedList :+ x
-      }
+      val xBytes = x.getID.getBytes
+      val index = this.propertyList.indexWhere(_.getID.getBytes.sameElements(xBytes))
+      updatedList = if (index == -1) updatedList :+ x else updatedList.updated(index, x)
     })
     new PropertyList(propertyList = updatedList)
   }
@@ -42,10 +41,9 @@ case class PropertyList(propertyList: Seq[Property]) {
   def remove(properties: Seq[Property]): PropertyList = {
     var updatedList = this.propertyList
     properties.foreach(x => {
-      val oldProperty = this.propertyList.find(_.getID.getBytes.sameElements(x.getID.getBytes))
-      if (oldProperty.isDefined) {
-        updatedList = updatedList.filterNot(_.getID.getBytes.sameElements(x.getID.getBytes))
-      }
+      val xBytes = x.getID.getBytes
+      val index = this.propertyList.indexWhere(_.getID.getBytes.sameElements(xBytes))
+      if (index != -1) updatedList = updatedList.zipWithIndex.filter(_._2 != index).map(_._1)
     })
     new PropertyList(propertyList = updatedList)
   }
@@ -53,11 +51,9 @@ case class PropertyList(propertyList: Seq[Property]) {
   def mutate(properties: Seq[Property]): PropertyList = {
     var updatedList = this.propertyList
     properties.foreach(x => {
-      val oldProperty = this.propertyList.find(_.getID.getBytes.sameElements(x.getID.getBytes))
-      if (oldProperty.isDefined) {
-        updatedList = updatedList.filterNot(_.getID.getBytes.sameElements(oldProperty.get.getID.getBytes))
-        updatedList = updatedList :+ x
-      }
+      val xBytes = x.getID.getBytes
+      val index = this.propertyList.indexWhere(_.getID.getBytes.sameElements(xBytes))
+      if (index != -1) updatedList = updatedList.updated(index, x)
     })
     new PropertyList(updatedList)
   }
