@@ -40,55 +40,57 @@
             </div>
         </div>
     </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="assetsParameters" class="tableViewCard tableCard tableGridLayout">
-            @assets(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ASSETS).get.value.asInstanceOf[AssetParameter])
+    @if(parameters.find(_.parameterType == constants.Blockchain.ParameterType.METAS).isDefined) {
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="assetsParameters" class="tableViewCard tableCard tableGridLayout">
+                @assets(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ASSETS).get.value.asInstanceOf[AssetParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="classificationsParameters" class="tableViewCard tableCard tableGridLayout">
-            @classifications(parameters.find(_.parameterType == constants.Blockchain.ParameterType.CLASSIFICATIONS).get.value.asInstanceOf[ClassificationParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="classificationsParameters" class="tableViewCard tableCard tableGridLayout">
+                @classifications(parameters.find(_.parameterType == constants.Blockchain.ParameterType.CLASSIFICATIONS).get.value.asInstanceOf[ClassificationParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="identitiesParameters" class="tableViewCard tableCard tableGridLayout">
-            @identities(parameters.find(_.parameterType == constants.Blockchain.ParameterType.IDENTITIES).get.value.asInstanceOf[IdentityParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="identitiesParameters" class="tableViewCard tableCard tableGridLayout">
+                @identities(parameters.find(_.parameterType == constants.Blockchain.ParameterType.IDENTITIES).get.value.asInstanceOf[IdentityParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="maintainersParameters" class="tableViewCard tableCard tableGridLayout">
-            @maintainers(parameters.find(_.parameterType == constants.Blockchain.ParameterType.MAINTAINERS).get.value.asInstanceOf[MaintainerParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="maintainersParameters" class="tableViewCard tableCard tableGridLayout">
+                @maintainers(parameters.find(_.parameterType == constants.Blockchain.ParameterType.MAINTAINERS).get.value.asInstanceOf[MaintainerParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="metasParameters" class="tableViewCard tableCard tableGridLayout">
-            @metas(parameters.find(_.parameterType == constants.Blockchain.ParameterType.METAS).get.value.asInstanceOf[MetaParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="metasParameters" class="tableViewCard tableCard tableGridLayout">
+                @metas(parameters.find(_.parameterType == constants.Blockchain.ParameterType.METAS).get.value.asInstanceOf[MetaParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="ordersParameters" class="tableViewCard tableCard tableGridLayout">
-            @orders(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ORDERS).get.value.asInstanceOf[OrderParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="ordersParameters" class="tableViewCard tableCard tableGridLayout">
+                @orders(parameters.find(_.parameterType == constants.Blockchain.ParameterType.ORDERS).get.value.asInstanceOf[OrderParameter])
+                </div>
             </div>
         </div>
-    </div>
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="splitsParameters" class="tableViewCard tableCard tableGridLayout">
-            @splits(parameters.find(_.parameterType == constants.Blockchain.ParameterType.SPLITS).get.value.asInstanceOf[SplitParameter])
+        <div class="cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div id="splitsParameters" class="tableViewCard tableCard tableGridLayout">
+                @splits(parameters.find(_.parameterType == constants.Blockchain.ParameterType.SPLITS).get.value.asInstanceOf[SplitParameter])
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>
 
 <script>
