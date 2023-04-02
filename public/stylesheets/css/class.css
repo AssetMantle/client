@@ -4627,7 +4627,6 @@ figure .block:hover {
 
 #transactionMessages .cmuk-card-body .cmuk-card{
     height: auto;
-    margin: 0px;
     padding: 16px 0px 0 0;
     background-color:var(--card-color);
     border-radius: 10px;
