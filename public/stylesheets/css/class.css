@@ -4501,6 +4501,7 @@ figure .block:hover {
     line-height: 14px;
     color: var(--text-medium);
     margin-top:4px;
+    word-break: break-word;
 }
 
 #blockDetails .cmuk-card-body .productTable .tableFieldValue a,
@@ -4606,6 +4607,14 @@ figure .block:hover {
 
 #transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowValue{
     padding: 0px;
+}
+
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue.longText{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    cursor: pointer;
 }
 
 #transactionMessages .cmuk-card-body{
