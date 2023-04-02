@@ -442,7 +442,7 @@ body.darkMode .block {
     border-color: var(--darkmode-border);
 }
 
-body.darkMode .searchForm dl .cmuk-search-input {
+body.darkMode .searchForm .cmuk-search-input {
     background: var(--header-bg);
     border-color: var(--text-medium);
     color: var(--text-medium);
@@ -1567,13 +1567,13 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     display: none;
 }
 
-.comdex .searchForm dl .cmuk-search-input {
-    padding: 0 10px 0 40px;
+.comdex .searchForm .cmuk-search-input {
+    padding: 0 10px 0 40px !important;
     background: var(--dark-2);
     border: 1px solid var(--dark-2);
     border-radius: 0;
     height: 35px;
-    width: 450px;
+    width: 220px;
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px !important;
@@ -1581,12 +1581,12 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 }
 
-.comdex .searchForm dl .cmuk-search-input::placeholder {
+.comdex .searchForm .cmuk-search-input::placeholder {
     color: var(--text-medium);
     font-weight: 500;
 }
 
-.comdex .searchForm dl .cmuk-search-input:focus{
+.comdex .searchForm .cmuk-search-input:focus{
     border-color: var(--primary-color);
     color: var(--mantle-off-white);
 }
