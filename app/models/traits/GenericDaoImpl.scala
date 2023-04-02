@@ -121,6 +121,8 @@ abstract class GenericDaoImpl[
 
   def getAllByPageNumber[C1 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C1)(implicit ev: C1 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
 
+  def sortWithPagination[C1 <: Rep[_]](offset: Int, limit: Int)(sortExpr: T => C1)(implicit ev: C1 => Ordered): Future[Seq[E]] = db.run(tableQuery.sortBy(sortExpr).drop(offset).take(limit).result)
+
   def tryGetById(id: PK): Future[E] = db.run(tableQuery.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
