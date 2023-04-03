@@ -125,27 +125,35 @@ class Startup @Inject()(
   }
 
   private def insertAccountsOnStart(accounts: Seq[Account]): Future[Seq[Unit]] = {
-    utilitiesOperations.traverse(accounts) { account =>
-      val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(account.address)
-      (for {
-        _ <- upsertAccount
-      } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
+    val bcAccountsCount = Await.result(blockchainAccounts.Service.getTotalAccounts, Duration.Inf)
+    if (accounts.length < bcAccountsCount) {
+      val allAddresses = Await.result(blockchainAccounts.Service.getAllAddressess, Duration.Inf)
+      utilitiesOperations.traverse(accounts.map(_.address).diff(allAddresses)) { address =>
+        val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(address)
+        (for {
+          _ <- upsertAccount
+        } yield ()
+          ).recover {
+          case baseException: BaseException => throw baseException
+        }
       }
-    }
+    } else Future(Seq())
   }
 
   private def insertBalancesOnStart(balances: Seq[BankBalance]): Future[Seq[Unit]] = {
-    utilitiesOperations.traverse(balances) { balance =>
-      val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(balance.address)
-      (for {
-        _ <- upsertAccount
-      } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
+    val bcAccountsCount = Await.result(blockchainBalances.Service.getTotalAccounts, Duration.Inf)
+    if (balances.length < bcAccountsCount) {
+      val allAddresses = Await.result(blockchainBalances.Service.getAllAddressess, Duration.Inf)
+      utilitiesOperations.traverse(balances.map(_.address).diff(allAddresses)) { address =>
+        val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(address)
+        (for {
+          _ <- upsertAccount
+        } yield ()
+          ).recover {
+          case baseException: BaseException => throw baseException
+        }
       }
-    }
+    } else Future(Seq())
   }
 
   private def updateStakingOnStart(staking: Staking.Module): Future[Unit] = {
@@ -372,7 +380,10 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    } else utilities.Scheduler.shutdownThread()
+    } else {
+      logger.error("Received signal to shut down")
+      utilities.Scheduler.shutdownThread()
+    }
   }
 
   //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
