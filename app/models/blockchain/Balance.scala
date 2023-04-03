@@ -8,9 +8,9 @@ import exceptions.BaseException
 import models.common.Serializable.Coin
 import models.traits.Logging
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetBalance
 import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
 import queries.responses.common.Header
@@ -74,6 +74,8 @@ class Balances @Inject()(
 
   private def getTotalAccountNumber: Future[Int] = db.run(balanceTable.length.result)
 
+  private def fetchAllAddresses: Future[Seq[String]] = db.run(balanceTable.map(_.address).result)
+
   private def getListByAddress(addresses: Seq[String]): Future[Seq[BalanceSerialized]] = db.run(balanceTable.filter(_.address.inSet(addresses)).result)
 
   private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance") {
@@ -106,6 +108,8 @@ class Balances @Inject()(
     def getList(addresses: Seq[String]): Future[Seq[Balance]] = getListByAddress(addresses).map(_.map(_.deserialize))
 
     def getTotalAccounts: Future[Int] = getTotalAccountNumber
+
+    def getAllAddressess: Future[Seq[String]] = fetchAllAddresses
   }
 
   object Utility {

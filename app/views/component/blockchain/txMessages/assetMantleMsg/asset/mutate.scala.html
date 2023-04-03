@@ -9,7 +9,7 @@
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonHtmlInfo(constants.View.ASSET_ID, commonJavascriptLink(AssetID(msg.getAssetID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${AssetID(msg.getAssetID).asString}'))")))
-@Messages(constants.View.MUTABLE_META_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
 @metaProperties(msg.getMutableMetaProperties)
-@Messages(constants.View.MUTABLE_MESA_PROPERTIES):
+<span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
 @mesaProperties(msg.getMutableProperties)

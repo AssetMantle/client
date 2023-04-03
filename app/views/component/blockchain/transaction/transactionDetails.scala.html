@@ -77,7 +77,7 @@
                 <td>
                     <div class="tableField">
                         <div class="tableFieldTitle">@Messages(constants.View.LOG)</div>
-                        <div class="tableFieldValue">@transaction.log</div>
+                        <div class="tableFieldValue longText">@transaction.log</div>
                     </div>
                 </td>
             </tr>
@@ -95,3 +95,4 @@
 <script>
         convertUTCDateToLocalDate("@block.time.toString", "transactionDetail_time")
 </script>
+<script src="@routes.Assets.versioned("javascripts/textShorter.js")" type="text/javascript"></script>

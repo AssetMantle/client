@@ -69,6 +69,8 @@ class Accounts @Inject()(
 
   private def getTotalAccountNumber: Future[Int] = db.run(accountTable.length.result)
 
+  private def fetchAllAddresses: Future[Seq[String]] = db.run(accountTable.map(_.address).result)
+
   private def getByAddress(address: String): Future[Option[AccountSerialized]] = db.run(accountTable.filter(_.address === address).result.headOption)
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") {
@@ -106,6 +108,8 @@ class Accounts @Inject()(
     def get(address: String): Future[Option[Account]] = getByAddress(address).map(_.map(_.deserialize))
 
     def getTotalAccounts: Future[Int] = getTotalAccountNumber
+
+    def getAllAddressess: Future[Seq[String]] = fetchAllAddresses
 
   }
 

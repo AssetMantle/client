@@ -19,12 +19,18 @@ object JSON {
         case JsSuccess(value: T, _: JsPath) => value
         case jsError: JsError =>
           val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
-          logger.error(response.json.toString())
-          throw new BaseException(new Failure(error))
+          logger.error(error)
+          throw new BaseException(new Failure(response.json.toString()))
       }
     }.recover {
-      case jsonParseException: JsonParseException => throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION, jsonParseException)
-      case jsonMappingException: JsonMappingException => throw new BaseException(constants.Response.NO_RESPONSE, jsonMappingException)
+      case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
+      case jsonMappingException: JsonMappingException => constants.Response.NO_RESPONSE.throwBaseException(jsonMappingException)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case baseException: BaseException => throw baseException
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
 
@@ -35,16 +41,19 @@ object JSON {
         case errors: JsError =>
           logger.error(errors.errors.map(_.toString()).mkString(", "))
           logger.error(jsonString)
-          throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+        constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(constants.Response.JSON_MAPPING_EXCEPTION)
+        constants.Response.NO_RESPONSE.throwBaseException(jsonMappingException)
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case baseException: BaseException => throw baseException
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
 }

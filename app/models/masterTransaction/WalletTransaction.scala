@@ -103,23 +103,23 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
           stdMsg.getTypeUrl match {
             //auth
             case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => val msg = VestingTx.MsgCreateVestingAccount.parseFrom(stdMsg.getValue)
-              Seq(msg.getFromAddress, msg.getToAddress)
+              Seq(msg.getFromAddress, msg.getToAddress).distinct
             //authz
             case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => val msg = authzTx.MsgGrant.parseFrom(stdMsg.getValue)
-              Seq(msg.getGranter, msg.getGrantee)
+              Seq(msg.getGranter, msg.getGrantee).distinct
             case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => val msg = authzTx.MsgRevoke.parseFrom(stdMsg.getValue)
-              Seq(msg.getGranter, msg.getGrantee)
+              Seq(msg.getGranter, msg.getGrantee).distinct
             case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => Seq(authzTx.MsgExec.parseFrom(stdMsg.getValue).getGrantee)
             //bank
             case constants.Blockchain.TransactionMessage.SEND_COIN => val msg = bankTx.MsgSend.parseFrom(stdMsg.getValue)
-              Seq(msg.getFromAddress, msg.getToAddress)
+              Seq(msg.getFromAddress, msg.getToAddress).distinct
             case constants.Blockchain.TransactionMessage.MULTI_SEND => val msg = bankTx.MsgMultiSend.parseFrom(stdMsg.getValue)
               (msg.getInputsList.asScala.toSeq.map(_.getAddress) ++ msg.getOutputsList.asScala.toSeq.map(_.getAddress)).distinct
             //crisis
             case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => Seq(crisisTx.MsgVerifyInvariant.parseFrom(stdMsg.getValue).getSender)
             //distribution
             case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => val msg = distributionTx.MsgSetWithdrawAddress.parseFrom(stdMsg.getValue)
-              Seq(msg.getWithdrawAddress, msg.getDelegatorAddress)
+              Seq(msg.getWithdrawAddress, msg.getDelegatorAddress).distinct
             case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => Seq(distributionTx.MsgWithdrawDelegatorReward.parseFrom(stdMsg.getValue).getDelegatorAddress)
             case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => Seq(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress)
             case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => Seq(distributionTx.MsgFundCommunityPool.parseFrom(stdMsg.getValue).getDepositor)
@@ -127,9 +127,9 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
             case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Seq(evidenceTx.MsgSubmitEvidence.parseFrom(stdMsg.getValue).getSubmitter)
             //feeGrant
             case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => val msg = feegrantTx.MsgGrantAllowance.parseFrom(stdMsg.getValue)
-              Seq(msg.getGranter, msg.getGranter)
+              Seq(msg.getGranter, msg.getGranter).distinct
             case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => val msg = feegrantTx.MsgRevokeAllowance.parseFrom(stdMsg.getValue)
-              Seq(msg.getGranter, msg.getGranter)
+              Seq(msg.getGranter, msg.getGranter).distinct
             //gov
             case constants.Blockchain.TransactionMessage.DEPOSIT => Seq(govTx.MsgDeposit.parseFrom(stdMsg.getValue).getDepositor)
             case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => Seq(govTx.MsgSubmitProposal.parseFrom(stdMsg.getValue).getProposer)
@@ -159,7 +159,7 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
             case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => Seq(channelTx.MsgChannelCloseInit.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => Seq(channelTx.MsgChannelCloseConfirm.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.RECV_PACKET => val msg = channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue)
-              Seq(msg.getSigner, com.ibc.applications.transfer.v2.FungibleTokenPacketData.parseFrom(msg.getPacket.getData.toByteArray).getReceiver)
+              Seq(msg.getSigner, com.ibc.applications.transfer.v2.FungibleTokenPacketData.parseFrom(msg.getPacket.getData.toByteArray).getReceiver).distinct
             case constants.Blockchain.TransactionMessage.TIMEOUT => Seq(channelTx.MsgTimeout.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => Seq(channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue).getSigner)
             case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => Seq(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue).getSigner)
@@ -177,15 +177,15 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
             case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => Seq(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => Seq(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => val msg = identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue)
-              Seq(msg.getFrom, msg.getTo)
+              Seq(msg.getFrom, msg.getTo).distinct
             case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => Seq(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_NUB => Seq(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => val msg = identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue)
-              Seq(msg.getFrom, msg.getTo)
+              Seq(msg.getFrom, msg.getTo).distinct
             case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => Seq(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => Seq(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => val msg = identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue)
-              Seq(msg.getFrom, msg.getTo)
+              Seq(msg.getFrom, msg.getTo).distinct
             //orders
             case constants.Blockchain.TransactionMessage.ORDER_CANCEL => Seq(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
             case constants.Blockchain.TransactionMessage.ORDER_DEFINE => Seq(ordersTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
