@@ -2,6 +2,7 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
+import constants.Response.Failure
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
@@ -18,8 +19,9 @@ object JSON {
         case JsSuccess(value: T, _: JsPath) => value
         case jsError: JsError =>
           val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
+          logger.error(error)
           logger.error(response.json.toString())
-          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+          throw new BaseException(new Failure(response.json.toString()))
       }
     }.recover {
       case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
