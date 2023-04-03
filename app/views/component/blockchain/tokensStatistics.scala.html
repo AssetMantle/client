@@ -4,7 +4,7 @@
 
 @(token: Token, tokenTickers: Seq[constants.AppConfig.TokenTicker])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@commonCard(constants.View.TOKEN) {
+@commonCard(constants.View.TOKEN_DETAILS) {
 } {
     @commonTable(id = Seq("tokenStatistics", token.denom).mkString("_"), tableType = "cmuk-table-divider") {
     } {
