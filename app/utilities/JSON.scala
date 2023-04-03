@@ -23,8 +23,13 @@ object JSON {
           throw new BaseException(new Failure(error))
       }
     }.recover {
-      case jsonParseException: JsonParseException => throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION, jsonParseException)
-      case jsonMappingException: JsonMappingException => throw new BaseException(constants.Response.NO_RESPONSE, jsonMappingException)
+      case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
+      case jsonMappingException: JsonMappingException => constants.Response.NO_RESPONSE.throwBaseException(jsonMappingException)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 
@@ -39,12 +44,14 @@ object JSON {
       }
     } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+        constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
       case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(constants.Response.JSON_MAPPING_EXCEPTION)
+        constants.Response.NO_RESPONSE.throwBaseException(jsonMappingException)
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 }
