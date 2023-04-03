@@ -375,6 +375,7 @@ object View {
   val REVEAL_ENABLED = "REVEAL_ENABLED"
   val MAX_ORDER_LIFE = "MAX_ORDER_LIFE"
   val WRAPPING_ALLOWED_DENOMS = "WRAPPING_ALLOWED_DENOMS"
+  val TOKEN_DETAILS = "TOKEN_DETAILS"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
