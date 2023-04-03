@@ -4,8 +4,7 @@ import exceptions.BaseException
 import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetValidatorDelegatorDelegation
 import slick.jdbc.JdbcProfile
 
@@ -34,7 +33,7 @@ class Delegations @Inject()(
 
   private[models] val delegationTable = TableQuery[DelegationTable]
 
-  private val responseErrorDelegationNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.delegationNotFound")
+  private val notFoundRegex = """delegation.with.delegator.*not.found.for.validator.*""".r
 
   private def add(delegation: Delegation): Future[String] = db.run((delegationTable returning delegationTable.map(_.delegatorAddress) += delegation).asTry).map {
     case Success(result) => result
@@ -122,7 +121,7 @@ class Delegations @Inject()(
         _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
         // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
-        case baseException: BaseException => if (!baseException.failure.message.matches(responseErrorDelegationNotFound)) throw baseException else logger.info(baseException.failure.logMessage)
+        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isEmpty) throw baseException else logger.info(baseException.failure.logMessage)
       }
     }
 
@@ -135,7 +134,7 @@ class Delegations @Inject()(
         delegationResponse <- delegationResponse
         _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
       } yield ()).recover {
-        case baseException: BaseException => if (baseException.failure.message.matches(responseErrorDelegationNotFound)) {
+        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
           val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
           (for {
             _ <- delete
