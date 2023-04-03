@@ -20,7 +20,6 @@ object JSON {
         case jsError: JsError =>
           val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
           logger.error(error)
-          logger.error(response.json.toString())
           throw new BaseException(new Failure(response.json.toString()))
       }
     }.recover {
