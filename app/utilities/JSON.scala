@@ -2,7 +2,6 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import constants.Response.Failure
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
@@ -20,7 +19,7 @@ object JSON {
         case jsError: JsError =>
           val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
           logger.error(response.json.toString())
-          throw new BaseException(new Failure(error))
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     }.recover {
       case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
@@ -28,8 +27,9 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
 
@@ -40,7 +40,7 @@ object JSON {
         case errors: JsError =>
           logger.error(errors.errors.map(_.toString()).mkString(", "))
           logger.error(jsonString)
-          throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+          constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     } catch {
       case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
@@ -50,8 +50,9 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
 }
