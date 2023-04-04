@@ -10,7 +10,7 @@ function horizontalStackedChart(id, keys, values){
 
     valueList.slice(0, 9).forEach((item,index) => {
         $("#" + id + " .chart").append(`
-        <span class="block" title="${nameList[index]} - ${(item * 100.0 / totalValue).toFixed(2) + "%"}" style="width: ${(item * 100.0 / totalValue).toFixed(2) + "%"}; background-color: ${colors[index]};"></span>`);
+        <span class="block" title="${nameList[index]} - ${(item * 100.0 / totalValue).toFixed(2) + "%"}" style="width: ${(item * 100.0 / totalValue) + "%"}; background-color: ${colors[index]};"></span>`);
     });
 
     let legendColumn = 1;
