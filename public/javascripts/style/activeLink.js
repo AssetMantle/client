@@ -21,6 +21,9 @@ function navBar() {
                 case "proposalList":
                     $('#proposals').addClass('active');
                     break;
+                case "parameters":
+                    $('#parameters').addClass('active');
+                    break;
                 case "":
                     $('#dashBoard').addClass('active');
                     break;
