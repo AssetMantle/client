@@ -20,6 +20,8 @@ case class Mutables(propertyList: PropertyList) {
 
   def getProtoBytes: Array[Byte] = this.asProtoMutables.toByteString.toByteArray
 
+  def getTotalBondWeight: Int = this.propertyList.getTotalBondWeight
+
   def add(properties: Seq[Property]): Mutables = new Mutables(this.propertyList.add(properties))
 
   def remove(properties: Seq[Property]): Mutables = new Mutables(this.propertyList.remove(properties))

@@ -95,7 +95,7 @@ class MessageCounters @Inject()(
     }
 
     def getMessagesStatistics: Future[ListMap[String, Double]] = {
-      val all = Service.fetchAll
+      val all = Service.fetchAll.map(_.sortBy(_.counter).reverse)
       (for {
         all <- all
       } yield ListMap(all.map(x => x.messageType -> x.counter.toDouble): _*)

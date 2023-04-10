@@ -22,17 +22,4 @@ object Data {
   val NumberDataWeight = 8
   val StringDataWeight = 256
 
-  def getBondedWeight(dataTypeID: StringID): Int = dataTypeID.value match {
-    case "A" => AccAddressBondWeight
-    case "B" => BooleanBondWeight
-    case "D" => DecDataWeight
-    case "H" => HeightDataWeight
-    case "I" => IDDataWeight
-    case "L" => ListDataWeight
-    case "N" => NumberDataWeight
-    case "S" => StringDataWeight
-    case _ => 0
-  }
-
-
 }

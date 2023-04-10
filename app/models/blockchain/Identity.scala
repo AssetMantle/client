@@ -38,13 +38,17 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
     val property = this.getProperty(constants.Blockchain.AuthenticationProperty.getID)
     if (property.isDefined) {
       if (property.get.isMeta) ListData(MetaProperty(property.get.getProtoBytes).getData.toAnyData.getListData)
-      else ListData(Seq(constants.Blockchain.AuthenticationProperty.getData.toAnyData))
-    } else ListData(Seq())
+      else ListData(Seq(constants.Blockchain.AuthenticationProperty.getData))
+    } else ListData(Seq[Data]())
   }
 
   def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)
 
   def mutate(properties: Seq[Property]): Identity = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
+
+  def provision(accAddressData: AccAddressData): Identity = this.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = this.getAuthentication.add(accAddressData))))
+
+  def unprovision(accAddressData: AccAddressData): Identity = this.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = this.getAuthentication.remove(accAddressData))))
 
 }
 
@@ -126,8 +130,8 @@ class Identities @Inject()(
   object Utility {
 
     def onNub(msg: com.identities.transactions.nub.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID).toAnyID).toAnyData))))
-      val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getFrom)).toAnyData)).toAnyData))))
+      val immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty.copy(data = IDData(StringID(msg.getNubID))))))
+      val mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
       val identityID = utilities.ID.getIdentityID(classificationID = constants.Blockchain.NubClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = constants.Blockchain.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
@@ -138,11 +142,11 @@ class Identities @Inject()(
     }
 
     def onIssue(msg: com.identities.transactions.issue.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).propertyList))
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val identityID = utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
-      val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData)).toAnyData)
-      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).propertyList))
+      val authenticationProperty = constants.Blockchain.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getTo))))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
       val add = Service.add(identity)
@@ -155,7 +159,7 @@ class Identities @Inject()(
 
     def onMutate(msg: com.identities.transactions.mutate.Message): Future[String] = {
       val identityID = IdentityID(msg.getIdentityID)
-      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Service.tryGet(identityID)
 
       def update(identity: Identity) = Service.update(identity.mutate(mutables.getProperties))
@@ -169,10 +173,7 @@ class Identities @Inject()(
     def onProvision(msg: com.identities.transactions.provision.Message): Future[String] = {
       val identity = Service.tryGet(IdentityID(msg.getIdentityID))
 
-      def update(identity: Identity) = {
-        val updatedList = ListData(identity.getAuthentication.dataList :+ AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).toAnyData).toAnyData
-        Service.insertOrUpdate(identity.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = updatedList))))
-      }
+      def update(identity: Identity) = Service.insertOrUpdate(identity.provision(AccAddressData(msg.getTo)))
 
       for {
         identity <- identity
@@ -215,10 +216,7 @@ class Identities @Inject()(
     def onUnprovision(msg: com.identities.transactions.unprovision.Message): Future[String] = {
       val identity = Service.tryGet(IdentityID(msg.getIdentityID))
 
-      def update(identity: Identity) = {
-        val updatedList = ListData(identity.getAuthentication.dataList.filterNot(x => AccAddressData(x.getAccAddressData).getBytes.sameElements(AccAddressData(utilities.Crypto.convertAddressToAccAddressBytes(msg.getTo)).getBytes))).toAnyData
-        Service.insertOrUpdate(identity.mutate(Seq(MetaProperty(id = constants.Blockchain.AuthenticationProperty.getID, data = updatedList))))
-      }
+      def update(identity: Identity) = Service.insertOrUpdate(identity.unprovision(AccAddressData(msg.getTo)))
 
       for {
         identity <- identity

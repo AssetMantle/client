@@ -8,6 +8,8 @@ case class SplitID(ownerID: IdentityID, ownableID: OwnableID) extends ID {
 
   def getBytes: Array[Byte] = this.ownerID.getBytes ++ this.ownableID.getBytes
 
+  def getType: StringID = constants.ID.SplitIDType
+
   def asString: String = this.ownerID.asString + constants.Blockchain.IDSeparator + this.ownableID.asString
 
   def asProtoSplitID: protoSplitID = protoSplitID.newBuilder().setOwnerID(this.ownerID.asProtoIdentityID).setOwnableID(this.ownableID.toAnyOwnableID).build()

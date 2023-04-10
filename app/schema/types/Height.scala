@@ -6,6 +6,8 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 case class Height(value: Long) {
 
+  require(value >= -1, "INVALID_VALUE_FOR_HEIGHT")
+
   def AsString: String = this.value.toString
 
   def getBytes: Array[Byte] = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(this.value).array()

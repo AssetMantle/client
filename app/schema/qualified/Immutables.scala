@@ -16,7 +16,9 @@ case class Immutables(propertyList: PropertyList) {
 
   def getPropertyIDList: Seq[PropertyID] = this.getProperties.map(_.getID)
 
-  def generateHashID: HashID = utilities.ID.generateHashIDFromList(this.getProperties.map(x => x.getDataID.getHashID.getBytes))
+  def getTotalBondWeight: Int = this.propertyList.getTotalBondWeight
+
+  def generateHashID: HashID = utilities.ID.generateHashIDFromList(this.getProperties.map(_.getDataID.getHashID.getBytes))
 
   def asProtoImmutables: protoImmutables = protoImmutables.newBuilder().setPropertyList(this.getProtoPropertyList).build()
 

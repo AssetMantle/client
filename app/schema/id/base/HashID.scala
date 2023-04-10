@@ -8,6 +8,8 @@ case class HashID(value: Array[Byte]) extends ID {
 
   def getBytes: Array[Byte] = this.value
 
+  def getType: StringID = constants.ID.HashIDType
+
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
   def asProtoHashID: protoHashId = protoHashId.newBuilder().setIDBytes(ByteString.copyFrom(this.getBytes)).build()

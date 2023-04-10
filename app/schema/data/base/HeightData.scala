@@ -32,4 +32,6 @@ object HeightData {
   def apply(value: protoHeightData): HeightData = HeightData(Height(value.getValue))
 
   def apply(protoBytes: Array[Byte]): HeightData = HeightData(protoHeightData.parseFrom(protoBytes))
+
+  def apply(value: Long): HeightData = HeightData(Height(value))
 }

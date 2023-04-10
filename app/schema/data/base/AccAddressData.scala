@@ -12,7 +12,7 @@ case class AccAddressData(value: Array[Byte]) extends Data {
 
   def getDataID: DataID = DataID(typeID = constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
 
-  def zeroValue: Data = AccAddressData(new Array[Byte](0))
+  def zeroValue: AccAddressData = AccAddressData(Array[Byte]())
 
   def getBytes: Array[Byte] = this.value
 

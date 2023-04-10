@@ -26,6 +26,10 @@ case class Document(classificationID: ClassificationID, immutables: Immutables, 
   def getProtoBytes: Array[Byte] = this.asProtoDocument.toByteString.toByteArray
 
   def mutate(properties: Seq[Property]): Document = this.copy(mutables = this.mutables.mutate(properties))
+
+  def getTotalBondWeight: Int = this.immutables.getTotalBondWeight + this.mutables.getTotalBondWeight
+
+  def getTotalBondAmount(bondRate: Int): Int = this.getTotalBondWeight * bondRate
 }
 
 object Document {

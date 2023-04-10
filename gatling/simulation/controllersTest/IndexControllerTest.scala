@@ -1,12 +1,9 @@
 package controllersTest
 
-import constants.{Form, Test}
-import controllers.routes
-import feeders._
+import constants.Test
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import scenarios.{IndexControllerTest, ViewControllerTest}
+import scenarios.IndexControllerTest
 
 
 class IndexControllerTest extends Simulation {

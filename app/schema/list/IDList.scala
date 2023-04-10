@@ -3,6 +3,7 @@ package schema.list
 import com.ids.AnyID
 import com.lists.{IDList => protoIDList}
 import schema.id.ID
+import utilities.ID.byteArraysCompare
 
 import scala.jdk.CollectionConverters._
 
@@ -16,6 +17,27 @@ case class IDList(idList: Seq[ID]) {
 
   def getProtoBytes: Array[Byte] = this.asProtoIDList.toByteString.toByteArray
 
+  def add(ids: Seq[ID]): IDList = {
+    var updatedList = this.idList
+    ids.foreach(x => {
+      val xBytes = x.getBytes
+      val index = this.idList.indexWhere(_.getBytes.sameElements(xBytes))
+      if (index == -1) updatedList = updatedList :+ x
+    })
+    new IDList(idList = updatedList)
+  }
+
+  def remove(ids: Seq[ID]): IDList = {
+    var updatedList = this.idList
+    ids.foreach(x => {
+      val xBytes = x.getBytes
+      val index = this.idList.indexWhere(_.getBytes.sameElements(xBytes))
+      if (index != -1) updatedList = updatedList.zipWithIndex.filter(_._2 != index).map(_._1)
+    })
+    new IDList(idList = updatedList)
+  }
+
+  def sort: IDList = IDList(this.idList.sortWith((x, y) => byteArraysCompare(x.getBytes, y.getBytes) < 0))
 }
 
 object IDList {

@@ -6,9 +6,9 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 import schema.id.{ID, base}
 
-case class IDData(value: AnyID) extends Data {
+case class IDData(value: ID) extends Data {
 
-  def getID: ID = ID(this.value)
+  def getID: ID = this.value
 
   def getBondWeight: Int = constants.Data.IDDataWeight
 
@@ -22,9 +22,9 @@ case class IDData(value: AnyID) extends Data {
 
   def getProtoDataID: protoDataID = this.getDataID.asProtoDataID
 
-  def zeroValue: Data = IDData(StringID("").toAnyID)
+  def zeroValue: IDData = IDData(StringID(""))
 
-  def asProtoIDData: protoIDData = protoIDData.newBuilder().setValue(this.value).build()
+  def asProtoIDData: protoIDData = protoIDData.newBuilder().setValue(this.value.toAnyID).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setIDData(this.asProtoIDData).build()
 
@@ -32,12 +32,14 @@ case class IDData(value: AnyID) extends Data {
 
   def viewString: String = this.getID.asString
 
-  def getAnyID: AnyID = this.value
+  def getAnyID: AnyID = this.value.toAnyID
 }
 
 object IDData {
 
-  def apply(value: protoIDData): IDData = IDData(value.getValue)
+  def apply(value: protoIDData): IDData = IDData(ID(value.getValue))
 
   def apply(protoBytes: Array[Byte]): IDData = IDData(protoIDData.parseFrom(protoBytes))
+
+  //  def apply(anyID: AnyID): IDData = IDData(ID(anyID))
 }

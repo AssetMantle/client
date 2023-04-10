@@ -14,7 +14,7 @@ object Property {
   implicit val MesaPropertyReads: Reads[MesaProperty] = Json.reads[MesaProperty]
 
   case class MetaProperty(data: AnyData, i_d: PropertyID) {
-    def toMetaProperty: schema.property.base.MetaProperty = schema.property.base.MetaProperty(id = this.i_d.toPropertyID, data = this.data.toData.toAnyData)
+    def toMetaProperty: schema.property.base.MetaProperty = schema.property.base.MetaProperty(id = this.i_d.toPropertyID, data = this.data.toData)
   }
 
   implicit val MetaPropertyReads: Reads[MetaProperty] = Json.reads[MetaProperty]

@@ -1,11 +1,9 @@
 package queries.responses.blockchain.common
 
-import com.data
 import play.api.libs.json.{Json, Reads}
 import queries.responses.blockchain.common.ID._
 import schema.data.{base => baseSchemaData}
 import schema.types.{Height => baseHeight}
-import utilities.AttoNumber
 
 object Data {
 
@@ -24,7 +22,7 @@ object Data {
   implicit val BooleanDataReads: Reads[BooleanData] = Json.reads[BooleanData]
 
   case class DecData(value: String) {
-    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(AttoNumber(BigDecimal(this.value)))
+    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(BigDecimal(this.value))
   }
 
   implicit val DecDataReads: Reads[DecData] = Json.reads[DecData]
@@ -42,7 +40,7 @@ object Data {
   implicit val HeightDataReads: Reads[HeightData] = Json.reads[HeightData]
 
   case class IDData(value: AnyID) {
-    def toIDData: baseSchemaData.IDData = baseSchemaData.IDData(this.value.toID.toAnyID)
+    def toIDData: baseSchemaData.IDData = baseSchemaData.IDData(this.value.toID)
   }
 
   implicit val IDDataReads: Reads[IDData] = Json.reads[IDData]
@@ -69,7 +67,7 @@ object Data {
                                      number_data: Option[NumberData]
                                    ) {
 
-    def toAnyData: data.AnyData = {
+    def toData: schema.data.Data = {
       val schemaData: schema.data.Data = if (this.acc_address_data.isDefined) this.acc_address_data.get.toAccAddressData
       else if (this.boolean_data.isDefined) this.boolean_data.get.toBooleanData
       else if (this.dec_data.isDefined) this.dec_data.get.toDecData
@@ -77,7 +75,7 @@ object Data {
       else if (this.i_d_data.isDefined) this.i_d_data.get.toIDData
       else if (this.string_data.isDefined) this.string_data.get.toStringData
       else this.number_data.get.toNumberData
-      schemaData.toAnyData
+      schemaData
     }
 
   }
@@ -85,7 +83,7 @@ object Data {
   implicit val AnyDataWithoutListDataReads: Reads[AnyDataWithoutListData] = Json.reads[AnyDataWithoutListData]
 
   case class ListData(data_list: Seq[AnyDataWithoutListData]) {
-    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.data_list.map(_.toAnyData))
+    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.data_list.map(_.toData))
   }
 
   implicit val ListDataReads: Reads[ListData] = Json.reads[ListData]

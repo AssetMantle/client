@@ -7,6 +7,8 @@ case class IdentityID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
+  def getType: StringID = constants.ID.IdentityIDType
+
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
   def asProtoIdentityID: protoIdentityID = protoIdentityID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
@@ -19,4 +21,9 @@ case class IdentityID(hashID: HashID) extends ID {
 
 object IdentityID {
   def apply(anyID: protoIdentityID): IdentityID = IdentityID(HashID(anyID.getHashID))
+
+  def apply(value: Array[Byte]): IdentityID = IdentityID(HashID(value))
+
+  def apply(value: String): IdentityID = IdentityID(HashID(utilities.Secrets.base64URLDecode(value)))
+
 }

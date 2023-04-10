@@ -11,7 +11,7 @@ case class BooleanData(value: Boolean) extends Data {
 
   def getDataID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
 
-  def zeroValue: Data = BooleanData(false)
+  def zeroValue: BooleanData = BooleanData(false)
 
   def getBytes: Array[Byte] = {
     val res: Byte = if (this.value) 1 else 0

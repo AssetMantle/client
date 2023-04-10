@@ -23,6 +23,8 @@ abstract class Property {
 
   def getProtoBytes: Array[Byte]
 
+  def scrub(): MesaProperty
+
 }
 
 object Property {

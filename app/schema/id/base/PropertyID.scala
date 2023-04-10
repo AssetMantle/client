@@ -7,6 +7,8 @@ case class PropertyID(keyID: StringID, typeID: StringID) extends ID {
 
   def getBytes: Array[Byte] = this.keyID.getBytes ++ this.typeID.getBytes
 
+  def getType: StringID = constants.ID.PropertyIDType
+
   def asString: String = this.keyID.asString + constants.Blockchain.IDSeparator + this.typeID.asString
 
   def asProtoPropertyID: protoPropertyID = protoPropertyID.newBuilder().setTypeID(this.typeID.asProtoStringID).setKeyID(this.keyID.asProtoStringID).build()

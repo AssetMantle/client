@@ -7,6 +7,8 @@ case class StringID(value: String) extends ID {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
+  def getType: StringID = StringID("SI")
+
   def asString: String = this.value
 
   def asProtoStringID: protoStringID = protoStringID.newBuilder().setIDString(this.value).build()

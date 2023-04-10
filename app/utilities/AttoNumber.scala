@@ -36,7 +36,7 @@ class AttoNumber(val value: BigDecimal) extends ScalaNumber with ScalaNumericCon
 
   def toBigDecimal: BigDecimal = this.value
 
-  def toDecData: DecData = DecData(this)
+  def toDecData: DecData = DecData(this.value)
 
   override def byteValue: Byte = intValue.toByte
 

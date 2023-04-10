@@ -11,11 +11,11 @@ case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
 
   def getDataID: DataID = this.dataID
 
-  def getBondedWeight: Int = constants.Data.getBondedWeight(this.getType)
+  def getBondedWeight: Int = this.getDataID.getBondWeight
 
   def getKey: StringID = this.id.keyID
 
-  def getType: StringID = this.dataID.getTypeID
+  def getType: StringID = this.dataID.getDataTypeID
 
   def isMeta: Boolean = false
 
@@ -24,6 +24,8 @@ case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
   def toAnyProperty: AnyProperty = AnyProperty.newBuilder().setMesaProperty(this.asProtoMesaProperty).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoMesaProperty.toByteString.toByteArray
+
+  def scrub(): MesaProperty = this
 }
 
 object MesaProperty {

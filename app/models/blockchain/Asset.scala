@@ -128,16 +128,16 @@ class Assets @Inject()(
   object Utility {
 
     def onMint(msg: com.assets.transactions.mint.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).propertyList))
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
-      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val asset = Asset(id = assetID.getBytes, idString = assetID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
 
       val add = Service.add(asset)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
 
-      def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value.toBigDecimal)
+      def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.getValue)
 
       for {
         _ <- add
@@ -148,7 +148,7 @@ class Assets @Inject()(
 
     def onMutate(msg: com.assets.transactions.mutate.Message): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
-      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).propertyList))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val asset = Service.tryGet(assetID)
 
       def updateAsset(asset: Asset) = Service.update(asset.mutate(mutables.getProperties))
@@ -170,7 +170,7 @@ class Assets @Inject()(
       val assetID = AssetID(msg.getAssetID)
       val asset = Service.tryGet(assetID)
 
-      def updateSupply(asset: Asset) = blockchainSplits.Utility.renumerate(IdentityID(msg.getFromID), assetID, asset.getSupply.value.toBigDecimal)
+      def updateSupply(asset: Asset) = blockchainSplits.Utility.renumerate(IdentityID(msg.getFromID), assetID, asset.getSupply.getValue)
 
       for {
         asset <- asset
