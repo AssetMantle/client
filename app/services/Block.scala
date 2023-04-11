@@ -89,14 +89,12 @@ class Block @Inject()(
 
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
-    val blockResponse = getBlock.Service.get(height)
 
     def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address))
 
     (for {
       blockCommitResponse <- blockCommitResponse
       _ <- insertBlock(blockCommitResponse)
-      blockResponse <- blockResponse
     } yield blockCommitResponse
       ).recover {
       case baseException: BaseException => throw baseException

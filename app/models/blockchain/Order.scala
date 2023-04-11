@@ -278,23 +278,24 @@ class Orders @Inject()(
     }
 
     def onNewBlock(header: Header): Future[Unit] = {
-      val allOrders = Service.fetchAll
-
-      def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
-        if (header.height.toLong >= order.getExpiryHeight) {
-          val delete = Service.delete(order.getID)
-          val transferAux = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
-          for {
-            _ <- delete
-            _ <- transferAux
-          } yield ()
-        } else Future()
-      }
-
-      for {
-        allOrders <- allOrders
-        _ <- filterAndDelete(allOrders)
-      } yield ()
+      //      val allOrders = Service.fetchAll
+      //
+      //      def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
+      //        if (header.height.toLong >= order.getExpiryHeight) {
+      //          val delete = Service.delete(order.getID)
+      //          val transferAux = blockchainSplits.Utility.transfer(fromID = constants.Blockchain.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
+      //          for {
+      //            _ <- delete
+      //            _ <- transferAux
+      //          } yield ()
+      //        } else Future()
+      //      }
+      //
+      //      for {
+      //        allOrders <- allOrders
+      //        _ <- filterAndDelete(allOrders)
+      //      } yield ()
+      Future()
     }
 
   }
