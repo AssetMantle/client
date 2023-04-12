@@ -1,7 +1,7 @@
 package models.blockchain
 
-import com.google.protobuf.{Any => protoAny}
 import com.cosmos.authz.{v1beta1 => authzTx}
+import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
 import models.Abstract.{Authorization => AbstractAuthorization}
 import models.traits.Logging
@@ -66,8 +66,7 @@ class Authorizations @Inject()(
   private def findByGranterGranteeAndMsgType(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = db.run(authorizationTable.filter(x => x.granter === granter && x.grantee === grantee && x.msgTypeURL === msgTypeURL).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.AUTHORIZATION_NOT_FOUND, noSuchElementException)
     }
   }
 
