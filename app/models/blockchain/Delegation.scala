@@ -1,10 +1,11 @@
 package models.blockchain
 
 import exceptions.BaseException
+import models.oldBlockchain
 import models.traits.Logging
 import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.{Configuration, Logger}
 import queries.blockchain.GetValidatorDelegatorDelegation
 import slick.jdbc.JdbcProfile
 
@@ -17,7 +18,7 @@ case class Delegation(delegatorAddress: String, validatorAddress: String, shares
 @Singleton
 class Delegations @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
-                             configuration: Configuration,
+                             oldBlockchainDelegations: oldBlockchain.Delegations,
                              getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
                            )(implicit executionContext: ExecutionContext) {
 
@@ -112,16 +113,25 @@ class Delegations @Inject()(
     //onDelegation moved to blockchain/Validators due to import cycle issues
 
     def insertOrUpdate(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
-      val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+      val delegation = oldBlockchainDelegations.Service.get(delegatorAddress = delegatorAddress, operatorAddress = validatorAddress)
 
-      def insertDelegation(delegation: Delegation) = Service.insertOrUpdate(delegation)
-
+      def insertDelegation(delegation: Option[oldBlockchain.Delegation]) = if (delegation.isDefined) Service.insertOrUpdate(Delegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress, shares = delegation.get.shares)) else Future(0)
+      //      val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+      //
+      //      def insertDelegation(delegation: Delegation) = Service.insertOrUpdate(delegation)
+      //
+      //      (for {
+      //        delegationResponse <- delegationResponse
+      //        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
+      //      } yield ()).recover {
+      //        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
+      //        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isEmpty) throw baseException else logger.info(baseException.failure.logMessage)
+      //      }
       (for {
-        delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
+        delegation <- delegation
+        _ <- insertDelegation(delegation)
       } yield ()).recover {
-        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
-        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isEmpty) throw baseException else logger.info(baseException.failure.logMessage)
+        case baseException: BaseException => throw baseException
       }
     }
 
