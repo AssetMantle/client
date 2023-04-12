@@ -113,9 +113,7 @@ class Delegations @Inject()(
     //onDelegation moved to blockchain/Validators due to import cycle issues
 
     def insertOrUpdate(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
-      val delegation = oldBlockchainDelegations.Service.get(delegatorAddress = delegatorAddress, operatorAddress = validatorAddress)
-
-      def insertDelegation(delegation: Option[oldBlockchain.Delegation]) = if (delegation.isDefined) Service.insertOrUpdate(Delegation(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress, shares = delegation.get.shares)) else Future(0)
+      Future()
       //      val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
       //
       //      def insertDelegation(delegation: Delegation) = Service.insertOrUpdate(delegation)
@@ -127,12 +125,6 @@ class Delegations @Inject()(
       //        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
       //        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isEmpty) throw baseException else logger.info(baseException.failure.logMessage)
       //      }
-      (for {
-        delegation <- delegation
-        _ <- insertDelegation(delegation)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
     def updateOrDelete(delegatorAddress: String, validatorAddress: String): Future[Unit] = {

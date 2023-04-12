@@ -247,16 +247,7 @@ class Balances @Inject()(
     //    }
 
     def insertOrUpdateBalance(address: String): Future[Unit] = {
-      val balance = oldBlockchainBalances.Service.get(address)
-
-      def upsert(balance: Option[oldBlockchain.Balance]) = if (balance.isDefined) Service.insertOrUpdate(Balance(address = address, coins = balance.get.coins)) else Future(0)
-
-      (for {
-        balance <- balance
-        _ <- upsert(balance)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      Future()
       //      val balanceResponse = getBalance.Service.get(address)
       //
       //      def upsert(balanceResponse: BalanceResponse) = Service.insertOrUpdate(Balance(address = address, coins = balanceResponse.balances.map(_.toCoin)))

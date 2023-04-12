@@ -356,7 +356,7 @@ class Startup @Inject()(
         } yield ()
       } else {
         val updateBlockHeight = latestExplorerHeight + 1
-        if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
+        if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight && updateBlockHeight <= 5248275) insertBlock(updateBlockHeight)
         else Future()
       }
 
