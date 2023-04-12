@@ -1,7 +1,6 @@
 package models.blockchain
 
 import exceptions.BaseException
-import models.oldBlockchain
 import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -18,7 +17,6 @@ case class Delegation(delegatorAddress: String, validatorAddress: String, shares
 @Singleton
 class Delegations @Inject()(
                              protected val databaseConfigProvider: DatabaseConfigProvider,
-                             oldBlockchainDelegations: oldBlockchain.Delegations,
                              getValidatorDelegatorDelegation: GetValidatorDelegatorDelegation,
                            )(implicit executionContext: ExecutionContext) {
 

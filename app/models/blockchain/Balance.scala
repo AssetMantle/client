@@ -6,7 +6,6 @@ import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import exceptions.BaseException
 import models.common.Serializable.Coin
-import models.oldBlockchain
 import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -28,7 +27,6 @@ class Balances @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getBalance: GetBalance,
                           utilitiesOperations: utilities.Operations,
-                          oldBlockchainBalances: oldBlockchain.Balances,
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
