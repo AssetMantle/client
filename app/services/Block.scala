@@ -268,11 +268,11 @@ class Block @Inject()(
         val executeMsg = authzTx.MsgExec.parseFrom(stdMsg.getValue)
         val processMessages = utilitiesOperations.traverse(executeMsg.getMsgsList.asScala.toSeq)(message => actionOnTxMessages(message))
 
-        def updateAuthorization(granters: Seq[String]) = blockchainAuthorizations.Utility.onExecuteAuthorization(executeMsg, granters.head)
+//        def updateAuthorization(granters: Seq[String]) = blockchainAuthorizations.Utility.onExecuteAuthorization(executeMsg, granters.head)
 
         for {
           granters <- processMessages
-          _ <- updateAuthorization(granters)
+//          _ <- updateAuthorization(granters)
         } yield executeMsg.getGrantee
       }
       //bank

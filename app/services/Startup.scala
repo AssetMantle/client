@@ -4,7 +4,7 @@ import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
-import models.{blockchain, keyBase}
+import models.{archive, blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
@@ -57,7 +57,8 @@ class Startup @Inject()(
                          getStakingPool: GetStakingPool,
                          getMintingInflation: GetMintingInflation,
                          getCommunityPool: GetCommunityPool,
-                         utilitiesOperations: utilities.Operations
+                         utilitiesOperations: utilities.Operations,
+                         archiveBlocks: archive.Blocks,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
@@ -295,6 +296,7 @@ class Startup @Inject()(
   def insertOrdersOnStart(orders: Seq[Order.Mappable]): Future[Unit] = blockchainOrders.Service.add(orders.map(_.order.toOrder))
 
   private def insertBlock(height: Int): Future[Unit] = {
+    val startTime = System.currentTimeMillis()
     val blockCommitResponse = blocksServices.insertOnBlock(height)
     val blockResultResponse = getBlockResults.Service.get(height)
 
@@ -314,7 +316,10 @@ class Startup @Inject()(
       _ <- actionsOnEvents(blockResultResponse = blockResultResponse, currentBlockTimeStamp = blockCommitResponse.result.signed_header.header.time)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
       _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
-    } yield ()).recover {
+    } yield {
+      val endTime = System.currentTimeMillis()
+      logger.info("Time to process " + height + " : " + (endTime - startTime))
+    }).recover {
       case baseException: BaseException => throw baseException
     }
   }
@@ -355,9 +360,17 @@ class Startup @Inject()(
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
+        val archive = archiveBlocks.Utility.checkAndUpdate(latestExplorerHeight)
+
         val updateBlockHeight = latestExplorerHeight + 1
-        if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight && updateBlockHeight <= 5248275) insertBlock(updateBlockHeight)
+
+        val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight && updateBlockHeight <= 5248275) insertBlock(updateBlockHeight)
         else Future()
+
+        for {
+          _ <- archive
+          _ <- processBlock
+        } yield ()
       }
 
       val forComplete = (for {
