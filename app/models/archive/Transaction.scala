@@ -1,4 +1,4 @@
-package models.blockchain
+package models.archive
 
 import com.cosmos.crypto.{secp256k1, secp256r1}
 import com.cosmos.tx.v1beta1.Tx
@@ -11,7 +11,6 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
-import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success}
@@ -78,24 +77,10 @@ class Transactions @Inject()(
 
   private[models] val transactionTable = TableQuery[TransactionTable]
 
-  private def add(transaction: Transaction): Future[Int] = db.run((transactionTable returning transactionTable.map(_.height) += transaction).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_INSERT_FAILED, psqlException)
-    }
-  }
-
   private def addMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = db.run((transactionTable returning transactionTable.map(_.height) ++= transactions).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_INSERT_FAILED, psqlException)
-    }
-  }
-
-  private def upsert(transaction: Transaction): Future[Int] = db.run(transactionTable.insertOrUpdate(transaction).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_UPSERT_FAILED, psqlException)
     }
   }
 
@@ -120,12 +105,7 @@ class Transactions @Inject()(
 
   private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = db.run(transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result)
 
-  private def getByHeightRange(start: Int, end: Int): Future[Seq[Transaction]] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).result)
-
-  private def deleteByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).delete)
-
-
-  private[models] class TransactionTable(tag: Tag) extends Table[Transaction](tag, Option("blockchain"), "Transaction") {
+  private[models] class TransactionTable(tag: Tag) extends Table[Transaction](tag, Option("archive"), "Transaction") {
 
     def * = (hash, height, code, gasWanted, gasUsed, txBytes, log.?) <> (Transaction.tupled, Transaction.unapply)
 
@@ -142,15 +122,12 @@ class Transactions @Inject()(
     def txBytes = column[Array[Byte]]("txBytes")
 
     def log = column[String]("log")
+
   }
 
   object Service {
 
-    def create(hash: String, height: String, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, log = log, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes))
-
-    def insertMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
-
-    def insertOrUpdate(hash: String, height: String, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, log = log, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes))
+    def create(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash)
 
@@ -172,26 +149,5 @@ class Transactions @Inject()(
 
     def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
 
-    def getByHeight(start: Int, end: Int): Future[Seq[Transaction]] = getByHeightRange(start = start, end = end)
-
-    def deleteByHeight(start: Int, end: Int): Future[Int] = deleteByHeightRange(start = start, end = end)
-
-    def getTransactionStatisticsData(latestHeight: Int): Future[ListMap[String, Int]] = {
-      val end = if (latestHeight % transactionsStatisticsBinWidth == 0) latestHeight else ((latestHeight / transactionsStatisticsBinWidth) + 1) * transactionsStatisticsBinWidth
-      val start = if (end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth > blockchainStartHeight) end - transactionsStatisticsTotalBins * transactionsStatisticsBinWidth else blockchainStartHeight - 1
-      val maxBins = (end - start + 1) / transactionsStatisticsBinWidth
-      val totalBins = if (maxBins == transactionsStatisticsTotalBins) transactionsStatisticsTotalBins else maxBins
-      val result = utilitiesOperations.traverse(0 until totalBins) { index =>
-        val s = start + index * transactionsStatisticsBinWidth + 1
-        val e = start + (index + 1) * transactionsStatisticsBinWidth
-        val numTxs = getTransactionsNumberByHeightRange(s, e)
-        for {
-          numTxs <- numTxs
-        } yield s"""${s / transactionsStatisticsBinWidth} - ${e / transactionsStatisticsBinWidth}""" -> numTxs
-      }
-      for {
-        result <- result
-      } yield ListMap(result.toList: _*)
-    }
   }
 }

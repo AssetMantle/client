@@ -30,8 +30,8 @@
     <option name="play2JpdaPort" value="9998" />
     <option name="play2JvmOptions">
       <array>
-        <option value="-Xms512M" />
-        <option value="-Xmx1024M" />
+        <option value="-Xms2048M" />
+        <option value="-Xmx10240M" />
         <option value="-Xss1M" />
         <option value="-XX:+CMSClassUnloadingEnabled" />
         <option value="-XX:MaxPermSize=256M" />
@@ -47,7 +47,6 @@
     </option>
     <method v="2">
       <option name="Make" enabled="true" />
-      <option name="MakeProject" enabled="true" />
     </method>
   </configuration>
 </component>
