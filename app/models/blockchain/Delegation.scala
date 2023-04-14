@@ -1,7 +1,6 @@
 package models.blockchain
 
 import exceptions.BaseException
-import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Delegation(delegatorAddress: String, validatorAddress: String, shares: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Delegation(delegatorAddress: String, validatorAddress: String, shares: BigDecimal)
 
 @Singleton
 class Delegations @Inject()(
@@ -71,21 +70,13 @@ class Delegations @Inject()(
 
   private[models] class DelegationTable(tag: Tag) extends Table[Delegation](tag, "Delegation") {
 
-    def * = (delegatorAddress, validatorAddress, shares, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Delegation.tupled, Delegation.unapply)
+    def * = (delegatorAddress, validatorAddress, shares) <> (Delegation.tupled, Delegation.unapply)
 
     def delegatorAddress = column[String]("delegatorAddress", O.PrimaryKey)
 
     def validatorAddress = column[String]("validatorAddress", O.PrimaryKey)
 
     def shares = column[BigDecimal]("shares")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
