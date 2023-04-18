@@ -364,52 +364,42 @@ class Validators @Inject()(
     }
 
     def insertOrUpdateValidator(validatorAddress: String): Future[Validator] = {
-      val validator = Service.get(validatorAddress)
-
-      def checkAndUpdate(validator: Option[Validator]) = if (validator.isEmpty) {
-        val validatorResponse = getValidator.Service.get(validatorAddress)
-
-        for {
-          validatorResponse <- validatorResponse
-          _ <- Service.insertOrUpdate(validatorResponse.validator.toValidator)
-        } yield validatorResponse.validator.toValidator
-      } else Future(validator.get)
+      val validatorResponse = getValidator.Service.get(validatorAddress)
 
       (for {
-        validatorOption <- validator
-        validator <- checkAndUpdate(validatorOption)
-      } yield validator
+        validatorResponse <- validatorResponse
+        _ <- Service.insertOrUpdate(validatorResponse.validator.toValidator)
+      } yield validatorResponse.validator.toValidator
         ).recover {
         case baseException: BaseException => throw baseException
       }
     }
 
     def onNewBlock(header: Header): Future[Unit] = {
-      Future()
-      //      val unbondingValidators = Service.getAllUnbondingValidatorList
-      //
-      //      def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
-      //        if (header.height >= unbondingValidator.unbondingHeight && unbondingValidator.isUnbondingMatured(header.time)) {
-      //          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
-      //          val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
-      //
-      //          for {
-      //            _ <- updateOrDeleteValidator
-      //            _ <- withdrawValidatorRewards
-      //          } yield ()
-      //
-      //        } else Future()
-      //      })
-      //
-      //      // Unbonding delegations updated in separate onNewBlock of Undelegations table
-      //
-      //      (for {
-      //        unbondingValidators <- unbondingValidators
-      //        _ <- checkAndUpdateUnbondingValidators(unbondingValidators)
-      //      } yield ()
-      //        ).recover {
-      //        case baseException: BaseException => throw baseException
-      //      }
+      val unbondingValidators = Service.getAllUnbondingValidatorList
+
+      def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
+        if (header.height >= unbondingValidator.unbondingHeight && unbondingValidator.isUnbondingMatured(header.time)) {
+          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
+          val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
+
+          for {
+            _ <- updateOrDeleteValidator
+            _ <- withdrawValidatorRewards
+          } yield ()
+
+        } else Future()
+      })
+
+      // Unbonding delegations updated in separate onNewBlock of Undelegations table
+
+      (for {
+        unbondingValidators <- unbondingValidators
+        _ <- checkAndUpdateUnbondingValidators(unbondingValidators)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
 
     //TODO Can be optimized whenever called?

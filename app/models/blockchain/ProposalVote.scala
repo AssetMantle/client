@@ -2,12 +2,9 @@ package models.blockchain
 
 import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
-import models.traits.Logging
 import org.postgresql.util.PSQLException
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
 import play.api.Logger
-import queries.blockchain.GetProposalVote
+import play.api.db.slick.DatabaseConfigProvider
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
@@ -16,13 +13,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class ProposalVote(proposalID: Int, voter: String, option: String, weight: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class ProposalVote(proposalID: Int, voter: String, option: String, weight: BigDecimal)
 
 @Singleton
 class ProposalVotes @Inject()(
                                protected val databaseConfigProvider: DatabaseConfigProvider,
-                               getProposalVote: GetProposalVote,
-                               configuration: Configuration,
+                               blockchainValidators: Validators,
                                utilitiesOperations: utilities.Operations
                              )(implicit executionContext: ExecutionContext) {
 
@@ -65,7 +61,7 @@ class ProposalVotes @Inject()(
 
   private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote") {
 
-    def * = (proposalID, voter, option, weight, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ProposalVote.tupled, ProposalVote.unapply)
+    def * = (proposalID, voter, option, weight) <> (ProposalVote.tupled, ProposalVote.unapply)
 
     def proposalID = column[Int]("proposalID", O.PrimaryKey)
 
@@ -74,14 +70,6 @@ class ProposalVotes @Inject()(
     def option = column[String]("option")
 
     def weight = column[BigDecimal]("weight")
-
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
@@ -96,19 +84,21 @@ class ProposalVotes @Inject()(
 
     def deleteAllVotesForProposal(address: String, proposalID: Int): Future[Int] = deleteByVoterAndProposal(address = address, proposalID = proposalID)
 
-
   }
 
   object Utility {
 
     def onVote(vote: govTx.MsgVote)(implicit header: Header): Future[String] = {
-      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+      val validatorExists = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
 
-      def add = Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1))
+      def delete(validatorExists: Boolean) = if (validatorExists) Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt) else Future(0)
+
+      def add(validatorExists: Boolean) = if (validatorExists) Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1)) else Future(0)
 
       (for {
-        _ <- delete
-        _ <- add
+        validatorExists <- validatorExists
+        _ <- delete(validatorExists)
+        _ <- add(validatorExists)
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter
@@ -116,14 +106,18 @@ class ProposalVotes @Inject()(
     }
 
     def onWeightedVote(vote: govTx.MsgVoteWeighted)(implicit header: Header): Future[String] = {
-      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+      val validatorExists = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
+
+      def delete(validatorExists: Boolean) = if (validatorExists) Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt) else Future(0)
+
       val proposalVotes = vote.getOptionsList.asScala.toSeq.map(x => ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = x.getOption.toString, weight = BigDecimal(x.getWeight)))
 
-      def addVotes() = Service.add(proposalVotes)
+      def addVotes(validatorExists: Boolean) = if (validatorExists) Service.add(proposalVotes) else Future(0)
 
       (for {
-        _ <- delete
-        _ <- addVotes()
+        validatorExists <- validatorExists
+        _ <- delete(validatorExists)
+        _ <- addVotes(validatorExists)
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter

@@ -11,6 +11,7 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import queries.blockchain.GetBalance
+import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
@@ -237,17 +238,16 @@ class Balances @Inject()(
     //    }
 
     def insertOrUpdateBalance(address: String): Future[Unit] = {
-      Future()
-      //      val balanceResponse = getBalance.Service.get(address)
-      //
-      //      def upsert(balanceResponse: BalanceResponse) = Service.insertOrUpdate(Balance(address = address, coins = balanceResponse.balances.map(_.toCoin)))
-      //
-      //      (for {
-      //        balanceResponse <- balanceResponse
-      //        _ <- upsert(balanceResponse)
-      //      } yield ()).recover {
-      //        case baseException: BaseException => throw baseException
-      //      }
+      val balanceResponse = getBalance.Service.get(address)
+
+      def upsert(balanceResponse: BalanceResponse) = Service.insertOrUpdate(Balance(address = address, coins = balanceResponse.balances.map(_.toCoin)))
+
+      (for {
+        balanceResponse <- balanceResponse
+        _ <- upsert(balanceResponse)
+      } yield ()).recover {
+        case baseException: BaseException => throw baseException
+      }
     }
   }
 

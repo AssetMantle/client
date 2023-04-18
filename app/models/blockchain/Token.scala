@@ -5,6 +5,9 @@ import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
+import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
+import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import slick.jdbc.JdbcProfile
@@ -222,34 +225,33 @@ class Tokens @Inject()(
     }
 
     def updateAll(): Future[Unit] = {
-      //      val totalSupplyResponse = getTotalSupply.Service.get
-      //      val mintingInflationResponse = getMintingInflation.Service.get
-      //      val stakingPoolResponse = getStakingPool.Service.get
-      //      val communityPoolResponse = getCommunityPool.Service.get
-      //
-      //      def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.supply) { token =>
-      //        Service.updateOnNewBlock(
-      //          denom = token.denom,
-      //          totalSupply = token.amount,
-      //          bondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
-      //          notBondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
-      //          communityPool = communityPoolResponse.pool.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
-      //          inflation = if (token.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
-      //        )
-      //      }
-      //
-      //      (for {
-      //        totalSupplyResponse <- totalSupplyResponse
-      //        mintingInflationResponse <- mintingInflationResponse
-      //        stakingPoolResponse <- stakingPoolResponse
-      //        communityPoolResponse <- communityPoolResponse
-      //        _ <- update(totalSupplyResponse, mintingInflationResponse, stakingPoolResponse, communityPoolResponse)
-      //      } yield ()
-      //        ).recover {
-      //        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      //          throw baseException
-      //      }
-      Future()
+      val totalSupplyResponse = getTotalSupply.Service.get
+      val mintingInflationResponse = getMintingInflation.Service.get
+      val stakingPoolResponse = getStakingPool.Service.get
+      val communityPoolResponse = getCommunityPool.Service.get
+
+      def update(totalSupplyResponse: TotalSupplyResponse, mintingInflationResponse: MintingInflationResponse, stakingPoolResponse: StakingPoolResponse, communityPoolResponse: CommunityPoolResponse) = Future.traverse(totalSupplyResponse.supply) { token =>
+        Service.updateOnNewBlock(
+          denom = token.denom,
+          totalSupply = token.amount,
+          bondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.bonded_tokens else MicroNumber.zero,
+          notBondedAmount = if (token.denom == constants.Blockchain.StakingDenom) stakingPoolResponse.pool.not_bonded_tokens else MicroNumber.zero,
+          communityPool = communityPoolResponse.pool.find(_.denom == token.denom).fold(MicroNumber.zero)(_.amount),
+          inflation = if (token.denom == constants.Blockchain.StakingDenom) BigDecimal(mintingInflationResponse.inflation) else BigDecimal(0.0)
+        )
+      }
+
+      (for {
+        totalSupplyResponse <- totalSupplyResponse
+        mintingInflationResponse <- mintingInflationResponse
+        stakingPoolResponse <- stakingPoolResponse
+        communityPoolResponse <- communityPoolResponse
+        _ <- update(totalSupplyResponse, mintingInflationResponse, stakingPoolResponse, communityPoolResponse)
+      } yield ()
+        ).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw baseException
+      }
     }
   }
 
