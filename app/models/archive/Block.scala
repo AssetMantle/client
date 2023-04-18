@@ -1,7 +1,7 @@
 package models.archive
 
 import exceptions.BaseException
-import models.{archive, blockchain, masterTransaction}
+import models.blockchain
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,11 +9,12 @@ import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Block(height: Int, time: Long, proposerAddress: String, validators: Seq[String])
+case class Block(height: Int, time: Long, proposerAddress: String, validators: Seq[String]) {
+  def toBlock: blockchain.Block = blockchain.Block(height = this.height, time = this.time, proposerAddress = this.proposerAddress, validators = this.validators)
+}
 
 @Singleton
 class Blocks @Inject()(
@@ -61,6 +62,8 @@ class Blocks @Inject()(
 
   private def getByList(heights: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height.inSet(heights)).result)
 
+  private def getByHeight(height: Int): Future[Option[BlockSerialized]] = db.run(blockTable.filter(_.height === height).result.headOption)
+
   private def getBlocksByHeightRange(heightRange: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height inSet heightRange).sortBy(_.time.desc).result)
 
   private[models] class BlockTable(tag: Tag) extends Table[BlockSerialized](tag, Option("archive"), "Block") {
@@ -84,6 +87,8 @@ class Blocks @Inject()(
     def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
 
     def get(heights: Seq[Int]): Future[Seq[Block]] = getByList(heights).map(_.map(_.deserialize))
+
+    def get(height: Int): Future[Option[Block]] = getByHeight(height).map(_.map(_.deserialize))
 
   }
 

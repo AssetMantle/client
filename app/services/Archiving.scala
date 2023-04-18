@@ -45,7 +45,10 @@ class Archiving @Inject()(
       if (txs.nonEmpty) archiveTransactions.Service.create(txs.map(x => archive.Transaction(hash = x.hash, height = x.height, code = x.code, gasWanted = x.gasWanted, gasUsed = x.gasUsed, txBytes = x.txBytes, log = x.log))) else Future(Seq())
     }
 
-    def deleteTransactions() = blockchainTransactions.Service.deleteByHeight(start = start, end = end)
+    def deleteTransactions() = {
+      blockchainTransactions.Utility.updateLastHeight(start + 1)
+      blockchainTransactions.Service.deleteByHeight(start = start, end = end)
+    }
 
     def moveBlocks() = {
       val blocks = Await.result(blockchainBlocks.Service.getByHeight(start = start, end = end), Duration.Inf)

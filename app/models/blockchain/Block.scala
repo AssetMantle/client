@@ -1,6 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
+import models.archive
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -17,7 +18,8 @@ case class Block(height: Int, time: Long, proposerAddress: String, validators: S
 @Singleton
 class Blocks @Inject()(
                         protected val databaseConfigProvider: DatabaseConfigProvider,
-                        configuration: Configuration
+                        configuration: Configuration,
+                        archiveBlocks: archive.Blocks,
                       )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -76,13 +78,6 @@ class Blocks @Inject()(
 
   private def deleteByHeightRange(start: Int, end: Int): Future[Int] = db.run(blockTable.filter(x => x.height >= start && x.height <= end).delete)
 
-  private def tryGetLatestBlock: Future[BlockSerialized] = db.run(blockTable.sortBy(_.height.desc).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BLOCK_NOT_FOUND, noSuchElementException)
-    }
-  }
-
   private def tryGetBlockByHeight(height: Int): Future[BlockSerialized] = db.run(blockTable.filter(_.height === height).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -90,12 +85,7 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetProposerAddressByHeight(height: Int): Future[String] = db.run(blockTable.filter(_.height === height).map(_.proposerAddress).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BLOCK_NOT_FOUND, noSuchElementException)
-    }
-  }
+  private def getBlockByHeight(height: Int): Future[Option[BlockSerialized]] = db.run(blockTable.filter(_.height === height).result.headOption)
 
   private def getByList(heights: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height.inSet(heights)).result)
 
@@ -120,9 +110,18 @@ class Blocks @Inject()(
 
     def insertOrUpdate(height: Int, time: RFC3339, proposerAddress: String, validators: Seq[String]): Future[Int] = upsert(Block(height = height, time = time.epoch, proposerAddress = proposerAddress, validators = validators))
 
-    def tryGet(height: Int): Future[Block] = tryGetBlockByHeight(height).map(_.deserialize)
+    def tryGet(height: Int): Future[Block] = get(height).map(_.getOrElse(constants.Response.BLOCK_NOT_FOUND.throwBaseException()))
 
-    def tryGetProposerAddress(height: Int): Future[String] = tryGetProposerAddressByHeight(height)
+    def get(height: Int): Future[Option[Block]] = {
+      val block = getBlockByHeight(height).map(_.map(_.deserialize))
+
+      def getFromArchive(defined: Boolean) = if (!defined) archiveBlocks.Service.get(height) else Future(None)
+
+      for {
+        block <- block
+        archiveBlock <- getFromArchive(block.isDefined)
+      } yield if (block.isDefined) block else if (archiveBlock.isDefined) archiveBlock.map(_.toBlock) else None
+    }
 
     def get(heights: Seq[Int]): Future[Seq[Block]] = getByList(heights).map(_.map(_.deserialize))
 
@@ -137,7 +136,6 @@ class Blocks @Inject()(
         block <- tryGetBlockByHeight(latestBlockHeight).map(_.deserialize)
       } yield block
     }
-
 
     def getBlocksPerPage(pageNumber: Int): Future[Seq[Block]] = {
       val latestBlockHeight = tryGetLatestBlockHeight

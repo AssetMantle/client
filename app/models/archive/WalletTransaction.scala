@@ -1,6 +1,7 @@
 package models.archive
 
 import exceptions.BaseException
+import models.masterTransaction
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -10,7 +11,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class WalletTransaction(address: String, txHash: String, height: Int)
+case class WalletTransaction(address: String, txHash: String, height: Int) {
+  def toWalletTx: masterTransaction.WalletTransaction = masterTransaction.WalletTransaction(address = address, txHash = txHash, height = height)
+}
 
 @Singleton
 class WalletTransactions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
@@ -53,7 +56,7 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
 
     def add(walletTransactions: Seq[WalletTransaction]): Future[Seq[Int]] = create(walletTransactions)
 
-    def getTransactions(address: String, pageNumber: Int): Future[Seq[WalletTransaction]] = findWalletTransactions(address = address, offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage)
+    def getTransactions(address: String, offset: Int, limit: Int): Future[Seq[WalletTransaction]] = findWalletTransactions(address = address, offset = offset, limit = limit)
 
   }
 
