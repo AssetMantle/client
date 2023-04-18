@@ -4,7 +4,7 @@ import akka.actor.Cancellable
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
-import models.{archive, blockchain, keyBase}
+import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
@@ -58,7 +58,7 @@ class Startup @Inject()(
                          getMintingInflation: GetMintingInflation,
                          getCommunityPool: GetCommunityPool,
                          utilitiesOperations: utilities.Operations,
-                         archiveBlocks: archive.Blocks,
+                         archiving: Archiving,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
@@ -352,19 +352,19 @@ class Startup @Inject()(
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
       val abciInfo = getABCIInfo.Service.get()
 
-      def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
+      def latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
 
-      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerHeight: Int) = if (latestExplorerHeight == 0) {
+      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlock: blockchain.Block) = if (latestExplorerBlock.height == 0) {
         for {
           _ <- onGenesis()
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
-        val archive = archiveBlocks.Utility.checkAndUpdate(latestExplorerHeight)
+        val archive = if (latestExplorerBlock.height / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlock.height, latestExplorerBlock.time) else Future(0)
 
-        val updateBlockHeight = latestExplorerHeight + 1
+        val updateBlockHeight = latestExplorerBlock.height + 1
 
-        val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight && updateBlockHeight <= 5248275) insertBlock(updateBlockHeight)
+        val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
         else Future()
 
         for {
@@ -375,8 +375,8 @@ class Startup @Inject()(
 
       val forComplete = (for {
         abciInfo <- abciInfo
-        latestExplorerHeight <- latestExplorerHeight
-        _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
+        latestExplorerBlock <- latestExplorerBlock
+        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlock)
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

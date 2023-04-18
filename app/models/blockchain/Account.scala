@@ -3,11 +3,10 @@ package models.blockchain
 import com.cosmos.vesting.v1beta1._
 import exceptions.BaseException
 import models.common.Serializable.Vesting.VestingParameters
-import models.traits.Logging
 import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
 import queries.blockchain.GetAccount
 import queries.responses.blockchain.AccountResponse.{Response => AccountResponse}
 import queries.responses.common.Header
@@ -17,13 +16,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], publicKey: Option[Array[Byte]], publicKeyType: Option[String], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Account(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[VestingParameters], publicKey: Option[Array[Byte]], publicKeyType: Option[String])
 
 @Singleton
 class Accounts @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getAccount: GetAccount,
-                          configuration: Configuration,
                           utilitiesOperations: utilities.Operations,
                           blockchainBalances: Balances,
                         )(implicit executionContext: ExecutionContext) {
@@ -40,8 +38,8 @@ class Accounts @Inject()(
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  case class AccountSerialized(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], publicKey: Option[Array[Byte]], publicKeyType: Option[String], createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
-    def deserialize: Account = Account(address = address, accountType = accountType, accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), publicKey = publicKey, publicKeyType = publicKeyType, createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class AccountSerialized(address: String, accountType: Option[String], accountNumber: Int, sequence: Int, vestingParameters: Option[String], publicKey: Option[Array[Byte]], publicKeyType: Option[String]) {
+    def deserialize: Account = Account(address = address, accountType = accountType, accountNumber = accountNumber, sequence = sequence, vestingParameters = vestingParameters.fold[Option[VestingParameters]](None)(x => Option(utilities.JSON.convertJsonStringToObject[VestingParameters](x))), publicKey = publicKey, publicKeyType = publicKeyType)
   }
 
   private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += serialize(account)).asTry).map {
@@ -51,7 +49,7 @@ class Accounts @Inject()(
     }
   }
 
-  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, accountType = account.accountType, accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), publicKey = account.publicKey, publicKeyType = account.publicKeyType, createdBy = account.createdBy, createdOnMillisEpoch = account.createdOnMillisEpoch, updatedBy = account.updatedBy, updatedOnMillisEpoch = account.updatedOnMillisEpoch)
+  def serialize(account: Account): AccountSerialized = AccountSerialized(address = account.address, accountType = account.accountType, accountNumber = account.accountNumber, sequence = account.sequence, vestingParameters = account.vestingParameters.fold[Option[String]](None)(x => Option(Json.toJson(x).toString)), publicKey = account.publicKey, publicKeyType = account.publicKeyType)
 
   private def upsert(account: Account): Future[Int] = db.run(accountTable.insertOrUpdate(serialize(account)).asTry).map {
     case Success(result) => result
@@ -75,7 +73,7 @@ class Accounts @Inject()(
 
   private[models] class AccountTable(tag: Tag) extends Table[AccountSerialized](tag, "Account") {
 
-    def * = (address, accountType.?, accountNumber, sequence, vestingParameters.?, publicKey.?, publicKeyType.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
+    def * = (address, accountType.?, accountNumber, sequence, vestingParameters.?, publicKey.?, publicKeyType.?) <> (AccountSerialized.tupled, AccountSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -91,13 +89,6 @@ class Accounts @Inject()(
 
     def publicKeyType = column[String]("publicKeyType")
 
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
