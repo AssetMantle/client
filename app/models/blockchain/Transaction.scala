@@ -4,6 +4,7 @@ import com.cosmos.crypto.{secp256k1, secp256r1}
 import com.cosmos.tx.v1beta1.Tx
 import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
+import models.archive
 import models.common.Serializable.{Coin, Fee}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -54,6 +55,7 @@ class Transactions @Inject()(
                               protected val databaseConfigProvider: DatabaseConfigProvider,
                               configuration: Configuration,
                               utilitiesOperations: utilities.Operations,
+                              archiveTransactions: archive.Transactions,
                             )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -108,6 +110,8 @@ class Transactions @Inject()(
     }
   }
 
+  private def getTransactionByHash(hash: String): Future[Option[Transaction]] = db.run(transactionTable.filter(_.hash === hash).result.headOption)
+
   private def getTransactionsByHeightList(heights: Seq[Int]): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.height.inSet(heights)).result)
 
   private def getTransactionsNumberByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).length.result)
@@ -152,13 +156,35 @@ class Transactions @Inject()(
 
     def insertOrUpdate(hash: String, height: String, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, log = log, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes))
 
-    def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash)
+    def tryGet(hash: String): Future[Transaction] = get(hash).map(_.getOrElse(constants.Response.TRANSACTION_NOT_FOUND.throwBaseException()))
 
-    def getTransactions(height: Int): Future[Seq[Transaction]] = getTransactionsByHeight(height)
+    def get(hash: String): Future[Option[Transaction]] = {
+      val tx = getTransactionByHash(hash)
 
-    def get(hashes: Seq[String]): Future[Seq[Transaction]] = getTransactionsByHashes(hashes)
+      def archiveTx(defined: Boolean) = if (!defined) archiveTransactions.Service.tryGet(hash).map(x => Option(x.toTx)) else Future(None)
 
-    def getNumberOfTransactions(height: Int): Future[Int] = getNumberOfTransactionsByHeight(height)
+      for {
+        tx <- tx
+        archiveTx <- archiveTx(tx.isDefined)
+      } yield if (tx.isDefined) tx else if (archiveTx.isDefined) archiveTx else None
+    }
+
+    def getTransactions(height: Int): Future[Seq[Transaction]] = if (height >= Utility.getLastHeight) getTransactionsByHeight(height)
+    else archiveTransactions.Service.getTransactions(height).map(_.map(_.toTx))
+
+    def get(hashes: Seq[String]): Future[Seq[Transaction]] = {
+      val txs = getTransactionsByHashes(hashes)
+
+      def archiveTxs = archiveTransactions.Service.get(hashes).map(_.map(_.toTx))
+
+      for {
+        txs <- txs
+        archiveTxs <- if (txs.length != hashes.length) archiveTxs else Future(Seq())
+      } yield txs ++ archiveTxs
+    }
+
+    def getNumberOfTransactions(height: Int): Future[Int] = if (height >= Utility.getLastHeight) getNumberOfTransactionsByHeight(height)
+    else archiveTransactions.Service.getNumberOfTransactions(height)
 
     def getNumberOfTransactions(blockHeights: Seq[Int]): Future[Map[Int, Int]] = {
       val transactions = getTransactionsByHeightList(blockHeights)
@@ -170,7 +196,14 @@ class Transactions @Inject()(
 
     def getTransactionsPerPage(pageNumber: Int): Future[Seq[Transaction]] = getTransactionsForPageNumber(offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage)
 
-    def getTotalTransactions: Future[Int] = getTotalTransactionsNumber
+    def getTotalTransactions: Future[Int] = {
+      val current = getTotalTransactionsNumber
+      val archive = archiveTransactions.Service.getTotalTransactions
+      for {
+        current <- current
+        archive <- archive
+      } yield current + archive
+    }
 
     def getByHeight(start: Int, end: Int): Future[Seq[Transaction]] = getByHeightRange(start = start, end = end)
 
@@ -193,5 +226,13 @@ class Transactions @Inject()(
         result <- result
       } yield ListMap(result.toList: _*)
     }
+  }
+
+  object Utility {
+    private var lastHeight = 0
+
+    def getLastHeight: Int = lastHeight
+
+    def updateLastHeight(height: Int): Unit = lastHeight = height
   }
 }

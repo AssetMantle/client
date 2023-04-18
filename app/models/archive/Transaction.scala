@@ -9,13 +9,15 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-
+import models.blockchain
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success}
 
 case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: Option[String]) {
+  
+  def toTx: blockchain.Transaction = blockchain.Transaction(hash = hash, height = height, code = code, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes, log = log)
 
   lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
 
@@ -94,8 +96,6 @@ class Transactions @Inject()(
   }
 
   private def getTransactionsByHeightList(heights: Seq[Int]): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.height.inSet(heights)).result)
-
-  private def getTransactionsNumberByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).length.result)
 
   private def getNumberOfTransactionsByHeight(height: Int): Future[Int] = db.run(transactionTable.filter(_.height === height).length.result)
 
