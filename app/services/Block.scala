@@ -127,16 +127,18 @@ class Block @Inject()(
     def insertTransactions(transactions: Seq[TransactionByHeightResponseTx]): Future[Seq[blockchainTransaction]] = if (transactions.nonEmpty) {
       val bcTxs = transactions.map(_.toTransaction)
       val insertTxs = blockchainTransactions.Service.insertMultiple(bcTxs)
-
       val updateTransactionCounter = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length)
-
       val updateMessageCounter = analyticMessageCounters.Utility.updateMessageCounter(bcTxs)
+      val wallet = masterTransactionWalletTransactions.Utility.addForTransactions(bcTxs, header.height)
+      val validator = masterTransactionValidatorTransactions.Utility.addForTransactions(bcTxs, header.height)
 
       for {
         _ <- insertTxs
         _ <- updateTransactionCounter
         _ <- updateMessageCounter
         _ <- actionsOnTransactions(bcTxs)(header)
+        _ <- wallet
+        _ <- validator
       } yield bcTxs
     } else Future(Seq())
 
@@ -228,21 +230,10 @@ class Block @Inject()(
       } yield ()
     }
 
-    val addAddressTxs = {
-      val wallet = masterTransactionWalletTransactions.Utility.addForTransactions(transactions, header.height)
-      val validator = masterTransactionValidatorTransactions.Utility.addForTransactions(transactions, header.height)
-
-      for {
-        _ <- wallet
-        _ <- validator
-      } yield ()
-    }
-
     (for {
       _ <- signers
       _ <- updateAccount
       _ <- deductFees
-      _ <- addAddressTxs
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
