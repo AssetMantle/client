@@ -50,21 +50,21 @@ class Balances @Inject()(
   private def add(balance: Balance): Future[String] = db.run((balanceTable returning balanceTable.map(_.address) += serialize(balance)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.BALANCE_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(balance: Balance): Future[Int] = db.run(balanceTable.insertOrUpdate(serialize(balance)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.BALANCE_UPSERT_FAILED, psqlException)
     }
   }
 
   private def tryGetByAddress(address: String): Future[BalanceSerialized] = db.run(balanceTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.WALLET_NOT_FOUND, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BALANCE_NOT_FOUND, noSuchElementException)
     }
   }
 

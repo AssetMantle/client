@@ -567,10 +567,14 @@ class ComponentViewController @Inject()(
   def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
+        val allValidators = blockchainValidators.Service.getAll
+
+        def proposalVotes(allValidators: Seq[String]) = blockchainProposalVotes.Service.getAllByIDAndAddresses(id, allValidators)
+
         (for {
-          proposalVotes <- proposalVotes
-        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes))
+          allValidators <- allValidators
+          proposalVotes <- proposalVotes(allValidators.map(_.getDelegatorAddress))
+        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes, allValidators.map(x => x.getDelegatorAddress -> x.description.moniker).toMap))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

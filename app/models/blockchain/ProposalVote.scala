@@ -59,6 +59,8 @@ class ProposalVotes @Inject()(
 
   private def getByID(proposalID: Int): Future[Seq[ProposalVote]] = db.run(proposalVoteTable.filter(_.proposalID === proposalID).result)
 
+  private def getByIDAndAddresses(proposalID: Int, addresses: Seq[String]): Future[Seq[ProposalVote]] = db.run(proposalVoteTable.filter(x => x.proposalID === proposalID && x.voter.inSet(addresses)).result)
+
   private[models] class ProposalVoteTable(tag: Tag) extends Table[ProposalVote](tag, "ProposalVote") {
 
     def * = (proposalID, voter, option, weight) <> (ProposalVote.tupled, ProposalVote.unapply)
@@ -81,6 +83,8 @@ class ProposalVotes @Inject()(
     def add(proposalVotes: Seq[ProposalVote]): Future[Unit] = create(proposalVotes)
 
     def getAllByID(proposalID: Int): Future[Seq[ProposalVote]] = getByID(proposalID)
+
+    def getAllByIDAndAddresses(proposalID: Int, addresses: Seq[String]): Future[Seq[ProposalVote]] = getByIDAndAddresses(proposalID, addresses)
 
     def deleteAllVotesForProposal(address: String, proposalID: Int): Future[Int] = deleteByVoterAndProposal(address = address, proposalID = proposalID)
 
