@@ -1,7 +1,7 @@
 package models.blockchain
 
-import com.google.protobuf.{Any => protoAny}
 import com.cosmos.feegrant.{v1beta1 => feegrantTx}
+import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
 import models.Abstract.{FeeAllowance => AbstractFeeAllowance}
 import models.traits.Logging
@@ -42,30 +42,30 @@ class FeeGrants @Inject()(
   private def add(feeGrant: FeeGrant): Future[String] = db.run((feeGrantTable returning feeGrantTable.map(_.granter) += feeGrant).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.FEE_GRANT_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(feeGrant: FeeGrant): Future[Int] = db.run(feeGrantTable.insertOrUpdate(feeGrant).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.FEE_GRANT_UPSERT_FAILED, psqlException)
     }
   }
 
   private def deleteByGranterGranteeAndMsgType(granter: String, grantee: String): Future[Int] = db.run(feeGrantTable.filter(x => x.granter === granter && x.grantee === grantee).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.FEE_GRANT_DELETE_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.FEE_GRANT_DELETE_FAILED, noSuchElementException)
     }
   }
 
   private def findByGranterGranteeAndMsgType(granter: String, grantee: String): Future[FeeGrant] = db.run(feeGrantTable.filter(x => x.granter === granter && x.grantee === grantee).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, psqlException)
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.AUTHORIZATION_DELETE_FAILED, noSuchElementException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.FEE_GRANT_DELETE_FAILED, psqlException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.FEE_GRANT_DELETE_FAILED, noSuchElementException)
     }
   }
 

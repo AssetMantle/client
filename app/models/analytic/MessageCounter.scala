@@ -98,7 +98,7 @@ class MessageCounters @Inject()(
       val all = Service.fetchAll
       (for {
         all <- all
-      } yield ListMap(all.map(x => x.messageType -> x.counter.toDouble): _*)
+      } yield ListMap(all.sortBy(_.counter).reverse.map(x => x.messageType -> x.counter.toDouble): _*)
         ).recover {
         case baseException: BaseException => throw baseException
       }

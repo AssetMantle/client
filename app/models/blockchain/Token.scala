@@ -5,11 +5,11 @@ import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
-import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
-import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
 import queries.blockchain.{GetCommunityPool, GetMintingInflation, GetStakingPool, GetTotalSupply}
+import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
+import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
+import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import slick.jdbc.JdbcProfile
 import utilities.MicroNumber
 
@@ -96,6 +96,8 @@ class Tokens @Inject()(
     }
   }
 
+  private def existsByDenom(denom: String): Future[Boolean] = db.run(tokenTable.filter(_.denom === denom).exists.result)
+
   private def updateBondingTokenByDenom(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toBigDecimal, notBondedAmount.toBigDecimal)).asTry).map {
     case Success(result) => result match {
       case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -166,9 +168,21 @@ class Tokens @Inject()(
 
     def getStakingToken: Future[Token] = findByDenom(constants.Blockchain.StakingDenom).map(_.deserialize)
 
+    def insertOrUpdate(token: Token): Future[Int] = upsert(token)
+
     def insertMultiple(tokens: Seq[Token]): Future[Seq[String]] = addMultiple(tokens)
 
-    def updateOnNewBlock(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal): Future[Int] = updateExceptBurnAndLock(denom = denom, totalSupply = totalSupply.toBigDecimal, bondedAmount = bondedAmount.toBigDecimal, notBondedAmount = notBondedAmount.toBigDecimal, communityPool = communityPool.toBigDecimal, inflation = inflation)
+    def updateOnNewBlock(denom: String, totalSupply: MicroNumber, bondedAmount: MicroNumber, notBondedAmount: MicroNumber, communityPool: MicroNumber, inflation: BigDecimal): Future[Unit] = {
+      val exists = existsByDenom(denom)
+
+      def checkAndProcess(exists: Boolean) = if (!exists) insertOrUpdate(Token(denom = denom, totalSupply = totalSupply, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount, communityPool = communityPool, inflation = inflation, totalLocked = MicroNumber.zero, totalBurnt = MicroNumber.zero))
+      else updateExceptBurnAndLock(denom = denom, totalSupply = totalSupply.toBigDecimal, bondedAmount = bondedAmount.toBigDecimal, notBondedAmount = notBondedAmount.toBigDecimal, communityPool = communityPool.toBigDecimal, inflation = inflation)
+
+      for {
+        exists <- exists
+        _ <- checkAndProcess(exists)
+      } yield ()
+    }
 
     def updateStakingAmounts(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = updateBondingTokenByDenom(denom = denom, bondedAmount = bondedAmount, notBondedAmount = notBondedAmount)
 

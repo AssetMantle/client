@@ -34,14 +34,14 @@ class TransactionCounters @Inject()(
   private def add(transactionCounter: TransactionCounter): Future[Long] = db.run((transactionCounterTable returning transactionCounterTable.map(_.epoch) += transactionCounter).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_COUNTER_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(transactionCounter: TransactionCounter): Future[Int] = db.run(transactionCounterTable.insertOrUpdate(transactionCounter).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_COUNTER_UPSERT_FAILED, psqlException)
     }
   }
 

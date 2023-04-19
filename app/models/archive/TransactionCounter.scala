@@ -33,7 +33,7 @@ class TransactionCounters @Inject()(
   private def add(transactionCounters: Seq[TransactionCounter]): Future[Seq[Long]] = db.run((transactionCounterTable returning transactionCounterTable.map(_.epoch) ++= transactionCounters).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_COUNTER_UPSERT_FAILED, psqlException)
     }
   }
 

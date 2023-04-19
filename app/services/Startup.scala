@@ -296,7 +296,6 @@ class Startup @Inject()(
   def insertOrdersOnStart(orders: Seq[Order.Mappable]): Future[Unit] = blockchainOrders.Service.add(orders.map(_.order.toOrder))
 
   private def insertBlock(height: Int): Future[Unit] = {
-    val startTime = System.currentTimeMillis()
     val blockCommitResponse = blocksServices.insertOnBlock(height)
     val blockResultResponse = getBlockResults.Service.get(height)
 
@@ -312,14 +311,11 @@ class Startup @Inject()(
       blockCommitResponse <- blockCommitResponse
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
+      _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
       blockResultResponse <- blockResultResponse
       _ <- actionsOnEvents(blockResultResponse = blockResultResponse, currentBlockTimeStamp = blockCommitResponse.result.signed_header.header.time)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
-      _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
-    } yield {
-      val endTime = System.currentTimeMillis()
-      logger.info("Time to process " + height + " : " + (endTime - startTime))
-    }).recover {
+    } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
   }

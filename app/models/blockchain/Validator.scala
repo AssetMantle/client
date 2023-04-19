@@ -42,6 +42,8 @@ case class Validator(operatorAddress: String, hexAddress: String, jailed: Boolea
   def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONDED
 
   def isUnbondingMatured(currentTime: RFC3339): Boolean = !unbondingTime.isAfter(currentTime)
+
+  def getDelegatorAddress: String = utilities.Crypto.convertOperatorAddressToAccountAddress(this.operatorAddress)
 }
 
 @Singleton

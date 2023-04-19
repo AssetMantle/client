@@ -255,23 +255,10 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
-        val ibcTxsCount = analyticMessageCounters.Service.getByMessageTypes(
-          Seq(constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION),
-          ))
 
         (for {
           messagesData <- messagesData
-          ibcTxsCount <- ibcTxsCount
-        } yield Ok(views.html.component.blockchain.dashboard.transactionMessagesStatistics(
-          ibcIn = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)).fold(0)(_.counter),
-          ibcOut = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER)).fold(0)(_.counter),
-          delegate = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE)).fold(0)(_.counter),
-          executeAuthorization = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION)).fold(0)(_.counter),
-          messagesData = messagesData))
+        } yield Ok(views.html.component.blockchain.dashboard.transactionMessagesStatistics(messagesData = messagesData))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -580,10 +567,14 @@ class ComponentViewController @Inject()(
   def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
+        val allValidators = blockchainValidators.Service.getAll
+
+        def proposalVotes(allValidators: Seq[String]) = blockchainProposalVotes.Service.getAllByIDAndAddresses(id, allValidators)
+
         (for {
-          proposalVotes <- proposalVotes
-        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes))
+          allValidators <- allValidators
+          proposalVotes <- proposalVotes(allValidators.map(_.getDelegatorAddress))
+        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes, allValidators.map(x => x.getDelegatorAddress -> x.description.moniker).toMap))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
