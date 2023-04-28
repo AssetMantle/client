@@ -169,7 +169,7 @@ class Transactions @Inject()(
       } yield if (tx.isDefined) tx else if (archiveTx.isDefined) archiveTx else None
     }
 
-    def getTransactions(height: Int): Future[Seq[Transaction]] = if (height >= Utility.getLastHeight) getTransactionsByHeight(height)
+    def getTransactions(height: Int): Future[Seq[Transaction]] = if (height > archiveTransactions.Service.getLastArchiveHeight) getTransactionsByHeight(height)
     else archiveTransactions.Service.getTransactions(height).map(_.map(_.toTx))
 
     def get(hashes: Seq[String]): Future[Seq[Transaction]] = {
@@ -183,7 +183,7 @@ class Transactions @Inject()(
       } yield txs ++ archiveTxs
     }
 
-    def getNumberOfTransactions(height: Int): Future[Int] = if (height >= Utility.getLastHeight) getNumberOfTransactionsByHeight(height)
+    def getNumberOfTransactions(height: Int): Future[Int] = if (height > archiveTransactions.Service.getLastArchiveHeight) getNumberOfTransactionsByHeight(height)
     else archiveTransactions.Service.getNumberOfTransactions(height)
 
     def getNumberOfTransactions(blockHeights: Seq[Int]): Future[Map[Int, Int]] = {
@@ -226,13 +226,5 @@ class Transactions @Inject()(
         result <- result
       } yield ListMap(result.toList: _*)
     }
-  }
-
-  object Utility {
-    private var lastHeight = 0
-
-    def getLastHeight: Int = lastHeight
-
-    def updateLastHeight(height: Int): Unit = lastHeight = height
   }
 }

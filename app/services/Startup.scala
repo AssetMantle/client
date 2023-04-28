@@ -75,6 +75,7 @@ class Startup @Inject()(
 
   private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
 
+  archiving.setLastArchiveHeight()
 
   private def insertInitialClassificationIDs() = {
     val nubClassificationID = models.blockchain.Classification(

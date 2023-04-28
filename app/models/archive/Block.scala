@@ -53,12 +53,7 @@ class Blocks @Inject()(
     }
   }
 
-  private def tryGetProposerAddressByHeight(height: Int): Future[String] = db.run(blockTable.filter(_.height === height).map(_.proposerAddress).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BLOCK_NOT_FOUND, noSuchElementException)
-    }
-  }
+  private def tryGetLatestHeight: Future[Int] = db.run(blockTable.map(_.height).sorted.max.result.map(_.getOrElse(0)))
 
   private def getByList(heights: Seq[Int]): Future[Seq[BlockSerialized]] = db.run(blockTable.filter(_.height.inSet(heights)).result)
 
@@ -89,6 +84,8 @@ class Blocks @Inject()(
     def get(heights: Seq[Int]): Future[Seq[Block]] = getByList(heights).map(_.map(_.deserialize))
 
     def get(height: Int): Future[Option[Block]] = getByHeight(height).map(_.map(_.deserialize))
+
+    def getLatestHeight: Future[Int] = tryGetLatestHeight
 
   }
 

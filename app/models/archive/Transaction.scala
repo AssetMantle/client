@@ -4,19 +4,20 @@ import com.cosmos.crypto.{secp256k1, secp256r1}
 import com.cosmos.tx.v1beta1.Tx
 import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
+import models.blockchain
 import models.common.Serializable.{Coin, Fee}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import models.blockchain
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success}
 
 case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: Option[String]) {
-  
+
   def toTx: blockchain.Transaction = blockchain.Transaction(hash = hash, height = height, code = code, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes, log = log)
 
   lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
@@ -126,8 +127,20 @@ class Transactions @Inject()(
   }
 
   object Service {
+    private var lastArchiveHeight = 0
+    private var setHeight = false
 
-    def create(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
+    def getLastArchiveHeight: Int = lastArchiveHeight
+
+    def create(transactions: Seq[Transaction], endHeight: Int): Future[Seq[Int]] = {
+      lastArchiveHeight = endHeight
+      addMultiple(transactions)
+    }
+
+    def setLastArchiveHeight(value: Int): Unit = if (!setHeight) {
+      lastArchiveHeight = value
+      setHeight = true
+    }
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash)
 
