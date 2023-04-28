@@ -42,11 +42,10 @@ class Archiving @Inject()(
 
     def moveTransactions() = {
       val txs = Await.result(blockchainTransactions.Service.getByHeight(start = start, end = end), Duration.Inf)
-      if (txs.nonEmpty) archiveTransactions.Service.create(txs.map(x => archive.Transaction(hash = x.hash, height = x.height, code = x.code, gasWanted = x.gasWanted, gasUsed = x.gasUsed, txBytes = x.txBytes, log = x.log))) else Future(Seq())
+      if (txs.nonEmpty) archiveTransactions.Service.create(txs.map(x => archive.Transaction(hash = x.hash, height = x.height, code = x.code, gasWanted = x.gasWanted, gasUsed = x.gasUsed, txBytes = x.txBytes, log = x.log)), end) else Future(Seq())
     }
 
     def deleteTransactions() = {
-      blockchainTransactions.Utility.updateLastHeight(start + 1)
       blockchainTransactions.Service.deleteByHeight(start = start, end = end)
     }
 
@@ -79,6 +78,11 @@ class Archiving @Inject()(
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
+  }
+
+  def setLastArchiveHeight(): Unit = {
+    val lastArchiveHeight = Await.result(archiveBlocks.Service.getLatestHeight, Duration.Inf)
+    archiveTransactions.Service.setLastArchiveHeight(lastArchiveHeight)
   }
 
 }

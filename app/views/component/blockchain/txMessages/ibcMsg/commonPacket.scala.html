@@ -1,19 +1,17 @@
-@import views.html.base.infos._
 @import com.ibc.core.channel.v1.Packet
-@import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+@import models.common.Serializable.IBC
+@import views.html.base.infos._
+@import play.api.Logger
 
 @(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-
+<div class="cmuk-text-left title">@Messages(key):</div>
+<div>
     @commonTextInfo(constants.View.SEQUENCE, packet.getSequence.toString)
     @commonTextInfo(constants.View.SOURCE_PORT, packet.getSourcePort)
     @commonTextInfo(constants.View.SOURCE_CHANNEL, packet.getSourceChannel)
     @commonTextInfo(constants.View.DESTINATION_PORT, packet.getDestinationPort)
     @commonTextInfo(constants.View.DESTINATION_CHANNEL, packet.getDestinationChannel)
-    @views.html.component.blockchain.txMessages.ibcMsg.commonFungibleTokenPacketData(constants.View.DATA, FungibleTokenPacketData.parseFrom(packet.getData))
+    @views.html.component.blockchain.txMessages.ibcMsg.commonFungibleTokenPacketData(constants.View.DATA, utilities.JSON.convertJsonStringToObject[IBC.FungibleTokenPacketData](packet.getData.toStringUtf8)("commonPacket", Logger("commonPacket"), IBC.fungibleTokenPacketDataReads))
     @views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.TIMEOUT_HEIGHT, packet.getTimeoutHeight)
     @commonEpochInfo(constants.View.TIMEOUT_TIMESTAMP, packet.getTimeoutTimestamp)
-<div class="cmuk-text-left title">@Messages(key):</div>
-<div>
-
 </div>

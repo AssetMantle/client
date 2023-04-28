@@ -1,13 +1,13 @@
-@import com.ibc.applications.transfer.v2.FungibleTokenPacketData
+@import models.common.Serializable.IBC
 @import views.html.base.infos._
 @import views.html.base.buttons._
 
-@(key: String, fungibleTokenPacketData: FungibleTokenPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(key: String, fungibleTokenPacketData: IBC.FungibleTokenPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @Messages(key):
 <div>
-    @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.getDenom)
-    @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.getAmount, normalize = false))
-    @commonTextInfo(constants.View.SENDER, fungibleTokenPacketData.getSender)
-    @commonHtmlInfo(constants.View.RECEIVER, commonJavascriptLink(fungibleTokenPacketData.getReceiver, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fungibleTokenPacketData.getReceiver}'))")))
+    @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.denom)
+    @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.amount, normalize = false))
+    @commonTextInfo(constants.View.SENDER, fungibleTokenPacketData.sender)
+    @commonHtmlInfo(constants.View.RECEIVER, commonJavascriptLink(fungibleTokenPacketData.receiver, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fungibleTokenPacketData.receiver}'))")))
 </div>
