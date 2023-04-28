@@ -1,9 +1,8 @@
 @import views.html.base.cards._
-@import views.html.base.infos._
 @import views.html.base.charts._
 @import scala.collection.immutable.ListMap
 
-@(ibcIn: Int, ibcOut: Int, delegate: Int, executeAuthorization: Int, messagesData: ListMap[String, Double])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(messagesData: ListMap[String, Double])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonCard(constants.View.TRANSACTIONS_MESSAGES_TRAFFIC) {
 } {
     @commonHorisontalStackedChart("messagesStatistics", messagesData)

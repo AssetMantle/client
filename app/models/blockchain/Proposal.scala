@@ -4,11 +4,10 @@ import com.cosmos.gov.{v1beta1 => govTx}
 import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
 import models.Abstract.ProposalContent
-import models.traits.Logging
 import models.common.Serializable.{Coin, FinalTallyResult}
+import models.traits.Logging
 import org.postgresql.util.PSQLException
-import play.api.Logger
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import queries.blockchain.GetProposal
@@ -92,14 +91,14 @@ class Proposals @Inject()(
   private def add(proposal: Proposal): Future[Int] = db.run((proposalTable returning proposalTable.map(_.id) += serialize(proposal)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PROPOSAL_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(proposal: Proposal): Future[Int] = db.run(proposalTable.insertOrUpdate(serialize(proposal)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PROPOSAL_UPSERT_FAILED, psqlException)
     }
   }
 
@@ -114,12 +113,7 @@ class Proposals @Inject()(
 
   private def getByID(id: Int): Future[Option[ProposalSerialized]] = db.run(proposalTable.filter(_.id === id).result.headOption)
 
-  private def getMaxProposalID: Future[Int] = db.run(proposalTable.map(_.id).max.result.asTry).map {
-    case Success(result) => result.getOrElse(0)
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
-    }
-  }
+  private def getMaxProposalID = db.run(proposalTable.map(_.id).max.result.map(_.getOrElse(0)))
 
   private def getAllProposals: Future[Seq[ProposalSerialized]] = db.run(proposalTable.sortBy(_.id.desc).result)
 

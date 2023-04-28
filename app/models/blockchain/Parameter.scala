@@ -54,21 +54,21 @@ class Parameters @Inject()(
   private def add(parameter: Parameter): Future[String] = db.run((parameterTable returning parameterTable.map(_.parameterType) += serialize(parameter)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PARAMETER_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(parameter: Parameter): Future[Int] = db.run(parameterTable.insertOrUpdate(serialize(parameter)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PARAMETER_UPSERT_FAILED, psqlException)
     }
   }
 
   private def tryGetByType(parameterType: String): Future[ParameterSerialized] = db.run(parameterTable.filter(_.parameterType === parameterType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.PARAMETER_NOT_FOUND, noSuchElementException)
     }
   }
 

@@ -7,8 +7,7 @@ import exceptions.BaseException
 import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -82,12 +81,13 @@ class ValidatorTransactions @Inject()(protected val databaseConfigProvider: Data
 
     def addForTransactions(txs: Seq[models.blockchain.Transaction], height: Int): Future[Unit] = {
       val validatorTransactions = txs.map { tx =>
-        val txAddresses = tx.getMessages.map { stdMsg =>
+        val txAddresses = tx.getMessages.flatMap { stdMsg =>
           stdMsg.getTypeUrl match {
-            case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress
-            case constants.Blockchain.TransactionMessage.UNJAIL => slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr
-            case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress
-            case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress
+            case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => Option(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case constants.Blockchain.TransactionMessage.UNJAIL => Option(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr)
+            case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => Option(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => Option(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case _ => None
           }
         }
         txAddresses.distinct.map(x => ValidatorTransaction(address = x, txHash = tx.hash, height = height))

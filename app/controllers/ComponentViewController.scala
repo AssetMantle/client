@@ -11,7 +11,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import queries.blockchain.{GetDelegatorRewards, GetValidatorCommission}
+import queries.blockchain.{GetDelegatorRewards, GetTransactionsByHash, GetValidatorCommission}
 import queries.responses.common.EventWrapper
 import schema.document.Document
 import utilities.MicroNumber
@@ -45,6 +45,7 @@ class ComponentViewController @Inject()(
                                          cached: Cached,
                                          getDelegatorRewards: GetDelegatorRewards,
                                          getValidatorCommission: GetValidatorCommission,
+                                         getTxByHash: GetTransactionsByHash,
                                          masterTransactionTokenPrices: masterTransaction.TokenPrices,
                                          masterTransactionWalletTransactions: masterTransaction.WalletTransactions,
                                          masterTransactionValidatorTransactions: masterTransaction.ValidatorTransactions,
@@ -254,23 +255,10 @@ class ComponentViewController @Inject()(
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         val messagesData = analyticMessageCounters.Utility.getMessagesStatistics
-        val ibcTxsCount = analyticMessageCounters.Service.getByMessageTypes(
-          Seq(constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE),
-            constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION),
-          ))
 
         (for {
           messagesData <- messagesData
-          ibcTxsCount <- ibcTxsCount
-        } yield Ok(views.html.component.blockchain.dashboard.transactionMessagesStatistics(
-          ibcIn = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.RECV_PACKET, constants.Blockchain.TransactionMessage.RECV_PACKET)).fold(0)(_.counter),
-          ibcOut = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.TRANSFER, constants.Blockchain.TransactionMessage.TRANSFER)).fold(0)(_.counter),
-          delegate = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.DELEGATE, constants.Blockchain.TransactionMessage.DELEGATE)).fold(0)(_.counter),
-          executeAuthorization = ibcTxsCount.find(_.messageType == constants.View.TxMessagesMap.getOrElse(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION, constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION)).fold(0)(_.counter),
-          messagesData = messagesData))
+        } yield Ok(views.html.component.blockchain.dashboard.transactionMessagesStatistics(messagesData = messagesData))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -505,12 +493,12 @@ class ComponentViewController @Inject()(
   def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path + "/" + txHash + "/" + msgIndex.toString, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transaction = blockchainTransactions.Service.tryGet(txHash)
+        val transaction = getTxByHash.Service.get(txHash).map(_.result.toTransactionWithLog)
         (for {
           transaction <- transaction
         } yield {
           if (transaction.status) {
-            val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.log)
+            val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.log.get)
               .find(_.msg_index.getOrElse(0) == msgIndex)
               .fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.value.getOrElse(MicroNumber.zero + constants.Blockchain.StakingDenom))))
               .split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
@@ -579,10 +567,14 @@ class ComponentViewController @Inject()(
   def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val proposalVotes = blockchainProposalVotes.Service.getAllByID(id)
+        val allValidators = blockchainValidators.Service.getAll
+
+        def proposalVotes(allValidators: Seq[String]) = blockchainProposalVotes.Service.getAllByIDAndAddresses(id, allValidators)
+
         (for {
-          proposalVotes <- proposalVotes
-        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes))
+          allValidators <- allValidators
+          proposalVotes <- proposalVotes(allValidators.map(_.getDelegatorAddress))
+        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes, allValidators.map(x => x.getDelegatorAddress -> x.description.moniker).toMap))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

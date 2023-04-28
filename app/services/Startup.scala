@@ -57,7 +57,8 @@ class Startup @Inject()(
                          getStakingPool: GetStakingPool,
                          getMintingInflation: GetMintingInflation,
                          getCommunityPool: GetCommunityPool,
-                         utilitiesOperations: utilities.Operations
+                         utilitiesOperations: utilities.Operations,
+                         archiving: Archiving,
                        )(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.SERVICES_STARTUP
@@ -74,6 +75,7 @@ class Startup @Inject()(
 
   private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
 
+  archiving.setLastArchiveHeight()
 
   private def insertInitialClassificationIDs() = {
     val nubClassificationID = models.blockchain.Classification(
@@ -310,10 +312,10 @@ class Startup @Inject()(
       blockCommitResponse <- blockCommitResponse
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
+      _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
       blockResultResponse <- blockResultResponse
       _ <- actionsOnEvents(blockResultResponse = blockResultResponse, currentBlockTimeStamp = blockCommitResponse.result.signed_header.header.time)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
-      _ <- sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
     } yield ()).recover {
       case baseException: BaseException => throw baseException
     }
@@ -347,23 +349,31 @@ class Startup @Inject()(
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
       val abciInfo = getABCIInfo.Service.get()
 
-      def latestExplorerHeight = blockchainBlocks.Service.getLatestBlockHeight
+      def latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
 
-      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerHeight: Int) = if (latestExplorerHeight == 0) {
+      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlock: blockchain.Block) = if (latestExplorerBlock.height == 0) {
         for {
           _ <- onGenesis()
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
-        val updateBlockHeight = latestExplorerHeight + 1
-        if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
+        val archive = if (latestExplorerBlock.height / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlock.height, latestExplorerBlock.time) else Future(0)
+
+        val updateBlockHeight = latestExplorerBlock.height + 1
+
+        val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
         else Future()
+
+        for {
+          _ <- archive
+          _ <- processBlock
+        } yield ()
       }
 
       val forComplete = (for {
         abciInfo <- abciInfo
-        latestExplorerHeight <- latestExplorerHeight
-        _ <- checkAndInsertBlock(abciInfo, latestExplorerHeight)
+        latestExplorerBlock <- latestExplorerBlock
+        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlock)
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

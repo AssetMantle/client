@@ -8,6 +8,15 @@ firebaseConfig = {
     appId: "1:656465615885:web:18bfbb26f03fd043278944",
 };
 
+dateFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+};
+
 ws = {
     url: 'wss://' + $(location).attr('host') + '/websocket',
     start: 'START',

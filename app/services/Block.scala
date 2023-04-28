@@ -89,14 +89,12 @@ class Block @Inject()(
 
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
-    val blockResponse = getBlock.Service.get(height)
 
     def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address))
 
     (for {
       blockCommitResponse <- blockCommitResponse
       _ <- insertBlock(blockCommitResponse)
-      blockResponse <- blockResponse
     } yield blockCommitResponse
       ).recover {
       case baseException: BaseException => throw baseException
@@ -129,16 +127,18 @@ class Block @Inject()(
     def insertTransactions(transactions: Seq[TransactionByHeightResponseTx]): Future[Seq[blockchainTransaction]] = if (transactions.nonEmpty) {
       val bcTxs = transactions.map(_.toTransaction)
       val insertTxs = blockchainTransactions.Service.insertMultiple(bcTxs)
-
       val updateTransactionCounter = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length)
-
       val updateMessageCounter = analyticMessageCounters.Utility.updateMessageCounter(bcTxs)
+      val wallet = masterTransactionWalletTransactions.Utility.addForTransactions(bcTxs, header.height)
+      val validator = masterTransactionValidatorTransactions.Utility.addForTransactions(bcTxs, header.height)
 
       for {
         _ <- insertTxs
         _ <- updateTransactionCounter
         _ <- updateMessageCounter
         _ <- actionsOnTransactions(bcTxs)(header)
+        _ <- wallet
+        _ <- validator
       } yield bcTxs
     } else Future(Seq())
 
@@ -230,32 +230,12 @@ class Block @Inject()(
       } yield ()
     }
 
-    val addAddressTxs = {
-      val wallet = masterTransactionWalletTransactions.Utility.addForTransactions(transactions, header.height)
-      val validator = masterTransactionValidatorTransactions.Utility.addForTransactions(transactions, header.height)
-
-      for {
-        _ <- wallet
-        _ <- validator
-      } yield ()
-    }
-
     (for {
       _ <- signers
       _ <- updateAccount
       _ <- deductFees
-      _ <- addAddressTxs
     } yield ()).recover {
-      case baseException: BaseException => {
-        println("here")
-        val a = true
-        throw baseException
-      }
-      case exception: Exception => {
-        val a = true
-        println("here")
-        throw exception
-      }
+      case baseException: BaseException => throw baseException
     }
   }
 

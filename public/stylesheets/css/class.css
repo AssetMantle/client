@@ -4757,7 +4757,7 @@ figure .block:hover {
 #validatorsList table.dataTable tbody td.blockHeightItem{
     display: flex;
     align-items: center;
-    /*gap: 8px;*/
+    gap: 0.8rem;
 }
 
 #validatorsList table.dataTable tbody td.blockHeightItem img{

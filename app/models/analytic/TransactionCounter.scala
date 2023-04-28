@@ -1,19 +1,17 @@
 package models.analytic
 
 import exceptions.BaseException
-import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TransactionCounter(epoch: Long, totalTxs: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class TransactionCounter(epoch: Long, totalTxs: Int)
 
 @Singleton
 class TransactionCounters @Inject()(
@@ -36,45 +34,45 @@ class TransactionCounters @Inject()(
   private def add(transactionCounter: TransactionCounter): Future[Long] = db.run((transactionCounterTable returning transactionCounterTable.map(_.epoch) += transactionCounter).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_COUNTER_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(transactionCounter: TransactionCounter): Future[Int] = db.run(transactionCounterTable.insertOrUpdate(transactionCounter).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.TRANSACTION_COUNTER_UPSERT_FAILED, psqlException)
     }
   }
 
+  private def getFirstCounter: Future[Option[TransactionCounter]] = db.run(transactionCounterTable.sortBy(_.epoch).take(1).result.headOption)
+
   private def getByEpoch(startEpoch: Long, endEpoch: Long): Future[Seq[TransactionCounter]] = db.run(transactionCounterTable.filter(x => x.epoch >= startEpoch && x.epoch <= endEpoch).sortBy(_.epoch).result)
+
+  private def deleteByStartAndEnd(startEpoch: Long, endEpoch: Long): Future[Int] = db.run(transactionCounterTable.filter(x => x.epoch >= startEpoch && x.epoch <= endEpoch).delete)
 
   private def getTotalTxsByEpoch(epoch: Long): Future[Option[Int]] = db.run(transactionCounterTable.filter(_.epoch < epoch).map(_.totalTxs).sum.result)
 
-  private[models] class TransactionCounterTable(tag: Tag) extends Table[TransactionCounter](tag, "TransactionCounter") {
+  private[models] class TransactionCounterTable(tag: Tag) extends Table[TransactionCounter](tag, Option("analytics"), "TransactionCounter") {
 
-    def * = (epoch, totalTxs, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (TransactionCounter.tupled, TransactionCounter.unapply)
+    def * = (epoch, totalTxs) <> (TransactionCounter.tupled, TransactionCounter.unapply)
 
     def epoch = column[Long]("epoch", O.PrimaryKey)
 
     def totalTxs = column[Int]("totalTxs")
-
-   def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
 
     def create(epoch: Long, totalTxs: Int): Future[Long] = add(TransactionCounter(epoch = epoch, totalTxs = totalTxs))
 
+    def getFirst: Future[Option[TransactionCounter]] = getFirstCounter
+
     def getByStartAndEndEpoch(startEpoch: Long, endEpoch: Long): Future[Seq[TransactionCounter]] = getByEpoch(startEpoch = startEpoch, endEpoch = endEpoch)
 
     def getTotalTxsTill(epoch: Long): Future[Int] = getTotalTxsByEpoch(epoch).map(_.getOrElse(0))
+
+    def deleteByEpoch(startEpoch: Long, endEpoch: Long): Future[Int] = deleteByStartAndEnd(startEpoch = startEpoch, endEpoch = endEpoch)
 
   }
 

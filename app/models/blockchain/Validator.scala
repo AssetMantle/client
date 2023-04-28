@@ -4,14 +4,13 @@ import com.cosmos.distribution.{v1beta1 => distributionTx}
 import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
-import models.traits.Logging
 import models.common.Serializable.Validator.{Commission, Description}
+import models.traits.Logging
 import models.{keyBase, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.{GetBondedValidators, GetValidator}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -43,6 +42,8 @@ case class Validator(operatorAddress: String, hexAddress: String, jailed: Boolea
   def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONDED
 
   def isUnbondingMatured(currentTime: RFC3339): Boolean = !unbondingTime.isAfter(currentTime)
+
+  def getDelegatorAddress: String = utilities.Crypto.convertOperatorAddressToAccountAddress(this.operatorAddress)
 }
 
 @Singleton
@@ -112,6 +113,8 @@ class Validators @Inject()(
       case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND, noSuchElementException)
     }
   }
+
+  private def getValidatorByOperatorOrHexAddress(address: String): Future[Option[ValidatorSerialized]] = db.run(validatorTable.filter(x => x.operatorAddress === address || x.hexAddress === address).result.headOption)
 
   private def tryGetValidatorsByHexAddresses(hexAddresses: Seq[String]): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.hexAddress.inSet(hexAddresses)).result)
 
@@ -208,6 +211,8 @@ class Validators @Inject()(
     def insertOrUpdate(validator: Validator): Future[Int] = upsert(validator)
 
     def tryGet(address: String): Future[Validator] = tryGetValidatorByOperatorOrHexAddress(address).map(_.deserialize)
+
+    def get(address: String): Future[Option[Validator]] = getValidatorByOperatorOrHexAddress(address).map(_.map(_.deserialize))
 
     def getAllByHexAddresses(hexAddresses: Seq[String]): Future[Seq[Validator]] = tryGetValidatorsByHexAddresses(hexAddresses).map(_.map(_.deserialize))
 
@@ -363,11 +368,9 @@ class Validators @Inject()(
     def insertOrUpdateValidator(validatorAddress: String): Future[Validator] = {
       val validatorResponse = getValidator.Service.get(validatorAddress)
 
-      def insertValidator(validator: Validator) = Service.insertOrUpdate(validator)
-
       (for {
         validatorResponse <- validatorResponse
-        _ <- insertValidator(validatorResponse.validator.toValidator)
+        _ <- Service.insertOrUpdate(validatorResponse.validator.toValidator)
       } yield validatorResponse.validator.toValidator
         ).recover {
         case baseException: BaseException => throw baseException

@@ -6,11 +6,10 @@ import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import exceptions.BaseException
 import models.common.Serializable.Coin
-import models.traits.Logging
 import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.{Configuration, Logger}
 import queries.blockchain.GetBalance
 import queries.responses.blockchain.BalanceResponse.{Response => BalanceResponse}
 import queries.responses.common.Header
@@ -21,14 +20,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class Balance(address: String, coins: Seq[Coin], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class Balance(address: String, coins: Seq[Coin])
 
 @Singleton
 class Balances @Inject()(
                           protected val databaseConfigProvider: DatabaseConfigProvider,
                           getBalance: GetBalance,
-                          configuration: Configuration,
-                          utilitiesOperations: utilities.Operations
+                          utilitiesOperations: utilities.Operations,
                         )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -43,30 +41,30 @@ class Balances @Inject()(
 
   private[models] val balanceTable = TableQuery[BalanceTable]
 
-  case class BalanceSerialized(address: String, coins: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long], updatedBy: Option[String], updatedOnMillisEpoch: Option[Long]) {
-    def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
+  case class BalanceSerialized(address: String, coins: String) {
+    def deserialize: Balance = Balance(address = address, coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](coins))
   }
 
-  def serialize(balance: Balance): BalanceSerialized = BalanceSerialized(address = balance.address, coins = Json.toJson(balance.coins).toString, createdBy = balance.createdBy, createdOnMillisEpoch = balance.createdOnMillisEpoch, updatedBy = balance.updatedBy, updatedOnMillisEpoch = balance.updatedOnMillisEpoch)
+  def serialize(balance: Balance): BalanceSerialized = BalanceSerialized(address = balance.address, coins = Json.toJson(balance.coins).toString)
 
   private def add(balance: Balance): Future[String] = db.run((balanceTable returning balanceTable.map(_.address) += serialize(balance)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_INSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.BALANCE_INSERT_FAILED, psqlException)
     }
   }
 
   private def upsert(balance: Balance): Future[Int] = db.run(balanceTable.insertOrUpdate(serialize(balance)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => throw new BaseException(constants.Response.WALLET_UPSERT_FAILED, psqlException)
+      case psqlException: PSQLException => throw new BaseException(constants.Response.BALANCE_UPSERT_FAILED, psqlException)
     }
   }
 
   private def tryGetByAddress(address: String): Future[BalanceSerialized] = db.run(balanceTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.WALLET_NOT_FOUND, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.BALANCE_NOT_FOUND, noSuchElementException)
     }
   }
 
@@ -80,19 +78,12 @@ class Balances @Inject()(
 
   private[models] class BalanceTable(tag: Tag) extends Table[BalanceSerialized](tag, "Balance") {
 
-    def * = (address, coins, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
+    def * = (address, coins) <> (BalanceSerialized.tupled, BalanceSerialized.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
     def coins = column[String]("coins")
 
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {

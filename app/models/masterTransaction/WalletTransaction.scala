@@ -20,11 +20,10 @@ import com.metas.{transactions => metasTransactions}
 import com.orders.{transactions => ordersTransactions}
 import com.splits.{transactions => splitsTransactions}
 import exceptions.BaseException
-import models.traits.Logging
+import models.archive
 import org.postgresql.util.PSQLException
-import play.api.Logger
-import play.api.Configuration
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -32,10 +31,14 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.{Failure, Success}
 
-case class WalletTransaction(address: String, txHash: String, height: Int, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class WalletTransaction(address: String, txHash: String, height: Int)
 
 @Singleton
-class WalletTransactions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
+class WalletTransactions @Inject()(
+                                    protected val databaseConfigProvider: DatabaseConfigProvider,
+                                    configuration: Configuration,
+                                    archiveWalletTransactions: archive.WalletTransactions,
+                                  )(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_WALLET_TRANSACTION
 
@@ -67,9 +70,15 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
 
   private def findWalletTransactions(address: String, offset: Int, limit: Int): Future[Seq[WalletTransaction]] = db.run(walletTransactionTable.filter(_.address === address).sortBy(_.height.desc).drop(offset).take(limit).result)
 
-  private[models] class WalletTransactionTable(tag: Tag) extends Table[WalletTransaction](tag, "WalletTransaction") {
+  private def countWalletTransactions(address: String): Future[Int] = db.run(walletTransactionTable.filter(_.address === address).length.result)
 
-    def * = (address, txHash, height, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WalletTransaction.tupled, WalletTransaction.unapply)
+  private def getByHeightRange(start: Int, end: Int): Future[Seq[WalletTransaction]] = db.run(walletTransactionTable.filter(x => x.height >= start && x.height <= end).result)
+
+  private def deleteByHeightRange(start: Int, end: Int): Future[Int] = db.run(walletTransactionTable.filter(x => x.height >= start && x.height <= end).delete)
+
+  private[models] class WalletTransactionTable(tag: Tag) extends Table[WalletTransaction](tag, Option("master_transaction"), "WalletTransaction") {
+
+    def * = (address, txHash, height) <> (WalletTransaction.tupled, WalletTransaction.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -77,21 +86,38 @@ class WalletTransactions @Inject()(protected val databaseConfigProvider: Databas
 
     def height = column[Int]("height")
 
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
-
   }
 
   object Service {
 
     def add(walletTransactions: Seq[WalletTransaction]): Future[Unit] = create(walletTransactions)
 
-    def getTransactions(address: String, pageNumber: Int): Future[Seq[WalletTransaction]] = findWalletTransactions(address = address, offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage)
+    def getTransactions(address: String, pageNumber: Int): Future[Seq[WalletTransaction]] = {
+      val totalWant = pageNumber * transactionsPerPage
+      val count = countWalletTransactions(address)
+      val txs = findWalletTransactions(address = address, offset = (pageNumber - 1) * transactionsPerPage, limit = transactionsPerPage)
+
+      def getWalletTxs(count: Int) = if (totalWant <= count) Future(Seq())
+      else {
+        val (offset, limit) = if (totalWant - count < transactionsPerPage) {
+          (0, totalWant - count)
+        } else {
+          val drop = (transactionsPerPage * (count / transactionsPerPage)) + ((totalWant - count) % transactionsPerPage)
+          (drop, transactionsPerPage)
+        }
+        archiveWalletTransactions.Service.getTransactions(address = address, offset = offset, limit = limit)
+      }
+
+      for {
+        count <- count
+        txs <- txs
+        archiveWalletTxs <- getWalletTxs(count)
+      } yield txs ++ archiveWalletTxs.map(_.toWalletTx)
+    }
+
+    def getByHeight(start: Int, end: Int): Future[Seq[WalletTransaction]] = getByHeightRange(start = start, end = end)
+
+    def deleteByHeight(start: Int, end: Int): Future[Int] = deleteByHeightRange(start = start, end = end)
 
   }
 

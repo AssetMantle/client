@@ -2,7 +2,7 @@
 @import views.html.base.buttons._
 @import models.blockchain.ProposalVote
 
-@(proposalVotes: Seq[ProposalVote])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(proposalVotes: Seq[ProposalVote], allValidators: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonCard(constants.View.VALIDATORS_VOTES) {
 
@@ -13,16 +13,14 @@
                 <th>@Messages(constants.View.VALIDATOR_NAME)</th>
                 <th>@Messages(constants.View.TRANSACTION_HASH)</th>
                 <th>@Messages(constants.View.TRANSACTION_ANSWER)</th>
-                <th>@Messages(constants.View.TRANSACTION_TIME)</th>
             </tr>
         </thead>
         <tbody>
         @proposalVotes.map { proposalVote =>
             <tr>
-                <td>--</td>
+                <td>@allValidators.getOrElse(proposalVote.voter, utilities.Crypto.convertAccountAddressToOperatorAddress(proposalVote.voter))</td>
                 <td class="blockHeightItem">@commonJavascriptLink(proposalVote.voter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${proposalVote.voter}'))"))</td>
                 <td>@Messages(proposalVote.option)</td>
-                <td>--</td>
             </tr>
         }
         </tbody>

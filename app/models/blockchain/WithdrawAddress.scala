@@ -2,10 +2,9 @@ package models.blockchain
 
 import com.cosmos.distribution.{v1beta1 => distributionTx}
 import exceptions.BaseException
-import models.traits.Logging
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 
@@ -13,7 +12,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging
+case class WithdrawAddress(delegatorAddress: String, withdrawAddress: String)
 
 @Singleton
 class WithdrawAddresses @Inject()(
@@ -68,19 +67,12 @@ class WithdrawAddresses @Inject()(
 
   private[models] class WithdrawAddressTable(tag: Tag) extends Table[WithdrawAddress](tag, "WithdrawAddress") {
 
-    def * = (delegatorAddress, withdrawAddress, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (WithdrawAddress.tupled, WithdrawAddress.unapply)
+    def * = (delegatorAddress, withdrawAddress) <> (WithdrawAddress.tupled, WithdrawAddress.unapply)
 
     def delegatorAddress = column[String]("delegatorAddress", O.PrimaryKey)
 
     def withdrawAddress = column[String]("withdrawAddress")
 
-    def createdBy = column[String]("createdBy")
-
-    def createdOnMillisEpoch = column[Long]("createdOnMillisEpoch")
-
-    def updatedBy = column[String]("updatedBy")
-
-    def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
   }
 
   object Service {
