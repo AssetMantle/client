@@ -1,6 +1,6 @@
 package schema.data
 
-import com.data.AnyData
+import com.assetmantle.schema.data.base.AnyData
 import org.slf4j.{Logger, LoggerFactory}
 import schema.data.base._
 import schema.id.base.{DataID, HashID, StringID}

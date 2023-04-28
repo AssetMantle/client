@@ -1,6 +1,6 @@
 package schema.data.base
 
-import com.data.{AnyData, ListData => protoListData}
+import com.assetmantle.schema.data.base.{AnyData, ListData => protoListData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 import utilities.ID.byteArraysCompare

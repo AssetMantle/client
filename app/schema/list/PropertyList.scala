@@ -1,7 +1,7 @@
 package schema.list
 
-import com.lists.{PropertyList => protoPropertyList}
-import com.properties.AnyProperty
+import com.assetmantle.schema.lists.base.{PropertyList => protoPropertyList}
+import com.assetmantle.schema.properties.base.AnyProperty
 import schema.id.base.PropertyID
 import schema.property.Property
 import utilities.ID.byteArraysCompare

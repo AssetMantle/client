@@ -1,7 +1,7 @@
 
 package schema.id.base
 
-import com.ids.{AnyID, SplitID => protoSplitID}
+import com.assetmantle.schema.ids.base.{AnyID, SplitID => protoSplitID}
 import schema.id.{ID, OwnableID}
 
 case class SplitID(ownerID: IdentityID, ownableID: OwnableID) extends ID {

@@ -1,6 +1,6 @@
 package schema.data.base
 
-import com.data.{AnyData, AccAddressData => protoAccAddressData}
+import com.assetmantle.schema.data.base.{AnyData, AccAddressData => protoAccAddressData}
 import com.google.protobuf.ByteString
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}

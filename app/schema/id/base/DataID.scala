@@ -1,6 +1,6 @@
 package schema.id.base
 
-import com.ids.{AnyID, DataID => protoDataID}
+import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
 import constants.Data._
 import schema.id.ID
 

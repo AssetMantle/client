@@ -1,6 +1,6 @@
 package schema.data.base
 
-import com.data.{AnyData, BooleanData => protoBooleanData}
+import com.assetmantle.schema.data.base.{AnyData, BooleanData => protoBooleanData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 

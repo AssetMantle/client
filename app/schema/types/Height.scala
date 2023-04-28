@@ -1,6 +1,6 @@
 package schema.types
 
-import com.types.{Height => protoHeight}
+import com.assetmantle.schema.types.base.{Height => protoHeight}
 
 import java.nio.{ByteBuffer, ByteOrder}
 

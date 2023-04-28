@@ -1,7 +1,7 @@
 package schema.list
 
-import com.ids.AnyID
-import com.lists.{IDList => protoIDList}
+import com.assetmantle.schema.ids.base.AnyID
+import com.assetmantle.schema.lists.base.{IDList => protoIDList}
 import schema.id.ID
 import utilities.ID.byteArraysCompare
 

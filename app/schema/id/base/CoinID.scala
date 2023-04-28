@@ -1,6 +1,6 @@
 package schema.id.base
 
-import com.ids.{AnyID, AnyOwnableID, CoinID => protoCoinID}
+import com.assetmantle.schema.ids.base.{AnyID, AnyOwnableID, CoinID => protoCoinID}
 import schema.id.OwnableID
 
 case class CoinID(value: StringID) extends OwnableID {

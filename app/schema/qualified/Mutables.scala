@@ -1,7 +1,7 @@
 package schema.qualified
 
-import com.lists.{PropertyList => protoPropertyList}
-import com.qualified.{Mutables => protoMutables}
+import com.assetmantle.schema.lists.base.{PropertyList => protoPropertyList}
+import com.assetmantle.schema.qualified.base.{Mutables => protoMutables}
 import schema.id.base.PropertyID
 import schema.list.PropertyList
 import schema.property.Property

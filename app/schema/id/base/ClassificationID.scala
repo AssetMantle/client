@@ -1,6 +1,6 @@
 package schema.id.base
 
-import com.ids.{AnyID, ClassificationID => protoClassificationID}
+import com.assetmantle.schema.ids.base.{AnyID, ClassificationID => protoClassificationID}
 import schema.id.ID
 
 case class ClassificationID(hashID: HashID) extends ID {

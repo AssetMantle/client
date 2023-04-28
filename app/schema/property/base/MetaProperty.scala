@@ -1,7 +1,7 @@
 package schema.property.base
 
-import com.data.AnyData
-import com.properties.{AnyProperty, MetaProperty => protoMetaProperty}
+import com.assetmantle.schema.data.base.AnyData
+import com.assetmantle.schema.properties.base.{AnyProperty, MetaProperty => protoMetaProperty}
 import schema.data.Data
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.Property

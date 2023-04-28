@@ -1,7 +1,7 @@
 package schema.id.base
 
 import com.google.protobuf.ByteString
-import com.ids.{AnyID, HashID => protoHashId}
+import com.assetmantle.schema.ids.base.{AnyID, HashID => protoHashId}
 import schema.id.ID
 
 case class HashID(value: Array[Byte]) extends ID {

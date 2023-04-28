@@ -1,6 +1,6 @@
 package schema.data.base
 
-import com.data.{AnyData, StringData => protoStringData}
+import com.assetmantle.schema.data.base.{AnyData, StringData => protoStringData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 

@@ -1,6 +1,6 @@
 package schema.id
 
-import com.ids.AnyID
+import com.assetmantle.schema.ids.base.AnyID
 import org.slf4j.{Logger, LoggerFactory}
 import schema.id.base._
 

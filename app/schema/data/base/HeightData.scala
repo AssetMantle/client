@@ -1,6 +1,6 @@
 package schema.data.base
 
-import com.data.{AnyData, HeightData => protoHeightData}
+import com.assetmantle.schema.data.base.{AnyData, HeightData => protoHeightData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 import schema.types.Height
