@@ -7,6 +7,7 @@ case class StringID(value: String) extends ID {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
+  // Cannot call constant because of import cycle
   def getType: StringID = StringID("SI")
 
   def asString: String = this.value

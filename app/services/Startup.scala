@@ -79,15 +79,15 @@ class Startup @Inject()(
 
   private def insertInitialClassificationIDs() = {
     val nubClassificationID = models.blockchain.Classification(
-      id = constants.Blockchain.NubClassificationID.getBytes,
-      idString = constants.Blockchain.NubClassificationID.asString,
-      immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
-      mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes)
+      id = schema.constants.ID.NubClassificationID.getBytes,
+      idString = schema.constants.ID.NubClassificationID.asString,
+      immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty))).getProtoBytes,
+      mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty))).getProtoBytes)
     val maintainerClassificationID = models.blockchain.Classification(
-      id = constants.Blockchain.MaintainerClassificationID.getBytes,
-      idString = constants.Blockchain.MaintainerClassificationID.asString,
-      immutables = constants.Blockchain.MaintainerClassificationImmutables.getProtoBytes,
-      mutables = constants.Blockchain.MaintainerClassificationMutables.getProtoBytes)
+      id = schema.constants.ID.MaintainerClassificationID.getBytes,
+      idString = schema.constants.ID.MaintainerClassificationID.asString,
+      immutables = schema.constants.ID.MaintainerClassificationImmutables.getProtoBytes,
+      mutables = schema.constants.ID.MaintainerClassificationMutables.getProtoBytes)
 
     blockchainClassifications.Service.add(Seq(nubClassificationID, maintainerClassificationID))
   }

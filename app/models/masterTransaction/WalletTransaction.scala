@@ -1,6 +1,10 @@
 package models.masterTransaction
 
-import com.assets.{transactions => assetsTransactions}
+import com.assetmantle.modules.assets.{transactions => assetsTransactions}
+import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
+import com.assetmantle.modules.metas.{transactions => metasTransactions}
+import com.assetmantle.modules.orders.{transactions => ordersTransactions}
+import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -15,10 +19,6 @@ import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
-import com.identities.{transactions => identitiesTransactions}
-import com.metas.{transactions => metasTransactions}
-import com.orders.{transactions => ordersTransactions}
-import com.splits.{transactions => splitsTransactions}
 import exceptions.BaseException
 import models.archive
 import org.postgresql.util.PSQLException

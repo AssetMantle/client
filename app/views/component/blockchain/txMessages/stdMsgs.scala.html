@@ -1,5 +1,10 @@
 @import com.google.protobuf.{Any => protoAny}
 @import views.html.base.cards._
+@import com.assetmantle.modules.assets.{transactions => assetsTransactions}
+@import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
+@import com.assetmantle.modules.metas.{transactions => metasTransactions}
+@import com.assetmantle.modules.orders.{transactions => ordersTransactions}
+@import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 
 @(title: String, txHash: String, messages: Seq[protoAny])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -137,85 +142,85 @@
                         @views.html.component.blockchain.txMessages.ibcMsg.transfer(com.ibc.applications.transfer.v1.MsgTransfer.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_DEFINE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.define(com.assets.transactions.define.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.define(assetsTransactions.define.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_MINT => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.mint(com.assets.transactions.mint.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.mint(assetsTransactions.mint.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_MUTATE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.mutate(com.assets.transactions.mutate.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.mutate(assetsTransactions.mutate.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_BURN => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.burn(com.assets.transactions.burn.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.burn(assetsTransactions.burn.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_REVOKE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.revoke(com.assets.transactions.revoke.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.revoke(assetsTransactions.revoke.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.deputize(com.assets.transactions.deputize.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.deputize(assetsTransactions.deputize.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.renumerate(com.assets.transactions.renumerate.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.renumerate(assetsTransactions.renumerate.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.define(com.identities.transactions.define.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.define(identitiesTransactions.define.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.issue(com.identities.transactions.issue.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.issue(identitiesTransactions.issue.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.provision(com.identities.transactions.provision.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.provision(identitiesTransactions.provision.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.unprovision(com.identities.transactions.unprovision.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.unprovision(identitiesTransactions.unprovision.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_NUB => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.nub(com.identities.transactions.nub.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.nub(identitiesTransactions.nub.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.quash(com.identities.transactions.quash.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.quash(identitiesTransactions.quash.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.revoke(com.identities.transactions.revoke.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.revoke(identitiesTransactions.revoke.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.deputize(com.identities.transactions.deputize.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.deputize(identitiesTransactions.deputize.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.SPLIT_SEND => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.send(com.splits.transactions.send.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.send(splitsTransactions.send.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.SPLIT_WRAP => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.wrap(com.splits.transactions.wrap.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.wrap(splitsTransactions.wrap.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.unwrap(com.splits.transactions.unwrap.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.unwrap(splitsTransactions.unwrap.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_DEFINE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.define(com.orders.transactions.define.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.define(ordersTransactions.define.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_MAKE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.make(com.orders.transactions.make.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.make(ordersTransactions.make.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_TAKE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.take(com.orders.transactions.take.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.take(ordersTransactions.take.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_CANCEL => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.cancel(com.orders.transactions.cancel.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.cancel(ordersTransactions.cancel.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_REVOKE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.revoke(com.orders.transactions.revoke.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.revoke(ordersTransactions.revoke.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_MODIFY => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.modify(com.orders.transactions.modify.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.modify(ordersTransactions.modify.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.deputize(com.orders.transactions.deputize.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.deputize(ordersTransactions.deputize.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.immediate(com.orders.transactions.immediate.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.immediate(ordersTransactions.immediate.Message.parseFrom(msg.getValue))
                     }
                     case constants.Blockchain.TransactionMessage.META_REVEAL => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.meta.reveal(com.metas.transactions.reveal.Message.parseFrom(msg.getValue))
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.meta.reveal(metasTransactions.reveal.Message.parseFrom(msg.getValue))
                     }
                     case _ => {
 

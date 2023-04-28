@@ -30,7 +30,7 @@ public final class NumberDataProto {
     java.lang.String[] descriptorData = {
       "\n\033data/base/number_data.proto\022\034assetmant" +
       "le.schema.data.base\032\024gogoproto/gogo.prot" +
-      "o\"(\n\nNumberData\022\024\n\005value\030\001 \001(\003R\005value:\004\210" +
+      "o\"(\n\nNumberData\022\024\n\005value\030\001 \001(\tR\005value:\004\210" +
       "\240\037\000B\363\001\n com.assetmantle.schema.data.base" +
       "B\017NumberDataProtoP\001Z*github.com/AssetMan" +
       "tle/schema/go/data/base\242\002\004ASDB\252\002\034Assetma" +

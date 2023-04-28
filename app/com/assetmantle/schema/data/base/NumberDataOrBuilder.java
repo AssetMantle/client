@@ -8,8 +8,14 @@ public interface NumberDataOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>int64 value = 1 [json_name = "value"];</code>
+   * <code>string value = 1 [json_name = "value"];</code>
    * @return The value.
    */
-  long getValue();
+  java.lang.String getValue();
+  /**
+   * <code>string value = 1 [json_name = "value"];</code>
+   * @return The bytes for value.
+   */
+  com.google.protobuf.ByteString
+      getValueBytes();
 }

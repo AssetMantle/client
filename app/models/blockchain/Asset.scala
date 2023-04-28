@@ -1,9 +1,10 @@
 package models.blockchain
 
+import com.assetmantle.modules.assets.{transactions => assetsTransactions}
 import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.data.base.{DecData, HeightData}
+import schema.data.base.{HeightData, NumberData}
 import schema.document.Document
 import schema.id.base._
 import schema.list.PropertyList
@@ -33,19 +34,19 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getProperty(id: PropertyID): Option[Property] = this.getDocument.getProperty(id)
 
-  def getSupply: DecData = {
-    val supply = this.getProperty(constants.Blockchain.SupplyProperty.getID)
-    DecData((if (supply.isDefined) MetaProperty(supply.get.getProtoBytes) else constants.Blockchain.SupplyProperty).getData.getProtoBytes)
+  def getSupply: NumberData = {
+    val supply = this.getProperty(schema.constants.Properties.SupplyProperty.getID)
+    NumberData((if (supply.isDefined) MetaProperty(supply.get.getProtoBytes) else schema.constants.Properties.SupplyProperty).getData.getProtoBytes)
   }
 
   def getBurnHeight: HeightData = {
-    val burnHeight = this.getProperty(constants.Blockchain.BurnHeightProperty.getID)
-    HeightData((if (burnHeight.isDefined) MetaProperty(burnHeight.get.getProtoBytes) else constants.Blockchain.BurnHeightProperty).getData.getProtoBytes)
+    val burnHeight = this.getProperty(schema.constants.Properties.BurnHeightProperty.getID)
+    HeightData((if (burnHeight.isDefined) MetaProperty(burnHeight.get.getProtoBytes) else schema.constants.Properties.BurnHeightProperty).getData.getProtoBytes)
   }
 
   def getLockHeight: HeightData = {
-    val lock = this.getProperty(constants.Blockchain.LockProperty.getID)
-    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else constants.Blockchain.LockProperty).getData.getProtoBytes)
+    val lock = this.getProperty(schema.constants.Properties.LockProperty.getID)
+    HeightData((if (lock.isDefined) MetaProperty(lock.get.getProtoBytes) else schema.constants.Properties.LockProperty).getData.getProtoBytes)
   }
 
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
@@ -127,7 +128,21 @@ class Assets @Inject()(
 
   object Utility {
 
-    def onMint(msg: com.assets.transactions.mint.Message): Future[String] = {
+    def onDefine(msg: assetsTransactions.define.Message): Future[String] = {
+      val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
+      val add = blockchainClassifications.Utility.define(msg.getFrom, mutables, immutables)
+
+      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
+
+      for {
+        classificationID <- add
+        _ <- addMaintainer(classificationID)
+      } yield msg.getFrom
+    }
+
+
+    def onMint(msg: assetsTransactions.mint.Message): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
@@ -137,7 +152,7 @@ class Assets @Inject()(
       val add = Service.add(asset)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
 
-      def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.getValue)
+      def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), ownableID = assetID, value = asset.getSupply.value)
 
       for {
         _ <- add
@@ -146,7 +161,7 @@ class Assets @Inject()(
       } yield msg.getFrom
     }
 
-    def onMutate(msg: com.assets.transactions.mutate.Message): Future[String] = {
+    def onMutate(msg: assetsTransactions.mutate.Message): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val asset = Service.tryGet(assetID)
@@ -159,18 +174,18 @@ class Assets @Inject()(
       } yield msg.getFrom
     }
 
-    def onRevoke(msg: com.assets.transactions.revoke.Message): Future[String] = {
+    def onRevoke(msg: assetsTransactions.revoke.Message): Future[String] = {
       val deputize = blockchainMaintainers.Utility.revoke(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
       for {
         _ <- deputize
       } yield msg.getFrom
     }
 
-    def onRenumerate(msg: com.assets.transactions.renumerate.Message): Future[String] = {
+    def onRenumerate(msg: assetsTransactions.renumerate.Message): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
       val asset = Service.tryGet(assetID)
 
-      def updateSupply(asset: Asset) = blockchainSplits.Utility.renumerate(IdentityID(msg.getFromID), assetID, asset.getSupply.getValue)
+      def updateSupply(asset: Asset) = blockchainSplits.Utility.renumerate(IdentityID(msg.getFromID), assetID, asset.getSupply.value)
 
       for {
         asset <- asset
@@ -178,16 +193,16 @@ class Assets @Inject()(
       } yield msg.getFrom
     }
 
-    def onDeputize(msg: com.assets.transactions.deputize.Message): Future[String] = {
+    def onDeputize(msg: assetsTransactions.deputize.Message): Future[String] = {
       val deputize = blockchainMaintainers.Utility.deputize(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID), maintainedProperties = PropertyList(msg.getMaintainedProperties), canMintAsset = msg.getCanMintAsset, canBurnAsset = msg.getCanBurnAsset, canRenumerateAsset = msg.getCanRenumerateAsset, canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
       for {
         _ <- deputize
       } yield msg.getFrom
     }
 
-    def onBurn(msg: com.assets.transactions.burn.Message): Future[String] = {
+    def onBurn(msg: assetsTransactions.burn.Message): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
-      val renumerate = blockchainSplits.Utility.renumerate(ownerID = IdentityID(msg.getFromID), ownableID = assetID, value = constants.Blockchain.ZeroDec)
+      val renumerate = blockchainSplits.Utility.renumerate(ownerID = IdentityID(msg.getFromID), ownableID = assetID, value = 0)
       val asset = Service.tryGet(assetID)
 
       def updateUnbondAndDelete(asset: Asset) = {

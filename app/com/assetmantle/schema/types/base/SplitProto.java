@@ -29,9 +29,9 @@ public final class SplitProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\026types/base/split.proto\022\035assetmantle.sc" +
-      "hema.types.base\032\032ids/base/identity_id.pr" +
-      "oto\032\035ids/base/any_ownable_id.proto\032\024gogo" +
-      "proto/gogo.proto\"\263\001\n\005Split\022C\n\towner_i_d\030" +
+      "hema.types.base\032\024gogoproto/gogo.proto\032\035i" +
+      "ds/base/any_ownable_id.proto\032\032ids/base/i" +
+      "dentity_id.proto\"\263\001\n\005Split\022C\n\towner_i_d\030" +
       "\001 \001(\0132\'.assetmantle.schema.ids.base.Iden" +
       "tityIDR\007ownerID\022I\n\013ownable_i_d\030\002 \001(\0132).a" +
       "ssetmantle.schema.ids.base.AnyOwnableIDR" +
@@ -47,9 +47,9 @@ public final class SplitProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor(),
           com.gogoproto.GogoProto.getDescriptor(),
+          com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor(),
+          com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_types_base_Split_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -62,9 +62,9 @@ public final class SplitProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
-    com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor();
     com.gogoproto.GogoProto.getDescriptor();
+    com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor();
+    com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

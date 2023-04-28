@@ -33,6 +33,26 @@ case class DecData(value: String) extends Data {
   def getProtoBytes: Array[Byte] = this.asProtoDecData.toByteString.toByteArray
 
   def viewString: String = this.value
+
+  def validSortable: Boolean = this.getValue.abs <= schema.constants.Data.DecDataMaxValue
+
+  def getSortableDecBytes: Array[Byte] = {
+    if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_ATTONUMBER")
+    else {
+      if (this.getValue == schema.constants.Data.DecDataMaxValue) "max".getBytes
+      else if (this.getValue == (-1 * schema.constants.Data.DecDataMaxValue)) "--".getBytes
+      else {
+        val f = java.lang.String.format("%18s", this.getValue.abs.toString.split("\\.").head).replace(" ", "0")
+        val l = java.lang.String.format("%-18s", this.getValue.abs.toString.split("\\.").last).replace(" ", "0")
+        if (this.getValue < 0) "-".getBytes ++ (f + "." + l).getBytes
+        else (f + "." + l).getBytes
+      }
+    }
+  }
+
+  def quotientTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor).toBigInt / (that.getValue * schema.constants.Data.DecFactor).toBigInt) / schema.constants.Data.DecFactor)
+
+  def multiplyTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor).toBigInt * (that.getValue * schema.constants.Data.DecFactor).toBigInt) / schema.constants.Data.DecFactor)
 }
 
 object DecData {

@@ -4,9 +4,7 @@ import com.assetmantle.schema.data.base.{AnyData, NumberData => protoNumberData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
-import java.nio.{ByteBuffer, ByteOrder}
-
-case class NumberData(value: Long) extends Data {
+case class NumberData(value: BigInt) extends Data {
   def getType: StringID = constants.Data.NumberDataTypeID
 
   def getBondWeight: Int = constants.Data.NumberDataWeight
@@ -15,11 +13,11 @@ case class NumberData(value: Long) extends Data {
 
   def zeroValue: Data = NumberData(0)
 
-  def getBytes: Array[Byte] = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(this.value).array()
+  def getBytes: Array[Byte] = this.value.toString().getBytes
 
   def generateHashID: HashID = if (this.value == 0) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
 
-  def asProtoNumberData: protoNumberData = protoNumberData.newBuilder().setValue(this.value).build()
+  def asProtoNumberData: protoNumberData = protoNumberData.newBuilder().setValue(this.value.toString()).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setNumberData(this.asProtoNumberData).build()
 
@@ -30,7 +28,7 @@ case class NumberData(value: Long) extends Data {
 
 object NumberData {
 
-  def apply(value: protoNumberData): NumberData = NumberData(value.getValue)
+  def apply(value: protoNumberData): NumberData = NumberData(BigInt(value.getValue))
 
   def apply(protoBytes: Array[Byte]): NumberData = NumberData(protoNumberData.parseFrom(protoBytes))
 }

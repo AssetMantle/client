@@ -9,7 +9,7 @@ case class PropertyID(keyID: StringID, typeID: StringID) extends ID {
 
   def getType: StringID = constants.ID.PropertyIDType
 
-  def asString: String = this.keyID.asString + constants.Blockchain.IDSeparator + this.typeID.asString
+  def asString: String = this.keyID.asString + schema.constants.ID.Separator + this.typeID.asString
 
   def asProtoPropertyID: protoPropertyID = protoPropertyID.newBuilder().setTypeID(this.typeID.asProtoStringID).setKeyID(this.keyID.asProtoStringID).build()
 
