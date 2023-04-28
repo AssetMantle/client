@@ -116,7 +116,7 @@ class Classifications @Inject()(
 
       def add(classificationParameter: ClassificationParameter) = {
         val updatedImmutables = Immutables(PropertyList(immutables.propertyList.properties ++ Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
-        val classificationID = utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
+        val classificationID = schema.utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
         val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = updatedImmutables.asProtoImmutables.toByteString.toByteArray, mutables = mutables.asProtoMutables.toByteString.toByteArray)
         Service.add(classification)
       }

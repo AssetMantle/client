@@ -16,7 +16,7 @@ case class AccAddressData(value: Array[Byte]) extends Data {
 
   def getBytes: Array[Byte] = this.value
 
-  def generateHashID: HashID = if (this.value.length == 0) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value.length == 0) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def toBech32Address: String = utilities.Crypto.convertAccAddressBytesToAddress(this.value)
 

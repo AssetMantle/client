@@ -145,7 +145,7 @@ class Assets @Inject()(
     def onMint(msg: assetsTransactions.mint.Message): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
-      val assetID = utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
+      val assetID = schema.utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val asset = Asset(id = assetID.getBytes, idString = assetID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
 

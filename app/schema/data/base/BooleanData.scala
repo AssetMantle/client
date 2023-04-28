@@ -18,7 +18,7 @@ case class BooleanData(value: Boolean) extends Data {
     Seq(res).toArray
   }
 
-  def generateHashID: HashID = if (!this.value) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (!this.value) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoBooleanData: protoBooleanData = protoBooleanData.newBuilder().setValue(this.value).build()
 

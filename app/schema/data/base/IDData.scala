@@ -18,7 +18,7 @@ case class IDData(value: ID) extends Data {
 
   def getBytes: Array[Byte] = this.getID.getBytes
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = schema.utilities.ID.generateHashID(this.getBytes)
 
   def getProtoDataID: protoDataID = this.getDataID.asProtoDataID
 

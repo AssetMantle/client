@@ -1,9 +1,7 @@
-package utilities
+package schema.utilities
 
 import com.assetmantle.schema.ids.base.{HashID => protoHashID}
 import com.google.protobuf.ByteString
-import constants.Data._
-import org.slf4j.{Logger, LoggerFactory}
 import schema.data.Data
 import schema.id.OwnableID
 import schema.id.base._
@@ -11,36 +9,8 @@ import schema.property.Property
 import schema.qualified.{Immutables, Mutables}
 import schema.types.Split
 
-import scala.util.Random
-
 
 object ID {
-
-  private implicit val module: String = constants.Module.COMMON_UTILITIES_ID
-
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
-  def getDataTypeID(id: String): StringID = id match {
-    case "A" => AccAddressDataTypeID
-    case "B" => BooleanDataTypeID
-    case "D" => DecDataTypeID
-    case "H" => HeightDataTypeID
-    case "I" => IDDataTypeID
-    case "L" => ListDataTypeID
-    case "S" => StringDataTypeID
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
-  }
-
-  def getDataTypeID(implNumber: Int): StringID = implNumber match {
-    case 1 => AccAddressDataTypeID
-    case 2 => BooleanDataTypeID
-    case 3 => DecDataTypeID
-    case 4 => HeightDataTypeID
-    case 5 => IDDataTypeID
-    case 6 => StringDataTypeID
-    case 7 => ListDataTypeID
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
-  }
 
   def generateHashID(bytesList: Array[Byte]*): HashID = if (bytesList.exists(_.length != 0)) {
     HashID(protoHashID.newBuilder().setIDBytes(ByteString.copyFrom(
@@ -94,5 +64,5 @@ object ID {
 
   def getSplitID(ownerID: IdentityID, ownableID: OwnableID): SplitID = SplitID(ownerID = ownerID, ownableID = ownableID)
 
-  def getRandomHexadecimal: String = (-Math.abs(Random.nextLong)).toHexString.toUpperCase
+
 }

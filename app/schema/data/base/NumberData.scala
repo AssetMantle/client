@@ -15,7 +15,7 @@ case class NumberData(value: BigInt) extends Data {
 
   def getBytes: Array[Byte] = this.value.toString().getBytes
 
-  def generateHashID: HashID = if (this.value == 0) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value == 0) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoNumberData: protoNumberData = protoNumberData.newBuilder().setValue(this.value.toString()).build()
 

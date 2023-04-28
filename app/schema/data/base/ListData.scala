@@ -3,7 +3,7 @@ package schema.data.base
 import com.assetmantle.schema.data.base.{AnyData, ListData => protoListData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
-import utilities.ID.byteArraysCompare
+import schema.utilities.ID.byteArraysCompare
 
 import scala.jdk.CollectionConverters._
 
@@ -24,7 +24,7 @@ case class ListData(dataList: Seq[Data]) extends Data {
 
   def search(dataID: DataID): Int = this.getDataList.indexWhere(_.getDataID.getBytes.sameElements(dataID.getBytes))
 
-  def generateHashID: HashID = if (this.dataList.isEmpty) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.dataList.isEmpty) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoListData: protoListData = protoListData.newBuilder().addAllDataList(this.getAnyDataList.asJava).build()
 

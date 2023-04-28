@@ -16,7 +16,7 @@ case class HeightData(value: Height) extends Data {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def generateHashID: HashID = if (this.value.value == -1) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value.value == -1) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoHeightData: protoHeightData = protoHeightData.newBuilder().setValue(this.value.asProtoHeight).build()
 

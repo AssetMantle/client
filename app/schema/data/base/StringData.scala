@@ -15,7 +15,7 @@ case class StringData(value: String) extends Data {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def generateHashID: HashID = utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoStringData: protoStringData = protoStringData.newBuilder().setValue(this.value).build()
 

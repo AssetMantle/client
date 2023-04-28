@@ -13,13 +13,13 @@ object ID {
 
   val NumImmutables: Immutables = Immutables(PropertyList(Seq(NubProperty)))
   val NumMutables: Mutables = Mutables(PropertyList(Seq(AuthenticationProperty)))
-  val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(NumImmutables, NumMutables)
+  val NubClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(NumImmutables, NumMutables)
 
   val MaintainerClassificationImmutables: Immutables = Immutables(PropertyList(Seq(IdentityIDProperty, MaintainedClassificationIDProperty)))
   val MaintainerClassificationMutables: Mutables = Mutables(PropertyList(Seq(MaintainedPropertiesProperty, PermissionsProperty)))
-  val MaintainerClassificationID: ClassificationID = utilities.ID.getClassificationID(MaintainerClassificationImmutables, MaintainerClassificationMutables)
+  val MaintainerClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(MaintainerClassificationImmutables, MaintainerClassificationMutables)
 
-  val OrderIdentityID: IdentityID = utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getDataID)))))
+  val OrderIdentityID: IdentityID = schema.utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getDataID)))))
 
 
 }

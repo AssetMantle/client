@@ -173,7 +173,7 @@ class Orders @Inject()(
           schema.constants.Properties.MakerIDProperty.copy(data = IDData(IdentityID(msg.getFromID))),
           schema.constants.Properties.TakerIDProperty.copy(data = IDData(IdentityID(msg.getTakerID)))))
         .add(PropertyList(msg.getImmutableProperties).properties))
-      val orderID = utilities.ID.getOrderID(classificationID = classificationID, immutables = immutables)
+      val orderID = schema.utilities.ID.getOrderID(classificationID = classificationID, immutables = immutables)
 
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties)
         .add(Seq(

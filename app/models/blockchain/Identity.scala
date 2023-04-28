@@ -133,7 +133,7 @@ class Identities @Inject()(
     def onNub(msg: identityTransactions.nub.Message): Future[String] = {
       val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty.copy(data = IDData(StringID(msg.getNubID))))))
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
-      val identityID = utilities.ID.getIdentityID(classificationID = schema.constants.ID.NubClassificationID, immutables = immutables)
+      val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.constants.ID.NubClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.constants.ID.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
@@ -158,7 +158,7 @@ class Identities @Inject()(
     def onIssue(msg: identityTransactions.issue.Message): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
-      val identityID = utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
+      val identityID = schema.utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
       val authenticationProperty = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getTo))))
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)

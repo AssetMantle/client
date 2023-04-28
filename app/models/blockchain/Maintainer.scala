@@ -136,13 +136,13 @@ class Maintainers @Inject()(
     }
 
     def deputize(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
-      val fromMaintainerID = utilities.ID.getMaintainerID(
+      val fromMaintainerID = schema.utilities.ID.getMaintainerID(
         classificationID = schema.constants.ID.MaintainerClassificationID,
         immutables = Immutables(PropertyList(Seq(
           MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
           MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(fromID)),
         ))))
-      val toMaintainerID = utilities.ID.getMaintainerID(
+      val toMaintainerID = schema.utilities.ID.getMaintainerID(
         classificationID = schema.constants.ID.MaintainerClassificationID,
         immutables = Immutables(PropertyList(Seq(
           MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
@@ -173,7 +173,7 @@ class Maintainers @Inject()(
     }
 
     def revoke(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID): Future[Unit] = {
-      val toMaintainerID = utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
+      val toMaintainerID = schema.utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
         MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
         MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(toID)),
       ))))
@@ -192,7 +192,7 @@ class Maintainers @Inject()(
         MetaProperty(id = schema.constants.Properties.MaintainedPropertiesProperty.id, data = ListData(maintainedPropertyIDList.idList.map(x => IDData(x)))),
         MetaProperty(id = schema.constants.Properties.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x)))),
       )))
-      val maintainerID = utilities.ID.getMaintainerID(classificationID = schema.constants.ID.MaintainerClassificationID, immutables = immutables)
+      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.constants.ID.MaintainerClassificationID, immutables = immutables)
       Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
     }
 

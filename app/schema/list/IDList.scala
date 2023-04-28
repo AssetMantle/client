@@ -3,7 +3,7 @@ package schema.list
 import com.assetmantle.schema.ids.base.AnyID
 import com.assetmantle.schema.lists.base.{IDList => protoIDList}
 import schema.id.ID
-import utilities.ID.byteArraysCompare
+import schema.utilities.ID.byteArraysCompare
 
 import scala.jdk.CollectionConverters._
 

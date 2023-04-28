@@ -24,7 +24,7 @@ case class DecData(value: String) extends Data {
 
   def getBytes: Array[Byte] = this.toPlainString.getBytes
 
-  def generateHashID: HashID = if (this.value == this.zeroValue.value) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value == this.zeroValue.value) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoDecData: protoDecData = protoDecData.newBuilder().setValue(this.toPlainString).build()
 

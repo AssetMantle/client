@@ -4,7 +4,7 @@ import com.assetmantle.schema.lists.base.{PropertyList => protoPropertyList}
 import com.assetmantle.schema.properties.base.AnyProperty
 import schema.id.base.PropertyID
 import schema.property.Property
-import utilities.ID.byteArraysCompare
+import schema.utilities.ID.byteArraysCompare
 
 import scala.jdk.CollectionConverters._
 
