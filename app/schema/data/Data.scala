@@ -1,7 +1,7 @@
 package schema.data
 
 import com.assetmantle.schema.data.base.AnyData
-import org.slf4j.{Logger, LoggerFactory}
+import schema.constants
 import schema.data.base._
 import schema.id.base.{DataID, HashID, StringID}
 
@@ -27,10 +27,6 @@ abstract class Data {
 }
 
 object Data {
-
-  private implicit val module: String = constants.Module.SCHEMA_DATA
-
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def apply(anyData: AnyData): Data = anyData.getImplCase.getNumber match {
     case 1 => AccAddressData(anyData.getAccAddressData)

@@ -5,11 +5,11 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class NumberData(value: BigInt) extends Data {
-  def getType: StringID = constants.Data.NumberDataTypeID
+  def getType: StringID = schema.constants.Data.NumberDataTypeID
 
-  def getBondWeight: Int = constants.Data.NumberDataWeight
+  def getBondWeight: Int = schema.constants.Data.NumberDataWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.NumberDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.NumberDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = NumberData(0)
 

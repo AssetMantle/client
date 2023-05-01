@@ -5,11 +5,11 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class BooleanData(value: Boolean) extends Data {
-  def getType: StringID = constants.Data.BooleanDataTypeID
+  def getType: StringID = schema.constants.Data.BooleanDataTypeID
 
-  def getBondWeight: Int = constants.Data.BooleanBondWeight
+  def getBondWeight: Int = schema.constants.Data.BooleanBondWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: BooleanData = BooleanData(false)
 

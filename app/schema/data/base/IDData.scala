@@ -10,11 +10,11 @@ case class IDData(value: ID) extends Data {
 
   def getID: ID = this.value
 
-  def getBondWeight: Int = constants.Data.IDDataWeight
+  def getBondWeight: Int = schema.constants.Data.IDDataWeight
 
-  def getType: StringID = constants.Data.IDDataTypeID
+  def getType: StringID = schema.constants.Data.IDDataTypeID
 
-  def getDataID: DataID = base.DataID(typeID = constants.Data.IDDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = base.DataID(typeID = schema.constants.Data.IDDataTypeID, hashID = this.generateHashID)
 
   def getBytes: Array[Byte] = this.getID.getBytes
 

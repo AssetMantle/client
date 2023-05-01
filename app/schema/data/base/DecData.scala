@@ -12,13 +12,13 @@ case class DecData(value: String) extends Data {
 
   def toPlainString: String = schema.constants.Data.DecStringFormat.format(this.value)
 
-  def getType: StringID = constants.Data.DecDataTypeID
+  def getType: StringID = schema.constants.Data.DecDataTypeID
 
-  def getBondWeight: Int = constants.Data.DecDataWeight
+  def getBondWeight: Int = schema.constants.Data.DecDataWeight
 
   def getValue: BigDecimal = BigDecimal(value, schema.constants.Data.DecPrecisionContext)
 
-  def getDataID: DataID = DataID(typeID = constants.Data.DecDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.DecDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: DecData = DecData(BigDecimal(0))
 

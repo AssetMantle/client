@@ -8,11 +8,11 @@ import schema.utilities.ID.byteArraysCompare
 import scala.jdk.CollectionConverters._
 
 case class ListData(dataList: Seq[Data]) extends Data {
-  def getType: StringID = constants.Data.ListDataTypeID
+  def getType: StringID = schema.constants.Data.ListDataTypeID
 
-  def getBondWeight: Int = constants.Data.ListDataWeight
+  def getBondWeight: Int = schema.constants.Data.ListDataWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.ListDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.ListDataTypeID, hashID = this.generateHashID)
 
   def getAnyDataList: Seq[AnyData] = this.dataList.map(_.toAnyData)
 

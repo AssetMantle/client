@@ -1,5 +1,6 @@
 package schema.constants
 
+import schema.constants
 import schema.data.Data
 import schema.data.base._
 import schema.id.base._

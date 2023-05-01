@@ -1,7 +1,7 @@
 package schema.id.base
 
 import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
-import constants.Data._
+import schema.constants.Data._
 import schema.id.ID
 
 case class DataID(typeID: StringID, hashID: HashID) extends ID {

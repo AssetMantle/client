@@ -6,11 +6,11 @@ import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
 case class AccAddressData(value: Array[Byte]) extends Data {
-  def getType: StringID = constants.Data.AccAddressDataTypeID
+  def getType: StringID = schema.constants.Data.AccAddressDataTypeID
 
-  def getBondWeight: Int = constants.Data.AccAddressBondWeight
+  def getBondWeight: Int = schema.constants.Data.AccAddressBondWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: AccAddressData = AccAddressData(Array[Byte]())
 

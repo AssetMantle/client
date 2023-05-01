@@ -6,11 +6,11 @@ import schema.id.base.{DataID, HashID, StringID}
 import schema.types.Height
 
 case class HeightData(value: Height) extends Data {
-  def getType: StringID = constants.Data.HeightDataTypeID
+  def getType: StringID = schema.constants.Data.HeightDataTypeID
 
-  def getBondWeight: Int = constants.Data.HeightDataWeight
+  def getBondWeight: Int = schema.constants.Data.HeightDataWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.HeightDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.HeightDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = HeightData(Height(-1))
 
