@@ -7,7 +7,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.NumberData
 import schema.document.Document
 import schema.id.base.{ClassificationID, HashID, PropertyID}
-import schema.list.PropertyList
 import schema.property.Property
 import schema.property.base.MetaProperty
 import schema.qualified.{Immutables, Mutables}
@@ -109,13 +108,13 @@ class Classifications @Inject()(
 
   object Utility {
 
-    def define(definer: String, mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
+    def defineAuxiliary(definer: String, mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(definer)
       val classificationParameter = blockchainParameters.Service.tryGetClassificationParameter
       val totalWeight = mutables.getTotalBondWeight + immutables.getTotalBondWeight
 
       def add(classificationParameter: ClassificationParameter) = {
-        val updatedImmutables = Immutables(PropertyList(immutables.propertyList.properties ++ Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
+        val updatedImmutables = Immutables(immutables.propertyList.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
         val classificationID = schema.utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
         val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = updatedImmutables.asProtoImmutables.toByteString.toByteArray, mutables = mutables.asProtoMutables.toByteString.toByteArray)
         Service.add(classification)

@@ -15,15 +15,19 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Maintainer(id: Array[Byte], idString: String, classificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Maintainer(id: Array[Byte], idString: String, maintainedClassificationID: Array[Byte], immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
   def getID: MaintainerID = MaintainerID(HashID(this.id))
 
-  def getClassificationIDString: String = utilities.Secrets.base64URLEncoder(this.classificationID)
+  def getClassificationIDString: String = schema.constants.ID.MaintainerClassificationID.asString
 
-  def getClassificationID: ClassificationID = ClassificationID(this.classificationID)
+  def getClassificationID: ClassificationID = schema.constants.ID.MaintainerClassificationID
+
+  def getMaintainedClassificationID: ClassificationID = ClassificationID(this.maintainedClassificationID)
+
+  def getMaintainedClassificationIDAsString: String = utilities.Secrets.base64URLEncoder(this.maintainedClassificationID)
 
   def getPermissions: ListData = {
     val property = this.getProperty(schema.constants.Properties.PermissionsProperty.getID)
@@ -68,13 +72,13 @@ object Maintainers {
 
   class DataTable(tag: Tag) extends Table[Maintainer](tag, "Maintainer") with ModelTable[Array[Byte]] {
 
-    def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Maintainer.tupled, Maintainer.unapply)
+    def * = (id, idString, maintainedClassificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Maintainer.tupled, Maintainer.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
 
     def idString = column[String]("idString")
 
-    def classificationID = column[Array[Byte]]("classificationID")
+    def maintainedClassificationID = column[Array[Byte]]("maintainedClassificationID")
 
     def immutables = column[Array[Byte]]("immutables")
 
@@ -135,7 +139,7 @@ class Maintainers @Inject()(
       Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedMutables.propertyList.getPropertyIDList, permissions = permissions))
     }
 
-    def deputize(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
+    def deputizeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
       val fromMaintainerID = schema.utilities.ID.getMaintainerID(
         classificationID = schema.constants.ID.MaintainerClassificationID,
         immutables = Immutables(PropertyList(Seq(
@@ -172,7 +176,7 @@ class Maintainers @Inject()(
       } yield ()
     }
 
-    def revoke(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID): Future[Unit] = {
+    def revokeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID): Future[Unit] = {
       val toMaintainerID = schema.utilities.ID.getMaintainerID(classificationID = maintainedClassificationID, immutables = Immutables(PropertyList(Seq(
         MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
         MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(toID)),
@@ -185,15 +189,15 @@ class Maintainers @Inject()(
 
     private def newMaintainer(identityID: IdentityID, maintainedClassificationID: ClassificationID, maintainedPropertyIDList: IDList, permissions: IDList): Maintainer = {
       val immutables = Immutables(PropertyList(Seq(
-        MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
         MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(identityID)),
+        MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
       )))
       val mutables = Mutables(PropertyList(Seq(
         MetaProperty(id = schema.constants.Properties.MaintainedPropertiesProperty.id, data = ListData(maintainedPropertyIDList.idList.map(x => IDData(x)))),
         MetaProperty(id = schema.constants.Properties.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x)))),
       )))
       val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.constants.ID.MaintainerClassificationID, immutables = immutables)
-      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, classificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
     }
 
     private def getPermissions(canAdd: Boolean, canMutate: Boolean, canBurn: Boolean, canMint: Boolean, canRemove: Boolean, canRenumerate: Boolean) = {
