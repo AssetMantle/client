@@ -8,7 +8,7 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
   def getDataTypeID: StringID = this.typeID
 
-  def getType: StringID = constants.ID.DataIDType
+  def getType: StringID = schema.constants.ID.DataIDType
 
   def getBondWeight: Int = this.typeID.value match {
     case "A" => AccAddressBondWeight

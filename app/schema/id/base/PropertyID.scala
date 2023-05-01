@@ -7,7 +7,7 @@ case class PropertyID(keyID: StringID, typeID: StringID) extends ID {
 
   def getBytes: Array[Byte] = this.keyID.getBytes ++ this.typeID.getBytes
 
-  def getType: StringID = constants.ID.PropertyIDType
+  def getType: StringID = schema.constants.ID.PropertyIDType
 
   def asString: String = this.keyID.asString + schema.constants.ID.Separator + this.typeID.asString
 

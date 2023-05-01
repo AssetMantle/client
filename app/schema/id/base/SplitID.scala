@@ -8,7 +8,7 @@ case class SplitID(ownerID: IdentityID, ownableID: OwnableID) extends ID {
 
   def getBytes: Array[Byte] = this.ownerID.getBytes ++ this.ownableID.getBytes
 
-  def getType: StringID = constants.ID.SplitIDType
+  def getType: StringID = schema.constants.ID.SplitIDType
 
   def asString: String = this.ownerID.asString + schema.constants.ID.Separator + this.ownableID.asString
 

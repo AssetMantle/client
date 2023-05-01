@@ -7,7 +7,7 @@ case class AssetID(hashID: HashID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def getType: StringID = constants.ID.AssetIDType
+  def getType: StringID = schema.constants.ID.AssetIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 

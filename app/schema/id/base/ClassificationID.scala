@@ -7,7 +7,7 @@ case class ClassificationID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def getType: StringID = constants.ID.ClassificationIDType
+  def getType: StringID = schema.constants.ID.ClassificationIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 

@@ -7,7 +7,7 @@ case class CoinID(value: StringID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def getType: StringID = constants.ID.CoinIDType
+  def getType: StringID = schema.constants.ID.CoinIDType
 
   def asString: String = this.value.asString
 

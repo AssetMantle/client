@@ -7,7 +7,7 @@ case class OrderID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def getType: StringID = constants.ID.OrderIDType
+  def getType: StringID = schema.constants.ID.OrderIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
