@@ -54,7 +54,7 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getExchangeRate: BigDecimal = {
     val property = this.getProperty(schema.constants.Properties.ExchangeRateProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.SmallestDec
+    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.ZeroDec
   }
 
   def getExpiryHeight: Long = {

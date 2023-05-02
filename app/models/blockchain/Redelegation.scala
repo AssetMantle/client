@@ -164,7 +164,7 @@ class Redelegations @Inject()(
         _ <- updateValidators
         _ <- updateActiveValidatorSet()
       } yield redelegate.getDelegatorAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.REDELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           redelegate.getDelegatorAddress
       }
     }

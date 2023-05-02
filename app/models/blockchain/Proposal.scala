@@ -175,7 +175,7 @@ class Proposals @Inject()(
         latestProposalID <- latestProposalID
         _ <- upsert(latestProposalID)
       } yield submitProposal.getProposer).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           submitProposal.getProposer
       }
     }

@@ -349,17 +349,17 @@ class Startup @Inject()(
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
       val abciInfo = getABCIInfo.Service.get()
 
-      def latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
+      def latestExplorerBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
 
-      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlock: blockchain.Block) = if (latestExplorerBlock.height == 0) {
+      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlockHeight: Int) = if (latestExplorerBlockHeight == 0) {
         for {
           _ <- onGenesis()
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
-        val archive = if (latestExplorerBlock.height / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlock.height, latestExplorerBlock.time) else Future(0)
+        val archive = if (latestExplorerBlockHeight > 0 && latestExplorerBlockHeight / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlockHeight) else Future(0)
 
-        val updateBlockHeight = latestExplorerBlock.height + 1
+        val updateBlockHeight = latestExplorerBlockHeight + 1
 
         val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
         else Future()
@@ -372,8 +372,8 @@ class Startup @Inject()(
 
       val forComplete = (for {
         abciInfo <- abciInfo
-        latestExplorerBlock <- latestExplorerBlock
-        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlock)
+        latestExplorerBlockHeight <- latestExplorerBlockHeight
+        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlockHeight)
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

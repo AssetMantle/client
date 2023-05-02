@@ -151,7 +151,7 @@ class ComponentViewController @Inject()(
   def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val latestBlock = blockchainBlocks.Service.tryGetLatestBlock
 
         def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
@@ -227,7 +227,7 @@ class ComponentViewController @Inject()(
       implicit request =>
         val dayEpoch: Long = 24 * 60 * 60
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
-        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val latestBlock = blockchainBlocks.Service.tryGetLatestBlock
         val totalTxs = blockchainTransactions.Service.getTotalTransactions
 
         def getTxData(latestHeightEpoch: Long) = {

@@ -23,12 +23,21 @@ class Archiving @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def checkAndUpdate(latestHeight: Int, latestBlockEpoch: Long): Future[Unit] = {
-    val firstHeight = Await.result(blockchainBlocks.Service.getFirstHeight, Duration.Inf)
+  def checkAndUpdate(latestHeight: Int): Future[Unit] = {
+    val firstHeight = blockchainBlocks.Service.getFirstHeight
+    val latestBlock = blockchainBlocks.Service.tryGet(latestHeight)
 
-    if (firstHeight > 0 && latestHeight > (firstHeight + 250000 + 10000)) {
-      migrateBlocks(start = firstHeight, end = firstHeight + 10000, latestBlockEpoch)
-    } else Future()
+    def checkAndMigrate(firstHeight: Int, latestHeight: Int, latestBlockEpoch: Long) = {
+      if (firstHeight > 0 && latestHeight > (firstHeight + 250000 + 10000)) {
+        migrateBlocks(start = firstHeight, end = firstHeight + 10000, latestBlockEpoch)
+      } else Future()
+    }
+
+    for {
+      firstHeight <- firstHeight
+      latestBlock <- latestBlock
+      _ <- checkAndMigrate(firstHeight = firstHeight, latestHeight = latestHeight, latestBlockEpoch = latestBlock.time)
+    } yield ()
   }
 
   private def migrateBlocks(start: Int, end: Int, latestBlockEpoch: Long) = {

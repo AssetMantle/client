@@ -14,7 +14,7 @@ object Authz {
   //bank
   case class SendAuthorization(spendLimit: Seq[Coin]) extends Authorization {
 
-    def getMsgTypeURL: String = constants.Blockchain.TransactionMessage.SEND_COIN
+    def getMsgTypeURL: String = schema.constants.Messages.SEND_COIN
 
     def validate(stdMsg: protoAny): ValidateResponse = {
       val (limitLeft, _) = utilities.Blockchain.subtractCoins(spendLimit, com.cosmos.bank.v1beta1.MsgSend.parseFrom(stdMsg.getValue).getAmountList.asScala.toSeq.map(x => Coin(x)))
@@ -57,9 +57,9 @@ object Authz {
 
   case class StakeAuthorization(maxTokens: Coin, allowList: StakeAuthorizationValidators, denyList: StakeAuthorizationValidators, authorizationType: String) extends Authorization {
     def getMsgTypeURL: String = authorizationType match {
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => constants.Blockchain.TransactionMessage.DELEGATE
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => constants.Blockchain.TransactionMessage.UNDELEGATE
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_REDELEGATE => constants.Blockchain.TransactionMessage.REDELEGATE
+      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => schema.constants.Messages.DELEGATE
+      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => schema.constants.Messages.UNDELEGATE
+      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_REDELEGATE => schema.constants.Messages.REDELEGATE
       case _ => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED.toString
     }
 
@@ -67,9 +67,9 @@ object Authz {
       ValidateResponse(accept = true, delete = false, updated = Option(this.copy(maxTokens = Coin("", MicroNumber.zero))))
     } else {
       val amount: Coin = getMsgTypeURL match {
-        case constants.Blockchain.TransactionMessage.DELEGATE => Coin(stakingTx.MsgDelegate.parseFrom(stdMsg.getValue).getAmount)
-        case constants.Blockchain.TransactionMessage.UNDELEGATE => Coin(stakingTx.MsgUndelegate.parseFrom(stdMsg.getValue).getAmount)
-        case constants.Blockchain.TransactionMessage.REDELEGATE => Coin(stakingTx.MsgBeginRedelegate.parseFrom(stdMsg.getValue).getAmount)
+        case schema.constants.Messages.DELEGATE => Coin(stakingTx.MsgDelegate.parseFrom(stdMsg.getValue).getAmount)
+        case schema.constants.Messages.UNDELEGATE => Coin(stakingTx.MsgUndelegate.parseFrom(stdMsg.getValue).getAmount)
+        case schema.constants.Messages.REDELEGATE => Coin(stakingTx.MsgBeginRedelegate.parseFrom(stdMsg.getValue).getAmount)
       }
       val limitLeft = maxTokens.subtract(amount)
       if (limitLeft.isZero) ValidateResponse(accept = true, delete = true, updated = None)

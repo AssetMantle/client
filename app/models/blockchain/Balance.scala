@@ -114,7 +114,7 @@ class Balances @Inject()(
         _ <- fromAccount
         _ <- toAccount
       } yield sendCoin.getFromAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SEND_COIN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.SEND_COIN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           sendCoin.getFromAddress
       }
     }
@@ -128,7 +128,7 @@ class Balances @Inject()(
         _ <- inputAccounts
         _ <- outputAccounts
       } yield multiSend.getInputs(0).getAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.MULTI_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.MULTI_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           multiSend.getInputs(0).getAddress
       }
     }
@@ -143,7 +143,7 @@ class Balances @Inject()(
         _ <- updateSender
         _ <- updateReceiver
       } yield recvPacket.getSigner).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.RECV_PACKET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.RECV_PACKET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           recvPacket.getSigner
       }
     }
@@ -158,7 +158,7 @@ class Balances @Inject()(
         _ <- updateSender
         _ <- updateReceiver
       } yield timeout.getSigner).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TIMEOUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.TIMEOUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           timeout.getSigner
       }
     }
@@ -173,7 +173,7 @@ class Balances @Inject()(
         _ <- updateSender
         _ <- updateReceiver
       } yield timeoutOnClose.getSigner).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.TIMEOUT_ON_CLOSE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           timeoutOnClose.getSigner
       }
     }
@@ -188,7 +188,7 @@ class Balances @Inject()(
         _ <- updateSender
         _ <- updateReceiver
       } yield acknowledgement.getSigner).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.ACKNOWLEDGEMENT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           acknowledgement.getSigner
       }
     }
@@ -203,7 +203,7 @@ class Balances @Inject()(
         _ <- updateSender
         _ <- updateReceiver
       } yield transfer.getSender).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.TRANSFER + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.TRANSFER + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           transfer.getSender
       }
 

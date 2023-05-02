@@ -96,7 +96,7 @@ class WithdrawAddresses @Inject()(
       (for {
         _ <- insert
       } yield setWithdrawAddress.getDelegatorAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.SET_WITHDRAW_ADDRESS + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           setWithdrawAddress.getDelegatorAddress
       }
     }

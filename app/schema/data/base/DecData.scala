@@ -4,11 +4,7 @@ import com.assetmantle.schema.data.base.{AnyData, DecData => protoDecData}
 import schema.data.Data
 import schema.id.base.{DataID, HashID, StringID}
 
-import scala.util.Try
-
-case class DecData(value: String) extends Data {
-
-  require(Try(BigDecimal(value, schema.constants.Data.DecPrecisionContext)).isSuccess, "INVALID_STRING_FOR_DEC_DATA")
+case class DecData(value: BigDecimal) extends Data {
 
   def toPlainString: String = schema.constants.Data.DecStringFormat.format(this.value)
 
@@ -16,7 +12,7 @@ case class DecData(value: String) extends Data {
 
   def getBondWeight: Int = schema.constants.Data.DecDataWeight
 
-  def getValue: BigDecimal = BigDecimal(value, schema.constants.Data.DecPrecisionContext)
+  def getValue: BigDecimal = this.value
 
   def getDataID: DataID = DataID(typeID = schema.constants.Data.DecDataTypeID, hashID = this.generateHashID)
 
@@ -32,7 +28,7 @@ case class DecData(value: String) extends Data {
 
   def getProtoBytes: Array[Byte] = this.asProtoDecData.toByteString.toByteArray
 
-  def viewString: String = this.value
+  def viewString: String = this.toPlainString
 
   def validSortable: Boolean = this.getValue.abs <= schema.constants.Data.DecDataMaxValue
 
@@ -57,9 +53,10 @@ case class DecData(value: String) extends Data {
 
 object DecData {
 
-  def apply(value: protoDecData): DecData = DecData(value.getValue)
+  def apply(value: protoDecData): DecData = DecData(BigDecimal(value.getValue))
 
   def apply(protoBytes: Array[Byte]): DecData = DecData(protoDecData.parseFrom(protoBytes))
 
-  def apply(value: BigDecimal): DecData = DecData(schema.constants.Data.DecStringFormat.format(value))
+  def apply(value: String): DecData = DecData(BigDecimal(value))
+
 }

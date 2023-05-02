@@ -114,7 +114,7 @@ class FeeGrants @Inject()(
       (for {
         _ <- upsert
       } yield feeGrantAllowance.getGranter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.FEE_GRANT_ALLOWANCE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           feeGrantAllowance.getGranter
       }
     }
@@ -125,7 +125,7 @@ class FeeGrants @Inject()(
       (for {
         _ <- delete
       } yield feeRevokeAllowance.getGranter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.FEE_REVOKE_ALLOWANCE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           feeRevokeAllowance.getGranter
       }
     }

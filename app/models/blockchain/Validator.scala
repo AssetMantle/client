@@ -287,7 +287,7 @@ class Validators @Inject()(
         _ <- updateOtherDetails()
         _ <- updateActiveValidatorSet()
       } yield createValidator.getDelegatorAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.CREATE_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.CREATE_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           createValidator.getDelegatorAddress
       }
     }
@@ -304,7 +304,7 @@ class Validators @Inject()(
         _ <- addEvent(validator)
         - <- insertKeyBaseAccount(validator)
       } yield utilities.Crypto.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.EDIT_VALIDATOR + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           utilities.Crypto.convertOperatorAddressToAccountAddress(editValidator.getValidatorAddress)
       }
     }
@@ -319,7 +319,7 @@ class Validators @Inject()(
         _ <- updateActiveValidatorSet()
         _ <- addEvent(validator)
       } yield utilities.Crypto.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.UNJAIL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           utilities.Crypto.convertOperatorAddressToAccountAddress(unjail.getValidatorAddr)
       }
     }
@@ -337,7 +337,7 @@ class Validators @Inject()(
         _ <- withdrawRewards
         _ <- updateActiveValidatorSet()
       } yield delegate.getDelegatorAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.DELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.DELEGATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           delegate.getDelegatorAddress
       }
     }
@@ -348,7 +348,7 @@ class Validators @Inject()(
       (for {
         _ <- withdrawBalance
       } yield withdrawDelegatorReward.getDelegatorAddress).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.WITHDRAW_DELEGATOR_REWARD + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           withdrawDelegatorReward.getDelegatorAddress
       }
     }
@@ -360,7 +360,7 @@ class Validators @Inject()(
       (for {
         _ <- withdrawBalance
       } yield utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
       }
     }

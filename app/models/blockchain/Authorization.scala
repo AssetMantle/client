@@ -120,7 +120,7 @@ class Authorizations @Inject()(
       (for {
         _ <- insertOrUpdate
       } yield grantAuthorization.getGranter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.GRANT_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           grantAuthorization.getGranter
       }
     }
@@ -130,7 +130,7 @@ class Authorizations @Inject()(
       (for {
         _ <- delete
       } yield revokeAuthorization.getGranter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.REVOKE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           revokeAuthorization.getGranter
       }
     }
@@ -161,7 +161,7 @@ class Authorizations @Inject()(
       (for {
         _ <- execute
       } yield executeAuthorization.getGrantee).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.EXECUTE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           executeAuthorization.getGrantee
       }
     }
