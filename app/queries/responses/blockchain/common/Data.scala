@@ -22,7 +22,7 @@ object Data {
   implicit val BooleanDataReads: Reads[BooleanData] = Json.reads[BooleanData]
 
   case class DecData(value: String) {
-    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(BigDecimal(this.value))
+    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(this.value)
   }
 
   implicit val DecDataReads: Reads[DecData] = Json.reads[DecData]
@@ -52,7 +52,7 @@ object Data {
   implicit val StringDataReads: Reads[StringData] = Json.reads[StringData]
 
   case class NumberData(value: String) {
-    def toNumberData: baseSchemaData.NumberData = baseSchemaData.NumberData(this.value.toLong)
+    def toNumberData: baseSchemaData.NumberData = baseSchemaData.NumberData(BigInt(this.value))
   }
 
   implicit val NumberDataReads: Reads[NumberData] = Json.reads[NumberData]
