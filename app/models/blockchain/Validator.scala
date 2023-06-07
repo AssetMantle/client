@@ -327,7 +327,7 @@ class Validators @Inject()(
     def onDelegation(delegate: stakingTx.MsgDelegate)(implicit header: Header): Future[String] = {
       val updateValidator = insertOrUpdateValidator(delegate.getValidatorAddress)
       val accountBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegate.getDelegatorAddress)
-      val insertDelegation = blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = delegate.getDelegatorAddress, validatorAddress = delegate.getValidatorAddress)
+      val insertDelegation = blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = delegate.getDelegatorAddress, validatorAddress = delegate.getValidatorAddress)
       val withdrawRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(delegate.getDelegatorAddress)
 
       (for {

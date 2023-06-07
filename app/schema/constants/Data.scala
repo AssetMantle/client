@@ -7,7 +7,9 @@ import java.text.DecimalFormat
 
 object Data {
 
-  val DecFactor = 1000000000000000000L
+  val ListSeparator = "\\#"
+
+  val DecFactor: Long = 1000000000000000000L
 
   val DecStringFormat = new DecimalFormat("#0.000000000000000000")
 

@@ -20,7 +20,7 @@ case class PropertyList(properties: Seq[Property]) {
 
   def getPropertyIDList: IDList = IDList(this.properties.map(_.getID))
 
-  def asProtoPropertyList: protoPropertyList = protoPropertyList.newBuilder().addAllProperties(this.properties.map(_.toAnyProperty).asJava).build()
+  def asProtoPropertyList: protoPropertyList = protoPropertyList.newBuilder().addAllAnyProperties(this.properties.map(_.toAnyProperty).asJava).build()
 
   def scrub: PropertyList = PropertyList(this.properties.map(_.scrub()))
 
@@ -61,7 +61,7 @@ case class PropertyList(properties: Seq[Property]) {
 
 object PropertyList {
 
-  def apply(properties: protoPropertyList): PropertyList = PropertyList(properties.getPropertiesList.asScala.toSeq.map(x => Property(x)))
+  def apply(properties: protoPropertyList): PropertyList = PropertyList(properties.getAnyPropertiesList.asScala.toSeq.map(x => Property(x)))
 
   def apply(protoBytes: Array[Byte]): PropertyList = PropertyList(protoPropertyList.parseFrom(protoBytes))
 

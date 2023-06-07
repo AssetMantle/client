@@ -29,8 +29,8 @@ public final class MetaPropertyProto {
   static {
     java.lang.String[] descriptorData = {
       "\n#properties/base/meta_property.proto\022\"a" +
-      "ssetmantle.schema.properties.base\032\024gogop" +
-      "roto/gogo.proto\032\030data/base/any_data.prot" +
+      "ssetmantle.schema.properties.base\032\030data/" +
+      "base/any_data.proto\032\024gogoproto/gogo.prot" +
       "o\032\032ids/base/property_id.proto\"\211\001\n\014MetaPr" +
       "operty\0228\n\003i_d\030\001 \001(\0132\'.assetmantle.schema" +
       ".ids.base.PropertyIDR\002iD\0229\n\004data\030\002 \001(\0132%" +
@@ -47,8 +47,8 @@ public final class MetaPropertyProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.gogoproto.GogoProto.getDescriptor(),
           com.assetmantle.schema.data.base.AnyDataProto.getDescriptor(),
+          com.gogoproto.GogoProto.getDescriptor(),
           com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_properties_base_MetaProperty_descriptor =
@@ -62,8 +62,8 @@ public final class MetaPropertyProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.gogoproto.GogoProto.getDescriptor();
     com.assetmantle.schema.data.base.AnyDataProto.getDescriptor();
+    com.gogoproto.GogoProto.getDescriptor();
     com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor();
   }
 

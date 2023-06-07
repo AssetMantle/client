@@ -16,7 +16,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private PropertyList() {
-    properties_ = java.util.Collections.emptyList();
+    anyProperties_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -39,45 +39,45 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.schema.lists.base.PropertyList.class, com.assetmantle.schema.lists.base.PropertyList.Builder.class);
   }
 
-  public static final int PROPERTIES_FIELD_NUMBER = 1;
+  public static final int ANY_PROPERTIES_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
-  private java.util.List<com.assetmantle.schema.properties.base.AnyProperty> properties_;
+  private java.util.List<com.assetmantle.schema.properties.base.AnyProperty> anyProperties_;
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   @java.lang.Override
-  public java.util.List<com.assetmantle.schema.properties.base.AnyProperty> getPropertiesList() {
-    return properties_;
+  public java.util.List<com.assetmantle.schema.properties.base.AnyProperty> getAnyPropertiesList() {
+    return anyProperties_;
   }
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   @java.lang.Override
   public java.util.List<? extends com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> 
-      getPropertiesOrBuilderList() {
-    return properties_;
+      getAnyPropertiesOrBuilderList() {
+    return anyProperties_;
   }
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   @java.lang.Override
-  public int getPropertiesCount() {
-    return properties_.size();
+  public int getAnyPropertiesCount() {
+    return anyProperties_.size();
   }
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.properties.base.AnyProperty getProperties(int index) {
-    return properties_.get(index);
+  public com.assetmantle.schema.properties.base.AnyProperty getAnyProperties(int index) {
+    return anyProperties_.get(index);
   }
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getPropertiesOrBuilder(
+  public com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getAnyPropertiesOrBuilder(
       int index) {
-    return properties_.get(index);
+    return anyProperties_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -94,8 +94,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    for (int i = 0; i < properties_.size(); i++) {
-      output.writeMessage(1, properties_.get(i));
+    for (int i = 0; i < anyProperties_.size(); i++) {
+      output.writeMessage(1, anyProperties_.get(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -106,9 +106,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    for (int i = 0; i < properties_.size(); i++) {
+    for (int i = 0; i < anyProperties_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, properties_.get(i));
+        .computeMessageSize(1, anyProperties_.get(i));
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -125,8 +125,8 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.schema.lists.base.PropertyList other = (com.assetmantle.schema.lists.base.PropertyList) obj;
 
-    if (!getPropertiesList()
-        .equals(other.getPropertiesList())) return false;
+    if (!getAnyPropertiesList()
+        .equals(other.getAnyPropertiesList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -138,9 +138,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (getPropertiesCount() > 0) {
-      hash = (37 * hash) + PROPERTIES_FIELD_NUMBER;
-      hash = (53 * hash) + getPropertiesList().hashCode();
+    if (getAnyPropertiesCount() > 0) {
+      hash = (37 * hash) + ANY_PROPERTIES_FIELD_NUMBER;
+      hash = (53 * hash) + getAnyPropertiesList().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -271,11 +271,11 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      if (propertiesBuilder_ == null) {
-        properties_ = java.util.Collections.emptyList();
+      if (anyPropertiesBuilder_ == null) {
+        anyProperties_ = java.util.Collections.emptyList();
       } else {
-        properties_ = null;
-        propertiesBuilder_.clear();
+        anyProperties_ = null;
+        anyPropertiesBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
@@ -311,14 +311,14 @@ private static final long serialVersionUID = 0L;
     }
 
     private void buildPartialRepeatedFields(com.assetmantle.schema.lists.base.PropertyList result) {
-      if (propertiesBuilder_ == null) {
+      if (anyPropertiesBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
-          properties_ = java.util.Collections.unmodifiableList(properties_);
+          anyProperties_ = java.util.Collections.unmodifiableList(anyProperties_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.properties_ = properties_;
+        result.anyProperties_ = anyProperties_;
       } else {
-        result.properties_ = propertiesBuilder_.build();
+        result.anyProperties_ = anyPropertiesBuilder_.build();
       }
     }
 
@@ -370,29 +370,29 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.schema.lists.base.PropertyList other) {
       if (other == com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance()) return this;
-      if (propertiesBuilder_ == null) {
-        if (!other.properties_.isEmpty()) {
-          if (properties_.isEmpty()) {
-            properties_ = other.properties_;
+      if (anyPropertiesBuilder_ == null) {
+        if (!other.anyProperties_.isEmpty()) {
+          if (anyProperties_.isEmpty()) {
+            anyProperties_ = other.anyProperties_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensurePropertiesIsMutable();
-            properties_.addAll(other.properties_);
+            ensureAnyPropertiesIsMutable();
+            anyProperties_.addAll(other.anyProperties_);
           }
           onChanged();
         }
       } else {
-        if (!other.properties_.isEmpty()) {
-          if (propertiesBuilder_.isEmpty()) {
-            propertiesBuilder_.dispose();
-            propertiesBuilder_ = null;
-            properties_ = other.properties_;
+        if (!other.anyProperties_.isEmpty()) {
+          if (anyPropertiesBuilder_.isEmpty()) {
+            anyPropertiesBuilder_.dispose();
+            anyPropertiesBuilder_ = null;
+            anyProperties_ = other.anyProperties_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            propertiesBuilder_ = 
+            anyPropertiesBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getPropertiesFieldBuilder() : null;
+                 getAnyPropertiesFieldBuilder() : null;
           } else {
-            propertiesBuilder_.addAllMessages(other.properties_);
+            anyPropertiesBuilder_.addAllMessages(other.anyProperties_);
           }
         }
       }
@@ -427,11 +427,11 @@ private static final long serialVersionUID = 0L;
                   input.readMessage(
                       com.assetmantle.schema.properties.base.AnyProperty.parser(),
                       extensionRegistry);
-              if (propertiesBuilder_ == null) {
-                ensurePropertiesIsMutable();
-                properties_.add(m);
+              if (anyPropertiesBuilder_ == null) {
+                ensureAnyPropertiesIsMutable();
+                anyProperties_.add(m);
               } else {
-                propertiesBuilder_.addMessage(m);
+                anyPropertiesBuilder_.addMessage(m);
               }
               break;
             } // case 10
@@ -452,244 +452,244 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.util.List<com.assetmantle.schema.properties.base.AnyProperty> properties_ =
+    private java.util.List<com.assetmantle.schema.properties.base.AnyProperty> anyProperties_ =
       java.util.Collections.emptyList();
-    private void ensurePropertiesIsMutable() {
+    private void ensureAnyPropertiesIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        properties_ = new java.util.ArrayList<com.assetmantle.schema.properties.base.AnyProperty>(properties_);
+        anyProperties_ = new java.util.ArrayList<com.assetmantle.schema.properties.base.AnyProperty>(anyProperties_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.assetmantle.schema.properties.base.AnyProperty, com.assetmantle.schema.properties.base.AnyProperty.Builder, com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> propertiesBuilder_;
+        com.assetmantle.schema.properties.base.AnyProperty, com.assetmantle.schema.properties.base.AnyProperty.Builder, com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> anyPropertiesBuilder_;
 
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public java.util.List<com.assetmantle.schema.properties.base.AnyProperty> getPropertiesList() {
-      if (propertiesBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(properties_);
+    public java.util.List<com.assetmantle.schema.properties.base.AnyProperty> getAnyPropertiesList() {
+      if (anyPropertiesBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(anyProperties_);
       } else {
-        return propertiesBuilder_.getMessageList();
+        return anyPropertiesBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public int getPropertiesCount() {
-      if (propertiesBuilder_ == null) {
-        return properties_.size();
+    public int getAnyPropertiesCount() {
+      if (anyPropertiesBuilder_ == null) {
+        return anyProperties_.size();
       } else {
-        return propertiesBuilder_.getCount();
+        return anyPropertiesBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public com.assetmantle.schema.properties.base.AnyProperty getProperties(int index) {
-      if (propertiesBuilder_ == null) {
-        return properties_.get(index);
+    public com.assetmantle.schema.properties.base.AnyProperty getAnyProperties(int index) {
+      if (anyPropertiesBuilder_ == null) {
+        return anyProperties_.get(index);
       } else {
-        return propertiesBuilder_.getMessage(index);
+        return anyPropertiesBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder setProperties(
+    public Builder setAnyProperties(
         int index, com.assetmantle.schema.properties.base.AnyProperty value) {
-      if (propertiesBuilder_ == null) {
+      if (anyPropertiesBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePropertiesIsMutable();
-        properties_.set(index, value);
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.set(index, value);
         onChanged();
       } else {
-        propertiesBuilder_.setMessage(index, value);
+        anyPropertiesBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder setProperties(
+    public Builder setAnyProperties(
         int index, com.assetmantle.schema.properties.base.AnyProperty.Builder builderForValue) {
-      if (propertiesBuilder_ == null) {
-        ensurePropertiesIsMutable();
-        properties_.set(index, builderForValue.build());
+      if (anyPropertiesBuilder_ == null) {
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.set(index, builderForValue.build());
         onChanged();
       } else {
-        propertiesBuilder_.setMessage(index, builderForValue.build());
+        anyPropertiesBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder addProperties(com.assetmantle.schema.properties.base.AnyProperty value) {
-      if (propertiesBuilder_ == null) {
+    public Builder addAnyProperties(com.assetmantle.schema.properties.base.AnyProperty value) {
+      if (anyPropertiesBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePropertiesIsMutable();
-        properties_.add(value);
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.add(value);
         onChanged();
       } else {
-        propertiesBuilder_.addMessage(value);
+        anyPropertiesBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder addProperties(
+    public Builder addAnyProperties(
         int index, com.assetmantle.schema.properties.base.AnyProperty value) {
-      if (propertiesBuilder_ == null) {
+      if (anyPropertiesBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePropertiesIsMutable();
-        properties_.add(index, value);
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.add(index, value);
         onChanged();
       } else {
-        propertiesBuilder_.addMessage(index, value);
+        anyPropertiesBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder addProperties(
+    public Builder addAnyProperties(
         com.assetmantle.schema.properties.base.AnyProperty.Builder builderForValue) {
-      if (propertiesBuilder_ == null) {
-        ensurePropertiesIsMutable();
-        properties_.add(builderForValue.build());
+      if (anyPropertiesBuilder_ == null) {
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.add(builderForValue.build());
         onChanged();
       } else {
-        propertiesBuilder_.addMessage(builderForValue.build());
+        anyPropertiesBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder addProperties(
+    public Builder addAnyProperties(
         int index, com.assetmantle.schema.properties.base.AnyProperty.Builder builderForValue) {
-      if (propertiesBuilder_ == null) {
-        ensurePropertiesIsMutable();
-        properties_.add(index, builderForValue.build());
+      if (anyPropertiesBuilder_ == null) {
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.add(index, builderForValue.build());
         onChanged();
       } else {
-        propertiesBuilder_.addMessage(index, builderForValue.build());
+        anyPropertiesBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder addAllProperties(
+    public Builder addAllAnyProperties(
         java.lang.Iterable<? extends com.assetmantle.schema.properties.base.AnyProperty> values) {
-      if (propertiesBuilder_ == null) {
-        ensurePropertiesIsMutable();
+      if (anyPropertiesBuilder_ == null) {
+        ensureAnyPropertiesIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, properties_);
+            values, anyProperties_);
         onChanged();
       } else {
-        propertiesBuilder_.addAllMessages(values);
+        anyPropertiesBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder clearProperties() {
-      if (propertiesBuilder_ == null) {
-        properties_ = java.util.Collections.emptyList();
+    public Builder clearAnyProperties() {
+      if (anyPropertiesBuilder_ == null) {
+        anyProperties_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
       } else {
-        propertiesBuilder_.clear();
+        anyPropertiesBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public Builder removeProperties(int index) {
-      if (propertiesBuilder_ == null) {
-        ensurePropertiesIsMutable();
-        properties_.remove(index);
+    public Builder removeAnyProperties(int index) {
+      if (anyPropertiesBuilder_ == null) {
+        ensureAnyPropertiesIsMutable();
+        anyProperties_.remove(index);
         onChanged();
       } else {
-        propertiesBuilder_.remove(index);
+        anyPropertiesBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public com.assetmantle.schema.properties.base.AnyProperty.Builder getPropertiesBuilder(
+    public com.assetmantle.schema.properties.base.AnyProperty.Builder getAnyPropertiesBuilder(
         int index) {
-      return getPropertiesFieldBuilder().getBuilder(index);
+      return getAnyPropertiesFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getPropertiesOrBuilder(
+    public com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getAnyPropertiesOrBuilder(
         int index) {
-      if (propertiesBuilder_ == null) {
-        return properties_.get(index);  } else {
-        return propertiesBuilder_.getMessageOrBuilder(index);
+      if (anyPropertiesBuilder_ == null) {
+        return anyProperties_.get(index);  } else {
+        return anyPropertiesBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
     public java.util.List<? extends com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> 
-         getPropertiesOrBuilderList() {
-      if (propertiesBuilder_ != null) {
-        return propertiesBuilder_.getMessageOrBuilderList();
+         getAnyPropertiesOrBuilderList() {
+      if (anyPropertiesBuilder_ != null) {
+        return anyPropertiesBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(properties_);
+        return java.util.Collections.unmodifiableList(anyProperties_);
       }
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public com.assetmantle.schema.properties.base.AnyProperty.Builder addPropertiesBuilder() {
-      return getPropertiesFieldBuilder().addBuilder(
+    public com.assetmantle.schema.properties.base.AnyProperty.Builder addAnyPropertiesBuilder() {
+      return getAnyPropertiesFieldBuilder().addBuilder(
           com.assetmantle.schema.properties.base.AnyProperty.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
-    public com.assetmantle.schema.properties.base.AnyProperty.Builder addPropertiesBuilder(
+    public com.assetmantle.schema.properties.base.AnyProperty.Builder addAnyPropertiesBuilder(
         int index) {
-      return getPropertiesFieldBuilder().addBuilder(
+      return getAnyPropertiesFieldBuilder().addBuilder(
           index, com.assetmantle.schema.properties.base.AnyProperty.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+     * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
      */
     public java.util.List<com.assetmantle.schema.properties.base.AnyProperty.Builder> 
-         getPropertiesBuilderList() {
-      return getPropertiesFieldBuilder().getBuilderList();
+         getAnyPropertiesBuilderList() {
+      return getAnyPropertiesFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
         com.assetmantle.schema.properties.base.AnyProperty, com.assetmantle.schema.properties.base.AnyProperty.Builder, com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> 
-        getPropertiesFieldBuilder() {
-      if (propertiesBuilder_ == null) {
-        propertiesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+        getAnyPropertiesFieldBuilder() {
+      if (anyPropertiesBuilder_ == null) {
+        anyPropertiesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.assetmantle.schema.properties.base.AnyProperty, com.assetmantle.schema.properties.base.AnyProperty.Builder, com.assetmantle.schema.properties.base.AnyPropertyOrBuilder>(
-                properties_,
+                anyProperties_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
                 isClean());
-        properties_ = null;
+        anyProperties_ = null;
       }
-      return propertiesBuilder_;
+      return anyPropertiesBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

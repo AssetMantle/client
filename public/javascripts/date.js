@@ -1,6 +1,8 @@
 
 function convertUTCDateToLocalDate(date, id) {
+    console.log(date)
     let newDate = new Date(date);
+    console.log(newDate)
     $('#' + id).html(newDate.toLocaleDateString("en", dateFormatOptions));
 }
 

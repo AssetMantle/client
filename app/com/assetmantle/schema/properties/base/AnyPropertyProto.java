@@ -29,10 +29,10 @@ public final class AnyPropertyProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\"properties/base/any_property.proto\022\"as" +
-      "setmantle.schema.properties.base\032#proper" +
-      "ties/base/mesa_property.proto\032#propertie" +
-      "s/base/meta_property.proto\032\024gogoproto/go" +
-      "go.proto\"\315\001\n\013AnyProperty\022W\n\rmesa_propert" +
+      "setmantle.schema.properties.base\032\024gogopr" +
+      "oto/gogo.proto\032#properties/base/mesa_pro" +
+      "perty.proto\032#properties/base/meta_proper" +
+      "ty.proto\"\315\001\n\013AnyProperty\022W\n\rmesa_propert" +
       "y\030\001 \001(\01320.assetmantle.schema.properties." +
       "base.MesaPropertyH\000R\014mesaProperty\022W\n\rmet" +
       "a_property\030\002 \001(\01320.assetmantle.schema.pr" +
@@ -49,9 +49,9 @@ public final class AnyPropertyProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.gogoproto.GogoProto.getDescriptor(),
           com.assetmantle.schema.properties.base.MesaPropertyProto.getDescriptor(),
           com.assetmantle.schema.properties.base.MetaPropertyProto.getDescriptor(),
-          com.gogoproto.GogoProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_properties_base_AnyProperty_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -64,9 +64,9 @@ public final class AnyPropertyProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
+    com.gogoproto.GogoProto.getDescriptor();
     com.assetmantle.schema.properties.base.MesaPropertyProto.getDescriptor();
     com.assetmantle.schema.properties.base.MetaPropertyProto.getDescriptor();
-    com.gogoproto.GogoProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

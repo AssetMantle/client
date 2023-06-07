@@ -147,7 +147,7 @@ class WalletTransactions @Inject()(
             case schema.constants.Messages.SET_WITHDRAW_ADDRESS => val msg = distributionTx.MsgSetWithdrawAddress.parseFrom(stdMsg.getValue)
               Seq(msg.getWithdrawAddress, msg.getDelegatorAddress).distinct
             case schema.constants.Messages.WITHDRAW_DELEGATOR_REWARD => Seq(distributionTx.MsgWithdrawDelegatorReward.parseFrom(stdMsg.getValue).getDelegatorAddress)
-            case schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION => Seq(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION => Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress))
             case schema.constants.Messages.FUND_COMMUNITY_POOL => Seq(distributionTx.MsgFundCommunityPool.parseFrom(stdMsg.getValue).getDepositor)
             //evidence
             case schema.constants.Messages.SUBMIT_EVIDENCE => Seq(evidenceTx.MsgSubmitEvidence.parseFrom(stdMsg.getValue).getSubmitter)
@@ -162,8 +162,10 @@ class WalletTransactions @Inject()(
             case schema.constants.Messages.VOTE => Seq(govTx.MsgVote.parseFrom(stdMsg.getValue).getVoter)
             case schema.constants.Messages.WEIGHTED_VOTE => Seq(govTx.MsgVoteWeighted.parseFrom(stdMsg.getValue).getVoter)
             //slashing
-            case schema.constants.Messages.UNJAIL => Seq(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr)
+            case schema.constants.Messages.UNJAIL => Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr))
             //staking
+            case schema.constants.Messages.CREATE_VALIDATOR => Seq(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getDelegatorAddress)
+            case schema.constants.Messages.EDIT_VALIDATOR => Seq(utilities.Crypto.convertOperatorAddressToAccountAddress(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress))
             case schema.constants.Messages.DELEGATE => Seq(stakingTx.MsgDelegate.parseFrom(stdMsg.getValue).getDelegatorAddress)
             case schema.constants.Messages.REDELEGATE => Seq(stakingTx.MsgBeginRedelegate.parseFrom(stdMsg.getValue).getDelegatorAddress)
             case schema.constants.Messages.UNDELEGATE => Seq(stakingTx.MsgUndelegate.parseFrom(stdMsg.getValue).getDelegatorAddress)

@@ -65,8 +65,8 @@ object Messages {
   val ASSET_DEPUTIZE = "/assetmantle.modules.assets.transactions.deputize.Message"
   val ASSET_MINT = "/assetmantle.modules.assets.transactions.mint.Message"
   val ASSET_MUTATE = "/assetmantle.modules.assets.transactions.mutate.Message"
-  val ASSET_RENUMERATE = "/assets.transactions.renumerate.Message"
-  val ASSET_REVOKE = "/assets.transactions.revoke.Message"
+  val ASSET_RENUMERATE = "/assetmantle.modules.assets.transactions.renumerate.Message"
+  val ASSET_REVOKE = "/assetmantle.modules.assets.transactions.revoke.Message"
   //identity
   val IDENTITY_DEFINE = "/assetmantle.modules.identities.transactions.define.Message"
   val IDENTITY_DEPUTIZE = "/assetmantle.modules.identities.transactions.deputize.Message"

@@ -36,6 +36,6 @@ object Property {
   def apply(anyProperty: AnyProperty): Property = anyProperty.getImplCase.getNumber match {
     case 1 => MesaProperty(anyProperty.getMesaProperty)
     case 2 => MetaProperty(anyProperty.getMetaProperty)
-    case _ => throw new IllegalArgumentException("INVALID_PROPERTY_TYPE")
+    case _ => throw new IllegalArgumentException("INVALID_PROPERTY_IMPL_CASE_NUMBER: " + anyProperty.getImplCase.getNumber.toString)
   }
 }

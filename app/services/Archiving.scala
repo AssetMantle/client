@@ -83,7 +83,7 @@ class Archiving @Inject()(
       _ <- if (moved3.nonEmpty) deleteBlocks() else Future(0)
       moved4 <- moveTxCounter()
       _ <- if (moved4.nonEmpty) deleteTxCounters() else Future(0)
-    } yield ()
+    } yield archiveTransactions.Service.setLastArchiveHeight(end)
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
     }

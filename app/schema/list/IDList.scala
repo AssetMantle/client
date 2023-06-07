@@ -13,7 +13,7 @@ case class IDList(idList: Seq[ID]) {
 
   def getAnyIDs: Seq[AnyID] = this.getIDs.map(_.toAnyID)
 
-  def asProtoIDList: protoIDList = protoIDList.newBuilder().addAllIDList(this.idList.map(_.toAnyID).asJava).build()
+  def asProtoIDList: protoIDList = protoIDList.newBuilder().addAllAnyIDs(this.idList.map(_.toAnyID).asJava).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoIDList.toByteString.toByteArray
 
@@ -42,7 +42,7 @@ case class IDList(idList: Seq[ID]) {
 
 object IDList {
 
-  def apply(idList: protoIDList): IDList = IDList(idList.getIDListList.asScala.toSeq.map(x => ID(x)))
+  def apply(idList: protoIDList): IDList = IDList(idList.getAnyIDsList.asScala.toSeq.map(x => ID(x)))
 
   def apply(protoBytes: Array[Byte]): IDList = IDList(protoIDList.parseFrom(protoBytes))
 

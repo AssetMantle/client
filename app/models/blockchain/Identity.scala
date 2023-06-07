@@ -39,8 +39,8 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
     val property = this.getProperty(schema.constants.Properties.AuthenticationProperty.getID)
     if (property.isDefined) {
       if (property.get.isMeta) ListData(MetaProperty(property.get.getProtoBytes).getData.toAnyData.getListData)
-      else ListData(Seq(schema.constants.Properties.AuthenticationProperty.getData))
-    } else ListData(Seq[Data]())
+      else ListData(schema.constants.Properties.AuthenticationProperty.getData.getProtoBytes)
+    } else ListData(Seq())
   }
 
   def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)

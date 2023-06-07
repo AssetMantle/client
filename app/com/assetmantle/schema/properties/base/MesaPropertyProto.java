@@ -29,9 +29,9 @@ public final class MesaPropertyProto {
   static {
     java.lang.String[] descriptorData = {
       "\n#properties/base/mesa_property.proto\022\"a" +
-      "ssetmantle.schema.properties.base\032\032ids/b" +
-      "ase/property_id.proto\032\026ids/base/data_id." +
-      "proto\032\024gogoproto/gogo.proto\"\215\001\n\014MesaProp" +
+      "ssetmantle.schema.properties.base\032\024gogop" +
+      "roto/gogo.proto\032\026ids/base/data_id.proto\032" +
+      "\032ids/base/property_id.proto\"\215\001\n\014MesaProp" +
       "erty\0228\n\003i_d\030\001 \001(\0132\'.assetmantle.schema.i" +
       "ds.base.PropertyIDR\002iD\022=\n\010data_i_d\030\002 \001(\013" +
       "2#.assetmantle.schema.ids.base.DataIDR\006d" +
@@ -47,9 +47,9 @@ public final class MesaPropertyProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.DataIdProto.getDescriptor(),
           com.gogoproto.GogoProto.getDescriptor(),
+          com.assetmantle.schema.ids.base.DataIdProto.getDescriptor(),
+          com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_properties_base_MesaProperty_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -62,9 +62,9 @@ public final class MesaPropertyProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor();
-    com.assetmantle.schema.ids.base.DataIdProto.getDescriptor();
     com.gogoproto.GogoProto.getDescriptor();
+    com.assetmantle.schema.ids.base.DataIdProto.getDescriptor();
+    com.assetmantle.schema.ids.base.PropertyIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

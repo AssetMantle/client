@@ -2,7 +2,6 @@
 @import com.assetmantle.modules.splits.transactions.send.Message
 @import schema.id.base._
 @import schema.id.OwnableID
-@import utilities.AttoNumber
 @import views.html.base.buttons.commonJavascriptLink
 
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -11,4 +10,4 @@
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(IdentityID(msg.getToID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getToID).asString}'))")))
 @commonTextInfo(constants.View.OWNABLE_ID, OwnableID(msg.getOwnableID).asString)
-@commonTextInfo(constants.View.VALUE, AttoNumber(msg.getValue).toPlainString)
+@commonTextInfo(constants.View.AMOUNT, msg.getValue)

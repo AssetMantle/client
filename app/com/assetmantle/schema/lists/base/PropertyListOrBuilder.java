@@ -8,26 +8,26 @@ public interface PropertyListOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   java.util.List<com.assetmantle.schema.properties.base.AnyProperty> 
-      getPropertiesList();
+      getAnyPropertiesList();
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
-  com.assetmantle.schema.properties.base.AnyProperty getProperties(int index);
+  com.assetmantle.schema.properties.base.AnyProperty getAnyProperties(int index);
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
-  int getPropertiesCount();
+  int getAnyPropertiesCount();
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
   java.util.List<? extends com.assetmantle.schema.properties.base.AnyPropertyOrBuilder> 
-      getPropertiesOrBuilderList();
+      getAnyPropertiesOrBuilderList();
   /**
-   * <code>repeated .assetmantle.schema.properties.base.AnyProperty properties = 1 [json_name = "properties"];</code>
+   * <code>repeated .assetmantle.schema.properties.base.AnyProperty any_properties = 1 [json_name = "anyProperties"];</code>
    */
-  com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getPropertiesOrBuilder(
+  com.assetmantle.schema.properties.base.AnyPropertyOrBuilder getAnyPropertiesOrBuilder(
       int index);
 }

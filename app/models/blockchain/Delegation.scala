@@ -31,8 +31,6 @@ class Delegations @Inject()(
 
   private[models] val delegationTable = TableQuery[DelegationTable]
 
-  private val notFoundRegex = """delegation.with.delegator.*not.found.for.validator.*""".r
-
   private def add(delegation: Delegation): Future[String] = db.run((delegationTable returning delegationTable.map(_.delegatorAddress) += delegation).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -100,40 +98,17 @@ class Delegations @Inject()(
   object Utility {
 
     //onDelegation moved to blockchain/Validators due to import cycle issues
-
-    def insertOrUpdate(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
+    def upsertOrDelete(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
       val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
-      def insertDelegation(delegation: Delegation) = Service.insertOrUpdate(delegation)
+      def insertOrDeleteDelegation(delegation: Delegation) = if (delegation.shares > 0) Service.insertOrUpdate(delegation)
+      else if (delegation.shares == 0) Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+      else Future(0)
 
-      (for {
+      for {
         delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
-      } yield ()).recover {
-        // It's fine if responseErrorDelegationNotFound exception comes, happens when syncing from block 1
-        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isEmpty) throw baseException else logger.info(baseException.failure.logMessage)
-      }
-    }
-
-    def updateOrDelete(delegatorAddress: String, validatorAddress: String): Future[Unit] = {
-      val delegationResponse = getValidatorDelegatorDelegation.Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
-
-      def insertDelegation(delegation: Delegation) = Service.insertOrUpdate(delegation)
-
-      (for {
-        delegationResponse <- delegationResponse
-        _ <- insertDelegation(delegationResponse.delegation_response.delegation.toDelegation)
-      } yield ()).recover {
-        case baseException: BaseException => if (notFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
-          val delete = Service.delete(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
-          (for {
-            _ <- delete
-          } yield ()
-            ).recover {
-            case baseException: BaseException => logger.info(baseException.failure.logMessage)
-          }
-        } else throw baseException
-      }
+        _ <- insertOrDeleteDelegation(delegationResponse.delegation_response.delegation.toDelegation)
+      } yield ()
     }
   }
 

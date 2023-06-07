@@ -51,6 +51,7 @@ GET        /component/accountWallet                        controllers.Component
 GET        /component/accountDelegations                   controllers.ComponentViewController.accountDelegations(address: String)
 GET        /component/accountTransactions                  controllers.ComponentViewController.accountTransactions(address: String)
 GET        /component/accountTransactionsPerPage           controllers.ComponentViewController.accountTransactionsPerPage(address: String, page: Int)
+GET        /component/accountAuthorizations                controllers.ComponentViewController.accountAuthorizations(address: String)
 
 GET        /component/blockList                            controllers.ComponentViewController.blockList
 GET        /component/blockListPage                        controllers.ComponentViewController.blockListPage(pageNumber: Int)

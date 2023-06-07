@@ -168,6 +168,9 @@
                     case schema.constants.Messages.IDENTITY_ISSUE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.issue(identitiesTransactions.issue.Message.parseFrom(msg.getValue))
                     }
+                    case schema.constants.Messages.IDENTITY_MUTATE => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.mutate(identitiesTransactions.mutate.Message.parseFrom(msg.getValue))
+                    }
                     case schema.constants.Messages.IDENTITY_PROVISION => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.provision(identitiesTransactions.provision.Message.parseFrom(msg.getValue))
                     }

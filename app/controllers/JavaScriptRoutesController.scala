@@ -41,6 +41,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.accountDelegations,
           routes.javascript.ComponentViewController.accountTransactions,
           routes.javascript.ComponentViewController.accountTransactionsPerPage,
+          routes.javascript.ComponentViewController.accountAuthorizations,
 
           routes.javascript.ComponentViewController.blockList,
           routes.javascript.ComponentViewController.blockListPage,

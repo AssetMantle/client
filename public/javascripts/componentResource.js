@@ -19,6 +19,9 @@ function componentResource(source, route, loadingSpinnerID = 'commonSpinner', ev
             401: function (data) {
                 replaceDocument(data.responseText);
             },
+            400: function (data) {
+                div.html(data.responseText);
+            },
             500: function (data) {
                 let imageElement = document.createElement('img');
                 const imageRoute = jsRoutes.controllers.Assets.versioned("images/exclamation.png");

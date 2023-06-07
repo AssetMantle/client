@@ -7,4 +7,4 @@
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
-@commonTextInfo(constants.View.ASSET_ID, OrderID(msg.getOrderID).asString)
+@commonTextInfo(constants.View.ORDER_ID, OrderID(msg.getOrderID).asString)

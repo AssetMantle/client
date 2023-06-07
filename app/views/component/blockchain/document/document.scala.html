@@ -4,13 +4,14 @@
 @import views.html.component.blockchain.txMessages.common._
 @import views.html.base.cards.commonCard
 
-@(id: String, document: Option[Document])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(id: String, document: Option[Document], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="cmuk-container cmuk-margin-bottom">
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
             <div id="documentDetails">
             @commonCard(constants.View.DOCUMENT) {
+                @Messages(documentType)
             } {
                 @if(document.isDefined) {
                     @commonTextInfo(constants.View.ID, id)

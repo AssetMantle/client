@@ -1,0 +1,31 @@
+@import views.html.component.blockchain.authorization
+@import models.blockchain.Authorization
+@import views.html.base.buttons._
+@import views.html.base.cards.commonTable
+
+@(assigned: Seq[Authorization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@if(assigned.nonEmpty) {
+    <table class="cmuk-table cmuk-table-striped">
+        <thead>
+            <tr>
+                <th>@Messages(constants.View.GRANTER)</th>
+                <th>@Messages(constants.View.MESSAGES_TYPE)</th>
+                <th>@Messages(constants.View.EXPIRATION)</th>
+            </tr>
+        </thead>
+        <tbody>
+        @assigned.zipWithIndex.map { case (authz, index) =>
+            <tr>
+                <td>@commonJavascriptLink(authz.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${authz.granter}'))"))</td>
+                <td>@Messages(constants.View.TxMessagesMap.getOrElse(authz.msgTypeURL, authz.msgTypeURL))</td>
+                <td id='@Seq(authz.granter, authz.grantee, index.toString).mkString("_")'>
+                    <script>
+                            fromEpochDateToLocal(@authz.expiration, '@Seq(authz.granter, authz.grantee, index.toString).mkString("_")')
+                    </script>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

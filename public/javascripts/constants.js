@@ -21,7 +21,7 @@ ws = {
     url: 'wss://' + $(location).attr('host') + '/websocket',
     start: 'START',
 };
-if ($(location).attr('host') === "localhost:9000") {
+if ($(location).attr('host') === "localhost:9001") {
     ws.url = 'ws://' + $(location).attr('host') + '/websocket'
 }
 addState = true

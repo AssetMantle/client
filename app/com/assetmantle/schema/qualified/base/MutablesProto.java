@@ -29,8 +29,8 @@ public final class MutablesProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\035qualified/base/mutables.proto\022!assetma" +
-      "ntle.schema.qualified.base\032\036lists/base/p" +
-      "roperty_list.proto\032\024gogoproto/gogo.proto" +
+      "ntle.schema.qualified.base\032\024gogoproto/go" +
+      "go.proto\032\036lists/base/property_list.proto" +
       "\"b\n\010Mutables\022P\n\rproperty_list\030\001 \001(\0132+.as" +
       "setmantle.schema.lists.base.PropertyList" +
       "R\014propertyList:\004\210\240\037\000B\217\002\n%com.assetmantle" +
@@ -45,8 +45,8 @@ public final class MutablesProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor(),
           com.gogoproto.GogoProto.getDescriptor(),
+          com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_qualified_base_Mutables_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -59,8 +59,8 @@ public final class MutablesProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();
     com.gogoproto.GogoProto.getDescriptor();
+    com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

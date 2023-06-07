@@ -8,26 +8,26 @@ public interface IDListOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.schema.ids.base.AnyID i_d_list = 1 [json_name = "iDList"];</code>
+   * <code>repeated .assetmantle.schema.ids.base.AnyID any_i_ds = 1 [json_name = "anyIDs"];</code>
    */
   java.util.List<com.assetmantle.schema.ids.base.AnyID> 
-      getIDListList();
+      getAnyIDsList();
   /**
-   * <code>repeated .assetmantle.schema.ids.base.AnyID i_d_list = 1 [json_name = "iDList"];</code>
+   * <code>repeated .assetmantle.schema.ids.base.AnyID any_i_ds = 1 [json_name = "anyIDs"];</code>
    */
-  com.assetmantle.schema.ids.base.AnyID getIDList(int index);
+  com.assetmantle.schema.ids.base.AnyID getAnyIDs(int index);
   /**
-   * <code>repeated .assetmantle.schema.ids.base.AnyID i_d_list = 1 [json_name = "iDList"];</code>
+   * <code>repeated .assetmantle.schema.ids.base.AnyID any_i_ds = 1 [json_name = "anyIDs"];</code>
    */
-  int getIDListCount();
+  int getAnyIDsCount();
   /**
-   * <code>repeated .assetmantle.schema.ids.base.AnyID i_d_list = 1 [json_name = "iDList"];</code>
+   * <code>repeated .assetmantle.schema.ids.base.AnyID any_i_ds = 1 [json_name = "anyIDs"];</code>
    */
   java.util.List<? extends com.assetmantle.schema.ids.base.AnyIDOrBuilder> 
-      getIDListOrBuilderList();
+      getAnyIDsOrBuilderList();
   /**
-   * <code>repeated .assetmantle.schema.ids.base.AnyID i_d_list = 1 [json_name = "iDList"];</code>
+   * <code>repeated .assetmantle.schema.ids.base.AnyID any_i_ds = 1 [json_name = "anyIDs"];</code>
    */
-  com.assetmantle.schema.ids.base.AnyIDOrBuilder getIDListOrBuilder(
+  com.assetmantle.schema.ids.base.AnyIDOrBuilder getAnyIDsOrBuilder(
       int index);
 }

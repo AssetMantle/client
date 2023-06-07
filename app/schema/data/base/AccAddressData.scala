@@ -1,11 +1,11 @@
 package schema.data.base
 
-import com.assetmantle.schema.data.base.{AnyData, AccAddressData => protoAccAddressData}
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, AccAddressData => protoAccAddressData}
 import com.google.protobuf.ByteString
-import schema.data.Data
+import schema.data.ListableData
 import schema.id.base.{DataID, HashID, StringID}
 
-case class AccAddressData(value: Array[Byte]) extends Data {
+case class AccAddressData(value: Array[Byte]) extends ListableData {
   def getType: StringID = schema.constants.Data.AccAddressDataTypeID
 
   def getBondWeight: Int = schema.constants.Data.AccAddressBondWeight
@@ -24,9 +24,11 @@ case class AccAddressData(value: Array[Byte]) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setAccAddressData(this.asProtoAccAddressData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setAccAddressData(this.asProtoAccAddressData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoAccAddressData.toByteString.toByteArray
 
-  def viewString: String = this.toBech32Address
+  def viewString: String = "AccAddress: " + this.toBech32Address
 }
 
 object AccAddressData {

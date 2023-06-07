@@ -195,7 +195,7 @@ class Startup @Inject()(
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
       val updateTx = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainValidators.Utility.insertOrUpdateValidator(msg.validator_address))
 
-      def insertDelegation() = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = msg.delegator_address, validatorAddress = msg.validator_address))
+      def insertDelegation() = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = msg.delegator_address, validatorAddress = msg.validator_address))
 
       def insertKeyBaseAccount(validators: Seq[Validator]) = utilitiesOperations.traverse(validators)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
 

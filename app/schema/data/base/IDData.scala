@@ -1,12 +1,12 @@
 package schema.data.base
 
-import com.assetmantle.schema.data.base.{AnyData, IDData => protoIDData}
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, IDData => protoIDData}
 import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
-import schema.data.Data
+import schema.data.ListableData
 import schema.id.base.{DataID, HashID, StringID}
 import schema.id.{ID, base}
 
-case class IDData(value: ID) extends Data {
+case class IDData(value: ID) extends ListableData {
 
   def getID: ID = this.value
 
@@ -28,9 +28,11 @@ case class IDData(value: ID) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setIDData(this.asProtoIDData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setIDData(this.asProtoIDData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoIDData.toByteString.toByteArray
 
-  def viewString: String = this.getID.asString
+  def viewString: String = "ID: " + this.getID.asString
 
   def getAnyID: AnyID = this.value.toAnyID
 }

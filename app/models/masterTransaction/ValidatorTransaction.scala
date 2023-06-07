@@ -93,7 +93,7 @@ class ValidatorTransactions @Inject()(protected val databaseConfigProvider: Data
         txAddresses.distinct.map(x => ValidatorTransaction(address = x, txHash = tx.hash, height = height))
       }
 
-      Service.add(validatorTransactions.flatten)
+      if (validatorTransactions.flatten.nonEmpty) Service.add(validatorTransactions.flatten) else Future()
     }
 
   }

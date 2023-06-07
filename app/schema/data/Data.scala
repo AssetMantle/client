@@ -24,6 +24,8 @@ abstract class Data {
   def viewString: String
 
   def getBondWeight: Int
+
+  def isListableData: Boolean
 }
 
 object Data {
@@ -37,7 +39,7 @@ object Data {
     case 6 => ListData(anyData.getListData)
     case 7 => NumberData(anyData.getNumberData)
     case 8 => StringData(anyData.getStringData)
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
+    case _ => throw new IllegalArgumentException("INVALID_DATA_IMPL_CASE_NUMBER: " + anyData.getImplCase.getNumber.toString)
   }
 
   def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
@@ -49,7 +51,7 @@ object Data {
     case constants.Data.ListDataTypeID.value => ListData(protoBytes)
     case constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
     case constants.Data.StringDataTypeID.value => StringData(protoBytes)
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
+    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE: " + dataType)
   }
 
 }

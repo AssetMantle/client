@@ -3,8 +3,8 @@
 @import schema.id.base._
 @import schema.types.Height
 @import views.html.component.blockchain.txMessages.common._
-@import utilities.AttoNumber
 @import views.html.base.buttons.commonJavascriptLink
+@import schema.data.base.DecData
 
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -12,8 +12,8 @@
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
 @commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiresIn).AsString)
-@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toPlainString)
-@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toPlainString)
+@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, msg.getMakerOwnableSplit)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, msg.getTakerOwnableSplit)
 @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
 @metaProperties(msg.getImmutableMetaProperties)
 @Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):

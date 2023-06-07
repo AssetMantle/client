@@ -49,19 +49,19 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
 
   def mutate(properties: Seq[Property]): Maintainer = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
-  def maintainsProperty(id: PropertyID): Boolean = this.getMaintainedProperties.dataList.exists(_.getBytes.sameElements(IDData(id).getBytes))
+  def maintainsProperty(id: PropertyID): Boolean = this.getMaintainedProperties.getDataList.exists(_.getBytes.sameElements(IDData(id).getBytes))
 
-  def canAdd: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Add).getBytes))
+  def canAdd: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Add).getBytes))
 
-  def canMutate: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mutate).getBytes))
+  def canMutate: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mutate).getBytes))
 
-  def canBurn: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Burn).getBytes))
+  def canBurn: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Burn).getBytes))
 
-  def canMint: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mint).getBytes))
+  def canMint: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mint).getBytes))
 
-  def canRemove: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Remove).getBytes))
+  def canRemove: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Remove).getBytes))
 
-  def canRenumerate: Boolean = this.getPermissions.dataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Renumerate).getBytes))
+  def canRenumerate: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Renumerate).getBytes))
 }
 
 object Maintainers {

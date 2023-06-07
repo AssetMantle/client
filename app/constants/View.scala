@@ -179,6 +179,8 @@ object View {
   val DELEGATED = "DELEGATED"
   val UNDELEGATING = "UNDELEGATING"
   val REDELEGATING = "REDELEGATING"
+  val GRANTED = "GRANTED"
+  val ASSIGNED = "ASSIGNED"
   val COMMISSION_REWARDS = "COMMISSION_REWARDS"
   val DELEGATOR_REWARDS = "DELEGATOR_REWARDS"
   val STAKING_TOKEN = "STAKING_TOKEN"
@@ -229,6 +231,7 @@ object View {
   val AMOUNTS = "AMOUNTS"
   val MINT = "MINT"
   val BURN = "BURN"
+  val MAINTAINER = "MAINTAINER"
   val ADD_MAINTAINER = "ADD_MAINTAINER"
   val MUTATE_MAINTAINER = "MUTATE_MAINTAINER"
   val REMOVE_MAINTAINER = "REMOVE_MAINTAINER"
@@ -306,6 +309,7 @@ object View {
   val ALLOW_LIST = "ALLOW_LIST"
   val DENY_LIST = "DENY_LIST"
   val AUTHORIZATION = "AUTHORIZATION"
+  val AUTHORIZATIONS = "AUTHORIZATIONS"
   val MESSAGES = "MESSAGES"
   val ALLOWANCE_TYPE = "ALLOWANCE_TYPE"
   val PERIOD = "PERIOD"
@@ -376,6 +380,10 @@ object View {
   val MAX_ORDER_LIFE = "MAX_ORDER_LIFE"
   val WRAPPING_ALLOWED_DENOMS = "WRAPPING_ALLOWED_DENOMS"
   val TOKEN_DETAILS = "TOKEN_DETAILS"
+  val ASSET = "ASSET"
+  val IDENTITY = "IDENTITY"
+  val ORDER = "ORDER"
+  val CLASSIFICATION = "CLASSIFICATION"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
@@ -438,32 +446,38 @@ object View {
     schema.constants.Messages.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
     schema.constants.Messages.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
     schema.constants.Messages.TRANSFER -> "MESSAGE_IBC_TRANSFER",
+    //assets
+    schema.constants.Messages.ASSET_BURN -> "MESSAGE_ASSET_BURN",
     schema.constants.Messages.ASSET_DEFINE -> "MESSAGE_ASSET_DEFINE",
+    schema.constants.Messages.ASSET_DEPUTIZE -> "MESSAGE_ASSET_DEPUTIZE",
     schema.constants.Messages.ASSET_MINT -> "MESSAGE_ASSET_MINT",
     schema.constants.Messages.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
-    schema.constants.Messages.ASSET_BURN -> "MESSAGE_ASSET_BURN",
-    schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
-    schema.constants.Messages.ASSET_DEPUTIZE -> "MESSAGE_ASSET_DEPUTIZE",
     schema.constants.Messages.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
+    schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
+    //identities
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
+    schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
     schema.constants.Messages.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
-    schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
-    schema.constants.Messages.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
+    schema.constants.Messages.IDENTITY_MUTATE -> "MESSAGE_IDENTITY_MUTATE",
     schema.constants.Messages.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
     schema.constants.Messages.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",
     schema.constants.Messages.IDENTITY_REVOKE -> "MESSAGE_IDENTITY_REVOKE",
-    schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
+    schema.constants.Messages.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
+    //splits
     schema.constants.Messages.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
     schema.constants.Messages.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
     schema.constants.Messages.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
-    schema.constants.Messages.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
-    schema.constants.Messages.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
-    schema.constants.Messages.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    //orders
     schema.constants.Messages.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
-    schema.constants.Messages.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
-    schema.constants.Messages.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
+    schema.constants.Messages.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
     schema.constants.Messages.ORDER_DEPUTIZE -> "MESSAGE_ORDER_DEPUTIZE",
     schema.constants.Messages.ORDER_IMMEDIATE -> "MESSAGE_ORDER_IMMEDIATE",
+    schema.constants.Messages.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
+    schema.constants.Messages.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
+    schema.constants.Messages.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
+    schema.constants.Messages.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    //metas
     schema.constants.Messages.META_REVEAL -> "MESSAGE_META_REVEAL",
   )
 

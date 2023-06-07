@@ -57,33 +57,32 @@ object Data {
 
   implicit val NumberDataReads: Reads[NumberData] = Json.reads[NumberData]
 
-  case class AnyDataWithoutListData(
-                                     acc_address_data: Option[AccAddressData],
-                                     boolean_data: Option[BooleanData],
-                                     dec_data: Option[DecData],
-                                     height_data: Option[HeightData],
-                                     i_d_data: Option[IDData],
-                                     string_data: Option[StringData],
-                                     number_data: Option[NumberData]
-                                   ) {
+  case class AnyListableData(
+                              acc_address_data: Option[AccAddressData],
+                              boolean_data: Option[BooleanData],
+                              dec_data: Option[DecData],
+                              height_data: Option[HeightData],
+                              i_d_data: Option[IDData],
+                              string_data: Option[StringData],
+                              number_data: Option[NumberData]
+                            ) {
 
-    def toData: schema.data.Data = {
-      val schemaData: schema.data.Data = if (this.acc_address_data.isDefined) this.acc_address_data.get.toAccAddressData
+    def toListableData: schema.data.ListableData = {
+      if (this.acc_address_data.isDefined) this.acc_address_data.get.toAccAddressData
       else if (this.boolean_data.isDefined) this.boolean_data.get.toBooleanData
       else if (this.dec_data.isDefined) this.dec_data.get.toDecData
       else if (this.height_data.isDefined) this.height_data.get.toHeightData
       else if (this.i_d_data.isDefined) this.i_d_data.get.toIDData
       else if (this.string_data.isDefined) this.string_data.get.toStringData
       else this.number_data.get.toNumberData
-      schemaData
     }
 
   }
 
-  implicit val AnyDataWithoutListDataReads: Reads[AnyDataWithoutListData] = Json.reads[AnyDataWithoutListData]
+  implicit val AnyDataWithoutListDataReads: Reads[AnyListableData] = Json.reads[AnyListableData]
 
-  case class ListData(data_list: Seq[AnyDataWithoutListData]) {
-    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.data_list.map(_.toData))
+  case class ListData(any_listable_data: Seq[AnyListableData]) {
+    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.any_listable_data.map(_.toListableData))
   }
 
   implicit val ListDataReads: Reads[ListData] = Json.reads[ListData]

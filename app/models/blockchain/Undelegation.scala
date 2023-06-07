@@ -3,13 +3,12 @@ package models.blockchain
 import akka.actor.ActorSystem
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import exceptions.BaseException
-import models.traits.Logging
 import models.common.Serializable.UndelegationEntry
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetValidatorDelegatorUndelegation
 import queries.responses.blockchain.ValidatorDelegatorUndelegationResponse.{Response => ValidatorDelegatorUndelegationResponse}
 import queries.responses.common.Header
@@ -89,12 +88,7 @@ class Undelegations @Inject()(
     }
   }
 
-  private def tryGetByAddress(delegatorAddress: String, validatorAddress: String): Future[UndelegationSerialized] = db.run(undelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => throw new BaseException(constants.Response.UNDELEGATION_NOT_FOUND, noSuchElementException)
-    }
-  }
+  private def getByAddress(delegatorAddress: String, validatorAddress: String): Future[Option[UndelegationSerialized]] = db.run(undelegationTable.filter(x => x.delegatorAddress === delegatorAddress && x.validatorAddress === validatorAddress).result.headOption)
 
   private[models] class UndelegationTable(tag: Tag) extends Table[UndelegationSerialized](tag, "Undelegation") {
 
@@ -131,7 +125,7 @@ class Undelegations @Inject()(
 
     def delete(delegatorAddress: String, validatorAddress: String): Future[Int] = deleteByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
-    def tryGet(delegatorAddress: String, validatorAddress: String): Future[Undelegation] = tryGetByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).map(_.deserialize)
+    def get(delegatorAddress: String, validatorAddress: String): Future[Option[Undelegation]] = getByAddress(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).map(_.map(_.deserialize))
 
   }
 
@@ -139,18 +133,22 @@ class Undelegations @Inject()(
 
     def onUndelegation(undelegate: stakingTx.MsgUndelegate)(implicit header: Header): Future[String] = {
       val undelegationsResponse = getValidatorDelegatorUndelegation.Service.get(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
-      val updateOrDeleteDelegation = blockchainDelegations.Utility.updateOrDelete(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
+      val updateOrDeleteDelegation = blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
       val updateValidator = blockchainValidators.Utility.insertOrUpdateValidator(undelegate.getValidatorAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(undelegate.getDelegatorAddress)
 
-      def upsertUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationResponse) = Service.insertOrUpdate(undelegationsResponse.unbond.toUndelegation)
+      def upsertOrDeleteUndelegation(undelegationsResponse: ValidatorDelegatorUndelegationResponse) = {
+        if (undelegationsResponse.unbond.entries.nonEmpty) Service.insertOrUpdate(undelegationsResponse.unbond.toUndelegation)
+        else Service.delete(delegatorAddress = undelegate.getDelegatorAddress, validatorAddress = undelegate.getValidatorAddress)
+      }
+
 
       def updateActiveValidatorSet() = blockchainValidators.Utility.updateActiveValidatorSet()
 
       (for {
         undelegationsResponse <- undelegationsResponse
         _ <- updateValidator
-        _ <- upsertUndelegation(undelegationsResponse)
+        _ <- upsertOrDeleteUndelegation(undelegationsResponse)
         _ <- withdrawAddressBalanceUpdate
         _ <- updateOrDeleteDelegation
         _ <- updateActiveValidatorSet()
@@ -162,9 +160,9 @@ class Undelegations @Inject()(
 
     def onUnbondingCompletionEvent(delegatorAddress: String, validatorAddress: String, currentBlockTimeStamp: RFC3339): Future[Unit] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(delegatorAddress)
-      val undelegation = Service.tryGet(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
+      val undelegation = Service.get(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress)
 
-      def updateOrDelete(undelegation: Undelegation) = {
+      def updateOrDelete(optionalUndelegation: Option[Undelegation]) = optionalUndelegation.fold(Future(0)) { undelegation =>
         val updatedEntries = undelegation.entries.filterNot(_.isMature(currentBlockTimeStamp))
         if (updatedEntries.isEmpty) Service.delete(delegatorAddress = undelegation.delegatorAddress, validatorAddress = undelegation.validatorAddress)
         else Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))

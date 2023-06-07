@@ -50,5 +50,5 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   }
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
-//  utilities.Scheduler.setShutdownCancellable(startup.start())
+  utilities.Scheduler.setShutdownCancellable(startup.start())
 }

@@ -5,10 +5,8 @@
 @import schema.types.Height
 @import views.html.base.buttons.commonJavascriptLink
 @import views.html.component.blockchain.txMessages.common._
-@import utilities.AttoNumber
+@import schema.data.base.DecData
 
-@import utilities.AttoNumber
-@import utilities.AttoNumber
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
@@ -18,8 +16,8 @@
 @commonTextInfo(constants.View.MAKER_OWNABLE_ID, OwnableID(msg.getMakerOwnableID).asString)
 @commonTextInfo(constants.View.TAKER_OWNABLE_ID, OwnableID(msg.getTakerOwnableID).asString)
 @commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiresIn).AsString)
-@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, AttoNumber(msg.getMakerOwnableSplit).toPlainString)
-@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AttoNumber(msg.getTakerOwnableSplit).toPlainString)
+@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, msg.getMakerOwnableSplit)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, msg.getTakerOwnableSplit)
 @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
 @metaProperties(msg.getImmutableMetaProperties)
 @Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):

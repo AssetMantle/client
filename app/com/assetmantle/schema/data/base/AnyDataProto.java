@@ -19,11 +19,6 @@ public final class AnyDataProto {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_assetmantle_schema_data_base_AnyData_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_assetmantle_schema_data_base_ListData_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_assetmantle_schema_data_base_ListData_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -34,49 +29,48 @@ public final class AnyDataProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\030data/base/any_data.proto\022\034assetmantle." +
-      "schema.data.base\032\024gogoproto/gogo.proto\032 " +
-      "data/base/acc_address_data.proto\032\034data/b" +
-      "ase/boolean_data.proto\032\030data/base/dec_da" +
-      "ta.proto\032\033data/base/height_data.proto\032\027d" +
-      "ata/base/id_data.proto\032\033data/base/number" +
-      "_data.proto\032\033data/base/string_data.proto" +
-      "\"\365\004\n\007AnyData\022X\n\020acc_address_data\030\001 \001(\0132," +
-      ".assetmantle.schema.data.base.AccAddress" +
-      "DataH\000R\016accAddressData\022N\n\014boolean_data\030\002" +
-      " \001(\0132).assetmantle.schema.data.base.Bool" +
-      "eanDataH\000R\013booleanData\022B\n\010dec_data\030\003 \001(\013" +
-      "2%.assetmantle.schema.data.base.DecDataH" +
-      "\000R\007decData\022K\n\013height_data\030\004 \001(\0132(.assetm" +
-      "antle.schema.data.base.HeightDataH\000R\nhei" +
-      "ghtData\022@\n\010i_d_data\030\005 \001(\0132$.assetmantle." +
-      "schema.data.base.IDDataH\000R\006iDData\022E\n\tlis" +
-      "t_data\030\006 \001(\0132&.assetmantle.schema.data.b" +
-      "ase.ListDataH\000R\010listData\022K\n\013number_data\030" +
-      "\007 \001(\0132(.assetmantle.schema.data.base.Num" +
-      "berDataH\000R\nnumberData\022K\n\013string_data\030\010 \001" +
-      "(\0132(.assetmantle.schema.data.base.String" +
-      "DataH\000R\nstringData:\004\210\240\037\000B\006\n\004impl\"T\n\010List" +
-      "Data\022B\n\tdata_list\030\001 \003(\0132%.assetmantle.sc" +
-      "hema.data.base.AnyDataR\010dataList:\004\210\240\037\000B\360" +
-      "\001\n com.assetmantle.schema.data.baseB\014Any" +
-      "DataProtoP\001Z*github.com/AssetMantle/sche" +
-      "ma/go/data/base\242\002\004ASDB\252\002\034Assetmantle.Sch" +
-      "ema.Data.Base\312\002\034Assetmantle\\Schema\\Data\\" +
-      "Base\342\002(Assetmantle\\Schema\\Data\\Base\\GPBM" +
-      "etadata\352\002\037Assetmantle::Schema::Data::Bas" +
-      "eb\006proto3"
+      "schema.data.base\032 data/base/acc_address_" +
+      "data.proto\032\034data/base/boolean_data.proto" +
+      "\032\030data/base/dec_data.proto\032\033data/base/he" +
+      "ight_data.proto\032\027data/base/id_data.proto" +
+      "\032\031data/base/list_data.proto\032\033data/base/n" +
+      "umber_data.proto\032\033data/base/string_data." +
+      "proto\032\024gogoproto/gogo.proto\"\365\004\n\007AnyData\022" +
+      "X\n\020acc_address_data\030\001 \001(\0132,.assetmantle." +
+      "schema.data.base.AccAddressDataH\000R\016accAd" +
+      "dressData\022N\n\014boolean_data\030\002 \001(\0132).assetm" +
+      "antle.schema.data.base.BooleanDataH\000R\013bo" +
+      "oleanData\022B\n\010dec_data\030\003 \001(\0132%.assetmantl" +
+      "e.schema.data.base.DecDataH\000R\007decData\022K\n" +
+      "\013height_data\030\004 \001(\0132(.assetmantle.schema." +
+      "data.base.HeightDataH\000R\nheightData\022@\n\010i_" +
+      "d_data\030\005 \001(\0132$.assetmantle.schema.data.b" +
+      "ase.IDDataH\000R\006iDData\022E\n\tlist_data\030\006 \001(\0132" +
+      "&.assetmantle.schema.data.base.ListDataH" +
+      "\000R\010listData\022K\n\013number_data\030\007 \001(\0132(.asset" +
+      "mantle.schema.data.base.NumberDataH\000R\nnu" +
+      "mberData\022K\n\013string_data\030\010 \001(\0132(.assetman" +
+      "tle.schema.data.base.StringDataH\000R\nstrin" +
+      "gData:\004\210\240\037\000B\006\n\004implB\360\001\n com.assetmantle." +
+      "schema.data.baseB\014AnyDataProtoP\001Z*github" +
+      ".com/AssetMantle/schema/go/data/base\242\002\004A" +
+      "SDB\252\002\034Assetmantle.Schema.Data.Base\312\002\034Ass" +
+      "etmantle\\Schema\\Data\\Base\342\002(Assetmantle\\" +
+      "Schema\\Data\\Base\\GPBMetadata\352\002\037Assetmant" +
+      "le::Schema::Data::Baseb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.gogoproto.GogoProto.getDescriptor(),
           com.assetmantle.schema.data.base.AccAddressDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.BooleanDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.DecDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.HeightDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.IdDataProto.getDescriptor(),
+          com.assetmantle.schema.data.base.ListDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.NumberDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.StringDataProto.getDescriptor(),
+          com.gogoproto.GogoProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_data_base_AnyData_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -84,25 +78,20 @@ public final class AnyDataProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_schema_data_base_AnyData_descriptor,
         new java.lang.String[] { "AccAddressData", "BooleanData", "DecData", "HeightData", "IDData", "ListData", "NumberData", "StringData", "Impl", });
-    internal_static_assetmantle_schema_data_base_ListData_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_assetmantle_schema_data_base_ListData_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_assetmantle_schema_data_base_ListData_descriptor,
-        new java.lang.String[] { "DataList", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.gogoproto.GogoProto.getDescriptor();
     com.assetmantle.schema.data.base.AccAddressDataProto.getDescriptor();
     com.assetmantle.schema.data.base.BooleanDataProto.getDescriptor();
     com.assetmantle.schema.data.base.DecDataProto.getDescriptor();
     com.assetmantle.schema.data.base.HeightDataProto.getDescriptor();
     com.assetmantle.schema.data.base.IdDataProto.getDescriptor();
+    com.assetmantle.schema.data.base.ListDataProto.getDescriptor();
     com.assetmantle.schema.data.base.NumberDataProto.getDescriptor();
     com.assetmantle.schema.data.base.StringDataProto.getDescriptor();
+    com.gogoproto.GogoProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

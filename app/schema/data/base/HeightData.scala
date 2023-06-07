@@ -1,11 +1,11 @@
 package schema.data.base
 
-import com.assetmantle.schema.data.base.{AnyData, HeightData => protoHeightData}
-import schema.data.Data
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, HeightData => protoHeightData}
+import schema.data.{Data, ListableData}
 import schema.id.base.{DataID, HashID, StringID}
 import schema.types.Height
 
-case class HeightData(value: Height) extends Data {
+case class HeightData(value: Height) extends ListableData {
   def getType: StringID = schema.constants.Data.HeightDataTypeID
 
   def getBondWeight: Int = schema.constants.Data.HeightDataWeight
@@ -22,9 +22,11 @@ case class HeightData(value: Height) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setHeightData(this.asProtoHeightData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setHeightData(this.asProtoHeightData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoHeightData.toByteString.toByteArray
 
-  def viewString: String = this.value.AsString
+  def viewString: String = "Height: " + this.value.AsString
 }
 
 object HeightData {

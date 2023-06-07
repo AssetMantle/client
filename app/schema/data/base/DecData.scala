@@ -1,10 +1,10 @@
 package schema.data.base
 
-import com.assetmantle.schema.data.base.{AnyData, DecData => protoDecData}
-import schema.data.Data
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, DecData => protoDecData}
+import schema.data.ListableData
 import schema.id.base.{DataID, HashID, StringID}
 
-case class DecData(value: BigDecimal) extends Data {
+case class DecData(value: BigDecimal) extends ListableData {
 
   def toPlainString: String = schema.constants.Data.DecStringFormat.format(this.value)
 
@@ -26,14 +26,16 @@ case class DecData(value: BigDecimal) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setDecData(this.asProtoDecData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setDecData(this.asProtoDecData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoDecData.toByteString.toByteArray
 
-  def viewString: String = this.toPlainString
+  def viewString: String = "Decimal: " + this.toPlainString
 
   def validSortable: Boolean = this.getValue.abs <= schema.constants.Data.DecDataMaxValue
 
   def getSortableDecBytes: Array[Byte] = {
-    if (!this.validSortable) throw new IllegalArgumentException("UNSORTABLE_ATTONUMBER")
+    if (!this.validSortable) throw new IllegalArgumentException("INVALID_DEC_DATA_FOR_SORTED_BYTES")
     else {
       if (this.getValue == schema.constants.Data.DecDataMaxValue) "max".getBytes
       else if (this.getValue == (-1 * schema.constants.Data.DecDataMaxValue)) "--".getBytes
@@ -46,9 +48,9 @@ case class DecData(value: BigDecimal) extends Data {
     }
   }
 
-  def quotientTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor).toBigInt / (that.getValue * schema.constants.Data.DecFactor).toBigInt) / schema.constants.Data.DecFactor)
+  def quotientTruncate(that: DecData): DecData = DecData(BigDecimal(((this.getValue * schema.constants.Data.DecFactor) / that.getValue).toBigInt) / schema.constants.Data.DecFactor)
 
-  def multiplyTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor).toBigInt * (that.getValue * schema.constants.Data.DecFactor).toBigInt) / schema.constants.Data.DecFactor)
+  def multiplyTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor * that.getValue).toBigInt) / schema.constants.Data.DecFactor)
 }
 
 object DecData {

@@ -1,10 +1,10 @@
 package schema.data.base
 
-import com.assetmantle.schema.data.base.{AnyData, BooleanData => protoBooleanData}
-import schema.data.Data
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, BooleanData => protoBooleanData}
+import schema.data.ListableData
 import schema.id.base.{DataID, HashID, StringID}
 
-case class BooleanData(value: Boolean) extends Data {
+case class BooleanData(value: Boolean) extends ListableData {
   def getType: StringID = schema.constants.Data.BooleanDataTypeID
 
   def getBondWeight: Int = schema.constants.Data.BooleanBondWeight
@@ -24,9 +24,11 @@ case class BooleanData(value: Boolean) extends Data {
 
   def toAnyData: AnyData = AnyData.newBuilder().setBooleanData(this.asProtoBooleanData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setBooleanData(this.asProtoBooleanData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoBooleanData.toByteString.toByteArray
 
-  def viewString: String = this.value.toString
+  def viewString: String = "Boolean: " + this.value.toString
 }
 
 object BooleanData {
