@@ -5,13 +5,14 @@
 @import views.html.base.cards.commonCard
 @import views.html.base.cards._
 
-@(id: String, document: Option[Document])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(id: String, document: Option[Document], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="cmuk-container cmuk-margin-bottom">
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
             <div id="documentDetails" class="tableViewCard tableCard">
             @commonCard(constants.View.DOCUMENT) {
+                @Messages(documentType)
             } {
                 @if(document.isDefined) {
                     @commonTable(id = "documentDetail", tableType = "cmuk-table-divider") {

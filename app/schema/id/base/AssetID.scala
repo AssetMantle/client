@@ -1,11 +1,13 @@
 package schema.id.base
 
-import com.ids.{AnyID, AnyOwnableID, AssetID => protoAssetID}
-import schema.id.{ID, OwnableID}
+import com.assetmantle.schema.ids.base.{AnyID, AnyOwnableID, AssetID => protoAssetID}
+import schema.id.OwnableID
 
 case class AssetID(hashID: HashID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
+
+  def getType: StringID = schema.constants.ID.AssetIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
@@ -23,4 +25,8 @@ case class AssetID(hashID: HashID) extends OwnableID {
 
 object AssetID {
   def apply(anyID: protoAssetID): AssetID = AssetID(HashID(anyID.getHashID))
+
+  def apply(value: Array[Byte]): AssetID = AssetID(HashID(value))
+
+  def apply(value: String): AssetID = AssetID(HashID(utilities.Secrets.base64URLDecode(value)))
 }

@@ -55,7 +55,7 @@ object Date {
     true
   } catch {
     case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+      false
   }
 
   class RFC3339(timestamp: String) {

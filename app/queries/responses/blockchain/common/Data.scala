@@ -1,11 +1,9 @@
 package queries.responses.blockchain.common
 
-import com.data
 import play.api.libs.json.{Json, Reads}
 import queries.responses.blockchain.common.ID._
 import schema.data.{base => baseSchemaData}
 import schema.types.{Height => baseHeight}
-import utilities.AttoNumber
 
 object Data {
 
@@ -24,7 +22,7 @@ object Data {
   implicit val BooleanDataReads: Reads[BooleanData] = Json.reads[BooleanData]
 
   case class DecData(value: String) {
-    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(AttoNumber(BigDecimal(this.value)))
+    def toDecData: baseSchemaData.DecData = baseSchemaData.DecData(this.value)
   }
 
   implicit val DecDataReads: Reads[DecData] = Json.reads[DecData]
@@ -42,7 +40,7 @@ object Data {
   implicit val HeightDataReads: Reads[HeightData] = Json.reads[HeightData]
 
   case class IDData(value: AnyID) {
-    def toIDData: baseSchemaData.IDData = baseSchemaData.IDData(this.value.toID.toAnyID)
+    def toIDData: baseSchemaData.IDData = baseSchemaData.IDData(this.value.toID)
   }
 
   implicit val IDDataReads: Reads[IDData] = Json.reads[IDData]
@@ -54,38 +52,37 @@ object Data {
   implicit val StringDataReads: Reads[StringData] = Json.reads[StringData]
 
   case class NumberData(value: String) {
-    def toNumberData: baseSchemaData.NumberData = baseSchemaData.NumberData(this.value.toLong)
+    def toNumberData: baseSchemaData.NumberData = baseSchemaData.NumberData(BigInt(this.value))
   }
 
   implicit val NumberDataReads: Reads[NumberData] = Json.reads[NumberData]
 
-  case class AnyDataWithoutListData(
-                                     acc_address_data: Option[AccAddressData],
-                                     boolean_data: Option[BooleanData],
-                                     dec_data: Option[DecData],
-                                     height_data: Option[HeightData],
-                                     i_d_data: Option[IDData],
-                                     string_data: Option[StringData],
-                                     number_data: Option[NumberData]
-                                   ) {
+  case class AnyListableData(
+                              acc_address_data: Option[AccAddressData],
+                              boolean_data: Option[BooleanData],
+                              dec_data: Option[DecData],
+                              height_data: Option[HeightData],
+                              i_d_data: Option[IDData],
+                              string_data: Option[StringData],
+                              number_data: Option[NumberData]
+                            ) {
 
-    def toAnyData: data.AnyData = {
-      val schemaData: schema.data.Data = if (this.acc_address_data.isDefined) this.acc_address_data.get.toAccAddressData
+    def toListableData: schema.data.ListableData = {
+      if (this.acc_address_data.isDefined) this.acc_address_data.get.toAccAddressData
       else if (this.boolean_data.isDefined) this.boolean_data.get.toBooleanData
       else if (this.dec_data.isDefined) this.dec_data.get.toDecData
       else if (this.height_data.isDefined) this.height_data.get.toHeightData
       else if (this.i_d_data.isDefined) this.i_d_data.get.toIDData
       else if (this.string_data.isDefined) this.string_data.get.toStringData
       else this.number_data.get.toNumberData
-      schemaData.toAnyData
     }
 
   }
 
-  implicit val AnyDataWithoutListDataReads: Reads[AnyDataWithoutListData] = Json.reads[AnyDataWithoutListData]
+  implicit val AnyDataWithoutListDataReads: Reads[AnyListableData] = Json.reads[AnyListableData]
 
-  case class ListData(data_list: Seq[AnyDataWithoutListData]) {
-    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.data_list.map(_.toAnyData))
+  case class ListData(any_listable_data: Seq[AnyListableData]) {
+    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.any_listable_data.map(_.toListableData))
   }
 
   implicit val ListDataReads: Reads[ListData] = Json.reads[ListData]

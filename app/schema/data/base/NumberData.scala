@@ -1,36 +1,36 @@
 package schema.data.base
 
-import com.data.{AnyData, NumberData => protoNumberData}
-import schema.data.Data
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, NumberData => protoNumberData}
+import schema.data.{Data, ListableData}
 import schema.id.base.{DataID, HashID, StringID}
 
-import java.nio.{ByteBuffer, ByteOrder}
+case class NumberData(value: BigInt) extends ListableData {
+  def getType: StringID = schema.constants.Data.NumberDataTypeID
 
-case class NumberData(value: Long) extends Data {
-  def getType: StringID = constants.Data.NumberDataTypeID
+  def getBondWeight: Int = schema.constants.Data.NumberDataWeight
 
-  def getBondWeight: Int = constants.Data.NumberDataWeight
-
-  def getDataID: DataID = DataID(typeID = constants.Data.NumberDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.NumberDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = NumberData(0)
 
-  def getBytes: Array[Byte] = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(this.value).array()
+  def getBytes: Array[Byte] = this.value.toString().getBytes
 
-  def generateHashID: HashID = if (this.value == 0) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (this.value == 0) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
-  def asProtoNumberData: protoNumberData = protoNumberData.newBuilder().setValue(this.value).build()
+  def asProtoNumberData: protoNumberData = protoNumberData.newBuilder().setValue(this.value.toString()).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setNumberData(this.asProtoNumberData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setNumberData(this.asProtoNumberData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoNumberData.toByteString.toByteArray
 
-  def viewString: String = this.value.toString
+  def viewString: String = "Number: " + this.value.toString
 }
 
 object NumberData {
 
-  def apply(value: protoNumberData): NumberData = NumberData(value.getValue)
+  def apply(value: protoNumberData): NumberData = NumberData(BigInt(value.getValue))
 
   def apply(protoBytes: Array[Byte]): NumberData = NumberData(protoNumberData.parseFrom(protoBytes))
 }

@@ -1,11 +1,26 @@
 package schema.id.base
 
-import com.ids.{AnyID, DataID => protoDataID}
+import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
+import schema.constants.Data._
 import schema.id.ID
 
 case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
-  def getTypeID: StringID = this.typeID
+  def getDataTypeID: StringID = this.typeID
+
+  def getType: StringID = schema.constants.ID.DataIDType
+
+  def getBondWeight: Int = this.typeID.value match {
+    case "A" => AccAddressBondWeight
+    case "B" => BooleanBondWeight
+    case "D" => DecDataWeight
+    case "H" => HeightDataWeight
+    case "I" => IDDataWeight
+    case "L" => ListDataWeight
+    case "N" => NumberDataWeight
+    case "S" => StringDataWeight
+    case _ => 0
+  }
 
   def getHashID: HashID = this.hashID
 
@@ -13,7 +28,7 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.typeID.getBytes ++ this.hashID.getBytes
 
-  def asString: String = this.getTypeID.asString + constants.Blockchain.IDSeparator + this.getHashIDString
+  def asString: String = this.getDataTypeID.asString + schema.constants.ID.Separator + this.getHashIDString
 
   def asProtoDataID: protoDataID = protoDataID.newBuilder().setTypeID(this.typeID.asProtoStringID).setHashID(this.hashID.asProtoHashID).build()
 

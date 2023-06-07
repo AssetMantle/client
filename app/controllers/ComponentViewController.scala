@@ -13,7 +13,6 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.blockchain.{GetDelegatorRewards, GetTransactionsByHash, GetValidatorCommission}
 import queries.responses.common.EventWrapper
-import schema.document.Document
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
@@ -25,6 +24,7 @@ class ComponentViewController @Inject()(
                                          analyticTransactionCounters: analytic.TransactionCounters,
                                          analyticMessageCounters: analytic.MessageCounters,
                                          blockchainAccounts: blockchain.Accounts,
+                                         blockchainAuthorizations: blockchain.Authorizations,
                                          blockchainBalances: blockchain.Balances,
                                          blockchainDelegations: blockchain.Delegations,
                                          blockchainUndelegations: blockchain.Undelegations,
@@ -41,6 +41,8 @@ class ComponentViewController @Inject()(
                                          blockchainIdentities: blockchain.Identities,
                                          blockchainAssets: blockchain.Assets,
                                          blockchainOrders: blockchain.Orders,
+                                         blockchainSplits: blockchain.Splits,
+                                         blockchainMaintainers: blockchain.Maintainers,
                                          blockchainClassifications: blockchain.Classifications,
                                          cached: Cached,
                                          getDelegatorRewards: GetDelegatorRewards,
@@ -89,15 +91,27 @@ class ComponentViewController @Inject()(
         val asset = if (idBytes.nonEmpty) blockchainAssets.Service.get(idBytes) else Future(None)
         val identity = if (idBytes.nonEmpty) blockchainIdentities.Service.get(idBytes) else Future(None)
         val order = if (idBytes.nonEmpty) blockchainOrders.Service.get(idBytes) else Future(None)
+        val maintainer = if (idBytes.nonEmpty) blockchainMaintainers.Service.get(id) else Future(None)
 
         for {
           asset <- asset
           identity <- identity
           order <- order
           classification <- classification
+          maintainer <- maintainer
         } yield {
-          val document: Option[Document] = if (asset.isDefined) Option(asset.get.getDocument) else if (identity.isDefined) Option(identity.get.getDocument) else if (order.isDefined) Option(order.get.getDocument) else if (classification.isDefined) Option(classification.get.getDocument) else None
-          Ok(views.html.component.blockchain.document.document(id, document))
+          if (asset.isDefined)
+            Ok(views.html.component.blockchain.document.document(id, Option(asset.get.getDocument), constants.View.ASSET))
+          else if (identity.isDefined)
+            Ok(views.html.component.blockchain.document.document(id, Option(identity.get.getDocument), constants.View.IDENTITY))
+          else if (order.isDefined)
+            Ok(views.html.component.blockchain.document.document(id, Option(order.get.getDocument), constants.View.ORDER))
+          else if (classification.isDefined)
+            Ok(views.html.component.blockchain.document.document(id, Option(classification.get.getDocument), constants.View.CLASSIFICATION))
+          else if (maintainer.isDefined)
+            Ok(views.html.component.blockchain.document.document(id, Option(maintainer.get.getDocument), constants.View.MAINTAINER))
+          else Ok(views.html.component.blockchain.document.document(id, None, ""))
+
         }
     }
   }
@@ -151,7 +165,7 @@ class ComponentViewController @Inject()(
   def latestBlockHeight(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val latestBlock = blockchainBlocks.Service.tryGetLatestBlock
 
         def getAverageBlockTime(latestBlock: Block) = blockchainBlocks.Utility.getAverageBlockTime(fromBlock = Option(latestBlock.height))
 
@@ -227,7 +241,7 @@ class ComponentViewController @Inject()(
       implicit request =>
         val dayEpoch: Long = 24 * 60 * 60
         val totalAccounts = blockchainBalances.Service.getTotalAccounts
-        val latestBlock = blockchainBlocks.Service.getLatestBlock
+        val latestBlock = blockchainBlocks.Service.tryGetLatestBlock
         val totalTxs = blockchainTransactions.Service.getTotalTransactions
 
         def getTxData(latestHeightEpoch: Long) = {
@@ -332,7 +346,7 @@ class ComponentViewController @Inject()(
         val redelegations = blockchainRedelegations.Service.getAllByDelegator(address)
         val validators = blockchainValidators.Service.getAll
 
-        def getDelegationsMap(delegations: Seq[Delegation], validators: Seq[Validator]) = ListMap(delegations.map(delegation => delegation.validatorAddress -> validators.find(_.operatorAddress == delegation.validatorAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND)).getTokensFromShares(delegation.shares)): _*)
+        def getDelegationsMap(delegations: Seq[Delegation], validators: Seq[Validator]) = ListMap(delegations.sortBy(_.shares).reverse.map(delegation => delegation.validatorAddress -> validators.find(_.operatorAddress == delegation.validatorAddress).getOrElse(constants.Response.VALIDATOR_NOT_FOUND.throwBaseException()).getTokensFromShares(delegation.shares)): _*)
 
         def getUndelegationsMap(undelegations: Seq[Undelegation]) = ListMap(undelegations.map(undelegation => undelegation.validatorAddress -> undelegation.entries): _*)
 
@@ -375,6 +389,19 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
+
+  def accountAuthorizations(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val granted = blockchainAuthorizations.Service.getListByGranter(address)
+        val assigned = blockchainAuthorizations.Service.getListByGrantee(address)
+
+        for {
+          granted <- granted
+          assigned <- assigned
+        } yield Ok(views.html.component.blockchain.account.accountAuthorizations(granted = granted, assigned = assigned))
+    }
   }
 
   def blockList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
@@ -506,7 +533,7 @@ class ComponentViewController @Inject()(
           } else Ok(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
         }
           ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
+          case baseException: BaseException => BadRequest("N/A")
         }
     }
   }

@@ -105,10 +105,10 @@ object Blockchain {
   def getValidatorTxs(transaction: Transaction): Seq[ValidatorTransaction] = {
     val addresses = transaction.getMessages.map { stdMsg =>
       stdMsg.getTypeUrl match {
-        case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress
-        case constants.Blockchain.TransactionMessage.UNJAIL => slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr
-        case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress
-        case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress
+        case schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION => distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress
+        case schema.constants.Messages.UNJAIL => slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr
+        case schema.constants.Messages.CREATE_VALIDATOR => stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress
+        case schema.constants.Messages.EDIT_VALIDATOR => stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress
       }
     }
     addresses.distinct.map(x => ValidatorTransaction(address = x, txHash = transaction.hash))

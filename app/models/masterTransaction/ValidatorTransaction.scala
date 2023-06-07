@@ -83,17 +83,17 @@ class ValidatorTransactions @Inject()(protected val databaseConfigProvider: Data
       val validatorTransactions = txs.map { tx =>
         val txAddresses = tx.getMessages.flatMap { stdMsg =>
           stdMsg.getTypeUrl match {
-            case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => Option(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress)
-            case constants.Blockchain.TransactionMessage.UNJAIL => Option(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr)
-            case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => Option(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
-            case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => Option(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION => Option(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case schema.constants.Messages.UNJAIL => Option(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue).getValidatorAddr)
+            case schema.constants.Messages.CREATE_VALIDATOR => Option(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
+            case schema.constants.Messages.EDIT_VALIDATOR => Option(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue).getValidatorAddress)
             case _ => None
           }
         }
         txAddresses.distinct.map(x => ValidatorTransaction(address = x, txHash = tx.hash, height = height))
       }
 
-      Service.add(validatorTransactions.flatten)
+      if (validatorTransactions.flatten.nonEmpty) Service.add(validatorTransactions.flatten) else Future()
     }
 
   }

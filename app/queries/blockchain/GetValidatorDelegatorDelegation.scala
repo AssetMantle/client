@@ -2,9 +2,9 @@ package queries.blockchain
 
 import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.responses.blockchain.ValidatorDelegatorDelegationResponse.Response
+import queries.responses.common.Delegation
 
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
@@ -23,12 +23,17 @@ class GetValidatorDelegatorDelegation @Inject()()(implicit wsClient: WSClient, c
 
   private val url = constants.Blockchain.RestEndPoint + "/" + path1 + "/"
 
+  private val DelegationNotFoundRegex = """delegation.with.delegator.*not.found.for.validator.*""".r
+
   private def action(delegatorAddress: String, validatorAddress: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + validatorAddress + path2 + delegatorAddress).get)
 
   object Service {
 
     def get(delegatorAddress: String, validatorAddress: String): Future[Response] = action(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).recover {
       case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case baseException: BaseException => if (DelegationNotFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
+        Response(Delegation.Result(Delegation(delegator_address = delegatorAddress, validator_address = validatorAddress, shares = 0)))
+      } else throw baseException
     }
   }
 

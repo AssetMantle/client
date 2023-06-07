@@ -77,25 +77,14 @@ class MessageCounters @Inject()(
         Service.insertOrUpdateMultiple(addCounters.map(addCounter => MessageCounter(messageType = addCounter._1, counter = oldMessageCounters.find(_.messageType == addCounter._1).fold(0)(_.counter) + addCounter._2)).toSeq)
       }
 
-      (for {
+      for {
         oldMessageCounters <- oldMessageCounters
         _ <- update(oldMessageCounters = oldMessageCounters, addCounters = updates)
-      } yield ()).recover {
-        case baseException: BaseException => {
-          println("here")
-          val a = true
-          throw baseException
-        }
-        case exception: Exception => {
-          println("here")
-          val a = true
-          throw exception
-        }
-      }
+      } yield ()
     }
 
     def getMessagesStatistics: Future[ListMap[String, Double]] = {
-      val all = Service.fetchAll
+      val all = Service.fetchAll.map(_.sortBy(_.counter).reverse)
       (for {
         all <- all
       } yield ListMap(all.sortBy(_.counter).reverse.map(x => x.messageType -> x.counter.toDouble): _*)

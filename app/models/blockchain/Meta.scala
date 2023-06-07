@@ -81,7 +81,7 @@ class Metas @Inject()(
 
   object Utility {
 
-    def onRevealMeta(msg: com.metas.transactions.reveal.Message): Future[String] = {
+    def onRevealMeta(msg: com.assetmantle.modules.metas.transactions.reveal.Message): Future[String] = {
       val add = Service.add(abstractData(msg.getData))
 
       for {

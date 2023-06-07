@@ -14,9 +14,6 @@
                         <th>@Messages(constants.View.ID)</th>
                         <th>@Messages(constants.View.TITLE)</th>
                         <th>@Messages(constants.View.STATUS)</th>
-                        <th>@Messages(constants.View.VOTING_START)</th>
-                        <th>@Messages(constants.View.SUBMIT_TIME)</th>
-                        <th>@Messages(constants.View.TOTAL_DEPOSIT)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,17 +22,6 @@
                         <td>@commonJavascriptLink(proposal.id.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(${proposal.id}))"))</td>
                         <td>@proposal.content.title</td>
                         <td>@Messages(proposal.status)</td>
-                        <td id="startingTime_@proposal.id">
-                            <script>
-                                    convertUTCDateToLocalDate('@proposal.votingStartTime.toString',"startingTime_@proposal.id")
-                            </script>
-                        </td>
-                        <td id="submitTime_@proposal.id">
-                            <script>
-                                    convertUTCDateToLocalDate('@proposal.submitTime.toString',"submitTime_@proposal.id")
-                            </script>
-                        </td>
-                        <td>@proposal.totalDeposit.map(x => s"${x.amount.toMicroString} ${x.denom}").mkString(",")</td>
                     </tr>
                 }
                 </tbody>

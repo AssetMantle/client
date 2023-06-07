@@ -104,7 +104,7 @@ class ProposalVotes @Inject()(
         _ <- delete(validatorExists)
         _ <- add(validatorExists)
       } yield vote.getVoter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter
       }
     }
@@ -123,7 +123,7 @@ class ProposalVotes @Inject()(
         _ <- delete(validatorExists)
         _ <- addVotes(validatorExists)
       } yield vote.getVoter).recover {
-        case _: BaseException => logger.error(constants.Blockchain.TransactionMessage.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+        case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter
       }
     }

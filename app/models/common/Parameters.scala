@@ -92,7 +92,7 @@ object Parameters {
 
   implicit val transferParameterReads: Reads[TransferParameter] = Json.reads[TransferParameter]
 
-  case class ClassificationParameter(bondRate: Long, maxPropertyCount: Long) extends Parameter {
+  case class ClassificationParameter(bondRate: BigInt, maxPropertyCount: BigInt) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.CLASSIFICATIONS
   }
 
@@ -108,7 +108,7 @@ object Parameters {
 
   implicit val AssetParameterReads: Reads[AssetParameter] = Json.reads[AssetParameter]
 
-  case class IdentityParameter(maxProvisionAddressCount: Long) extends Parameter {
+  case class IdentityParameter(maxProvisionAddressCount: BigInt) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.IDENTITIES
   }
 

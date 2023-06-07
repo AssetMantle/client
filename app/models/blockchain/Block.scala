@@ -129,7 +129,7 @@ class Blocks @Inject()(
 
     def getFirstHeight: Future[Int] = tryGetFirstHeight
 
-    def getLatestBlock: Future[Block] = {
+    def tryGetLatestBlock: Future[Block] = {
       val latestBlockHeight = tryGetLatestBlockHeight
       for {
         latestBlockHeight <- latestBlockHeight
@@ -163,7 +163,7 @@ class Blocks @Inject()(
   object Utility {
 
     def getAverageBlockTime(fromBlock: Option[Int] = None, numBlocks: Int = numBlocksAvgBlockTimes): Future[Double] = {
-      val lastBlock = fromBlock.fold(Service.getLatestBlock)(height => Service.tryGet(height))
+      val lastBlock = fromBlock.fold(Service.tryGetLatestBlock)(height => Service.tryGet(height))
 
       // Should not use block height 1 since time difference between block 1 and block 2 can be very high
       def getFirstBlock(lastBlock: Block) = if (lastBlock.height == blockchainStartHeight) Future(lastBlock) else if (numBlocks >= (lastBlock.height - blockchainStartHeight)) Service.tryGet(blockchainStartHeight + 1) else Service.tryGet(lastBlock.height - numBlocks)

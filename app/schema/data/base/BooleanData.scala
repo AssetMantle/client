@@ -1,32 +1,34 @@
 package schema.data.base
 
-import com.data.{AnyData, BooleanData => protoBooleanData}
-import schema.data.Data
+import com.assetmantle.schema.data.base.{AnyData, AnyListableData, BooleanData => protoBooleanData}
+import schema.data.ListableData
 import schema.id.base.{DataID, HashID, StringID}
 
-case class BooleanData(value: Boolean) extends Data {
-  def getType: StringID = constants.Data.BooleanDataTypeID
+case class BooleanData(value: Boolean) extends ListableData {
+  def getType: StringID = schema.constants.Data.BooleanDataTypeID
 
-  def getBondWeight: Int = constants.Data.BooleanBondWeight
+  def getBondWeight: Int = schema.constants.Data.BooleanBondWeight
 
-  def getDataID: DataID = DataID(typeID = constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = schema.constants.Data.BooleanDataTypeID, hashID = this.generateHashID)
 
-  def zeroValue: Data = BooleanData(false)
+  def zeroValue: BooleanData = BooleanData(false)
 
   def getBytes: Array[Byte] = {
     val res: Byte = if (this.value) 1 else 0
     Seq(res).toArray
   }
 
-  def generateHashID: HashID = if (!this.value) utilities.ID.generateHashID() else utilities.ID.generateHashID(this.getBytes)
+  def generateHashID: HashID = if (!this.value) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 
   def asProtoBooleanData: protoBooleanData = protoBooleanData.newBuilder().setValue(this.value).build()
 
   def toAnyData: AnyData = AnyData.newBuilder().setBooleanData(this.asProtoBooleanData).build()
 
+  def toAnyListableData: AnyListableData = AnyListableData.newBuilder().setBooleanData(this.asProtoBooleanData).build()
+
   def getProtoBytes: Array[Byte] = this.asProtoBooleanData.toByteString.toByteArray
 
-  def viewString: String = this.value.toString
+  def viewString: String = "Boolean: " + this.value.toString
 }
 
 object BooleanData {

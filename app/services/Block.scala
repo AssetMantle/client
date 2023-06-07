@@ -1,7 +1,11 @@
 package services
 
 import actors.{Message => actorsMessage}
-import com.assets.{transactions => assetsTransactions}
+import com.assetmantle.modules.assets.{transactions => assetsTransactions}
+import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
+import com.assetmantle.modules.metas.{transactions => metasTransactions}
+import com.assetmantle.modules.orders.{transactions => ordersTransactions}
+import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -17,10 +21,6 @@ import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
-import com.identities.{transactions => identitiesTransactions}
-import com.metas.{transactions => metasTransactions}
-import com.orders.{transactions => ordersTransactions}
-import com.splits.{transactions => splitsTransactions}
 import exceptions.BaseException
 import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
@@ -242,11 +242,11 @@ class Block @Inject()(
   def actionOnTxMessages(stdMsg: protoAny)(implicit header: Header): Future[String] = {
     val processMsg: Future[String] = stdMsg.getTypeUrl match {
       //auth
-      case constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT => blockchainAccounts.Utility.onCreateVestingAccount(VestingTx.MsgCreateVestingAccount.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.CREATE_VESTING_ACCOUNT => blockchainAccounts.Utility.onCreateVestingAccount(VestingTx.MsgCreateVestingAccount.parseFrom(stdMsg.getValue))
       //authz
-      case constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION => blockchainAuthorizations.Utility.onGrantAuthorization(authzTx.MsgGrant.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION => blockchainAuthorizations.Utility.onRevokeAuthorization(authzTx.MsgRevoke.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION => {
+      case schema.constants.Messages.GRANT_AUTHORIZATION => blockchainAuthorizations.Utility.onGrantAuthorization(authzTx.MsgGrant.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.REVOKE_AUTHORIZATION => blockchainAuthorizations.Utility.onRevokeAuthorization(authzTx.MsgRevoke.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.EXECUTE_AUTHORIZATION => {
         val executeMsg = authzTx.MsgExec.parseFrom(stdMsg.getValue)
         val processMessages = utilitiesOperations.traverse(executeMsg.getMsgsList.asScala.toSeq)(message => actionOnTxMessages(message))
 
@@ -258,89 +258,89 @@ class Block @Inject()(
         } yield executeMsg.getGrantee
       }
       //bank
-      case constants.Blockchain.TransactionMessage.SEND_COIN => blockchainBalances.Utility.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.MULTI_SEND => blockchainBalances.Utility.onMultiSend(bankTx.MsgMultiSend.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.SEND_COIN => blockchainBalances.Utility.onSendCoin(bankTx.MsgSend.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.MULTI_SEND => blockchainBalances.Utility.onMultiSend(bankTx.MsgMultiSend.parseFrom(stdMsg.getValue))
       //crisis
-      case constants.Blockchain.TransactionMessage.VERIFY_INVARIANT => Future(crisisTx.MsgVerifyInvariant.parseFrom(stdMsg.getValue).getSender)
+      case schema.constants.Messages.VERIFY_INVARIANT => Future(crisisTx.MsgVerifyInvariant.parseFrom(stdMsg.getValue).getSender)
       //distribution
-      case constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(distributionTx.MsgSetWithdrawAddress.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegatorReward(distributionTx.MsgWithdrawDelegatorReward.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL => Future(distributionTx.MsgFundCommunityPool.parseFrom(stdMsg.getValue).getDepositor)
+      case schema.constants.Messages.SET_WITHDRAW_ADDRESS => blockchainWithdrawAddresses.Utility.onSetWithdrawAddress(distributionTx.MsgSetWithdrawAddress.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.WITHDRAW_DELEGATOR_REWARD => blockchainValidators.Utility.onWithdrawDelegatorReward(distributionTx.MsgWithdrawDelegatorReward.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION => blockchainValidators.Utility.onWithdrawValidatorCommission(distributionTx.MsgWithdrawValidatorCommission.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.FUND_COMMUNITY_POOL => Future(distributionTx.MsgFundCommunityPool.parseFrom(stdMsg.getValue).getDepositor)
       //evidence
-      case constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE => Future(evidenceTx.MsgSubmitEvidence.parseFrom(stdMsg.getValue).getSubmitter)
+      case schema.constants.Messages.SUBMIT_EVIDENCE => Future(evidenceTx.MsgSubmitEvidence.parseFrom(stdMsg.getValue).getSubmitter)
       //feeGrant
-      case constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE => blockchainFeeGrants.Utility.onFeeGrantAllowance(feegrantTx.MsgGrantAllowance.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE => blockchainFeeGrants.Utility.onFeeRevokeAllowance(feegrantTx.MsgRevokeAllowance.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.FEE_GRANT_ALLOWANCE => blockchainFeeGrants.Utility.onFeeGrantAllowance(feegrantTx.MsgGrantAllowance.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.FEE_REVOKE_ALLOWANCE => blockchainFeeGrants.Utility.onFeeRevokeAllowance(feegrantTx.MsgRevokeAllowance.parseFrom(stdMsg.getValue))
       //gov
-      case constants.Blockchain.TransactionMessage.DEPOSIT => blockchainProposalDeposits.Utility.onDeposit(govTx.MsgDeposit.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL => blockchainProposals.Utility.onSubmitProposal(govTx.MsgSubmitProposal.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.VOTE => blockchainProposalVotes.Utility.onVote(govTx.MsgVote.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.WEIGHTED_VOTE => blockchainProposalVotes.Utility.onWeightedVote(govTx.MsgVoteWeighted.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.DEPOSIT => blockchainProposalDeposits.Utility.onDeposit(govTx.MsgDeposit.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.SUBMIT_PROPOSAL => blockchainProposals.Utility.onSubmitProposal(govTx.MsgSubmitProposal.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.VOTE => blockchainProposalVotes.Utility.onVote(govTx.MsgVote.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.WEIGHTED_VOTE => blockchainProposalVotes.Utility.onWeightedVote(govTx.MsgVoteWeighted.parseFrom(stdMsg.getValue))
       //slashing
-      case constants.Blockchain.TransactionMessage.UNJAIL => blockchainValidators.Utility.onUnjail(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.UNJAIL => blockchainValidators.Utility.onUnjail(slashingTx.MsgUnjail.parseFrom(stdMsg.getValue))
       //staking
-      case constants.Blockchain.TransactionMessage.CREATE_VALIDATOR => blockchainValidators.Utility.onCreateValidator(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.EDIT_VALIDATOR => blockchainValidators.Utility.onEditValidator(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.DELEGATE => blockchainValidators.Utility.onDelegation(stakingTx.MsgDelegate.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stakingTx.MsgBeginRedelegate.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stakingTx.MsgUndelegate.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.CREATE_VALIDATOR => blockchainValidators.Utility.onCreateValidator(stakingTx.MsgCreateValidator.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.EDIT_VALIDATOR => blockchainValidators.Utility.onEditValidator(stakingTx.MsgEditValidator.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.DELEGATE => blockchainValidators.Utility.onDelegation(stakingTx.MsgDelegate.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.REDELEGATE => blockchainRedelegations.Utility.onRedelegation(stakingTx.MsgBeginRedelegate.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.UNDELEGATE => blockchainUndelegations.Utility.onUndelegation(stakingTx.MsgUndelegate.parseFrom(stdMsg.getValue))
       //ibc-client
-      case constants.Blockchain.TransactionMessage.CREATE_CLIENT => Future(clientTx.MsgCreateClient.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.UPDATE_CLIENT => Future(clientTx.MsgUpdateClient.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR => Future(clientTx.MsgSubmitMisbehaviour.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.UPGRADE_CLIENT => Future(clientTx.MsgUpgradeClient.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CREATE_CLIENT => Future(clientTx.MsgCreateClient.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.UPDATE_CLIENT => Future(clientTx.MsgUpdateClient.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.SUBMIT_MISBEHAVIOUR => Future(clientTx.MsgSubmitMisbehaviour.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.UPGRADE_CLIENT => Future(clientTx.MsgUpgradeClient.parseFrom(stdMsg.getValue).getSigner)
       //ibc-connection
-      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT => Future(connectionTx.MsgConnectionOpenInit.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM => Future(connectionTx.MsgConnectionOpenConfirm.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK => Future(connectionTx.MsgConnectionOpenAck.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY => Future(connectionTx.MsgConnectionOpenTry.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CONNECTION_OPEN_INIT => Future(connectionTx.MsgConnectionOpenInit.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CONNECTION_OPEN_CONFIRM => Future(connectionTx.MsgConnectionOpenConfirm.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CONNECTION_OPEN_ACK => Future(connectionTx.MsgConnectionOpenAck.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CONNECTION_OPEN_TRY => Future(connectionTx.MsgConnectionOpenTry.parseFrom(stdMsg.getValue).getSigner)
       //ibc-channel
-      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT => Future(channelTx.MsgChannelOpenInit.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY => Future(channelTx.MsgChannelOpenTry.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK => Future(channelTx.MsgChannelOpenAck.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM => Future(channelTx.MsgChannelOpenConfirm.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT => Future(channelTx.MsgChannelCloseInit.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM => Future(channelTx.MsgChannelCloseConfirm.parseFrom(stdMsg.getValue).getSigner)
-      case constants.Blockchain.TransactionMessage.RECV_PACKET => blockchainBalances.Utility.onRecvPacket(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.TIMEOUT => blockchainBalances.Utility.onTimeout(channelTx.MsgTimeout.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE => blockchainBalances.Utility.onTimeoutOnClose(channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.CHANNEL_OPEN_INIT => Future(channelTx.MsgChannelOpenInit.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CHANNEL_OPEN_TRY => Future(channelTx.MsgChannelOpenTry.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CHANNEL_OPEN_ACK => Future(channelTx.MsgChannelOpenAck.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CHANNEL_OPEN_CONFIRM => Future(channelTx.MsgChannelOpenConfirm.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CHANNEL_CLOSE_INIT => Future(channelTx.MsgChannelCloseInit.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.CHANNEL_CLOSE_CONFIRM => Future(channelTx.MsgChannelCloseConfirm.parseFrom(stdMsg.getValue).getSigner)
+      case schema.constants.Messages.RECV_PACKET => blockchainBalances.Utility.onRecvPacket(channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.TIMEOUT => blockchainBalances.Utility.onTimeout(channelTx.MsgTimeout.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.TIMEOUT_ON_CLOSE => blockchainBalances.Utility.onTimeoutOnClose(channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ACKNOWLEDGEMENT => blockchainBalances.Utility.onAcknowledgement(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue))
       //ibc-transfer
-      case constants.Blockchain.TransactionMessage.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.TRANSFER => blockchainBalances.Utility.onIBCTransfer(transferTx.MsgTransfer.parseFrom(stdMsg.getValue))
       //assets
-      case constants.Blockchain.TransactionMessage.ASSET_BURN => blockchainAssets.Utility.onBurn(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_DEFINE => blockchainClassifications.Utility.onDefineAsset(assetsTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE => blockchainAssets.Utility.onDeputize(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_MINT => blockchainAssets.Utility.onMint(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_MUTATE => blockchainAssets.Utility.onMutate(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_RENUMERATE => blockchainAssets.Utility.onRenumerate(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ASSET_REVOKE => blockchainAssets.Utility.onRevoke(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_BURN => blockchainAssets.Utility.onBurn(assetsTransactions.burn.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_DEFINE => blockchainAssets.Utility.onDefine(assetsTransactions.define.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_DEPUTIZE => blockchainAssets.Utility.onDeputize(assetsTransactions.deputize.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_MINT => blockchainAssets.Utility.onMint(assetsTransactions.mint.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_MUTATE => blockchainAssets.Utility.onMutate(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_RENUMERATE => blockchainAssets.Utility.onRenumerate(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_REVOKE => blockchainAssets.Utility.onRevoke(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       //identities
-      case constants.Blockchain.TransactionMessage.IDENTITY_DEFINE => blockchainClassifications.Utility.onDefineIdentity(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE => blockchainIdentities.Utility.onDeputize(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_MUTATE => blockchainIdentities.Utility.onMutate(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_NUB => blockchainIdentities.Utility.onNub(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_QUASH => blockchainIdentities.Utility.onQuash(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_REVOKE => blockchainIdentities.Utility.onRevoke(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_DEFINE => blockchainIdentities.Utility.onDefine(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_DEPUTIZE => blockchainIdentities.Utility.onDeputize(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_MUTATE => blockchainIdentities.Utility.onMutate(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_NUB => blockchainIdentities.Utility.onNub(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_QUASH => blockchainIdentities.Utility.onQuash(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_REVOKE => blockchainIdentities.Utility.onRevoke(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
       //orders
-      case constants.Blockchain.TransactionMessage.ORDER_CANCEL => blockchainOrders.Utility.onCancel(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_DEFINE => blockchainClassifications.Utility.onDefineOrder(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE => blockchainOrders.Utility.onDeputize(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
-      case constants.Blockchain.TransactionMessage.ORDER_MAKE => blockchainOrders.Utility.onMake(ordersTransactions.make.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_MODIFY => blockchainOrders.Utility.onModify(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_CANCEL => blockchainOrders.Utility.onCancel(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_DEFINE => blockchainOrders.Utility.onDefine(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_DEPUTIZE => blockchainOrders.Utility.onDeputize(ordersTransactions.deputize.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_IMMEDIATE => Future(ordersTransactions.immediate.Message.parseFrom(stdMsg.getValue).getFrom)
+      case schema.constants.Messages.ORDER_MAKE => blockchainOrders.Utility.onMake(ordersTransactions.make.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_MODIFY => blockchainOrders.Utility.onModify(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
       //metas
-      case constants.Blockchain.TransactionMessage.META_REVEAL => blockchainMetas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.META_REVEAL => blockchainMetas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
       // splits
-      case constants.Blockchain.TransactionMessage.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))
-      case constants.Blockchain.TransactionMessage.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }

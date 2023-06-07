@@ -1,0 +1,15 @@
+@import views.html.base._
+@import views.html.base.cards._
+@import views.html.component.blockchain.account.{accountAuthorizationsGranted, accountAuthorizationsAssigned}
+@import models.blockchain.Authorization
+@import scala.collection.immutable.ListMap
+
+@(granted: Seq[Authorization], assigned: Seq[Authorization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonCard(constants.View.AUTHORIZATION) {
+} {
+    @commonHorizontalSwitcher(ListMap(
+        constants.View.GRANTED -> accountAuthorizationsGranted(granted),
+        constants.View.ASSIGNED -> accountAuthorizationsAssigned(assigned),
+    ))
+}

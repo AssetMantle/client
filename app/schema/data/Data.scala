@@ -1,7 +1,7 @@
 package schema.data
 
-import com.data.AnyData
-import org.slf4j.{Logger, LoggerFactory}
+import com.assetmantle.schema.data.base.AnyData
+import schema.constants
 import schema.data.base._
 import schema.id.base.{DataID, HashID, StringID}
 
@@ -24,13 +24,11 @@ abstract class Data {
   def viewString: String
 
   def getBondWeight: Int
+
+  def isListableData: Boolean
 }
 
 object Data {
-
-  private implicit val module: String = constants.Module.SCHEMA_DATA
-
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def apply(anyData: AnyData): Data = anyData.getImplCase.getNumber match {
     case 1 => AccAddressData(anyData.getAccAddressData)
@@ -38,10 +36,10 @@ object Data {
     case 3 => DecData(anyData.getDecData)
     case 4 => HeightData(anyData.getHeightData)
     case 5 => IDData(anyData.getIDData)
-    case 6 => StringData(anyData.getStringData)
+    case 6 => ListData(anyData.getListData)
     case 7 => NumberData(anyData.getNumberData)
-    case 8 => ListData(anyData.getListData)
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
+    case 8 => StringData(anyData.getStringData)
+    case _ => throw new IllegalArgumentException("INVALID_DATA_IMPL_CASE_NUMBER: " + anyData.getImplCase.getNumber.toString)
   }
 
   def apply(dataType: String, protoBytes: Array[Byte]): Data = dataType match {
@@ -50,10 +48,10 @@ object Data {
     case constants.Data.DecDataTypeID.value => DecData(protoBytes)
     case constants.Data.HeightDataTypeID.value => HeightData(protoBytes)
     case constants.Data.IDDataTypeID.value => IDData(protoBytes)
-    case constants.Data.StringDataTypeID.value => StringData(protoBytes)
-    case constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
     case constants.Data.ListDataTypeID.value => ListData(protoBytes)
-    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE")
+    case constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
+    case constants.Data.StringDataTypeID.value => StringData(protoBytes)
+    case _ => throw new IllegalArgumentException("INVALID_DATA_TYPE: " + dataType)
   }
 
 }

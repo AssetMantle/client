@@ -79,15 +79,15 @@ class Startup @Inject()(
 
   private def insertInitialClassificationIDs() = {
     val nubClassificationID = models.blockchain.Classification(
-      id = constants.Blockchain.NubClassificationID.getBytes,
-      idString = constants.Blockchain.NubClassificationID.asString,
-      immutables = Immutables(PropertyList(Seq(constants.Blockchain.NubProperty))).getProtoBytes,
-      mutables = Mutables(PropertyList(Seq(constants.Blockchain.AuthenticationProperty))).getProtoBytes)
+      id = schema.constants.ID.NubClassificationID.getBytes,
+      idString = schema.constants.ID.NubClassificationID.asString,
+      immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty))).getProtoBytes,
+      mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty))).getProtoBytes)
     val maintainerClassificationID = models.blockchain.Classification(
-      id = constants.Blockchain.MaintainerClassificationID.getBytes,
-      idString = constants.Blockchain.MaintainerClassificationID.asString,
-      immutables = constants.Blockchain.MaintainerClassificationImmutables.getProtoBytes,
-      mutables = constants.Blockchain.MaintainerClassificationMutables.getProtoBytes)
+      id = schema.constants.ID.MaintainerClassificationID.getBytes,
+      idString = schema.constants.ID.MaintainerClassificationID.asString,
+      immutables = schema.constants.ID.MaintainerClassificationImmutables.getProtoBytes,
+      mutables = schema.constants.ID.MaintainerClassificationMutables.getProtoBytes)
 
     blockchainClassifications.Service.add(Seq(nubClassificationID, maintainerClassificationID))
   }
@@ -195,7 +195,7 @@ class Startup @Inject()(
     val updateTxs = utilitiesOperations.traverse(genTxs) { genTx =>
       val updateTx = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainValidators.Utility.insertOrUpdateValidator(msg.validator_address))
 
-      def insertDelegation() = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainDelegations.Utility.insertOrUpdate(delegatorAddress = msg.delegator_address, validatorAddress = msg.validator_address))
+      def insertDelegation() = utilitiesOperations.traverse(genTx.body.messages)(msg => blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = msg.delegator_address, validatorAddress = msg.validator_address))
 
       def insertKeyBaseAccount(validators: Seq[Validator]) = utilitiesOperations.traverse(validators)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
 
@@ -349,17 +349,17 @@ class Startup @Inject()(
       //TODO Tried changing explorerInitialDelay, explorerFixedDelay, actorSytem
       val abciInfo = getABCIInfo.Service.get()
 
-      def latestExplorerBlock = blockchainBlocks.Service.getLatestBlock
+      def latestExplorerBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
 
-      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlock: blockchain.Block) = if (latestExplorerBlock.height == 0) {
+      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlockHeight: Int) = if (latestExplorerBlockHeight == 0) {
         for {
           _ <- onGenesis()
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
-        val archive = if (latestExplorerBlock.height / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlock.height, latestExplorerBlock.time) else Future(0)
+        val archive = if (latestExplorerBlockHeight > 0 && latestExplorerBlockHeight / 10000 == 0) archiving.checkAndUpdate(latestExplorerBlockHeight) else Future(0)
 
-        val updateBlockHeight = latestExplorerBlock.height + 1
+        val updateBlockHeight = latestExplorerBlockHeight + 1
 
         val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
         else Future()
@@ -372,8 +372,8 @@ class Startup @Inject()(
 
       val forComplete = (for {
         abciInfo <- abciInfo
-        latestExplorerBlock <- latestExplorerBlock
-        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlock)
+        latestExplorerBlockHeight <- latestExplorerBlockHeight
+        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlockHeight)
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {
@@ -390,10 +390,7 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    } else {
-      logger.error("Received signal to shut down")
-      utilities.Scheduler.shutdownThread()
-    }
+    } else utilities.Scheduler.shutdownThread()
   }
 
   //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.

@@ -4,17 +4,8 @@ import com.google.common.collect
 import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
-import schema.data.base._
-import schema.id.base._
-import schema.list._
-import schema.property.base.{MesaProperty, MetaProperty}
-import schema.qualified.{Immutables, Mutables}
-import schema.types.Height
-import utilities.AttoNumber
 
 object Blockchain {
-  val MnemonicShown = 3
-  val FullFundraiserPath = "44'/118'/0'/0/0"
   val AccountPrefix: String = AppConfig.configuration.get[String]("blockchain.account.prefix")
   val ValidatorPrefix: String = AccountPrefix + "valoper"
   val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
@@ -23,14 +14,6 @@ object Blockchain {
   }
   val ChainID: String = AppConfig.configuration.get[String]("blockchain.chainID")
   val StakingDenom: String = AppConfig.configuration.get[String]("blockchain.stakingDenom")
-  val NegotiationDefaultTime = 5000000
-  val DefaultFaucetTokenAmount = 1
-  val IDSeparator = "."
-  val OneDec: BigDecimal = BigDecimal("1.000000000000000000")
-  val ZeroDec: BigDecimal = BigDecimal("0.0")
-  val SmallestDec: BigDecimal = BigDecimal("0.000000000000000001")
-  val SmallestDecReciprocal: BigDecimal = 1 / SmallestDec
-  val HeightDataDefaultValue: Int = -1
   val CoinType = 118
   val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
     new ChildNumber(44, true),
@@ -42,51 +25,6 @@ object Blockchain {
 
   val RPCEndPoint: String = AppConfig.configuration.get[String]("blockchain.rpcURL")
   val RestEndPoint: String = AppConfig.configuration.get[String]("blockchain.restURL")
-
-  object Document {
-    val ASSET = "ASSET"
-    val IDENTITY = "IDENTITY"
-    val ORDER = "ORDER"
-  }
-
-  val Mint: StringID = StringID("mint")
-  val Burn: StringID = StringID("burn")
-  val Renumerate: StringID = StringID("renumerate")
-  val Add: StringID = StringID("add")
-  val Remove: StringID = StringID("remove")
-  val Mutate: StringID = StringID("mutate")
-
-  val AuthenticationProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("authentication"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val BondAmountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("bondAmount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val BondRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("bondRate"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val BurnHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("burnHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val ExpiryHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("expiryHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val ExchangeRateProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("exchangeRate"), typeID = constants.Data.DecDataTypeID), data = DecData(AttoNumber(ZeroDec)).toAnyData)
-  val CreationHeightProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("creationHeight"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val IdentityIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("identityID"), typeID = constants.Data.IDDataTypeID), data = IDData(IdentityID(HashID(Array[Byte]())).toAnyID).toAnyData)
-  val LockProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("lock"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val MaintainedPropertiesProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedProperties"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val MaintainedClassificationIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maintainedClassificationID"), typeID = constants.Data.IDDataTypeID), data = IDData(ClassificationID(HashID(Array[Byte]())).toAnyID).toAnyData)
-  val MakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val MakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val MakerOwnableSplitProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("makerOwnableSplit"), typeID = constants.Data.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
-  val MaxOrderLifeProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxOrderLife"), typeID = constants.Data.HeightDataTypeID), data = HeightData(Height(-1)).toAnyData)
-  val MaxPropertyCountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxPropertyCount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val MaxProvisionAddressCountProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("maxProvisionAddressCount"), typeID = constants.Data.NumberDataTypeID), data = NumberData(0).toAnyData)
-  val NubProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("nubID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val PermissionsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("permissions"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-  val SupplyProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("supply"), typeID = constants.Data.DecDataTypeID), data = DecData(SmallestDec.toString()).toAnyData)
-  val TakerOwnableIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerOwnableID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val TakerIDProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("takerID"), typeID = constants.Data.IDDataTypeID), data = IDData(StringID("").toAnyID).toAnyData)
-  val WrapAllowedCoinsProperty: MetaProperty = MetaProperty(id = PropertyID(keyID = StringID("wrapAllowedCoins"), typeID = constants.Data.ListDataTypeID), data = ListData(Seq()).toAnyData)
-
-  val NubClassificationID: ClassificationID = utilities.ID.getClassificationID(Immutables(PropertyList(Seq(NubProperty))), Mutables(PropertyList(Seq(AuthenticationProperty))))
-
-  val MaintainerClassificationImmutables: Immutables = Immutables(PropertyList(Seq(IdentityIDProperty, MaintainedClassificationIDProperty)))
-  val MaintainerClassificationMutables: Mutables = Mutables(PropertyList(Seq(MaintainedPropertiesProperty, PermissionsProperty)))
-  val MaintainerClassificationID: ClassificationID = utilities.ID.getClassificationID(MaintainerClassificationImmutables, MaintainerClassificationMutables)
-
-  val OrderIdentityID: IdentityID = utilities.ID.getIdentityID(NubClassificationID, Immutables(PropertyList(Seq(MesaProperty(id = NubProperty.id, dataID = StringData("orders").getDataID)))))
 
   object PublicKey {
     val MULTI_SIG = "/cosmos.crypto.multisig.LegacyAminoPubKey"
@@ -249,99 +187,5 @@ object Blockchain {
     val PERIODIC_ALLOWANCE = "/cosmos.feegrant.v1beta1.PeriodicAllowance"
     val ALLOWED_MSG_ALLOWANCE = "/cosmos.feegrant.v1beta1.AllowedMsgAllowance"
   }
-
-  object TransactionMessage {
-    //auth
-    val CREATE_VESTING_ACCOUNT = "/cosmos.vesting.v1beta1.MsgCreateVestingAccount"
-    //authz
-    val GRANT_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgGrant"
-    val REVOKE_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgRevoke"
-    val EXECUTE_AUTHORIZATION = "/cosmos.authz.v1beta1.MsgExec"
-    //bank
-    val SEND_COIN = "/cosmos.bank.v1beta1.MsgSend"
-    val MULTI_SEND = "/cosmos.bank.v1beta1.MsgMultiSend"
-    //crisis
-    val VERIFY_INVARIANT = "/cosmos.crisis.v1beta1.MsgVerifyInvariant"
-    //distribution
-    val SET_WITHDRAW_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress"
-    val WITHDRAW_DELEGATOR_REWARD = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
-    val WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
-    val FUND_COMMUNITY_POOL = "/cosmos.distribution.v1beta1.MsgFundCommunityPool"
-    //evidence
-    val SUBMIT_EVIDENCE = "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
-    //feeGrant
-    val FEE_GRANT_ALLOWANCE = "/cosmos.feegrant.v1beta1.MsgGrantAllowance"
-    val FEE_REVOKE_ALLOWANCE = "/cosmos.feegrant.v1beta1.MsgRevokeAllowance"
-    //gov
-    val DEPOSIT = "/cosmos.gov.v1beta1.MsgDeposit"
-    val SUBMIT_PROPOSAL = "/cosmos.gov.v1beta1.MsgSubmitProposal"
-    val VOTE = "/cosmos.gov.v1beta1.MsgVote"
-    val WEIGHTED_VOTE = "/cosmos.gov.v1beta1.MsgVoteWeighted"
-    //slashing
-    val UNJAIL = "/cosmos.slashing.v1beta1.MsgUnjail"
-    //staking
-    val CREATE_VALIDATOR = "/cosmos.staking.v1beta1.MsgCreateValidator"
-    val EDIT_VALIDATOR = "/cosmos.staking.v1beta1.MsgEditValidator"
-    val DELEGATE = "/cosmos.staking.v1beta1.MsgDelegate"
-    val REDELEGATE = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
-    val UNDELEGATE = "/cosmos.staking.v1beta1.MsgUndelegate"
-    //ibc-client
-    val CREATE_CLIENT = "/ibc.core.client.v1.MsgCreateClient"
-    val UPDATE_CLIENT = "/ibc.core.client.v1.MsgUpdateClient"
-    val UPGRADE_CLIENT = "/ibc.core.client.v1.MsgUpgradeClient"
-    val SUBMIT_MISBEHAVIOUR = "/ibc.core.client.v1.MsgSubmitMisbehaviour"
-    //ibc-connection
-    val CONNECTION_OPEN_INIT = "/ibc.core.connection.v1.MsgConnectionOpenInit"
-    val CONNECTION_OPEN_TRY = "/ibc.core.connection.v1.MsgConnectionOpenTry"
-    val CONNECTION_OPEN_ACK = "/ibc.core.connection.v1.MsgConnectionOpenAck"
-    val CONNECTION_OPEN_CONFIRM = "/ibc.core.connection.v1.MsgConnectionOpenConfirm"
-    //ibc-channel
-    val CHANNEL_OPEN_INIT = "/ibc.core.channel.v1.MsgChannelOpenInit"
-    val CHANNEL_OPEN_TRY = "/ibc.core.channel.v1.MsgChannelOpenTry"
-    val CHANNEL_OPEN_ACK = "/ibc.core.channel.v1.MsgChannelOpenAck"
-    val CHANNEL_OPEN_CONFIRM = "/ibc.core.channel.v1.MsgChannelOpenConfirm"
-    val CHANNEL_CLOSE_INIT = "/ibc.core.channel.v1.MsgChannelCloseInit"
-    val CHANNEL_CLOSE_CONFIRM = "/ibc.core.channel.v1.MsgChannelCloseConfirm"
-    val RECV_PACKET = "/ibc.core.channel.v1.MsgRecvPacket"
-    val TIMEOUT = "/ibc.core.channel.v1.MsgTimeout"
-    val TIMEOUT_ON_CLOSE = "/ibc.core.channel.v1.MsgTimeoutOnClose"
-    val ACKNOWLEDGEMENT = "/ibc.core.channel.v1.MsgAcknowledgement"
-    //ibc-transfer
-    val TRANSFER = "/ibc.applications.transfer.v1.MsgTransfer"
-    //asset
-    val ASSET_BURN = "/assets.transactions.burn.Message"
-    val ASSET_DEFINE = "/assets.transactions.define.Message"
-    val ASSET_DEPUTIZE = "/assets.transactions.deputize.Message"
-    val ASSET_MINT = "/assets.transactions.mint.Message"
-    val ASSET_MUTATE = "/assets.transactions.mutate.Message"
-    val ASSET_RENUMERATE = "/assets.transactions.renumerate.Message"
-    val ASSET_REVOKE = "/assets.transactions.revoke.Message"
-    //identity
-    val IDENTITY_DEFINE = "/identities.transactions.define.Message"
-    val IDENTITY_DEPUTIZE = "/identities.transactions.deputize.Message"
-    val IDENTITY_ISSUE = "/identities.transactions.issue.Message"
-    val IDENTITY_MUTATE = "/identities.transactions.mutate.Message"
-    val IDENTITY_NUB = "/identities.transactions.nub.Message"
-    val IDENTITY_PROVISION = "/identities.transactions.provision.Message"
-    val IDENTITY_QUASH = "/identities.transactions.quash.Message"
-    val IDENTITY_REVOKE = "/identities.transactions.revoke.Message"
-    val IDENTITY_UNPROVISION = "/identities.transactions.unprovision.Message"
-    //split
-    val SPLIT_SEND = "/splits.transactions.send.Message"
-    val SPLIT_WRAP = "/splits.transactions.wrap.Message"
-    val SPLIT_UNWRAP = "/splits.transactions.unwrap.Message"
-    //order
-    val ORDER_CANCEL = "/orders.transactions.cancel.Message"
-    val ORDER_DEFINE = "/orders.transactions.define.Message"
-    val ORDER_DEPUTIZE = "/orders.transactions.deputize.Message"
-    val ORDER_IMMEDIATE = "/orders.transactions.immediate.Message"
-    val ORDER_MAKE = "/orders.transactions.make.Message"
-    val ORDER_MODIFY = "/orders.transactions.modify.Message"
-    val ORDER_REVOKE = "/orders.transactions.revoke.Message"
-    val ORDER_TAKE = "/orders.transactions.take.Message"
-    //metaList
-    val META_REVEAL = "/metas.transactions.reveal.Message"
-  }
-
 
 }

@@ -179,6 +179,8 @@ object View {
   val DELEGATED = "DELEGATED"
   val UNDELEGATING = "UNDELEGATING"
   val REDELEGATING = "REDELEGATING"
+  val GRANTED = "GRANTED"
+  val ASSIGNED = "ASSIGNED"
   val COMMISSION_REWARDS = "COMMISSION_REWARDS"
   val DELEGATOR_REWARDS = "DELEGATOR_REWARDS"
   val STAKING_TOKEN = "STAKING_TOKEN"
@@ -229,6 +231,7 @@ object View {
   val AMOUNTS = "AMOUNTS"
   val MINT = "MINT"
   val BURN = "BURN"
+  val MAINTAINER = "MAINTAINER"
   val ADD_MAINTAINER = "ADD_MAINTAINER"
   val MUTATE_MAINTAINER = "MUTATE_MAINTAINER"
   val REMOVE_MAINTAINER = "REMOVE_MAINTAINER"
@@ -306,6 +309,7 @@ object View {
   val ALLOW_LIST = "ALLOW_LIST"
   val DENY_LIST = "DENY_LIST"
   val AUTHORIZATION = "AUTHORIZATION"
+  val AUTHORIZATIONS = "AUTHORIZATIONS"
   val MESSAGES = "MESSAGES"
   val ALLOWANCE_TYPE = "ALLOWANCE_TYPE"
   val PERIOD = "PERIOD"
@@ -376,6 +380,10 @@ object View {
   val MAX_ORDER_LIFE = "MAX_ORDER_LIFE"
   val WRAPPING_ALLOWED_DENOMS = "WRAPPING_ALLOWED_DENOMS"
   val TOKEN_DETAILS = "TOKEN_DETAILS"
+  val ASSET = "ASSET"
+  val IDENTITY = "IDENTITY"
+  val ORDER = "ORDER"
+  val CLASSIFICATION = "CLASSIFICATION"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
@@ -391,80 +399,86 @@ object View {
 
   val TxMessagesMap: Map[String, String] = Map(
     //auth
-    constants.Blockchain.TransactionMessage.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
+    schema.constants.Messages.CREATE_VESTING_ACCOUNT -> "MESSAGE_CREATE_VESTING_ACCOUNT",
     //authz
-    constants.Blockchain.TransactionMessage.GRANT_AUTHORIZATION -> "MESSAGE_GRANT_AUTHORIZATION",
-    constants.Blockchain.TransactionMessage.REVOKE_AUTHORIZATION -> "MESSAGE_REVOKE_AUTHORIZATION",
-    constants.Blockchain.TransactionMessage.EXECUTE_AUTHORIZATION -> "MESSAGE_EXECUTE_AUTHORIZATION",
+    schema.constants.Messages.GRANT_AUTHORIZATION -> "MESSAGE_GRANT_AUTHORIZATION",
+    schema.constants.Messages.REVOKE_AUTHORIZATION -> "MESSAGE_REVOKE_AUTHORIZATION",
+    schema.constants.Messages.EXECUTE_AUTHORIZATION -> "MESSAGE_EXECUTE_AUTHORIZATION",
     //bank
-    constants.Blockchain.TransactionMessage.SEND_COIN -> "MESSAGE_SEND",
-    constants.Blockchain.TransactionMessage.MULTI_SEND -> "MESSAGE_MULTI_SEND",
+    schema.constants.Messages.SEND_COIN -> "MESSAGE_SEND",
+    schema.constants.Messages.MULTI_SEND -> "MESSAGE_MULTI_SEND",
     //evidence
-    constants.Blockchain.TransactionMessage.VERIFY_INVARIANT -> "MESSAGE_VERIFY_INVARIANT",
+    schema.constants.Messages.VERIFY_INVARIANT -> "MESSAGE_VERIFY_INVARIANT",
     //feeGrant
-    constants.Blockchain.TransactionMessage.FEE_GRANT_ALLOWANCE -> "MESSAGE_FEE_GRANT_ALLOWANCE",
-    constants.Blockchain.TransactionMessage.FEE_REVOKE_ALLOWANCE -> "MESSAGE_FEE_REVOKE_ALLOWANCE",
+    schema.constants.Messages.FEE_GRANT_ALLOWANCE -> "MESSAGE_FEE_GRANT_ALLOWANCE",
+    schema.constants.Messages.FEE_REVOKE_ALLOWANCE -> "MESSAGE_FEE_REVOKE_ALLOWANCE",
     //distribution
-    constants.Blockchain.TransactionMessage.SET_WITHDRAW_ADDRESS -> "MESSAGE_SET_WITHDRAW_ADDRESS",
-    constants.Blockchain.TransactionMessage.WITHDRAW_DELEGATOR_REWARD -> "MESSAGE_WITHDRAW_REWARD",
-    constants.Blockchain.TransactionMessage.WITHDRAW_VALIDATOR_COMMISSION -> "MESSAGE_WITHDRAW_COMMISSION",
-    constants.Blockchain.TransactionMessage.FUND_COMMUNITY_POOL -> "MESSAGE_FUND_COMMUNITY_POOL",
-    constants.Blockchain.TransactionMessage.SUBMIT_EVIDENCE -> "MESSAGE_SUBMIT_EVIDENCE",
-    constants.Blockchain.TransactionMessage.DEPOSIT -> "MESSAGE_DEPOSIT",
-    constants.Blockchain.TransactionMessage.SUBMIT_PROPOSAL -> "MESSAGE_PROPOSAL",
-    constants.Blockchain.TransactionMessage.VOTE -> "MESSAGE_VOTE",
-    constants.Blockchain.TransactionMessage.UNJAIL -> "MESSAGE_UNJAIL",
-    constants.Blockchain.TransactionMessage.CREATE_VALIDATOR -> "MESSAGE_CREATE_VALIDATOR",
-    constants.Blockchain.TransactionMessage.EDIT_VALIDATOR -> "MESSAGE_EDIT_VALIDATOR",
-    constants.Blockchain.TransactionMessage.DELEGATE -> "MESSAGE_DELEGATE",
-    constants.Blockchain.TransactionMessage.REDELEGATE -> "MESSAGE_REDELEGATE",
-    constants.Blockchain.TransactionMessage.UNDELEGATE -> "MESSAGE_UNBOND",
-    constants.Blockchain.TransactionMessage.CREATE_CLIENT -> "MESSAGE_IBC_CREATE_CLIENT",
-    constants.Blockchain.TransactionMessage.UPDATE_CLIENT -> "MESSAGE_IBC_UPDATE_CLIENT",
-    constants.Blockchain.TransactionMessage.UPGRADE_CLIENT -> "MESSAGE_IBC_UPGRADE_CLIENT",
-    constants.Blockchain.TransactionMessage.SUBMIT_MISBEHAVIOUR -> "MESSAGE_IBC_MISBEHAVIOUR",
-    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_INIT -> "MESSAGE_IBC_CONN_OPEN_INIT",
-    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_TRY -> "MESSAGE_IBC_CONN_OPEN_TRY",
-    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_ACK -> "MESSAGE_IBC_CONN_OPEN_ACK",
-    constants.Blockchain.TransactionMessage.CONNECTION_OPEN_CONFIRM -> "MESSAGE_IBC_CONN_OPEN_CONFIRM",
-    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_INIT -> "MESSAGE_IBC_CHANNEL_OPEN_INIT",
-    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_TRY -> "MESSAGE_IBC_CHANNEL_OPEN_TRY",
-    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_ACK -> "MESSAGE_IBC_CHANNEL_OPEN_ACK",
-    constants.Blockchain.TransactionMessage.CHANNEL_OPEN_CONFIRM -> "MESSAGE_IBC_CHANNEL_OPEN_CONFIRM",
-    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_INIT -> "MESSAGE_IBC_CHANNEL_CLOSE_INIT",
-    constants.Blockchain.TransactionMessage.CHANNEL_CLOSE_CONFIRM -> "MESSAGE_IBC_CHANNEL_CLOSE_CONFIRM",
-    constants.Blockchain.TransactionMessage.RECV_PACKET -> "MESSAGE_IBC_RECV_PACKET",
-    constants.Blockchain.TransactionMessage.TIMEOUT -> "MESSAGE_IBC_TIMEOUT",
-    constants.Blockchain.TransactionMessage.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
-    constants.Blockchain.TransactionMessage.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
-    constants.Blockchain.TransactionMessage.TRANSFER -> "MESSAGE_IBC_TRANSFER",
-    constants.Blockchain.TransactionMessage.ASSET_DEFINE -> "MESSAGE_ASSET_DEFINE",
-    constants.Blockchain.TransactionMessage.ASSET_MINT -> "MESSAGE_ASSET_MINT",
-    constants.Blockchain.TransactionMessage.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
-    constants.Blockchain.TransactionMessage.ASSET_BURN -> "MESSAGE_ASSET_BURN",
-    constants.Blockchain.TransactionMessage.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
-    constants.Blockchain.TransactionMessage.ASSET_DEPUTIZE -> "MESSAGE_ASSET_DEPUTIZE",
-    constants.Blockchain.TransactionMessage.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
-    constants.Blockchain.TransactionMessage.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
-    constants.Blockchain.TransactionMessage.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
-    constants.Blockchain.TransactionMessage.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
-    constants.Blockchain.TransactionMessage.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
-    constants.Blockchain.TransactionMessage.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
-    constants.Blockchain.TransactionMessage.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",
-    constants.Blockchain.TransactionMessage.IDENTITY_REVOKE -> "MESSAGE_IDENTITY_REVOKE",
-    constants.Blockchain.TransactionMessage.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
-    constants.Blockchain.TransactionMessage.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
-    constants.Blockchain.TransactionMessage.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
-    constants.Blockchain.TransactionMessage.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
-    constants.Blockchain.TransactionMessage.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
-    constants.Blockchain.TransactionMessage.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
-    constants.Blockchain.TransactionMessage.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
-    constants.Blockchain.TransactionMessage.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
-    constants.Blockchain.TransactionMessage.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
-    constants.Blockchain.TransactionMessage.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
-    constants.Blockchain.TransactionMessage.ORDER_DEPUTIZE -> "MESSAGE_ORDER_DEPUTIZE",
-    constants.Blockchain.TransactionMessage.ORDER_IMMEDIATE -> "MESSAGE_ORDER_IMMEDIATE",
-    constants.Blockchain.TransactionMessage.META_REVEAL -> "MESSAGE_META_REVEAL",
+    schema.constants.Messages.SET_WITHDRAW_ADDRESS -> "MESSAGE_SET_WITHDRAW_ADDRESS",
+    schema.constants.Messages.WITHDRAW_DELEGATOR_REWARD -> "MESSAGE_WITHDRAW_REWARD",
+    schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION -> "MESSAGE_WITHDRAW_COMMISSION",
+    schema.constants.Messages.FUND_COMMUNITY_POOL -> "MESSAGE_FUND_COMMUNITY_POOL",
+    schema.constants.Messages.SUBMIT_EVIDENCE -> "MESSAGE_SUBMIT_EVIDENCE",
+    schema.constants.Messages.DEPOSIT -> "MESSAGE_DEPOSIT",
+    schema.constants.Messages.SUBMIT_PROPOSAL -> "MESSAGE_PROPOSAL",
+    schema.constants.Messages.VOTE -> "MESSAGE_VOTE",
+    schema.constants.Messages.UNJAIL -> "MESSAGE_UNJAIL",
+    schema.constants.Messages.CREATE_VALIDATOR -> "MESSAGE_CREATE_VALIDATOR",
+    schema.constants.Messages.EDIT_VALIDATOR -> "MESSAGE_EDIT_VALIDATOR",
+    schema.constants.Messages.DELEGATE -> "MESSAGE_DELEGATE",
+    schema.constants.Messages.REDELEGATE -> "MESSAGE_REDELEGATE",
+    schema.constants.Messages.UNDELEGATE -> "MESSAGE_UNBOND",
+    schema.constants.Messages.CREATE_CLIENT -> "MESSAGE_IBC_CREATE_CLIENT",
+    schema.constants.Messages.UPDATE_CLIENT -> "MESSAGE_IBC_UPDATE_CLIENT",
+    schema.constants.Messages.UPGRADE_CLIENT -> "MESSAGE_IBC_UPGRADE_CLIENT",
+    schema.constants.Messages.SUBMIT_MISBEHAVIOUR -> "MESSAGE_IBC_MISBEHAVIOUR",
+    schema.constants.Messages.CONNECTION_OPEN_INIT -> "MESSAGE_IBC_CONN_OPEN_INIT",
+    schema.constants.Messages.CONNECTION_OPEN_TRY -> "MESSAGE_IBC_CONN_OPEN_TRY",
+    schema.constants.Messages.CONNECTION_OPEN_ACK -> "MESSAGE_IBC_CONN_OPEN_ACK",
+    schema.constants.Messages.CONNECTION_OPEN_CONFIRM -> "MESSAGE_IBC_CONN_OPEN_CONFIRM",
+    schema.constants.Messages.CHANNEL_OPEN_INIT -> "MESSAGE_IBC_CHANNEL_OPEN_INIT",
+    schema.constants.Messages.CHANNEL_OPEN_TRY -> "MESSAGE_IBC_CHANNEL_OPEN_TRY",
+    schema.constants.Messages.CHANNEL_OPEN_ACK -> "MESSAGE_IBC_CHANNEL_OPEN_ACK",
+    schema.constants.Messages.CHANNEL_OPEN_CONFIRM -> "MESSAGE_IBC_CHANNEL_OPEN_CONFIRM",
+    schema.constants.Messages.CHANNEL_CLOSE_INIT -> "MESSAGE_IBC_CHANNEL_CLOSE_INIT",
+    schema.constants.Messages.CHANNEL_CLOSE_CONFIRM -> "MESSAGE_IBC_CHANNEL_CLOSE_CONFIRM",
+    schema.constants.Messages.RECV_PACKET -> "MESSAGE_IBC_RECV_PACKET",
+    schema.constants.Messages.TIMEOUT -> "MESSAGE_IBC_TIMEOUT",
+    schema.constants.Messages.TIMEOUT_ON_CLOSE -> "MESSAGE_IBC_TIMEOUT_ON_CLOSE",
+    schema.constants.Messages.ACKNOWLEDGEMENT -> "MESSAGE_IBC_ACKNOWLEDGEMENT",
+    schema.constants.Messages.TRANSFER -> "MESSAGE_IBC_TRANSFER",
+    //assets
+    schema.constants.Messages.ASSET_BURN -> "MESSAGE_ASSET_BURN",
+    schema.constants.Messages.ASSET_DEFINE -> "MESSAGE_ASSET_DEFINE",
+    schema.constants.Messages.ASSET_DEPUTIZE -> "MESSAGE_ASSET_DEPUTIZE",
+    schema.constants.Messages.ASSET_MINT -> "MESSAGE_ASSET_MINT",
+    schema.constants.Messages.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
+    schema.constants.Messages.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
+    schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
+    //identities
+    schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
+    schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
+    schema.constants.Messages.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
+    schema.constants.Messages.IDENTITY_MUTATE -> "MESSAGE_IDENTITY_MUTATE",
+    schema.constants.Messages.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
+    schema.constants.Messages.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",
+    schema.constants.Messages.IDENTITY_REVOKE -> "MESSAGE_IDENTITY_REVOKE",
+    schema.constants.Messages.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
+    //splits
+    schema.constants.Messages.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
+    schema.constants.Messages.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
+    schema.constants.Messages.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
+    //orders
+    schema.constants.Messages.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
+    schema.constants.Messages.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
+    schema.constants.Messages.ORDER_DEPUTIZE -> "MESSAGE_ORDER_DEPUTIZE",
+    schema.constants.Messages.ORDER_IMMEDIATE -> "MESSAGE_ORDER_IMMEDIATE",
+    schema.constants.Messages.ORDER_MAKE -> "MESSAGE_ORDER_MAKE",
+    schema.constants.Messages.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
+    schema.constants.Messages.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
+    schema.constants.Messages.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    //metas
+    schema.constants.Messages.META_REVEAL -> "MESSAGE_META_REVEAL",
   )
 
 }

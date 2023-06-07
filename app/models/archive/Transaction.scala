@@ -68,14 +68,6 @@ class Transactions @Inject()(
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
 
-  private val transactionsStatisticsBinWidth = configuration.get[Int]("statistics.transactions.binWidth")
-
-  private val transactionsStatisticsTotalBins = configuration.get[Int]("statistics.transactions.totalBins")
-
-  private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
-
-  private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
-
   import databaseConfig.profile.api._
 
   private[models] val transactionTable = TableQuery[TransactionTable]
@@ -128,7 +120,6 @@ class Transactions @Inject()(
 
   object Service {
     private var lastArchiveHeight = 0
-    private var setHeight = false
 
     def getLastArchiveHeight: Int = lastArchiveHeight
 
@@ -137,9 +128,8 @@ class Transactions @Inject()(
       addMultiple(transactions)
     }
 
-    def setLastArchiveHeight(value: Int): Unit = if (!setHeight) {
+    def setLastArchiveHeight(value: Int): Unit = {
       lastArchiveHeight = value
-      setHeight = true
     }
 
     def tryGet(hash: String): Future[Transaction] = tryGetTransactionByHash(hash)

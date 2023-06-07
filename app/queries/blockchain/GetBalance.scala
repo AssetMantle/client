@@ -1,9 +1,8 @@
 package queries.blockchain
 
 import exceptions.BaseException
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
 import queries.responses.blockchain.BalanceResponse.Response
 
 import java.net.ConnectException
@@ -17,9 +16,9 @@ class GetBalance @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val path = "cosmos/bank/v1beta1/balances"
+  private val path = "/cosmos/bank/v1beta1/balances/"
 
-  private val url = constants.Blockchain.RestEndPoint + "/" + path + "/"
+  private val url = constants.Blockchain.RestEndPoint + path
 
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 

@@ -1,10 +1,12 @@
 package schema.types
 
-import com.types.{Height => protoHeight}
+import com.assetmantle.schema.types.base.{Height => protoHeight}
 
 import java.nio.{ByteBuffer, ByteOrder}
 
 case class Height(value: Long) {
+
+  require(value >= -1, "INVALID_VALUE_FOR_HEIGHT")
 
   def AsString: String = this.value.toString
 

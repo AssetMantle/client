@@ -1,7 +1,7 @@
 package schema.qualified
 
-import com.lists.{PropertyList => protoPropertyList}
-import com.qualified.{Mutables => protoMutables}
+import com.assetmantle.schema.lists.base.{PropertyList => protoPropertyList}
+import com.assetmantle.schema.qualified.base.{Mutables => protoMutables}
 import schema.id.base.PropertyID
 import schema.list.PropertyList
 import schema.property.Property
@@ -19,6 +19,8 @@ case class Mutables(propertyList: PropertyList) {
   def asProtoMutables: protoMutables = protoMutables.newBuilder().setPropertyList(this.getProtoPropertyList).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoMutables.toByteString.toByteArray
+
+  def getTotalBondWeight: Int = this.propertyList.getTotalBondWeight
 
   def add(properties: Seq[Property]): Mutables = new Mutables(this.propertyList.add(properties))
 

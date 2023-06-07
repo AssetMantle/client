@@ -1,11 +1,13 @@
 package schema.id.base
 
-import com.ids.{AnyID, ClassificationID => protoClassificationID}
+import com.assetmantle.schema.ids.base.{AnyID, ClassificationID => protoClassificationID}
 import schema.id.ID
 
 case class ClassificationID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
+
+  def getType: StringID = schema.constants.ID.ClassificationIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 
@@ -21,4 +23,6 @@ object ClassificationID {
   def apply(anyID: protoClassificationID): ClassificationID = ClassificationID(HashID(anyID.getHashID))
 
   def apply(value: Array[Byte]): ClassificationID = ClassificationID(HashID(value))
+
+  def apply(value: String): ClassificationID = ClassificationID(HashID(utilities.Secrets.base64URLDecode(value)))
 }

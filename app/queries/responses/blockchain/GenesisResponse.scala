@@ -38,11 +38,11 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: AssetParameter = AssetParameter(
-        burnEnabled = baseSchemaData.BooleanData(this.parameterList.getMetaProperty("burnEnabled").getData.getProtoBytes).value,
-        mintEnabled = baseSchemaData.BooleanData(this.parameterList.getMetaProperty("mintEnabled").getData.getProtoBytes).value,
-        renumerateEnabled = baseSchemaData.BooleanData(this.parameterList.getMetaProperty("renumerateEnabled").getData.getProtoBytes).value)
+        burnEnabled = baseSchemaData.BooleanData(this.parameter_list.getMetaProperty("burnEnabled").getData.getProtoBytes).value,
+        mintEnabled = baseSchemaData.BooleanData(this.parameter_list.getMetaProperty("mintEnabled").getData.getProtoBytes).value,
+        renumerateEnabled = baseSchemaData.BooleanData(this.parameter_list.getMetaProperty("renumerateEnabled").getData.getProtoBytes).value)
     }
 
     implicit val metaReads: Reads[Module] = Json.reads[Module]
@@ -86,10 +86,10 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: ClassificationParameter = ClassificationParameter(
-        bondRate = baseSchemaData.NumberData(this.parameterList.getMetaProperty("bondRate").getData.getProtoBytes).value,
-        maxPropertyCount = baseSchemaData.NumberData(this.parameterList.getMetaProperty("maxPropertyCount").getData.getProtoBytes).value)
+        bondRate = baseSchemaData.NumberData(this.parameter_list.getMetaProperty("bondRate").getData.getProtoBytes).value,
+        maxPropertyCount = baseSchemaData.NumberData(this.parameter_list.getMetaProperty("maxPropertyCount").getData.getProtoBytes).value)
     }
 
     implicit val metaReads: Reads[Module] = Json.reads[Module]
@@ -124,9 +124,9 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: IdentityParameter = IdentityParameter(
-        maxProvisionAddressCount = baseSchemaData.NumberData(this.parameterList.getMetaProperty("maxProvisionAddressCount").getData.getProtoBytes).value)
+        maxProvisionAddressCount = baseSchemaData.NumberData(this.parameter_list.getMetaProperty("maxProvisionAddressCount").getData.getProtoBytes).value)
     }
 
     implicit val metaReads: Reads[Module] = Json.reads[Module]
@@ -137,9 +137,9 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: MaintainerParameter = MaintainerParameter(
-        deputizeAllowed = baseSchemaData.BooleanData(this.parameterList.getMetaProperty("deputizeAllowed").getData.getProtoBytes).value)
+        deputizeAllowed = baseSchemaData.BooleanData(this.parameter_list.getMetaProperty("deputizeAllowed").getData.getProtoBytes).value)
     }
 
     implicit val metaReads: Reads[Module] = Json.reads[Module]
@@ -152,9 +152,9 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: MetaParameter = MetaParameter(
-        revealEnabled = baseSchemaData.BooleanData(this.parameterList.getMetaProperty("revealEnabled").getData.getProtoBytes).value)
+        revealEnabled = baseSchemaData.BooleanData(this.parameter_list.getMetaProperty("revealEnabled").getData.getProtoBytes).value)
     }
 
 
@@ -178,9 +178,9 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: OrderParameter = OrderParameter(
-        maxOrderLife = baseSchemaData.HeightData(this.parameterList.getMetaProperty("maxOrderLife").getData.getProtoBytes).value.value)
+        maxOrderLife = baseSchemaData.HeightData(this.parameter_list.getMetaProperty("maxOrderLife").getData.getProtoBytes).value.value)
     }
 
     implicit val metaReads: Reads[Module] = Json.reads[Module]
@@ -199,7 +199,7 @@ object GenesisResponse {
 
     implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
 
-    case class Module(mappables: Seq[Mappable], parameterList: ParameterList) {
+    case class Module(mappables: Seq[Mappable], parameter_list: ParameterList) {
       def getParameter: SplitParameter = SplitParameter(
         wrapAllowedCoins = Seq("umntl")) //TODO: baseSchemaData.ListData(this.parameterList.getMetaProperty("wrapAllowedCoins").getData.getProtoBytes).getAbstractDataList.map(x => (baseSchemaData.IDData(x.getProtoBytes).getProtoBytes)))
     }

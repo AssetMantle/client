@@ -16,10 +16,16 @@
             <div id="accountTransactions" class="accountTransactions"></div>
         </div>
     </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
+            <div id="accountAuthorizations" class="switcherCard tableViewCard"></div>
+        </div>
+    </div>
 </div>
 <script>
     componentResource('accountWallet', jsRoutes.controllers.ComponentViewController.accountWallet('@address'));
     componentResource('accountDelegations', jsRoutes.controllers.ComponentViewController.accountDelegations('@address'));
     componentResource('accountTransactions', jsRoutes.controllers.ComponentViewController.accountTransactions('@address'));
+    componentResource('accountAuthorizations', jsRoutes.controllers.ComponentViewController.accountAuthorizations('@address'));
     checkAndPushState(jsRoutes.controllers.ViewController.wallet().url, '@address', "wallet");
 </script>

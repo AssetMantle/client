@@ -1,6 +1,6 @@
 package schema.property
 
-import com.properties.AnyProperty
+import com.assetmantle.schema.properties.base.AnyProperty
 import org.slf4j.{Logger, LoggerFactory}
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
@@ -23,6 +23,8 @@ abstract class Property {
 
   def getProtoBytes: Array[Byte]
 
+  def scrub(): MesaProperty
+
 }
 
 object Property {
@@ -34,6 +36,6 @@ object Property {
   def apply(anyProperty: AnyProperty): Property = anyProperty.getImplCase.getNumber match {
     case 1 => MesaProperty(anyProperty.getMesaProperty)
     case 2 => MetaProperty(anyProperty.getMetaProperty)
-    case _ => throw new IllegalArgumentException("INVALID_PROPERTY_TYPE")
+    case _ => throw new IllegalArgumentException("INVALID_PROPERTY_IMPL_CASE_NUMBER: " + anyProperty.getImplCase.getNumber.toString)
   }
 }
