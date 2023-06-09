@@ -111,7 +111,7 @@ function updateTransactionList(message) {
                     $('#transactionListPageItemTxHash_' + i).text(message.txs[numTxs - i].hash);
                     $('#transactionListPageItemTxMessageTypes_' + i).text(message.txs[numTxs - i].messageTypes);
                     $('#transactionListPageItemTxHeight_' + i).text(message.block.height);
-                    $('#transactionListPageItemTxStatusStatic_' + i).hide();
+                    $('#transactionListPageItemTxStatusStatic_' + i).show();
                     if (message.txs[numTxs - i].status) {
                         $('#transactionListPageItemTxStatusTrue_' + i).show();
                         $('#transactionListPageItemTxStatusFalse_' + i).hide();
@@ -125,7 +125,7 @@ function updateTransactionList(message) {
                         $('#transactionListPageItemTxHash_' + i).text(message.txs[i].hash);
                         $('#transactionListPageItemTxMessageTypes_' + i).text(message.txs[i].messageTypes);
                         $('#transactionListPageItemTxHeight_' + i).text(message.block.height);
-                        $('#transactionListPageItemTxStatusStatic_' + i).hide();
+                        $('#transactionListPageItemTxStatusStatic_' + i).show();
                         if (message.txs[i].status) {
                             $('#transactionListPageItemTxStatusTrue_' + i).show();
                             $('#transactionListPageItemTxStatusFalse_' + i).hide();
