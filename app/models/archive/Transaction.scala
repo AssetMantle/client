@@ -64,7 +64,7 @@ class Transactions @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION
+  private implicit val module: String = constants.Module.ARCHIVE_TRANSACTION
 
   private val transactionsPerPage = configuration.get[Int]("blockchain.transactions.perPage")
 

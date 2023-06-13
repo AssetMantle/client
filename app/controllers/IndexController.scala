@@ -11,16 +11,15 @@ import play.api.{Configuration, Logger}
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
-                                blockchainSplits: blockchain.Splits,
-                                blockchainClassifications: blockchain.Classifications,
-                                blockchainIdentities: blockchain.Identities,
+                                blockchainBlocks: blockchain.Blocks,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {

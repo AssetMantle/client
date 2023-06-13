@@ -46,7 +46,7 @@ class GetGov @Inject()()(implicit wsClient: WSClient, configuration: Configurati
         depositResponse <- depositResponse
         tallyingResponse <- tallyingResponse
       } yield votingResponse.copy(deposit_params = depositResponse.deposit_params, tally_params = tallyingResponse.tally_params)).recover {
-        case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+        case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       }
     }
   }

@@ -122,7 +122,10 @@ class Transactions @Inject()(
 
   private def getTransactionsByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.hash.inSet(hashes)).result)
 
-  private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = db.run(transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result)
+  private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = {
+    val a = transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result
+    db.run(a)
+  }
 
   private def getByHeightRange(start: Int, end: Int): Future[Seq[Transaction]] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).result)
 

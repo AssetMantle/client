@@ -30,7 +30,7 @@ class GetValidatorDelegatorDelegation @Inject()()(implicit wsClient: WSClient, c
   object Service {
 
     def get(delegatorAddress: String, validatorAddress: String): Future[Response] = action(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => if (DelegationNotFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
         Response(Delegation.Result(Delegation(delegator_address = delegatorAddress, validator_address = validatorAddress, shares = 0)))
       } else throw baseException

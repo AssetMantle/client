@@ -1,14 +1,13 @@
 package utilities
 
+import play.api.{Configuration, Logger}
+
 import java.io.{FileInputStream, FileOutputStream}
 import java.security.KeyStore
-import scala.concurrent.blocking
-import exceptions.BaseException
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import play.api.Logger
+import scala.concurrent.blocking
 
 @Singleton
 class KeyStore @Inject()(configuration: Configuration) {
@@ -36,7 +35,7 @@ class KeyStore @Inject()(configuration: Configuration) {
     new String(SecretKeyFactory.getInstance(secretKeyFactoryAlgorithm).getKeySpec(secretKeyEntry.getSecretKey, classOf[PBEKeySpec]).asInstanceOf[PBEKeySpec].getPassword)
   } catch {
     case exception: Exception => logger.error(exception.getMessage)
-      throw new BaseException(constants.Response.KEY_STORE_ERROR)
+      constants.Response.KEY_STORE_ERROR.throwBaseException(exception)
   }
 
   def setPassphrase(alias: String, aliasValue: String): Unit = blocking(this.synchronized(
@@ -50,7 +49,7 @@ class KeyStore @Inject()(configuration: Configuration) {
       ks.store(new FileOutputStream(keyStoreLocation), keyStorePassword.toCharArray)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.KEY_STORE_ERROR)
+        constants.Response.KEY_STORE_ERROR.throwBaseException(exception)
     }
   ))
 

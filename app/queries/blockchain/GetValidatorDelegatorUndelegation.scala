@@ -32,7 +32,7 @@ class GetValidatorDelegatorUndelegation @Inject()()(implicit wsClient: WSClient,
   object Service {
 
     def get(delegatorAddress: String, validatorAddress: String): Future[Response] = action(delegatorAddress = delegatorAddress, validatorAddress = validatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => if (UndelegationNotFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
         Response(Undelegation.Result(delegator_address = delegatorAddress, validator_address = validatorAddress, entries = Seq()))
       } else throw baseException

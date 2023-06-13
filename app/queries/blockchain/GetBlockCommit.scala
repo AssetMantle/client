@@ -1,9 +1,8 @@
 package queries.blockchain
 
 import exceptions.BaseException
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
 import queries.responses.blockchain.BlockCommitResponse.Response
 
 import java.net.ConnectException
@@ -25,10 +24,10 @@ class GetBlockCommit @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   object Service {
     def get(height: Int): Future[Response] = action(height).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => if (baseException.failure == constants.Response.JSON_UNMARSHALLING_ERROR) {
         logger.error(constants.Response.BLOCK_QUERY_FAILED.logMessage + ": " + height)
-        throw new BaseException(constants.Response.BLOCK_QUERY_FAILED, baseException)
+        constants.Response.BLOCK_QUERY_FAILED.throwBaseException()
       } else throw baseException
     }
   }

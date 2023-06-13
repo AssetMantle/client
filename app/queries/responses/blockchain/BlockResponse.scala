@@ -1,6 +1,5 @@
 package queries.responses.blockchain
 
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
@@ -39,7 +38,7 @@ object BlockResponse {
   def tendermintEvidenceApply(evidenceType: String, value: JsObject): TendermintEvidence = evidenceType match {
     case constants.Blockchain.Tendermint.DuplicateVoteEvidence => utilities.JSON.convertJsonStringToObject[DuplicateVoteEvidence](value.toString)
     case constants.Blockchain.Tendermint.LightClientAttackEvidence => utilities.JSON.convertJsonStringToObject[LightClientAttackEvidence](value.toString)
-    case _ => throw new BaseException(constants.Response.UNKNOWN_TENDERMINT_EVIDENCE_TYPE)
+    case _ => constants.Response.UNKNOWN_TENDERMINT_EVIDENCE_TYPE.throwBaseException()
   }
 
   case class Evidence(evidence: Seq[TendermintEvidence])

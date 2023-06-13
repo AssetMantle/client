@@ -28,7 +28,7 @@ class GetProposalDeposit @Inject()()(implicit wsClient: WSClient, configuration:
   object Service {
 
     def get(id: String, address: String): Future[Response] = action(id = id, address = address).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

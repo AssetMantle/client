@@ -8,7 +8,6 @@ import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
-import queries.responses.blockchain.ABCIInfoResponse.{Response => ABCIInfoResponse}
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
@@ -122,7 +121,7 @@ class Startup @Inject()(
       ).recover {
       case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.NO_RESPONSE, exception)
+        constants.Response.NO_RESPONSE.throwBaseException(exception)
     }
   }
 
@@ -351,7 +350,7 @@ class Startup @Inject()(
 
       def latestExplorerBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
 
-      def checkAndInsertBlock(abciInfo: ABCIInfoResponse, latestExplorerBlockHeight: Int) = if (latestExplorerBlockHeight == 0) {
+      def checkAndInsertBlock(latestChainHeight: Int, latestExplorerBlockHeight: Int) = if (latestExplorerBlockHeight == 0) {
         for {
           _ <- onGenesis()
           _ <- insertBlock(blockchainStartHeight)
@@ -361,8 +360,13 @@ class Startup @Inject()(
 
         val updateBlockHeight = latestExplorerBlockHeight + 1
 
-        val processBlock = if (abciInfo.result.response.last_block_height.toInt > updateBlockHeight) insertBlock(updateBlockHeight)
-        else Future()
+        val processBlock = if (latestChainHeight > updateBlockHeight) {
+          for {
+            _ <- insertBlock(updateBlockHeight)
+          } yield {
+            if (latestChainHeight - latestExplorerBlockHeight > 10) blocksServices.setSyncing(true) else blocksServices.setSyncing(false)
+          }
+        } else Future()
 
         for {
           _ <- archive
@@ -373,7 +377,7 @@ class Startup @Inject()(
       val forComplete = (for {
         abciInfo <- abciInfo
         latestExplorerBlockHeight <- latestExplorerBlockHeight
-        _ <- checkAndInsertBlock(abciInfo, latestExplorerBlockHeight)
+        _ <- checkAndInsertBlock(abciInfo.result.response.last_block_height.toInt, latestExplorerBlockHeight)
       } yield ()
         ).recover {
         case baseException: BaseException => if (baseException.failure == constants.Response.CONNECT_EXCEPTION) {

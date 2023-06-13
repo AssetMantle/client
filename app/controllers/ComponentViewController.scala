@@ -178,6 +178,8 @@ class ComponentViewController @Inject()(
         } yield Ok(views.html.component.blockchain.latestBlockHeight(blockHeight = latestBlock.height, proposer = proposer, time = latestBlock.time, averageBlockTime = averageBlockTime))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
+          case exception: Exception => logger.error(exception.getLocalizedMessage, exception)
+            InternalServerError(exception.getLocalizedMessage)
         }
     }
   }
@@ -298,7 +300,7 @@ class ComponentViewController @Inject()(
 
         def getValidatorsDelegated(operatorAddresses: Seq[String]): Future[Seq[Validator]] = blockchainValidators.Service.getByOperatorAddresses(operatorAddresses)
 
-        def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(constants.Blockchain.StakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))(_.getTokensFromShares(x.shares))).sum)
+        def getDelegatedAmount(delegations: Seq[Delegation], validators: Seq[Validator]): Coin = Coin(constants.Blockchain.StakingDenom, delegations.map(x => validators.find(_.operatorAddress == x.validatorAddress).fold(constants.Response.VALIDATOR_NOT_FOUND.throwBaseException())(_.getTokensFromShares(x.shares))).sum)
 
         def getUndelegatingAmount(undelegations: Seq[Undelegation]): Coin = Coin(constants.Blockchain.StakingDenom, undelegations.map(_.entries.map(_.balance).sum).sum)
 
@@ -421,7 +423,7 @@ class ComponentViewController @Inject()(
 
         def getProposers(blocks: Seq[Block], validators: Seq[Validator]): Future[Map[Int, String]] = Future {
           blocks.map { block =>
-            val validator = validators.find(_.hexAddress == block.proposerAddress).getOrElse(throw new BaseException(constants.Response.VALIDATOR_NOT_FOUND))
+            val validator = validators.find(_.hexAddress == block.proposerAddress).getOrElse(constants.Response.VALIDATOR_NOT_FOUND.throwBaseException())
             block.height -> validator.description.moniker
           }.toMap
         }

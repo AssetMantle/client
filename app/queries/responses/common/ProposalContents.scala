@@ -1,10 +1,8 @@
 package queries.responses.common
 
-import exceptions.BaseException
 import models.common.{ProposalContents => SerializableProposalContents}
 import play.api.Logger
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.ProposalContent
 import utilities.Date.RFC3339
 
@@ -71,7 +69,7 @@ object ProposalContents {
     case constants.Blockchain.Proposal.PARAMETER_CHANGE => utilities.JSON.convertJsonStringToObject[ParameterChange](value.toString)
     case constants.Blockchain.Proposal.TEXT => utilities.JSON.convertJsonStringToObject[Text](value.toString)
     case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => utilities.JSON.convertJsonStringToObject[CommunityPoolSpend](value.toString)
-    case _ => throw new BaseException(constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE)
+    case _ => constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE.throwBaseException()
   }
 
 }

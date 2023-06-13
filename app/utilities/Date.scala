@@ -1,7 +1,6 @@
 package utilities
 
 import com.google.protobuf.{Timestamp => protoTimestamp}
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 
@@ -40,7 +39,7 @@ object Date {
       case "s" => time.dropRight(1).toLong
       case "m" => 60 * time.dropRight(1).toLong
       case "h" => 60 * 60 * time.dropRight(1).toLong
-      case _ => throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+      case _ => constants.Response.DATE_FORMAT_ERROR.throwBaseException()
     }
   }
 
@@ -70,14 +69,14 @@ object Date {
       this.zonedDateTime.isAfter(that.zonedDateTime)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+        constants.Response.DATE_FORMAT_ERROR.throwBaseException(exception)
     }
 
     def isBefore(that: RFC3339): Boolean = try {
       this.zonedDateTime.isBefore(that.zonedDateTime)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+        constants.Response.DATE_FORMAT_ERROR.throwBaseException(exception)
     }
 
     def isEqual(that: RFC3339): Boolean = this.zonedDateTime.isEqual(that.zonedDateTime)
@@ -88,7 +87,7 @@ object Date {
       thisTime.isEqual(thatTime) || thisTime.isAfter(thatTime)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+        constants.Response.DATE_FORMAT_ERROR.throwBaseException(exception)
     }
 
     def isBeforeOrEqual(that: RFC3339): Boolean = try {
@@ -97,21 +96,21 @@ object Date {
       thisTime.isEqual(thatTime) || thisTime.isBefore(thatTime)
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+        constants.Response.DATE_FORMAT_ERROR.throwBaseException(exception)
     }
 
     def addEpoch(epoch: Long): RFC3339 = try {
       RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.epoch + epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
     } catch {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
-        throw new BaseException(constants.Response.INVALID_DATA_TYPE)
+        constants.Response.INVALID_DATA_TYPE.throwBaseException(exception)
     }
 
     def add(that: RFC3339): RFC3339 = try {
       RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(this.epoch + that.epoch), ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME))
     } catch {
       case exception: Exception => logger.error(exception.getMessage)
-        throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+        constants.Response.DATE_FORMAT_ERROR.throwBaseException(exception)
     }
 
     def difference(that: RFC3339): Duration = Duration.between(this.zonedDateTime, that.zonedDateTime)
@@ -122,7 +121,7 @@ object Date {
 
   object RFC3339 {
 
-    def apply(value: String): RFC3339 = if (isValidRFC3339(value)) new RFC3339(value) else throw new BaseException(constants.Response.DATE_FORMAT_ERROR)
+    def apply(value: String): RFC3339 = if (isValidRFC3339(value)) new RFC3339(value) else constants.Response.DATE_FORMAT_ERROR.throwBaseException()
 
     def apply(value: Long): RFC3339 = new RFC3339(ZonedDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.of("UTC")).toString)
 

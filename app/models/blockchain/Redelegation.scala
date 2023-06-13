@@ -143,11 +143,11 @@ class Redelegations @Inject()(
     def onRedelegation(redelegate: stakingTx.MsgBeginRedelegate)(implicit header: Header): Future[String] = {
       val redelegationResponse = getDelegatorRedelegations.Service.getWithSourceAndDestinationValidator(delegatorAddress = redelegate.getDelegatorAddress, sourceValidatorAddress = redelegate.getValidatorSrcAddress, destinationValidatorAddress = redelegate.getValidatorDstAddress)
       val updateSrcValidatorDelegation = blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = redelegate.getDelegatorAddress, validatorAddress = redelegate.getValidatorSrcAddress)
-      val updateDstValidatorDelegation = blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = redelegate.getDelegatorAddress, validatorAddress = redelegate.getValidatorSrcAddress)
+      val updateDstValidatorDelegation = blockchainDelegations.Utility.upsertOrDelete(delegatorAddress = redelegate.getDelegatorAddress, validatorAddress = redelegate.getValidatorDstAddress)
       val withdrawAddressBalanceUpdate = blockchainWithdrawAddresses.Utility.withdrawRewards(redelegate.getDelegatorAddress)
       val updateValidators = {
         val updateSrcValidatorResponse = blockchainValidators.Utility.insertOrUpdateValidator(redelegate.getValidatorSrcAddress)
-        val updateDstValidatorResponse = blockchainValidators.Utility.insertOrUpdateValidator(redelegate.getValidatorSrcAddress)
+        val updateDstValidatorResponse = blockchainValidators.Utility.insertOrUpdateValidator(redelegate.getValidatorDstAddress)
         for {
           _ <- updateSrcValidatorResponse
           _ <- updateDstValidatorResponse

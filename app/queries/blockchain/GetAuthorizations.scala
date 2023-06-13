@@ -27,7 +27,7 @@ class GetAuthorizations @Inject()()(implicit wsClient: WSClient, configuration: 
   object Service {
 
     def get(grantee: String, granter: String): Future[Response] = action(grantee = grantee, granter = granter).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

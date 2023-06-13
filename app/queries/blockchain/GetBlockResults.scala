@@ -26,7 +26,7 @@ class GetBlockResults @Inject()()(implicit wsClient: WSClient, configuration: Co
   object Service {
 
     def get(height: Int): Future[Response] = action(height).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

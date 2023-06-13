@@ -25,7 +25,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
   object Service {
 
     def get(address: String): Future[Response] = action(address).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 
