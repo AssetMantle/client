@@ -3,30 +3,44 @@
 @import views.html.base.infos._
 @import views.html.component.blockchain.txMessages.common._
 @import views.html.base.cards.commonCard
+@import views.html.base.cards._
 
 @(id: String, document: Option[Document], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="cmuk-container cmuk-margin-bottom">
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
-            <div id="documentDetails">
+            <div id="documentDetails" class="tableViewCard tableCard">
             @commonCard(constants.View.DOCUMENT) {
                 @Messages(documentType)
             } {
                 @if(document.isDefined) {
-                    @commonTextInfo(constants.View.ID, id)
-                    @commonTextInfo(constants.View.CLASSIFICATION_ID, document.get.classificationID.asString)
-                    <br>
-                    @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
+                    @commonTable(id = "documentDetail", tableType = "cmuk-table-divider") {
+                    } {
+                        <tr>
+                            <td>
+                                <div class="tableField">
+                                    <div class="tableFieldTitle">@Messages(constants.View.ID)</div>
+                                    <div class="tableFieldValue">@id</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="tableField">
+                                    <div class="tableFieldTitle">@Messages(constants.View.CLASSIFICATION_ID)</div>
+                                    <div class="tableFieldValue">@document.get.classificationID.asString</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_META_PROPERTIES):</span>
                     @metaProperties(PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
-                    <br>
-                    @Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):
+                    <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):</span>
                     @mesaProperties(PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
-                    <br>
-                    @Messages(constants.View.MUTABLE_META_PROPERTIES):
+                    <span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
                     @metaProperties(PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
-                    <br>
-                    @Messages(constants.View.MUTABLE_MESA_PROPERTIES):
+                    <span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
                     @mesaProperties(PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
                 } else {
                     @Messages(constants.View.DOCUMENT_NOT_FOUND)
