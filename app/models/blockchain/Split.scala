@@ -2,7 +2,7 @@ package models.blockchain
 
 import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 import models.common.Serializable.Coin
-import models.traits.{Entity2, GenericDaoImpl2, Logging, ModelTable2}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.id.OwnableID
@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
-  def serialize: Splits.SplitSerialized = Splits.SplitSerialized(
+  def serialize: SplitSerialized = SplitSerialized(
     ownerID = this.ownerID,
     ownableID = this.ownableID,
     protoOwnableID = this.protoOwnableID,
@@ -28,33 +28,29 @@ case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: A
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-object Splits {
+case class SplitSerialized(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
 
-  case class SplitSerialized(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
+  def id1: Array[Byte] = this.ownerID
 
-    def id1: Array[Byte] = this.ownerID
+  def id2: Array[Byte] = this.ownableID
 
-    def id2: Array[Byte] = this.ownableID
+  def deserialize: Split = Split(
+    ownerID = this.ownerID,
+    ownableID = this.ownableID,
+    protoOwnableID = this.protoOwnableID,
+    ownerIDString = this.ownerIDString,
+    ownableIDString = this.ownableIDString,
+    value = this.value.toBigInt,
+    createdBy = this.createdBy,
+    createdOnMillisEpoch = this.createdOnMillisEpoch,
+    updatedBy = this.updatedBy,
+    updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 
-    def deserialize: Split = Split(
-      ownerID = this.ownerID,
-      ownableID = this.ownableID,
-      protoOwnableID = this.protoOwnableID,
-      ownerIDString = this.ownerIDString,
-      ownableIDString = this.ownableIDString,
-      value = this.value.toBigInt,
-      createdBy = this.createdBy,
-      createdOnMillisEpoch = this.createdOnMillisEpoch,
-      updatedBy = this.updatedBy,
-      updatedOnMillisEpoch = this.updatedOnMillisEpoch)
+}
 
-  }
+private[blockchain] object Splits {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_SPLIT
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[SplitSerialized](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
+  class SplitTable(tag: Tag) extends Table[SplitSerialized](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
 
     def * = (ownerID, ownableID, protoOwnableID, ownerIDString, ownableIDString, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SplitSerialized.tupled, SplitSerialized.unapply)
 
@@ -83,28 +79,26 @@ object Splits {
     def id2 = ownableID
 
   }
-
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Splits @Inject()(
                         blockchainBalances: Balances,
                         utilitiesOperations: utilities.Operations,
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl2[Splits.DataTable, Splits.SplitSerialized, Array[Byte], Array[Byte]](
-    databaseConfigProvider,
-    Splits.TableQuery,
-    executionContext,
-    Splits.module,
-    Splits.logger
-  ) {
-  object Service {
-    def insertOrUpdate(split: Split): Future[Unit] = upsert(split.serialize)
+                        protected val dbConfigProvider: DatabaseConfigProvider,
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl2[Splits.SplitTable, SplitSerialized, Array[Byte], Array[Byte]]() {
 
-    def add(splits: Seq[Split]): Future[Unit] = create(splits.map(_.serialize))
+  implicit val module: String = constants.Module.BLOCKCHAIN_SPLIT
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Splits.SplitTable(tag))
+
+  object Service {
+    def insertOrUpdate(split: Split): Future[Int] = upsert(split.serialize)
+
+    def add(splits: Seq[Split]): Future[Int] = create(splits.map(_.serialize))
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes).map(_.map(_.deserialize))
 

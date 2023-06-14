@@ -1,7 +1,7 @@
 package models.blockchain
 
 import com.assetmantle.modules.identities.{transactions => identityTransactions}
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.Data
@@ -53,13 +53,9 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
 
 }
 
-object Identities {
+private[blockchain] object Identities {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
+  class IdentityTable(tag: Tag) extends Table[Identity](tag, "Identity") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Identity.tupled, Identity.unapply)
 
@@ -82,32 +78,29 @@ object Identities {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Identities @Inject()(
                             blockchainMaintainers: Maintainers,
                             blockchainClassifications: Classifications,
-                            protected val databaseConfigProvider: DatabaseConfigProvider
-                          )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Identities.DataTable, Identity, Array[Byte]](
-    databaseConfigProvider,
-    Identities.TableQuery,
-    executionContext,
-    Identities.module,
-    Identities.logger
-  ) {
+                            protected val dbConfigProvider: DatabaseConfigProvider
+                          )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Identities.IdentityTable, Identity, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_IDENTITY
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Identities.IdentityTable(tag))
 
   object Service {
 
-    def add(identity: Identity): Future[String] = create(identity).map(x => utilities.Secrets.base64URLEncoder(x))
+    def add(identity: Identity): Future[Identity] = create(identity)
 
-    def add(identities: Seq[Identity]): Future[Unit] = create(identities)
+    def add(identities: Seq[Identity]): Future[Int] = create(identities)
 
-    def insertOrUpdate(identity: Identity): Future[Unit] = upsert(identity)
+    def insertOrUpdate(identity: Identity): Future[Int] = upsert(identity)
 
     def get(id: String): Future[Option[Identity]] = getById(utilities.Secrets.base64URLDecode(id))
 

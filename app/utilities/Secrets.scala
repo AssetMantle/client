@@ -1,6 +1,5 @@
 package utilities
 
-import exceptions.BaseException
 import play.api.Logger
 import sun.nio.cs.ISO_8859_1
 

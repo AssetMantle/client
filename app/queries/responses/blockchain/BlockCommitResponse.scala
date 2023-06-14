@@ -1,6 +1,5 @@
 package queries.responses.blockchain
 
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
@@ -26,7 +25,7 @@ object BlockCommitResponse {
         case v: JsObject => Some(utilities.JSON.convertJsonStringToObject[Signature](v.toString))
       }
     } catch {
-      case baseException: BaseException => throw baseException
+      case exception: Exception => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(exception)
     }
     Commit(height, signaturesList)
   }

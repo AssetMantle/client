@@ -1,6 +1,5 @@
 package utilities
 
-import exceptions.BaseException
 import org.bitcoinj.core.ECKey
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.{ECDomainParameters, ECPublicKeyParameters}
@@ -90,7 +89,6 @@ object Crypto {
       signer.init(false, pubKeyParams)
       signer.verifySignature(data, getR(signature), getS(signature))
     } catch {
-      case baseException: BaseException => throw baseException
       case exception: Exception => constants.Response.INVALID_SIGNATURE.throwBaseException(exception)
     }
   }

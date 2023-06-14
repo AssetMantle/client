@@ -184,12 +184,10 @@ class Redelegations @Inject()(
         else Service.insertOrUpdate(redelegation.copy(entries = updatedEntries))
       }
 
-      (for {
+      for {
         redelegation <- redelegation
         _ <- updateOrDelete(redelegation)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
 
     def slashRedelegation(redelegation: Redelegation, infractionHeight: Int, currentBlockTIme: RFC3339, slashingFraction: BigDecimal): Future[MicroNumber] = {

@@ -8,17 +8,19 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import queries.blockchain._
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
+                                getBlockResults: GetBlockResults,
+                                getProposalDeposit: GetProposalDeposit,
                                 blockchainBlocks: blockchain.Blocks,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,

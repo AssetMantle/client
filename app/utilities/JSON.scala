@@ -13,14 +13,17 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object JSON {
 
+  private def logJsonError(jsonString: String, jsErrors: JsError*)(implicit module: String, logger: Logger): Unit = {
+    jsErrors.foreach(jsError => logger.error(s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"))
+    logger.error(jsonString)
+  }
+
   def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads: Reads[T]): Future[T] = {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case jsError: JsError =>
-          val error = s"JSON_PARSE_ERROR: ${jsError.errors.zipWithIndex.map { case (x, index) => s"[${index}] ${x._1}: ${x._2.map(_.message).mkString(",")}" }.mkString("; ")}"
-          logger.error(error)
-          throw new BaseException(new Failure(response.json.toString()))
+        case jsError: JsError => logJsonError(response.json.toString(), jsError)
+          new Failure(response.json.toString()).throwBaseException()
       }
     }.recover {
       case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
@@ -28,6 +31,7 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      // Here we need to throw baseException before any general exception
       case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
@@ -38,9 +42,7 @@ object JSON {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case errors: JsError =>
-          logger.error(errors.errors.map(_.toString()).mkString(", "))
-          logger.error(jsonString)
+        case jsError: JsError => logJsonError(jsonString, jsError)
           constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
       }
     } catch {
@@ -51,6 +53,7 @@ object JSON {
       case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
         logger.error("Check order of case class definitions")
         constants.Response.NULL_POINTER_EXCEPTION.throwBaseException()
+      // Here we need to throw baseException before any general exception
       case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)

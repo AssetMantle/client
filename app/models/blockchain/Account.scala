@@ -107,7 +107,7 @@ class Accounts @Inject()(
   object Utility {
 
     def onCreateVestingAccount(createVestingAccount: MsgCreateVestingAccount)(implicit header: Header): Future[String] = {
-      val insert = insertOrUpdateAccountWithoutAnyTx(createVestingAccount.getToAddress)
+      val insert = insertOrUpdateAccount(createVestingAccount.getToAddress)
       val insertBalance = blockchainBalances.Utility.insertOrUpdateBalance(createVestingAccount.getToAddress)
 
       (for {
@@ -119,47 +119,15 @@ class Accounts @Inject()(
       }
     }
 
-    def insertOrUpdateAccountWithoutAnyTx(address: String): Future[Unit] = {
+    def insertOrUpdateAccount(address: String): Future[Unit] = {
       val accountResponse = getAccount.Service.get(address)
-      val bcAccount = Service.get(address)
 
-      def upsert(accountResponse: AccountResponse, bcAccount: Option[Account]) = Service.insertOrUpdate(accountResponse.account.toSerializableAccount.copy(sequence = 0))
+      def upsert(accountResponse: AccountResponse) = Service.insertOrUpdate(accountResponse.account.toSerializableAccount)
 
-      (for {
+      for {
         accountResponse <- accountResponse
-        bcAccount <- bcAccount
-        _ <- upsert(accountResponse, bcAccount)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
-    }
-
-    def incrementSequence(address: String): Future[Unit] = {
-      val bcAccount = Service.get(address)
-
-      def getUpdatedAccount(bcAccount: Option[Account]): Future[Account] = bcAccount.fold {
-        val accountResponse = getAccount.Service.get(address)
-        for {
-          accountResponse <- accountResponse
-        } yield accountResponse.account.toSerializableAccount.copy(sequence = 1)
-      }(account => {
-        if (account.accountNumber == -1) {
-          val accountResponse = getAccount.Service.get(address)
-          for {
-            accountResponse <- accountResponse
-          } yield accountResponse.account.toSerializableAccount
-        } else Future(account.copy(sequence = account.sequence + 1))
-      })
-
-      def update(account: Account) = Service.insertOrUpdate(account)
-
-      (for {
-        bcAccount <- bcAccount
-        updatedAccount <- getUpdatedAccount(bcAccount)
-        _ <- update(updatedAccount)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+        _ <- upsert(accountResponse)
+      } yield ()
     }
   }
 }

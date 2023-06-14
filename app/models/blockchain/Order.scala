@@ -1,7 +1,7 @@
 package models.blockchain
 
 import com.assetmantle.modules.orders.{transactions => ordersTransactions}
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import queries.responses.common.Header
@@ -70,13 +70,8 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 }
 
-object Orders {
-
-  implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
+private[blockchain] object Orders {
+  class OrderTable(tag: Tag) extends Table[Order](tag, "Order") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Order.tupled, Order.unapply)
 
@@ -99,9 +94,6 @@ object Orders {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
@@ -110,21 +102,21 @@ class Orders @Inject()(
                         blockchainMaintainers: Maintainers,
                         blockchainSplits: Splits,
                         utilitiesOperations: utilities.Operations,
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Orders.DataTable, Order, Array[Byte]](
-    databaseConfigProvider,
-    Orders.TableQuery,
-    executionContext,
-    Orders.module,
-    Orders.logger
-  ) {
+                        protected val dbConfigProvider: DatabaseConfigProvider
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Orders.OrderTable, Order, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Orders.OrderTable(tag))
 
   object Service {
 
-    def add(order: Order): Future[String] = create(order).map(x => utilities.Secrets.base64URLEncoder(x))
+    def add(order: Order): Future[String] = create(order).map(_.idString)
 
-    def add(orders: Seq[Order]): Future[Unit] = create(orders)
+    def add(orders: Seq[Order]): Future[Int] = create(orders)
 
     def get(id: String): Future[Option[Order]] = getById(utilities.Secrets.base64URLDecode(id))
 

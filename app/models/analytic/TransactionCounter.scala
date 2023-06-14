@@ -102,13 +102,11 @@ class TransactionCounters @Inject()(
         }
       } else Future(statisticsData)
 
-      (for {
+      for {
         data <- data
       } yield data.map { case (key, value) =>
         val dates = key.split("/")
         Seq(dates(2), dates(1)).mkString("/") -> value
-      }).recover {
-        case baseException: BaseException => throw baseException
       }
     }
   }

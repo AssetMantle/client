@@ -43,7 +43,7 @@ class Parameters @Inject()(
 
   import databaseConfig.profile.api._
 
-  private[models] val parameterTable = TableQuery[ParameterTable]
+  val parameterTable = TableQuery[ParameterTable]
 
   case class ParameterSerialized(parameterType: String, value: String, createdBy: Option[String], createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) {
     def deserialize: Parameter = Parameter(parameterType = parameterType, value = utilities.JSON.convertJsonStringToObject[abstractParameter](value), createdBy = createdBy, createdOnMillisEpoch = createdOnMillisEpoch, updatedBy = updatedBy, updatedOnMillisEpoch = updatedOnMillisEpoch)
@@ -74,7 +74,7 @@ class Parameters @Inject()(
 
   private def getAllParameters: Future[Seq[ParameterSerialized]] = db.run(parameterTable.result)
 
-  private[models] class ParameterTable(tag: Tag) extends Table[ParameterSerialized](tag, "Parameter") {
+  class ParameterTable(tag: Tag) extends Table[ParameterSerialized](tag, "Parameter") {
 
     def * = (parameterType, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ParameterSerialized.tupled, ParameterSerialized.unapply)
 
@@ -179,11 +179,9 @@ class Parameters @Inject()(
         } yield ()
       })
 
-      (for {
+      for {
         _ <- update
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
   }
 

@@ -107,8 +107,7 @@ class Balances @Inject()(
 
     def onSendCoin(sendCoin: bankTx.MsgSend)(implicit header: Header): Future[String] = {
       val fromAccount = insertOrUpdateBalance(sendCoin.getFromAddress)
-
-      def toAccount = insertOrUpdateBalance(sendCoin.getToAddress)
+      val toAccount = insertOrUpdateBalance(sendCoin.getToAddress)
 
       (for {
         _ <- fromAccount
@@ -229,12 +228,10 @@ class Balances @Inject()(
     //        Service.insertOrUpdate(Balance(address = toAddress, coins = utilities.Blockchain.addCoins(old.coins, addCoins)))
     //      })
     //
-    //      (for {
+    //      for {
     //        oldBalance <- oldBalance
     //        _ <- upsert(oldBalance)
-    //      } yield ()).recover {
-    //        case baseException: BaseException => throw baseException
-    //      }
+    //      } yield ()
     //    }
 
     def insertOrUpdateBalance(address: String): Future[Unit] = {
@@ -242,12 +239,10 @@ class Balances @Inject()(
 
       def upsert(balanceResponse: BalanceResponse) = Service.insertOrUpdate(Balance(address = address, coins = balanceResponse.balances.map(_.toCoin)))
 
-      (for {
+      for {
         balanceResponse <- balanceResponse
         _ <- upsert(balanceResponse)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
   }
 

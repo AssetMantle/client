@@ -22,9 +22,8 @@ import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
 import exceptions.BaseException
-import models.blockchain.{FeeGrant, Proposal, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
+import models.blockchain.{FeeGrant, Redelegation, Undelegation, Validator, Transaction => blockchainTransaction}
 import models.common.Parameters.SlashingParameter
-import models.common.ProposalContents.ParameterChange
 import models.{analytic, blockchain, masterTransaction}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.{Configuration, Logger}
@@ -32,7 +31,6 @@ import queries.blockchain._
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResponse.{Response => BlockResponse}
 import queries.responses.blockchain.TransactionByHeightResponse.{Response => TransactionByHeightResponse, Tx => TransactionByHeightResponseTx}
-import queries.responses.common.ProposalContents.CommunityPoolSpend
 import queries.responses.common.{Event, Header}
 import utilities.Date.RFC3339
 import utilities.MicroNumber
@@ -96,15 +94,12 @@ class Block @Inject()(
   def insertOnBlock(height: Int): Future[BlockCommitResponse] = {
     val blockCommitResponse = getBlockCommit.Service.get(height)
 
-    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Unit] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address))
+    def insertBlock(blockCommitResponse: BlockCommitResponse): Future[Int] = blockchainBlocks.Service.insertOrUpdate(height = blockCommitResponse.result.signed_header.header.height, time = blockCommitResponse.result.signed_header.header.time, proposerAddress = blockCommitResponse.result.signed_header.header.proposer_address, validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address))
 
-    (for {
+    for {
       blockCommitResponse <- blockCommitResponse
       _ <- insertBlock(blockCommitResponse)
     } yield blockCommitResponse
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   }
 
   def insertTransactionsOnBlock(header: Header): Future[Seq[blockchainTransaction]] = {
@@ -170,14 +165,11 @@ class Block @Inject()(
     // Slashing BeginBlocker is handled via Events
     // Staking Unbonding and Redelegation Completion EndBlocker is handled via Events
 
-    (for {
+    for {
       _ <- tokens
       _ <- orders
       _ <- validators
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   }
 
   def sendNewBlockWebSocketMessage(blockCommitResponse: BlockCommitResponse, transactions: Seq[blockchainTransaction], averageBlockTime: Double): Future[Unit] = {
@@ -198,20 +190,17 @@ class Block @Inject()(
       validators = blockCommitResponse.result.signed_header.commit.signatures.flatten.map(_.validator_address)
     )
 
-    (for {
+    for {
       proposer <- proposer
     } yield actors.Service.appWebSocketActor ! getWebSocketNewBlock(proposer)
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   }
 
   def actionsOnTransactions(transactions: Seq[blockchainTransaction])(implicit header: Header): Future[Seq[Unit]] = utilitiesOperations.traverse(transactions) { transaction =>
     val signers = if (transaction.status) utilitiesOperations.traverse(transaction.getMessages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg)) else Future(Seq())
-    val updateAccount = blockchainAccounts.Utility.incrementSequence(transaction.getSigners.head)
+    val updateAccount = blockchainAccounts.Utility.insertOrUpdateAccount(transaction.getSigners.head)
 
     // Should always be called after messages are processed, otherwise can create conflict
-    def deductFees = {
+    def deductFees = if (!transaction.getMessages.map(_.getTypeUrl).contains(schema.constants.Messages.SEND_COIN)) {
       val deductFeesFrom = if (transaction.getFeeGranter != "") {
         val grantee = transaction.getFeePayer
         val feeGrant = blockchainFeeGrants.Service.tryGet(granter = transaction.getFeeGranter, grantee = grantee)
@@ -234,15 +223,13 @@ class Block @Inject()(
         deductFeesFrom <- deductFeesFrom
         _ <- updateBalance(deductFeesFrom)
       } yield ()
-    }
+    } else Future()
 
-    (for {
+    for {
       _ <- signers
       _ <- updateAccount
       _ <- deductFees
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 
   def actionOnTxMessages(stdMsg: protoAny)(implicit header: Header): Future[String] = {
@@ -280,7 +267,8 @@ class Block @Inject()(
       case schema.constants.Messages.FEE_REVOKE_ALLOWANCE => blockchainFeeGrants.Utility.onFeeRevokeAllowance(feegrantTx.MsgRevokeAllowance.parseFrom(stdMsg.getValue))
       //gov
       case schema.constants.Messages.DEPOSIT => blockchainProposalDeposits.Utility.onDeposit(govTx.MsgDeposit.parseFrom(stdMsg.getValue))
-      case schema.constants.Messages.SUBMIT_PROPOSAL => blockchainProposals.Utility.onSubmitProposal(govTx.MsgSubmitProposal.parseFrom(stdMsg.getValue))
+      // Handled via events. Update balance
+      case schema.constants.Messages.SUBMIT_PROPOSAL => Future(govTx.MsgSubmitProposal.parseFrom(stdMsg.getValue).getProposer)
       case schema.constants.Messages.VOTE => blockchainProposalVotes.Utility.onVote(govTx.MsgVote.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.WEIGHTED_VOTE => blockchainProposalVotes.Utility.onWeightedVote(govTx.MsgVoteWeighted.parseFrom(stdMsg.getValue))
       //slashing
@@ -366,13 +354,13 @@ class Block @Inject()(
     def update(blockResponse: BlockResponse, slashingParameter: SlashingParameter): Future[Map[String, String]] = {
       val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == constants.Blockchain.Event.Attribute.Reason))) { slashingEvent =>
         slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
-          val slashingReason = Future(slashingReasonAttribute.value.getOrElse(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND.throwBaseException()))
+          val slashingReason = slashingReasonAttribute.value.getOrElse(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND.throwBaseException())
           val hexAddress = utilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND.throwBaseException()
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
-          def getDistributionHeight(slashingReason: String) = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) (height - 2)
-          else (blockResponse.result.block.evidence.evidence.flatMap(_.getSlashingEvidences).find(_.validatorHexAddress == hexAddress).getOrElse(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND.throwBaseException()).height - 1)
+          val distributionHeight = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) height - 2
+          else blockResponse.result.block.evidence.evidence.flatMap(_.getSlashingEvidences).find(_.validatorHexAddress == hexAddress).getOrElse(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND.throwBaseException()).height - 1
 
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
             val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
@@ -382,8 +370,7 @@ class Block @Inject()(
 
           for {
             operatorAddress <- operatorAddress
-            slashingReason <- slashingReason
-            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = getDistributionHeight(slashingReason))
+            _ <- slashing(operatorAddress = operatorAddress, slashingReason = slashingReason, distributionHeight = distributionHeight)
           } yield (operatorAddress, slashingReason)
         })
       }
@@ -409,7 +396,7 @@ class Block @Inject()(
       } yield ()
     }
 
-    (for {
+    for {
       blockResponse <- blockResponse
       slashingParameter <- slashingParameter
       validatorReasons <- update(blockResponse, slashingParameter)
@@ -417,9 +404,6 @@ class Block @Inject()(
       _ <- slashing
       _ <- addEvents(validatorReasons)
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   } else Future()
 
   def onMissedBlockEvents(livenessEvents: Seq[Event], height: Int): Future[Unit] = if (livenessEvents.nonEmpty) {
@@ -434,96 +418,73 @@ class Block @Inject()(
       } else Future("")
     }
 
-    def update(slashingParameter: SlashingParameter) = Future.traverse(livenessEvents) { event =>
+    def update(slashingParameter: SlashingParameter) = utilitiesOperations.traverse(livenessEvents) { event =>
       val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
       val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
       val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Crypto.convertConsensusAddressToHexAddress(consensusAddress)) else constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND.throwBaseException()
 
-      (for {
+      for {
         validator <- validator
         _ <- addEvent(validator = validator, missedBlockCounter = missedBlocks, height = height, slashingParameter = slashingParameter)
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
-    (for {
+    for {
       slashingParameter <- slashingParameter
       _ <- update(slashingParameter)
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   } else Future()
 
-  def onProposalEvents(proposalEvents: Seq[Event]): Future[Seq[Unit]] = utilitiesOperations.traverse(proposalEvents)(event => {
-    val processInactiveProposal = if (event.`type` == constants.Blockchain.Event.InactiveProposal) {
-      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
-      val deleteDeposits = blockchainProposalDeposits.Service.deleteByProposalID(proposalID)
-
-      def deleteProposal() = blockchainProposals.Service.delete(proposalID)
-
-      for {
-        _ <- deleteDeposits
-        _ <- deleteProposal()
-      } yield if (proposalID == 0) constants.Response.EVENT_PROPOSAL_ID_NOT_FOUND.throwBaseException() else ()
-    } else Future()
-
-    val processActiveProposal = if (event.`type` == constants.Blockchain.Event.ActiveProposal) {
-      val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
-      val oldProposal = blockchainProposals.Service.tryGet(proposalID)
-
-      def process(oldProposal: Proposal) = {
-
-        def updateDeposits() = blockchainProposalDeposits.Utility.burnOrRefundDeposits(oldProposal.id)
-
-        def updateProposal() = blockchainProposals.Utility.insertOrUpdateProposal(oldProposal.id)
-
-        def actOnProposal(proposal: Proposal): Future[Unit] = if (proposal.isPassed) {
-          proposal.content.toProto.getTypeUrl match {
-            case constants.Blockchain.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposal.content.asInstanceOf[ParameterChange])
-            case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
-            case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => Future()
-            case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
-            case constants.Blockchain.Proposal.TEXT => Future()
-            case _ => Future()
+  def onProposalEvents(proposalEvents: Seq[Event], txResults: Seq[queries.responses.blockchain.BlockResultResponse.TxResult]): Future[Unit] = {
+    val processSubmitProposal = utilitiesOperations.traverse(txResults.filter(_.status)) { txResult =>
+      val proposalIDs = txResult.getSubmitProposalIDs
+      val addProposals = utilitiesOperations.traverse(proposalIDs) { proposalID => blockchainProposals.Utility.insertOrUpdateProposal(proposalID) }
+      val proposers = txResult.getProposalSubmitters
+      val addProposerDeposits = {
+        utilitiesOperations.traverse(proposalIDs) { proposalID =>
+          utilitiesOperations.traverse(proposers) { proposer =>
+            blockchainProposalDeposits.Utility.onNewProposalEvent(proposalID, proposer)
           }
-        } else Future()
-
-        for {
-          _ <- updateDeposits()
-          proposal <- updateProposal()
-          _ <- actOnProposal(proposal)
-        } yield ()
+        }
       }
 
       for {
-        oldProposal <- oldProposal
-        _ <- process(oldProposal)
+        _ <- addProposals
+        _ <- addProposerDeposits
       } yield ()
-
-    } else Future()
-
-    (for {
-      _ <- processInactiveProposal
-      _ <- processActiveProposal
-    } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
     }
-  })
+
+    val activeInactiveEvents = utilitiesOperations.traverse(proposalEvents)(event => {
+      val processInactiveProposal = if (event.`type` == constants.Blockchain.Event.InactiveProposal) {
+        val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
+        if (proposalID != 0) blockchainProposalDeposits.Utility.onInactiveProposalEvent(proposalID) else Future()
+      } else Future()
+
+      val processActiveProposal = if (event.`type` == constants.Blockchain.Event.ActiveProposal) {
+        val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
+        if (proposalID != 0) blockchainProposalDeposits.Utility.onActiveProposalEvent(proposalID) else Future()
+      } else Future()
+
+      for {
+        _ <- processInactiveProposal
+        _ <- processActiveProposal
+      } yield ()
+    })
+
+    for {
+      _ <- processSubmitProposal
+      _ <- activeInactiveEvents
+    } yield ()
+  }
 
   def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
     val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator, currentBlockTimeStamp = currentBlockTimeStamp) else constants.Response.INVALID_UNBONDING_COMPLETION_EVENT.throwBaseException()
-    (for {
+
+    for {
       _ <- process
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   })
 
   def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
@@ -531,12 +492,10 @@ class Block @Inject()(
     val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
     val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator, currentBlockTimeStamp = currentBlockTimeStamp) else constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT.throwBaseException()
-    (for {
+
+    for {
       _ <- process
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   })
 
   private def slash(validatorAddress: String, infractionHeight: Int, currentBlockHeight: Int, currentBlockTIme: RFC3339, slashingFraction: BigDecimal) = {
@@ -561,11 +520,9 @@ class Block @Inject()(
       } yield ()
     } else Future(MicroNumber.zero)
 
-    (for {
+    for {
       validator <- validator
       _ <- update(validator)
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 }

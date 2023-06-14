@@ -168,13 +168,11 @@ class Undelegations @Inject()(
         else Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
       }
 
-      (for {
+      for {
         _ <- updateBalance
         undelegation <- undelegation
         _ <- updateOrDelete(undelegation)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
 
     def slashUndelegation(undelegation: Undelegation, currentBlockTime: RFC3339, infractionHeight: Int, slashingFraction: BigDecimal): Future[Unit] = {
@@ -187,11 +185,9 @@ class Undelegations @Inject()(
       })
       val updateUndelegation = Service.insertOrUpdate(undelegation.copy(entries = updatedEntries))
 
-      (for {
+      for {
         _ <- updateUndelegation
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
 
     def unbond(delegation: Delegation, validator: Validator, shares: BigDecimal): Future[MicroNumber] = {
@@ -215,16 +211,13 @@ class Undelegations @Inject()(
 
         val withdrawValidatorRewards = if (deleteValidator) blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(delegation.validatorAddress)) else Future()
 
-        (for {
+        for {
           _ <- withdrawDelegatorRewards
           _ <- jailValidator
           _ <- updateOrDeleteDelegation
           _ <- deleteOrUpdateValidator
           _ <- withdrawValidatorRewards
-        } yield removedTokens).recover {
-          case baseException: BaseException => throw baseException
-        }
-
+        } yield removedTokens
       } else Future(throw new BaseException(constants.Response.INVALID_VALIDATOR_OR_DELEGATION_OR_SHARES))
     }
 

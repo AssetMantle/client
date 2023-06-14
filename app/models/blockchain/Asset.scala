@@ -1,7 +1,7 @@
 package models.blockchain
 
 import com.assetmantle.modules.assets.{transactions => assetsTransactions}
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.{HeightData, NumberData}
@@ -52,13 +52,9 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 }
 
-object Assets {
+private[blockchain] object Assets {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
+  class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, classificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Asset.tupled, Asset.unapply)
 
@@ -82,8 +78,6 @@ object Assets {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
@@ -91,21 +85,21 @@ class Assets @Inject()(
                         blockchainSplits: Splits,
                         blockchainMaintainers: Maintainers,
                         blockchainClassifications: Classifications,
-                        protected val databaseConfigProvider: DatabaseConfigProvider
-                      )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Assets.DataTable, Asset, Array[Byte]](
-    databaseConfigProvider,
-    Assets.TableQuery,
-    executionContext,
-    Assets.module,
-    Assets.logger
-  ) {
+                        protected val dbConfigProvider: DatabaseConfigProvider
+                      )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Assets.AssetTable, Asset, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Assets.AssetTable(tag))
 
   object Service {
 
-    def add(asset: Asset): Future[String] = create(asset).map(x => utilities.Secrets.base64URLEncoder(x))
+    def add(asset: Asset): Future[Asset] = create(asset)
 
-    def add(assets: Seq[Asset]): Future[Unit] = create(assets)
+    def add(assets: Seq[Asset]): Future[Int] = create(assets)
 
     def update(asset: Asset): Future[Unit] = updateById(asset)
 

@@ -41,6 +41,13 @@ class ProposalVotes @Inject()(
     }
   }
 
+  private def upsert(proposalVote: ProposalVote): Future[Int] = db.run((proposalVoteTable.insertOrUpdate(proposalVote)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => throw new BaseException(constants.Response.PSQL_EXCEPTION, psqlException)
+    }
+  }
+
   private def create(proposalVotes: Seq[ProposalVote]) = db.run((proposalVoteTable ++= proposalVotes).asTry).map {
     case Success(result) => ()
     case Failure(exception) => exception match {
@@ -93,16 +100,13 @@ class ProposalVotes @Inject()(
   object Utility {
 
     def onVote(vote: govTx.MsgVote)(implicit header: Header): Future[String] = {
-      val validatorExists = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
+      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
 
-      def delete(validatorExists: Boolean) = if (validatorExists) Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt) else Future(0)
-
-      def add(validatorExists: Boolean) = if (validatorExists) Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1)) else Future(0)
+      def add = Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1))
 
       (for {
-        validatorExists <- validatorExists
-        _ <- delete(validatorExists)
-        _ <- add(validatorExists)
+        _ <- delete
+        _ <- add
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter
@@ -110,18 +114,14 @@ class ProposalVotes @Inject()(
     }
 
     def onWeightedVote(vote: govTx.MsgVoteWeighted)(implicit header: Header): Future[String] = {
-      val validatorExists = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
-
-      def delete(validatorExists: Boolean) = if (validatorExists) Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt) else Future(0)
-
+      val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
       val proposalVotes = vote.getOptionsList.asScala.toSeq.map(x => ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = x.getOption.toString, weight = BigDecimal(x.getWeight)))
 
-      def addVotes(validatorExists: Boolean) = if (validatorExists) Service.add(proposalVotes) else Future(0)
+      def add = Service.add(proposalVotes)
 
       (for {
-        validatorExists <- validatorExists
-        _ <- delete(validatorExists)
-        _ <- addVotes(validatorExists)
+        _ <- delete
+        _ <- add
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter

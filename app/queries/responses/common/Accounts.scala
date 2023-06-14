@@ -1,6 +1,5 @@
 package queries.responses.common
 
-import exceptions.BaseException
 import models.blockchain.{Account => BlockchainAccount}
 import models.common.Serializable
 import models.common.Serializable.Vesting.VestingParameters

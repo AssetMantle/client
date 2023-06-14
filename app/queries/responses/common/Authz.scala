@@ -54,7 +54,6 @@ object Authz {
       case _ => constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE.throwBaseException()
     }
   } catch {
-    case baseException: BaseException => throw baseException
     case exception: Exception => logger.error(exception.getLocalizedMessage)
       constants.Response.GRANT_AUTHORIZATION_RESPONSE_STRUCTURE_CHANGED.throwBaseException()
   }

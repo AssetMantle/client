@@ -88,7 +88,7 @@ class Startup @Inject()(
       immutables = schema.constants.ID.MaintainerClassificationImmutables.getProtoBytes,
       mutables = schema.constants.ID.MaintainerClassificationMutables.getProtoBytes)
 
-    blockchainClassifications.Service.add(Seq(nubClassificationID, maintainerClassificationID))
+    blockchainClassifications.Service.insertOrUpdate(nubClassificationID) //Seq(nubClassificationID, maintainerClassificationID))
   }
 
   private def onGenesis(): Future[Unit] = {
@@ -119,7 +119,6 @@ class Startup @Inject()(
       _ <- if (genesis.app_state.orders.isDefined) insertOrdersOnStart(genesis.app_state.orders.get.mappables) else Future()
     } yield ()
       ).recover {
-      case baseException: BaseException => throw baseException
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         constants.Response.NO_RESPONSE.throwBaseException(exception)
     }
@@ -127,32 +126,28 @@ class Startup @Inject()(
 
   private def insertAccountsOnStart(accounts: Seq[Account]): Future[Seq[Unit]] = {
     val bcAccountsCount = Await.result(blockchainAccounts.Service.getTotalAccounts, Duration.Inf)
-    if (accounts.length < bcAccountsCount) {
+    if (accounts.length > bcAccountsCount) {
       val allAddresses = Await.result(blockchainAccounts.Service.getAllAddressess, Duration.Inf)
       utilitiesOperations.traverse(accounts.map(_.address).diff(allAddresses)) { address =>
-        val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccountWithoutAnyTx(address)
-        (for {
+        val upsertAccount = blockchainAccounts.Utility.insertOrUpdateAccount(address)
+
+        for {
           _ <- upsertAccount
         } yield ()
-          ).recover {
-          case baseException: BaseException => throw baseException
-        }
       }
     } else Future(Seq())
   }
 
   private def insertBalancesOnStart(balances: Seq[BankBalance]): Future[Seq[Unit]] = {
     val bcAccountsCount = Await.result(blockchainBalances.Service.getTotalAccounts, Duration.Inf)
-    if (balances.length < bcAccountsCount) {
+    if (balances.length > bcAccountsCount) {
       val allAddresses = Await.result(blockchainBalances.Service.getAllAddressess, Duration.Inf)
       utilitiesOperations.traverse(balances.map(_.address).diff(allAddresses)) { address =>
         val upsertAccount = blockchainBalances.Utility.insertOrUpdateBalance(address)
-        (for {
+
+        for {
           _ <- upsertAccount
         } yield ()
-          ).recover {
-          case baseException: BaseException => throw baseException
-        }
       }
     } else Future(Seq())
   }
@@ -172,21 +167,18 @@ class Startup @Inject()(
       } yield ()
     }
 
-    (for {
+    for {
       _ <- insertAllValidators
       _ <- updateDelegations()
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 
   private def updateDistributionOnStart(distribution: Distribution.Module): Future[Unit] = {
     val insertAllWithdrawAddresses = blockchainWithdrawAddresses.Service.insertMultiple(distribution.delegator_withdraw_infos.map(_.toWithdrawAddress))
-    (for {
+
+    for {
       _ <- insertAllWithdrawAddresses
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 
   // IMPORTANT: Assuming all GenTxs are valid txs and successfully goes through
@@ -198,7 +190,7 @@ class Startup @Inject()(
 
       def insertKeyBaseAccount(validators: Seq[Validator]) = utilitiesOperations.traverse(validators)(validator => keyBaseValidatorAccounts.Utility.insertOrUpdateKeyBaseAccount(validator.operatorAddress, validator.description.identity))
 
-      def updateAccount(signers: Seq[String]) = utilitiesOperations.traverse(signers)(signer => blockchainAccounts.Utility.incrementSequence(signer))
+      def updateAccount(signers: Seq[String]) = utilitiesOperations.traverse(signers)(signer => blockchainAccounts.Utility.insertOrUpdateAccount(signer))
 
       // Should always be called after messages are processed, otherwise can create conflict
       def updateBalance(signers: Seq[String]) = utilitiesOperations.traverse(signers)(signer => blockchainBalances.Utility.insertOrUpdateBalance(signer))
@@ -212,11 +204,9 @@ class Startup @Inject()(
       } yield ()
     }
 
-    (for {
+    for {
       _ <- updateTxs
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 
   private def insertAllTokensOnStart(): Future[Unit] = {
@@ -236,64 +226,53 @@ class Startup @Inject()(
       )))
     }
 
-    (for {
+    for {
       totalSupplyResponse <- totalSupplyResponse
       mintingInflationResponse <- mintingInflationResponse
       stakingPoolResponse <- stakingPoolResponse
       communityPoolResponse <- communityPoolResponse
       _ <- insert(totalSupplyResponse, mintingInflationResponse, stakingPoolResponse, communityPoolResponse)
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   }
 
   private def insertParametersOnStart(parameters: Seq[Parameter]) = {
     utilitiesOperations.traverse(parameters)(parameter => {
       val insert = blockchainParameters.Service.insertOrUpdate(blockchain.Parameter(parameterType = parameter.parameterType, value = parameter))
 
-      (for {
+      for {
         _ <- insert
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     })
   }
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
     val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
-    (for {
+
+    for {
       _ <- insert
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   })
 
   def insertFeeGrantsOnStart(allowances: Seq[FeeGrant.Allowance]): Future[Seq[Unit]] = utilitiesOperations.traverse(allowances)(allowance => {
     val insert = blockchainFeeGrants.Service.insertOrUpdate(blockchain.FeeGrant(granter = allowance.granter, grantee = allowance.grantee, allowance = allowance.allowance.value.toSerializable.toProto.toByteString.toByteArray))
-    (for {
+    for {
       _ <- insert
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   })
 
-  def insertMetasOnStart(metas: Seq[Meta.Mappable]): Future[Unit] = blockchainMetas.Service.add(metas.map(_.data.toData))
+  def insertMetasOnStart(metas: Seq[Meta.Mappable]): Future[Int] = blockchainMetas.Service.add(metas.map(_.data.toData))
 
-  def insertClassificationsOnStart(classifications: Seq[Classification.Mappable]): Future[Unit] = blockchainClassifications.Service.add(classifications.map(_.classification.toClassification))
+  def insertClassificationsOnStart(classifications: Seq[Classification.Mappable]): Future[Int] = blockchainClassifications.Service.add(classifications.map(_.classification.toClassification))
 
-  def insertMaintainersOnStart(maintainers: Seq[Maintainer.Mappable]): Future[Unit] = blockchainMaintainers.Service.add(maintainers.map(_.maintainer.toMaintainer))
+  def insertMaintainersOnStart(maintainers: Seq[Maintainer.Mappable]): Future[Int] = blockchainMaintainers.Service.add(maintainers.map(_.maintainer.toMaintainer))
 
-  def insertAssetsOnStart(assets: Seq[Asset.Mappable]): Future[Unit] = blockchainAssets.Service.add(assets.map(_.asset.toAsset))
+  def insertAssetsOnStart(assets: Seq[Asset.Mappable]): Future[Int] = blockchainAssets.Service.add(assets.map(_.asset.toAsset))
 
-  def insertIdentitiesOnStart(identities: Seq[Identity.Mappable]): Future[Unit] = blockchainIdentities.Service.add(identities.map(_.identity.toIdentity))
+  def insertIdentitiesOnStart(identities: Seq[Identity.Mappable]): Future[Int] = blockchainIdentities.Service.add(identities.map(_.identity.toIdentity))
 
-  def insertSplitsOnStart(splits: Seq[Split.Mappable]): Future[Unit] = blockchainSplits.Service.add(splits.map(_.split.toSplit))
+  def insertSplitsOnStart(splits: Seq[Split.Mappable]): Future[Int] = blockchainSplits.Service.add(splits.map(_.split.toSplit))
 
-  def insertOrdersOnStart(orders: Seq[Order.Mappable]): Future[Unit] = blockchainOrders.Service.add(orders.map(_.order.toOrder))
+  def insertOrdersOnStart(orders: Seq[Order.Mappable]): Future[Int] = blockchainOrders.Service.add(orders.map(_.order.toOrder))
 
   private def insertBlock(height: Int): Future[Unit] = {
     val blockCommitResponse = blocksServices.insertOnBlock(height)
@@ -307,7 +286,7 @@ class Startup @Inject()(
 
     def sendNewBlockWebSocketMessage(blockCommitResponse: BlockCommitResponse, transactions: Seq[blockchainTransaction], averageBlockTime: Double) = blocksServices.sendNewBlockWebSocketMessage(blockCommitResponse = blockCommitResponse, transactions = transactions, averageBlockTime = averageBlockTime)
 
-    (for {
+    for {
       blockCommitResponse <- blockCommitResponse
       transactions <- insertTransactions(blockCommitResponse.result.signed_header.header)
       averageBlockTime <- getAverageBlockTime(blockCommitResponse.result.signed_header.header)
@@ -315,27 +294,23 @@ class Startup @Inject()(
       blockResultResponse <- blockResultResponse
       _ <- actionsOnEvents(blockResultResponse = blockResultResponse, currentBlockTimeStamp = blockCommitResponse.result.signed_header.header.time)
       _ <- checksAndUpdatesOnNewBlock(blockCommitResponse.result.signed_header.header)
-    } yield ()).recover {
-      case baseException: BaseException => throw baseException
-    }
+    } yield ()
   }
 
   private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: RFC3339): Future[Unit] = {
-    val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Slash).map(_.decode), blockResultResponse.result.height.toInt)
-    val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.begin_block_events.filter(_.`type` == constants.Blockchain.Event.Liveness).map(_.decode), blockResultResponse.result.height.toInt)
+    val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.getSlashingEvents, blockResultResponse.result.height.toInt)
+    val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.getLivenessEvents, blockResultResponse.result.height.toInt)
     val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
     val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
-    val proposal = blocksServices.onProposalEvents(blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(x => x.`type` == constants.Blockchain.Event.InactiveProposal || x.`type` == constants.Blockchain.Event.ActiveProposal).map(_.decode))
-    (for {
+    val proposal = blocksServices.onProposalEvents(blockResultResponse.result.getActiveInactiveProposalEvents, blockResultResponse.result.txs_results.getOrElse(Seq()))
+
+    for {
       _ <- slashing
       _ <- missedBlock
       _ <- unbondingCompletion
       _ <- redelegationCompletion
       _ <- proposal
     } yield ()
-      ).recover {
-      case baseException: BaseException => throw baseException
-    }
   }
 
   private val explorerRunnable = new Runnable {
