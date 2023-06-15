@@ -20,7 +20,7 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 
 resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.11"
 
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
