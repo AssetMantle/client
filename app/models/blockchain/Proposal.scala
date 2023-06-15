@@ -1,18 +1,16 @@
 package models.blockchain
 
-import com.cosmos.gov.{v1beta1 => govTx}
 import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
 import models.Abstract.ProposalContent
 import models.common.Serializable.{Coin, FinalTallyResult}
 import models.traits.Logging
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetProposal
 import queries.responses.blockchain.ProposalResponse.{Response => ProposalResponse}
-import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
 import utilities.Date.RFC3339
 
@@ -53,10 +51,7 @@ case class Proposal(id: Int, content: ProposalContent, status: String, finalTall
     votingEndTime = currentTime.addEpoch(votingPeriod)
   )
 
-  def isPassed: Boolean = status match {
-    case constants.Blockchain.Proposal.Status.PASSED => true
-    case _ => false
-  }
+  def isPassed: Boolean = status == constants.Blockchain.Proposal.Status.PASSED
 
 }
 
@@ -109,11 +104,9 @@ class Proposals @Inject()(
     }
   }
 
-  private def deleteByID(id: Int): Future[Int] = db.run(proposalTable.filter(_.id === id).delete)
-
   private def getByID(id: Int): Future[Option[ProposalSerialized]] = db.run(proposalTable.filter(_.id === id).result.headOption)
 
-  private def getMaxProposalID = db.run(proposalTable.map(_.id).max.result.map(_.getOrElse(0)))
+  private def deleteByID(id: Int) = db.run(proposalTable.filter(_.id === id).delete)
 
   private def getAllProposals: Future[Seq[ProposalSerialized]] = db.run(proposalTable.sortBy(_.id.desc).result)
 
@@ -156,41 +149,22 @@ class Proposals @Inject()(
 
     def get(id: Int): Future[Option[Proposal]] = getByID(id).map(_.map(_.deserialize))
 
-    def getLatestProposalID: Future[Int] = getMaxProposalID
+    def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 
     def delete(id: Int): Future[Int] = deleteByID(id)
-
-    def get(): Future[Seq[Proposal]] = getAllProposals.map(_.map(_.deserialize))
 
   }
 
   object Utility {
-
-    def onSubmitProposal(submitProposal: govTx.MsgSubmitProposal)(implicit header: Header): Future[String] = {
-      val latestProposalID = Service.getLatestProposalID
-
-      def upsert(latestProposalID: Int) = insertOrUpdateProposal(latestProposalID + startingProposalID)
-
-      (for {
-        latestProposalID <- latestProposalID
-        _ <- upsert(latestProposalID)
-      } yield submitProposal.getProposer).recover {
-        case _: BaseException => logger.error(schema.constants.Messages.SUBMIT_PROPOSAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          submitProposal.getProposer
-      }
-    }
-
     def insertOrUpdateProposal(id: Int): Future[Proposal] = {
       val proposalResponse = getProposal.Service.get(id)
 
       def upsert(proposalResponse: ProposalResponse) = Service.insertOrUpdate(proposalResponse.proposal.toSerializableProposal)
 
-      (for {
+      for {
         proposalResponse <- proposalResponse
         _ <- upsert(proposalResponse)
-      } yield proposalResponse.proposal.toSerializableProposal).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield proposalResponse.proposal.toSerializableProposal
     }
 
     // WARNING: Risky to use due to state difference
@@ -225,13 +199,11 @@ class Proposals @Inject()(
     //        }
     //      }
     //
-    //      (for {
+    //      for {
     //        governanceParameter <- governanceParameter
     //        totalVotingPower <- totalVotingPower
     //        totalBondedTokens <- totalBondedTokens
-    //      } yield getResults(governanceParameter = governanceParameter, totalVotingPower = totalVotingPower, totalBondedTokens = totalBondedTokens)).recover {
-    //        case baseException: BaseException => throw baseException
-    //      }
+    //      } yield getResults(governanceParameter = governanceParameter, totalVotingPower = totalVotingPower, totalBondedTokens = totalBondedTokens)
     //    }
 
   }

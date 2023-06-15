@@ -1,8 +1,7 @@
 package models.analytic
 
-import exceptions.BaseException
 import models.blockchain.Transaction
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.H2Profile.api._
@@ -16,10 +15,7 @@ case class MessageCounter(messageType: String, counter: Int, createdBy: Option[S
   def id: String = messageType
 }
 
-object MessageCounters {
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.ANALYTIC_MESSAGE_COUNTER
+private[analytic] object MessageCounters {
 
   class MessageCounterTable(tag: Tag) extends Table[MessageCounter](tag, "MessageCounter") with ModelTable[String] {
 
@@ -40,27 +36,26 @@ object MessageCounters {
     def id = messageType
   }
 
-  val TableQuery = new TableQuery(tag => new MessageCounterTable(tag))
 }
 
 @Singleton
 class MessageCounters @Inject()(
-                                 protected val databaseConfigProvider: DatabaseConfigProvider,
+                                 protected val dbConfigProvider: DatabaseConfigProvider,
                                  utilitiesOperations: utilities.Operations,
                                )(implicit executionContext: ExecutionContext)
-  extends GenericDaoImpl[MessageCounters.MessageCounterTable, MessageCounter, String](
-    databaseConfigProvider,
-    MessageCounters.TableQuery,
-    executionContext,
-    MessageCounters.module,
-    MessageCounters.logger
-  ) {
+  extends GenericDaoImpl[MessageCounters.MessageCounterTable, MessageCounter, String]() {
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  implicit val module: String = constants.Module.ANALYTIC_MESSAGE_COUNTER
+
+  val tableQuery = new TableQuery(tag => new MessageCounters.MessageCounterTable(tag))
 
   object Service {
 
-    def insertOrUpdateMultiple(messageCounters: Seq[MessageCounter]): Future[Unit] = upsertMultiple(messageCounters)
+    def insertOrUpdateMultiple(messageCounters: Seq[MessageCounter]): Future[Int] = upsertMultiple(messageCounters)
 
-    def update(messageType: String, counter: Int): Future[Int] = customUpdate(MessageCounters.TableQuery.filter(_.messageType === messageType).map(_.counter).update(counter))
+    def update(messageType: String, counter: Int): Future[Int] = customUpdate(tableQuery.filter(_.messageType === messageType).map(_.counter).update(counter))
 
     def getByMessageTypes(messageTypes: Seq[String]): Future[Seq[MessageCounter]] = filter(_.messageType.inSet(messageTypes))
 
@@ -85,14 +80,10 @@ class MessageCounters @Inject()(
 
     def getMessagesStatistics: Future[ListMap[String, Double]] = {
       val all = Service.fetchAll.map(_.sortBy(_.counter).reverse)
-      (for {
+      for {
         all <- all
       } yield ListMap(all.sortBy(_.counter).reverse.map(x => x.messageType -> x.counter.toDouble): _*)
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
   }
-
 }

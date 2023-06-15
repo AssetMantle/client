@@ -1,9 +1,7 @@
 package queries.blockchain
 
-import exceptions.BaseException
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.responses.blockchain.BlockResultResponse.Response
 
 import java.net.ConnectException
@@ -26,7 +24,7 @@ class GetBlockResults @Inject()()(implicit wsClient: WSClient, configuration: Co
   object Service {
 
     def get(height: Int): Future[Response] = action(height).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

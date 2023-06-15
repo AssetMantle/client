@@ -1,9 +1,7 @@
 package queries.blockchain.params
 
-import exceptions.BaseException
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
 import queries.responses.blockchain.params.BankResponse.Response
 
 import java.net.ConnectException
@@ -25,8 +23,8 @@ class GetBank @Inject()()(implicit wsClient: WSClient, configuration: Configurat
 
   object Service {
     def get(): Future[Response] = action().recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
-      case illegalStateException: IllegalStateException => throw new BaseException(constants.Response.ILLEGAL_STATE_EXCEPTION, illegalStateException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
+      case illegalStateException: IllegalStateException => constants.Response.ILLEGAL_STATE_EXCEPTION.throwBaseException(illegalStateException)
     }
   }
 

@@ -1,7 +1,7 @@
 package models.blockchain
 
 import models.common.Parameters.ClassificationParameter
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.NumberData
@@ -37,13 +37,9 @@ case class Classification(id: Array[Byte], idString: String, immutables: Array[B
 
 }
 
-object Classifications {
+private[blockchain] object Classifications {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
+  class ClassificationTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
 
@@ -65,8 +61,6 @@ object Classifications {
 
   }
 
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
@@ -75,23 +69,25 @@ class Classifications @Inject()(
                                  blockchainBalances: Balances,
                                  blockchainTokens: Tokens,
                                  blockchainParameters: models.blockchain.Parameters,
-                                 protected val databaseConfigProvider: DatabaseConfigProvider
-                               )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Classifications.DataTable, Classification, Array[Byte]](
-    databaseConfigProvider,
-    Classifications.TableQuery,
-    executionContext,
-    Classifications.module,
-    Classifications.logger
-  ) {
+                                 protected val dbConfigProvider: DatabaseConfigProvider
+                               )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Classifications.ClassificationTable, Classification, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_CLASSIFICATION
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = TableQuery[Classifications.ClassificationTable] //new TableQuery(tag => new ClassificationTable(tag))
 
   object Service {
 
-    def add(classification: Classification): Future[Array[Byte]] = create(classification)
+    def add(classification: Classification): Future[Array[Byte]] = create(classification).map(_.id)
 
-    def add(classifications: Seq[Classification]): Future[Unit] = create(classifications)
+    def add(classifications: Seq[Classification]): Future[Int] = create(classifications)
 
-    def insertOrUpdate(classification: Classification): Future[Unit] = upsert(classification)
+    def insertOrUpdate(classification: Classification): Future[Int] = upsert(classification)
+
+    def insertOrUpdate(classifications: Seq[Classification]): Future[Int] = upsertMultiple(classifications)
 
     def get(id: String): Future[Option[Classification]] = getById(utilities.Secrets.base64URLDecode(id))
 

@@ -250,13 +250,10 @@ class Validators @Inject()(
 
       def deleteValidator() = deleteByOperatorAddress(operatorAddress)
 
-      (for {
+      for {
         _ <- deleteKeyBaseAccount
         _ <- deleteValidator()
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
     def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
@@ -269,7 +266,7 @@ class Validators @Inject()(
 
       def updateOtherDetails() = {
         val insertDelegation = onDelegation(stakingTx.MsgDelegate.newBuilder()
-          .setDelegatorAddress(utilities.Crypto.convertOperatorAddressToAccountAddress(createValidator.getValidatorAddress))
+          .setDelegatorAddress(createValidator.getDelegatorAddress)
           .setValidatorAddress(createValidator.getValidatorAddress)
           .setAmount(createValidator.getValue).build())
         val addEvent = masterTransactionNotifications.Service.create(constants.Notification.VALIDATOR_CREATED, createValidator.getDescription.getMoniker)(s"'${createValidator.getValidatorAddress}'")
@@ -361,20 +358,17 @@ class Validators @Inject()(
         _ <- withdrawBalance
       } yield utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)).recover {
         case _: BaseException => logger.error(schema.constants.Messages.WITHDRAW_VALIDATOR_COMMISSION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
-          utilities.Crypto.convertOperatorAddressToAccountAddress(withdrawValidatorCommission.getValidatorAddress)
+          accountAddress
       }
     }
 
     def insertOrUpdateValidator(validatorAddress: String): Future[Validator] = {
       val validatorResponse = getValidator.Service.get(validatorAddress)
 
-      (for {
+      for {
         validatorResponse <- validatorResponse
         _ <- Service.insertOrUpdate(validatorResponse.validator.toValidator)
       } yield validatorResponse.validator.toValidator
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
     def onNewBlock(header: Header): Future[Unit] = {
@@ -395,13 +389,10 @@ class Validators @Inject()(
 
       // Unbonding delegations updated in separate onNewBlock of Undelegations table
 
-      (for {
+      for {
         unbondingValidators <- unbondingValidators
         _ <- checkAndUpdateUnbondingValidators(unbondingValidators)
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
 
     //TODO Can be optimized whenever called?
@@ -411,14 +402,11 @@ class Validators @Inject()(
 
       def checkAndUpdate(explorerAllActiveValidators: Seq[String], bcAllActiveValidators: Seq[String]) = utilitiesOperations.traverse(explorerAllActiveValidators.diff(bcAllActiveValidators) ++ bcAllActiveValidators.diff(explorerAllActiveValidators))(operatorAddress => insertOrUpdateValidator(operatorAddress))
 
-      (for {
+      for {
         explorerAllActiveValidators <- explorerAllActiveValidators
         bcAllActiveValidators <- bcAllActiveValidators
         _ <- checkAndUpdate(explorerAllActiveValidators = explorerAllActiveValidators, bcAllActiveValidators = bcAllActiveValidators)
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     }
   }
 

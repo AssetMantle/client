@@ -2,14 +2,13 @@ package models.blockchain
 
 import com.cosmos.gov.{v1beta1 => govTx}
 import exceptions.BaseException
-import models.traits.Logging
-import models.common.Parameters.GovernanceParameter
+import models.common.ProposalContents._
 import models.common.Serializable.Coin
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.blockchain.GetProposalDeposit
 import queries.responses.common.Header
 import slick.jdbc.JdbcProfile
@@ -113,26 +112,16 @@ class ProposalDeposits @Inject()(
   object Utility {
 
     def onDeposit(deposit: govTx.MsgDeposit)(implicit header: Header): Future[String] = {
-      val proposal = blockchainProposals.Service.tryGet(deposit.getProposalId.toInt)
-      val governanceParameters = blockchainParameters.Service.tryGetGovernanceParameter
+      val updateProposal = blockchainProposals.Utility.insertOrUpdateProposal(deposit.getProposalId.toInt)
+      val updateAccountBalance = blockchainBalances.Utility.insertOrUpdateBalance(deposit.getDepositor)
       val proposalDeposit = Service.get(deposit.getProposalId.toInt, deposit.getDepositor)
-
-      def updateAccountBalance() = blockchainBalances.Utility.insertOrUpdateBalance(deposit.getDepositor)
-
-      def updateProposal(proposal: Proposal, governanceParameters: GovernanceParameter) = {
-        if (proposal.status == constants.Blockchain.Proposal.Status.DEPOSIT_PERIOD && proposal.isTotalDepositGTEMinimum(governanceParameters.minDeposit)) {
-          blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.getAmountList.asScala.toSeq.map(x => Coin(x))).activateVotingPeriod(currentTime = header.time, votingPeriod = governanceParameters.votingPeriod))
-        } else blockchainProposals.Service.insertOrUpdate(proposal.addDeposit(deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))
-      }
 
       def upsertDeposit(proposalDeposit: Option[ProposalDeposit]) = proposalDeposit.fold(Service.insertOrUpdate(ProposalDeposit(proposalID = deposit.getProposalId.toInt, depositor = deposit.getDepositor, amount = deposit.getAmountList.asScala.toSeq.map(x => Coin(x)))))(x => Service.insertOrUpdate(x.copy(amount = utilities.Blockchain.addCoins(oldCoins = x.amount, add = deposit.getAmountList.asScala.toSeq.map(x => Coin(x))))))
 
       (for {
-        proposal <- proposal
-        governanceParameters <- governanceParameters
+        _ <- updateProposal
         proposalDeposit <- proposalDeposit
-        _ <- updateAccountBalance()
-        _ <- updateProposal(proposal, governanceParameters)
+        _ <- updateAccountBalance
         _ <- upsertDeposit(proposalDeposit)
       } yield deposit.getDepositor).recover {
         case _: BaseException => logger.error(schema.constants.Messages.DEPOSIT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
@@ -140,17 +129,56 @@ class ProposalDeposits @Inject()(
       }
     }
 
-    def burnOrRefundDeposits(proposalID: Int): Future[Unit] = {
+    def onNewProposalEvent(proposalID: Int, proposer: String): Future[Unit] = {
+      val depositor = getProposalDeposit.Service.get(id = proposalID.toString, address = proposer).map(_.deposit.toSerializableProposalDeposit)
+
+      def addDepositor(proposalDeposit: ProposalDeposit) = if (proposalDeposit.amount.nonEmpty) Service.insertOrUpdate(proposalDeposit) else Future(0)
+
+      for {
+        proposalDeposit <- depositor
+        _ <- addDepositor(proposalDeposit)
+      } yield ()
+    }
+
+    def onInactiveProposalEvent(proposalID: Int): Future[Unit] = {
+      val deleteDeposits = Service.deleteByProposalID(proposalID)
+      val deleteProposal = blockchainProposals.Service.delete(proposalID)
+
+      for {
+        _ <- deleteDeposits
+        _ <- deleteProposal
+      } yield ()
+    }
+
+    def onActiveProposalEvent(proposalID: Int): Future[Unit] = {
+      val updateProposal = blockchainProposals.Utility.insertOrUpdateProposal(proposalID)
       val deposits = Service.getByProposalID(proposalID)
 
-      def updateAll(deposits: Seq[ProposalDeposit]) = utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor))
+      def deleteDeposits() = Service.deleteByProposalID(proposalID)
 
-      (for {
-        deposits <- deposits
-        _ <- updateAll(deposits)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
+      def updateBalances(deposits: Seq[ProposalDeposit]) = {
+        logger.info("Processing depositor balances. Might take some time, depending on BC node. Please do not shutdown.")
+        utilitiesOperations.traverse(deposits)(deposit => blockchainBalances.Utility.insertOrUpdateBalance(deposit.depositor))
       }
+
+      def actOnProposal(proposal: Proposal): Future[Unit] = if (proposal.isPassed) {
+        proposal.content.toProto.getTypeUrl match {
+          case constants.Blockchain.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposal.content.asInstanceOf[ParameterChange])
+          case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
+          case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => Future()
+          case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
+          case constants.Blockchain.Proposal.TEXT => Future()
+          case _ => Future()
+        }
+      } else Future()
+
+      for {
+        proposal <- updateProposal
+        _ <- actOnProposal(proposal)
+        deposits <- deposits
+        _ <- updateBalances(deposits)
+        _ <- deleteDeposits()
+      } yield ()
     }
   }
 

@@ -30,7 +30,7 @@ class GetTicker @Inject()()(implicit wsClient: WSClient, configuration: Configur
   object Service {
 
     def get(tokenName: String): Future[Response] = action(tokenName: String).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

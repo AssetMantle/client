@@ -1,6 +1,5 @@
 package utilities
 
-import exceptions.BaseException
 import play.api.Logger
 import sun.nio.cs.ISO_8859_1
 
@@ -59,56 +58,56 @@ object Secrets {
     Base64.getUrlDecoder.decode(s.replace("+", "-").replace("/", "_")).map(_.toChar).mkString
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLEncoder(s: String): String = try {
     Base64.getUrlEncoder.encodeToString(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64URLEncoder(s: Array[Byte]): String = try {
     Base64.getUrlEncoder.encodeToString(s)
   } catch {
     case exception: Exception => logger.error(s"${s.mkString("Array(", ", ", ")")} : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Encoder(s: String): Array[Byte] = try {
     Base64.getEncoder.encode(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Encoder(s: Array[Byte]): String = try {
     Base64.getEncoder.encodeToString(s)
   } catch {
     case exception: Exception => logger.error(s"${s.mkString("Array(", ", ", ")")} : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64Decoder(s: String): Array[Byte] = try {
     Base64.getDecoder.decode(s)
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64MimeEncoder(s: String): Array[Byte] = try {
     Base64.getMimeEncoder.encode(s.getBytes(ISO_8859_1.INSTANCE))
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def base64MimeDecoder(s: String): Array[Byte] = try {
     Base64.getMimeDecoder.decode(s.replace("+", "-").replace("/", "_"))
   } catch {
     case exception: Exception => logger.error(s"$s : ${exception.getLocalizedMessage}")
-      throw new BaseException(constants.Response.INVALID_BASE64_ENCODING, exception)
+      constants.Response.INVALID_BASE64_ENCODING.throwBaseException(exception)
   }
 
   def sha256Hash(value: String): Array[Byte] = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8))

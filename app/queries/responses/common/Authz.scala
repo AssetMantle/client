@@ -51,12 +51,11 @@ object Authz {
       case constants.Blockchain.Authz.SEND_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[SendAuthorization](value.toString))
       case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[GenericAuthorization](value.toString))
       case constants.Blockchain.Authz.STAKE_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[StakeAuthorization](value.toString))
-      case _ => throw new BaseException(constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE)
+      case _ => constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE.throwBaseException()
     }
   } catch {
-    case baseException: BaseException => throw baseException
     case exception: Exception => logger.error(exception.getLocalizedMessage)
-      throw new BaseException(constants.Response.GRANT_AUTHORIZATION_RESPONSE_STRUCTURE_CHANGED)
+      constants.Response.GRANT_AUTHORIZATION_RESPONSE_STRUCTURE_CHANGED.throwBaseException()
   }
 
   implicit val authorizationReads: Reads[Authorization] = (

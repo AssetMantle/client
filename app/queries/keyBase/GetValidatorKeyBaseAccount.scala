@@ -26,8 +26,7 @@ class GetValidatorKeyBaseAccount @Inject()()(implicit wsClient: WSClient, config
   object Service {
 
     def get(identity: String): Future[Response] = action(identity).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
-      case baseException: BaseException => throw baseException
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

@@ -8,6 +8,7 @@ import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import queries.blockchain._
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -18,9 +19,9 @@ import scala.util.Try
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
-                                blockchainSplits: blockchain.Splits,
-                                blockchainClassifications: blockchain.Classifications,
-                                blockchainIdentities: blockchain.Identities,
+                                getBlockResults: GetBlockResults,
+                                getProposalDeposit: GetProposalDeposit,
+                                blockchainBlocks: blockchain.Blocks,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {

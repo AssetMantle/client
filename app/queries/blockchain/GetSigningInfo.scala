@@ -26,7 +26,7 @@ class GetSigningInfo @Inject()()(implicit wsClient: WSClient, configuration: Con
   object Service {
 
     def get(validatorConsAddress: String): Future[Response] = action(validatorConsAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

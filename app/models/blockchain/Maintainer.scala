@@ -1,6 +1,6 @@
 package models.blockchain
 
-import models.traits.{Entity, GenericDaoImpl, Logging, ModelTable}
+import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.base.{IDData, ListData}
@@ -64,13 +64,9 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
   def canRenumerate: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Renumerate).getBytes))
 }
 
-object Maintainers {
+private[blockchain] object Maintainers {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN_MAINTAINER
-
-  implicit val logger: Logger = Logger(this.getClass)
-
-  class DataTable(tag: Tag) extends Table[Maintainer](tag, "Maintainer") with ModelTable[Array[Byte]] {
+  class MaintainerTable(tag: Tag) extends Table[Maintainer](tag, "Maintainer") with ModelTable[Array[Byte]] {
 
     def * = (id, idString, maintainedClassificationID, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Maintainer.tupled, Maintainer.unapply)
 
@@ -93,28 +89,25 @@ object Maintainers {
     def updatedOnMillisEpoch = column[Long]("updatedOnMillisEpoch")
 
   }
-
-  val TableQuery = new TableQuery(tag => new DataTable(tag))
-
 }
 
 @Singleton
 class Maintainers @Inject()(
-                             protected val databaseConfigProvider: DatabaseConfigProvider
-                           )(implicit override val executionContext: ExecutionContext)
-  extends GenericDaoImpl[Maintainers.DataTable, Maintainer, Array[Byte]](
-    databaseConfigProvider,
-    Maintainers.TableQuery,
-    executionContext,
-    Maintainers.module,
-    Maintainers.logger
-  ) {
+                             protected val dbConfigProvider: DatabaseConfigProvider
+                           )(implicit val executionContext: ExecutionContext)
+  extends GenericDaoImpl[Maintainers.MaintainerTable, Maintainer, Array[Byte]]() {
+
+  implicit val module: String = constants.Module.BLOCKCHAIN_MAINTAINER
+
+  implicit val logger: Logger = Logger(this.getClass)
+
+  val tableQuery = new TableQuery(tag => new Maintainers.MaintainerTable(tag))
 
   object Service {
 
-    def add(maintainer: Maintainer): Future[String] = create(maintainer).map(x => utilities.Secrets.base64URLEncoder(x))
+    def add(maintainer: Maintainer): Future[String] = create(maintainer).map(_.idString)
 
-    def add(maintainers: Seq[Maintainer]): Future[Unit] = create(maintainers)
+    def add(maintainers: Seq[Maintainer]): Future[Int] = create(maintainers)
 
     def update(maintainer: Maintainer): Future[String] = updateById(maintainer).map(_ => maintainer.getIDString)
 

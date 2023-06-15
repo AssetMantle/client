@@ -2,12 +2,11 @@ package models.masterTransaction
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import models.traits.Logging
 import models.blockchain
+import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.coingecko.GetTicker
 import slick.jdbc.JdbcProfile
 
@@ -115,14 +114,11 @@ class TokenPrices @Inject()(
     def getLatestTokenPrice(denom: String): Future[TokenPrice] = getLatestTokenPriceBySerial(denom = denom).map(_.getOrElse(TokenPrice(denom = denom, price = 0.0)))
 
     def getLatestForAllTokens(n: Int, totalTokens: Int): Future[Seq[TokenPrice]] = {
-      (for {
+      for {
         latestSerial <- getLatestSerial
         tokenPrices <- getAllTokensBySerial(startSerial = latestSerial - (n * totalTokens), endSerial = latestSerial)
-      } yield tokenPrices).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield tokenPrices
     }
-
   }
 
   object Utility {
@@ -130,12 +126,10 @@ class TokenPrices @Inject()(
       val tokenTicker = constants.AppConfig.tokenTickers.find(_.denom == constants.Blockchain.StakingDenom)
       if (tokenTicker.isDefined) {
         val price = getCoingeckoTicker.Service.get().map(_.assetmantle.usd)
-        (for {
+        for {
           price <- price
           _ <- Service.create(denom = constants.Blockchain.StakingDenom, price = price)
-        } yield ()).recover {
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        }
+        } yield ()
       } else {
         logger.warn(constants.Response.CRYPTO_TOKEN_TICKER_NOT_FOUND.logMessage)
         Future()

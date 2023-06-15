@@ -23,7 +23,7 @@ class GetTransactionsByHeight @Inject()()(implicit wsClient: WSClient, configura
 
   object Service {
     def get(height: Int, perPage: Int, page: Int): Future[Response] = action(height = height, page = page, perPage = perPage).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => logger.error(constants.Response.TRANSACTION_BY_HEIGHT_QUERY_FAILED.logMessage + ": " + height)
         throw baseException
     }

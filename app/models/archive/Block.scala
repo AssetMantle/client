@@ -27,7 +27,7 @@ class Blocks @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN_BLOCK
+  private implicit val module: String = constants.Module.ARCHIVE_BLOCK
 
   import databaseConfig.profile.api._
 

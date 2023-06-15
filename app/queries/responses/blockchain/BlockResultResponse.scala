@@ -6,7 +6,45 @@ import transactions.Abstract.BaseResponse
 
 object BlockResultResponse {
 
-  case class Result(height: String, begin_block_events: Seq[Event], end_block_events: Option[Seq[Event]])
+  case class TxResult(code: Int, events: Seq[Event]) {
+
+    lazy val decodedEvents: Seq[Event] = this.events.map(_.decode)
+
+    def getSubmitProposalIDs: Seq[Int] = this.decodedEvents
+      .filter(x => x.`type` == constants.Blockchain.Event.SubmitProposal && x.attributes.exists(_.key == constants.Blockchain.Event.Attribute.ProposalID))
+      .flatMap(_.attributes)
+      .filter(_.key == constants.Blockchain.Event.Attribute.ProposalID)
+      .flatMap(_.value.map(_.toInt))
+
+    def getProposalSubmitters: Seq[String] = this.decodedEvents
+      .filter(x => x.`type` == constants.Blockchain.Event.Message && x.attributes.exists(y => y.key == constants.Blockchain.Event.Attribute.Module && y.value.getOrElse("") == "governance") && x.attributes.exists(y => y.key == constants.Blockchain.Event.Attribute.Sender))
+      .flatMap(_.attributes)
+      .filter(_.key == constants.Blockchain.Event.Attribute.Sender)
+      .flatMap(_.value)
+
+    def status: Boolean = code == 0
+
+  }
+
+  implicit val txResultReads: Reads[TxResult] = Json.reads[TxResult]
+
+  case class Result(height: String, txs_results: Option[Seq[TxResult]], begin_block_events: Seq[Event], end_block_events: Option[Seq[Event]]) {
+
+    lazy val decodedSuccessfulTxEvents: Seq[Event] = this.txs_results.fold[Seq[Event]](Seq())(_.filter(_.status).flatMap(_.decodedEvents))
+
+    lazy val decodedBeginBlockEvents: Seq[Event] = this.begin_block_events.map(_.decode)
+
+    lazy val decodedEndBlockEvents: Seq[Event] = this.end_block_events.getOrElse(Seq()).map(_.decode)
+
+    def getSlashingEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == constants.Blockchain.Event.Slash)
+
+    def getLivenessEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == constants.Blockchain.Event.Liveness)
+
+    def getAllEvents: Seq[Event] = this.decodedBeginBlockEvents ++ this.decodedSuccessfulTxEvents ++ this.decodedEndBlockEvents
+
+    def getActiveInactiveProposalEvents: Seq[Event] = this.decodedEndBlockEvents.filter(x => x.`type` == constants.Blockchain.Event.ActiveProposal || x.`type` == constants.Blockchain.Event.InactiveProposal)
+
+  }
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 

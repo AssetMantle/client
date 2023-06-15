@@ -18,7 +18,7 @@ case class WalletTransaction(address: String, txHash: String, height: Int) {
 @Singleton
 class WalletTransactions @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, configuration: Configuration)(implicit executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_WALLET_TRANSACTION
+  private implicit val module: String = constants.Module.ARCHIVE_WALLET_TRANSACTION
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

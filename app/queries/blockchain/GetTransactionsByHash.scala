@@ -22,7 +22,7 @@ class GetTransactionsByHash @Inject()()(implicit wsClient: WSClient, configurati
 
   object Service {
     def get(hash: String): Future[Response] = action(hash).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => logger.error(constants.Response.TRANSACTION_BY_HASH_QUERY_FAILED.logMessage + ": " + hash)
         throw baseException
     }

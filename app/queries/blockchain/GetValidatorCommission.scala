@@ -27,7 +27,7 @@ class GetValidatorCommission @Inject()()(implicit wsClient: WSClient, configurat
   object Service {
 
     def get(validatorAddress: String): Future[Response] = action(validatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
   }
 

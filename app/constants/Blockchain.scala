@@ -86,6 +86,8 @@ object Blockchain {
   }
 
   object Event {
+    //transaction
+    val Message = "message"
     //bank
     val Transfer = "transfer"
     //crisis
@@ -120,6 +122,8 @@ object Blockchain {
     val Redelegate = "redelegate"
 
     object Attribute {
+      // transaction
+      val Module = "module"
       //bank
       val Recipient = "recipient"
       val Sender = "sender"

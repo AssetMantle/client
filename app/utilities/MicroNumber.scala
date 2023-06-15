@@ -1,6 +1,5 @@
 package utilities
 
-import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 
@@ -106,7 +105,7 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def &~(that: MicroNumber): MicroNumber = new MicroNumber(this.value &~ that.value)
 
-  def gcd(that: MicroNumber): MicroNumber = if (this.isWhole && that.isWhole) new MicroNumber(this.value.gcd(that.value)) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
+  def gcd(that: MicroNumber): MicroNumber = if (this.isWhole && that.isWhole) new MicroNumber(this.value.gcd(that.value)) else constants.Response.NUMBER_FORMAT_EXCEPTION.throwBaseException()(MicroNumber.module, MicroNumber.logger)
 
   def mod(that: MicroNumber): MicroNumber = new MicroNumber(this.value.mod(that.value))
 
@@ -174,7 +173,7 @@ class MicroNumber(val value: BigInt) extends ScalaNumber with ScalaNumericConver
 
   def bitCount: Int = this.value.bitCount
 
-  def isProbablePrime(certainty: Int): Boolean = if (this.isWhole) BigInt(this.toLong).isProbablePrime(certainty) else throw new BaseException(constants.Response.NUMBER_FORMAT_EXCEPTION)(MicroNumber.module, MicroNumber.logger)
+  def isProbablePrime(certainty: Int): Boolean = if (this.isWhole) BigInt(this.toLong).isProbablePrime(certainty) else constants.Response.NUMBER_FORMAT_EXCEPTION.throwBaseException()(MicroNumber.module, MicroNumber.logger)
 
   def +(that: String): String = this.toString + that
 

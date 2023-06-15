@@ -1,6 +1,5 @@
 package queries.responses.common
 
-import exceptions.BaseException
 import models.blockchain.{Account => BlockchainAccount}
 import models.common.Serializable
 import models.common.Serializable.Vesting.VestingParameters
@@ -68,6 +67,6 @@ object Accounts {
     case constants.Blockchain.Account.DELAYED_VESTING => utilities.JSON.convertJsonStringToObject[DelayedVestingAccount](value.toString)
     case constants.Blockchain.Account.CONTINUOUS_VESTING => utilities.JSON.convertJsonStringToObject[ContinuousVestingAccount](value.toString)
     case constants.Blockchain.Account.PERIODIC_VESTING => utilities.JSON.convertJsonStringToObject[PeriodicVestingAccount](value.toString)
-    case _ => throw new BaseException(constants.Response.ACCOUNT_TYPE_NOT_FOUND)
+    case _ => constants.Response.ACCOUNT_TYPE_NOT_FOUND.throwBaseException()
   }
 }

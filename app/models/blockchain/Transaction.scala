@@ -28,7 +28,8 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
     signerInfo.getPublicKey.getTypeUrl match {
       case constants.Blockchain.PublicKey.SINGLE_SECP256K1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
       case constants.Blockchain.PublicKey.SINGLE_SECP256R1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256r1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
-      case constants.Blockchain.PublicKey.MULTI_SIG => "mantle1glk8f6xhs0u440xwfwqgn68aps6l85v9sn4efz"
+      case constants.Blockchain.PublicKey.MULTI_SIG => "mantle1qar3lv9amjel2u6f2tam58vyhf5m4f5csjctns"
+      case _ => "mantle1qar3lv9amjel2u6f2tam58vyhf5m4f5csjctns"
     }
   }
 
@@ -40,10 +41,7 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
 
   def getMessagesTypeURL: Seq[String] = this.getMessages.map(_.getTypeUrl)
 
-  def getFee: Fee = {
-    val fee = parsedTx.getAuthInfo.getFee
-    Fee(amount = fee.getAmountList.asScala.toSeq.map(x => Coin(x)), gasLimit = fee.getGasLimit.toString, payer = fee.getPayer, granter = fee.getGranter)
-  }
+  def getFee: Fee = Fee(amount = parsedTx.getAuthInfo.getFee.getAmountList.asScala.toSeq.map(x => Coin(x)), gasLimit = parsedTx.getAuthInfo.getFee.getGasLimit.toString, payer = parsedTx.getAuthInfo.getFee.getPayer, granter = parsedTx.getAuthInfo.getFee.getGranter)
 
   def getMessageCounters: Map[String, Int] = parsedTx.getBody.getMessagesList.asScala.toSeq.map(stdMsg => constants.View.TxMessagesMap.getOrElse(stdMsg.getTypeUrl, stdMsg.getTypeUrl)).groupBy(identity).view.mapValues(_.size).toMap
 
@@ -122,7 +120,10 @@ class Transactions @Inject()(
 
   private def getTransactionsByHashes(hashes: Seq[String]): Future[Seq[Transaction]] = db.run(transactionTable.filter(_.hash.inSet(hashes)).result)
 
-  private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = db.run(transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result)
+  private def getTransactionsForPageNumber(offset: Int, limit: Int): Future[Seq[Transaction]] = {
+    val a = transactionTable.sortBy(_.height.desc).drop(offset).take(limit).result
+    db.run(a)
+  }
 
   private def getByHeightRange(start: Int, end: Int): Future[Seq[Transaction]] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).result)
 

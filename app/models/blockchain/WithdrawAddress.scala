@@ -106,12 +106,10 @@ class WithdrawAddresses @Inject()(
 
       def updateBalance(withdrawAddress: String) = blockchainBalances.Utility.insertOrUpdateBalance(withdrawAddress)
 
-      (for {
+      for {
         withdrawAddress <- withdrawAddress
         _ <- updateBalance(withdrawAddress)
-      } yield ()).recover {
-        case baseException: BaseException => throw baseException
-      }
+      } yield ()
     }
   }
 

@@ -24,7 +24,7 @@ class TransactionCounters @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.ANALYTIC_TRANSACTION_COUNTER
+  private implicit val module: String = constants.Module.ARCHIVE_TRANSACTION_COUNTER
 
   import databaseConfig.profile.api._
 

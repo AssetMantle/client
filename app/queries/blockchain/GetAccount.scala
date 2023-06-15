@@ -4,6 +4,7 @@ import exceptions.BaseException
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.blockchain.AccountResponse.Response
+import queries.responses.common.Accounts.BaseAccount
 
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
@@ -20,13 +21,17 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val url = constants.Blockchain.RestEndPoint + "/" + path + "/"
 
+  private val AccountNotFoundRegex = """account.*not.found.*key.not.found""".r
+
   private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 
     def get(address: String): Future[Response] = action(address).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
+      case baseException: BaseException => if (AccountNotFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
+        Response(BaseAccount(address = address, pub_key = None, account_number = "-1", sequence = "0"))
+      } else throw baseException
     }
   }
-
 }

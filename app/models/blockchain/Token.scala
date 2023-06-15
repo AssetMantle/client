@@ -229,13 +229,11 @@ class Tokens @Inject()(
 
       def updateStakingToken(stakingPoolResponse: StakingPoolResponse) = Service.updateStakingAmounts(denom = constants.Blockchain.StakingDenom, bondedAmount = stakingPoolResponse.pool.bonded_tokens, notBondedAmount = stakingPoolResponse.pool.not_bonded_tokens)
 
-      (for {
+      for {
         stakingPoolResponse <- stakingPoolResponse
         _ <- updateStakingToken(stakingPoolResponse)
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
+
     }
 
     def updateAll(): Future[Unit] = {
@@ -255,17 +253,13 @@ class Tokens @Inject()(
         )
       }
 
-      (for {
+      for {
         totalSupplyResponse <- totalSupplyResponse
         mintingInflationResponse <- mintingInflationResponse
         stakingPoolResponse <- stakingPoolResponse
         communityPoolResponse <- communityPoolResponse
         _ <- update(totalSupplyResponse, mintingInflationResponse, stakingPoolResponse, communityPoolResponse)
       } yield ()
-        ).recover {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw baseException
-      }
     }
   }
 

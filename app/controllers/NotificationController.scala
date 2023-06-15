@@ -3,10 +3,9 @@ package controllers
 import controllers.actions.WithoutLoginActionAsync
 import exceptions.BaseException
 import models.masterTransaction
+import play.api.{Configuration, Logger}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import play.api.Configuration
-import play.api.Logger
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -24,7 +23,7 @@ class NotificationController @Inject()(
 
   def recentActivityMessages(pageNumber: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
     implicit request =>
-      val notifications = if (pageNumber < 1) throw new BaseException(constants.Response.INVALID_PAGE_NUMBER) else {
+      val notifications = if (pageNumber < 1) constants.Response.INVALID_PAGE_NUMBER.throwBaseException() else {
         loginState match {
           case Some(login) => masterTransactionNotifications.Service.getPublic(pageNumber = pageNumber)
           case None => masterTransactionNotifications.Service.getPublic(pageNumber)

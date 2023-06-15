@@ -34,19 +34,19 @@ class GetDelegatorRedelegations @Inject()()(implicit wsClient: WSClient, configu
   object Service {
 
     def getAll(delegatorAddress: String): Future[Response] = action(url + delegatorAddress + path2).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
 
     def getWithSourceValidator(delegatorAddress: String, sourceValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path3 + sourceValidatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
 
     def getWithDestinationValidator(delegatorAddress: String, destinationValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path4 + destinationValidatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
     }
 
     def getWithSourceAndDestinationValidator(delegatorAddress: String, sourceValidatorAddress: String, destinationValidatorAddress: String): Future[Response] = action(url + delegatorAddress + path2 + "?" + path3 + sourceValidatorAddress + "&" + path4 + destinationValidatorAddress).recover {
-      case connectException: ConnectException => throw new BaseException(constants.Response.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException => constants.Response.CONNECT_EXCEPTION.throwBaseException(connectException)
       case baseException: BaseException => if (RedelegationNotFoundRegex.findFirstIn(baseException.failure.message).isDefined) {
         Response(Seq())
       } else throw baseException

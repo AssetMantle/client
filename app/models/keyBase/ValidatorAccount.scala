@@ -5,8 +5,7 @@ import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import queries.keyBase.GetValidatorKeyBaseAccount
 import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.{Response => ValidatorKeyBaseAccountResponse}
 import slick.jdbc.JdbcProfile
@@ -142,21 +141,15 @@ class ValidatorAccounts @Inject()(
 
         }
 
-        (for {
+        for {
           keyBaseResponse <- keyBaseResponse
         } yield ValidatorAccount(address = validatorAddress, identity = identity, username = keyBaseResponse.them.headOption.fold[Option[String]](None)(x => Option(x.basics.username)), pictureURL = getImageURL(keyBaseResponse))
-          ).recover {
-          case baseException: BaseException => throw baseException
-        }
       } else Future(ValidatorAccount(address = validatorAddress, identity = "", username = None, pictureURL = None))
 
-      (for {
+      for {
         validatorAccount <- validatorAccount
         _ <- Service.insertOrUpdate(validatorAccount)
       } yield ()
-        ).recover {
-        case baseException: BaseException => throw baseException
-      }
     } else Future()
 
     def scheduleUpdates(): Future[Unit] = {
