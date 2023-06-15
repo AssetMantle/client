@@ -103,8 +103,7 @@ abstract class CommonGenericDao[E, T <: Table[E]]()(implicit executionContext: E
 
   def sortWithPagination[C1 <: Rep[_]](sortExpr: T => Ordered)(offset: Int, limit: Int): Future[Seq[E]] = db.run(tableQuery.sorted(sortExpr).drop(offset).take(limit).result)
 
-  def upsert(entity: E): Future[Int] = db.run(tableQuery.insertOrUpdate(entity).asTry
-  ).map {
+  def upsert(entity: E): Future[Int] = db.run(tableQuery.insertOrUpdate(entity).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => new constants.Response.Failure(module + "_UPSERT_FAILED").throwBaseException(psqlException)
