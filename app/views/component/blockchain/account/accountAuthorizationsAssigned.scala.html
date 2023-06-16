@@ -17,7 +17,7 @@
         <tbody>
         @assigned.zipWithIndex.map { case (authz, index) =>
             <tr>
-                <td>@commonJavascriptLink(authz.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${authz.granter}'))"))</td>
+                <td class="blockHeightItem">@commonJavascriptLink(authz.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${authz.granter}'))"))</td>
                 <td>@Messages(constants.View.TxMessagesMap.getOrElse(authz.msgTypeURL, authz.msgTypeURL))</td>
                 <td id='@Seq(authz.granter, authz.grantee, index.toString).mkString("_")'>
                     <script>

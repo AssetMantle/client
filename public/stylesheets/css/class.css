@@ -4997,7 +4997,9 @@ figure .block:hover {
 }
 
 #accountWallet .cmuk-subnav,
-#accountDelegations .cmuk-subnav{
+#accountDelegations .cmuk-subnav,
+#accountAuthorizations .cmuk-subnav
+{
     border: none;
     justify-content: start;
     gap: 24px;
@@ -5005,17 +5007,20 @@ figure .block:hover {
     margin-left: 24px;
 }
 #accountWallet .cmuk-subnav-pill li:not(:last-child),
-#accountDelegations .cmuk-subnav-pill li:not(:last-child)
+#accountDelegations .cmuk-subnav-pill li:not(:last-child),
+#accountAuthorizations .cmuk-subnav-pill li:not(:last-child)
 {
     border: none;
 }
 #accountWallet .cmuk-subnav li,
-#accountDelegations .cmuk-subnav li
+#accountDelegations .cmuk-subnav li,
+#accountAuthorizations .cmuk-subnav li
 {
     flex: none;
 }
 #accountWallet .cmuk-subnav li a,
-#accountDelegations .cmuk-subnav li a
+#accountDelegations .cmuk-subnav li a,
+#accountAuthorizations .cmuk-subnav li a
 {
     font-family: var(--font-type-1);
     font-weight: 500;
@@ -5025,19 +5030,22 @@ figure .block:hover {
     color: var(--gray);
 }
 #accountWallet .cmuk-subnav-pill > .cmuk-active > a,
-#accountDelegations .cmuk-subnav-pill > .cmuk-active > a
+#accountDelegations .cmuk-subnav-pill > .cmuk-active > a,
+#accountAuthorizations .cmuk-subnav-pill > .cmuk-active > a
 {
     font-weight: 700;
     color: var(--primary-color);
     border: none;
 }
 #accountWallet .cmuk-subnav-pill > * > :first-child,
-#accountDelegations .cmuk-subnav-pill > * > :first-child
+#accountDelegations .cmuk-subnav-pill > * > :first-child,
+#accountAuthorizations .cmuk-subnav-pill > * > :first-child
 {
     padding: 0px;
 }
 #accountWallet .cmuk-switcher,
-#accountDelegations .cmuk-switcher
+#accountDelegations .cmuk-switcher,
+#accountAuthorizations .cmuk-switcher
 {
     height: auto;
     margin: 0px 16px 0px 16px;
@@ -5046,12 +5054,14 @@ figure .block:hover {
     border-radius: 10px;
 }
 #accountWallet .cmuk-card-body,
-#accountDelegations .cmuk-card-body
+#accountDelegations .cmuk-card-body,
+#accountAuthorizations .cmuk-card-body
 {
     height: auto;
 }
 #accountWallet .cmuk-card-body .productTable,
-#accountDelegations .cmuk-card-body .productTable
+#accountDelegations .cmuk-card-body .productTable,
+#accountAuthorizations .cmuk-card-body .productTable
 {
     padding: 0px;
 }
@@ -5061,7 +5071,8 @@ figure .block:hover {
     align-items: center;
 }
 #accountWallet .cmuk-card-body .tableFieldTitle .cmuk-link,
-#accountDelegations .cmuk-card-body .tableFieldTitle .cmuk-link
+#accountDelegations .cmuk-card-body .tableFieldTitle .cmuk-link,
+#accountAuthorizations .cmuk-card-body .tableFieldTitle .cmuk-link
 {
     color: var(--primary-color);
 }
@@ -5076,17 +5087,24 @@ figure .block:hover {
 {
     align-self: start;
 }
-#accountDelegations table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+#accountDelegations table.cmuk-table tbody td.blockHeightItem .cmuk-link,
+#accountAuthorizations table.cmuk-table tbody td.blockHeightItem .cmuk-link
+{
     width: 180px;
 }
-#accountDelegations table.cmuk-table.cmuk-table-striped{
+#accountDelegations table.cmuk-table.cmuk-table-striped,
+#accountAuthorizations table.cmuk-table.cmuk-table-striped
+{
     margin-bottom: 16px;
 }
-#accountDelegations table.cmuk-table.cmuk-table-striped thead th{
+#accountDelegations table.cmuk-table.cmuk-table-striped thead th
+{
     padding: 10px 0px 10px 16px;
     white-space: nowrap;
 }
-#accountDelegations table.cmuk-table.cmuk-table-striped tbody td{
+#accountDelegations table.cmuk-table.cmuk-table-striped tbody td,
+#accountAuthorizations table.cmuk-table.cmuk-table-striped tbody td
+{
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -5094,10 +5112,14 @@ figure .block:hover {
     color: var(--gray);
     padding: 16px 0 0 0;
 }
-
-#accountTransactions .cmuk-card-body{
-    height: auto;
+#accountAuthorizations .cmuk-switcher{
     margin: 0px 16px 16px 16px;
+}
+
+#accountTransactions .cmuk-card-body
+{
+    height: auto;
+    margin: 0px 16px 0px 16px;
     padding: 16px 24px 0px 24px;
     background-color: var(--bg-popup);
     border-radius: 10px;
