@@ -24,15 +24,5 @@ object ListableData {
     case _ => throw new IllegalArgumentException("INVALID_LISTABLE_DATA_IMPL_CASE_NUMBER: " + anyListableData.getImplCase.getNumber.toString)
   }
 
-  def apply(dataType: String, protoBytes: Array[Byte]): ListableData = dataType match {
-    case schema.constants.Data.AccAddressDataTypeID.value => AccAddressData.fromProtoBytes(protoBytes)
-    case schema.constants.Data.BooleanDataTypeID.value => BooleanData(protoBytes)
-    case schema.constants.Data.DecDataTypeID.value => DecData(protoBytes)
-    case schema.constants.Data.HeightDataTypeID.value => HeightData(protoBytes)
-    case schema.constants.Data.IDDataTypeID.value => IDData(protoBytes)
-    case schema.constants.Data.NumberDataTypeID.value => NumberData(protoBytes)
-    case schema.constants.Data.StringDataTypeID.value => StringData(protoBytes)
-    case _ => throw new IllegalArgumentException("INVALID_LISTABLE_DATA_TYPE: " + dataType)
-  }
-
+  def apply(protoBytes: Array[Byte]): ListableData = ListableData(AnyListableData.parseFrom(protoBytes))
 }

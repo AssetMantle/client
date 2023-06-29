@@ -2,7 +2,7 @@ package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, IDData => protoIDData}
 import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
-import schema.data.ListableData
+import schema.data._
 import schema.id.base.{DataID, HashID, StringID}
 import schema.id.{ID, base}
 
@@ -10,11 +10,11 @@ case class IDData(value: ID) extends ListableData {
 
   def getID: ID = this.value
 
-  def getBondWeight: Int = schema.constants.Data.IDDataWeight
+  def getBondWeight: Int = constants.IDDataWeight
 
-  def getType: StringID = schema.constants.Data.IDDataTypeID
+  def getType: StringID = this.value.getType
 
-  def getDataID: DataID = base.DataID(typeID = schema.constants.Data.IDDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = base.DataID(typeID = this.getType, hashID = this.generateHashID)
 
   def getBytes: Array[Byte] = this.getID.getBytes
 
@@ -42,6 +42,4 @@ object IDData {
   def apply(value: protoIDData): IDData = IDData(ID(value.getValue))
 
   def apply(protoBytes: Array[Byte]): IDData = IDData(protoIDData.parseFrom(protoBytes))
-
-  //  def apply(anyID: AnyID): IDData = IDData(ID(anyID))
 }

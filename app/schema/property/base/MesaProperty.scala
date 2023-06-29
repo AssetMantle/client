@@ -36,4 +36,6 @@ object MesaProperty {
 
   def apply(id: PropertyID, data: Data): MesaProperty = MesaProperty(id, data.getDataID)
 
+  def apply(keyID: StringID, data: Data): MesaProperty = MesaProperty(id = PropertyID(keyID = keyID, typeID = data.getType), data.getDataID)
+
 }

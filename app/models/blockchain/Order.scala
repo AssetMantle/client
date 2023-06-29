@@ -54,7 +54,7 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
 
   def getExchangeRate: BigDecimal = {
     val property = this.getProperty(schema.constants.Properties.ExchangeRateProperty.getID)
-    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.constants.Data.ZeroDec
+    if (property.isDefined && property.get.isMeta) DecData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).getValue else schema.data.constants.ZeroDec
   }
 
   def getExpiryHeight: Long = {
@@ -184,7 +184,7 @@ class Orders @Inject()(
 
       val order = Order(id = orderID.getBytes, idString = orderID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(order)
-      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = schema.constants.ID.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = makerOwnableSplit)
+      val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = schema.constants.Document.OrderIdentityID, ownableID = OwnableID(msg.getMakerOwnableID), value = makerOwnableSplit)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
 
       for {
@@ -208,9 +208,9 @@ class Orders @Inject()(
       def transfer(order: Order) = {
         val transferMakerOwnableSplit = makerOwnableSplit - order.getMakerOwnableSplit
         if (transferMakerOwnableSplit < 0) {
-          blockchainSplits.Utility.transfer(fromID = schema.constants.ID.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit.abs)
+          blockchainSplits.Utility.transfer(fromID = schema.constants.Document.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit.abs)
         } else if (transferMakerOwnableSplit > 0) {
-          blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = schema.constants.ID.OrderIdentityID, ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit)
+          blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = schema.constants.Document.OrderIdentityID, ownableID = order.getMakerOwnableID, value = transferMakerOwnableSplit)
         } else Future()
       }
 
@@ -227,7 +227,7 @@ class Orders @Inject()(
       val orderID = OrderID(msg.getOrderID)
       val order = Service.tryGet(orderID)
 
-      def transfer(order: Order) = blockchainSplits.Utility.transfer(fromID = schema.constants.ID.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
+      def transfer(order: Order) = blockchainSplits.Utility.transfer(fromID = schema.constants.Document.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
 
       def updateUnbondAndDelete(order: Order) = {
         val delete = Service.delete(order.getID)
@@ -267,7 +267,7 @@ class Orders @Inject()(
         }
 
         val makerTransfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = order.getMakerID, ownableID = order.getTakerOwnableID, value = makerReceiveTakerOwnableSplit)
-        val takerTransfer = blockchainSplits.Utility.transfer(fromID = schema.constants.ID.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit)
+        val takerTransfer = blockchainSplits.Utility.transfer(fromID = schema.constants.Document.OrderIdentityID, toID = IdentityID(msg.getFromID), ownableID = order.getMakerOwnableID, value = takerReceiveMakerOwnableSplit)
 
         for {
           _ <- updateOrDelete
@@ -303,7 +303,7 @@ class Orders @Inject()(
       def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
         if (header.height.toLong >= order.getExpiryHeight) {
           val delete = Service.delete(order.getID)
-          val transferAux = blockchainSplits.Utility.transfer(fromID = schema.constants.ID.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
+          val transferAux = blockchainSplits.Utility.transfer(fromID = schema.constants.Document.OrderIdentityID, toID = order.getMakerID, ownableID = order.getMakerOwnableID, value = order.getMakerOwnableSplit)
           for {
             _ <- delete
             _ <- transferAux

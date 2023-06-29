@@ -2,15 +2,15 @@ package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, AccAddressData => protoAccAddressData}
 import com.google.protobuf.ByteString
-import schema.data.ListableData
+import schema.data._
 import schema.id.base.{DataID, HashID, StringID}
 
 case class AccAddressData(value: Array[Byte]) extends ListableData {
-  def getType: StringID = schema.constants.Data.AccAddressDataTypeID
+  def getType: StringID = constants.AccAddressDataTypeID
 
-  def getBondWeight: Int = schema.constants.Data.AccAddressBondWeight
+  def getBondWeight: Int = constants.AccAddressBondWeight
 
-  def getDataID: DataID = DataID(typeID = schema.constants.Data.AccAddressDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.AccAddressDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: AccAddressData = AccAddressData(Array[Byte]())
 

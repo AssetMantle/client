@@ -64,7 +64,4 @@ object PropertyList {
   def apply(properties: protoPropertyList): PropertyList = PropertyList(properties.getAnyPropertiesList.asScala.toSeq.map(x => Property(x)))
 
   def apply(protoBytes: Array[Byte]): PropertyList = PropertyList(protoPropertyList.parseFrom(protoBytes))
-
-  //  def apply(properties: Seq[AnyProperty]): PropertyList = PropertyList(properties.map(x => Property(x)))
-
 }

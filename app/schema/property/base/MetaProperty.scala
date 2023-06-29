@@ -39,4 +39,6 @@ object MetaProperty {
 
   def apply(protoBytes: Array[Byte]): MetaProperty = MetaProperty(protoMetaProperty.parseFrom(protoBytes))
 
+  def apply(keyID: StringID, data: Data): MetaProperty = MetaProperty(id = PropertyID(keyID = keyID, typeID = data.getType), data = data)
+
 }

@@ -1,13 +1,13 @@
 package schema.id.base
 
 import com.assetmantle.schema.ids.base.{AnyID, IdentityID => protoIdentityID}
-import schema.id.ID
+import schema.id._
 
 case class IdentityID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
-  def getType: StringID = schema.constants.ID.IdentityIDType
+  def getType: StringID = constants.IdentityIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 

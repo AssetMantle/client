@@ -2,13 +2,13 @@ package schema.id.base
 
 import com.google.protobuf.ByteString
 import com.assetmantle.schema.ids.base.{AnyID, HashID => protoHashId}
-import schema.id.ID
+import schema.id._
 
 case class HashID(value: Array[Byte]) extends ID {
 
   def getBytes: Array[Byte] = this.value
 
-  def getType: StringID = schema.constants.ID.HashIDType
+  def getType: StringID = constants.HashIDType
 
   def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
 

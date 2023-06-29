@@ -1,16 +1,16 @@
 package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, HeightData => protoHeightData}
-import schema.data.{Data, ListableData}
+import schema.data._
 import schema.id.base.{DataID, HashID, StringID}
 import schema.types.Height
 
 case class HeightData(value: Height) extends ListableData {
-  def getType: StringID = schema.constants.Data.HeightDataTypeID
+  def getType: StringID = constants.HeightDataTypeID
 
-  def getBondWeight: Int = schema.constants.Data.HeightDataWeight
+  def getBondWeight: Int = constants.HeightDataWeight
 
-  def getDataID: DataID = DataID(typeID = schema.constants.Data.HeightDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.HeightDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: Data = HeightData(Height(-1))
 

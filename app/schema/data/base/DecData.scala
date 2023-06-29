@@ -1,20 +1,20 @@
 package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, DecData => protoDecData}
-import schema.data.ListableData
+import schema.data._
 import schema.id.base.{DataID, HashID, StringID}
 
 case class DecData(value: BigDecimal) extends ListableData {
 
-  def toPlainString: String = schema.constants.Data.DecStringFormat.format(this.value)
+  def toPlainString: String = constants.DecStringFormat.format(this.value)
 
-  def getType: StringID = schema.constants.Data.DecDataTypeID
+  def getType: StringID = constants.DecDataTypeID
 
-  def getBondWeight: Int = schema.constants.Data.DecDataWeight
+  def getBondWeight: Int = constants.DecDataWeight
 
   def getValue: BigDecimal = this.value
 
-  def getDataID: DataID = DataID(typeID = schema.constants.Data.DecDataTypeID, hashID = this.generateHashID)
+  def getDataID: DataID = DataID(typeID = constants.DecDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: DecData = DecData(BigDecimal(0))
 
@@ -32,13 +32,13 @@ case class DecData(value: BigDecimal) extends ListableData {
 
   def viewString: String = "Decimal: " + this.toPlainString
 
-  def validSortable: Boolean = this.getValue.abs <= schema.constants.Data.DecDataMaxValue
+  def validSortable: Boolean = this.getValue.abs <= constants.DecDataMaxValue
 
   def getSortableDecBytes: Array[Byte] = {
     if (!this.validSortable) throw new IllegalArgumentException("INVALID_DEC_DATA_FOR_SORTED_BYTES")
     else {
-      if (this.getValue == schema.constants.Data.DecDataMaxValue) "max".getBytes
-      else if (this.getValue == (-1 * schema.constants.Data.DecDataMaxValue)) "--".getBytes
+      if (this.getValue == constants.DecDataMaxValue) "max".getBytes
+      else if (this.getValue == (-1 * constants.DecDataMaxValue)) "--".getBytes
       else {
         val f = java.lang.String.format("%18s", this.getValue.abs.toString.split("\\.").head).replace(" ", "0")
         val l = java.lang.String.format("%-18s", this.getValue.abs.toString.split("\\.").last).replace(" ", "0")
@@ -48,9 +48,9 @@ case class DecData(value: BigDecimal) extends ListableData {
     }
   }
 
-  def quotientTruncate(that: DecData): DecData = DecData(BigDecimal(((this.getValue * schema.constants.Data.DecFactor) / that.getValue).toBigInt) / schema.constants.Data.DecFactor)
+  def quotientTruncate(that: DecData): DecData = DecData(BigDecimal(((this.getValue * constants.DecFactor) / that.getValue).toBigInt) / constants.DecFactor)
 
-  def multiplyTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * schema.constants.Data.DecFactor * that.getValue).toBigInt) / schema.constants.Data.DecFactor)
+  def multiplyTruncate(that: DecData): DecData = DecData(BigDecimal((this.getValue * constants.DecFactor * that.getValue).toBigInt) / constants.DecFactor)
 }
 
 object DecData {

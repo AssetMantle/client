@@ -1,7 +1,6 @@
 package schema.id
 
 import com.assetmantle.schema.ids.base.AnyID
-import org.slf4j.{Logger, LoggerFactory}
 import schema.id.base._
 
 abstract class ID {
@@ -19,10 +18,6 @@ abstract class ID {
 }
 
 object ID {
-
-  private implicit val module: String = constants.Module.SCHEMA_ID
-
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def apply(anyID: AnyID): ID = anyID.getImplCase.getNumber match {
     case 1 => AssetID(anyID.getAssetID)

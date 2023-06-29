@@ -206,8 +206,9 @@ class Undelegations @Inject()(
         val (updatedValidator, removedTokens) = validator.removeDelegatorShares(shares)
         val deleteValidator = updatedValidator.delegatorShares == 0 && validator.isUnbonded
 
-        val deleteOrUpdateValidator = if (deleteValidator) blockchainValidators.Service.delete(validator.operatorAddress)
-        else blockchainValidators.Service.insertOrUpdate(updatedValidator)
+        //        val deleteOrUpdateValidator = if (deleteValidator) blockchainValidators.Service.delete(validator.operatorAddress)
+        //        else blockchainValidators.Service.insertOrUpdate(updatedValidator)
+        val deleteOrUpdateValidator = blockchainValidators.Service.insertOrUpdate(updatedValidator)
 
         val withdrawValidatorRewards = if (deleteValidator) blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(delegation.validatorAddress)) else Future()
 

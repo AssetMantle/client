@@ -245,16 +245,16 @@ class Validators @Inject()(
 
     def jailValidator(operatorAddress: String): Future[Int] = updateJailedStatus(operatorAddress = operatorAddress, jailed = true)
 
-    def delete(operatorAddress: String): Future[Unit] = {
-      val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
-
-      def deleteValidator() = deleteByOperatorAddress(operatorAddress)
-
-      for {
-        _ <- deleteKeyBaseAccount
-        _ <- deleteValidator()
-      } yield ()
-    }
+//    def delete(operatorAddress: String): Future[Unit] = {
+//      val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
+//
+//      def deleteValidator() = deleteByOperatorAddress(operatorAddress)
+//
+//      for {
+//        _ <- deleteKeyBaseAccount
+//        _ <- deleteValidator()
+//      } yield ()
+//    }
 
     def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
   }
@@ -376,7 +376,8 @@ class Validators @Inject()(
 
       def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
         if (header.height >= unbondingValidator.unbondingHeight && unbondingValidator.isUnbondingMatured(header.time)) {
-          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
+          //          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
+          val updateOrDeleteValidator = Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
           val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
 
           for {
@@ -388,7 +389,6 @@ class Validators @Inject()(
       })
 
       // Unbonding delegations updated in separate onNewBlock of Undelegations table
-
       for {
         unbondingValidators <- unbondingValidators
         _ <- checkAndUpdateUnbondingValidators(unbondingValidators)

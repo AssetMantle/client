@@ -3,16 +3,17 @@ package models.blockchain
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.data.{Data => abstractData}
+import schema.data.Data
 import schema.id.base.DataID
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+// TODO rename dataBytes to dataProtoBytes
 case class Meta(dataTypeID: String, dataHashID: Array[Byte], dataHashIDString: String, dataBytes: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[String, Array[Byte]] {
 
-  lazy val data: abstractData = abstractData(this.dataTypeID, this.dataBytes)
+  lazy val data: Data = Data(this.dataBytes)
 
   def id1: String = this.dataTypeID
 
@@ -63,9 +64,9 @@ class Metas @Inject()(
 
   object Service {
 
-    def add(data: abstractData): Future[Array[Byte]] = create(Meta(dataTypeID = data.getType.value, dataHashID = data.generateHashID.getBytes, dataHashIDString = data.generateHashID.asString, dataBytes = data.getProtoBytes)).map(_.dataHashID)
+    def add(data: Data): Future[Array[Byte]] = create(Meta(dataTypeID = data.getType.value, dataHashID = data.generateHashID.getBytes, dataHashIDString = data.generateHashID.asString, dataBytes = data.getProtoBytes)).map(_.dataHashID)
 
-    def add(datas: Seq[abstractData]): Future[Int] = create(datas.map(x => Meta(dataTypeID = x.getType.value, dataHashID = x.generateHashID.getBytes, dataHashIDString = x.generateHashID.asString, dataBytes = x.getProtoBytes)))
+    def add(datas: Seq[Data]): Future[Int] = create(datas.map(x => Meta(dataTypeID = x.getType.value, dataHashID = x.generateHashID.getBytes, dataHashIDString = x.generateHashID.asString, dataBytes = x.getProtoBytes)))
 
     def get(id: DataID): Future[Option[Meta]] = getById(id1 = id.typeID.value, id2 = id.hashID.getBytes)
 
@@ -76,7 +77,7 @@ class Metas @Inject()(
   object Utility {
 
     def onRevealMeta(msg: com.assetmantle.modules.metas.transactions.reveal.Message): Future[String] = {
-      val add = Service.add(abstractData(msg.getData))
+      val add = Service.add(Data(msg.getData))
 
       for {
         _ <- add

@@ -1,13 +1,13 @@
 package schema.id.base
 
 import com.assetmantle.schema.ids.base.{AnyID, AnyOwnableID, CoinID => protoCoinID}
-import schema.id.OwnableID
+import schema.id._
 
 case class CoinID(value: StringID) extends OwnableID {
 
   def getBytes: Array[Byte] = this.value.getBytes
 
-  def getType: StringID = schema.constants.ID.CoinIDType
+  def getType: StringID = constants.CoinIDType
 
   def asString: String = this.value.asString
 
